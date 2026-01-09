@@ -1,0 +1,1706 @@
+'use client';
+import { useState, useEffect } from 'react';
+
+const API_BASE = '';
+const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
+
+// ═══════════════════════════════════════════════════════════════
+// PACKS DE RUNAS (con URLs directas)
+// ═══════════════════════════════════════════════════════════════
+
+const PACKS_RUNAS = [
+  { nombre: 'Chispa', runas: 15, precio: 7, url: 'https://duendesuy.10web.cloud/producto/runas-chispa/', desc: 'Para empezar a explorar' },
+  { nombre: 'Destello', runas: 30, precio: 12, url: 'https://duendesuy.10web.cloud/producto/runas-destello/', desc: 'El más popular' },
+  { nombre: 'Fulgor', runas: 50, precio: 18, url: 'https://duendesuy.10web.cloud/producto/runas-fulgor/', desc: 'Para varias experiencias' },
+  { nombre: 'Resplandor', runas: 100, precio: 32, url: 'https://duendesuy.10web.cloud/producto/runas-resplandor/', desc: 'El mejor valor' }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// EXPERIENCIAS CON INFO COMPLETA Y HUMANA
+// ═══════════════════════════════════════════════════════════════
+
+const EXPERIENCIAS = [
+  { 
+    id: 'tirada-runas', 
+    nombre: 'Tirada de Runas', 
+    icono: 'ᚱ', 
+    runas: 5, 
+    treboles: 25, 
+    tiempo: '20-30 minutos', 
+    intro: `Las runas son un antiguo alfabeto nórdico que trasciende la escritura. Cada símbolo guarda energía, sabiduría y mensajes del universo. Cuando hacemos una tirada, no es azar - es sincronicidad pura.
+
+Yo (Gabriel o Thibisay, dependiendo de quién esté canalizando ese día) me siento en silencio, conecto con tu energía a través de tu pregunta, y dejo que las runas hablen. A veces el mensaje es directo; otras veces es simbólico y requiere interpretación.`,
+    queRecibis: ['Tirada de 3 runas con interpretación profunda', 'Mensaje canalizado específico para tu situación', 'Guía práctica de acción (qué hacer ahora)', 'Ritual opcional para potenciar el mensaje'],
+    paraQuien: 'Ideal si tenés una pregunta concreta, necesitás claridad sobre una decisión, o simplemente querés saber qué energía te rodea en este momento.',
+    campos: ['pregunta', 'contexto']
+  },
+  { 
+    id: 'susurro-guardian', 
+    nombre: 'Susurro del Guardián', 
+    icono: '✦', 
+    runas: 10, 
+    treboles: 50, 
+    tiempo: '40-60 minutos',
+    intro: `¿Estás mirando los guardianes de la tienda y no sabés cuál elegir? ¿Sentís que varios te llaman pero no podés decidirte? Este servicio existe exactamente para eso.
+
+Lo que hacemos es conectar con los guardianes que mencionás y dejar que ELLOS hablen. Porque recordá: el duende te elige a vos, no al revés. A veces pensamos que queremos uno y resulta que otro lleva tiempo esperándonos.`,
+    queRecibis: ['Conexión canalizada con los guardianes que mencionaste', 'Mensaje directo del guardián que resuena con vos', 'Explicación de por qué ÉL te eligió', 'Guía para preparar su llegada a tu hogar'],
+    paraQuien: 'Para vos que estás entre varios guardianes y necesitás esa confirmación. O si sentís el llamado pero no sabés por dónde empezar.',
+    campos: ['guardianes_interes', 'situacion', 'que_buscas'],
+    esElegirGuardian: true
+  },
+  { 
+    id: 'oraculo-mes', 
+    nombre: 'Oráculo del Mes', 
+    icono: '☽', 
+    runas: 12, 
+    treboles: 60, 
+    tiempo: '1-2 horas',
+    intro: `Cada mes trae su propia energía. Las fases lunares, los tránsitos planetarios, las estaciones... todo influye en cómo fluye nuestra vida. Este oráculo te da un mapa completo del mes que viene.
+
+No es una predicción rígida del futuro - es una guía de las energías disponibles y cómo aprovecharlas. Porque el futuro no está escrito; se co-crea entre el universo y tus decisiones.`,
+    queRecibis: ['Tirada de 5 runas para cada área de tu vida', 'Análisis de las fases lunares del mes', 'Días favorables marcados para diferentes actividades', 'Rituales específicos para cada semana', 'Cristales y elementos recomendados'],
+    paraQuien: 'Perfecto si te gusta planificar, si querés saber cuándo es mejor momento para iniciar proyectos, tener conversaciones difíciles, o simplemente fluir con la energía del mes.',
+    campos: ['mes', 'area_principal', 'situacion']
+  },
+  { 
+    id: 'gran-oraculo', 
+    nombre: 'El Gran Oráculo', 
+    icono: '★', 
+    runas: 20, 
+    treboles: 100, 
+    tiempo: '2-3 horas',
+    intro: `Esta es nuestra lectura más completa para quienes quieren ver el panorama grande. Tres meses de tu vida mapeados en detalle: amor, trabajo, salud, espiritualidad, desarrollo personal.
+
+Usamos una combinación de runas, numerología (por eso pedimos tu fecha de nacimiento) y canalización directa. El resultado es un documento extenso que vas a querer releer varias veces porque siempre encontrarás nuevos detalles.`,
+    queRecibis: ['Tirada de 7 runas maestras', 'Análisis numerológico personal', 'Mapa detallado de los próximos 3 meses', '3 rituales completamente personalizados', 'Cristales, hierbas y elementos específicos para tu camino'],
+    paraQuien: 'Para momentos de transición importante, inicio de año, cumpleaños, o cuando sentís que necesitás una visión amplia de hacia dónde va tu vida.',
+    campos: ['fecha_nacimiento', 'hora_nacimiento', 'lugar_nacimiento', 'pregunta_principal']
+  },
+  { 
+    id: 'lectura-alma', 
+    nombre: 'Lectura del Alma', 
+    icono: '◈', 
+    runas: 25, 
+    treboles: 125, 
+    tiempo: '4-6 horas',
+    intro: `¿Alguna vez sentiste que hay algo más grande esperándote? ¿Que viniste a este mundo con un propósito que todavía no terminás de descifrar? Esta lectura va a las profundidades de tu ser.
+
+Trabajamos con tu número de vida (calculado desde tu fecha de nacimiento), patrones que se repiten en tu historia, y canalización profunda para revelar tu misión de alma. No es solo "qué vas a ser" - es "quién viniste a ser".`,
+    queRecibis: ['Tu número de vida y su significado completo', 'Misión de alma revelada', 'Patrones kármicos que estás trabajando', 'Dones innatos que podés desarrollar', 'Guía detallada para los próximos 6 meses', 'Meditación personalizada grabada'],
+    paraQuien: 'Para quienes sienten el llamado espiritual fuerte, están en búsqueda de propósito, o atraviesan una "crisis" que en realidad es un despertar.',
+    campos: ['fecha_nacimiento', 'hora_nacimiento', 'lugar_nacimiento', 'nombre_completo', 'patrones_repetitivos']
+  },
+  { 
+    id: 'registros-akashicos', 
+    nombre: 'Registros Akáshicos', 
+    icono: '∞', 
+    runas: 35, 
+    treboles: 175, 
+    tiempo: '6-8 horas',
+    intro: `Los Registros Akáshicos son la biblioteca cósmica donde está guardada toda la información de tu alma a través de todas sus encarnaciones. Acceder a ellos es como abrir el libro de tu existencia eterna.
+
+Este proceso es sagrado y profundo. Requiere preparación tanto de nuestra parte como tuya. El resultado es información de vidas pasadas que explican patrones actuales, contratos álmicos que tenés vigentes, y mensajes directos de tus guías y maestros ascendidos.`,
+    queRecibis: ['Apertura ceremonial de tus registros', 'Información de 3 vidas pasadas relevantes para tu presente', 'Contratos álmicos actuales y cómo trabajarlos', 'Mensajes de tus guías y maestros', 'Karma pendiente y guía para resolverlo', 'Tu misión específica en esta vida', 'Ritual de integración'],
+    paraQuien: 'Para almas maduras en el camino espiritual, quienes sienten conexiones inexplicables con épocas o lugares, o quienes quieren entender el "por qué" profundo de sus experiencias.',
+    campos: ['fecha_nacimiento', 'hora_nacimiento', 'lugar_nacimiento', 'nombre_completo', 'miedos_inexplicables', 'atracciones_epocas']
+  },
+  { 
+    id: 'carta-ancestral', 
+    nombre: 'Carta Ancestral', 
+    icono: '❧', 
+    runas: 15, 
+    treboles: 75, 
+    tiempo: '1-2 horas',
+    intro: `Tus ancestros no se fueron del todo. Su sangre corre por tus venas, sus memorias están en tu ADN, y su amor te acompaña aunque no los veas. Esta carta es un puente hacia ellos.
+
+Canalizamos mensajes de tu linaje - pueden ser abuelos que conociste, bisabuelos que no, o ancestros más antiguos que tienen algo que decirte. A veces traen bendiciones; otras veces, advertencias cariñosas; siempre, amor.`,
+    queRecibis: ['Mensaje canalizado directamente de tu linaje', 'Activación de protección ancestral', 'Bendiciones de línea familiar', 'Patrones heredados que podés sanar', 'Dones ancestrales que podés recuperar', 'Ritual de ofrenda sugerido para honrarlos'],
+    paraQuien: 'Para quienes sienten conexión con sus raíces, perdieron seres queridos y quieren reconectar, o notan patrones familiares que quieren entender y sanar.',
+    campos: ['nombre_ancestro', 'nacionalidades', 'patrones_familia']
+  },
+  { 
+    id: 'mapa-energetico', 
+    nombre: 'Mapa Energético', 
+    icono: '◎', 
+    runas: 18, 
+    treboles: 90, 
+    tiempo: '2-3 horas',
+    intro: `Tu cuerpo físico es solo la capa más densa de quien sos. Alrededor y a través de él fluye tu cuerpo energético: chakras, aura, meridianos. Cuando algo está mal energéticamente, eventualmente se manifiesta en lo físico o emocional.
+
+Este mapa es un diagnóstico completo. Escaneamos tu campo, identificamos dónde hay bloqueos, fugas, o desequilibrios, y te damos un plan concreto para limpiarte y reequilibrarte.`,
+    queRecibis: ['Análisis detallado de tus 7 chakras principales', 'Bloqueos específicos identificados con su origen probable', 'Fugas energéticas y cómo sellarlas', 'Plan de limpieza día a día por 21 días', 'Cristales recomendados para cada chakra', 'Ejercicios energéticos diarios', 'Afirmaciones personalizadas'],
+    paraQuien: 'Para quienes sienten cansancio inexplicable, bloqueos creativos o emocionales, sensación de estancamiento, o simplemente quieren un "chequeo energético".',
+    campos: ['sintomas_fisicos', 'sintomas_emocionales', 'areas_bloqueadas']
+  },
+  { 
+    id: 'pregunta-especifica', 
+    nombre: 'Pregunta Específica', 
+    icono: '?', 
+    runas: 8, 
+    treboles: 40, 
+    tiempo: '30-45 minutos',
+    intro: `A veces no necesitás un análisis extenso. Necesitás UNA respuesta. Esa pregunta que te da vueltas en la cabeza, que no te deja dormir, que necesitás resolver para poder avanzar.
+
+Este servicio es directo y al punto. Hacés tu pregunta, canalizamos la respuesta, te la damos sin vueltas. Sí, no, cómo, cuándo, qué hacer. Claridad pura.`,
+    queRecibis: ['Respuesta canalizada directa y clara', 'Pros y contras revelados', 'Consejo de acción específico', 'Timing sugerido (cuándo actuar)', 'Posibles obstáculos y cómo superarlos'],
+    paraQuien: 'Para decisiones puntuales: ¿acepto ese trabajo?, ¿termino esta relación?, ¿me mudo?, ¿empiezo ese proyecto? Preguntas concretas, respuestas concretas.',
+    campos: ['pregunta', 'contexto', 'opciones', 'deadline']
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// CANJES (con IDs para API)
+// ═══════════════════════════════════════════════════════════════
+
+const CANJES = [
+  { id: 'cupon-5', nombre: 'Cupón 5%', treboles: 30, desc: 'Válido en cualquier guardián', tipo: 'cupon', valor: 5 },
+  { id: 'cupon-10', nombre: 'Cupón 10%', treboles: 60, desc: 'Compras +$50 USD', tipo: 'cupon', valor: 10, minCompra: 50 },
+  { id: 'cupon-15', nombre: 'Cupón 15%', treboles: 100, desc: 'Compras +$100 USD', tipo: 'cupon', valor: 15, minCompra: 100 },
+  { id: 'cupon-20', nombre: 'Cupón 20%', treboles: 150, desc: 'Compras +$150 USD', tipo: 'cupon', valor: 20, minCompra: 150 },
+  { id: 'envio-gratis', nombre: 'Envío Gratis', treboles: 100, desc: 'Pedido nacional', tipo: 'envio' },
+  { id: 'envio-int', nombre: 'Desc. Envío Int.', treboles: 80, desc: '-$15 USD en envío', tipo: 'envio-int' },
+  { id: 'mini-guardian', nombre: 'Mini Guardián', treboles: 150, desc: 'Pequeño protector', tipo: 'producto' },
+  { id: 'cristal', nombre: 'Cristal Sorpresa', treboles: 50, desc: 'Cristal pulido', tipo: 'producto' },
+  { id: 'tirada-gratis', nombre: 'Tirada Gratis', treboles: 25, desc: 'Sin usar runas', tipo: 'lectura' }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// MEMBRESÍAS CÍRCULO (info completa desplegable)
+// ═══════════════════════════════════════════════════════════════
+
+const MEMBRESIAS = [
+  { nombre: 'Mensual', precio: 9.99, precioUY: 450, dias: 30, url: 'https://duendesuy.10web.cloud/producto/circulo-mensual/' },
+  { nombre: 'Trimestral', precio: 24.99, precioUY: 1150, dias: 90, ahorro: '17%', url: 'https://duendesuy.10web.cloud/producto/circulo-trimestral/' },
+  { nombre: 'Semestral', precio: 44.99, precioUY: 2050, dias: 180, ahorro: '25%', url: 'https://duendesuy.10web.cloud/producto/circulo-semestral/' },
+  { nombre: 'Anual', precio: 79.99, precioUY: 3650, dias: 365, ahorro: '33%', url: 'https://duendesuy.10web.cloud/producto/circulo-anual/' }
+];
+
+const CIRCULO_CONTENIDO = {
+  beneficios: [
+    { icono: "◈", titulo: "15% descuento permanente", desc: "En absolutamente todos los guardianes y productos de la tienda, siempre, sin mínimo de compra." },
+    { icono: "✦", titulo: "Acceso anticipado 48hs", desc: "Ves los nuevos guardianes 48 horas antes de que se publiquen. Reservá los que te llaman antes que nadie." },
+    { icono: "ᚱ", titulo: "1 lectura gratis al mes", desc: "Cada mes podés elegir una Tirada de Runas o una Pregunta Específica sin gastar runas." },
+    { icono: "☽", titulo: "Guía lunar mensual", desc: "Documento completo con las energías de cada fase lunar del mes y rituales sugeridos." },
+    { icono: "❧", titulo: "DIY mágicos mensuales", desc: "Proyectos para hacer en casa: crear tu altar, hacer velas rituales, preparar aguas mágicas, etc." },
+    { icono: "◎", titulo: "Meditaciones guiadas", desc: "Audios exclusivos para conectar con tu guardián, limpiar chakras, y más." },
+    { icono: "★", titulo: "Contenido semanal", desc: "Cada semana nuevo contenido: mini-lecturas colectivas, tips, información esotérica." },
+    { icono: "?", titulo: "Tus preguntas respondidas", desc: "Mandás tus dudas y las respondemos en los contenidos semanales." }
+  ],
+  temas: [
+    "Calendario esotérico completo: Samhain, Yule, Imbolc, Ostara, Beltane, Litha, Lughnasadh, Mabon",
+    "Fases lunares: qué hacer en cada una, rituales específicos",
+    "Cristales: propiedades de más de 50 piedras, cómo limpiarlas, programarlas y usarlas",
+    "Tarot para principiantes: significado de las cartas, tiradas básicas",
+    "Runas: historia, significado de cada una, cómo hacer tu propio set",
+    "Cómo crear tu altar personal paso a paso",
+    "Rituales de protección para el hogar",
+    "Trabajo con los 4 elementos: ejercicios prácticos",
+    "Conexión con guías espirituales y ancestros",
+    "Limpieza energética: técnicas avanzadas",
+    "Magia de las velas: colores, días, intenciones",
+    "Herbolaria mágica: plantas, usos, preparaciones",
+    "Desarrollo de la intuición: ejercicios diarios"
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+// OPCIONES DE DIARIO (expandidas)
+// ═══════════════════════════════════════════════════════════════
+
+const TIPOS_DIARIO = [
+  { id: 'reflexion', n: 'Reflexión personal', i: '✦', desc: 'Pensamientos, insights, lo que tengas en mente' },
+  { id: 'senal', n: 'Recibí una señal', i: '◈', desc: 'Algo que interpretaste como mensaje' },
+  { id: 'sueno', n: 'Tuve un sueño', i: '☽', desc: 'Sueños que quieras recordar o interpretar' },
+  { id: 'sincronicidad', n: 'Sincronicidad', i: '∞', desc: 'Coincidencias significativas' },
+  { id: 'mensaje', n: 'Mensaje de mi guardián', i: '❧', desc: 'Comunicación que percibiste' },
+  { id: 'ritual', n: 'Hice un ritual', i: '◎', desc: 'Rituales, limpiezas, meditaciones' },
+  { id: 'gratitud', n: 'Gratitud', i: '♥', desc: 'Lo que agradecés hoy' },
+  { id: 'intencion', n: 'Intención/manifestación', i: '★', desc: 'Lo que querés atraer' },
+  { id: 'sanacion', n: 'Proceso de sanación', i: '✚', desc: 'Avances en tu camino de sanación' },
+  { id: 'libre', n: 'Escritura libre', i: '✎', desc: 'Lo que quieras, sin categoría' }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// SISTEMA DE RANGOS
+// ═══════════════════════════════════════════════════════════════
+
+const RANGOS = [
+  { id: 'semilla', nombre: 'Semilla Mágica', min: 0, icono: '🌱', color: '#90EE90', beneficio: 'Bienvenida al mundo elemental' },
+  { id: 'brote', nombre: 'Brote de Luz', min: 50, icono: '🌿', color: '#98FB98', beneficio: '+5% tréboles extra' },
+  { id: 'aprendiz', nombre: 'Aprendiz Elemental', min: 150, icono: '✨', color: '#d4af37', beneficio: '1 tirada gratis' },
+  { id: 'guardian', nombre: 'Guardiana del Bosque', min: 300, icono: '🌳', color: '#228B22', beneficio: '10% descuento' },
+  { id: 'hechicera', nombre: 'Hechicera de Cristal', min: 500, icono: '💎', color: '#9b59b6', beneficio: 'Acceso 72hs antes' },
+  { id: 'alquimista', nombre: 'Alquimista del Alba', min: 800, icono: '⚗️', color: '#e74c3c', beneficio: '15% + 1 lectura/mes' },
+  { id: 'maestra', nombre: 'Maestra Elemental', min: 1200, icono: '👑', color: '#f39c12', beneficio: 'Todo + sorpresas' }
+];
+
+const getRango = (gastado) => {
+  const g = gastado || 0;
+  for (let i = RANGOS.length - 1; i >= 0; i--) {
+    if (g >= RANGOS[i].min) return RANGOS[i];
+  }
+  return RANGOS[0];
+};
+
+const getSiguienteRango = (gastado) => {
+  const g = gastado || 0;
+  for (let i = 0; i < RANGOS.length; i++) {
+    if (g < RANGOS[i].min) return RANGOS[i];
+  }
+  return null;
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MUNDO ELEMENTAL (resumido para espacio)
+// ═══════════════════════════════════════════════════════════════
+
+const MUNDO_ELEMENTAL = {
+  intro: { titulo: "El Reino Elemental", texto: `El Reino Elemental es el mundo invisible que coexiste con el nuestro. Es el plano donde habitan los seres de naturaleza, aquellos que los antiguos llamaban "los que están entre mundos".
+
+Cada cultura los ha conocido: los celtas hablaban del Pueblo de las Hadas, los nórdicos de los Alfar, los griegos de Ninfas y Dríades. Todos describían lo mismo: seres de luz que custodian los secretos de la naturaleza.
+
+En Duendes del Uruguay trabajamos principalmente con los seres de Tierra - duendes, gnomos y guardianes - porque son los más afines a la vida humana.` },
+  elementales: [
+    { elemento: "Tierra", nombre: "Duendes y Gnomos", icono: "◆", color: "#8B4513", desc: "Los más cercanos a los humanos. Guardianes de hogares y tesoros.", conectar: "Cristales, plantas, figuras canalizadas." },
+    { elemento: "Agua", nombre: "Ondinas y Ninfas", icono: "≋", color: "#1E90FF", desc: "Trabajan emociones, intuición y sueños.", conectar: "Agua bendecida, fuentes, rituales lunares." },
+    { elemento: "Fuego", nombre: "Salamandras", icono: "🔥", color: "#FF4500", desc: "Pura energía transformadora. Transmutan lo negativo.", conectar: "Velas, incienso, luz solar." },
+    { elemento: "Aire", nombre: "Silfos", icono: "❋", color: "#87CEEB", desc: "Mensajeros, inspiración, claridad mental.", conectar: "Viento, plumas, campanas, música." }
+  ],
+  duendes: { titulo: "Los Duendes", texto: `Los duendes son seres de energía que han elegido vibrar cerca del plano físico. Pueden manifestarse moviendo objetos, creando sonidos, enviando señales, y habitando objetos físicos como nuestros guardianes.
+
+Tienen personalidades definidas: algunos traviesos, otros serios. Pero todos son leales con quienes les tratan bien y tienen conexión especial con niños y animales.` },
+  alquimia: { titulo: "Alquimia y Piriápolis", texto: `La alquimia no era solo convertir plomo en oro. Era una ciencia espiritual que entendía la conexión entre elementos, planetas, alma humana y seres invisibles.
+
+Piriápolis fue fundada por Francisco Piria siguiendo principios alquímicos. Eligió este punto por su configuración energética única: el encuentro del mar con las sierras crea un vórtice donde el velo entre mundos es más delgado. Es acá donde Gabriel canaliza a los guardianes.` }
+};
+
+const CUIDADOS = [
+  { titulo: "Ritual de Bienvenida", texto: "Dejalo reposar unas horas, luego en calma: lavá tus manos con sal, encendé vela blanca, abrilo con reverencia, presentate y escuchá.", items: ["Lavá manos con agua y sal", "Encendé vela blanca o dorada", "Abrí con reverencia", "Presentate y escuchá en silencio"] },
+  { titulo: "Espacio Sagrado", texto: "Necesita un lugar propio, elevado, limpio. Que pueda 'ver' lo que protege.", items: ["Evitá ruido y tránsito", "Nunca en el piso", "Protectores: cerca de la entrada", "Abundancia: cerca de donde manejás dinero"] },
+  { titulo: "Limpieza Energética Semanal", texto: "Absorbe energías densas para protegerte. Necesita limpieza regular.", items: ["Humo de salvia o palo santo", "Luz de luna llena", "Agua con sal marina (rociar)", "Sonido de cuenco o campana"] },
+  { titulo: "Comunicación", texto: "Hablale diariamente, en voz alta o mental.", items: ["Buenos días al levantarte", "Pedí protección antes de salir", "Agradecé cada noche", "Celebrá logros con él"] },
+  { titulo: "Ofrendas de Alta Vibración", texto: "Fortalecen el vínculo. Cosas naturales y de alta energía.", items: ["Flores frescas", "Cristales pequeños", "Agua fresca", "Luz de vela", "Incienso de calidad"] },
+  { titulo: "⚠️ QUÉ NO HACER", texto: "Esto baja la vibración o rompe el vínculo.", items: ["NUNCA dulces ni azúcar", "NUNCA alcohol", "No guardarlo en cajones", "No exponerlo a peleas", "No prestarlo", "No ignorarlo mucho tiempo"], esProhibido: true }
+];
+
+const CRISTALES = [
+  { nombre: "Amatista", color: "#9b59b6", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol." },
+  { nombre: "Cuarzo Rosa", color: "#f8bbd9", props: "Amor, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
+  { nombre: "Citrino", color: "#f4d03f", props: "Abundancia, alegría", cuidado: "Auto-limpiante. Carga al sol." },
+  { nombre: "Turmalina Negra", color: "#2c3e50", props: "Protección máxima", cuidado: "Enterrar en sal o tierra." },
+  { nombre: "Labradorita", color: "#3498db", props: "Magia, transformación", cuidado: "Bajo las estrellas." },
+  { nombre: "Cuarzo Transparente", color: "#ecf0f1", props: "Amplificador universal", cuidado: "Acepta todo. Limpiar seguido." },
+  { nombre: "Selenita", color: "#f5f5f5", props: "Limpieza, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
+  { nombre: "Ojo de Tigre", color: "#b8860b", props: "Coraje, prosperidad", cuidado: "Sol de mañana." }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// COMPONENTE PRINCIPAL
+// ═══════════════════════════════════════════════════════════════
+
+export default function MiMagia() {
+  const [usuario, setUsuario] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [seccion, setSeccion] = useState('inicio');
+  const [onboarding, setOnboarding] = useState(false);
+  const [chatAbierto, setChatAbierto] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [token, setToken] = useState('');
+  const [pais, setPais] = useState('UY');
+
+  useEffect(() => { cargarUsuario(); detectarPais(); }, []);
+
+  const detectarPais = async () => {
+    try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); setPais(data.country_code || 'UY'); } catch(e) { setPais('UY'); }
+  };
+
+  const cargarUsuario = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('token');
+    if (!t) { window.location.href = 'https://duendesuy.10web.cloud'; return; }
+    setToken(t);
+    try {
+      const res = await fetch(`${API_BASE}/api/mi-magia/usuario?token=${t}`);
+      const data = await res.json();
+      if (data.success && data.usuario) {
+        setUsuario(data.usuario);
+        if (!data.usuario.onboardingCompleto) setOnboarding(true);
+      } else { window.location.href = 'https://duendesuy.10web.cloud'; }
+    } catch (e) { console.error(e); }
+    setCargando(false);
+  };
+
+  if (cargando) return <Carga />;
+  if (onboarding) return <Onboarding usuario={usuario} token={token} onDone={(d) => { setUsuario({...usuario, ...d, onboardingCompleto: true, runas: 50}); setOnboarding(false); }} />;
+
+  const renderSeccion = () => {
+    switch(seccion) {
+      case 'inicio': return <Inicio usuario={usuario} ir={setSeccion} />;
+      case 'canalizaciones': return <Canalizaciones usuario={usuario} />;
+      case 'jardin': return <Jardin usuario={usuario} setUsuario={setUsuario} pais={pais} token={token} />;
+      case 'experiencias': return <SeccionExperiencias usuario={usuario} setUsuario={setUsuario} />;
+      case 'regalos': return <Regalos ir={setSeccion} />;
+      case 'mundo': return <MundoSec />;
+      case 'cuidados': return <CuidadosSec />;
+      case 'cristales': return <CristalesSec />;
+      case 'circulo': return <CirculoSec usuario={usuario} setUsuario={setUsuario} token={token} pais={pais} />;
+      case 'grimorio': return <GrimorioSec usuario={usuario} token={token} setUsuario={setUsuario} />;
+      default: return <Inicio usuario={usuario} ir={setSeccion} />;
+    }
+  };
+
+  return (
+    <div className="app">
+      <style jsx global>{estilos}</style>
+      <header className="header">
+        <div className="logo"><span>✦</span> MI MAGIA</div>
+        <div className="user-info">Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'}, {usuario?.nombrePreferido}</div>
+        <div className="hstats"><span>☘ {usuario?.treboles || 0}</span><span>ᚱ {usuario?.runas || 0}</span></div>
+        <button className="menu-btn" onClick={() => setMenuAbierto(!menuAbierto)}><span></span><span></span><span></span></button>
+      </header>
+      
+      <nav className={`nav ${menuAbierto ? 'abierto' : ''}`}>
+        {[['inicio','◇','Inicio'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['regalos','❤','Regalos']].map(([k,i,t]) => 
+          <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
+        )}
+        <div className="nav-sep">El Mundo Elemental</div>
+        {[['mundo','◈','Reino Elemental'],['cuidados','❧','Cuidados'],['cristales','◎','Cristales']].map(([k,i,t]) => 
+          <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
+        )}
+        <div className="nav-sep">Tu Espacio</div>
+        {[['circulo','★','Círculo'],['grimorio','▣','Grimorio']].map(([k,i,t]) => 
+          <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
+        )}
+        <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="nav-volver">↗ Ir a la tienda</a>
+      </nav>
+      
+      <main className="contenido">{renderSeccion()}</main>
+      <Tito usuario={usuario} abierto={chatAbierto} setAbierto={setChatAbierto} />
+    </div>
+  );
+}
+
+function Carga() {
+  return <div className="carga"><style jsx global>{estilos}</style><div className="carga-c"><div className="carga-runa">ᚱ</div><p>Preparando tu magia...</p></div></div>;
+}
+
+function Onboarding({ usuario, token, onDone }) {
+  const [paso, setPaso] = useState(1);
+  const [datos, setDatos] = useState({ nombrePreferido: usuario?.nombre || '', pronombre: 'ella', intereses: [], moneda: 'USD', cumpleanos: '' });
+  const ints = ['Protección', 'Abundancia', 'Amor', 'Sanación', 'Espiritualidad', 'Paz mental', 'Creatividad', 'Autoconocimiento'];
+  
+  const guardar = async () => {
+    try { await fetch(`${API_BASE}/api/mi-magia/onboarding`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, ...datos }) }); } catch(e) {}
+    onDone(datos);
+  };
+  
+  return (
+    <div className="onb"><style jsx global>{estilos}</style>
+      <div className="onb-card">
+        <div className="onb-header"><span>✦</span><h2>¡Bienvenida a Mi Magia!</h2><p>Personalizá tu espacio en 5 pasos</p></div>
+        <div className="onb-prog">{[1,2,3,4,5].map(p => <div key={p} className={`prog-p ${paso >= p ? 'act' : ''}`}>{p}</div>)}</div>
+        
+        {paso === 1 && (
+          <div className="onb-paso">
+            <h3>¿Cómo te llamamos?</h3>
+            <p className="onb-sub">Este nombre aparecerá en tus lecturas y comunicaciones</p>
+            <input type="text" value={datos.nombrePreferido} onChange={e => setDatos({...datos, nombrePreferido: e.target.value})} placeholder="Tu nombre preferido" />
+          </div>
+        )}
+        
+        {paso === 2 && (
+          <div className="onb-paso">
+            <h3>¿Qué pronombre preferís?</h3>
+            <p className="onb-sub">Para personalizar los mensajes</p>
+            <div className="prons">
+              {['ella', 'el', 'elle'].map(p => (
+                <button key={p} className={`pron ${datos.pronombre === p ? 'act' : ''}`} onClick={() => setDatos({...datos, pronombre: p})}>
+                  {p === 'ella' ? 'Ella' : p === 'el' ? 'Él' : 'Elle'}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {paso === 3 && (
+          <div className="onb-paso">
+            <h3>¿En qué moneda preferís ver los precios?</h3>
+            <p className="onb-sub">Podés cambiarlo después en configuración</p>
+            <div className="monedas">
+              <button className={`moneda ${datos.moneda === 'UYU' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'UYU'})}>
+                <span>🇺🇾</span>
+                <strong>Pesos Uruguayos</strong>
+                <small>UYU $</small>
+              </button>
+              <button className={`moneda ${datos.moneda === 'USD' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'USD'})}>
+                <span>🌎</span>
+                <strong>Dólares</strong>
+                <small>USD $</small>
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {paso === 4 && (
+          <div className="onb-paso">
+            <h3>¿Qué te interesa?</h3>
+            <p className="onb-sub">Elegí todo lo que resuene (opcional)</p>
+            <div className="ints">
+              {ints.map(i => (
+                <button key={i} className={`int ${datos.intereses.includes(i) ? 'act' : ''}`} onClick={() => setDatos({...datos, intereses: datos.intereses.includes(i) ? datos.intereses.filter(x=>x!==i) : [...datos.intereses, i]})}>
+                  {i}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {paso === 5 && (
+          <div className="onb-paso">
+            <h3>¡Todo listo!</h3>
+            <div className="regalo-box">
+              <span>🎁</span>
+              <p>Tu regalo de bienvenida:</p>
+              <strong>50 Runas de Poder</strong>
+              <small>Para que explores las experiencias mágicas</small>
+            </div>
+            <div className="resumen-onb">
+              <p>Vas a entrar como <strong>{datos.nombrePreferido}</strong></p>
+              <p>Precios en <strong>{datos.moneda === 'UYU' ? 'Pesos Uruguayos' : 'Dólares'}</strong></p>
+            </div>
+          </div>
+        )}
+        
+        <div className="onb-btns">
+          {paso > 1 && <button className="btn-sec" onClick={() => setPaso(paso-1)}>Atrás</button>}
+          {paso < 5 && <button className="btn-pri" onClick={() => setPaso(paso+1)} disabled={paso === 1 && !datos.nombrePreferido}>Continuar</button>}
+          {paso === 5 && <button className="btn-gold" onClick={guardar}>Entrar a Mi Magia ✦</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INICIO
+// ═══════════════════════════════════════════════════════════════
+
+function Inicio({ usuario, ir }) {
+  const rango = getRango(usuario?.gastado);
+  const siguiente = getSiguienteRango(usuario?.gastado);
+  const progreso = siguiente ? ((usuario?.gastado || 0) / siguiente.min) * 100 : 100;
+  
+  return (
+    <div className="sec">
+      <div className="banner">
+        <div className="banner-rango">
+          <span className="rango-icono">{rango.icono}</span>
+          <div className="rango-info">
+            <span className="rango-nombre">{rango.nombre}</span>
+            <span className="rango-ben">{rango.beneficio}</span>
+          </div>
+        </div>
+        <h1>Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'} de vuelta, {usuario?.nombrePreferido}</h1>
+        <p>Tu santuario personal donde la magia cobra vida.</p>
+        {siguiente && (
+          <div className="progreso-rango">
+            <div className="progreso-bar"><div className="progreso-fill" style={{width: `${Math.min(progreso, 100)}%`}}></div></div>
+            <small>${usuario?.gastado || 0} / ${siguiente.min} para {siguiente.icono} {siguiente.nombre}</small>
+          </div>
+        )}
+      </div>
+      
+      <div className="stats-g">
+        <div className="stat-c" onClick={() => ir('canalizaciones')}><div className="stat-n">{(usuario?.guardianes?.length || 0) + (usuario?.lecturas?.length || 0)}</div><div className="stat-t">Canalizaciones</div></div>
+        <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.treboles || 0}</div><div className="stat-t">Tréboles</div></div>
+        <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.runas || 0}</div><div className="stat-t">Runas</div></div>
+        <div className="stat-c" onClick={() => ir('grimorio')}><div className="stat-n">{usuario?.diario?.length || 0}</div><div className="stat-t">Entradas</div></div>
+      </div>
+      
+      <div className="accesos-g">
+        <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Experiencias Mágicas</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
+        <button className="acceso" onClick={() => ir('mundo')}><span>◈</span><strong>Reino Elemental</strong><small>Duendes, hadas, elementales, alquimia</small></button>
+        <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalá Magia</strong><small>Experiencias, guardianes, runas</small></button>
+      </div>
+      
+      {!usuario?.esCirculo && (
+        <div className="banner-circ" onClick={() => ir('circulo')}><span>★</span><div><h3>Círculo de Duendes</h3><p>15 días gratis. Descuentos, lecturas mensuales, contenido exclusivo.</p></div><span className="badge">PROBAR</span></div>
+      )}
+      
+      <div className="info-box">
+        <h3>¿Cómo funciona Mi Magia?</h3>
+        <div className="info-grid">
+          <div><span>☘</span><h4>Tréboles</h4><p>Se ganan comprando ({usuario?.moneda === 'UYU' ? '$400 UYU' : '$10 USD'} = 1). Canjealos por descuentos, envíos gratis, regalos.</p></div>
+          <div><span>ᚱ</span><h4>Runas</h4><p>Se compran o ganan. Para experiencias mágicas personalizadas.</p></div>
+          <div><span>▣</span><h4>Grimorio</h4><p>Tus lecturas guardadas para siempre + tu diario espiritual.</p></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MIS CANALIZACIONES (antes Santuario)
+// ═══════════════════════════════════════════════════════════════
+
+function Canalizaciones({ usuario }) {
+  const [tab, setTab] = useState('guardianes');
+  
+  const guardianes = usuario?.guardianes || [];
+  const talismanes = usuario?.talismanes || [];
+  const libros = usuario?.libros || [];
+  const lecturas = usuario?.lecturas || [];
+  const regalosHechos = usuario?.regalosHechos || [];
+  const regalosRecibidos = usuario?.regalosRecibidos || [];
+  
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>Mis Canalizaciones</h1><p>Todo lo que ha llegado a tu vida desde el mundo elemental.</p></div>
+      
+      <div className="tabs-h">
+        {[['guardianes','◆','Guardianes'],['talismanes','✧','Talismanes'],['libros','📖','Libros'],['lecturas','✦','Lecturas'],['regalosH','❤↗','Regalos Hechos'],['regalosR','❤↙','Regalos Recibidos']].map(([k,i,t]) => 
+          <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}>{i} {t}</button>
+        )}
+      </div>
+      
+      {tab === 'guardianes' && (
+        <div className="cana-content">
+          {guardianes.length > 0 ? (
+            <div className="items-grid">{guardianes.map((g,i) => <div key={i} className="item-card"><div className="item-img">{g.imagen ? <img src={g.imagen} alt={g.nombre} /> : <span>◆</span>}</div><h4>{g.nombre}</h4><small>{g.tipo} • {g.fecha}</small></div>)}</div>
+          ) : (
+            <div className="empty-tab">
+              <span>◆</span>
+              <h3>Tus guardianes te esperan</h3>
+              <p>Cuando adoptes tu primer guardián, aparecerá acá con toda su información, su historia y cómo cuidarlo.</p>
+              <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-gold">Explorar Guardianes ↗</a>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {tab === 'talismanes' && (
+        <div className="cana-content">
+          {talismanes.length > 0 ? (
+            <div className="items-grid">{talismanes.map((t,i) => <div key={i} className="item-card"><h4>{t.nombre}</h4><small>{t.fecha}</small></div>)}</div>
+          ) : (
+            <div className="empty-tab"><span>✧</span><h3>Sin talismanes aún</h3><p>Los talismanes son piezas especiales con propósitos específicos.</p></div>
+          )}
+        </div>
+      )}
+      
+      {tab === 'libros' && (
+        <div className="cana-content">
+          {libros.length > 0 ? (
+            <div className="items-grid">{libros.map((l,i) => <div key={i} className="item-card"><h4>{l.nombre}</h4><small>{l.fecha}</small></div>)}</div>
+          ) : (
+            <div className="empty-tab"><span>📖</span><h3>Sin libros digitales</h3><p>Próximamente tendremos guías y libros digitales sobre el mundo elemental.</p></div>
+          )}
+        </div>
+      )}
+      
+      {tab === 'lecturas' && (
+        <div className="cana-content">
+          {lecturas.length > 0 ? (
+            <div className="lecturas-list">{lecturas.map((l,i) => <div key={i} className="lectura-item"><span className="lec-fecha">{l.fecha}</span><h4>{l.tipo}</h4><p>{l.resumen || l.contenido?.substring(0, 200)}...</p><button className="btn-sec">Ver completa</button></div>)}</div>
+          ) : (
+            <div className="empty-tab"><span>✦</span><h3>Sin lecturas aún</h3><p>Cuando solicites una experiencia mágica, quedará guardada acá para siempre. Podrás releerla cuando quieras.</p></div>
+          )}
+        </div>
+      )}
+      
+      {tab === 'regalosH' && (
+        <div className="cana-content">
+          {regalosHechos.length > 0 ? (
+            <div className="items-grid">{regalosHechos.map((r,i) => <div key={i} className="item-card"><h4>{r.tipo}</h4><small>Para: {r.para} • {r.fecha}</small></div>)}</div>
+          ) : (
+            <div className="empty-tab"><span>❤↗</span><h3>No has regalado aún</h3><p>Cuando regales una experiencia o guardián, quedará registrado acá.</p></div>
+          )}
+        </div>
+      )}
+      
+      {tab === 'regalosR' && (
+        <div className="cana-content">
+          {regalosRecibidos.length > 0 ? (
+            <div className="items-grid">{regalosRecibidos.map((r,i) => <div key={i} className="item-card"><h4>{r.tipo}</h4><small>De: {r.de} • {r.fecha}</small></div>)}</div>
+          ) : (
+            <div className="empty-tab"><span>❤↙</span><h3>No has recibido regalos</h3><p>Si alguien te regala una experiencia, aparecerá acá.</p></div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// JARDÍN MÁGICO (canjes funcionales + packs runas)
+// ═══════════════════════════════════════════════════════════════
+
+function Jardin({ usuario, setUsuario, pais, token }) {
+  const [canjeando, setCanjeando] = useState(null);
+  const [msg, setMsg] = useState(null);
+  const esUY = pais === 'UY';
+  
+  const canjear = async (canje) => {
+    if ((usuario?.treboles || 0) < canje.treboles) return;
+    setCanjeando(canje.id); setMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/mi-magia/canjear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, canjeId: canje.id, treboles: canje.treboles })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUsuario({ ...usuario, treboles: (usuario.treboles || 0) - canje.treboles });
+        if (data.cupon) {
+          setMsg({ t: 'ok', m: `¡Canjeado! Tu cupón: ${data.cupon}. Te llegará por email también.` });
+        } else {
+          setMsg({ t: 'ok', m: '¡Canjeado! Nos pondremos en contacto para coordinar.' });
+        }
+      } else {
+        setMsg({ t: 'error', m: data.error || 'Error al canjear' });
+      }
+    } catch(e) {
+      setMsg({ t: 'error', m: 'Error de conexión' });
+    }
+    setCanjeando(null);
+  };
+  
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>Jardín Mágico</h1><p>Tu riqueza en el mundo elemental.</p></div>
+      
+      <div className="balances">
+        <div className="bal-card">
+          <span className="bal-icon">☘</span>
+          <div className="bal-info">
+            <div className="bal-num">{usuario?.treboles || 0}</div>
+            <div className="bal-label">Tréboles</div>
+          </div>
+        </div>
+        <div className="bal-card">
+          <span className="bal-icon">ᚱ</span>
+          <div className="bal-info">
+            <div className="bal-num">{usuario?.runas || 0}</div>
+            <div className="bal-label">Runas de Poder</div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="explicacion-box">
+        <h3>☘ ¿Cómo funcionan los Tréboles?</h3>
+        <p><strong>{esUY ? '$400 UYU' : '$10 USD'} = 1 trébol.</strong> Se ganan automáticamente con cada compra.</p>
+        <p>Canjealos por descuentos, envíos gratis, productos y hasta lecturas. Son tu recompensa por ser parte de la tribu.</p>
+      </div>
+      
+      {msg && <div className={`msg ${msg.t}`}>{msg.m}</div>}
+      
+      <h2 className="sec-titulo">Canjeá tus Tréboles</h2>
+      <div className="canjes-grid">
+        {CANJES.map(c => {
+          const disponible = (usuario?.treboles || 0) >= c.treboles;
+          const esteCanjeando = canjeando === c.id;
+          return (
+            <div key={c.id} className={`canje-card ${disponible ? '' : 'bloq'}`}>
+              <div className="canje-cost">☘ {c.treboles}</div>
+              <h4>{c.nombre}</h4>
+              <p>{c.desc}</p>
+              <button 
+                className="btn-canjear" 
+                disabled={!disponible || esteCanjeando}
+                onClick={() => canjear(c)}
+              >
+                {esteCanjeando ? 'Canjeando...' : disponible ? 'Canjear' : `Necesitás ${c.treboles}`}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div className="explicacion-box">
+        <h3>ᚱ ¿Cómo funcionan las Runas de Poder?</h3>
+        <p>Las Runas son tu moneda para las <strong>experiencias mágicas</strong>: tiradas, lecturas del alma, registros akáshicos y más.</p>
+        <p>Podés comprarlas en packs, o ganarlas uniéndote al Círculo (recibís 50 de regalo + beneficios mensuales).</p>
+      </div>
+      
+      <h2 className="sec-titulo">Packs de Runas</h2>
+      <div className="packs-grid">
+        {PACKS_RUNAS.map(p => (
+          <div key={p.nombre} className="pack-card">
+            <div className="pack-runas">{p.runas} ᚱ</div>
+            <h4>{p.nombre}</h4>
+            <p>{p.desc}</p>
+            <div className="pack-precio">${p.precio} USD</div>
+            <a href={p.url} target="_blank" rel="noopener" className="btn-gold-sm">Comprar ↗</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPERIENCIAS (con intro humana completa)
+// ═══════════════════════════════════════════════════════════════
+
+function SeccionExperiencias({ usuario, setUsuario }) {
+  const [selExp, setSelExp] = useState(null);
+  const [vista, setVista] = useState('info'); // 'info' o 'form'
+  const [form, setForm] = useState({});
+  const [esRegalo, setEsRegalo] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [msg, setMsg] = useState(null);
+  
+  const solicitar = async () => {
+    if ((usuario?.runas || 0) < selExp.runas) { setMsg({ t: 'error', m: `Necesitás ${selExp.runas} Runas.` }); return; }
+    setEnviando(true); setMsg(null);
+    try {
+      const payload = esRegalo 
+        ? { emailRegalo: form.email_regalo, nombreRegalo: form.nombre_regalo, mensajeRegalo: form.mensaje_regalo, tipo: selExp.id, emailComprador: usuario.email, esRegalo: true }
+        : { email: usuario.email, tipo: selExp.id, datos: form, esRegalo: false };
+      
+      const res = await fetch(`${API_BASE}/api/experiencias/solicitar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) { 
+        setMsg({ t: 'ok', m: esRegalo ? '¡Regalo enviado! La persona recibirá acceso por email.' : '¡Solicitada! Recibirás tu lectura por email.' }); 
+        setUsuario({ ...usuario, runas: (usuario.runas || 0) - selExp.runas }); 
+        setTimeout(() => { setSelExp(null); setVista('info'); setForm({}); setEsRegalo(false); setMsg(null); }, 3000);
+      } else { setMsg({ t: 'error', m: data.error || 'Error' }); }
+    } catch(e) { setMsg({ t: 'error', m: 'Error de conexión' }); }
+    setEnviando(false);
+  };
+  
+  if (selExp) {
+    return (
+      <div className="sec">
+        <button className="btn-back" onClick={() => { setSelExp(null); setVista('info'); setForm({}); }}>← Volver a experiencias</button>
+        
+        {vista === 'info' && (
+          <div className="exp-detalle">
+            <div className="exp-d-header">
+              <span className="exp-d-icon">{selExp.icono}</span>
+              <h1>{selExp.nombre}</h1>
+              <div className="exp-d-meta"><span>⏱ {selExp.tiempo}</span><span>ᚱ {selExp.runas} runas</span></div>
+            </div>
+            
+            <div className="exp-d-intro">
+              {selExp.intro.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}
+            </div>
+            
+            <div className="exp-d-section">
+              <h3>¿Qué vas a recibir?</h3>
+              <ul>{selExp.queRecibis.map((q, i) => <li key={i}>{q}</li>)}</ul>
+            </div>
+            
+            <div className="exp-d-section">
+              <h3>¿Para quién es?</h3>
+              <p>{selExp.paraQuien}</p>
+            </div>
+            
+            <div className="exp-d-cta">
+              <div className="exp-d-cost"><span>Costo:</span><strong>{selExp.runas} ᚱ</strong><small>Tenés {usuario?.runas || 0}</small></div>
+              <button className="btn-gold btn-lg" onClick={() => setVista('form')} disabled={(usuario?.runas || 0) < selExp.runas}>
+                {(usuario?.runas || 0) >= selExp.runas ? 'Continuar →' : `Necesitás ${selExp.runas} Runas`}
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {vista === 'form' && (
+          <div className="exp-form">
+            <h2>{selExp.nombre}</h2>
+            
+            <div className="regalo-toggle">
+              <label><input type="checkbox" checked={esRegalo} onChange={e => setEsRegalo(e.target.checked)} /> <span>🎁 Es un regalo para otra persona</span></label>
+            </div>
+            
+            {esRegalo ? (
+              <div className="form-campos">
+                <p className="form-note">La persona recibirá un email con acceso a Mi Magia donde completará sus propios datos y recibirá la lectura personalizada.</p>
+                <div className="campo"><label>Email de quien recibe *</label><input type="email" value={form.email_regalo || ''} onChange={e => setForm({...form, email_regalo: e.target.value})} placeholder="email@ejemplo.com" /></div>
+                <div className="campo"><label>Nombre</label><input type="text" value={form.nombre_regalo || ''} onChange={e => setForm({...form, nombre_regalo: e.target.value})} placeholder="Para personalizar" /></div>
+                <div className="campo"><label>Tu mensaje (opcional)</label><textarea value={form.mensaje_regalo || ''} onChange={e => setForm({...form, mensaje_regalo: e.target.value})} placeholder="Un mensaje personal..." rows={3} /></div>
+              </div>
+            ) : (
+              <div className="form-campos">
+                <p className="form-note">Completá lo que puedas. Cuanta más información nos des, más personalizada será tu lectura.</p>
+                {selExp.campos.includes('pregunta') && <div className="campo"><label>Tu pregunta o tema *</label><textarea value={form.pregunta || ''} onChange={e => setForm({...form, pregunta: e.target.value})} placeholder="¿Qué querés saber o trabajar?" rows={3} /></div>}
+                {selExp.campos.includes('contexto') && <div className="campo"><label>Contexto</label><textarea value={form.contexto || ''} onChange={e => setForm({...form, contexto: e.target.value})} placeholder="¿Qué está pasando en tu vida relacionado a esto?" rows={3} /></div>}
+                {selExp.campos.includes('guardianes_interes') && <div className="campo"><label>¿Qué guardianes te llaman? *</label><textarea value={form.guardianes_interes || ''} onChange={e => setForm({...form, guardianes_interes: e.target.value})} placeholder="Describí los que te atraen: pueden ser por nombre, por tipo (protección, abundancia), o por algo que notaste..." rows={3} /></div>}
+                {selExp.campos.includes('situacion') && <div className="campo"><label>Tu situación actual</label><textarea value={form.situacion || ''} onChange={e => setForm({...form, situacion: e.target.value})} placeholder="¿Qué momento de vida atravesás?" rows={2} /></div>}
+                {selExp.campos.includes('que_buscas') && <div className="campo"><label>¿Qué buscás?</label><input type="text" value={form.que_buscas || ''} onChange={e => setForm({...form, que_buscas: e.target.value})} placeholder="Protección, abundancia, amor, claridad..." /></div>}
+                {selExp.campos.includes('fecha_nacimiento') && <div className="campo"><label>Fecha de nacimiento *</label><input type="date" value={form.fecha_nacimiento || ''} onChange={e => setForm({...form, fecha_nacimiento: e.target.value})} /></div>}
+                {selExp.campos.includes('hora_nacimiento') && <div className="campo"><label>Hora de nacimiento (si la sabés)</label><input type="time" value={form.hora_nacimiento || ''} onChange={e => setForm({...form, hora_nacimiento: e.target.value})} /></div>}
+                {selExp.campos.includes('lugar_nacimiento') && <div className="campo"><label>Lugar de nacimiento</label><input type="text" value={form.lugar_nacimiento || ''} onChange={e => setForm({...form, lugar_nacimiento: e.target.value})} placeholder="Ciudad, país" /></div>}
+                {selExp.campos.includes('nombre_completo') && <div className="campo"><label>Nombre completo</label><input type="text" value={form.nombre_completo || ''} onChange={e => setForm({...form, nombre_completo: e.target.value})} /></div>}
+                {selExp.campos.includes('patrones_repetitivos') && <div className="campo"><label>Patrones que se repiten en tu vida</label><textarea value={form.patrones_repetitivos || ''} onChange={e => setForm({...form, patrones_repetitivos: e.target.value})} placeholder="Situaciones, relaciones, problemas que aparecen una y otra vez..." rows={2} /></div>}
+                {selExp.campos.includes('miedos_inexplicables') && <div className="campo"><label>Miedos inexplicables</label><textarea value={form.miedos_inexplicables || ''} onChange={e => setForm({...form, miedos_inexplicables: e.target.value})} placeholder="Miedos que tenés desde siempre sin saber por qué..." rows={2} /></div>}
+                {selExp.campos.includes('atracciones_epocas') && <div className="campo"><label>Épocas o culturas que te atraen</label><input type="text" value={form.atracciones_epocas || ''} onChange={e => setForm({...form, atracciones_epocas: e.target.value})} placeholder="Egipto, medieval, celta, oriental..." /></div>}
+                {selExp.campos.includes('nombre_ancestro') && <div className="campo"><label>¿A quién querés contactar?</label><input type="text" value={form.nombre_ancestro || ''} onChange={e => setForm({...form, nombre_ancestro: e.target.value})} placeholder="Nombre del ancestro o 'mis ancestros en general'" /></div>}
+                {selExp.campos.includes('nacionalidades') && <div className="campo"><label>Nacionalidades de tu familia</label><input type="text" value={form.nacionalidades || ''} onChange={e => setForm({...form, nacionalidades: e.target.value})} placeholder="Española, italiana, uruguaya..." /></div>}
+                {selExp.campos.includes('patrones_familia') && <div className="campo"><label>Patrones familiares que notás</label><textarea value={form.patrones_familia || ''} onChange={e => setForm({...form, patrones_familia: e.target.value})} placeholder="Enfermedades, separaciones, temas de dinero..." rows={2} /></div>}
+                {selExp.campos.includes('sintomas_fisicos') && <div className="campo"><label>Síntomas físicos</label><textarea value={form.sintomas_fisicos || ''} onChange={e => setForm({...form, sintomas_fisicos: e.target.value})} placeholder="Cansancio, dolores, tensiones..." rows={2} /></div>}
+                {selExp.campos.includes('sintomas_emocionales') && <div className="campo"><label>Síntomas emocionales</label><textarea value={form.sintomas_emocionales || ''} onChange={e => setForm({...form, sintomas_emocionales: e.target.value})} placeholder="Ansiedad, tristeza, bloqueos..." rows={2} /></div>}
+                {selExp.campos.includes('areas_bloqueadas') && <div className="campo"><label>Áreas que sentís bloqueadas</label><input type="text" value={form.areas_bloqueadas || ''} onChange={e => setForm({...form, areas_bloqueadas: e.target.value})} placeholder="Amor, dinero, creatividad..." /></div>}
+                {selExp.campos.includes('opciones') && <div className="campo"><label>Opciones que estás considerando</label><textarea value={form.opciones || ''} onChange={e => setForm({...form, opciones: e.target.value})} placeholder="Si tenés opciones concretas, contanos cuáles..." rows={2} /></div>}
+                {selExp.campos.includes('deadline') && <div className="campo"><label>¿Hay una fecha límite?</label><input type="text" value={form.deadline || ''} onChange={e => setForm({...form, deadline: e.target.value})} placeholder="Ej: tengo que decidir antes del viernes" /></div>}
+                {selExp.campos.includes('mes') && <div className="campo"><label>Mes a consultar</label><select value={form.mes || ''} onChange={e => setForm({...form, mes: e.target.value})}><option value="">Elegí</option><option value="proximo">Próximo mes</option><option value="actual">Este mes</option></select></div>}
+                {selExp.campos.includes('area_principal') && <div className="campo"><label>Área principal de enfoque</label><select value={form.area_principal || ''} onChange={e => setForm({...form, area_principal: e.target.value})}><option value="">Elegí</option><option value="amor">Amor</option><option value="trabajo">Trabajo/Dinero</option><option value="salud">Salud</option><option value="espiritualidad">Espiritualidad</option><option value="general">Visión general</option></select></div>}
+              </div>
+            )}
+            
+            {msg && <div className={`msg ${msg.t}`}>{msg.m}</div>}
+            
+            <div className="form-actions">
+              <button className="btn-sec" onClick={() => setVista('info')}>← Volver</button>
+              <button className="btn-gold" onClick={solicitar} disabled={enviando}>{enviando ? 'Enviando...' : esRegalo ? 'Enviar Regalo' : 'Solicitar Lectura'}</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  return (
+    <div className="sec">
+      <div className="sec-head">
+        <h1>Experiencias Mágicas</h1>
+        <p>Lecturas personalizadas, mensajes canalizados, guías para tu camino. Cada experiencia queda guardada en tu grimorio para siempre.</p>
+      </div>
+      
+      <div className="runas-header">
+        <div className="runas-balance"><span>ᚱ</span><strong>{usuario?.runas || 0}</strong><small>disponibles</small></div>
+        <a href="https://duendesuy.10web.cloud/producto-categoria/runas/" target="_blank" rel="noopener" className="btn-gold-sm">Obtener más ↗</a>
+      </div>
+      
+      <div className="exp-grid">
+        {EXPERIENCIAS.map(exp => {
+          const disponible = (usuario?.runas || 0) >= exp.runas;
+          return (
+            <div key={exp.id} className={`exp-card ${disponible ? '' : 'bloq'}`} onClick={() => setSelExp(exp)}>
+              <div className="exp-card-head"><span className="exp-icon">{exp.icono}</span><span className="exp-runas">{exp.runas} ᚱ</span></div>
+              <h3>{exp.nombre}</h3>
+              <p className="exp-tiempo">⏱ {exp.tiempo}</p>
+              <p className="exp-desc">{exp.intro.substring(0, 120)}...</p>
+              <button className="btn-ver">Ver más →</button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REGALOS
+// ═══════════════════════════════════════════════════════════════
+
+function Regalos({ ir }) {
+  const [expandido, setExpandido] = useState(null);
+  
+  return (
+    <div className="sec">
+      <div className="sec-head regalo-head"><span>❤</span><h1>Regalá Magia</h1><p>Un regalo de Duendes del Uruguay es diferente. Es compañía, protección, transformación.</p></div>
+      
+      <div className="regalos-grid">
+        <div className="regalo-card" onClick={() => setExpandido(expandido === 'guardianes' ? null : 'guardianes')}>
+          <span>◆</span><h3>Guardianes</h3><p>Un compañero de vida para alguien especial.</p>
+          {expandido === 'guardianes' && (
+            <div className="regalo-exp">
+              <p>Un guardián canalizado es un regalo que trasciende lo material. Es protección, compañía, conexión con el mundo elemental.</p>
+              <p><strong>¿Cómo funciona?</strong> Elegís el guardián en la tienda, en el checkout indicás que es regalo y ponés el email del destinatario. Le llega la sorpresa con toda la información de su nuevo compañero.</p>
+              <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-gold-sm">Ver guardianes ↗</a>
+            </div>
+          )}
+        </div>
+        
+        <div className="regalo-card" onClick={() => setExpandido(expandido === 'exp' ? null : 'exp')}>
+          <span>✦</span><h3>Experiencias Mágicas</h3><p>Una lectura personalizada.</p>
+          {expandido === 'exp' && (
+            <div className="regalo-exp">
+              <p>Regalá una Tirada de Runas, Lectura del Alma, Registros Akáshicos o cualquier experiencia.</p>
+              <p><strong>¿Cómo funciona?</strong> Vas a Experiencias, elegís la que querés regalar, marcás "Es un regalo" y ponés el email. La persona recibe acceso a Mi Magia donde completa SUS propios datos y recibe la lectura personalizada.</p>
+              <button className="btn-gold-sm" onClick={(e) => { e.stopPropagation(); ir('experiencias'); }}>Ir a Experiencias</button>
+            </div>
+          )}
+        </div>
+        
+        <div className="regalo-card" onClick={() => setExpandido(expandido === 'circulo' ? null : 'circulo')}>
+          <span>★</span><h3>Círculo de Duendes</h3><p>Membresía. El regalo que sigue dando.</p>
+          {expandido === 'circulo' && (
+            <div className="regalo-exp">
+              <p>3 meses de Círculo = 3 meses de descuentos, lecturas gratis, contenido exclusivo, comunidad.</p>
+              <p><strong>¿Cómo funciona?</strong> Comprás la membresía trimestral como regalo, indicás el email y la persona recibe acceso completo.</p>
+              <a href="https://duendesuy.10web.cloud/producto/circulo-trimestral/" target="_blank" rel="noopener" className="btn-gold-sm">Regalar 3 meses ↗</a>
+            </div>
+          )}
+        </div>
+        
+        <div className="regalo-card" onClick={() => setExpandido(expandido === 'runas' ? null : 'runas')}>
+          <span>ᚱ</span><h3>Runas de Poder</h3><p>Libertad para elegir qué experiencia quiere.</p>
+          {expandido === 'runas' && (
+            <div className="regalo-exp">
+              <p>Regalá Runas y dejá que la persona elija qué experiencia mágica quiere tener.</p>
+              <p><strong>¿Cómo funciona?</strong> Comprás el pack, indicás el email del destinatario, y las Runas aparecen en su cuenta de Mi Magia.</p>
+              <div className="mini-packs">
+                {PACKS_RUNAS.map(p => <a key={p.nombre} href={p.url} target="_blank" rel="noopener">{p.runas}ᚱ ${p.precio}</a>)}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MUNDO, CUIDADOS, CRISTALES
+// ═══════════════════════════════════════════════════════════════
+
+function MundoSec() {
+  const [tab, setTab] = useState('intro');
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>El Reino Elemental</h1><p>Duendes, hadas, gnomos, elementales, alquimia. Todo lo que necesitás saber.</p></div>
+      <div className="tabs-h">{[['intro','Introducción'],['elementales','Los 4 Elementos'],['duendes','Los Duendes'],['alquimia','Alquimia y Piriápolis']].map(([k,t]) => <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}>{t}</button>)}</div>
+      <div className="tab-content">
+        {tab === 'intro' && <div>{MUNDO_ELEMENTAL.intro.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}</div>}
+        {tab === 'elementales' && <div className="elementos-grid">{MUNDO_ELEMENTAL.elementales.map((el,i) => <div key={i} className="elem-card" style={{borderColor:el.color}}><div className="elem-head" style={{background:el.color}}><span>{el.icono}</span>{el.elemento}</div><h4>{el.nombre}</h4><p>{el.desc}</p><small><strong>Cómo conectar:</strong> {el.conectar}</small></div>)}</div>}
+        {tab === 'duendes' && <div>{MUNDO_ELEMENTAL.duendes.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}</div>}
+        {tab === 'alquimia' && <div>{MUNDO_ELEMENTAL.alquimia.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}</div>}
+      </div>
+    </div>
+  );
+}
+
+function CuidadosSec() {
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>Cuidados de tu Guardián</h1><p>Guía para mantener el vínculo fuerte y vibrante.</p></div>
+      <div className="cuidados-lista">
+        {CUIDADOS.map((c,i) => (
+          <div key={i} className={`cuidado-card ${c.esProhibido ? 'prohibido' : ''}`}>
+            <div className="cuidado-num">{i+1}</div>
+            <div className="cuidado-body">
+              <h3>{c.titulo}</h3>
+              <p>{c.texto}</p>
+              <ul>{c.items.map((it,j) => <li key={j}>{it}</li>)}</ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CristalesSec() {
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>Cristales y Gemas</h1><p>Aliados poderosos. Cada guardián viene acompañado de cristales específicos para su energía.</p></div>
+      <div className="cristales-grid">
+        {CRISTALES.map((c,i) => (
+          <div key={i} className="cristal-card">
+            <div className="cristal-color" style={{background:c.color}}></div>
+            <h4>{c.nombre}</h4>
+            <p className="cristal-props">{c.props}</p>
+            <small className="cristal-cuidado">{c.cuidado}</small>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CÍRCULO (con contenido interno desarrollado)
+// ═══════════════════════════════════════════════════════════════
+
+function CirculoSec({ usuario, setUsuario, token, pais }) {
+  const [tab, setTab] = useState('inicio');
+  const [verMembresias, setVerMembresias] = useState(false);
+  const [activandoPrueba, setActivandoPrueba] = useState(false);
+  const esUY = pais === 'UY';
+  
+  const activarPrueba = async () => {
+    setActivandoPrueba(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/mi-magia/circulo/prueba`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
+      const data = await res.json();
+      if (data.success) {
+        setUsuario({ ...usuario, esCirculo: true, circuloPrueba: true, circuloExpira: data.expira, runas: (usuario.runas || 0) + 50 });
+      }
+    } catch(e) {}
+    setActivandoPrueba(false);
+  };
+  
+  // SI ES MIEMBRO DEL CÍRCULO - MUNDO INTERNO
+  if (usuario?.esCirculo) {
+    return (
+      <div className="sec circulo-interno">
+        <div className="circulo-header-int">
+          <span>★</span>
+          <h1>Círculo de Duendes</h1>
+          <p>{usuario.circuloPrueba ? `Prueba gratuita hasta ${usuario.circuloExpira}` : `Miembro hasta ${usuario.circuloExpira}`}</p>
+        </div>
+        
+        <div className="circulo-tabs">
+          {[['inicio','◇','Inicio'],['contenido','✦','Contenido'],['guia','☽','Guía Lunar'],['comunidad','❧','Comunidad']].map(([k,i,t]) => 
+            <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}><span>{i}</span>{t}</button>
+          )}
+        </div>
+        
+        {tab === 'inicio' && (
+          <div className="circulo-inicio">
+            <div className="beneficios-activos">
+              <h2>Tus Beneficios Activos</h2>
+              <div className="benef-grid-int">
+                <div className="benef-item-int"><span>◈</span><strong>15% OFF</strong><p>En toda la tienda</p></div>
+                <div className="benef-item-int"><span>✦</span><strong>Acceso 48hs antes</strong><p>A nuevos guardianes</p></div>
+                <div className="benef-item-int"><span>ᚱ</span><strong>1 lectura/mes</strong><p>Tirada o Pregunta gratis</p></div>
+              </div>
+            </div>
+            <div className="circulo-bienvenida">
+              <h2>Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'} al santuario secreto</h2>
+              <p>Este es tu espacio exclusivo. Acá encontrarás contenido que no está disponible en ningún otro lugar: guías lunares, DIY mágicos, meditaciones, y una comunidad de personas que, como vos, sienten el llamado de la magia.</p>
+              <p>Explorá las secciones arriba. Cada semana agregamos contenido nuevo.</p>
+            </div>
+          </div>
+        )}
+        
+        {tab === 'contenido' && (
+          <div className="circulo-contenido">
+            <h2>Contenido Exclusivo</h2>
+            <p className="contenido-intro">Cada mes nuevo contenido. Acá abajo lo más reciente:</p>
+            <div className="contenido-lista">
+              <div className="contenido-item"><span>📖</span><h4>Guía: Los 8 Sabbats del Año</h4><p>Calendario esotérico completo con rituales para cada celebración.</p><button className="btn-sec">Ver guía</button></div>
+              <div className="contenido-item"><span>🕯️</span><h4>DIY: Velas con intención</h4><p>Cómo hacer tus propias velas rituales paso a paso.</p><button className="btn-sec">Ver tutorial</button></div>
+              <div className="contenido-item"><span>🎧</span><h4>Meditación: Conexión con tu guardián</h4><p>Audio guiado de 15 minutos para fortalecer el vínculo.</p><button className="btn-sec">Escuchar</button></div>
+              <div className="contenido-item"><span>✦</span><h4>Lectura colectiva: Enero 2026</h4><p>Mensaje general canalizado para todo el Círculo.</p><button className="btn-sec">Leer</button></div>
+            </div>
+            <div className="temas-explorar">
+              <h3>Temas que exploramos:</h3>
+              <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
+            </div>
+          </div>
+        )}
+        
+        {tab === 'guia' && (
+          <div className="circulo-guia">
+            <h2>Guía Lunar - Enero 2026</h2>
+            <div className="luna-actual"><span>☽</span><p>Luna actual: <strong>Menguante en Libra</strong></p></div>
+            <div className="fases-mes">
+              <div className="fase"><span>●</span><strong>Luna Nueva</strong><p>13 Enero - Ideal para intenciones, inicios</p></div>
+              <div className="fase"><span>◐</span><strong>Cuarto Creciente</strong><p>21 Enero - Acción, movimiento</p></div>
+              <div className="fase"><span>○</span><strong>Luna Llena</strong><p>28 Enero - Manifestación, gratitud</p></div>
+            </div>
+            <div className="ritual-sugerido">
+              <h3>Ritual sugerido esta semana:</h3>
+              <p>Con la luna menguante, es momento de soltar. Escribí en un papel lo que querés dejar ir, quemalo con una vela blanca, y dejá que el humo lleve esas energías.</p>
+            </div>
+          </div>
+        )}
+        
+        {tab === 'comunidad' && (
+          <div className="circulo-comunidad">
+            <h2>Comunidad del Círculo</h2>
+            <p className="comunidad-intro">Un espacio para compartir experiencias, hacer preguntas, y conectar con otros guardianes del mundo elemental.</p>
+            <div className="comunidad-prox">
+              <span>🚧</span>
+              <h3>Próximamente: Foro del Círculo</h3>
+              <p>Estamos desarrollando un espacio donde van a poder compartir sus experiencias con los guardianes, hacer preguntas, y conectar entre ustedes.</p>
+              <p>Mientras tanto, pueden enviar sus preguntas y las respondemos en el contenido semanal.</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  // SI NO ES MIEMBRO - LANDING INTERNA
+  return (
+    <div className="sec circulo-landing">
+      <div className="circulo-hero"><span>★</span><h1>Círculo de Duendes</h1><p>El santuario secreto para quienes sienten el llamado</p></div>
+      
+      <div className="circulo-intro-text">
+        <p>El Círculo es más que una membresía. Es una comunidad de personas que, como vos, sienten que hay algo más allá de lo visible. Es acceso a conocimiento que no compartimos en ningún otro lugar. Es descuentos permanentes, lecturas gratis, y la sensación de pertenecer a algo especial.</p>
+      </div>
+      
+      <div className="prueba-gratis">
+        <h2>🎁 15 días gratis</h2>
+        <p>Probá sin compromiso. Si no es para vos, no pasa nada.</p>
+        <p><strong>+ 50 Runas de regalo</strong> para que explores las experiencias mágicas.</p>
+        <button className="btn-gold btn-lg" onClick={activarPrueba} disabled={activandoPrueba}>
+          {activandoPrueba ? 'Activando...' : 'Activar prueba gratuita'}
+        </button>
+      </div>
+      
+      <h2 className="sec-titulo">¿Qué incluye?</h2>
+      <div className="beneficios-grid">
+        {CIRCULO_CONTENIDO.beneficios.map((b,i) => (
+          <div key={i} className="beneficio-card"><span>{b.icono}</span><h4>{b.titulo}</h4><p>{b.desc}</p></div>
+        ))}
+      </div>
+      
+      <h2 className="sec-titulo" style={{cursor:'pointer'}} onClick={() => setVerMembresias(!verMembresias)}>
+        Membresías {verMembresias ? '▼' : '▶'}
+      </h2>
+      {verMembresias && (
+        <div className="membresias-grid">
+          {MEMBRESIAS.map(m => (
+            <div key={m.nombre} className="membresia-card">
+              <h4>{m.nombre}</h4>
+              <div className="membresia-precio">{esUY ? `$${m.precioUY} UYU` : `$${m.precio} USD`}</div>
+              {m.ahorro && <span className="membresia-ahorro">Ahorrás {m.ahorro}</span>}
+              <p>{m.dias} días de acceso</p>
+              <a href={m.url} target="_blank" rel="noopener" className="btn-gold-sm">Elegir ↗</a>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      <h2 className="sec-titulo">Temas que exploramos</h2>
+      <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GRIMORIO (con explicación completa)
+// ═══════════════════════════════════════════════════════════════
+
+function GrimorioSec({ usuario, token, setUsuario }) {
+  const [tab, setTab] = useState('intro');
+  const [entrada, setEntrada] = useState('');
+  const [tipoEntrada, setTipoEntrada] = useState('libre');
+  const [guardando, setGuardando] = useState(false);
+  
+  const guardarEntrada = async () => {
+    if (!entrada.trim()) return;
+    setGuardando(true);
+    try { 
+      await fetch(`${API_BASE}/api/mi-magia/diario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, tipo: tipoEntrada, contenido: entrada }) }); 
+      setUsuario({ ...usuario, diario: [...(usuario.diario || []), { tipo: tipoEntrada, contenido: entrada, fecha: new Date().toLocaleDateString('es-UY') }] });
+      setEntrada('');
+    } catch(e) {}
+    setGuardando(false);
+  };
+  
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>Tu Grimorio</h1><p>Biblioteca mágica personal. Todo lo que recibís y escribís queda guardado acá para siempre.</p></div>
+      
+      <div className="tabs-h">
+        {[['intro','◇','¿Qué es?'],['lecturas','✦','Mis Lecturas'],['diario','✎','Mi Diario']].map(([k,i,t]) => 
+          <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}>{i} {t}</button>
+        )}
+      </div>
+      
+      {tab === 'intro' && (
+        <div className="grim-intro">
+          <div className="grim-intro-section">
+            <h3>📜 ¿Qué es un Grimorio?</h3>
+            <p>En la tradición mágica, un grimorio es el libro personal de una bruja, mago o practicante espiritual. Es donde se guardan hechizos, rituales, sueños, visiones, y todo el conocimiento acumulado en el camino.</p>
+            <p>Tu grimorio en Mi Magia tiene dos partes:</p>
+          </div>
+          
+          <div className="grim-intro-cards">
+            <div className="grim-card" onClick={() => setTab('lecturas')}>
+              <span>✦</span>
+              <h4>Mis Lecturas</h4>
+              <p>Todas las experiencias mágicas que solicites (tiradas de runas, lecturas del alma, registros akáshicos, etc.) quedan guardadas acá. Podés releerlas cuando quieras, encontrar patrones, ver tu evolución.</p>
+            </div>
+            <div className="grim-card" onClick={() => setTab('diario')}>
+              <span>✎</span>
+              <h4>Mi Diario</h4>
+              <p>Tu espacio personal para escribir lo que quieras: reflexiones, sueños, señales que recibiste, rituales que hiciste, sincronicidades, gratitud, intenciones. Es privado y solo vos lo ves.</p>
+            </div>
+          </div>
+          
+          <div className="grim-tip">
+            <strong>💡 Tip:</strong> Mantener un diario espiritual es una de las prácticas más poderosas para desarrollar la intuición. No tiene que ser largo ni elaborado - a veces una frase basta.
+          </div>
+        </div>
+      )}
+      
+      {tab === 'lecturas' && (
+        <div className="grim-lecturas">
+          <h2>Mis Lecturas</h2>
+          {usuario?.lecturas?.length > 0 ? (
+            <div className="lecturas-lista">
+              {usuario.lecturas.map((l, i) => (
+                <div key={i} className="lectura-card">
+                  <div className="lectura-head"><span className="lectura-tipo">{l.tipo}</span><span className="lectura-fecha">{l.fecha}</span></div>
+                  <p className="lectura-preview">{l.resumen || l.contenido?.substring(0, 300)}...</p>
+                  <button className="btn-sec">Leer completa</button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-grim">
+              <span>📜</span>
+              <h3>Todavía no tenés lecturas</h3>
+              <p>Cuando solicites una experiencia mágica (tirada de runas, lectura del alma, etc.), el resultado completo quedará guardado acá. Podrás releerlo cuando quieras, buscar patrones, ver cómo evoluciona tu camino.</p>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {tab === 'diario' && (
+        <div className="grim-diario">
+          <h2>Mi Diario</h2>
+          <p className="diario-intro">Tu espacio privado. Escribí lo que quieras: sueños, reflexiones, señales, rituales, o simplemente cómo te sentís hoy.</p>
+          
+          <div className="diario-nuevo">
+            <h3>Nueva entrada</h3>
+            <div className="tipos-entrada">
+              {TIPOS_DIARIO.map(t => (
+                <button key={t.id} className={`tipo-btn ${tipoEntrada === t.id ? 'act' : ''}`} onClick={() => setTipoEntrada(t.id)} title={t.desc}>
+                  <span>{t.i}</span>{t.n}
+                </button>
+              ))}
+            </div>
+            <div className="tipo-desc">{TIPOS_DIARIO.find(t => t.id === tipoEntrada)?.desc}</div>
+            <textarea 
+              placeholder="Escribí lo que tengas en mente... No hay reglas, es tu espacio." 
+              value={entrada} 
+              onChange={e => setEntrada(e.target.value)} 
+              rows={5}
+            />
+            <button className="btn-gold" onClick={guardarEntrada} disabled={!entrada.trim() || guardando}>
+              {guardando ? 'Guardando...' : 'Guardar en mi grimorio'}
+            </button>
+          </div>
+          
+          {usuario?.diario?.length > 0 && (
+            <div className="diario-entradas">
+              <h3>Entradas anteriores</h3>
+              {usuario.diario.slice().reverse().map((e, i) => {
+                const tipo = TIPOS_DIARIO.find(t => t.id === e.tipo) || TIPOS_DIARIO[TIPOS_DIARIO.length - 1];
+                return (
+                  <div key={i} className="entrada-card">
+                    <div className="entrada-head"><span>{tipo.i} {tipo.n}</span><span>{e.fecha}</span></div>
+                    <p>{e.contenido}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TITO
+// ═══════════════════════════════════════════════════════════════
+
+function Tito({ usuario, abierto, setAbierto }) {
+  const [msgs, setMsgs] = useState([]);
+  const [input, setInput] = useState('');
+  const [env, setEnv] = useState(false);
+  
+  const enviar = async () => {
+    if (!input.trim() || env) return;
+    const m = input.trim(); setInput('');
+    setMsgs(prev => [...prev, { r: 'u', t: m }]); setEnv(true);
+    try {
+      const contexto = `[El usuario está en Mi Magia. Tiene ${usuario?.runas||0} runas y ${usuario?.treboles||0} tréboles. Las secciones son: Mis Canalizaciones (guardianes, lecturas, regalos hechos/recibidos), Jardín Mágico (tréboles y runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas guardadas y diario). Tréboles: $10 USD = 1, se canjean por descuentos. Runas: para experiencias mágicas.]
+Pregunta: ${m}`;
+      const res = await fetch(`${API_BASE}/api/tito/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: contexto, email: usuario?.email }) });
+      const data = await res.json();
+      setMsgs(prev => [...prev, { r: 't', t: data.response || 'Hubo un error, intentá de nuevo.' }]);
+    } catch(e) { setMsgs(prev => [...prev, { r: 't', t: 'Error de conexión.' }]); }
+    setEnv(false);
+  };
+  
+  return (
+    <>
+      <button className="tito-btn" onClick={() => setAbierto(!abierto)}>
+        <img src={TITO_IMG} alt="Tito" onError={e => e.target.style.display='none'} />
+        <span className="tito-fb">T</span>
+      </button>
+      {abierto && (
+        <div className="tito-chat">
+          <div className="tito-head">
+            <img src={TITO_IMG} alt="" className="tito-av" onError={e => e.target.style.display='none'} />
+            <div><strong>Tito</strong><small>Tu guía</small></div>
+            <button onClick={() => setAbierto(false)}>✕</button>
+          </div>
+          <div className="tito-msgs">
+            <div className="msg-t"><p>¡Hola {usuario?.nombrePreferido}! Soy Tito. Preguntame sobre Mi Magia, los tréboles, las runas, las experiencias, o lo que necesites.</p></div>
+            {msgs.map((m,i) => <div key={i} className={m.r==='u'?'msg-u':'msg-t'}><p>{m.t}</p></div>)}
+            {env && <div className="msg-t"><p>...</p></div>}
+          </div>
+          <div className="tito-input">
+            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} />
+            <button onClick={enviar} disabled={env}>→</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ESTILOS
+// ═══════════════════════════════════════════════════════════════
+
+const estilos = `
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a1a1a;font-size:18px;line-height:1.6}
+.app{min-height:100vh}
+.header{position:fixed;top:0;left:0;right:0;height:65px;background:#fff;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;z-index:100}
+.logo{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:2px;display:flex;align-items:center;gap:0.5rem}
+.logo span{color:#d4af37}
+.user-info{color:#666;font-size:0.95rem}
+.hstats{display:flex;gap:1.5rem;font-family:'Cinzel',serif;font-size:0.9rem}
+.menu-btn{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:0.5rem}
+.menu-btn span{width:20px;height:2px;background:#1a1a1a}
+.nav{position:fixed;top:65px;left:0;bottom:0;width:240px;background:#fff;border-right:1px solid #f0f0f0;padding:1rem 0;display:flex;flex-direction:column;z-index:99;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.5rem;background:none;border:none;text-align:left;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:1rem;color:#666;transition:all 0.2s}
+.nav-item:hover{background:#fafafa;color:#1a1a1a}
+.nav-item.activo{background:#f5f5f5;color:#1a1a1a;border-left:3px solid #d4af37}
+.nav-i{color:#d4af37;width:20px;text-align:center}
+.nav-sep{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:1px;color:#999;padding:1.25rem 1.5rem 0.5rem;text-transform:uppercase}
+.nav-volver{margin-top:auto;padding:1rem 1.5rem;color:#d4af37;text-decoration:none;font-size:0.9rem}
+.contenido{margin-left:240px;margin-top:65px;min-height:calc(100vh - 65px)}
+.sec{padding:2rem 2.5rem;max-width:1100px}
+.sec-head{margin-bottom:2rem}
+.sec-head h1{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:500;margin-bottom:0.5rem}
+.sec-head p{color:#666}
+.sec-titulo{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:500;margin:2rem 0 1rem}
+.banner{background:#1a1a1a;border-radius:16px;padding:2.5rem;margin-bottom:2rem;position:relative}
+.banner-rango{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.rango-icono{font-size:2.5rem}
+.rango-info{display:flex;flex-direction:column}
+.rango-nombre{font-family:'Cinzel',serif;color:#d4af37;font-size:1rem}
+.rango-ben{font-size:0.8rem;color:rgba(255,255,255,0.6)}
+.progreso-rango{margin-top:1.5rem}
+.progreso-bar{height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden}
+.progreso-fill{height:100%;background:linear-gradient(90deg,#d4af37,#f4d03f);border-radius:3px;transition:width 0.5s}
+.progreso-rango small{display:block;margin-top:0.5rem;color:rgba(255,255,255,0.5);font-size:0.75rem}
+.banner h1{font-family:'Cinzel',serif;font-size:1.8rem;color:#fff;margin-bottom:0.5rem}
+.banner p{color:rgba(255,255,255,0.7)}
+.stats-g{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-c{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center}
+.stat-c:hover{border-color:#d4af37}
+.stat-n{font-family:'Cinzel',serif;font-size:2rem;line-height:1;color:#d4af37}
+.stat-t{font-size:0.85rem;color:#666;margin-top:0.25rem}
+.accesos-g{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.acceso{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;text-align:left;transition:all 0.2s}
+.acceso:hover{border-color:#d4af37}
+.acceso span{font-size:1.5rem;color:#d4af37}
+.acceso strong{display:block;font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem}
+.acceso small{color:#666;font-size:0.85rem}
+.banner-circ{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1.25rem;cursor:pointer;margin-bottom:2rem}
+.banner-circ span:first-child{font-size:2rem;color:#d4af37}
+.banner-circ h3{font-family:'Cinzel',serif;color:#fff;font-size:1rem}
+.banner-circ p{color:rgba(255,255,255,0.7);font-size:0.85rem}
+.badge{background:#d4af37;color:#1a1a1a;padding:0.25rem 0.75rem;border-radius:20px;font-family:'Cinzel',serif;font-size:0.7rem;font-weight:600}
+.info-box{background:#fafafa;border-radius:12px;padding:1.5rem;margin-top:2rem}
+.info-box h3{font-family:'Cinzel',serif;margin-bottom:1rem}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.info-grid div{text-align:center}
+.info-grid span{font-size:1.5rem;color:#d4af37}
+.info-grid h4{font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem;font-size:0.95rem}
+.info-grid p{font-size:0.85rem;color:#666}
+.tabs-h{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:0.5rem 1rem;background:#fff;border:1px solid #f0f0f0;border-radius:50px;font-family:'Cinzel',serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.tab:hover{border-color:#d4af37}
+.tab.act{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.cana-content,.tab-content,.grim-content{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.5rem}
+.items-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.item-card{border:1px solid #f0f0f0;border-radius:12px;overflow:hidden}
+.item-img{height:150px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#ddd}
+.item-img img{width:100%;height:100%;object-fit:cover}
+.item-card h4{font-family:'Cinzel',serif;padding:0.75rem 0.75rem 0.25rem;font-size:0.95rem}
+.item-card small{color:#666;font-size:0.8rem;padding:0 0.75rem 0.75rem;display:block}
+.empty-tab{text-align:center;padding:2rem}
+.empty-tab span{font-size:2.5rem;color:#ddd}
+.empty-tab h3{font-family:'Cinzel',serif;margin:0.5rem 0}
+.empty-tab p{color:#666;max-width:400px;margin:0 auto 1rem}
+.lecturas-list{display:flex;flex-direction:column;gap:1rem}
+.lectura-item{border-bottom:1px solid #f0f0f0;padding-bottom:1rem}
+.lectura-item:last-child{border:none}
+.lec-fecha{font-size:0.8rem;color:#999}
+.lectura-item h4{font-family:'Cinzel',serif;margin:0.25rem 0}
+.lectura-item p{font-size:0.9rem;color:#666}
+.balances{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2rem}
+.bal-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
+.bal-icon{font-size:2.5rem;color:#d4af37}
+.bal-num{font-family:'Cinzel',serif;font-size:2.5rem;line-height:1}
+.bal-label{font-size:0.9rem;color:#666}
+.explicacion-box{background:#fafafa;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+.explicacion-box h3{font-family:'Cinzel',serif;margin-bottom:0.5rem;font-size:1rem}
+.explicacion-box p{color:#666;font-size:0.95rem;margin-bottom:0.5rem}
+.explicacion-box p:last-child{margin:0}
+.msg{padding:1rem;border-radius:8px;margin-bottom:1rem}
+.msg.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.msg.ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.canjes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.canje-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;text-align:center}
+.canje-card.bloq{opacity:0.6}
+.canje-cost{display:inline-block;background:#f5f5f5;padding:0.25rem 0.6rem;border-radius:20px;font-family:'Cinzel',serif;font-size:0.8rem;color:#d4af37;margin-bottom:0.5rem}
+.canje-card h4{font-family:'Cinzel',serif;font-size:0.9rem;margin-bottom:0.25rem}
+.canje-card p{font-size:0.8rem;color:#666;margin-bottom:0.75rem}
+.btn-canjear{width:100%;padding:0.6rem;background:#1a1a1a;color:#fff;border:none;border-radius:6px;font-family:'Cinzel',serif;font-size:0.75rem;cursor:pointer}
+.btn-canjear:disabled{background:#ddd;color:#999;cursor:not-allowed}
+.packs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.pack-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;text-align:center}
+.pack-runas{font-family:'Cinzel',serif;font-size:1.5rem;color:#d4af37}
+.pack-card h4{font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem}
+.pack-card p{font-size:0.8rem;color:#666;margin-bottom:0.5rem}
+.pack-precio{font-family:'Cinzel',serif;font-size:1.1rem;margin-bottom:0.75rem}
+.runas-header{background:#1a1a1a;border-radius:12px;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.runas-balance{display:flex;align-items:center;gap:0.75rem;color:#fff}
+.runas-balance span{font-size:1.5rem;color:#d4af37}
+.runas-balance strong{font-family:'Cinzel',serif;font-size:1.5rem}
+.runas-balance small{opacity:0.7}
+.exp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.exp-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s}
+.exp-card:hover{border-color:#d4af37}
+.exp-card.bloq{opacity:0.7}
+.exp-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
+.exp-icon{font-size:1.5rem;color:#d4af37}
+.exp-runas{background:#f5f5f5;padding:0.25rem 0.6rem;border-radius:20px;font-family:'Cinzel',serif;font-size:0.8rem}
+.exp-card h3{font-family:'Cinzel',serif;font-size:1rem;margin-bottom:0.25rem}
+.exp-tiempo{font-size:0.8rem;color:#999;margin-bottom:0.5rem}
+.exp-desc{font-size:0.9rem;color:#666;margin-bottom:0.75rem}
+.btn-ver{background:none;border:1px solid #d4af37;color:#d4af37;padding:0.4rem 0.75rem;border-radius:6px;font-family:'Cinzel',serif;font-size:0.75rem;cursor:pointer}
+.btn-back{background:none;border:none;color:#d4af37;font-family:'Cinzel',serif;cursor:pointer;margin-bottom:1.5rem;font-size:0.9rem}
+.exp-detalle{max-width:700px}
+.exp-d-header{text-align:center;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid #f0f0f0}
+.exp-d-icon{font-size:3rem;color:#d4af37}
+.exp-d-header h1{font-family:'Cinzel',serif;font-size:1.8rem;margin:0.5rem 0}
+.exp-d-meta{display:flex;gap:1.5rem;justify-content:center;color:#666;font-size:0.9rem}
+.exp-d-intro{margin-bottom:2rem}
+.exp-d-intro p{margin-bottom:1rem;color:#444}
+.exp-d-section{background:#fafafa;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.exp-d-section h3{font-family:'Cinzel',serif;margin-bottom:0.75rem}
+.exp-d-section ul{margin-left:1.25rem;color:#666}
+.exp-d-section li{margin-bottom:0.4rem}
+.exp-d-section p{color:#666}
+.exp-d-cta{background:#1a1a1a;border-radius:12px;padding:1.5rem;display:flex;align-items:center;justify-content:space-between}
+.exp-d-cost{color:#fff}
+.exp-d-cost span{opacity:0.7;font-size:0.9rem}
+.exp-d-cost strong{display:block;font-family:'Cinzel',serif;font-size:1.5rem;color:#d4af37}
+.exp-d-cost small{opacity:0.6;font-size:0.8rem}
+.exp-form{max-width:600px}
+.exp-form h2{font-family:'Cinzel',serif;margin-bottom:1.5rem}
+.regalo-toggle{background:#fef3c7;padding:1rem;border-radius:8px;margin-bottom:1.5rem}
+.regalo-toggle label{display:flex;align-items:center;gap:0.75rem;cursor:pointer}
+.regalo-toggle input{width:18px;height:18px}
+.form-campos{display:flex;flex-direction:column;gap:1rem}
+.form-note{background:#f5f5f5;padding:1rem;border-radius:8px;font-size:0.9rem;color:#666;margin-bottom:0.5rem}
+.campo label{display:block;font-family:'Cinzel',serif;font-size:0.85rem;margin-bottom:0.4rem}
+.campo input,.campo select,.campo textarea{width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:1rem}
+.campo textarea{resize:vertical}
+.form-actions{display:flex;gap:1rem;margin-top:1.5rem;justify-content:flex-end}
+.btn-gold{display:inline-block;background:linear-gradient(135deg,#d4af37,#b8962e);color:#1a1a1a;padding:0.8rem 1.5rem;border-radius:50px;font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;text-decoration:none;border:none;cursor:pointer}
+.btn-gold:hover{transform:translateY(-1px)}
+.btn-gold:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-gold-sm{display:inline-block;background:linear-gradient(135deg,#d4af37,#b8962e);color:#1a1a1a;padding:0.5rem 1rem;border-radius:50px;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:600;text-decoration:none;border:none;cursor:pointer}
+.btn-lg{padding:1rem 2rem;font-size:0.95rem}
+.btn-sec{background:#fff;border:1px solid #ddd;padding:0.6rem 1rem;border-radius:8px;font-family:'Cinzel',serif;font-size:0.85rem;cursor:pointer}
+.btn-pri{background:#1a1a1a;color:#fff;padding:0.8rem 1.5rem;border-radius:8px;font-family:'Cinzel',serif;border:none;cursor:pointer}
+.btn-pri:disabled{background:#ccc}
+.regalo-head{text-align:center}
+.regalo-head span{font-size:3rem}
+.regalos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.regalo-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s}
+.regalo-card:hover{border-color:#d4af37}
+.regalo-card span{font-size:2rem;color:#d4af37}
+.regalo-card h3{font-family:'Cinzel',serif;margin:0.75rem 0 0.5rem}
+.regalo-card p{font-size:0.9rem;color:#666}
+.regalo-exp{margin-top:1rem;padding-top:1rem;border-top:1px solid #f0f0f0;text-align:left}
+.regalo-exp p{font-size:0.9rem;color:#666;margin-bottom:0.75rem}
+.mini-packs{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem}
+.mini-packs a{background:#f5f5f5;padding:0.4rem 0.75rem;border-radius:6px;font-size:0.8rem;text-decoration:none;color:#1a1a1a}
+.elementos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.elem-card{border:2px solid #f0f0f0;border-radius:12px;overflow:hidden}
+.elem-head{padding:0.75rem;text-align:center;color:#fff;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:'Cinzel',serif}
+.elem-card h4{font-family:'Cinzel',serif;padding:0.75rem 0.75rem 0.25rem;font-size:0.95rem}
+.elem-card p{padding:0 0.75rem;font-size:0.85rem;color:#666}
+.elem-card small{display:block;padding:0.5rem 0.75rem 0.75rem;font-size:0.8rem;color:#888}
+.cuidados-lista{display:flex;flex-direction:column;gap:1rem}
+.cuidado-card{display:flex;gap:1.25rem;background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem}
+.cuidado-card.prohibido{background:#fef2f2;border-color:#fecaca}
+.cuidado-num{width:36px;height:36px;min-width:36px;background:#d4af37;color:#1a1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:600}
+.cuidado-body h3{font-family:'Cinzel',serif;margin-bottom:0.5rem;font-size:1rem}
+.cuidado-body p{font-size:0.9rem;color:#666;margin-bottom:0.5rem}
+.cuidado-body ul{margin-left:1.25rem;font-size:0.9rem;color:#666}
+.cuidado-body li{margin-bottom:0.25rem}
+.cristales-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.cristal-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
+.cristal-color{width:50px;height:50px;border-radius:50%;margin:0 auto 0.75rem}
+.cristal-card h4{font-family:'Cinzel',serif;font-size:0.9rem;margin-bottom:0.25rem}
+.cristal-props{font-size:0.8rem;color:#d4af37;margin-bottom:0.5rem}
+.cristal-cuidado{font-size:0.75rem;color:#888}
+.circulo-landing{text-align:center}
+.circulo-hero{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:2.5rem;margin-bottom:2rem}
+.circulo-hero span{font-size:3rem;color:#d4af37}
+.circulo-hero h1{font-family:'Cinzel',serif;color:#fff;font-size:2rem;margin:0.75rem 0 0.5rem}
+.circulo-hero p{color:rgba(255,255,255,0.7)}
+.circulo-intro-text{max-width:600px;margin:0 auto 2rem}
+.circulo-intro-text p{color:#666}
+.prueba-gratis{background:#f0fdf4;border:2px solid #bbf7d0;border-radius:16px;padding:2rem;margin-bottom:2rem}
+.prueba-gratis h2{font-family:'Cinzel',serif;margin-bottom:0.5rem}
+.prueba-gratis p{color:#166534;margin-bottom:0.75rem}
+.beneficios-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.beneficio-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
+.beneficio-card span{font-size:1.5rem;color:#d4af37}
+.beneficio-card h4{font-family:'Cinzel',serif;font-size:0.85rem;margin:0.5rem 0 0.25rem}
+.beneficio-card p{font-size:0.75rem;color:#666}
+.membresias-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.membresia-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;text-align:center}
+.membresia-card h4{font-family:'Cinzel',serif;margin-bottom:0.5rem}
+.membresia-precio{font-family:'Cinzel',serif;font-size:1.25rem;color:#d4af37}
+.membresia-ahorro{display:inline-block;background:#f0fdf4;color:#166534;font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:4px;margin:0.25rem 0}
+.membresia-card p{font-size:0.8rem;color:#666;margin-bottom:0.75rem}
+.temas-tags{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center}
+.temas-tags span{background:#f5f5f5;padding:0.4rem 0.8rem;border-radius:20px;font-size:0.8rem;color:#666}
+.circulo-interno .circulo-header-int{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:2rem;text-align:center;margin-bottom:2rem}
+.circulo-header-int span{font-size:2.5rem;color:#d4af37}
+.circulo-header-int h1{font-family:'Cinzel',serif;color:#fff;margin:0.5rem 0}
+.circulo-header-int p{color:rgba(255,255,255,0.7);font-size:0.9rem}
+.circulo-tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem}
+.circulo-tabs .tab{display:flex;align-items:center;gap:0.4rem}
+.circulo-tabs .tab span{color:#d4af37}
+.beneficios-activos{margin-bottom:2rem}
+.beneficios-activos h2{font-family:'Cinzel',serif;margin-bottom:1rem;font-size:1.2rem}
+.benef-grid-int{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.benef-item-int{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
+.benef-item-int span{color:#d4af37;font-size:1.25rem}
+.benef-item-int strong{display:block;font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem}
+.benef-item-int p{font-size:0.8rem;color:#666}
+.circulo-bienvenida{background:#fafafa;border-radius:12px;padding:1.5rem}
+.circulo-bienvenida h2{font-family:'Cinzel',serif;margin-bottom:1rem}
+.circulo-bienvenida p{color:#666;margin-bottom:0.75rem}
+.contenido-intro{color:#666;margin-bottom:1.5rem}
+.contenido-lista{display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem}
+.contenido-item{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;display:flex;gap:1rem;align-items:flex-start}
+.contenido-item span{font-size:1.5rem}
+.contenido-item h4{font-family:'Cinzel',serif;margin-bottom:0.25rem}
+.contenido-item p{font-size:0.9rem;color:#666;margin-bottom:0.5rem}
+.temas-explorar h3{font-family:'Cinzel',serif;margin-bottom:1rem;font-size:1rem}
+.luna-actual{background:#1a1a1a;border-radius:12px;padding:1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.luna-actual span{font-size:2rem;color:#d4af37}
+.luna-actual p{color:#fff;margin:0}
+.fases-mes{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.fase{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
+.fase span{font-size:1.5rem;color:#d4af37}
+.fase strong{display:block;font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem}
+.fase p{font-size:0.8rem;color:#666}
+.ritual-sugerido{background:#fafafa;border-radius:12px;padding:1.25rem}
+.ritual-sugerido h3{font-family:'Cinzel',serif;margin-bottom:0.5rem;font-size:1rem}
+.ritual-sugerido p{color:#666;font-size:0.9rem}
+.comunidad-intro{color:#666;margin-bottom:1.5rem}
+.comunidad-prox{background:#fafafa;border-radius:12px;padding:2rem;text-align:center}
+.comunidad-prox span{font-size:2rem}
+.comunidad-prox h3{font-family:'Cinzel',serif;margin:0.5rem 0}
+.comunidad-prox p{color:#666;font-size:0.9rem}
+.grim-intro{display:flex;flex-direction:column;gap:1.5rem}
+.grim-intro-section h3{font-family:'Cinzel',serif;margin-bottom:0.5rem}
+.grim-intro-section p{color:#666;margin-bottom:0.5rem}
+.grim-intro-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.grim-card{background:#fafafa;border-radius:12px;padding:1.5rem;cursor:pointer;transition:all 0.2s}
+.grim-card:hover{background:#f5f5f5}
+.grim-card span{font-size:2rem;color:#d4af37}
+.grim-card h4{font-family:'Cinzel',serif;margin:0.5rem 0}
+.grim-card p{font-size:0.9rem;color:#666}
+.grim-tip{background:#fef3c7;border-radius:8px;padding:1rem;font-size:0.9rem}
+.grim-lecturas h2,.grim-diario h2{font-family:'Cinzel',serif;margin-bottom:1rem}
+.lecturas-lista{display:flex;flex-direction:column;gap:1rem}
+.lectura-card{background:#fafafa;border-radius:12px;padding:1.25rem}
+.lectura-head{display:flex;justify-content:space-between;margin-bottom:0.5rem}
+.lectura-tipo{font-family:'Cinzel',serif;color:#d4af37}
+.lectura-fecha{font-size:0.8rem;color:#999}
+.lectura-preview{font-size:0.9rem;color:#666;margin-bottom:0.75rem}
+.empty-grim{text-align:center;padding:2rem}
+.empty-grim span{font-size:3rem;color:#ddd}
+.empty-grim h3{font-family:'Cinzel',serif;margin:0.5rem 0}
+.empty-grim p{color:#666;max-width:400px;margin:0 auto}
+.diario-intro{color:#666;margin-bottom:1.5rem}
+.diario-nuevo{background:#fafafa;border-radius:12px;padding:1.5rem;margin-bottom:2rem}
+.diario-nuevo h3{font-family:'Cinzel',serif;margin-bottom:1rem}
+.tipos-entrada{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem}
+.tipo-btn{display:flex;align-items:center;gap:0.3rem;padding:0.5rem 0.75rem;background:#fff;border:1px solid #f0f0f0;border-radius:20px;font-size:0.8rem;cursor:pointer}
+.tipo-btn:hover{border-color:#d4af37}
+.tipo-btn.act{background:#d4af37;border-color:#d4af37;color:#1a1a1a}
+.tipo-btn span{font-size:1rem}
+.tipo-desc{font-size:0.8rem;color:#888;margin-bottom:0.75rem}
+.diario-nuevo textarea{width:100%;padding:1rem;border:1px solid #ddd;border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-bottom:1rem;resize:vertical}
+.diario-entradas h3{font-family:'Cinzel',serif;margin-bottom:1rem;font-size:1rem}
+.entrada-card{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:1rem;margin-bottom:0.75rem}
+.entrada-head{display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.85rem}
+.entrada-head span:first-child{color:#d4af37}
+.entrada-head span:last-child{color:#999}
+.entrada-card p{color:#666;font-size:0.95rem}
+.tito-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:60px;height:60px;border-radius:50%;background:#1a1a1a;border:2px solid #d4af37;cursor:pointer;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:1000;display:flex;align-items:center;justify-content:center}
+.tito-btn img{width:100%;height:100%;object-fit:cover;position:absolute}
+.tito-fb{font-family:'Cinzel',serif;font-size:1.5rem;color:#d4af37}
+.tito-chat{position:fixed;bottom:6rem;right:1.5rem;width:340px;height:450px;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);display:flex;flex-direction:column;z-index:999;overflow:hidden}
+.tito-head{display:flex;align-items:center;gap:0.75rem;padding:1rem;background:#1a1a1a}
+.tito-av{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.tito-head div{flex:1}
+.tito-head strong{display:block;color:#d4af37;font-family:'Cinzel',serif;font-size:0.9rem}
+.tito-head small{font-size:0.75rem;color:rgba(255,255,255,0.6)}
+.tito-head button{background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;cursor:pointer}
+.tito-msgs{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.6rem}
+.msg-t,.msg-u{max-width:85%;padding:0.6rem 0.9rem;border-radius:12px}
+.msg-t{background:#f5f5f5;align-self:flex-start}
+.msg-u{background:#1a1a1a;color:#fff;align-self:flex-end}
+.msg-t p,.msg-u p{margin:0;font-size:0.9rem}
+.tito-input{display:flex;gap:0.5rem;padding:0.75rem;border-top:1px solid #f0f0f0}
+.tito-input input{flex:1;padding:0.6rem 1rem;border:1px solid #e0e0e0;border-radius:50px;font-size:0.85rem;font-family:'Cormorant Garamond',serif}
+.tito-input button{width:36px;height:36px;border-radius:50%;background:#d4af37;border:none;color:#1a1a1a;font-size:1.1rem;cursor:pointer}
+.tito-input button:disabled{background:#ddd}
+.onb{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:#FFFEF9}
+.onb-card{background:#fff;border-radius:20px;padding:2rem;max-width:450px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.08)}
+.onb-header{text-align:center;margin-bottom:1.5rem}
+.onb-header span{font-size:2.5rem}
+.onb-header h2{font-family:'Cinzel',serif;margin:0.5rem 0}
+.onb-header p{color:#666;font-size:0.95rem}
+.onb-prog{display:flex;justify-content:center;gap:0.75rem;margin-bottom:1.5rem}
+.prog-p{width:32px;height:32px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:0.85rem;color:#999}
+.prog-p.act{background:#d4af37;border-color:#d4af37;color:#1a1a1a}
+.onb-paso{text-align:center;min-height:130px}
+.onb-paso h3{font-family:'Cinzel',serif;margin-bottom:0.5rem}
+.onb-sub{color:#666;font-size:0.9rem;margin-bottom:1rem}
+.onb-paso input[type="text"]{width:100%;padding:0.9rem;border:2px solid #f0f0f0;border-radius:10px;font-size:1rem;font-family:'Cormorant Garamond',serif;text-align:center}
+.prons{display:flex;gap:0.75rem;justify-content:center}
+.pron{padding:0.75rem 1.5rem;border:2px solid #f0f0f0;border-radius:10px;background:#fff;font-family:'Cinzel',serif;cursor:pointer}
+.pron:hover{border-color:#d4af37}
+.pron.act{background:#d4af37;border-color:#d4af37;color:#1a1a1a}
+.monedas{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.moneda{display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:1.5rem;border:2px solid #f0f0f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.2s}
+.moneda:hover{border-color:#d4af37}
+.moneda.act{border-color:#d4af37;background:#FFF8E7}
+.moneda span{font-size:2rem}
+.moneda strong{font-family:'Cinzel',serif}
+.moneda small{color:#666;font-size:0.85rem}
+.resumen-onb{background:#f5f5f5;border-radius:8px;padding:1rem;margin-top:1rem;text-align:center}
+.resumen-onb p{margin:0.25rem 0;font-size:0.9rem;color:#666}
+.resumen-onb strong{color:#1a1a1a}
+.ints{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem}
+.int{padding:0.5rem;border:1px solid #f0f0f0;border-radius:6px;background:#fff;font-size:0.85rem;cursor:pointer}
+.int:hover{border-color:#d4af37}
+.int.act{background:#d4af37;border-color:#d4af37;color:#1a1a1a}
+.regalo-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1.25rem;margin:1rem 0}
+.regalo-box span{font-size:1.5rem}
+.regalo-box p{margin:0.25rem 0;color:#666;font-size:0.9rem}
+.regalo-box strong{display:block;font-family:'Cinzel',serif;font-size:1.1rem;color:#166534}
+.regalo-box small{color:#888;font-size:0.8rem}
+.onb-btns{display:flex;gap:0.75rem;justify-content:center;margin-top:1.5rem}
+.carga{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FFFEF9}
+.carga-c{text-align:center}
+.carga-runa{font-size:3rem;color:#d4af37;animation:pulsar 2s ease-in-out infinite}
+.carga-c p{margin-top:1rem;color:#666}
+@keyframes pulsar{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
+@media(max-width:1100px){.stats-g,.beneficios-grid,.membresias-grid,.cristales-grid{grid-template-columns:repeat(2,1fr)}.exp-grid,.elementos-grid,.regalos-grid,.grim-intro-cards{grid-template-columns:1fr}.canjes-grid,.packs-grid{grid-template-columns:repeat(2,1fr)}.info-grid,.benef-grid-int,.fases-mes{grid-template-columns:1fr}}
+@media(max-width:900px){.menu-btn{display:flex}.nav{transform:translateX(-100%);transition:transform 0.3s}.nav.abierto{transform:translateX(0)}.contenido{margin-left:0}.user-info{display:none}}
+@media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tito-chat{right:1rem;left:1rem;width:auto;bottom:5rem}.tito-btn{width:50px;height:50px;bottom:1rem;right:1rem}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
+`;
