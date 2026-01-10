@@ -895,15 +895,23 @@ FEATURES:
     // ═══════════════════════════════════════════════════════════════
 
     function agregarMensaje(texto, tipo, productos = []) {
+        console.log('🍀 agregarMensaje llamado con:', { texto: texto.substring(0,50), tipo, productosLength: productos ? productos.length : 0 });
+
         const msg = document.createElement('div');
         msg.className = `tito-msg ${tipo}`;
         msg.innerHTML = texto;
         els.messages.appendChild(msg);
 
         // Si hay productos, agregar galería
+        console.log('🍀 Verificando productos:', productos);
         if (productos && productos.length > 0) {
+            console.log('🍀 CREANDO GALERÍA con', productos.length, 'productos');
             const galeria = crearGaleria(productos);
+            console.log('🍀 Galería creada:', galeria);
             els.messages.appendChild(galeria);
+            console.log('🍀 Galería agregada al DOM');
+        } else {
+            console.log('🍀 NO HAY PRODUCTOS para mostrar');
         }
 
         els.messages.scrollTop = els.messages.scrollHeight;
