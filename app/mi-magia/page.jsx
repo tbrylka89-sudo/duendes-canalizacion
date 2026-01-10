@@ -648,7 +648,7 @@ function Jardin({ usuario, setUsuario, pais, token }) {
       const res = await fetch(`${API_BASE}/api/mi-magia/canjear`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, canjeId: canje.id, treboles: canje.treboles })
+        body: JSON.stringify({ email: usuario.email, canjeId: canje.id })
       });
       const data = await res.json();
       if (data.success) {
@@ -1013,27 +1013,58 @@ function CristalesSec() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CÍRCULO (con contenido interno desarrollado)
+// CÍRCULO (con contenido interno desarrollado - conectado a APIs)
 // ═══════════════════════════════════════════════════════════════
 
 function CirculoSec({ usuario, setUsuario, token, pais }) {
   const [tab, setTab] = useState('inicio');
   const [verMembresias, setVerMembresias] = useState(false);
   const [activandoPrueba, setActivandoPrueba] = useState(false);
+  const [lunaData, setLunaData] = useState(null);
+  const [contenidos, setContenidos] = useState([]);
+  const [cargandoLuna, setCargandoLuna] = useState(false);
+  const [cargandoContenido, setCargandoContenido] = useState(false);
   const esUY = pais === 'UY';
-  
+
+  useEffect(() => {
+    if (usuario?.esCirculo) {
+      cargarLuna();
+      cargarContenido();
+    }
+  }, [usuario?.esCirculo]);
+
+  const cargarLuna = async () => {
+    setCargandoLuna(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/circulo/luna?email=${usuario.email}`);
+      const data = await res.json();
+      if (data.success) setLunaData(data.luna);
+    } catch(e) { console.error('Error cargando luna:', e); }
+    setCargandoLuna(false);
+  };
+
+  const cargarContenido = async () => {
+    setCargandoContenido(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/circulo/contenido?email=${usuario.email}`);
+      const data = await res.json();
+      if (data.success) setContenidos(data.contenidos || []);
+    } catch(e) { console.error('Error cargando contenido:', e); }
+    setCargandoContenido(false);
+  };
+
   const activarPrueba = async () => {
     setActivandoPrueba(true);
     try {
-      const res = await fetch(`${API_BASE}/api/mi-magia/circulo/prueba`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
+      const res = await fetch(`${API_BASE}/api/mi-magia/circulo/prueba`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: usuario.email }) });
       const data = await res.json();
       if (data.success) {
-        setUsuario({ ...usuario, esCirculo: true, circuloPrueba: true, circuloExpira: data.expira, runas: (usuario.runas || 0) + 50 });
+        setUsuario({ ...usuario, esCirculo: true, circuloPrueba: true, circuloExpira: data.beneficios?.expira, runas: (usuario.runas || 0) + 50 });
       }
     } catch(e) {}
     setActivandoPrueba(false);
   };
-  
+
   // SI ES MIEMBRO DEL CÍRCULO - MUNDO INTERNO
   if (usuario?.esCirculo) {
     return (
@@ -1041,15 +1072,15 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
         <div className="circulo-header-int">
           <span>★</span>
           <h1>Círculo de Duendes</h1>
-          <p>{usuario.circuloPrueba ? `Prueba gratuita hasta ${usuario.circuloExpira}` : `Miembro hasta ${usuario.circuloExpira}`}</p>
+          <p>{usuario.circuloPrueba ? `Prueba gratuita` : `Miembro activo`}{usuario.circuloExpira ? ` hasta ${new Date(usuario.circuloExpira).toLocaleDateString('es-UY')}` : ''}</p>
         </div>
-        
+
         <div className="circulo-tabs">
-          {[['inicio','◇','Inicio'],['contenido','✦','Contenido'],['guia','☽','Guía Lunar'],['comunidad','❧','Comunidad']].map(([k,i,t]) => 
+          {[['inicio','◇','Inicio'],['contenido','✦','Contenido'],['guia','☽','Guía Lunar'],['comunidad','❧','Comunidad']].map(([k,i,t]) =>
             <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}><span>{i}</span>{t}</button>
           )}
         </div>
-        
+
         {tab === 'inicio' && (
           <div className="circulo-inicio">
             <div className="beneficios-activos">
@@ -1060,6 +1091,20 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
                 <div className="benef-item-int"><span>ᚱ</span><strong>1 lectura/mes</strong><p>Tirada o Pregunta gratis</p></div>
               </div>
             </div>
+
+            {lunaData && (
+              <div className="luna-preview">
+                <div className="luna-mini">
+                  <span className="luna-emoji">{lunaData.faseActual?.emoji}</span>
+                  <div>
+                    <strong>{lunaData.faseActual?.nombre}</strong>
+                    <p>{lunaData.faseActual?.energia}</p>
+                  </div>
+                </div>
+                <button className="btn-sec" onClick={() => setTab('guia')}>Ver guía lunar completa →</button>
+              </div>
+            )}
+
             <div className="circulo-bienvenida">
               <h2>Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'} al santuario secreto</h2>
               <p>Este es tu espacio exclusivo. Acá encontrarás contenido que no está disponible en ningún otro lugar: guías lunares, DIY mágicos, meditaciones, y una comunidad de personas que, como vos, sienten el llamado de la magia.</p>
@@ -1067,40 +1112,126 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
             </div>
           </div>
         )}
-        
+
         {tab === 'contenido' && (
           <div className="circulo-contenido">
             <h2>Contenido Exclusivo</h2>
             <p className="contenido-intro">Cada mes nuevo contenido. Acá abajo lo más reciente:</p>
-            <div className="contenido-lista">
-              <div className="contenido-item"><span>📖</span><h4>Guía: Los 8 Sabbats del Año</h4><p>Calendario esotérico completo con rituales para cada celebración.</p><button className="btn-sec">Ver guía</button></div>
-              <div className="contenido-item"><span>🕯️</span><h4>DIY: Velas con intención</h4><p>Cómo hacer tus propias velas rituales paso a paso.</p><button className="btn-sec">Ver tutorial</button></div>
-              <div className="contenido-item"><span>🎧</span><h4>Meditación: Conexión con tu guardián</h4><p>Audio guiado de 15 minutos para fortalecer el vínculo.</p><button className="btn-sec">Escuchar</button></div>
-              <div className="contenido-item"><span>✦</span><h4>Lectura colectiva: Enero 2026</h4><p>Mensaje general canalizado para todo el Círculo.</p><button className="btn-sec">Leer</button></div>
-            </div>
+            {cargandoContenido ? (
+              <div className="cargando-mini">Cargando contenido...</div>
+            ) : (
+              <div className="contenido-lista">
+                {contenidos.length > 0 ? contenidos.map((c, i) => (
+                  <div key={c.id || i} className="contenido-item">
+                    <span>{c.tipo === 'ritual' ? '🕯️' : c.tipo === 'meditacion' ? '🎧' : c.tipo === 'guia' ? '📖' : '✦'}</span>
+                    <h4>{c.titulo}</h4>
+                    <p>{c.extracto}</p>
+                    <small>Por {c.autor} • {c.vistas} vistas</small>
+                    <button className="btn-sec">Ver {c.tipo}</button>
+                  </div>
+                )) : (
+                  <>
+                    <div className="contenido-item"><span>📖</span><h4>Guía: Los 8 Sabbats del Año</h4><p>Calendario esotérico completo con rituales para cada celebración.</p><button className="btn-sec">Ver guía</button></div>
+                    <div className="contenido-item"><span>🕯️</span><h4>DIY: Velas con intención</h4><p>Cómo hacer tus propias velas rituales paso a paso.</p><button className="btn-sec">Ver tutorial</button></div>
+                    <div className="contenido-item"><span>🎧</span><h4>Meditación: Conexión con tu guardián</h4><p>Audio guiado de 15 minutos para fortalecer el vínculo.</p><button className="btn-sec">Escuchar</button></div>
+                  </>
+                )}
+              </div>
+            )}
             <div className="temas-explorar">
               <h3>Temas que exploramos:</h3>
               <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
             </div>
           </div>
         )}
-        
+
         {tab === 'guia' && (
           <div className="circulo-guia">
-            <h2>Guía Lunar - Enero 2026</h2>
-            <div className="luna-actual"><span>☽</span><p>Luna actual: <strong>Menguante en Libra</strong></p></div>
-            <div className="fases-mes">
-              <div className="fase"><span>●</span><strong>Luna Nueva</strong><p>13 Enero - Ideal para intenciones, inicios</p></div>
-              <div className="fase"><span>◐</span><strong>Cuarto Creciente</strong><p>21 Enero - Acción, movimiento</p></div>
-              <div className="fase"><span>○</span><strong>Luna Llena</strong><p>28 Enero - Manifestación, gratitud</p></div>
-            </div>
-            <div className="ritual-sugerido">
-              <h3>Ritual sugerido esta semana:</h3>
-              <p>Con la luna menguante, es momento de soltar. Escribí en un papel lo que querés dejar ir, quemalo con una vela blanca, y dejá que el humo lleve esas energías.</p>
-            </div>
+            <h2>Guía Lunar</h2>
+            {cargandoLuna ? (
+              <div className="cargando-mini">Consultando las estrellas...</div>
+            ) : lunaData ? (
+              <>
+                <div className="luna-hero">
+                  <div className="luna-fase-grande">
+                    <span className="luna-emoji-lg">{lunaData.faseActual?.emoji}</span>
+                    <div>
+                      <h3>{lunaData.faseActual?.nombre}</h3>
+                      <p className="luna-energia">{lunaData.faseActual?.energia}</p>
+                      <small>{lunaData.iluminacion}% iluminada</small>
+                    </div>
+                  </div>
+                  {lunaData.signoLunar && (
+                    <div className="signo-lunar">
+                      <span>{lunaData.signoLunar.emoji}</span>
+                      <div>
+                        <strong>Luna en {lunaData.signoLunar.signo}</strong>
+                        <p>{lunaData.signoLunar.energia}</p>
+                        <small>Elemento: {lunaData.signoLunar.elemento}</small>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mensaje-guardian-luna">
+                  <h3>✦ Mensaje de tu Guardián</h3>
+                  <p className="mensaje-texto">{lunaData.mensajeGuardian}</p>
+                </div>
+
+                <div className="afirmacion-dia">
+                  <h3>Afirmación del día</h3>
+                  <p className="afirmacion">"{lunaData.afirmacionDia}"</p>
+                </div>
+
+                {lunaData.proximasFases && (
+                  <div className="proximas-fases">
+                    <h3>Próximas fases</h3>
+                    <div className="fases-grid">
+                      {lunaData.proximasFases.map((f, i) => (
+                        <div key={i} className="fase-item">
+                          <span>{f.emoji}</span>
+                          <strong>{f.fase}</strong>
+                          <small>en {f.diasRestantes} días</small>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {lunaData.ritualesRecomendados && (
+                  <div className="rituales-fase">
+                    <h3>Rituales para esta fase</h3>
+                    <ul>
+                      {lunaData.ritualesRecomendados.map((r, i) => <li key={i}>{r}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {lunaData.cristalesLuna && (
+                  <div className="cristales-fase">
+                    <h3>Cristales recomendados</h3>
+                    <div className="cristales-tags">
+                      {lunaData.cristalesLuna.map((c, i) => <span key={i}>{c}</span>)}
+                    </div>
+                  </div>
+                )}
+
+                {lunaData.energiaMes && (
+                  <div className="energia-mes">
+                    <h3>Energía del mes: {lunaData.energiaMes.nombre}</h3>
+                    <div className="energia-info" style={{borderColor: lunaData.energiaMes.color}}>
+                      <strong>Tema: {lunaData.energiaMes.tema}</strong>
+                      <p>Cristal del mes: {lunaData.energiaMes.cristal}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="luna-error">No pudimos cargar los datos lunares. Intentá de nuevo.</div>
+            )}
           </div>
         )}
-        
+
         {tab === 'comunidad' && (
           <div className="circulo-comunidad">
             <h2>Comunidad del Círculo</h2>
@@ -1116,32 +1247,34 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
       </div>
     );
   }
-  
+
   // SI NO ES MIEMBRO - LANDING INTERNA
   return (
     <div className="sec circulo-landing">
       <div className="circulo-hero"><span>★</span><h1>Círculo de Duendes</h1><p>El santuario secreto para quienes sienten el llamado</p></div>
-      
+
       <div className="circulo-intro-text">
         <p>El Círculo es más que una membresía. Es una comunidad de personas que, como vos, sienten que hay algo más allá de lo visible. Es acceso a conocimiento que no compartimos en ningún otro lugar. Es descuentos permanentes, lecturas gratis, y la sensación de pertenecer a algo especial.</p>
       </div>
-      
+
       <div className="prueba-gratis">
         <h2>🎁 15 días gratis</h2>
         <p>Probá sin compromiso. Si no es para vos, no pasa nada.</p>
         <p><strong>+ 50 Runas de regalo</strong> para que explores las experiencias mágicas.</p>
-        <button className="btn-gold btn-lg" onClick={activarPrueba} disabled={activandoPrueba}>
-          {activandoPrueba ? 'Activando...' : 'Activar prueba gratuita'}
+        <p><strong>+ 1 Tirada de Runas gratis</strong> para empezar tu camino.</p>
+        <button className="btn-gold btn-lg" onClick={activarPrueba} disabled={activandoPrueba || usuario?.circuloPruebaUsada}>
+          {activandoPrueba ? 'Activando...' : usuario?.circuloPruebaUsada ? 'Prueba ya utilizada' : 'Activar prueba gratuita'}
         </button>
+        {usuario?.circuloPruebaUsada && <p className="prueba-usada">Ya usaste tu prueba gratuita. Elegí una membresía para continuar.</p>}
       </div>
-      
+
       <h2 className="sec-titulo">¿Qué incluye?</h2>
       <div className="beneficios-grid">
         {CIRCULO_CONTENIDO.beneficios.map((b,i) => (
           <div key={i} className="beneficio-card"><span>{b.icono}</span><h4>{b.titulo}</h4><p>{b.desc}</p></div>
         ))}
       </div>
-      
+
       <h2 className="sec-titulo" style={{cursor:'pointer'}} onClick={() => setVerMembresias(!verMembresias)}>
         Membresías {verMembresias ? '▼' : '▶'}
       </h2>
@@ -1158,7 +1291,7 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
           ))}
         </div>
       )}
-      
+
       <h2 className="sec-titulo">Temas que exploramos</h2>
       <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
     </div>
@@ -1174,14 +1307,17 @@ function GrimorioSec({ usuario, token, setUsuario }) {
   const [entrada, setEntrada] = useState('');
   const [tipoEntrada, setTipoEntrada] = useState('libre');
   const [guardando, setGuardando] = useState(false);
+  const [msg, setMsg] = useState(null);
   
   const guardarEntrada = async () => {
     if (!entrada.trim()) return;
     setGuardando(true);
-    try { 
-      await fetch(`${API_BASE}/api/mi-magia/diario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, tipo: tipoEntrada, contenido: entrada }) }); 
-      setUsuario({ ...usuario, diario: [...(usuario.diario || []), { tipo: tipoEntrada, contenido: entrada, fecha: new Date().toLocaleDateString('es-UY') }] });
+    try {
+      const res = await fetch(`${API_BASE}/api/mi-magia/diario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: usuario.email, tipo: tipoEntrada, contenido: entrada }) });
+      const data = await res.json();
+      setUsuario({ ...usuario, diario: [...(usuario.diario || []), { tipo: tipoEntrada, contenido: entrada, fecha: new Date().toLocaleDateString('es-UY') }], runas: data.runaOtorgada ? (usuario.runas || 0) + 1 : usuario.runas });
       setEntrada('');
+      if (data.runaOtorgada) setMsg({ t: 'ok', m: '+1 Runa por tu práctica diaria!' });
     } catch(e) {}
     setGuardando(false);
   };
@@ -1703,4 +1839,55 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 @media(max-width:1100px){.stats-g,.beneficios-grid,.membresias-grid,.cristales-grid{grid-template-columns:repeat(2,1fr)}.exp-grid,.elementos-grid,.regalos-grid,.grim-intro-cards{grid-template-columns:1fr}.canjes-grid,.packs-grid{grid-template-columns:repeat(2,1fr)}.info-grid,.benef-grid-int,.fases-mes{grid-template-columns:1fr}}
 @media(max-width:900px){.menu-btn{display:flex}.nav{transform:translateX(-100%);transition:transform 0.3s}.nav.abierto{transform:translateX(0)}.contenido{margin-left:0}.user-info{display:none}}
 @media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tito-chat{right:1rem;left:1rem;width:auto;bottom:5rem}.tito-btn{width:50px;height:50px;bottom:1rem;right:1rem}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
+
+/* ═══════════════════════════════════════════════════════════════
+   LUNA CALENDAR STYLES - PREMIUM
+   ═══════════════════════════════════════════════════════════════ */
+.cargando-mini{text-align:center;padding:2rem;color:#888;font-style:italic}
+.luna-preview{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between}
+.luna-mini{display:flex;align-items:center;gap:1rem}
+.luna-emoji{font-size:2.5rem}
+.luna-mini strong{color:#d4af37;font-family:'Cinzel',serif}
+.luna-mini p{color:rgba(255,255,255,0.7);font-size:0.9rem;margin:0}
+.luna-hero{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2rem}
+.luna-fase-grande{background:#1a1a1a;border-radius:16px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
+.luna-emoji-lg{font-size:4rem}
+.luna-fase-grande h3{font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.25rem}
+.luna-energia{color:rgba(255,255,255,0.8);font-size:0.95rem;margin:0}
+.luna-fase-grande small{color:rgba(255,255,255,0.5);font-size:0.8rem}
+.signo-lunar{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
+.signo-lunar span{font-size:2.5rem}
+.signo-lunar strong{font-family:'Cinzel',serif;display:block}
+.signo-lunar p{color:#666;font-size:0.9rem;margin:0.25rem 0}
+.signo-lunar small{color:#888;font-size:0.8rem}
+.mensaje-guardian-luna{background:linear-gradient(135deg,#FFF9F0,#FDF8F5);border-left:4px solid #d4af37;border-radius:0 12px 12px 0;padding:1.5rem;margin-bottom:1.5rem}
+.mensaje-guardian-luna h3{font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.75rem}
+.mensaje-texto{font-style:italic;color:#444;font-size:1.05rem;line-height:1.7}
+.afirmacion-dia{background:#1a1a1a;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.5rem}
+.afirmacion-dia h3{font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.75rem;font-size:0.9rem}
+.afirmacion{color:#fff;font-size:1.2rem;font-style:italic;margin:0}
+.proximas-fases{margin-bottom:1.5rem}
+.proximas-fases h3{font-family:'Cinzel',serif;margin-bottom:1rem;font-size:1rem}
+.fases-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.fase-item{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
+.fase-item span{font-size:2rem}
+.fase-item strong{display:block;font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem;font-size:0.9rem}
+.fase-item small{color:#888;font-size:0.8rem}
+.rituales-fase{background:#fafafa;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.rituales-fase h3{font-family:'Cinzel',serif;margin-bottom:0.75rem;font-size:1rem}
+.rituales-fase ul{margin-left:1.25rem;color:#666}
+.rituales-fase li{margin-bottom:0.4rem}
+.cristales-fase{margin-bottom:1.5rem}
+.cristales-fase h3{font-family:'Cinzel',serif;margin-bottom:0.75rem;font-size:1rem}
+.cristales-tags{display:flex;flex-wrap:wrap;gap:0.5rem}
+.cristales-tags span{background:linear-gradient(135deg,#f5f5f5,#fff);padding:0.5rem 1rem;border-radius:50px;font-size:0.85rem;border:1px solid #e0e0e0}
+.energia-mes{margin-bottom:1.5rem}
+.energia-mes h3{font-family:'Cinzel',serif;margin-bottom:0.75rem;font-size:1rem}
+.energia-info{background:#fff;border-left:4px solid;border-radius:0 12px 12px 0;padding:1rem}
+.energia-info strong{display:block;font-family:'Cinzel',serif;margin-bottom:0.25rem}
+.energia-info p{color:#666;font-size:0.9rem;margin:0}
+.luna-error{text-align:center;padding:2rem;color:#dc2626;background:#fef2f2;border-radius:12px}
+.prueba-usada{color:#888;font-size:0.85rem;margin-top:0.5rem!important}
+.contenido-item small{display:block;font-size:0.75rem;color:#888;margin-bottom:0.5rem}
+@media(max-width:768px){.luna-hero{grid-template-columns:1fr}.fases-grid{grid-template-columns:1fr}}
 `;
