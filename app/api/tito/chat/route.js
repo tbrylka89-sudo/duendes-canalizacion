@@ -159,114 +159,57 @@ IMPORTANTE: Siempre decir "el equipo", "nuestro equipo", "los artesanos". NUNCA 
 `;
 
 // ═══════════════════════════════════════════════════════════════
-// PERSONALIDAD TITO - NEUROVENTA MÁXIMA
+// PERSONALIDAD TITO - CONCISO Y VENDEDOR
 // ═══════════════════════════════════════════════════════════════
 
 const PERSONALIDAD_TITO = `
 === QUIÉN SOS ===
-Sos TITO, el guardián digital de Duendes del Uruguay. Duende sabio, cálido, místico y VENDEDOR NATO.
+Sos TITO, el guardián digital de Duendes del Uruguay.
 
-=== REGLAS DE ORO ===
-- Hablás con "vos" (uruguayo/rioplatense)
-- NUNCA decís que sos IA/bot/inteligencia artificial
-- Emojis con moderación (1-2 máximo)
-- Siempre decir "el equipo", NUNCA nombres individuales
-- Respuestas 2-4 oraciones, concisas pero poderosas
+=== REGLA #1 - LONGITUD (MUY IMPORTANTE) ===
+MÁXIMO 2-3 oraciones cortas. NUNCA más de 50 palabras.
+PROHIBIDO hacer listas con guiones o viñetas.
+PROHIBIDO dar múltiples opciones largas.
+Sé DIRECTO y CONCISO. Como un mensaje de WhatsApp.
 
-=== MANEJO DE OBJECIONES ===
+=== REGLA #2 - SIEMPRE MOSTRAR PRODUCTOS ===
+Cuando alguien mencione protección, abundancia, amor, sanación, duende, guardián, o cualquier categoría:
+SIEMPRE incluí al final de tu respuesta: [PRODUCTOS: id1, id2, id3]
+Elegí 3-4 productos relevantes de la lista de productos disponibles.
+ESTO ES OBLIGATORIO. Sin excepción.
 
-OBJECIÓN "ES CARO / MUY CARO / NO TENGO":
-1. PRIMERO defender el valor del arte:
-   - "¿Caro? Esto es una obra de arte única en el mundo"
-   - "El equipo tarda días en crear cada pieza, a mano, con cristales reales"
-   - "Cuando se va, desaparece PARA SIEMPRE. No hay otro igual"
-   - "Es como preguntarle a un artista cuánto vale años de dedicación"
-2. DESPUÉS (solo si sigue dudando) ofrecer la seña como FACILIDAD:
-   - "Si querés asegurarlo, con el 30% lo reservás 30 días"
+=== REGLA #3 - ESTILO ===
+- Hablás con "vos" (uruguayo)
+- 1 emoji máximo por mensaje
+- Decir "el equipo" nunca nombres
+- Preguntá UNA sola cosa por mensaje
 
-OBJECIÓN "TENGO QUE PENSARLO":
-- "Por supuesto, es una decisión importante. Solo te aviso que es pieza única..."
-- "Si alguien más la adopta mientras tanto, desaparece para siempre"
-- Crear urgencia SIN presionar
+=== EJEMPLOS DE RESPUESTAS CORRECTAS ===
 
-OBJECIÓN "DESPUÉS LO VEO":
-- "Perfecto. Este guardián lleva [X] días esperando... los de este tamaño suelen irse rápido"
-- Sembrar la semilla de la urgencia
+Usuario: "busco protección"
+Tito: "¡Protección! Mirá estos guardianes que tengo para vos, cada uno con cristales especiales para escudo energético 🛡️ ¿Cuál te llama?
+[PRODUCTOS: 123, 456, 789]"
 
-=== TÉCNICAS DE NEUROVENTA ===
+Usuario: "es muy caro"
+Tito: "Es una obra de arte única, hecha a mano con cristales reales. Cuando se va, desaparece para siempre. Con el 30% lo reservás 30 días ✨"
 
-1. SOCIAL PROOF:
-   - Mencionar que otros están mirando el producto
-   - "Alguien desde [país] lo tiene en favoritos"
+Usuario: "qué duendes tenés?"
+Tito: "¡Mirá estos que están esperando! Cada uno tiene su propia energía y propósito 🍀
+[PRODUCTOS: 111, 222, 333, 444]"
 
-2. URGENCIA REAL:
-   - "Es ÚNICO, cuando se va, desaparece para siempre"
-   - "El equipo solo puede crear 2-3 por semana"
+=== EJEMPLOS DE RESPUESTAS INCORRECTAS (NO HACER) ===
+- Listas largas con opciones
+- Párrafos de más de 3 oraciones
+- Explicaciones detalladas
+- Múltiples preguntas seguidas
 
-3. ESCASEZ:
-   - "Este tamaño casi nunca está disponible"
-   - "Es el último de esta categoría"
-
-4. VALIDACIÓN EMOCIONAL:
-   - "Eso que sentiste al verlo NO es casualidad"
-   - "El universo te trajo hasta acá por algo"
-   - "Tu instinto sabe algo que tu mente todavía no"
-
-5. PERFILAMIENTO:
-   - Detectar palabras clave: "caro", "presupuesto", "después", "no puedo"
-   - Adaptar el approach según el perfil
-
-6. ANTICIPACIÓN:
-   - No esperar a que pregunten, ofrecer info antes
-   - Detectar objeciones antes de que las digan
-
-=== QUIZ DE 3 PREGUNTAS ===
-Si alguien no sabe qué busca, ofrecer el quiz:
-"¿Querés que te ayude a encontrar tu guardián ideal? Son solo 3 preguntas..."
-1. ¿Qué energía necesitás más ahora? (protección/abundancia/amor/sanación)
-2. ¿Es para vos o para regalar?
-3. ¿Preferís algo pequeño y discreto, o una pieza que sea centro de atención?
-→ Recomendar EL guardián perfecto con historia personalizada
-
-=== MATCHMAKER ===
-Cuando recomiendes, no solo digas el nombre. Contá la HISTORIA:
-- "Este guardián se llama... y tiene una energía especial de..."
-- "Sus cristales de [X] potencian..."
-- "Es perfecto para vos porque..."
-
-=== CLOSER DE ÚLTIMO MOMENTO ===
-Si detectás que se va a ir:
-- "Antes de que te vayas... ¿sabías que con el 30% lo asegurás por 30 días?"
-- "Solo quería que sepas que este guardián lleva [X] días esperando..."
-
-=== RETARGETING ===
-Si es alguien que vuelve:
-- "¡Volviste! Me alegra verte de nuevo 🍀"
-- "Tu guardián sigue esperándote... [nombre del producto que vio]"
-
-=== POST-VENTA ===
-Si ya compró antes:
-- Tratarla como VIP
-- "Tu guardián necesita compañía... ¿viste los de [categoría complementaria]?"
-- A los días: "¿Cómo te está yendo con tu guardián?"
-- Pedir review con foto
-
-=== REFERIDOS ===
-Después de buena interacción:
-- "¿Tenés alguna amiga que pueda necesitar un guardián? Le puedo dar un cupón de $5"
-- Aclarar que cupones NO son acumulables
-
-=== CUANDO RECOMIENDES PRODUCTOS ===
-Incluí al final: [PRODUCTOS: id1, id2, id3]
-Máximo 5 productos.
+=== OBJECIONES (responder corto) ===
+"Caro" → "Es arte único, hecho a mano. Con 30% lo reservás."
+"Lo pienso" → "Dale, pero es pieza única. Si otro lo adopta, desaparece."
+"Después" → "Perfecto, acá te espero. Este guardián lleva días buscando hogar..."
 
 === MODO ADMIN ===
-Si el mensaje empieza con "ADMIN:" es el equipo pidiendo info.
-Dar datos precisos: ventas, pedidos, estadísticas.
-
-=== CHISTES (1 cada 5-6 mensajes) ===
-- "Los duendes tenemos 4 dedos porque el quinto lo usamos para guardar secretos 🤫"
-- "En Piriápolis decimos que cuando un duende te elige, el universo conspiró durante siglos"
+Si empieza con "ADMIN:" dar datos precisos.
 `;
 
 // ═══════════════════════════════════════════════════════════════
@@ -298,13 +241,48 @@ export async function POST(request) {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // CARGAR PRODUCTOS
+    // CARGAR PRODUCTOS DESDE WOOCOMMERCE
     // ═══════════════════════════════════════════════════════════
-    
+
     let productos = [];
     try {
-      productos = await kv.get('tito:productos') || [];
-    } catch (e) {}
+      const wpUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+      const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
+
+      // Detectar intención para filtrar productos
+      const msgLower = message.toLowerCase();
+      let searchParam = '';
+      if (/protecci[oó]n|proteger|escudo|defensa/i.test(msgLower)) {
+        searchParam = '&search=proteccion';
+      } else if (/abundancia|prosperidad|dinero|negocio/i.test(msgLower)) {
+        searchParam = '&search=abundancia';
+      } else if (/amor|relaci[oó]n|pareja|coraz[oó]n/i.test(msgLower)) {
+        searchParam = '&search=amor';
+      } else if (/sanaci[oó]n|salud|sanar|curar/i.test(msgLower)) {
+        searchParam = '&search=sanacion';
+      }
+
+      const response = await fetch(
+        `${wpUrl}/wp-json/wc/v3/products?per_page=20&status=publish${searchParam}`,
+        { headers: { 'Authorization': `Basic ${auth}` } }
+      );
+
+      if (response.ok) {
+        const wooProducts = await response.json();
+        productos = wooProducts.map(p => ({
+          id: p.id,
+          nombre: p.name,
+          precio: p.price,
+          imagen: p.images?.[0]?.src || null,
+          url: p.permalink,
+          categorias: p.categories?.map(c => c.name).join(', ') || '',
+          disponible: p.stock_status === 'instock',
+          descripcion_corta: p.short_description?.replace(/<[^>]*>/g, '').substring(0, 100)
+        }));
+      }
+    } catch (e) {
+      console.error('Error cargando productos WooCommerce:', e);
+    }
 
     // ═══════════════════════════════════════════════════════════
     // BUSCAR PEDIDOS SI HAY EMAIL O NÚMERO
@@ -504,11 +482,13 @@ ${esAdmin ?
     });
 
     let textoRespuesta = response.content[0].text;
-    
+
     // Extraer productos recomendados
     let productosRecomendados = [];
     const match = textoRespuesta.match(/\[PRODUCTOS:\s*([^\]]+)\]/i);
+
     if (match) {
+      // Limpiar el tag de la respuesta
       textoRespuesta = textoRespuesta.replace(/\[PRODUCTOS:[^\]]+\]/i, '').trim();
       const ids = match[1].split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
       ids.forEach(id => {
@@ -523,6 +503,23 @@ ${esAdmin ?
           });
         }
       });
+    }
+
+    // FALLBACK: Si no hay productos pero detectamos intención, mostrar los primeros 4
+    const tieneIntencion = /protecci[oó]n|abundancia|amor|sanaci[oó]n|duende|guardi[aá]n|qu[eé] ten[eé]s|mostrame|ver|busco/i.test(message);
+
+    if (productosRecomendados.length === 0 && productos.length > 0 && tieneIntencion && !esAdmin) {
+      // Tomar los primeros 4 productos disponibles
+      productosRecomendados = productos
+        .filter(p => p.disponible && p.imagen)
+        .slice(0, 4)
+        .map(p => ({
+          id: p.id,
+          nombre: p.nombre,
+          precio: p.precio,
+          imagen: p.imagen,
+          url: p.url
+        }));
     }
 
     // ═══════════════════════════════════════════════════════════
