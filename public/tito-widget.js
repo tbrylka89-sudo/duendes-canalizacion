@@ -1,5 +1,5 @@
 /**
- * TITO WIDGET v5.1 - Duendes del Uruguay
+ * TITO WIDGET v5.2 - Duendes del Uruguay
  * <script src="https://duendes-vercel.vercel.app/tito-widget.js"></script>
  */
 
@@ -12,7 +12,7 @@
   };
 
   const CSS = `
-    @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
     #tito-widget-container * {
       box-sizing: border-box;
@@ -21,14 +21,14 @@
 
     #tito-bubble {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 72px;
-      height: 72px;
+      bottom: 20px;
+      right: 20px;
+      width: 85px;
+      height: 85px;
       border-radius: 50%;
       cursor: pointer;
       z-index: 999999;
-      box-shadow: 0 4px 24px rgba(198,169,98,0.5), 0 0 0 3px rgba(198,169,98,0.2);
+      box-shadow: 0 4px 28px rgba(198,169,98,0.5), 0 0 0 4px rgba(198,169,98,0.2);
       transition: all 0.3s ease;
       overflow: hidden;
       border: 3px solid #C6A962;
@@ -36,23 +36,35 @@
     }
     #tito-bubble:hover {
       transform: scale(1.08);
-      box-shadow: 0 6px 32px rgba(198,169,98,0.6), 0 0 0 6px rgba(198,169,98,0.15);
+      box-shadow: 0 6px 36px rgba(198,169,98,0.6), 0 0 0 8px rgba(198,169,98,0.15);
     }
     #tito-bubble img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+    #tito-bubble .tito-wave {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      font-size: 22px;
+      animation: wave 2s infinite;
+    }
+    @keyframes wave {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(20deg); }
+      75% { transform: rotate(-10deg); }
+    }
 
     #tito-proactive {
       position: fixed;
-      bottom: 108px;
-      right: 24px;
+      bottom: 118px;
+      right: 20px;
       background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
       border: 1px solid #C6A962;
       border-radius: 16px;
       padding: 16px 20px;
-      max-width: 260px;
+      max-width: 280px;
       z-index: 999998;
       display: none;
       animation: titoSlideIn 0.4s ease;
@@ -101,12 +113,12 @@
 
     #tito-chat {
       position: fixed;
-      bottom: 108px;
-      right: 24px;
-      width: 360px;
-      max-width: calc(100vw - 48px);
-      height: 500px;
-      max-height: calc(100vh - 140px);
+      bottom: 118px;
+      right: 20px;
+      width: 370px;
+      max-width: calc(100vw - 40px);
+      height: 520px;
+      max-height: calc(100vh - 150px);
       background: linear-gradient(180deg, #121212 0%, #0a0a0a 100%);
       border: 1px solid #C6A962;
       border-radius: 20px;
@@ -132,8 +144,8 @@
       border-bottom: 1px solid rgba(198,169,98,0.3);
     }
     #tito-header img {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       border: 2px solid #C6A962;
       object-fit: cover;
@@ -141,7 +153,7 @@
     #tito-header-info h3 {
       margin: 0;
       color: #C6A962;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 600;
       letter-spacing: 0.5px;
     }
@@ -197,11 +209,11 @@
     }
 
     .tito-msg {
-      max-width: 82%;
+      max-width: 85%;
       padding: 12px 16px;
       border-radius: 16px;
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.55;
       animation: msgFade 0.3s ease;
     }
     @keyframes msgFade {
@@ -221,6 +233,30 @@
       align-self: flex-end;
       border-bottom-right-radius: 4px;
       font-weight: 500;
+    }
+
+    .tito-quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      align-self: flex-start;
+    }
+    .tito-quick-btn {
+      background: rgba(198,169,98,0.1);
+      border: 1px solid rgba(198,169,98,0.4);
+      color: #C6A962;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Crimson Text', Georgia, serif;
+    }
+    .tito-quick-btn:hover {
+      background: #C6A962;
+      color: #0a0a0a;
+      transform: translateY(-1px);
     }
 
     .tito-typing {
@@ -351,20 +387,20 @@
     @media (max-width: 480px) {
       #tito-chat {
         width: calc(100vw - 24px);
-        height: calc(100vh - 110px);
-        bottom: 100px;
+        height: calc(100vh - 120px);
+        bottom: 110px;
         right: 12px;
         border-radius: 16px;
       }
       #tito-bubble {
-        width: 64px;
-        height: 64px;
-        bottom: 20px;
-        right: 16px;
+        width: 72px;
+        height: 72px;
+        bottom: 16px;
+        right: 14px;
       }
       #tito-proactive {
-        right: 16px;
-        bottom: 96px;
+        right: 14px;
+        bottom: 100px;
         max-width: calc(100vw - 100px);
       }
     }
@@ -404,10 +440,24 @@
     </div>
   `;
 
+  const TITO_INTRO = [
+    "Hola! Soy Tito, el guardian de este portal magico. Llevo siglos ayudando a las almas a encontrar su duende protector...",
+    "Bienvenida al bosque encantado! Soy Tito, y mi mision es ayudarte a encontrar al guardian que tu energia necesita.",
+    "Saludos, viajera! Soy Tito, el elfo custodio de Duendes del Uruguay. Siento que el universo te trajo hasta aca por una razon..."
+  ];
+
+  const QUICK_OPTIONS = [
+    { text: "Quien sos, Tito?", msg: "Contame sobre vos Tito, quien sos y que haces aca?" },
+    { text: "Recomendame un duende", msg: "Ayudame a elegir un duende, no se cual me conviene" },
+    { text: "Como comprar?", msg: "Como es el proceso para adoptar un duende?" },
+    { text: "Ver guardianes", msg: "Mostrame los duendes disponibles" }
+  ];
+
   const TitoWidget = {
     isOpen: false,
     conversationHistory: [],
     proactiveMessage: '',
+    hasShownIntro: false,
 
     init() {
       const style = document.createElement('style');
@@ -419,8 +469,8 @@
       document.body.appendChild(container.firstElementChild);
 
       this.bindEvents();
-      setTimeout(() => this.showProactive(), 6000);
-      console.log('Tito Widget v5.1 listo');
+      setTimeout(() => this.showProactive(), 5000);
+      console.log('Tito Widget v5.2 listo');
     },
 
     bindEvents() {
@@ -438,6 +488,9 @@
       document.getElementById('tito-proactive').style.display = 'none';
       if (this.isOpen) {
         document.getElementById('tito-input').focus();
+        if (!this.hasShownIntro) {
+          this.showIntro();
+        }
       }
     },
 
@@ -446,6 +499,9 @@
       document.getElementById('tito-chat').classList.add('open');
       document.getElementById('tito-proactive').style.display = 'none';
       document.getElementById('tito-input').focus();
+      if (!this.hasShownIntro) {
+        this.showIntro();
+      }
     },
 
     close() {
@@ -453,17 +509,47 @@
       document.getElementById('tito-chat').classList.remove('open');
     },
 
+    showIntro() {
+      this.hasShownIntro = true;
+      const intro = TITO_INTRO[Math.floor(Math.random() * TITO_INTRO.length)];
+      this.addMessage(intro, 'bot');
+      this.showQuickButtons();
+    },
+
+    showQuickButtons() {
+      const container = document.getElementById('tito-messages');
+      const buttonsDiv = document.createElement('div');
+      buttonsDiv.className = 'tito-quick-buttons';
+      buttonsDiv.id = 'tito-quick-buttons';
+
+      QUICK_OPTIONS.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'tito-quick-btn';
+        btn.textContent = opt.text;
+        btn.onclick = () => {
+          document.getElementById('tito-input').value = opt.msg;
+          this.send();
+          const btns = document.getElementById('tito-quick-buttons');
+          if (btns) btns.remove();
+        };
+        buttonsDiv.appendChild(btn);
+      });
+
+      container.appendChild(buttonsDiv);
+      container.scrollTop = container.scrollHeight;
+    },
+
     showProactive() {
       if (this.isOpen) return;
 
       const page = this.detectPage();
       const messages = {
-        home: { text: 'Hola! Queres ver los duendes mas especiales?', auto: 'Mostrame los duendes mas vendidos' },
-        tienda: { text: 'Buscas algo especial? Te ayudo a encontrarlo', auto: 'Que duendes me recomendas?' },
-        producto: { text: 'Tenes dudas sobre este guardian?', auto: 'Contame sobre este duende' },
-        carrito: { text: 'Necesitas ayuda con tu pedido?', auto: 'Tengo dudas sobre mi pedido' },
-        checkout: { text: 'Alguna duda antes de finalizar?', auto: 'Tengo una consulta' },
-        default: { text: 'Hola! Soy Tito. Te ayudo?', auto: 'Hola Tito!' }
+        home: { text: 'Psst... soy Tito! Puedo ayudarte a encontrar tu guardian perfecto', auto: 'Hola Tito! Que duendes tenes?' },
+        tienda: { text: 'Veo que estas explorando... Te ayudo a elegir?', auto: 'Ayudame a elegir un duende' },
+        producto: { text: 'Este guardian tiene algo especial... Queres saber mas?', auto: 'Contame sobre este duende' },
+        carrito: { text: 'Ya casi! Alguna duda antes de llevartelo?', auto: 'Tengo dudas sobre mi pedido' },
+        checkout: { text: 'Ultimo paso! Estoy aca si necesitas algo', auto: 'Tengo una consulta' },
+        default: { text: 'Hola! Soy Tito, el guardian del portal. Charlamos?', auto: 'Hola Tito!' }
       };
 
       const msg = messages[page] || messages.default;
@@ -481,10 +567,11 @@
       this.closeProactive();
       this.open();
 
-      // Enviar mensaje automatico basado en la pagina
-      if (this.proactiveMessage) {
-        document.getElementById('tito-input').value = this.proactiveMessage;
-        setTimeout(() => this.send(), 300);
+      if (this.proactiveMessage && this.hasShownIntro) {
+        setTimeout(() => {
+          document.getElementById('tito-input').value = this.proactiveMessage;
+          this.send();
+        }, 800);
       }
     },
 
@@ -564,6 +651,10 @@
       const text = input.value.trim();
       if (!text) return;
 
+      // Remove quick buttons if they exist
+      const btns = document.getElementById('tito-quick-buttons');
+      if (btns) btns.remove();
+
       input.value = '';
       this.addMessage(text, 'user');
       this.showTyping();
@@ -594,13 +685,13 @@
           this.addMessage(respuesta, 'bot', data.productos);
           this.conversationHistory.push({ role: 'assistant', content: respuesta });
         } else {
-          this.addMessage('Disculpa, hubo un error. Intenta de nuevo.', 'bot');
+          this.addMessage('Mmm, algo raro paso en el portal... Intenta de nuevo?', 'bot');
         }
 
       } catch (error) {
         console.error('Error Tito:', error);
         this.hideTyping();
-        this.addMessage('No pude conectarme. Intenta de nuevo.', 'bot');
+        this.addMessage('Se corto la magia por un momento... Probas de nuevo?', 'bot');
       }
     }
   };
