@@ -445,16 +445,16 @@
   `;
 
   const TITO_INTRO = [
-    "Hola! Soy Tito, el guardian de este portal magico. Llevo siglos ayudando a las almas a encontrar su duende protector...",
-    "Bienvenida al bosque encantado! Soy Tito, y mi mision es ayudarte a encontrar al guardian que tu energia necesita.",
-    "Saludos, viajera! Soy Tito, el elfo custodio de Duendes del Uruguay. Siento que el universo te trajo hasta aca por una razon..."
+    "Que bueno que llegaste... Soy Tito. Algo en tu energia me dice que este encuentro no es casualidad.",
+    "Hola! Soy Tito, guardian de este portal. Antes de mostrarte nada, contame... que estas buscando en este momento de tu vida?",
+    "Bienvenido/a... Soy Tito. Los antiguos decian que cuando alguien encuentra este lugar, es porque un guardian ya lo estaba esperando."
   ];
 
   const QUICK_OPTIONS = [
-    { text: "Quien sos, Tito?", msg: "Contame sobre vos Tito, quien sos y que haces aca?" },
-    { text: "Recomendame un duende", msg: "Ayudame a elegir un duende, no se cual me conviene" },
-    { text: "Como comprar?", msg: "Como es el proceso para adoptar un duende?" },
-    { text: "Ver guardianes", msg: "Mostrame los duendes disponibles" }
+    { text: "Conocer a Tito", msg: "Quien sos Tito? Contame tu historia" },
+    { text: "Elegir mi guardian", msg: "Necesito ayuda para elegir, no se por donde empezar" },
+    { text: "Ver duendes", msg: "Quiero ver los guardianes disponibles" },
+    { text: "Como funciona?", msg: "Como es el proceso de adopcion?" }
   ];
 
   const TitoWidget = {
@@ -548,12 +548,12 @@
 
       const page = this.detectPage();
       const messages = {
-        home: { text: 'Psst... soy Tito! Puedo ayudarte a encontrar tu guardian perfecto', auto: 'Hola Tito! Que duendes tenes?' },
-        tienda: { text: 'Veo que estas explorando... Te ayudo a elegir?', auto: 'Ayudame a elegir un duende' },
-        producto: { text: 'Este guardian tiene algo especial... Queres saber mas?', auto: 'Contame sobre este duende' },
-        carrito: { text: 'Ya casi! Alguna duda antes de llevartelo?', auto: 'Tengo dudas sobre mi pedido' },
-        checkout: { text: 'Ultimo paso! Estoy aca si necesitas algo', auto: 'Tengo una consulta' },
-        default: { text: 'Hola! Soy Tito, el guardian del portal. Charlamos?', auto: 'Hola Tito!' }
+        home: { text: 'Algo te trajo hasta aca... Te cuento un secreto sobre los guardianes?', auto: 'Hola Tito, contame ese secreto' },
+        tienda: { text: 'Cada guardian tiene una energia unica. Te ayudo a sentir cual resuena con vos?', auto: 'Si, ayudame a elegir' },
+        producto: { text: 'Este guardian tiene una historia... Queres conocerla?', auto: 'Contame sobre este guardian' },
+        carrito: { text: 'Buen ojo... Tenes alguna duda antes de dar el paso?', auto: 'Tengo una consulta' },
+        checkout: { text: 'Ya casi se encuentran... Necesitas algo?', auto: 'Tengo una pregunta' },
+        default: { text: 'Hola! Soy Tito. Hay algo que estes buscando?', auto: 'Hola Tito' }
       };
 
       const msg = messages[page] || messages.default;
