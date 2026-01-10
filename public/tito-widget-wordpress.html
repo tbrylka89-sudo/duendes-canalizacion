@@ -451,6 +451,7 @@ FEATURES:
 .tito-galeria-card {
     flex-shrink: 0 !important;
     width: 150px !important;
+    min-height: 180px !important;
     background: rgba(0,0,0,0.5) !important;
     border: 1px solid rgba(212,175,55,0.3) !important;
     border-radius: 14px !important;
@@ -458,6 +459,7 @@ FEATURES:
     cursor: pointer !important;
     transition: all 0.3s ease !important;
     text-decoration: none !important;
+    display: block !important;
 }
 
 .tito-galeria-card:hover {
@@ -921,17 +923,23 @@ FEATURES:
         const container = document.createElement('div');
         container.className = 'tito-galeria';
 
+        const defaultImg = CONFIG.TITO_AVATAR;
+
         productos.forEach(p => {
+            console.log('🍀 Creando tarjeta para:', p.nombre, 'Imagen:', p.imagen);
+
+            const imgSrc = p.imagen && p.imagen !== 'null' && p.imagen.startsWith('http') ? p.imagen : defaultImg;
+
             const card = document.createElement('a');
             card.className = 'tito-galeria-card';
             card.href = p.url || '#';
             card.target = '_blank';
             card.innerHTML = `
-                <img src="${p.imagen || CONFIG.TITO_AVATAR}" alt="${p.nombre}" onerror="this.src='${CONFIG.TITO_AVATAR}'">
-                <div class="tito-galeria-info">
-                    <p class="tito-galeria-nombre">${p.nombre}</p>
-                    <p class="tito-galeria-precio">$${p.precio} USD</p>
-                    <span class="tito-galeria-btn">Ver guardián ✨</span>
+                <img src="${imgSrc}" alt="${p.nombre}" style="width:150px;height:110px;object-fit:cover;display:block;background:#333;" onerror="this.src='${defaultImg}'">
+                <div class="tito-galeria-info" style="padding:10px;">
+                    <p class="tito-galeria-nombre" style="color:#fff;font-size:12px;margin:0 0 5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.nombre}</p>
+                    <p class="tito-galeria-precio" style="color:#d4af37;font-size:14px;font-weight:600;margin:0;">$${p.precio} USD</p>
+                    <span class="tito-galeria-btn" style="display:block;text-align:center;background:rgba(212,175,55,0.2);color:#d4af37;font-size:11px;padding:7px;margin-top:8px;border-radius:6px;">Ver ✨</span>
                 </div>
             `;
             container.appendChild(card);
