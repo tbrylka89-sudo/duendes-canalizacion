@@ -239,24 +239,26 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
       align-self: flex-start;
     }
     .tito-quick-btn {
-      background: rgba(198,169,98,0.1);
-      border: 1px solid rgba(198,169,98,0.4);
+      background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+      border: 1px solid #C6A962;
       color: #C6A962;
-      padding: 8px 14px;
+      padding: 9px 16px;
       border-radius: 20px;
       font-size: 13px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
       font-family: 'Crimson Text', Georgia, serif;
+      font-weight: 500;
     }
     .tito-quick-btn:hover {
-      background: #C6A962;
+      background: linear-gradient(135deg, #C6A962, #a88c4a);
       color: #0a0a0a;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(198,169,98,0.3);
     }
 
     .tito-typing {
@@ -378,10 +380,12 @@
       box-shadow: 0 4px 12px rgba(198,169,98,0.4);
     }
     #tito-send svg {
-      width: 18px;
-      height: 18px;
-      fill: #0a0a0a;
+      width: 20px;
+      height: 20px;
       margin-left: 2px;
+    }
+    #tito-send svg path {
+      fill: #0a0a0a;
     }
 
     @media (max-width: 480px) {
@@ -433,7 +437,7 @@
         <div id="tito-input-area">
           <input type="text" id="tito-input" placeholder="Escribi tu mensaje..." autocomplete="off">
           <button id="tito-send">
-            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="#0a0a0a"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="#0a0a0a"/></svg>
           </button>
         </div>
       </div>
