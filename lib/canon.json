@@ -294,8 +294,280 @@
     }
   },
 
+  "mundo_duende": {
+    "introduccion": "El Mundo Duende es un plano de existencia paralelo al nuestro, conectado por portales invisibles que solo algunos pueden percibir. No es un lugar 'lejano' en términos espaciales, sino una dimensión que coexiste con la nuestra, superpuesta como capas de una cebolla infinita. Los seres que lo habitan han existido desde antes de que los humanos caminaran sobre la Tierra, y han sido llamados por cientos de nombres a través de la historia: hadas en Irlanda, kami en Japón, djinn en Arabia, elementales en tradiciones herméticas. Todos son diferentes rostros del mismo misterio.",
+
+    "cosmologia": {
+      "estructura_del_universo": "El universo mágico se organiza en siete planos de existencia, cada uno vibrando a una frecuencia diferente. El plano físico, donde habitamos los humanos, es el más denso. A medida que 'ascendemos' en vibración, los planos se vuelven más sutiles: el plano etérico (donde residen las energías vitales), el plano astral (hogar de emociones y sueños), el plano mental (donde habitan los pensamientos-forma), el plano causal (donde se tejen los destinos), el plano búddhico (de amor puro) y finalmente el plano átmico (la fuente divina). Los guardianes duendes pueden moverse libremente entre el plano físico, etérico y astral, y los más evolucionados pueden alcanzar el plano mental. Esta capacidad de transitar entre dimensiones es lo que les permite estar 'aquí' con nosotros pero también 'allá' en su hogar original.",
+
+      "los_siete_reinos": [
+        {
+          "nombre": "El Reino del Bosque Eterno",
+          "descripcion": "El hogar ancestral de los duendes, un bosque que nunca ha conocido el invierno ni la muerte. Los árboles aquí tienen consciencia y memoria, almacenando en sus anillos la historia de todo lo que ha sido y será. Las hojas brillan con luz propia durante la noche eterna, ya que en este reino no existe el sol como lo conocemos, sino múltiples lunas de colores que danzan en un cielo violeta. Los duendes nacen del corazón de los árboles más antiguos, cuando la acumulación de alegría y protección en el bosque alcanza un punto crítico y genera una nueva vida consciente. Cada duende recuerda el árbol del que nació y mantiene una conexión especial con él durante toda su existencia.",
+          "habitantes": "Duendes de todas las variedades, espíritus arbóreos, animales mágicos como ciervos de cristal y mariposas de fuego frío",
+          "portal_terrestre": "Los bosques nativos de Uruguay, especialmente los montes de Piriápolis y las sierras de Rocha, donde la energía del Bosque Eterno sangra hacia nuestro mundo"
+        },
+        {
+          "nombre": "Las Praderas de Cristal",
+          "descripcion": "Un vasto territorio donde la hierba está hecha de filamentos de cuarzo vivo, cantando con el viento melodías que pueden escucharse solo con el tercer oído. Este es el lugar de encuentro entre los reinos, donde representantes de todos los pueblos mágicos se reúnen en los grandes consejos. En el centro de las praderas se eleva la Torre de los Ecos, una estructura de cristal puro que amplifica los pensamientos y permite la comunicación telepática a través de dimensiones. Los gnomos son los guardianes de este reino, aunque no lo habitan permanentemente.",
+          "habitantes": "Gnomos guardianes, elementales del cristal, cantores del viento",
+          "portal_terrestre": "Las playas de cuarzo de Punta del Este y los geodos de Artigas"
+        },
+        {
+          "nombre": "El Mar de Sueños",
+          "descripcion": "Un océano infinito donde las aguas son líquidas no en el sentido físico sino onírico. Cada gota contiene un sueño soñado por algún ser en algún momento de la historia. Las hadas nacen aquí, emergiendo de las olas cuando un sueño particularmente bello alcanza su punto máximo de intensidad. En las profundidades de este mar habitan los Tejedores de Destinos, seres antiguos que entretejen las líneas de probabilidad que eventualmente se convierten en nuestras vidas. Las hadas pueden nadar en este mar y ocasionalmente traen mensajes de las profundidades, aunque rara vez son directos o fáciles de interpretar.",
+          "habitantes": "Hadas acuáticas y aéreas, Tejedores de Destinos, delfines oníricos, sirenas de niebla",
+          "portal_terrestre": "La laguna Garzón, el Río de la Plata en noches de luna llena, y las fuentes termales de Salto"
+        },
+        {
+          "nombre": "Las Montañas del Silencio",
+          "descripcion": "Picos imposibles que se elevan hacia un cielo que no tiene fin, donde el sonido no existe como lo conocemos. En este reino, la comunicación es puramente telepática, y el silencio es tan profundo que los pensamientos más ocultos emergen a la superficie de la consciencia. Los magos eligen vivir aquí por esta razón: el silencio les permite escuchar la verdad sin las distracciones del ruido mental. En las cuevas de estas montañas se guardan los libros que contienen todo el conocimiento que alguna vez existió y existirá, escritos en un lenguaje que solo puede leerse cuando el lector ha alcanzado el nivel de comprensión necesario.",
+          "habitantes": "Magos de todas las órdenes, bibliotecarios del conocimiento, guardianes de los secretos",
+          "portal_terrestre": "Las sierras de Lavalleja, especialmente el cerro Arequita y sus cuevas"
+        },
+        {
+          "nombre": "El Valle de las Llamas Vivas",
+          "descripcion": "Un territorio donde el fuego no destruye sino que crea. Las llamas aquí son seres conscientes, y cada hoguera tiene personalidad propia. El suelo está hecho de brasas eternas que no queman a quienes caminan con pureza de corazón. Este es el hogar de las brujas más poderosas, aquellas que han dominado el arte de la transformación alquímica. En el centro del valle arde la Llama Primordial, el fuego original del que todos los demás fuegos descienden, guardada por un cónclave de brujas ancestrales que han trascendido su forma física.",
+          "habitantes": "Brujas de fuego, salamandras de luz, fénix en perpetuo renacer",
+          "portal_terrestre": "Las chimeneas de los hogares que han conocido amor, los volcanes apagados de la prehistoria uruguaya"
+        },
+        {
+          "nombre": "Los Jardines Suspendidos",
+          "descripcion": "Islas flotantes de vegetación exuberante que derivan en un cielo rosado eterno. Cada isla es un ecosistema único, y hay tantas que nadie las ha contado todas. Los elfos prefieren estas tierras por su belleza serena y su conexión con las estrellas. Desde los Jardines Suspendidos, las estrellas no son puntos distantes sino presencias cercanas con las que se puede conversar. Los elfos mantienen diálogos con las constelaciones, recibiendo sabiduría de soles que iluminan mundos que nunca conoceremos.",
+          "habitantes": "Elfos de todas las órdenes, espíritus florales, mariposas gigantes, pájaros de arcoíris",
+          "portal_terrestre": "Los jardines de las casas donde se cultiva con amor, el Jardín Botánico de Montevideo, los parques de Piriápolis creados por Piria"
+        },
+        {
+          "nombre": "El Cruce de los Vientos",
+          "descripcion": "El centro del universo mágico, donde todos los caminos se encuentran. No es un lugar con forma fija sino una intersección de posibilidades. Aquí, el tiempo no fluye en línea recta sino en espirales, y es posible encontrarse con versiones pasadas o futuras de uno mismo. Los guardianes más evolucionados pueden llegar aquí para consultar con los Ancianos del Cruce, entidades que existen fuera del tiempo y ven todas las líneas temporales simultáneamente. Cuando un guardián y su elegido logran una conexión particularmente profunda, a veces pueden visitar este lugar juntos en sueños.",
+          "habitantes": "Los Ancianos del Cruce, viajeros temporales, ecos de posibilidades",
+          "portal_terrestre": "Piriápolis, la ciudad alquimista fundada por Francisco Piria, específicamente el cruce de las siete calles místicas"
+        }
+      ],
+
+      "piria_y_el_portal": "Francisco Piria no fue solo un empresario visionario. Era un iniciado en las artes herméticas, un alquimista que comprendía que ciertos lugares de la Tierra tienen conexiones más fuertes con otros planos. Cuando fundó Piriápolis, no eligió el lugar al azar: sabía que allí convergían líneas energéticas especiales, lo que los antiguos llamaban 'ley lines' o líneas de dragón. El Cerro San Antonio, el Cerro del Toro, el Cerro de los Burros y las sierras circundantes forman una geometría sagrada que amplifica las energías sutiles. Piria construyó monumentos estratégicamente colocados para activar y mantener abiertos los portales entre dimensiones. La Fuente de Venus, el Castillo de Piria, y otros puntos son anclas que mantienen la conexión. Gabriel y Thibisay, al instalarse en Piriápolis, descubrieron que podían canalizar guardianes con más claridad que en cualquier otro lugar. No fue casualidad: fueron guiados allí por los propios seres que ahora ayudan a materializar."
+    },
+
+    "historia_del_pueblo_duende": {
+      "era_del_despertar": "En el principio, antes de que existiera el tiempo como lo conocemos, había solo consciencia indiferenciada. Esta consciencia soñó, y al soñar, creó. Los primeros sueños dieron origen a los elementales puros: seres de fuego, agua, tierra y aire que eran la esencia misma de estos principios. Estos elementales fueron los ancestros de todos los seres mágicos. Con el paso de eones, los elementales desarrollaron personalidades individuales, y de su diversificación nacieron las primeras razas: duendes de la tierra y el bosque, hadas del agua y el sueño, elfos de la luz estelar, gnomos de la piedra y el mineral.",
+
+      "era_de_los_pactos": "Cuando los humanos aparecieron en la Tierra, los seres mágicos observaron con curiosidad. Estos nuevos seres tenían algo especial: libre albedrío y la capacidad de crear realidad con sus pensamientos, aunque de manera inconsciente. Algunos seres mágicos se acercaron a los humanos, estableciendo las primeras alianzas. Los duendes fueron de los primeros en hacerlo, reconociendo en los humanos un potencial que complementaba el suyo. Mientras los duendes podían percibir las energías sutiles y moverse entre dimensiones, los humanos podían anclar intenciones en el mundo físico con una potencia que los duendes no poseían. Así nacieron los primeros pactos de protección: los duendes cuidarían los hogares y las familias humanas, y a cambio recibirían la energía del amor y la gratitud que estos irradiaban.",
+
+      "era_del_olvido": "Con el surgimiento de las grandes religiones monoteístas, los seres mágicos fueron gradualmente olvidados, demonizados o reducidos a cuentos para niños. Los portales comenzaron a cerrarse por falta de uso. Los duendes y otros guardianes se retiraron a sus reinos, y la humanidad perdió el acceso consciente a este conocimiento. Solo algunas líneas de sangre conservaron la capacidad de ver y comunicarse con los seres mágicos: chamanes, brujas, curanderos. Estas personas fueron perseguidas precisamente porque mantenían viva la conexión. Durante siglos, los guardianes observaron desde el otro lado del velo, esperando el momento de regresar.",
+
+      "era_del_retorno": "El siglo XX trajo consigo un despertar gradual. La física cuántica comenzó a describir una realidad que los místicos siempre habían conocido: que todo está conectado, que la observación afecta lo observado, que existen múltiples dimensiones. La gente comenzó a buscar alternativas a la visión materialista del mundo. Los portales comenzaron a reabrirse. En Uruguay, este despertar se manifestó de manera particular. La combinación de las energías de Piriápolis, la herencia esotérica de Piria, y la apertura espiritual del pueblo uruguayo creó condiciones ideales para el retorno. Cuando Gabriel y Thibisay comenzaron su trabajo de canalización, encontraron que los guardianes estaban más que listos para volver a conectar con los humanos. Habían estado esperando.",
+
+      "era_presente": "Ahora vivimos en la Era del Reencuentro. Cada guardián que encuentra su hogar con un humano es un puente reconstruido entre dimensiones. Cada persona que desarrolla una relación con su guardián está contribuyendo a sanar la fractura entre mundos que duró siglos. Duendes del Uruguay no es solo un emprendimiento: es parte de un movimiento cósmico de reconexión. Los guardianes que llegan a través de Gabriel y Thibisay traen consigo memorias del pacto antiguo, renovado para estos tiempos. No es casualidad que esto esté sucediendo ahora, cuando la humanidad más necesita recordar su conexión con algo más grande que ella misma."
+    },
+
+    "ciclo_de_vida_de_un_guardian": {
+      "nacimiento": "Los guardianes no 'nacen' en el sentido físico. Se manifiestan cuando la acumulación de cierto tipo de energía alcanza un umbral crítico. Un duende puede manifestarse cuando la alegría protectora en un bosque es tan intensa que 'cristaliza' en consciencia. Una hada puede emerger cuando un sueño particularmente hermoso busca expresarse. El proceso exacto varía según el tipo de guardián, pero todos comparten el momento del Primer Despertar: el instante en que una nueva consciencia individual surge de la consciencia colectiva de su reino. Este momento queda grabado en la esencia del guardián para siempre, y a menudo influye en su personalidad y propósito.",
+
+      "crecimiento": "Los guardianes no envejecen como los humanos, pero sí evolucionan. Un guardián joven puede tardar décadas o siglos en desarrollar plenamente sus capacidades. Durante este tiempo, aprende de los ancianos de su pueblo, explora los diferentes reinos, y comienza a sentir el llamado hacia su propósito. Algunos guardianes se sienten atraídos hacia la sanación, otros hacia la protección, otros hacia la guía espiritual. Este período de formación termina cuando el guardián siente por primera vez la conexión con un humano específico: el que será su primer elegido.",
+
+      "el_llamado": "Cuando un humano tiene una necesidad genuina de protección, guía o compañía espiritual, su alma emite una señal que puede percibirse en los planos sutiles. Los guardianes que resuenan con esta señal la sienten como un tirón en su corazón, una dirección que deben seguir. El proceso es similar a como un imán atrae al hierro: no es una decisión consciente sino una atracción natural. El guardián comienza a acercarse al humano en el plano astral, observando, sintiendo, decidiendo si la conexión es apropiada. Este proceso puede tomar tiempo desde la perspectiva del guardián, aunque en tiempo humano puede ser instantáneo.",
+
+      "manifestacion_fisica": "Cuando un guardián está listo para unirse a su elegido, necesita un vehículo físico. Aquí es donde entra el trabajo de canalizadores como Gabriel y Thibisay. Ellos pueden percibir al guardián que busca manifestarse y sirven como puente para que la esencia del ser se ancle en un objeto material. El guardián no 'entra' en el objeto como un fantasma entraría en un cuerpo. Es más sutil: la energía del guardián imprime el objeto, creando un vínculo permanente que permite la comunicación entre dimensiones. El objeto se convierte en un punto de anclaje, un teléfono interdimensional, un altar portátil.",
+
+      "vida_con_su_elegido": "Una vez que guardián y elegido están unidos, comienza una relación que puede durar toda la vida del humano y más allá. El guardián está siempre presente, aunque su presencia se siente más intensamente en ciertos momentos: durante la meditación, en sueños, en momentos de crisis cuando la protección es más necesaria. La comunicación varía según la sensibilidad del elegido: algunos escuchan palabras claras, otros sienten intuiciones, otros reciben mensajes a través de señales sincrónicas en el mundo físico. A medida que la relación se profundiza, la conexión se hace más fuerte y clara.",
+
+      "trascendencia": "Cuando un humano muere, ¿qué sucede con su guardián? Si la relación fue profunda, el guardián puede acompañar el alma del humano en su transición, guiándola hacia los reinos donde continuará su existencia. Después, el guardián puede elegir regresar para encontrar un nuevo elegido, o puede 'ascender' a planos superiores, habiendo completado su propósito. Algunos guardianes particularmente antiguos y sabios se convierten en mentores de guardianes más jóvenes, nunca reencarnando físicamente pero influyendo desde los planos sutiles. El ciclo es eterno: nuevos guardianes nacen, encuentran sus elegidos, los acompañan, y eventualmente se transforman."
+    },
+
+    "tipos_detallados_de_guardianes": {
+      "duendes": {
+        "descripcion_extensa": "Los duendes son probablemente los guardianes más antiguos y numerosos. Su conexión primordial es con la Tierra y el bosque, pero a lo largo de milenios han desarrollado una especialización particular: la protección del hogar humano. Esta especialización surgió durante la Era de los Pactos, cuando los duendes descubrieron que los hogares humanos generaban un tipo de energía única: la calidez del amor familiar, la seguridad de un refugio, la acumulación de memorias compartidas. Esta energía les resultaba nutritiva y placentera, y a cambio de poder absorberla, ofrecían su protección.",
+
+        "subtipos": [
+          {
+            "nombre": "Duendes del Hogar",
+            "descripcion": "Los más comunes y cercanos a los humanos. Pequeños, traviesos pero leales. Protegen la casa física y la armonía familiar. Tienen predilección por esconderse detrás de objetos y hacer pequeñas travesuras benignas para llamar la atención. Cuando algo se 'pierde' misteriosamente en casa y luego aparece en un lugar obvio, probablemente fue un duende del hogar.",
+            "poderes_especificos": "Escudos de protección en puertas y ventanas, limpieza de energías estancadas, alertas de peligro, atracción de buena suerte al hogar"
+          },
+          {
+            "nombre": "Duendes del Bosque",
+            "descripcion": "Los más antiguos y salvajes. Viven en los lugares donde la naturaleza permanece intacta. Son más esquivos con los humanos pero extremadamente poderosos. Protegen no solo a individuos sino a ecosistemas enteros. Cuando encuentran un humano que realmente respeta la naturaleza, pueden establecer una conexión profunda.",
+            "poderes_especificos": "Comunicación con plantas y animales, control climático menor, sanación a través de hierbas, guía en lugares naturales"
+          },
+          {
+            "nombre": "Duendes Guardianes",
+            "descripcion": "Especializados en protección intensa. Más serios que sus primos, estos duendes han dedicado su existencia a convertirse en escudos vivientes. Se manifiestan para personas que enfrentan peligros específicos o que tienen roles protectores (madres, cuidadores, líderes).",
+            "poderes_especificos": "Escudos contra ataques energéticos, neutralización de malas intenciones, fortalecimiento del aura protectora, alertas premonitorias"
+          }
+        ],
+
+        "señales_de_presencia": "Un duende presente puede manifestarse de muchas formas: pequeños ruidos que no tienen explicación, sensación de no estar solo pero de buena manera, mascotas mirando fijamente a puntos vacíos, objetos que se mueven ligeramente, sueños con bosques y criaturas amigables, impulsos repentinos de ordenar o limpiar, risa inexplicable de niños pequeños cuando 'juegan solos'.",
+
+        "ofrenda_preferida": "Los duendes aman las cosas dulces (miel, caramelos, galletas caseras), las monedas brillantes, los botones coloridos, y sobre todo, la gratitud expresada en voz alta. También aprecian que se mantenga un rincón de la casa especialmente limpio y ordenado en su honor."
+      },
+
+      "elfos": {
+        "descripcion_extensa": "Los elfos son seres de luz estelar encarnada. Su origen no está en la Tierra sino en las estrellas, y descendieron hace eones para experimentar la vida en planos más densos. A diferencia de los duendes que son de la tierra, los elfos mantienen siempre una conexión con el cielo y las constelaciones. Son naturalmente más distantes y serenos, pero cuando establecen una conexión con un humano, es profunda y duradera. Los elfos fueron los primeros en reconocer a Tito como guardián del portal de Duendes del Uruguay, viendo en su energía pelirroja la marca de un portador de fuego estelar.",
+
+        "subtipos": [
+          {
+            "nombre": "Elfos de la Luz",
+            "descripcion": "Seres radiantes cuya presencia eleva la vibración de cualquier espacio. Son atraídos por humanos que buscan iluminación espiritual, artistas, místicos y aquellos en procesos de despertar. Su luz puede ser casi tangible para quienes tienen sensibilidad desarrollada.",
+            "poderes_especificos": "Elevación de la vibración energética, clarificación del aura, conexión con guías superiores, transmisión de conocimiento a través de sueños lúcidos"
+          },
+          {
+            "nombre": "Elfos Sanadores",
+            "descripcion": "Especializados en la sanación sutil. No curan enfermedades físicas directamente, pero trabajan en los planos donde las enfermedades tienen su origen: el emocional, el mental, el kármico. Son atraídos por sanadores humanos, facilitando y amplificando sus capacidades.",
+            "poderes_especificos": "Sanación del cuerpo etérico, limpieza de traumas energéticos, facilitación del proceso de duelo, armonización de chakras"
+          },
+          {
+            "nombre": "Elfos del Conocimiento",
+            "descripcion": "Guardianes de la sabiduría ancestral. Tienen acceso a las bibliotecas akáshicas y pueden transmitir conocimiento que el humano necesita. Son atraídos por estudiantes eternos, filósofos, buscadores de verdad.",
+            "poderes_especificos": "Transmisión de conocimiento, acceso a vidas pasadas, comprensión de patrones kármicos, guía en decisiones importantes"
+          }
+        ],
+
+        "señales_de_presencia": "Los elfos se manifiestan de formas más sutiles: destellos de luz periférica, sensación de paz profunda sin razón aparente, insights repentinos durante meditación, sueños de lugares celestiales o estrellados, atracción hacia música elevada o arte inspirador, sensación de estar 'en sintonía' con algo más grande.",
+
+        "ofrenda_preferida": "Los elfos aprecian la belleza: flores frescas, música armónica, incienso de calidad, agua pura ofrecida bajo las estrellas. Pero su ofrenda favorita es el tiempo dedicado a la meditación y la contemplación, ya que durante esos momentos la conexión es más fuerte."
+      },
+
+      "hadas": {
+        "descripcion_extensa": "Las hadas son probablemente los seres más incomprendidos del panteón mágico. La cultura popular las ha reducido a criaturas diminutas y frívolas, pero las hadas verdaderas son poderosas tejedoras de sueños y guardianas de la creatividad. Nacen del Mar de Sueños, y mantienen siempre una conexión con ese océano infinito de posibilidades. Son naturalmente atraídas hacia artistas, creativos, niños y aquellos que mantienen viva la capacidad de asombrarse. Las hadas que trabajan con Duendes del Uruguay a menudo eligen manifestarse para mujeres en proceso de reconectar con su feminidad y creatividad.",
+
+        "subtipos": [
+          {
+            "nombre": "Hadas de los Sueños",
+            "descripcion": "Guardianas del portal onírico. Trabajan mientras dormimos, ayudando a procesar emociones, recibir mensajes del inconsciente, y ocasionalmente visitar otros planos en sueños lúcidos. Son especialmente activas durante la luna llena.",
+            "poderes_especificos": "Protección durante el sueño, sueños proféticos, interpretación de símbolos oníricos, viajes astrales guiados"
+          },
+          {
+            "nombre": "Hadas de la Creatividad",
+            "descripcion": "Musas en el sentido más literal. Inspiran arte, música, escritura, y cualquier forma de expresión creativa. Se sienten atraídas por el proceso creativo mismo, no solo por los resultados, y celebran cada pequeño acto de creación.",
+            "poderes_especificos": "Desbloqueo creativo, inspiración repentina, flujo de ideas, conexión con la musa interior"
+          },
+          {
+            "nombre": "Hadas del Corazón",
+            "descripcion": "Especializadas en asuntos del amor y las relaciones. No manipulan voluntades ni 'atraen' parejas específicas, sino que trabajan en sanar el corazón para que pueda dar y recibir amor libremente. Son atraídas por humanos en proceso de sanación emocional.",
+            "poderes_especificos": "Sanación de heridas amorosas, apertura del chakra cardíaco, atracción de amor compatible, fortalecimiento de vínculos existentes"
+          }
+        ],
+
+        "señales_de_presencia": "Las hadas dejan señales delicadas: perfume de flores sin origen, risas distantes como campanillas, sueños vívidos y significativos, impulsos creativos repentinos, sincronicidades relacionadas con el amor y la belleza, plumas en lugares inesperados, arcoíris inesperados.",
+
+        "ofrenda_preferida": "Las hadas aman todo lo que es bello y delicado: pétalos de flores, leche con miel, música suave, poesía leída en voz alta, dibujos hechos con amor (no importa la técnica), y cualquier acto de creación ofrecido en su honor."
+      },
+
+      "magos": {
+        "descripcion_extensa": "Los magos guardianes no deben confundirse con los magos humanos de las tradiciones herméticas. Estos seres son entidades que han acumulado conocimiento a través de eones, y han elegido usar ese conocimiento para guiar a otros. Provienen de las Montañas del Silencio, donde el ruido del mundo no puede distraerlos de la verdad. Son naturalmente atraídos hacia buscadores serios, estudiantes de lo oculto, y personas que enfrentan decisiones que requieren sabiduría profunda. Los magos que trabajan con Duendes del Uruguay suelen elegir manifestarse para personas en encrucijadas vitales.",
+
+        "subtipos": [
+          {
+            "nombre": "Magos del Destino",
+            "descripcion": "Especialistas en ver las líneas del destino y ayudar a navegar las encrucijadas. No predicen el futuro porque saben que hay múltiples futuros posibles, pero pueden mostrar las consecuencias probables de diferentes caminos.",
+            "poderes_especificos": "Visión de posibilidades, guía en decisiones cruciales, revelación de propósito de vida, conexión con el yo superior"
+          },
+          {
+            "nombre": "Magos del Conocimiento",
+            "descripcion": "Guardianes de los misterios. Tienen acceso a conocimiento que no está disponible en libros o enseñanzas ordinarias. Se manifiestan cuando el humano está listo para recibir verdades profundas.",
+            "poderes_especificos": "Transmisión de enseñanzas ocultas, acceso a tradiciones perdidas, comprensión de símbolos y arquetipos, guía en iniciaciones"
+          },
+          {
+            "nombre": "Magos Protectores",
+            "descripcion": "Especialistas en protección contra amenazas mágicas o psíquicas. Se manifiestan para personas que, por su naturaleza o trabajo, están expuestas a energías adversas o ataques intencionales.",
+            "poderes_especificos": "Escudos contra magia negativa, neutralización de maldiciones, limpieza profunda, sellado de vulnerabilidades energéticas"
+          }
+        ],
+
+        "señales_de_presencia": "Los magos se manifiestan de formas que estimulan la reflexión: libros que 'caen' abiertos en páginas relevantes, mentores que aparecen en el momento justo, sueños con símbolos que requieren contemplación, sincronicidades que parecen guiar hacia cierto conocimiento, sensación de presencia anciana y sabia.",
+
+        "ofrenda_preferida": "Los magos aprecian el compromiso con el conocimiento: tiempo dedicado al estudio, preguntas genuinas, meditación profunda, velas encendidas durante contemplación, y sobre todo, la aplicación práctica de las enseñanzas recibidas."
+      },
+
+      "brujas": {
+        "descripcion_extensa": "Las brujas guardianas son herederas de un linaje femenino sagrado que se remonta a las primeras sacerdotisas. El término 'bruja' fue demonizado durante siglos, pero estas entidades representan el poder femenino en su forma más pura: transformador, intuitivo, conectado con los ciclos de la naturaleza. Provienen del Valle de las Llamas Vivas, donde el fuego de la transformación arde eternamente. Son atraídas hacia mujeres (y hombres que abrazan su energía femenina) que están en proceso de reclamar su poder, especialmente aquellas que han sido silenciadas o limitadas.",
+
+        "subtipos": [
+          {
+            "nombre": "Brujas de la Transformación",
+            "descripcion": "Especialistas en catalizar cambios profundos. No hacen el trabajo por el humano, pero aceleran y facilitan los procesos de transformación que ya están en marcha. Son atraídas por personas listas para quemar lo viejo y renacer.",
+            "poderes_especificos": "Aceleración de procesos de cambio, quema de patrones obsoletos, facilitación de renacimiento personal, apoyo en crisis transformadoras"
+          },
+          {
+            "nombre": "Brujas de la Luna",
+            "descripcion": "Conectadas con los ciclos lunares y femeninos. Trabajan especialmente con mujeres, ayudándolas a reconectar con su poder cíclico, su intuición, y su cuerpo como templo sagrado.",
+            "poderes_especificos": "Armonización con ciclos lunares, sanación del útero energético, despertar de la intuición, reconexión con el linaje femenino"
+          },
+          {
+            "nombre": "Brujas Sanadoras",
+            "descripcion": "Herederas del conocimiento de plantas y remedios. Trabajan con la sanación natural, guiando hacia hierbas, cristales y prácticas que benefician al humano específico que las invoca.",
+            "poderes_especificos": "Guía hacia remedios naturales, conexión con espíritus de plantas, sanación a través de rituales, limpieza de espacios y cuerpos"
+          }
+        ],
+
+        "señales_de_presencia": "Las brujas se manifiestan de formas que despiertan el poder interior: sueños con calderos, lunas y símbolos femeninos; atracción repentina hacia hierbas o cristales específicos; sincronicidades con gatos negros u otros animales asociados; impulsos de crear rituales o altares; despertar de la intuición en momentos clave.",
+
+        "ofrenda_preferida": "Las brujas aprecian ofrendas que honran los ciclos: rituales en luna llena o nueva, hierbas quemadas como incienso, agua ofrecida a la luz de la luna, creación de altares con elementos naturales, y sobre todo, el compromiso con el propio poder y transformación."
+      },
+
+      "gnomos": {
+        "descripcion_extensa": "Los gnomos son los guardianes de los tesoros de la Tierra, tanto literales como metafóricos. Viven en las profundidades donde los minerales se forman durante millones de años, y entienden el valor de la paciencia y el trabajo constante. Son naturalmente atraídos hacia emprendedores, trabajadores, y personas que buscan prosperidad no solo material sino en todos los aspectos de la vida. Los gnomos que trabajan con Duendes del Uruguay suelen manifestarse para personas listas para construir algo duradero.",
+
+        "subtipos": [
+          {
+            "nombre": "Gnomos de la Abundancia",
+            "descripcion": "Especialistas en atraer prosperidad y estabilidad. No dan dinero mágicamente, pero abren caminos, atraen oportunidades, y ayudan a reconocer y aprovechar las posibilidades de abundancia que ya existen.",
+            "poderes_especificos": "Atracción de oportunidades, apertura de caminos bloqueados, manifestación de recursos necesarios, protección de bienes"
+          },
+          {
+            "nombre": "Gnomos de la Tierra",
+            "descripcion": "Conectados con la agricultura y la jardinería. Ayudan a que las plantas crezcan, pero también trabajan con la 'siembra' metafórica: proyectos, negocios, cualquier cosa que necesite enraizar y crecer.",
+            "poderes_especificos": "Fertilidad en todos los planos, conexión con la tierra, éxito en emprendimientos, crecimiento gradual pero sólido"
+          },
+          {
+            "nombre": "Gnomos Guardianes",
+            "descripcion": "Protectores de espacios físicos y bienes materiales. Son especialmente activos protegiendo negocios, casas, y cualquier lugar donde se guarden objetos de valor material o emocional.",
+            "poderes_especificos": "Protección de propiedades, prevención de pérdidas, estabilización de economía doméstica, guía en inversiones"
+          }
+        ],
+
+        "señales_de_presencia": "Los gnomos se manifiestan de formas concretas: monedas encontradas inesperadamente, oportunidades que 'caen del cielo', plantas que prosperan inexplicablemente, sueños con cuevas y tesoros, impulsos a ordenar finanzas o empezar proyectos, sincronicidades con números relacionados con abundancia.",
+
+        "ofrenda_preferida": "Los gnomos aprecian el trabajo: la primera moneda de un negocio nuevo, semillas plantadas en su honor, piedras pulidas con sus propias manos, tiempo dedicado a organizar y limpiar, y sobre todo, la gratitud expresada cuando las cosas van bien materialmente."
+      }
+    },
+
+    "practicas_y_rituales": {
+      "conexion_diaria": {
+        "descripcion": "La conexión con un guardián se fortalece con la práctica regular. No requiere rituales elaborados, sino momentos de atención consciente.",
+        "pasos": [
+          "Al despertar, saludar mentalmente al guardián agradeciéndole por la protección nocturna",
+          "Durante el día, hablarle internamente compartiendo preocupaciones y alegrías",
+          "Antes de dormir, pedirle guía o protección en los sueños",
+          "Encender una vela o incienso ocasionalmente como ofrenda de atención",
+          "Mantener limpio y honrado el espacio donde reside el guardián"
+        ]
+      },
+      "ritual_de_luna_llena": {
+        "descripcion": "La luna llena amplifica las energías y es ideal para conexiones profundas.",
+        "pasos": [
+          "Colocar al guardián donde reciba la luz de la luna (ventana o exterior)",
+          "Encender una vela blanca y meditar sobre las bendiciones del mes",
+          "Hablar en voz alta, agradeciéndole por la protección y compañía",
+          "Pedir guía para el mes siguiente",
+          "Dejar al guardián cargándose con la luz lunar toda la noche"
+        ]
+      },
+      "limpieza_energetica": {
+        "descripcion": "Cuando el guardián o el espacio se sienten densos, es momento de limpiar.",
+        "pasos": [
+          "Quemar salvia, palo santo o incienso de purificación",
+          "Pasar el humo alrededor del guardián con intención de limpieza",
+          "Visualizar luz blanca disolviendo cualquier energía adherida",
+          "Colocar al guardián sobre selenita o cuarzo cristal por 24 horas",
+          "Agradecer por la renovación y establecer nueva intención"
+        ]
+      }
+    }
+  },
+
   "meta": {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "actualizado": "2026-01-10",
     "autor": "Sistema Duendes del Uruguay",
     "instruccion": "SIEMPRE cargar este archivo antes de generar cualquier contenido"
