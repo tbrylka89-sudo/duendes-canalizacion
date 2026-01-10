@@ -520,8 +520,17 @@
     proactiveMessage: '',
     hasShownIntro: false,
     visitorData: null,
+    visitorId: null,
+    sessionStart: null,
 
     init() {
+      // Generar o recuperar visitorId
+      this.visitorId = localStorage.getItem('tito_visitor_id');
+      if (!this.visitorId) {
+        this.visitorId = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('tito_visitor_id', this.visitorId);
+      }
+      this.sessionStart = Date.now();
       const style = document.createElement('style');
       style.textContent = CSS;
       document.head.appendChild(style);
@@ -609,6 +618,30 @@
     close() {
       this.isOpen = false;
       document.getElementById('tito-chat').classList.remove('open');
+      // Guardar conversación en memoria si hubo mensajes del usuario
+      if (this.conversationHistory.length > 1) {
+        this.guardarEnMemoria();
+      }
+    },
+
+    async guardarEnMemoria() {
+      try {
+        const duracion = Math.round((Date.now() - this.sessionStart) / 1000);
+        await fetch('https://duendes-vercel.vercel.app/api/tito/memoria', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accion: 'guardar_conversacion',
+            conversacion: this.conversationHistory,
+            visitante: this.visitorData,
+            pagina: window.location.href,
+            duracion,
+            visitorId: this.visitorId
+          })
+        });
+      } catch (e) {
+        console.log('Error guardando en memoria:', e);
+      }
     },
 
     showIntro() {
@@ -687,13 +720,7 @@
     openFromProactive() {
       this.closeProactive();
       this.open();
-
-      if (this.proactiveMessage && this.hasShownIntro) {
-        setTimeout(() => {
-          document.getElementById('tito-input').value = this.proactiveMessage;
-          this.send();
-        }, 600);
-      }
+      // Ya no envía automáticamente - solo abre el chat
     },
 
     detectPage() {
