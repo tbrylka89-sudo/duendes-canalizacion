@@ -1236,9 +1236,14 @@ FEATURES:
 
         ocultarTyping();
 
+        console.log('🍀 RAW RESPONSE:', response);
         if (response.success) {
-            console.log('🍀 Tito respuesta:', response);
+            console.log('🍀 Tito respuesta:', response.response);
             console.log('🍀 Productos recibidos:', response.productos);
+            console.log('🍀 Cantidad productos:', response.productos ? response.productos.length : 0);
+            if (response.productos && response.productos.length > 0) {
+                console.log('🍀 Primer producto:', response.productos[0]);
+            }
             agregarMensaje(response.response, 'bot', response.productos);
             estado.conversationHistory.push({ role: 'assistant', content: response.response });
         } else {
