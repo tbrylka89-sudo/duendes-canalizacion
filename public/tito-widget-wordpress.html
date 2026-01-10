@@ -1237,6 +1237,8 @@ FEATURES:
         ocultarTyping();
 
         if (response.success) {
+            console.log('🍀 Tito respuesta:', response);
+            console.log('🍀 Productos recibidos:', response.productos);
             agregarMensaje(response.response, 'bot', response.productos);
             estado.conversationHistory.push({ role: 'assistant', content: response.response });
         } else {
