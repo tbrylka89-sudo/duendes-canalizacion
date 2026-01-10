@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperiencias, estilosNuevos } from './nuevas-funciones';
 
 const API_BASE = '';
 const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
@@ -340,10 +341,14 @@ export default function MiMagia() {
       case 'canalizaciones': return <Canalizaciones usuario={usuario} />;
       case 'jardin': return <Jardin usuario={usuario} setUsuario={setUsuario} pais={pais} token={token} />;
       case 'experiencias': return <SeccionExperiencias usuario={usuario} setUsuario={setUsuario} />;
+      case 'experiencias_catalogo': return <CatalogoExperiencias usuario={usuario} setUsuario={setUsuario} />;
       case 'regalos': return <Regalos ir={setSeccion} />;
       case 'mundo': return <MundoSec />;
       case 'cuidados': return <CuidadosSec />;
       case 'cristales': return <CristalesSec />;
+      case 'guia_cristales': return <GuiaCristales usuario={usuario} />;
+      case 'test_elemental': return <TestElemental usuario={usuario} onComplete={(r) => setUsuario({...usuario, elemento: r.elemento_principal})} />;
+      case 'cosmos': return <CosmosMes usuario={usuario} />;
       case 'circulo': return <CirculoSec usuario={usuario} setUsuario={setUsuario} token={token} pais={pais} />;
       case 'grimorio': return <GrimorioSec usuario={usuario} token={token} setUsuario={setUsuario} />;
       default: return <Inicio usuario={usuario} ir={setSeccion} />;
@@ -361,15 +366,15 @@ export default function MiMagia() {
       </header>
       
       <nav className={`nav ${menuAbierto ? 'abierto' : ''}`}>
-        {[['inicio','◇','Inicio'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['regalos','❤','Regalos']].map(([k,i,t]) => 
+        {[['inicio','◇','Inicio'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">El Mundo Elemental</div>
-        {[['mundo','◈','Reino Elemental'],['cuidados','❧','Cuidados'],['cristales','◎','Cristales']].map(([k,i,t]) => 
+        {[['test_elemental','◈','Tu Elemento'],['mundo','❂','Reino Elemental'],['cuidados','❧','Cuidados'],['guia_cristales','💎','Guía Cristales']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">Tu Espacio</div>
-        {[['circulo','★','Círculo'],['grimorio','▣','Grimorio']].map(([k,i,t]) => 
+        {[['circulo','★','Círculo'],['cosmos','☽','Cosmos del Mes'],['grimorio','▣','Grimorio']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="nav-volver">↗ Ir a la tienda</a>
@@ -510,14 +515,17 @@ function Inicio({ usuario, ir }) {
           </div>
         )}
       </div>
-      
+
+      {/* SEÑAL DEL DÍA - Mensaje personalizado diario */}
+      <SenalDelDia usuario={usuario} />
+
       <div className="stats-g">
         <div className="stat-c" onClick={() => ir('canalizaciones')}><div className="stat-n">{(usuario?.guardianes?.length || 0) + (usuario?.lecturas?.length || 0)}</div><div className="stat-t">Canalizaciones</div></div>
         <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.treboles || 0}</div><div className="stat-t">Tréboles</div></div>
         <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.runas || 0}</div><div className="stat-t">Runas</div></div>
         <div className="stat-c" onClick={() => ir('grimorio')}><div className="stat-n">{usuario?.diario?.length || 0}</div><div className="stat-t">Entradas</div></div>
       </div>
-      
+
       <div className="accesos-g">
         <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Experiencias Mágicas</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
         <button className="acceso" onClick={() => ir('mundo')}><span>◈</span><strong>Reino Elemental</strong><small>Duendes, hadas, elementales, alquimia</small></button>
@@ -1890,4 +1898,193 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .prueba-usada{color:#888;font-size:0.85rem;margin-top:0.5rem!important}
 .contenido-item small{display:block;font-size:0.75rem;color:#888;margin-bottom:0.5rem}
 @media(max-width:768px){.luna-hero{grid-template-columns:1fr}.fases-grid{grid-template-columns:1fr}}
+
+/* ═══ NUEVAS FUNCIONES ESTILOS ═══ */
+.senal-card{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #d4af3733}
+.senal-card.cargando{display:flex;justify-content:center;align-items:center;min-height:200px}
+.senal-loading{text-align:center}
+.pulse{animation:pulse 1.5s infinite;display:inline-block;font-size:2rem}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.1)}}
+.senal-header{display:flex;align-items:center;gap:15px;margin-bottom:15px}
+.senal-luna{font-size:2.5rem}
+.senal-header h3{margin:0;color:#d4af37}
+.senal-fase{margin:0;color:#aaa;font-size:0.9rem}
+.senal-numero{margin-left:auto;background:#d4af3722;padding:5px 10px;border-radius:8px;color:#d4af37;font-size:0.9rem}
+.senal-saludo p{font-size:1.1rem;color:#eee;margin-bottom:15px}
+.senal-mensaje-tito{display:flex;gap:12px;background:#0a0a0a;padding:15px;border-radius:12px;margin-bottom:15px}
+.tito-icon{font-size:1.5rem}
+.senal-mensaje-tito p{margin:0;color:#ccc;line-height:1.5}
+.senal-elemento,.senal-guardian{display:flex;align-items:center;gap:10px;padding:10px;background:#ffffff08;border-radius:8px;margin-bottom:10px}
+.senal-elemento span,.senal-guardian span{color:#d4af37}
+.senal-footer{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px;padding-top:15px;border-top:1px solid #333}
+.senal-accion,.senal-cristal,.senal-numero-significado{text-align:center;padding:10px;background:#0a0a0a;border-radius:8px}
+.senal-accion strong,.senal-cristal strong{display:block;color:#d4af37;font-size:0.8rem;margin-bottom:5px}
+.senal-cristal span{font-size:1.5rem}
+.senal-numero-significado span{display:block;font-size:1.5rem;color:#d4af37}
+.senal-numero-significado small{font-size:0.75rem;color:#888}
+.senal-luna-mensaje{margin-top:15px;padding:12px;background:#d4af3711;border-radius:8px;border-left:3px solid #d4af37}
+.senal-luna-mensaje p{margin:0;font-style:italic;color:#ccc}
+.senal-canalizado{margin-top:15px;padding:15px;background:linear-gradient(135deg,#1a1a3e,#0a0a2e);border-radius:12px;border:1px solid #d4af3744}
+.senal-canalizado h4{color:#d4af37;margin:0 0 10px}
+.test-intro,.test-pregunta,.test-cargando,.test-resultado{background:#141414;border-radius:16px;padding:30px;text-align:center}
+.test-header{margin-bottom:20px}
+.test-icono{font-size:3rem;color:#d4af37}
+.test-header h2{color:#fff;margin:10px 0}
+.elementos-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}
+.elem-prev{padding:15px;border-radius:12px;text-align:center}
+.elem-prev span{display:block;font-size:1.5rem;margin-bottom:5px}
+.elem-prev.fuego{background:#ff450033;color:#ff6b6b}
+.elem-prev.agua{background:#1e90ff33;color:#74b9ff}
+.elem-prev.tierra{background:#2ecc7133;color:#55efc4}
+.elem-prev.aire{background:#74b9ff33;color:#a29bfe}
+.test-tiempo{color:#888;font-size:0.9rem}
+.test-progress{display:flex;align-items:center;gap:15px;margin-bottom:30px}
+.progress-bar{flex:1;height:6px;background:#333;border-radius:3px;overflow:hidden}
+.progress-bar>div{height:100%;background:#d4af37;transition:width 0.3s}
+.test-pregunta h3{color:#fff;font-size:1.2rem;margin-bottom:25px}
+.opciones{display:flex;flex-direction:column;gap:10px}
+.opcion-btn{padding:15px 20px;background:#1f1f1f;border:1px solid #333;border-radius:12px;color:#fff;text-align:left;cursor:pointer;transition:all 0.2s}
+.opcion-btn:hover{background:#2a2a2a;border-color:#d4af37}
+.resultado-header{padding:30px;border-radius:16px;margin-bottom:20px}
+.resultado-header.fuego{background:linear-gradient(135deg,#ff4500,#ff6b6b)}
+.resultado-header.agua{background:linear-gradient(135deg,#1e90ff,#74b9ff)}
+.resultado-header.tierra{background:linear-gradient(135deg,#2ecc71,#55efc4)}
+.resultado-header.aire{background:linear-gradient(135deg,#a29bfe,#dfe6e9)}
+.resultado-emoji{font-size:4rem}
+.resultado-header h2{color:#fff;margin:10px 0 0}
+.elem-secundario{color:rgba(255,255,255,0.8)}
+.resultado-mensaje{background:#1f1f1f;padding:20px;border-radius:12px;margin-bottom:20px}
+.resultado-guardianes h4{color:#d4af37;margin-bottom:10px}
+.guardianes-lista{display:flex;flex-wrap:wrap;gap:8px}
+.guardianes-lista span{background:#d4af3722;color:#d4af37;padding:5px 12px;border-radius:20px;font-size:0.9rem}
+.resultado-ritual{background:#0a0a0a;padding:20px;border-radius:12px;border-left:3px solid #d4af37;margin-top:20px}
+.resultado-ritual h4{color:#d4af37;margin:0 0 10px}
+.cosmos-panel{background:#141414;border-radius:16px;padding:20px}
+.cosmos-header{text-align:center;margin-bottom:20px}
+.cosmos-header h2{color:#d4af37;margin:0}
+.cosmos-header p{color:#888}
+.cosmos-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:20px}
+.cosmos-tab{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px;background:#1f1f1f;border:none;border-radius:10px;color:#888;cursor:pointer;transition:all 0.2s}
+.cosmos-tab span{font-size:1.2rem}
+.cosmos-tab.activo{background:#d4af3722;color:#d4af37}
+.luna-actual{display:flex;align-items:center;gap:20px;background:#0a0a0a;padding:20px;border-radius:16px;margin-bottom:20px}
+.luna-emoji-xl{font-size:4rem}
+.luna-actual h3{color:#fff;margin:0 0 5px}
+.luna-actual p{color:#ccc;margin:0}
+.luna-actual small{color:#888}
+.luna-ritual{background:#1f1f1f;padding:15px;border-radius:12px;margin-bottom:15px}
+.luna-ritual h4{color:#d4af37;margin:0 0 10px}
+.fechas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.fecha-item{display:flex;align-items:center;gap:10px;background:#1f1f1f;padding:12px;border-radius:10px}
+.fecha-item span{font-size:1.5rem}
+.fecha-item strong{display:block;color:#fff}
+.fecha-item small{color:#888}
+.sol-actual{display:flex;align-items:center;gap:15px;background:#0a0a0a;padding:20px;border-radius:12px;margin-bottom:15px}
+.sol-actual span{font-size:2.5rem}
+.sol-actual strong{display:block;color:#fff}
+.alerta-retrogrado{display:flex;align-items:center;gap:10px;background:#ff450022;padding:15px;border-radius:12px;border:1px solid #ff4500;margin-bottom:15px}
+.cristal-mes{display:flex;align-items:center;gap:15px;margin-bottom:15px}
+.cristal-mes span{font-size:3rem}
+.cristal-mes h3{color:#fff;margin:0}
+.cristal-poder{color:#ccc;font-style:italic;margin-bottom:15px}
+.cristal-chakra,.cristal-ritual{background:#1f1f1f;padding:15px;border-radius:12px;margin-bottom:15px}
+.cosmos-guardian h3{color:#d4af37;margin:0 0 5px}
+.guardian-tipo{color:#888;font-size:0.9rem;margin-bottom:10px}
+.guardian-mensaje{background:#0a0a0a;padding:15px;border-radius:12px;margin-top:15px;border-left:3px solid #d4af37}
+.guardian-mensaje h4{color:#d4af37;margin:0 0 10px}
+.mensaje-destacado{font-size:1.1rem;line-height:1.6;color:#eee}
+.fechas-importantes{margin-top:20px;padding-top:20px;border-top:1px solid #333}
+.fechas-importantes h3{color:#d4af37;margin:0 0 15px}
+.fechas-lista{display:flex;flex-direction:column;gap:10px}
+.fecha-item-full{display:flex;align-items:center;gap:12px;padding:12px;background:#1f1f1f;border-radius:10px}
+.fecha-item-full span{font-size:1.5rem}
+.fecha-item-full strong{color:#fff}
+.fecha-item-full small{display:block;color:#888}
+.guia-cristales{padding-bottom:20px}
+.guia-header{text-align:center;margin-bottom:20px}
+.guia-header h2{color:#d4af37;margin:0 0 5px}
+.guia-header p{color:#888}
+.guia-filtros{margin-bottom:20px}
+.buscar-input{width:100%;padding:12px 15px;background:#1f1f1f;border:1px solid #333;border-radius:10px;color:#fff;font-size:1rem;margin-bottom:10px}
+.buscar-input:focus{outline:none;border-color:#d4af37}
+.chakra-filtros{display:flex;flex-wrap:wrap;gap:5px}
+.chakra-btn{padding:6px 12px;background:#1f1f1f;border:none;border-radius:20px;color:#888;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.chakra-btn.activo{background:#d4af3722;color:#d4af37}
+.cristales-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cristal-card{background:#1f1f1f;border-radius:12px;padding:15px;text-align:center;cursor:pointer;transition:all 0.2s;border:1px solid transparent}
+.cristal-card:hover{border-color:#d4af37;transform:translateY(-2px)}
+.cristal-emoji{font-size:2rem;margin-bottom:10px}
+.cristal-card h4{color:#fff;margin:0 0 5px;font-size:0.95rem}
+.cristal-color{color:#888;font-size:0.8rem;margin:0 0 8px}
+.cristal-chakras-mini{display:flex;justify-content:center;gap:5px;margin-bottom:8px}
+.cristal-chakras-mini span{background:#d4af3722;color:#d4af37;padding:2px 8px;border-radius:10px;font-size:0.7rem}
+.cristal-prop-mini{color:#aaa;font-size:0.75rem;margin:0;line-height:1.3}
+.cristal-detalle{padding:20px 0}
+.btn-volver{background:none;border:none;color:#d4af37;cursor:pointer;padding:10px 0;font-size:1rem}
+.cristal-header-det{margin-bottom:20px}
+.cristal-header-det h2{color:#d4af37;margin:0 0 5px}
+.nombres-alt{color:#888;font-size:0.9rem;margin:0}
+.cristal-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.info-item{background:#1f1f1f;padding:12px;border-radius:10px}
+.info-item strong{color:#d4af37;display:block;margin-bottom:5px;font-size:0.85rem}
+.cristal-seccion{background:#141414;padding:15px;border-radius:12px;margin-bottom:15px}
+.cristal-seccion h3{color:#d4af37;margin:0 0 10px;font-size:1rem}
+.cristal-seccion p{color:#ccc;margin:0;line-height:1.5}
+.cristal-seccion.ritual{background:linear-gradient(135deg,#1a1a2e,#0a0a2e);border:1px solid #d4af3733}
+.cristal-seccion.advertencia{background:#ff450011;border:1px solid #ff450044}
+.combinaciones-tags,.guardianes-tags{display:flex;flex-wrap:wrap;gap:8px}
+.combinaciones-tags span,.guardianes-tags span{background:#d4af3722;color:#d4af37;padding:5px 12px;border-radius:15px;font-size:0.85rem}
+.cristal-mensaje{text-align:center;padding:20px;background:linear-gradient(135deg,#d4af3711,#d4af3722);border-radius:12px;border:1px solid #d4af3744;margin-top:20px}
+.cristal-mensaje p{color:#d4af37;font-style:italic;font-size:1.1rem;margin:0}
+.catalogo-exp{padding-bottom:20px}
+.catalogo-header{text-align:center;margin-bottom:20px}
+.catalogo-header h2{color:#d4af37;margin:0 0 5px}
+.catalogo-header p{color:#888}
+.categorias-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px}
+.cat-tab{padding:8px 15px;background:#1f1f1f;border:none;border-radius:20px;color:#888;cursor:pointer;transition:all 0.2s}
+.cat-tab.activo{background:#d4af3722;color:#d4af37}
+.experiencias-grid-new{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
+.exp-card-new{background:#1f1f1f;border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;border:1px solid transparent;position:relative}
+.exp-card-new:hover{border-color:#d4af37;transform:translateY(-2px)}
+.exp-card-new.popular{border-color:#d4af3744}
+.exp-card-new.premium{background:linear-gradient(135deg,#1f1f2f,#1a1a2e)}
+.badge-popular,.badge-premium{position:absolute;top:10px;right:10px;padding:3px 8px;border-radius:10px;font-size:0.7rem;font-weight:600}
+.badge-popular{background:#d4af37;color:#000}
+.badge-premium{background:#9b59b6;color:#fff}
+.exp-icono{font-size:2rem;display:block;margin-bottom:10px}
+.exp-card-new h4{color:#fff;margin:0 0 8px}
+.exp-desc{color:#888;font-size:0.9rem;margin:0 0 12px;line-height:1.4}
+.exp-footer{display:flex;justify-content:space-between;align-items:center}
+.exp-runas{background:#d4af3722;color:#d4af37;padding:5px 10px;border-radius:8px;font-weight:600}
+.exp-duracion{color:#666;font-size:0.85rem}
+.runas-info{text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid #333}
+.runas-info p{margin:0 0 10px;color:#aaa}
+.runas-info strong{color:#d4af37}
+.exp-detalle{padding:20px 0}
+.exp-header-det{display:flex;align-items:center;gap:20px;margin-bottom:20px}
+.exp-icono-lg{font-size:3rem}
+.exp-header-det h2{color:#fff;margin:0 0 8px}
+.exp-meta{display:flex;gap:15px}
+.exp-runas-lg{background:#d4af37;color:#000;padding:5px 12px;border-radius:8px;font-weight:600}
+.exp-desc-full{color:#ccc;line-height:1.6;margin-bottom:20px}
+.exp-entregable{background:#1f1f1f;padding:15px;border-radius:12px;margin-bottom:20px}
+.exp-entregable strong{color:#d4af37}
+.exp-formulario{margin-bottom:20px}
+.exp-formulario h4{color:#d4af37;margin:0 0 15px}
+.exp-formulario textarea{width:100%;padding:12px;background:#1f1f1f;border:1px solid #333;border-radius:10px;color:#fff;font-size:1rem;margin-bottom:10px;resize:vertical}
+.exp-formulario textarea:focus{outline:none;border-color:#d4af37}
+.exp-accion{text-align:center;padding:20px;background:#141414;border-radius:16px}
+.runas-insuficientes{color:#ff6b6b;margin-bottom:15px}
+.runas-actuales{color:#888;margin-top:15px}
+.exp-resultado{padding:20px}
+.resultado-header-exp{text-align:center;margin-bottom:20px}
+.resultado-header-exp span{font-size:3rem;display:block;margin-bottom:10px}
+.resultado-header-exp h2{color:#d4af37;margin:0}
+.resultado-contenido{background:#141414;padding:20px;border-radius:16px;margin-bottom:20px}
+.resultado-contenido h3{color:#d4af37;margin:0 0 15px}
+.resultado-texto p{color:#ccc;line-height:1.7;margin-bottom:10px}
+.resultado-palabras{color:#888;font-size:0.85rem;text-align:right;margin-top:15px}
+.resultado-pendiente{background:#1f1f1f;padding:20px;border-radius:16px;text-align:center;margin-bottom:20px}
+.guia-cargando,.catalogo-cargando,.cosmos-cargando{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;color:#888}
+@media(max-width:768px){.senal-footer{grid-template-columns:1fr}.elementos-preview{grid-template-columns:repeat(2,1fr)}.cosmos-tabs{grid-template-columns:repeat(2,1fr)}.cristales-grid{grid-template-columns:repeat(2,1fr)}.experiencias-grid-new{grid-template-columns:1fr}}
 `;
