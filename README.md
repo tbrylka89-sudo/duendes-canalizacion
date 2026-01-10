@@ -121,3 +121,4 @@ curl -X POST https://TU-PROYECTO.vercel.app/api/generar \
 Con amor y magia 🍀
 Duendes del Uruguay
 # Actualizado Fri Jan  9 20:40:22 -03 2026
+# Segunda prueba Fri Jan  9 21:18:00 -03 2026
