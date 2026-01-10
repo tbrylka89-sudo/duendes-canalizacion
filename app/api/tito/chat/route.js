@@ -507,20 +507,27 @@ ${esAdmin ?
 
     // FALLBACK: Si no hay productos pero detectamos intención, mostrar los primeros 4
     const tieneIntencion = /protecci[oó]n|abundancia|amor|sanaci[oó]n|duende|guardi[aá]n|qu[eé] ten[eé]s|mostrame|ver|busco/i.test(message);
+    const TITO_AVATAR = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
 
     if (productosRecomendados.length === 0 && productos.length > 0 && tieneIntencion && !esAdmin) {
-      // Tomar los primeros 4 productos disponibles
+      // Tomar los primeros 4 productos disponibles (con o sin imagen)
       productosRecomendados = productos
-        .filter(p => p.disponible && p.imagen)
+        .filter(p => p.disponible)
         .slice(0, 4)
         .map(p => ({
           id: p.id,
           nombre: p.nombre,
           precio: p.precio,
-          imagen: p.imagen,
+          imagen: p.imagen || TITO_AVATAR,
           url: p.url
         }));
     }
+
+    // Asegurar que todos los productos tengan imagen (fallback a Tito)
+    productosRecomendados = productosRecomendados.map(p => ({
+      ...p,
+      imagen: p.imagen || TITO_AVATAR
+    }));
 
     // ═══════════════════════════════════════════════════════════
     // GUARDAR MEMORIA
