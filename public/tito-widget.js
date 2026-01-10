@@ -1,123 +1,139 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════
- * TITO WIDGET v5.0 - AUTO-CARGABLE
- * Solo necesitas: <script src="https://duendes-vercel.vercel.app/tito-widget.js"></script>
- * ═══════════════════════════════════════════════════════════════════════════
+ * TITO WIDGET v5.1 - Duendes del Uruguay
+ * <script src="https://duendes-vercel.vercel.app/tito-widget.js"></script>
  */
 
 (function() {
   'use strict';
-
-  // ═══════════════════════════════════════════════════════════════
-  // CONFIGURACION
-  // ═══════════════════════════════════════════════════════════════
 
   const CONFIG = {
     API_URL: 'https://duendes-vercel.vercel.app/api/tito/chat',
     AVATAR: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg'
   };
 
-  // ═══════════════════════════════════════════════════════════════
-  // ESTILOS CSS
-  // ═══════════════════════════════════════════════════════════════
-
   const CSS = `
-    #tito-widget-container * { box-sizing: border-box; }
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap');
+
+    #tito-widget-container * {
+      box-sizing: border-box;
+      font-family: 'Crimson Text', Georgia, serif;
+    }
 
     #tito-bubble {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 70px;
-      height: 70px;
+      bottom: 24px;
+      right: 24px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       cursor: pointer;
       z-index: 999999;
-      box-shadow: 0 4px 20px rgba(198,169,98,0.4);
-      transition: transform 0.3s;
+      box-shadow: 0 4px 24px rgba(198,169,98,0.5), 0 0 0 3px rgba(198,169,98,0.2);
+      transition: all 0.3s ease;
       overflow: hidden;
       border: 3px solid #C6A962;
+      background: #0a0a0a;
     }
-    #tito-bubble:hover { transform: scale(1.1); }
-    #tito-bubble img { width: 100%; height: 100%; object-fit: cover; }
+    #tito-bubble:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 32px rgba(198,169,98,0.6), 0 0 0 6px rgba(198,169,98,0.15);
+    }
+    #tito-bubble img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
     #tito-proactive {
       position: fixed;
-      bottom: 100px;
-      right: 20px;
-      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-      border: 2px solid #C6A962;
-      border-radius: 20px;
-      padding: 15px 20px;
-      max-width: 280px;
+      bottom: 108px;
+      right: 24px;
+      background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+      border: 1px solid #C6A962;
+      border-radius: 16px;
+      padding: 16px 20px;
+      max-width: 260px;
       z-index: 999998;
       display: none;
       animation: titoSlideIn 0.4s ease;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(198,169,98,0.1);
     }
     #tito-proactive p {
-      color: #f5f5f5;
-      margin: 0 0 10px 0;
-      font-size: 14px;
+      color: #e8e8e8;
+      margin: 0 0 12px 0;
+      font-size: 15px;
       line-height: 1.5;
     }
-    #tito-proactive button {
-      background: linear-gradient(135deg, #C6A962, #D4BC7D);
+    #tito-proactive .tito-cta {
+      background: linear-gradient(135deg, #C6A962 0%, #a88c4a 100%);
       color: #0a0a0a;
       border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 10px 18px;
+      border-radius: 24px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    #tito-proactive .tito-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(198,169,98,0.4);
     }
     #tito-proactive .close-btn {
       position: absolute;
       top: 8px;
-      right: 12px;
+      right: 10px;
       background: none;
       border: none;
-      color: #888;
-      font-size: 18px;
+      color: #666;
+      font-size: 20px;
       cursor: pointer;
       padding: 0;
+      line-height: 1;
     }
+    #tito-proactive .close-btn:hover { color: #C6A962; }
 
     @keyframes titoSlideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(16px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     #tito-chat {
       position: fixed;
-      bottom: 100px;
-      right: 20px;
-      width: 380px;
-      max-width: calc(100vw - 40px);
-      height: 520px;
+      bottom: 108px;
+      right: 24px;
+      width: 360px;
+      max-width: calc(100vw - 48px);
+      height: 500px;
       max-height: calc(100vh - 140px);
-      background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
-      border: 2px solid #C6A962;
-      border-radius: 24px;
+      background: linear-gradient(180deg, #121212 0%, #0a0a0a 100%);
+      border: 1px solid #C6A962;
+      border-radius: 20px;
       display: none;
       flex-direction: column;
       z-index: 999999;
       overflow: hidden;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+      box-shadow: 0 16px 64px rgba(0,0,0,0.7), inset 0 1px 0 rgba(198,169,98,0.1);
+      animation: chatOpen 0.3s ease;
+    }
+    @keyframes chatOpen {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     #tito-chat.open { display: flex; }
 
     #tito-header {
-      background: linear-gradient(135deg, #1f1f1f, #141414);
-      padding: 16px;
+      background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+      padding: 14px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid rgba(198,169,98,0.3);
     }
     #tito-header img {
-      width: 45px;
-      height: 45px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       border: 2px solid #C6A962;
       object-fit: cover;
@@ -125,22 +141,44 @@
     #tito-header-info h3 {
       margin: 0;
       color: #C6A962;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
     #tito-header-info span {
-      color: #4ade80;
+      color: #5cb85c;
       font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #tito-header-info span::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #5cb85c;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     #tito-close {
       margin-left: auto;
-      background: none;
+      background: rgba(255,255,255,0.05);
       border: none;
       color: #888;
-      font-size: 24px;
+      font-size: 18px;
       cursor: pointer;
-      padding: 0;
+      padding: 6px 10px;
+      border-radius: 8px;
       line-height: 1;
+      transition: all 0.2s;
+    }
+    #tito-close:hover {
+      background: rgba(198,169,98,0.15);
+      color: #C6A962;
     }
 
     #tito-messages {
@@ -151,31 +189,34 @@
       flex-direction: column;
       gap: 12px;
     }
-    #tito-messages::-webkit-scrollbar { width: 6px; }
-    #tito-messages::-webkit-scrollbar-track { background: #1a1a1a; }
-    #tito-messages::-webkit-scrollbar-thumb { background: #C6A962; border-radius: 3px; }
+    #tito-messages::-webkit-scrollbar { width: 5px; }
+    #tito-messages::-webkit-scrollbar-track { background: transparent; }
+    #tito-messages::-webkit-scrollbar-thumb {
+      background: rgba(198,169,98,0.4);
+      border-radius: 4px;
+    }
 
     .tito-msg {
-      max-width: 85%;
+      max-width: 82%;
       padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 14px;
+      border-radius: 16px;
+      font-size: 15px;
       line-height: 1.5;
       animation: msgFade 0.3s ease;
     }
     @keyframes msgFade {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .tito-msg.bot {
-      background: linear-gradient(135deg, #1f1f1f, #171717);
-      color: #f5f5f5;
+      background: linear-gradient(135deg, #1e1e1e 0%, #171717 100%);
+      color: #f0f0f0;
       align-self: flex-start;
-      border: 1px solid #333;
+      border: 1px solid rgba(198,169,98,0.2);
       border-bottom-left-radius: 4px;
     }
     .tito-msg.user {
-      background: linear-gradient(135deg, #C6A962, #a88c4a);
+      background: linear-gradient(135deg, #C6A962 0%, #a88c4a 100%);
       color: #0a0a0a;
       align-self: flex-end;
       border-bottom-right-radius: 4px;
@@ -184,9 +225,12 @@
 
     .tito-typing {
       display: flex;
-      gap: 4px;
-      padding: 16px;
+      gap: 5px;
+      padding: 14px 16px;
       align-self: flex-start;
+      background: rgba(30,30,30,0.6);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
     }
     .tito-typing span {
       width: 8px;
@@ -198,8 +242,8 @@
     .tito-typing span:nth-child(2) { animation-delay: 0.2s; }
     .tito-typing span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typingBounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-8px); }
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
     }
 
     .tito-products-gallery {
@@ -210,27 +254,27 @@
       width: 100%;
     }
     .tito-product-card {
-      background: linear-gradient(135deg, #1a1a1a, #0f0f0f) !important;
-      border: 1px solid #C6A962 !important;
+      background: linear-gradient(145deg, #1a1a1a, #0f0f0f) !important;
+      border: 1px solid rgba(198,169,98,0.4) !important;
       border-radius: 12px !important;
       overflow: hidden !important;
       cursor: pointer !important;
       transition: all 0.3s ease !important;
-      min-height: 180px !important;
+      min-height: 170px !important;
       display: flex !important;
       flex-direction: column !important;
     }
     .tito-product-card:hover {
-      transform: translateY(-3px) !important;
-      box-shadow: 0 8px 24px rgba(198,169,98,0.3) !important;
-      border-color: #D4BC7D !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 20px rgba(198,169,98,0.25) !important;
+      border-color: #C6A962 !important;
     }
     .tito-product-card img {
       width: 100% !important;
-      height: 100px !important;
+      height: 95px !important;
       object-fit: cover !important;
       display: block !important;
-      background: #222 !important;
+      background: #1a1a1a !important;
     }
     .tito-product-card .card-info {
       padding: 10px !important;
@@ -238,11 +282,11 @@
       display: flex !important;
       flex-direction: column !important;
       justify-content: space-between !important;
-      background: #1a1a1a !important;
+      background: linear-gradient(180deg, #1a1a1a, #141414) !important;
     }
     .tito-product-card h4 {
       margin: 0 0 6px 0 !important;
-      color: #f5f5f5 !important;
+      color: #f0f0f0 !important;
       font-size: 12px !important;
       font-weight: 600 !important;
       line-height: 1.3 !important;
@@ -258,26 +302,30 @@
     }
 
     #tito-input-area {
-      padding: 12px 16px;
-      border-top: 1px solid #333;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(198,169,98,0.2);
       display: flex;
       gap: 10px;
-      background: #0f0f0f;
+      background: linear-gradient(180deg, #0f0f0f, #0a0a0a);
     }
     #tito-input {
       flex: 1;
       background: #1a1a1a;
-      border: 1px solid #333;
+      border: 1px solid rgba(198,169,98,0.3);
       border-radius: 24px;
       padding: 12px 18px;
-      color: #f5f5f5;
+      color: #f0f0f0;
       font-size: 14px;
       outline: none;
+      transition: border-color 0.2s;
     }
-    #tito-input:focus { border-color: #C6A962; }
+    #tito-input:focus {
+      border-color: #C6A962;
+      box-shadow: 0 0 0 2px rgba(198,169,98,0.1);
+    }
     #tito-input::placeholder { color: #666; }
     #tito-send {
-      background: linear-gradient(135deg, #C6A962, #D4BC7D);
+      background: linear-gradient(135deg, #C6A962, #a88c4a);
       border: none;
       width: 44px;
       height: 44px;
@@ -286,31 +334,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s;
+      transition: all 0.2s;
+      flex-shrink: 0;
     }
-    #tito-send:hover { transform: scale(1.1); }
+    #tito-send:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(198,169,98,0.4);
+    }
     #tito-send svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       fill: #0a0a0a;
+      margin-left: 2px;
     }
 
     @media (max-width: 480px) {
       #tito-chat {
-        width: calc(100vw - 20px);
-        height: calc(100vh - 100px);
-        bottom: 90px;
-        right: 10px;
-        border-radius: 20px;
+        width: calc(100vw - 24px);
+        height: calc(100vh - 110px);
+        bottom: 100px;
+        right: 12px;
+        border-radius: 16px;
       }
-      #tito-bubble { width: 60px; height: 60px; bottom: 15px; right: 15px; }
-      .tito-products-gallery { grid-template-columns: 1fr 1fr; }
+      #tito-bubble {
+        width: 64px;
+        height: 64px;
+        bottom: 20px;
+        right: 16px;
+      }
+      #tito-proactive {
+        right: 16px;
+        bottom: 96px;
+        max-width: calc(100vw - 100px);
+      }
     }
   `;
-
-  // ═══════════════════════════════════════════════════════════════
-  // HTML ESTRUCTURA
-  // ═══════════════════════════════════════════════════════════════
 
   const HTML = `
     <div id="tito-widget-container">
@@ -319,9 +377,9 @@
       </div>
 
       <div id="tito-proactive">
-        <button class="close-btn" onclick="TitoWidget.closeProactive()">x</button>
-        <p id="tito-proactive-text">Hola! Buscas algo especial?</p>
-        <button onclick="TitoWidget.openFromProactive()">Chatear con Tito</button>
+        <button class="close-btn" onclick="TitoWidget.closeProactive()">&times;</button>
+        <p id="tito-proactive-text"></p>
+        <button class="tito-cta" id="tito-proactive-btn">Chatear con Tito</button>
       </div>
 
       <div id="tito-chat">
@@ -331,12 +389,10 @@
             <h3>Tito</h3>
             <span>En linea</span>
           </div>
-          <button id="tito-close" onclick="TitoWidget.close()">x</button>
+          <button id="tito-close" onclick="TitoWidget.close()">&times;</button>
         </div>
 
-        <div id="tito-messages">
-          <div class="tito-msg bot">Hola! Soy Tito. En que te ayudo?</div>
-        </div>
+        <div id="tito-messages"></div>
 
         <div id="tito-input-area">
           <input type="text" id="tito-input" placeholder="Escribi tu mensaje..." autocomplete="off">
@@ -348,32 +404,23 @@
     </div>
   `;
 
-  // ═══════════════════════════════════════════════════════════════
-  // WIDGET CLASS
-  // ═══════════════════════════════════════════════════════════════
-
   const TitoWidget = {
     isOpen: false,
     conversationHistory: [],
+    proactiveMessage: '',
 
     init() {
-      // Inyectar CSS
       const style = document.createElement('style');
       style.textContent = CSS;
       document.head.appendChild(style);
 
-      // Inyectar HTML
       const container = document.createElement('div');
       container.innerHTML = HTML;
       document.body.appendChild(container.firstElementChild);
 
-      // Bindings
       this.bindEvents();
-
-      // Proactive bubble despues de 8 segundos
-      setTimeout(() => this.showProactive(), 8000);
-
-      console.log('Tito Widget v5.0 cargado');
+      setTimeout(() => this.showProactive(), 6000);
+      console.log('Tito Widget v5.1 listo');
     },
 
     bindEvents() {
@@ -382,6 +429,7 @@
         if (e.key === 'Enter') this.send();
       });
       document.getElementById('tito-send').addEventListener('click', () => this.send());
+      document.getElementById('tito-proactive-btn').addEventListener('click', () => this.openFromProactive());
     },
 
     toggle() {
@@ -410,15 +458,18 @@
 
       const page = this.detectPage();
       const messages = {
-        home: 'Bienvenida! Queres ver los duendes mas vendidos?',
-        tienda: 'Buscas algo especial? Puedo ayudarte a encontrar el duende perfecto',
-        producto: 'Tenes dudas sobre este guardian? Preguntame!',
-        carrito: 'Necesitas ayuda para completar tu pedido?',
-        checkout: 'Estoy aca si tenes alguna duda antes de finalizar',
-        default: 'Hola! Soy Tito, en que te puedo ayudar?'
+        home: { text: 'Hola! Queres ver los duendes mas especiales?', auto: 'Mostrame los duendes mas vendidos' },
+        tienda: { text: 'Buscas algo especial? Te ayudo a encontrarlo', auto: 'Que duendes me recomendas?' },
+        producto: { text: 'Tenes dudas sobre este guardian?', auto: 'Contame sobre este duende' },
+        carrito: { text: 'Necesitas ayuda con tu pedido?', auto: 'Tengo dudas sobre mi pedido' },
+        checkout: { text: 'Alguna duda antes de finalizar?', auto: 'Tengo una consulta' },
+        default: { text: 'Hola! Soy Tito. Te ayudo?', auto: 'Hola Tito!' }
       };
 
-      document.getElementById('tito-proactive-text').textContent = messages[page] || messages.default;
+      const msg = messages[page] || messages.default;
+      this.proactiveMessage = msg.auto;
+
+      document.getElementById('tito-proactive-text').textContent = msg.text;
       document.getElementById('tito-proactive').style.display = 'block';
     },
 
@@ -429,6 +480,12 @@
     openFromProactive() {
       this.closeProactive();
       this.open();
+
+      // Enviar mensaje automatico basado en la pagina
+      if (this.proactiveMessage) {
+        document.getElementById('tito-input').value = this.proactiveMessage;
+        setTimeout(() => this.send(), 300);
+      }
     },
 
     detectPage() {
@@ -436,7 +493,7 @@
       const path = window.location.pathname.toLowerCase();
 
       if (path === '/' || path === '/home') return 'home';
-      if (url.includes('/tienda') || url.includes('/shop') || url.includes('/producto')) return 'tienda';
+      if (url.includes('/tienda') || url.includes('/shop')) return 'tienda';
       if (url.includes('/product/') || url.includes('/producto/')) return 'producto';
       if (url.includes('/cart') || url.includes('/carrito')) return 'carrito';
       if (url.includes('/checkout') || url.includes('/finalizar')) return 'checkout';
@@ -453,16 +510,14 @@
       return null;
     },
 
-    addMessage(text, type, productos = null) {
+    addMessage(text, type, productos) {
       const container = document.getElementById('tito-messages');
       const msg = document.createElement('div');
       msg.className = 'tito-msg ' + type;
-      msg.innerHTML = text;
+      msg.textContent = text;
       container.appendChild(msg);
 
-      // Si hay productos, crear galeria
       if (productos && productos.length > 0) {
-        console.log('Creando galeria con', productos.length, 'productos');
         const gallery = document.createElement('div');
         gallery.className = 'tito-products-gallery';
 
@@ -513,7 +568,6 @@
       this.addMessage(text, 'user');
       this.showTyping();
 
-      // Agregar al historial
       this.conversationHistory.push({ role: 'user', content: text });
 
       try {
@@ -535,25 +589,24 @@
         const data = await response.json();
         this.hideTyping();
 
-        if (data.respuesta) {
-          this.addMessage(data.respuesta, 'bot', data.productos);
-          this.conversationHistory.push({ role: 'assistant', content: data.respuesta });
+        const respuesta = data.respuesta || data.response;
+        if (respuesta) {
+          this.addMessage(respuesta, 'bot', data.productos);
+          this.conversationHistory.push({ role: 'assistant', content: respuesta });
         } else {
-          this.addMessage('Ups, algo fallo. Probamos de nuevo?', 'bot');
+          this.addMessage('Disculpa, hubo un error. Intenta de nuevo.', 'bot');
         }
 
       } catch (error) {
         console.error('Error Tito:', error);
         this.hideTyping();
-        this.addMessage('No pude conectarme. Intenta de nuevo', 'bot');
+        this.addMessage('No pude conectarme. Intenta de nuevo.', 'bot');
       }
     }
   };
 
-  // Exponer globalmente
   window.TitoWidget = TitoWidget;
 
-  // Auto-inicializar cuando el DOM este listo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() { TitoWidget.init(); });
   } else {

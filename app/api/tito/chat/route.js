@@ -220,8 +220,11 @@ export async function POST(request) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   
   try {
-    const { message, history, contexto, visitorId, email } = await request.json();
-    
+    const body = await request.json();
+    const message = body.message || body.mensaje;
+    const { history, historial, contexto, visitorId, email } = body;
+    const conversationHistory = history || historial || [];
+
     if (!message || message.trim() === '') {
       return Response.json({ 
         success: false, 
@@ -460,8 +463,8 @@ ${esAdmin ?
     // ═══════════════════════════════════════════════════════════
 
     const mensajes = [];
-    if (history?.length > 0) {
-      history.slice(-10).forEach(h => {
+    if (conversationHistory?.length > 0) {
+      conversationHistory.slice(-10).forEach(h => {
         mensajes.push({ 
           role: h.role === 'assistant' ? 'assistant' : 'user', 
           content: h.content 
@@ -574,9 +577,10 @@ ${esAdmin ?
     // RESPUESTA
     // ═══════════════════════════════════════════════════════════
 
-    return Response.json({ 
-      success: true, 
+    return Response.json({
+      success: true,
       response: textoRespuesta,
+      respuesta: textoRespuesta,
       productos: productosRecomendados,
       esAdmin,
       esRetorno
