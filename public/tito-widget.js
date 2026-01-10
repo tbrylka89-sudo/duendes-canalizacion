@@ -1,5 +1,5 @@
 /**
- * TITO WIDGET v5.2 - Duendes del Uruguay
+ * TITO WIDGET v6.0 - Duendes del Uruguay
  * <script src="https://duendes-vercel.vercel.app/tito-widget.js"></script>
  */
 
@@ -12,89 +12,98 @@
   };
 
   const CSS = `
-    @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
 
     #tito-widget-container * {
       box-sizing: border-box;
-      font-family: 'Crimson Text', Georgia, serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
     }
 
     #tito-bubble {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 85px;
-      height: 85px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       cursor: pointer;
       z-index: 999999;
-      box-shadow: 0 4px 28px rgba(198,169,98,0.5), 0 0 0 4px rgba(198,169,98,0.2);
+      box-shadow: 0 4px 24px rgba(198,169,98,0.45), 0 0 0 3px rgba(198,169,98,0.15);
       transition: all 0.3s ease;
       overflow: hidden;
-      border: 3px solid #C6A962;
-      background: #0a0a0a;
+      border: 2px solid #C6A962;
+      background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
     }
     #tito-bubble:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 36px rgba(198,169,98,0.6), 0 0 0 8px rgba(198,169,98,0.15);
+      transform: scale(1.08) rotate(3deg);
+      box-shadow: 0 8px 32px rgba(198,169,98,0.6), 0 0 20px rgba(198,169,98,0.3);
     }
     #tito-bubble img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    #tito-bubble .tito-wave {
+    #tito-bubble-badge {
       position: absolute;
-      bottom: -2px;
-      right: -2px;
-      font-size: 22px;
-      animation: wave 2s infinite;
+      top: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid #0a0a0a;
+      animation: pulse-badge 2s infinite;
     }
-    @keyframes wave {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(20deg); }
-      75% { transform: rotate(-10deg); }
+    @keyframes pulse-badge {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
     }
 
     #tito-proactive {
       position: fixed;
-      bottom: 118px;
+      bottom: 112px;
       right: 20px;
-      background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
-      border: 1px solid #C6A962;
-      border-radius: 16px;
+      background: linear-gradient(145deg, #141414, #0a0a0a);
+      border: 1px solid rgba(198,169,98,0.6);
+      border-radius: 16px 16px 4px 16px;
       padding: 16px 20px;
-      max-width: 280px;
+      max-width: 270px;
       z-index: 999998;
       display: none;
-      animation: titoSlideIn 0.4s ease;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(198,169,98,0.1);
+      animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     #tito-proactive p {
-      color: #e8e8e8;
-      margin: 0 0 12px 0;
+      color: #f0f0f0;
+      margin: 0 0 14px 0;
       font-size: 15px;
       line-height: 1.5;
+      font-weight: 500;
     }
     #tito-proactive .tito-cta {
-      background: linear-gradient(135deg, #C6A962 0%, #a88c4a 100%);
+      background: linear-gradient(135deg, #C6A962, #9a7b3c);
       color: #0a0a0a;
       border: none;
-      padding: 10px 18px;
-      border-radius: 24px;
+      padding: 11px 20px;
+      border-radius: 25px;
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
       width: 100%;
-      transition: all 0.2s;
+      transition: all 0.25s;
+      letter-spacing: 0.3px;
     }
     #tito-proactive .tito-cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(198,169,98,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(198,169,98,0.4);
     }
     #tito-proactive .close-btn {
       position: absolute;
-      top: 8px;
+      top: 6px;
       right: 10px;
       background: none;
       border: none;
@@ -103,136 +112,145 @@
       cursor: pointer;
       padding: 0;
       line-height: 1;
+      transition: color 0.2s;
     }
     #tito-proactive .close-btn:hover { color: #C6A962; }
 
-    @keyframes titoSlideIn {
-      from { opacity: 0; transform: translateY(16px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
     #tito-chat {
       position: fixed;
-      bottom: 118px;
+      bottom: 112px;
       right: 20px;
-      width: 370px;
+      width: 380px;
       max-width: calc(100vw - 40px);
-      height: 520px;
+      height: 540px;
       max-height: calc(100vh - 150px);
-      background: linear-gradient(180deg, #121212 0%, #0a0a0a 100%);
-      border: 1px solid #C6A962;
-      border-radius: 20px;
+      background: linear-gradient(180deg, #0f0f0f 0%, #080808 100%);
+      border: 1px solid rgba(198,169,98,0.5);
+      border-radius: 24px;
       display: none;
       flex-direction: column;
       z-index: 999999;
       overflow: hidden;
-      box-shadow: 0 16px 64px rgba(0,0,0,0.7), inset 0 1px 0 rgba(198,169,98,0.1);
-      animation: chatOpen 0.3s ease;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(198,169,98,0.1);
+      animation: chatOpen 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     @keyframes chatOpen {
-      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      from { opacity: 0; transform: translateY(30px) scale(0.9); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     #tito-chat.open { display: flex; }
 
     #tito-header {
-      background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
-      padding: 14px 16px;
+      background: linear-gradient(180deg, #161616, #0f0f0f);
+      padding: 16px 18px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid rgba(198,169,98,0.3);
+      gap: 14px;
+      border-bottom: 1px solid rgba(198,169,98,0.25);
     }
-    #tito-header img {
-      width: 48px;
-      height: 48px;
+    #tito-header-avatar {
+      position: relative;
+      width: 50px;
+      height: 50px;
+    }
+    #tito-header-avatar img {
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       border: 2px solid #C6A962;
       object-fit: cover;
     }
+    #tito-header-avatar .status-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid #0f0f0f;
+    }
     #tito-header-info h3 {
       margin: 0;
       color: #C6A962;
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 600;
       letter-spacing: 0.5px;
     }
     #tito-header-info span {
-      color: #5cb85c;
+      color: #22c55e;
       font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    #tito-header-info span::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: #5cb85c;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      font-weight: 500;
     }
     #tito-close {
       margin-left: auto;
-      background: rgba(255,255,255,0.05);
-      border: none;
-      color: #888;
-      font-size: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #777;
+      font-size: 20px;
       cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: 10px;
       line-height: 1;
       transition: all 0.2s;
     }
     #tito-close:hover {
-      background: rgba(198,169,98,0.15);
+      background: rgba(198,169,98,0.1);
+      border-color: rgba(198,169,98,0.3);
       color: #C6A962;
     }
 
     #tito-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      background: linear-gradient(180deg, rgba(20,20,20,0.5), transparent);
     }
-    #tito-messages::-webkit-scrollbar { width: 5px; }
+    #tito-messages::-webkit-scrollbar { width: 4px; }
     #tito-messages::-webkit-scrollbar-track { background: transparent; }
     #tito-messages::-webkit-scrollbar-thumb {
-      background: rgba(198,169,98,0.4);
+      background: rgba(198,169,98,0.3);
       border-radius: 4px;
     }
 
     .tito-msg {
       max-width: 85%;
-      padding: 12px 16px;
-      border-radius: 16px;
+      padding: 14px 18px;
+      border-radius: 18px;
       font-size: 15px;
-      line-height: 1.55;
-      animation: msgFade 0.3s ease;
+      line-height: 1.6;
+      animation: msgPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    @keyframes msgFade {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes msgPop {
+      from { opacity: 0; transform: scale(0.9) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .tito-msg.bot {
-      background: linear-gradient(135deg, #1e1e1e 0%, #171717 100%);
+      background: linear-gradient(145deg, #1a1a1a, #131313);
       color: #f0f0f0;
       align-self: flex-start;
-      border: 1px solid rgba(198,169,98,0.2);
+      border: 1px solid rgba(198,169,98,0.15);
       border-bottom-left-radius: 4px;
     }
     .tito-msg.user {
-      background: linear-gradient(135deg, #C6A962 0%, #a88c4a 100%);
+      background: linear-gradient(135deg, #C6A962, #9a7b3c);
       color: #0a0a0a;
       align-self: flex-end;
       border-bottom-right-radius: 4px;
       font-weight: 500;
+    }
+    .tito-msg.system {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+      font-size: 13px;
+      padding: 10px 14px;
+      align-self: center;
+      max-width: 90%;
+      text-align: center;
     }
 
     .tito-quick-buttons {
@@ -243,19 +261,19 @@
       align-self: flex-start;
     }
     .tito-quick-btn {
-      background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
-      border: 1px solid #C6A962;
+      background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+      border: 1px solid rgba(198,169,98,0.5);
       color: #C6A962;
-      padding: 9px 16px;
-      border-radius: 20px;
+      padding: 10px 16px;
+      border-radius: 22px;
       font-size: 13px;
       cursor: pointer;
-      transition: all 0.25s ease;
-      font-family: 'Crimson Text', Georgia, serif;
-      font-weight: 500;
+      transition: all 0.25s;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 600;
     }
     .tito-quick-btn:hover {
-      background: linear-gradient(135deg, #C6A962, #a88c4a);
+      background: linear-gradient(135deg, #C6A962, #9a7b3c);
       color: #0a0a0a;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(198,169,98,0.3);
@@ -263,11 +281,12 @@
 
     .tito-typing {
       display: flex;
-      gap: 5px;
-      padding: 14px 16px;
+      gap: 6px;
+      padding: 16px 20px;
       align-self: flex-start;
-      background: rgba(30,30,30,0.6);
-      border-radius: 16px;
+      background: linear-gradient(145deg, #1a1a1a, #131313);
+      border: 1px solid rgba(198,169,98,0.15);
+      border-radius: 18px;
       border-bottom-left-radius: 4px;
     }
     .tito-typing span {
@@ -275,59 +294,59 @@
       height: 8px;
       background: #C6A962;
       border-radius: 50%;
-      animation: typingBounce 1.4s infinite;
+      animation: bounce 1.4s infinite;
     }
-    .tito-typing span:nth-child(2) { animation-delay: 0.2s; }
-    .tito-typing span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typingBounce {
+    .tito-typing span:nth-child(2) { animation-delay: 0.15s; }
+    .tito-typing span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce {
       0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-6px); opacity: 1; }
+      30% { transform: translateY(-8px); opacity: 1; }
     }
 
     .tito-products-gallery {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 14px;
       width: 100%;
     }
     .tito-product-card {
-      background: linear-gradient(145deg, #1a1a1a, #0f0f0f) !important;
-      border: 1px solid rgba(198,169,98,0.4) !important;
-      border-radius: 12px !important;
+      background: linear-gradient(160deg, #1a1a1a, #0d0d0d) !important;
+      border: 1px solid rgba(198,169,98,0.35) !important;
+      border-radius: 14px !important;
       overflow: hidden !important;
       cursor: pointer !important;
       transition: all 0.3s ease !important;
-      min-height: 170px !important;
+      min-height: 175px !important;
       display: flex !important;
       flex-direction: column !important;
     }
     .tito-product-card:hover {
-      transform: translateY(-2px) !important;
-      box-shadow: 0 8px 20px rgba(198,169,98,0.25) !important;
+      transform: translateY(-4px) scale(1.02) !important;
+      box-shadow: 0 12px 28px rgba(198,169,98,0.25) !important;
       border-color: #C6A962 !important;
     }
     .tito-product-card img {
       width: 100% !important;
-      height: 95px !important;
+      height: 100px !important;
       object-fit: cover !important;
       display: block !important;
-      background: #1a1a1a !important;
+      background: #151515 !important;
     }
     .tito-product-card .card-info {
-      padding: 10px !important;
+      padding: 12px !important;
       flex: 1 !important;
       display: flex !important;
       flex-direction: column !important;
       justify-content: space-between !important;
-      background: linear-gradient(180deg, #1a1a1a, #141414) !important;
+      background: linear-gradient(180deg, #161616, #0f0f0f) !important;
     }
     .tito-product-card h4 {
-      margin: 0 0 6px 0 !important;
+      margin: 0 0 8px 0 !important;
       color: #f0f0f0 !important;
-      font-size: 12px !important;
+      font-size: 13px !important;
       font-weight: 600 !important;
-      line-height: 1.3 !important;
+      line-height: 1.35 !important;
       display: -webkit-box !important;
       -webkit-line-clamp: 2 !important;
       -webkit-box-orient: vertical !important;
@@ -336,76 +355,73 @@
     .tito-product-card .price {
       color: #C6A962 !important;
       font-weight: 700 !important;
-      font-size: 14px !important;
+      font-size: 15px !important;
+      letter-spacing: 0.3px !important;
     }
 
     #tito-input-area {
-      padding: 12px 14px;
+      padding: 14px 16px;
       border-top: 1px solid rgba(198,169,98,0.2);
       display: flex;
-      gap: 10px;
-      background: linear-gradient(180deg, #0f0f0f, #0a0a0a);
+      gap: 12px;
+      background: linear-gradient(180deg, #0d0d0d, #080808);
     }
     #tito-input {
       flex: 1;
-      background: #1a1a1a;
-      border: 1px solid rgba(198,169,98,0.3);
-      border-radius: 24px;
-      padding: 12px 18px;
+      background: #151515;
+      border: 1px solid rgba(198,169,98,0.25);
+      border-radius: 25px;
+      padding: 14px 20px;
       color: #f0f0f0;
-      font-size: 14px;
+      font-size: 15px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.25s;
+      font-family: 'Cormorant Garamond', Georgia, serif;
     }
     #tito-input:focus {
       border-color: #C6A962;
-      box-shadow: 0 0 0 2px rgba(198,169,98,0.1);
+      box-shadow: 0 0 0 3px rgba(198,169,98,0.1);
+      background: #1a1a1a;
     }
-    #tito-input::placeholder { color: #666; }
+    #tito-input::placeholder { color: #555; }
     #tito-send {
-      background: linear-gradient(135deg, #C6A962, #a88c4a);
+      background: linear-gradient(135deg, #C6A962, #9a7b3c);
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      transition: all 0.25s;
       flex-shrink: 0;
+      font-size: 20px;
+      color: #0a0a0a;
     }
     #tito-send:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(198,169,98,0.4);
-    }
-    #tito-send svg {
-      width: 20px;
-      height: 20px;
-      margin-left: 2px;
-    }
-    #tito-send svg path {
-      fill: #0a0a0a;
+      transform: scale(1.08);
+      box-shadow: 0 6px 18px rgba(198,169,98,0.45);
     }
 
     @media (max-width: 480px) {
       #tito-chat {
-        width: calc(100vw - 24px);
-        height: calc(100vh - 120px);
-        bottom: 110px;
-        right: 12px;
-        border-radius: 16px;
+        width: calc(100vw - 20px);
+        height: calc(100vh - 110px);
+        bottom: 100px;
+        right: 10px;
+        border-radius: 20px;
       }
       #tito-bubble {
-        width: 72px;
-        height: 72px;
+        width: 68px;
+        height: 68px;
         bottom: 16px;
         right: 14px;
       }
       #tito-proactive {
         right: 14px;
-        bottom: 100px;
-        max-width: calc(100vw - 100px);
+        bottom: 96px;
+        max-width: calc(100vw - 90px);
       }
     }
   `;
@@ -414,6 +430,7 @@
     <div id="tito-widget-container">
       <div id="tito-bubble">
         <img src="${CONFIG.AVATAR}" alt="Tito">
+        <div id="tito-bubble-badge"></div>
       </div>
 
       <div id="tito-proactive">
@@ -424,10 +441,13 @@
 
       <div id="tito-chat">
         <div id="tito-header">
-          <img src="${CONFIG.AVATAR}" alt="Tito">
+          <div id="tito-header-avatar">
+            <img src="${CONFIG.AVATAR}" alt="Tito">
+            <div class="status-dot"></div>
+          </div>
           <div id="tito-header-info">
             <h3>Tito</h3>
-            <span>En linea</span>
+            <span>En linea ahora</span>
           </div>
           <button id="tito-close" onclick="TitoWidget.close()">&times;</button>
         </div>
@@ -436,32 +456,18 @@
 
         <div id="tito-input-area">
           <input type="text" id="tito-input" placeholder="Escribi tu mensaje..." autocomplete="off">
-          <button id="tito-send">
-            <svg viewBox="0 0 24 24" fill="#0a0a0a"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="#0a0a0a"/></svg>
-          </button>
+          <button id="tito-send" aria-label="Enviar">&#10148;</button>
         </div>
       </div>
     </div>
   `;
-
-  const TITO_INTRO = [
-    "Hola! Soy Tito. Estoy aca para ayudarte con lo que necesites. Que andas buscando?",
-    "Bienvenido/a! Soy Tito. Si tenes dudas o queres que te recomiende algo, preguntame.",
-    "Hola! Soy Tito, conozco todos los guardianes. En que te puedo ayudar?"
-  ];
-
-  const QUICK_OPTIONS = [
-    { text: "Ayudame a elegir", msg: "No se cual me conviene, ayudame a elegir" },
-    { text: "Ver guardianes", msg: "Quiero ver que duendes hay disponibles" },
-    { text: "Como compro?", msg: "Como es el proceso para comprar?" },
-    { text: "Tengo un pedido", msg: "Quiero consultar sobre mi pedido" }
-  ];
 
   const TitoWidget = {
     isOpen: false,
     conversationHistory: [],
     proactiveMessage: '',
     hasShownIntro: false,
+    visitorData: null,
 
     init() {
       const style = document.createElement('style');
@@ -473,8 +479,48 @@
       document.body.appendChild(container.firstElementChild);
 
       this.bindEvents();
-      setTimeout(() => this.showProactive(), 5000);
-      console.log('Tito Widget v5.2 listo');
+      this.detectVisitor();
+      setTimeout(() => this.showProactive(), 4000);
+      console.log('Tito Widget v6.0');
+    },
+
+    async detectVisitor() {
+      try {
+        // Detect country via IP
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        this.visitorData = {
+          country: data.country_name || 'Desconocido',
+          countryCode: data.country_code || 'XX',
+          city: data.city || '',
+          currency: data.currency || 'USD',
+          timezone: data.timezone || '',
+          isUruguay: data.country_code === 'UY'
+        };
+        console.log('Visitor:', this.visitorData.country);
+      } catch(e) {
+        this.visitorData = { country: 'Desconocido', countryCode: 'XX', currency: 'USD', isUruguay: false };
+      }
+    },
+
+    getGreeting() {
+      const hour = new Date().getHours();
+      if (hour >= 5 && hour < 12) return 'Buen dia';
+      if (hour >= 12 && hour < 19) return 'Buenas tardes';
+      return 'Buenas noches';
+    },
+
+    getIntro() {
+      const greeting = this.getGreeting();
+      const country = this.visitorData?.country;
+      const isUruguay = this.visitorData?.isUruguay;
+
+      if (isUruguay) {
+        return greeting + '! Soy Tito. Que bueno verte por aca. En que te ayudo?';
+      } else if (country && country !== 'Desconocido') {
+        return greeting + '! Soy Tito. Veo que nos visitas desde ' + country + '. En que te puedo ayudar?';
+      }
+      return greeting + '! Soy Tito. Estoy aca para ayudarte. Que necesitas?';
     },
 
     bindEvents() {
@@ -515,9 +561,20 @@
 
     showIntro() {
       this.hasShownIntro = true;
-      const intro = TITO_INTRO[Math.floor(Math.random() * TITO_INTRO.length)];
+      const intro = this.getIntro();
       this.addMessage(intro, 'bot');
-      this.showQuickButtons();
+
+      // Show country detection as system message
+      if (this.visitorData && this.visitorData.country !== 'Desconocido') {
+        const currencyNote = this.visitorData.isUruguay
+          ? 'Te muestro precios en pesos uruguayos'
+          : 'Los precios estan en USD, pero te puedo decir cuanto seria en ' + this.visitorData.currency;
+        setTimeout(() => {
+          this.addSystemMessage(currencyNote);
+        }, 800);
+      }
+
+      setTimeout(() => this.showQuickButtons(), 400);
     },
 
     showQuickButtons() {
@@ -526,7 +583,14 @@
       buttonsDiv.className = 'tito-quick-buttons';
       buttonsDiv.id = 'tito-quick-buttons';
 
-      QUICK_OPTIONS.forEach(opt => {
+      const options = [
+        { text: 'Ayudame a elegir', msg: 'No se cual me conviene, ayudame a elegir' },
+        { text: 'Ver guardianes', msg: 'Quiero ver los duendes disponibles' },
+        { text: 'Como compro?', msg: 'Como es el proceso de compra?' },
+        { text: 'Mi pedido', msg: 'Quiero consultar sobre mi pedido' }
+      ];
+
+      options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'tito-quick-btn';
         btn.textContent = opt.text;
@@ -546,14 +610,15 @@
     showProactive() {
       if (this.isOpen) return;
 
+      const greeting = this.getGreeting();
       const page = this.detectPage();
       const messages = {
-        home: { text: 'Hola! Necesitas ayuda para encontrar algo?', auto: 'Hola, que duendes tenes?' },
+        home: { text: greeting + '! Necesitas ayuda para encontrar algo?', auto: 'Hola, que duendes tenes?' },
         tienda: { text: 'Hay muchos guardianes... Te ayudo a elegir?', auto: 'Si, ayudame a elegir' },
         producto: { text: 'Tenes dudas sobre este guardian?', auto: 'Contame mas sobre este duende' },
         carrito: { text: 'Alguna duda antes de finalizar?', auto: 'Tengo una consulta' },
         checkout: { text: 'Necesitas ayuda con algo?', auto: 'Tengo una pregunta' },
-        default: { text: 'Hola! Soy Tito. Te ayudo?', auto: 'Hola Tito' }
+        default: { text: greeting + '! Soy Tito. Te ayudo?', auto: 'Hola Tito' }
       };
 
       const msg = messages[page] || messages.default;
@@ -575,7 +640,7 @@
         setTimeout(() => {
           document.getElementById('tito-input').value = this.proactiveMessage;
           this.send();
-        }, 800);
+        }, 600);
       }
     },
 
@@ -612,19 +677,28 @@
         const gallery = document.createElement('div');
         gallery.className = 'tito-products-gallery';
 
-        productos.forEach(function(p) {
+        productos.forEach(p => {
           const card = document.createElement('div');
           card.className = 'tito-product-card';
-          card.onclick = function() { window.open(p.url || p.permalink, '_blank'); };
+          card.onclick = () => window.open(p.url || p.permalink, '_blank');
 
           const imgSrc = p.imagen || (p.images && p.images[0] ? p.images[0].src : null) || CONFIG.AVATAR;
           const nombre = p.nombre || p.name || 'Producto';
-          const precio = p.precio || p.price || '???';
+          let precio = p.precio || p.price || '???';
+
+          // Format price based on visitor country
+          if (this.visitorData?.isUruguay && precio !== '???') {
+            const usd = parseFloat(precio);
+            const uyu = Math.round(usd * 44); // Approximate rate
+            precio = '$' + uyu.toLocaleString() + ' UYU';
+          } else {
+            precio = '$' + precio + ' USD';
+          }
 
           card.innerHTML = '<img src="' + imgSrc + '" alt="' + nombre + '" onerror="this.src=\'' + CONFIG.AVATAR + '\'">' +
             '<div class="card-info">' +
             '<h4>' + nombre + '</h4>' +
-            '<span class="price">$' + precio + '</span>' +
+            '<span class="price">' + precio + '</span>' +
             '</div>';
           gallery.appendChild(card);
         });
@@ -632,6 +706,15 @@
         container.appendChild(gallery);
       }
 
+      container.scrollTop = container.scrollHeight;
+    },
+
+    addSystemMessage(text) {
+      const container = document.getElementById('tito-messages');
+      const msg = document.createElement('div');
+      msg.className = 'tito-msg system';
+      msg.textContent = text;
+      container.appendChild(msg);
       container.scrollTop = container.scrollHeight;
     },
 
@@ -655,7 +738,6 @@
       const text = input.value.trim();
       if (!text) return;
 
-      // Remove quick buttons if they exist
       const btns = document.getElementById('tito-quick-buttons');
       if (btns) btns.remove();
 
@@ -675,9 +757,10 @@
               pagina: window.location.href,
               titulo: document.title,
               tipoPagina: this.detectPage(),
-              carrito: this.getCartInfo()
+              carrito: this.getCartInfo(),
+              visitante: this.visitorData
             },
-            historial: this.conversationHistory.slice(-6)
+            historial: this.conversationHistory.slice(-8)
           })
         });
 
@@ -689,13 +772,13 @@
           this.addMessage(respuesta, 'bot', data.productos);
           this.conversationHistory.push({ role: 'assistant', content: respuesta });
         } else {
-          this.addMessage('Mmm, algo raro paso en el portal... Intenta de nuevo?', 'bot');
+          this.addMessage('Perdon, algo fallo. Probas de nuevo?', 'bot');
         }
 
       } catch (error) {
         console.error('Error Tito:', error);
         this.hideTyping();
-        this.addMessage('Se corto la magia por un momento... Probas de nuevo?', 'bot');
+        this.addMessage('Se corto la conexion. Intenta de nuevo.', 'bot');
       }
     }
   };
@@ -703,7 +786,7 @@
   window.TitoWidget = TitoWidget;
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { TitoWidget.init(); });
+    document.addEventListener('DOMContentLoaded', () => TitoWidget.init());
   } else {
     TitoWidget.init();
   }
