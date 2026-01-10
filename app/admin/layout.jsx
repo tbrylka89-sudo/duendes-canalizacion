@@ -98,6 +98,7 @@ export default function AdminLayout({ children }) {
   const navItems = [
     { href: '/admin', icono: '◇', texto: 'Dashboard' },
     { href: '/admin/clientes', icono: '👥', texto: 'Clientes' },
+    { href: '/admin/productos', icono: '📦', texto: 'Productos' },
     { href: '/admin/contenido', icono: '📝', texto: 'Contenido' },
     { href: '/admin/circulo', icono: '★', texto: 'Circulo' },
     { href: '/admin/regalos', icono: '🎁', texto: 'Regalos' },

@@ -84,6 +84,18 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON (sin texto adici
 8. GENERAR CONTENIDO:
 {"accion": "generar_contenido", "datos": {"categoria": "cosmos|duendes|diy|esoterico|sanacion|celebraciones", "tipo": "articulo|guia|ritual|meditacion", "tema": "descripcion del tema"}}
 
+9. VER PRODUCTOS:
+{"accion": "ver_productos", "datos": {"filtro": "opcional - nombre o categoria"}}
+
+10. DESTACAR PRODUCTO:
+{"accion": "destacar_producto", "datos": {"productoId": "id_del_producto", "destacado": true}}
+
+11. VER ACTIVIDAD RECIENTE:
+{"accion": "ver_actividad"}
+
+12. CREAR NOTA PARA CLIENTE:
+{"accion": "crear_nota", "datos": {"email": "email@ejemplo.com", "nota": "texto de la nota"}}
+
 EJEMPLOS DE USO:
 - "Busca a maria" -> buscar_cliente
 - "Dale 20 runas a juan@mail.com" -> dar_regalo con runas
@@ -405,6 +417,158 @@ _El contenido completo esta disponible en la seccion de Contenido del admin._`
       } catch (e) {
         return { mensaje: `Error al conectar con el generador: ${e.message}` };
       }
+    }
+
+    case 'ver_productos': {
+      const { filtro } = datos || {};
+      let productos = await kv.get('productos:catalogo') || [];
+
+      if (filtro) {
+        const filtroLower = filtro.toLowerCase();
+        productos = productos.filter(p =>
+          (p.nombre || '').toLowerCase().includes(filtroLower) ||
+          (p.categoria || '').toLowerCase().includes(filtroLower)
+        );
+      }
+
+      if (productos.length === 0) {
+        return { mensaje: filtro ? `No encontre productos con "${filtro}"` : 'No hay productos cargados todavia.' };
+      }
+
+      const lista = productos.slice(0, 10).map(p =>
+        `- **${p.nombre}** | $${p.precio} | Stock: ${p.stock || 0} | ${p.destacado ? '★' : ''}`
+      ).join('\n');
+
+      return {
+        mensaje: `📦 **Productos${filtro ? ` (filtro: ${filtro})` : ''}:**\n\n${lista}\n\n_Mostrando ${Math.min(10, productos.length)} de ${productos.length} productos_`
+      };
+    }
+
+    case 'destacar_producto': {
+      const { productoId, destacado } = datos;
+      if (!productoId) {
+        return { mensaje: 'Necesito el ID del producto.' };
+      }
+
+      let productos = await kv.get('productos:catalogo') || [];
+      const index = productos.findIndex(p => p.id === productoId);
+
+      if (index === -1) {
+        return { mensaje: `No encontre el producto con ID: ${productoId}` };
+      }
+
+      productos[index].destacado = destacado !== false;
+      await kv.set('productos:catalogo', productos);
+
+      return {
+        mensaje: `✓ Producto "${productos[index].nombre}" ${destacado !== false ? 'marcado como destacado' : 'quitado de destacados'}`
+      };
+    }
+
+    case 'ver_actividad': {
+      const userKeys = await kv.keys('user:*');
+      const elegidoKeys = await kv.keys('elegido:*');
+      const allKeys = [...new Set([...userKeys, ...elegidoKeys])];
+      const actividades = [];
+
+      const ahora = new Date();
+
+      for (const k of allKeys.slice(0, 50)) {
+        try {
+          const u = await kv.get(k);
+          if (!u) continue;
+
+          // Ultima compra
+          if (u.ultimaCompra) {
+            const fecha = new Date(u.ultimaCompra);
+            const diff = Math.floor((ahora - fecha) / (1000 * 60 * 60 * 24));
+            if (diff <= 30) {
+              actividades.push({
+                fecha,
+                tipo: 'compra',
+                texto: `🛒 ${u.nombre || u.email} realizo una compra`,
+                dias: diff
+              });
+            }
+          }
+
+          // Canjes recientes
+          if (u.historialCanjes?.length) {
+            const ultimoCanje = u.historialCanjes[u.historialCanjes.length - 1];
+            if (ultimoCanje.fecha) {
+              const fecha = new Date(ultimoCanje.fecha);
+              const diff = Math.floor((ahora - fecha) / (1000 * 60 * 60 * 24));
+              if (diff <= 30) {
+                actividades.push({
+                  fecha,
+                  tipo: 'canje',
+                  texto: `☘ ${u.nombre || u.email} canjeo ${ultimoCanje.tipo || 'experiencia'}`,
+                  dias: diff
+                });
+              }
+            }
+          }
+
+          // Alta reciente
+          if (u.fechaCreacion) {
+            const fecha = new Date(u.fechaCreacion);
+            const diff = Math.floor((ahora - fecha) / (1000 * 60 * 60 * 24));
+            if (diff <= 7) {
+              actividades.push({
+                fecha,
+                tipo: 'nuevo',
+                texto: `👋 ${u.nombre || u.email} se registro`,
+                dias: diff
+              });
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Ordenar por fecha
+      actividades.sort((a, b) => b.fecha - a.fecha);
+
+      if (actividades.length === 0) {
+        return { mensaje: 'No hay actividad reciente en los ultimos 30 dias.' };
+      }
+
+      const lista = actividades.slice(0, 15).map(a => {
+        const tiempo = a.dias === 0 ? 'hoy' : a.dias === 1 ? 'ayer' : `hace ${a.dias} dias`;
+        return `- ${a.texto} (${tiempo})`;
+      }).join('\n');
+
+      return { mensaje: `📋 **Actividad reciente:**\n\n${lista}` };
+    }
+
+    case 'crear_nota': {
+      const { email, nota } = datos;
+      if (!email || !nota) {
+        return { mensaje: 'Necesito el email del cliente y el texto de la nota.' };
+      }
+
+      const emailNorm = email.toLowerCase();
+      let userKey = `user:${emailNorm}`;
+      let user = await kv.get(userKey);
+      if (!user) {
+        userKey = `elegido:${emailNorm}`;
+        user = await kv.get(userKey);
+      }
+
+      if (!user) {
+        return { mensaje: `No encontre al usuario ${email}` };
+      }
+
+      // Agregar nota
+      if (!user.notasAdmin) user.notasAdmin = [];
+      user.notasAdmin.push({
+        texto: nota,
+        fecha: new Date().toISOString(),
+        autor: 'Tito'
+      });
+
+      await kv.set(userKey, user);
+
+      return { mensaje: `✓ Nota agregada para ${user.nombre || email}:\n"${nota}"` };
     }
 
     default:
