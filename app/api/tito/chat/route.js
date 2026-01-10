@@ -85,6 +85,42 @@ async function obtenerEstadisticasAdmin() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// CONVERSIÓN DE MONEDAS
+// ═══════════════════════════════════════════════════════════════
+
+const MONEDAS_POR_PAIS = {
+  UY: { codigo: 'UYU', simbolo: '$', nombre: 'pesos uruguayos', tasa: 44 },
+  AR: { codigo: 'ARS', simbolo: '$', nombre: 'pesos argentinos', tasa: 1050 },
+  MX: { codigo: 'MXN', simbolo: '$', nombre: 'pesos mexicanos', tasa: 17 },
+  CO: { codigo: 'COP', simbolo: '$', nombre: 'pesos colombianos', tasa: 4200 },
+  CL: { codigo: 'CLP', simbolo: '$', nombre: 'pesos chilenos', tasa: 980 },
+  PE: { codigo: 'PEN', simbolo: 'S/', nombre: 'soles peruanos', tasa: 3.8 },
+  BR: { codigo: 'BRL', simbolo: 'R$', nombre: 'reales', tasa: 5.2 },
+  ES: { codigo: 'EUR', simbolo: '€', nombre: 'euros', tasa: 0.92 },
+  US: { codigo: 'USD', simbolo: '$', nombre: 'dólares', tasa: 1 }
+};
+
+function obtenerInfoMoneda(codigoPais) {
+  return MONEDAS_POR_PAIS[codigoPais] || MONEDAS_POR_PAIS['US'];
+}
+
+function formatearPrecio(precioUSD, codigoPais) {
+  const moneda = obtenerInfoMoneda(codigoPais);
+  const precioLocal = Math.round(precioUSD * moneda.tasa);
+
+  if (codigoPais === 'UY') {
+    // Para Uruguay: mostrar solo en UYU
+    return `$${precioLocal.toLocaleString('es-UY')} ${moneda.codigo}`;
+  } else if (codigoPais === 'US' || !codigoPais) {
+    // Para USA o sin país: mostrar solo USD
+    return `$${precioUSD} USD`;
+  } else {
+    // Para otros países: USD + equivalente local
+    return `$${precioUSD} USD (aprox. ${moneda.simbolo}${precioLocal.toLocaleString('es')} ${moneda.nombre})`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SOCIAL PROOF - SIMULACIÓN INTELIGENTE
 // ═══════════════════════════════════════════════════════════════
 
@@ -121,11 +157,16 @@ Ropa de verdad: lanas, fieltros, telas naturales cosidas a mano.
 Tienen 4 dedos (detalle tradicional de los duendes).
 Son piezas únicas. Cuando alguien compra uno, ese diseño desaparece.
 
-=== PRECIOS ===
-Minis (10 cm): desde $70 USD
-Medianos (20-25 cm): $150-200 USD
-Grandes (30-40 cm): $300-450 USD
-Gigantes (50-70 cm): $700-1050 USD
+=== PRECIOS BASE (referencia en USD) ===
+Minis (10 cm): desde $70
+Medianos (20-25 cm): $150-200
+Grandes (30-40 cm): $300-450
+Gigantes (50-70 cm): $700-1050
+
+IMPORTANTE SOBRE PRECIOS:
+Los precios que muestres SIEMPRE deben coincidir con la moneda mostrada en las tarjetas de productos.
+El sistema te dará los precios ya formateados en la moneda correcta para cada visitante.
+NUNCA mezcles monedas - si la lista dice UYU, vos decís UYU.
 
 === CATEGORÍAS ===
 PROTECCIÓN: para cuidar espacios, alejar malas energías
@@ -371,6 +412,35 @@ ${pedido.meta_data?.find(m => m.key === '_tracking_number')?.value ?
     }
 
     // ═══════════════════════════════════════════════════════════
+    // EXTRAER PAÍS DEL VISITANTE (antes de todo para usar en precios)
+    // ═══════════════════════════════════════════════════════════
+
+    let codigoPais = 'US'; // Default
+    let paisNombre = 'desconocido';
+
+    // Widget envía: country (nombre) y countryCode (código ISO)
+    if (contexto?.visitante?.country) {
+      paisNombre = contexto.visitante.country;
+      codigoPais = contexto.visitante.countryCode || 'US';
+    } else if (contexto?.visitante?.pais) {
+      // Fallback para formato anterior
+      paisNombre = contexto.visitante.pais;
+      if (contexto.visitante.paisCodigo) {
+        codigoPais = contexto.visitante.paisCodigo;
+      } else {
+        const mapaPaises = {
+          'uruguay': 'UY', 'argentina': 'AR', 'mexico': 'MX', 'méxico': 'MX',
+          'colombia': 'CO', 'chile': 'CL', 'peru': 'PE', 'perú': 'PE',
+          'brasil': 'BR', 'brazil': 'BR', 'españa': 'ES', 'spain': 'ES',
+          'united states': 'US', 'estados unidos': 'US'
+        };
+        codigoPais = mapaPaises[paisNombre.toLowerCase()] || 'US';
+      }
+    }
+
+    const monedaInfo = obtenerInfoMoneda(codigoPais);
+
+    // ═══════════════════════════════════════════════════════════
     // CONSTRUIR CONTEXTOS
     // ═══════════════════════════════════════════════════════════
 
@@ -378,7 +448,8 @@ ${pedido.meta_data?.find(m => m.key === '_tracking_number')?.value ?
     if (productos.length > 0 && !esAdmin) {
       productosTexto = '\n=== PRODUCTOS DISPONIBLES ===\n';
       productos.filter(p => p.disponible).slice(0, 40).forEach(p => {
-        productosTexto += `- ${p.nombre} (ID:${p.id}): $${p.precio} USD | ${p.categorias}\n`;
+        const precioFormateado = formatearPrecio(parseFloat(p.precio), codigoPais);
+        productosTexto += `- ${p.nombre} (ID:${p.id}): ${precioFormateado} | ${p.categorias}\n`;
         if (p.descripcion_corta) {
           productosTexto += `  ${p.descripcion_corta.substring(0, 100)}\n`;
         }
@@ -387,10 +458,12 @@ ${pedido.meta_data?.find(m => m.key === '_tracking_number')?.value ?
 
     let contextoTexto = '';
     let socialProof = '';
-    
+
     if (contexto) {
       contextoTexto = '\n=== CONTEXTO ACTUAL ===\n';
       if (contexto.pagina) contextoTexto += `Página: ${contexto.pagina}\n`;
+      contextoTexto += `🌍 País: ${paisNombre} (${codigoPais})\n`;
+
       if (contexto.producto) {
         contextoTexto += `MIRANDO: ${contexto.producto.nombre}\n`;
         contextoTexto += `¡APROVECHÁ para crear urgencia sobre este producto!\n`;
@@ -446,12 +519,46 @@ ${statsAdmin.ultimosPedidos.map(p =>
     }
 
     // ═══════════════════════════════════════════════════════════
+    // INSTRUCCIONES DE MONEDA
+    // ═══════════════════════════════════════════════════════════
+
+    let monedaTexto = '';
+    if (!esAdmin) {
+      if (codigoPais === 'UY') {
+        monedaTexto = `
+=== MONEDA: PESOS URUGUAYOS ===
+Este visitante es de Uruguay.
+TODOS los precios que menciones deben estar en PESOS URUGUAYOS (UYU).
+Los precios en la lista ya están convertidos a UYU.
+Ejemplo: "Este guardián está en $3.080 UYU" (NO en dólares)
+`;
+      } else if (codigoPais === 'US') {
+        monedaTexto = `
+=== MONEDA: DÓLARES ===
+Este visitante es de Estados Unidos.
+TODOS los precios en DÓLARES (USD).
+Ejemplo: "Este guardián está en $70 USD"
+`;
+      } else {
+        const info = obtenerInfoMoneda(codigoPais);
+        monedaTexto = `
+=== MONEDA: ${info.codigo} ===
+Este visitante es de ${paisNombre}.
+Mostrá precios en USD + equivalente en ${info.nombre}.
+Los precios en la lista ya tienen el formato correcto.
+Ejemplo: "$70 USD (aprox. ${info.simbolo}${Math.round(70 * info.tasa).toLocaleString('es')} ${info.nombre})"
+`;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // SYSTEM PROMPT FINAL
     // ═══════════════════════════════════════════════════════════
 
     const systemPrompt = `${PERSONALIDAD_TITO}
 
 ${CONOCIMIENTO_BASE}
+${monedaTexto}
 ${productosTexto}
 ${contextoTexto}
 ${socialProof}
@@ -462,7 +569,7 @@ ${infoCliente}
 ${adminTexto}
 
 === INSTRUCCIÓN FINAL ===
-${esAdmin ? 
+${esAdmin ?
   'Estás hablando con el equipo (admin). Respondé con datos precisos.' :
   'VENDÉ con elegancia. Defendé el valor del arte. Cada respuesta acerca a la venta. Cerrá siempre con pregunta o call to action.'
 }
