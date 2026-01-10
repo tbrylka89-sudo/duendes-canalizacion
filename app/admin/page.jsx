@@ -23,17 +23,31 @@ function getRango(gastado) {
   return RANGOS[0];
 }
 
+function getSaludo() {
+  const hora = new Date().getHours();
+  if (hora >= 5 && hora < 12) return { texto: 'Buen dia', icono: '☀️' };
+  if (hora >= 12 && hora < 19) return { texto: 'Buenas tardes', icono: '🌤️' };
+  return { texto: 'Buenas noches', icono: '🌙' };
+}
+
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
+  const [wooStats, setWooStats] = useState(null);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    cargarStats();
+    cargarTodo();
   }, []);
+
+  const cargarTodo = async () => {
+    setCargando(true);
+    await Promise.all([cargarStats(), cargarWooStats()]);
+    setCargando(false);
+  };
 
   const cargarStats = async () => {
     try {
@@ -43,9 +57,21 @@ export default function Dashboard() {
     } catch (e) {
       console.error('Error cargando stats:', e);
     }
-    setCargando(false);
   };
 
+  const cargarWooStats = async () => {
+    try {
+      const res = await fetch('/api/admin/woo-stats');
+      const data = await res.json();
+      if (data.success) {
+        setWooStats(data);
+      }
+    } catch (e) {
+      console.error('Error cargando WooCommerce stats:', e);
+    }
+  };
+
+  const saludo = getSaludo();
   const hoy = new Date().toLocaleDateString('es-UY', {
     weekday: 'long',
     day: 'numeric',
@@ -66,44 +92,58 @@ export default function Dashboard() {
       {/* Header */}
       <div style={estilos.header}>
         <div>
-          <h1 style={estilos.titulo}>Buenos dias &#10024;</h1>
+          <h1 style={estilos.titulo}>{saludo.texto} {saludo.icono}</h1>
           <p style={estilos.fecha}>{hoy}</p>
         </div>
-        <button onClick={cargarStats} style={estilos.refreshBtn}>
+        <button onClick={cargarTodo} style={estilos.refreshBtn}>
           &#8635; Actualizar
         </button>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - WooCommerce primero */}
       <div style={estilos.statsGrid}>
         <div style={{ ...estilos.statCard, ...estilos.statCardGold }}>
           <span style={estilos.statIcono}>💰</span>
-          <div style={estilos.statValor}>${stats?.ingresosMes || 0}</div>
+          <div style={estilos.statValor}>${wooStats?.ingresosMes || stats?.ingresosMes || 0}</div>
           <div style={estilos.statLabel}>Ingresos este mes</div>
+          {wooStats?.comparativaMes && (
+            <div style={{
+              ...estilos.statComparativa,
+              color: wooStats.comparativaMes >= 0 ? '#22c55e' : '#ef4444'
+            }}>
+              {wooStats.comparativaMes >= 0 ? '↑' : '↓'} {Math.abs(wooStats.comparativaMes)}% vs mes anterior
+            </div>
+          )}
         </div>
 
         <div style={estilos.statCard}>
           <span style={estilos.statIcono}>🛒</span>
-          <div style={estilos.statValor}>{stats?.ventasMes || 0}</div>
-          <div style={estilos.statLabel}>Ventas este mes</div>
+          <div style={estilos.statValor}>{wooStats?.ventasMes || stats?.ventasMes || 0}</div>
+          <div style={estilos.statLabel}>Pedidos este mes</div>
+          {wooStats?.ventasHoy > 0 && (
+            <div style={estilos.statComparativa}>+{wooStats.ventasHoy} hoy</div>
+          )}
         </div>
 
         <div style={estilos.statCard}>
           <span style={estilos.statIcono}>★</span>
           <div style={estilos.statValor}>{stats?.miembrosCirculo || 0}</div>
           <div style={estilos.statLabel}>Miembros Circulo</div>
+          {stats?.pruebasActivas > 0 && (
+            <div style={estilos.statComparativa}>{stats.pruebasActivas} en prueba</div>
+          )}
         </div>
 
         <div style={estilos.statCard}>
           <span style={estilos.statIcono}>👥</span>
-          <div style={estilos.statValor}>{stats?.clientesTotal || 0}</div>
+          <div style={estilos.statValor}>{wooStats?.clientesWoo || stats?.clientesTotal || 0}</div>
           <div style={estilos.statLabel}>Total clientes</div>
         </div>
 
         <div style={estilos.statCard}>
-          <span style={estilos.statIcono}>📜</span>
-          <div style={estilos.statValor}>{stats?.lecturasPendientes || 0}</div>
-          <div style={estilos.statLabel}>Lecturas pendientes</div>
+          <span style={estilos.statIcono}>📦</span>
+          <div style={estilos.statValor}>{wooStats?.pendientes || 0}</div>
+          <div style={estilos.statLabel}>Pedidos pendientes</div>
         </div>
 
         <div style={estilos.statCard}>
@@ -112,6 +152,37 @@ export default function Dashboard() {
           <div style={estilos.statLabel}>Circulos por vencer</div>
         </div>
       </div>
+
+      {/* Pedidos recientes de WooCommerce */}
+      {wooStats?.ultimosPedidos?.length > 0 && (
+        <div style={estilos.seccion}>
+          <h2 style={estilos.seccionTitulo}>Pedidos recientes</h2>
+          <div style={estilos.pedidosGrid}>
+            {wooStats.ultimosPedidos.slice(0, 4).map((pedido, i) => (
+              <div key={i} style={estilos.pedidoCard}>
+                <div style={estilos.pedidoHeader}>
+                  <span style={estilos.pedidoId}>#{pedido.id}</span>
+                  <span style={{
+                    ...estilos.pedidoEstado,
+                    background: pedido.status === 'processing' ? 'rgba(245, 158, 11, 0.15)' :
+                               pedido.status === 'completed' ? 'rgba(34, 197, 94, 0.15)' :
+                               'rgba(107, 114, 128, 0.15)',
+                    color: pedido.status === 'processing' ? '#f59e0b' :
+                           pedido.status === 'completed' ? '#22c55e' : '#888'
+                  }}>
+                    {pedido.status === 'processing' ? 'Procesando' :
+                     pedido.status === 'completed' ? 'Completado' :
+                     pedido.status === 'on-hold' ? 'En espera' : pedido.status}
+                  </span>
+                </div>
+                <div style={estilos.pedidoCliente}>{pedido.cliente}</div>
+                <div style={estilos.pedidoTotal}>${pedido.total}</div>
+                <div style={estilos.pedidoFecha}>{pedido.fecha}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats Mi Magia */}
       <div style={estilos.seccion}>
@@ -318,6 +389,56 @@ const estilos = {
   statLabel: {
     color: '#666',
     fontSize: '13px'
+  },
+  statComparativa: {
+    marginTop: '6px',
+    fontSize: '11px',
+    color: '#888'
+  },
+
+  // Pedidos
+  pedidosGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '12px'
+  },
+  pedidoCard: {
+    background: '#141414',
+    border: '1px solid #2a2a2a',
+    borderRadius: '10px',
+    padding: '16px'
+  },
+  pedidoHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '10px'
+  },
+  pedidoId: {
+    color: '#C6A962',
+    fontWeight: '600',
+    fontSize: '14px'
+  },
+  pedidoEstado: {
+    padding: '4px 10px',
+    borderRadius: '12px',
+    fontSize: '11px',
+    fontWeight: '500'
+  },
+  pedidoCliente: {
+    color: '#fff',
+    fontSize: '14px',
+    marginBottom: '4px'
+  },
+  pedidoTotal: {
+    color: '#22c55e',
+    fontSize: '18px',
+    fontWeight: '700',
+    marginBottom: '4px'
+  },
+  pedidoFecha: {
+    color: '#666',
+    fontSize: '12px'
   },
 
   // Seccion

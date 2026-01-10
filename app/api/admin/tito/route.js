@@ -5,7 +5,13 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
 
-// POST - Chat con Tito
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+
+function getWooAuth() {
+  return Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
+}
+
+// POST - Chat con Tito MODO DIOS
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -19,98 +25,179 @@ export async function POST(request) {
     }
 
     // Obtener estadisticas actuales para contexto
-    let stats = { clientesTotal: 0, miembrosCirculo: 0 };
+    let stats = { clientesTotal: 0, miembrosCirculo: 0, totalGastado: 0, totalRunas: 0, totalTreboles: 0 };
     const usuarios = [];
     try {
       const userKeys = await kv.keys('user:*');
-      stats.clientesTotal = userKeys.length;
+      const elegidoKeys = await kv.keys('elegido:*');
+      const allKeys = [...new Set([...userKeys, ...elegidoKeys])];
+      stats.clientesTotal = allKeys.length;
 
-      for (const k of userKeys.slice(0, 100)) {
+      for (const k of allKeys.slice(0, 150)) {
         const u = await kv.get(k);
         if (u) {
           if (u.esCirculo) stats.miembrosCirculo++;
+          stats.totalGastado += u.gastado || u.totalCompras || 0;
+          stats.totalRunas += u.runas || 0;
+          stats.totalTreboles += u.treboles || 0;
           usuarios.push({
             email: u.email,
-            nombre: u.nombre || 'Sin nombre',
+            nombre: u.nombre || u.nombrePreferido || 'Sin nombre',
             runas: u.runas || 0,
             treboles: u.treboles || 0,
             esCirculo: u.esCirculo || false,
-            gastado: u.gastado || 0
+            gastado: u.gastado || u.totalCompras || 0,
+            guardianes: u.guardianes?.length || 0
           });
         }
       }
     } catch (e) {}
 
-    // System prompt mejorado
-    const systemPrompt = `Sos Tito, el asistente administrativo de Duendes del Uruguay - una tienda de productos magicos artesanales.
+    // Obtener estadisticas de WooCommerce
+    let wooStats = { ventas: 0, ingresos: 0, pendientes: 0 };
+    try {
+      const ahora = new Date();
+      const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+      const pedidosRes = await fetch(
+        `${WP_URL}/wp-json/wc/v3/orders?after=${inicioMes.toISOString().split('T')[0]}T00:00:00&per_page=50&status=completed,processing,on-hold`,
+        { headers: { 'Authorization': `Basic ${getWooAuth()}` } }
+      );
+      if (pedidosRes.ok) {
+        const pedidos = await pedidosRes.json();
+        wooStats.ventas = pedidos.filter(p => p.status !== 'on-hold').length;
+        wooStats.ingresos = pedidos.filter(p => p.status !== 'on-hold').reduce((s, p) => s + parseFloat(p.total || 0), 0);
+        wooStats.pendientes = pedidos.filter(p => p.status === 'processing' || p.status === 'on-hold').length;
+      }
+    } catch (e) {}
 
-PERSONALIDAD:
-- Hablas en espanol rioplatense (vos, tenes, podes)
-- Sos eficiente, amable y un poco magico
-- Usas lenguaje simple y directo
-- Podes usar emojis ocasionalmente
+    // System prompt MODO DIOS
+    const systemPrompt = `
+═══════════════════════════════════════════════════════════════════════════════
+                          TITO - MODO DIOS / ADMIN SUPREMO
+═══════════════════════════════════════════════════════════════════════════════
 
-CONTEXTO ACTUAL:
-- Total de clientes: ${stats.clientesTotal}
-- Miembros del Circulo: ${stats.miembrosCirculo}
+Sos Tito, el asistente administrativo TODOPODEROSO de Duendes del Uruguay.
 
-USUARIOS RECIENTES:
-${usuarios.slice(0, 15).map(u => `- ${u.nombre} (${u.email}): ᚱ${u.runas} ☘${u.treboles} ${u.esCirculo ? '★' : ''}`).join('\n')}
+## TU ESENCIA
+- Hablas en espanol rioplatense autentico (vos, tenes, podes)
+- Sos directo, eficiente, capaz de TODO
+- NUNCA decis "no puedo", siempre encontras la forma
+- Respondes con datos precisos, nunca inventas
+- Sos el mejor aliado de Duendes, lo sabes TODO del negocio
 
-CAPACIDADES Y FORMATO DE ACCIONES:
-Cuando necesites ejecutar una accion, responde SOLO con el JSON (sin texto adicional antes):
+## DATOS EN TIEMPO REAL
 
-1. BUSCAR CLIENTE:
-{"accion": "buscar_cliente", "datos": {"query": "email o nombre"}}
+### CLIENTES Y COMUNIDAD
+- Total clientes: ${stats.clientesTotal}
+- Miembros Circulo: ${stats.miembrosCirculo}
+- Total gastado historico: $${stats.totalGastado.toLocaleString()}
+- Runas en circulacion: ${stats.totalRunas.toLocaleString()}
+- Treboles en circulacion: ${stats.totalTreboles.toLocaleString()}
 
-2. DAR RUNAS:
-{"accion": "dar_regalo", "datos": {"email": "email@ejemplo.com", "tipoRegalo": "runas", "cantidad": 20}}
+### VENTAS WOOCOMMERCE (este mes)
+- Pedidos completados: ${wooStats.ventas}
+- Ingresos: $${Math.round(wooStats.ingresos).toLocaleString()}
+- Pedidos pendientes: ${wooStats.pendientes}
 
-3. DAR TREBOLES:
-{"accion": "dar_regalo", "datos": {"email": "email@ejemplo.com", "tipoRegalo": "treboles", "cantidad": 50}}
+### TOP 20 CLIENTES (por email)
+${usuarios.sort((a,b) => b.gastado - a.gastado).slice(0, 20).map(u =>
+  `- ${u.nombre} | ${u.email} | $${u.gastado} | ᚱ${u.runas} ☘${u.treboles} | ${u.guardianes} guardianes ${u.esCirculo ? '| ★ Circulo' : ''}`
+).join('\n')}
 
-4. ACTIVAR CIRCULO:
-{"accion": "gestionar_circulo", "datos": {"email": "email@ejemplo.com", "accionCirculo": "activar"}}
+## SUPERPODERES - ACCIONES DISPONIBLES
 
-5. EXTENDER CIRCULO:
-{"accion": "gestionar_circulo", "datos": {"email": "email@ejemplo.com", "accionCirculo": "extender", "dias": 30}}
+Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 
-6. DESACTIVAR CIRCULO:
-{"accion": "gestionar_circulo", "datos": {"email": "email@ejemplo.com", "accionCirculo": "desactivar"}}
+### GESTION DE CLIENTES
+1. BUSCAR: {"accion": "buscar_cliente", "datos": {"query": "email, nombre o telefono"}}
+2. PERFIL COMPLETO: {"accion": "perfil_cliente", "datos": {"email": "email@ejemplo.com"}}
+3. CREAR NOTA: {"accion": "crear_nota", "datos": {"email": "email@ejemplo.com", "nota": "texto"}}
 
-7. VER ESTADISTICAS:
-{"accion": "ver_stats"}
+### REGALOS Y MONEDAS
+4. DAR RUNAS: {"accion": "dar_regalo", "datos": {"email": "email@ejemplo.com", "tipoRegalo": "runas", "cantidad": 50, "mensaje": "opcional"}}
+5. DAR TREBOLES: {"accion": "dar_regalo", "datos": {"email": "email@ejemplo.com", "tipoRegalo": "treboles", "cantidad": 100}}
+6. REGALO MASIVO: {"accion": "regalo_masivo", "datos": {"filtro": "circulo|todos|top10", "tipoRegalo": "runas", "cantidad": 10}}
 
-8. GENERAR CONTENIDO:
-{"accion": "generar_contenido", "datos": {"categoria": "cosmos|duendes|diy|esoterico|sanacion|celebraciones", "tipo": "articulo|guia|ritual|meditacion", "tema": "descripcion del tema"}}
+### CIRCULO MAGICO
+7. ACTIVAR CIRCULO: {"accion": "gestionar_circulo", "datos": {"email": "email@ejemplo.com", "accionCirculo": "activar"}}
+8. EXTENDER CIRCULO: {"accion": "gestionar_circulo", "datos": {"email": "email@ejemplo.com", "accionCirculo": "extender", "dias": 30}}
+9. DESACTIVAR CIRCULO: {"accion": "gestionar_circulo", "datos": {"email": "email@ejemplo.com", "accionCirculo": "desactivar"}}
+10. VER CIRCULOS POR VENCER: {"accion": "circulos_por_vencer", "datos": {"dias": 7}}
 
-9. VER PRODUCTOS:
-{"accion": "ver_productos", "datos": {"filtro": "opcional - nombre o categoria"}}
+### CONTENIDO
+11. GENERAR ARTICULO: {"accion": "generar_contenido", "datos": {"categoria": "cosmos|duendes|diy|esoterico|sanacion|celebraciones", "tipo": "articulo|guia|ritual|meditacion", "tema": "tema especifico", "longitud": 3000}}
 
-10. DESTACAR PRODUCTO:
-{"accion": "destacar_producto", "datos": {"productoId": "id_del_producto", "destacado": true}}
+### WOOCOMMERCE
+12. VER PEDIDOS: {"accion": "ver_pedidos", "datos": {"estado": "processing|completed|on-hold|all"}}
+13. BUSCAR PEDIDO: {"accion": "buscar_pedido", "datos": {"query": "email, nombre o numero de pedido"}}
+14. VER PRODUCTOS: {"accion": "ver_productos", "datos": {"filtro": "nombre o categoria"}}
+15. DESTACAR PRODUCTO: {"accion": "destacar_producto", "datos": {"productoId": "123", "destacado": true}}
 
-11. VER ACTIVIDAD RECIENTE:
-{"accion": "ver_actividad"}
+### ESTADISTICAS
+16. STATS COMPLETAS: {"accion": "ver_stats"}
+17. ACTIVIDAD RECIENTE: {"accion": "ver_actividad"}
+18. REPORTE VENTAS: {"accion": "reporte_ventas", "datos": {"periodo": "hoy|semana|mes"}}
 
-12. CREAR NOTA PARA CLIENTE:
-{"accion": "crear_nota", "datos": {"email": "email@ejemplo.com", "nota": "texto de la nota"}}
+## EJEMPLOS DE USO NATURAL
 
-EJEMPLOS DE USO:
 - "Busca a maria" -> buscar_cliente
-- "Dale 20 runas a juan@mail.com" -> dar_regalo con runas
-- "Extiende el circulo de ana@mail.com 30 dias" -> gestionar_circulo extender
-- "Cuantos miembros del circulo hay?" -> responde conversacionalmente con los datos
-- "Mostrame las estadisticas" -> ver_stats
-- "Genera un articulo sobre cristales para sanacion" -> generar_contenido
+- "Dale 100 runas a ana@mail.com por su cumple" -> dar_regalo con mensaje
+- "Cuantas ventas hubo hoy?" -> respondes directo con los datos que tenes
+- "Extiende el circulo de juan 60 dias" -> gestionar_circulo
+- "Muestrame los pedidos pendientes" -> ver_pedidos
+- "Genera un articulo sobre cristales de 3000 palabras" -> generar_contenido
+- "A todos los del circulo dales 20 treboles" -> regalo_masivo
+- "Quien compro mas este mes?" -> respondes con los datos
+- "Cuantos circulos vencen esta semana?" -> circulos_por_vencer
 
-SI NO NECESITAS EJECUTAR ACCION:
-Simplemente responde de forma conversacional usando la informacion que tenes.
+## REGLAS DE ORO
 
-IMPORTANTE:
-- Si te piden algo que requiere un email y no lo tenes, pregunta cual es
-- Siempre confirma el resultado de las acciones
-- Se conciso pero completo`;
+1. Si no necesitas ejecutar accion, responde directo con los datos que ya tenes
+2. Si falta un email, pregunta cual es antes de actuar
+3. Siempre confirma lo que hiciste
+4. Se conciso pero completo
+5. Podes dar opiniones y sugerencias proactivas
+6. Si ves algo raro (circulo por vencer, cliente inactivo), mencionalo
+
+## ESTILO DE RESPUESTA
+
+- Usa markdown para formatear (negritas, listas)
+- Datos concretos, nada de relleno
+- Emojis con moderacion
+- Personalidad: profesional pero cercano
+- Cuando das buenas noticias, celebralas
+- Cuando hay problemas, propon soluciones`;
+
+    // Datos adicionales para contexto de circulos por vencer
+    let circulosPorVencer = [];
+    try {
+      const circuloKeys = await kv.keys('circulo:*');
+      const ahora = new Date();
+      const en7Dias = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+      for (const ck of circuloKeys) {
+        const c = await kv.get(ck);
+        if (c?.activo && c?.expira) {
+          const expira = new Date(c.expira);
+          if (expira <= en7Dias && expira > ahora) {
+            const email = ck.replace('circulo:', '');
+            const user = usuarios.find(u => u.email?.toLowerCase() === email);
+            circulosPorVencer.push({
+              email,
+              nombre: user?.nombre || email,
+              diasRestantes: Math.ceil((expira - ahora) / (24 * 60 * 60 * 1000))
+            });
+          }
+        }
+      }
+    } catch (e) {}
+
+    // Agregar alerta de circulos por vencer al contexto
+    const alertaCirculos = circulosPorVencer.length > 0
+      ? `\n\n⚠️ ALERTA: ${circulosPorVencer.length} circulos vencen en los proximos 7 dias:\n${circulosPorVencer.map(c => `- ${c.nombre} (${c.diasRestantes} dias)`).join('\n')}`
+      : '';
+
+    const systemPromptFinal = systemPrompt + alertaCirculos;
 
     // Construir mensajes
     const messages = [];

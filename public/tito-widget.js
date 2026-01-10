@@ -1,5 +1,6 @@
 /**
- * TITO WIDGET v6.0 - Duendes del Uruguay
+ * TITO WIDGET v7.0 - Duendes del Uruguay
+ * Badge verde visible + mensajes bien formateados
  * <script src="https://duendes-vercel.vercel.app/tito-widget.js"></script>
  */
 
@@ -30,7 +31,6 @@
       z-index: 999999;
       box-shadow: 0 4px 24px rgba(198,169,98,0.45), 0 0 0 3px rgba(198,169,98,0.15);
       transition: all 0.3s ease;
-      overflow: hidden;
       border: 2px solid #C6A962;
       background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
     }
@@ -42,21 +42,23 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: 50%;
     }
     #tito-bubble-badge {
       position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 16px;
-      height: 16px;
+      bottom: -2px;
+      right: -2px;
+      width: 22px;
+      height: 22px;
       background: #22c55e;
       border-radius: 50%;
-      border: 2px solid #0a0a0a;
+      border: 3px solid #0a0a0a;
       animation: pulse-badge 2s infinite;
+      z-index: 10;
     }
     @keyframes pulse-badge {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.8; }
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+      50% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(34,197,94,0); }
     }
 
     #tito-proactive {
@@ -217,11 +219,11 @@
     }
 
     .tito-msg {
-      max-width: 85%;
-      padding: 14px 18px;
+      max-width: 88%;
+      padding: 16px 20px;
       border-radius: 18px;
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.7;
       animation: msgPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     @keyframes msgPop {
@@ -230,10 +232,60 @@
     }
     .tito-msg.bot {
       background: linear-gradient(145deg, #1a1a1a, #131313);
-      color: #f0f0f0;
+      color: #e8e8e8;
       align-self: flex-start;
-      border: 1px solid rgba(198,169,98,0.15);
+      border: 1px solid rgba(198,169,98,0.2);
       border-bottom-left-radius: 4px;
+    }
+    .tito-msg.bot .msg-title {
+      color: #C6A962;
+      font-weight: 600;
+      font-size: 16px;
+      display: block;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(198,169,98,0.2);
+    }
+    .tito-msg.bot .msg-section {
+      margin: 12px 0;
+      padding-left: 8px;
+      border-left: 2px solid rgba(198,169,98,0.3);
+    }
+    .tito-msg.bot .msg-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 8px 0;
+      padding: 6px 0;
+    }
+    .tito-msg.bot .msg-emoji {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .tito-msg.bot .msg-highlight {
+      color: #C6A962;
+      font-weight: 600;
+    }
+    .tito-msg.bot strong, .tito-msg.bot b {
+      color: #C6A962;
+      font-weight: 600;
+    }
+    .tito-msg.bot .msg-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+    }
+    .tito-msg.bot .msg-list li {
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .tito-msg.bot .msg-list li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: #C6A962;
+      font-size: 10px;
     }
     .tito-msg.user {
       background: linear-gradient(135deg, #C6A962, #9a7b3c);
@@ -481,7 +533,7 @@
       this.bindEvents();
       this.detectVisitor();
       setTimeout(() => this.showProactive(), 4000);
-      console.log('Tito Widget v6.0');
+      console.log('Tito Widget v7.0 - Better formatting');
     },
 
     async detectVisitor() {
@@ -666,11 +718,57 @@
       return null;
     },
 
+    formatBotMessage(text) {
+      // Format bot messages to be more readable
+      let html = text;
+
+      // Convert **bold** to <strong>
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+      // Convert *italic* to <em>
+      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+      // Convert numbered lists (1. 2. 3. etc)
+      html = html.replace(/(\d+)\.\s+\*\*([^*]+)\*\*\s*[-–]\s*/g, '<div class="msg-item"><span class="msg-emoji">$1️⃣</span><span><strong>$2</strong> - ');
+      html = html.replace(/(\d+)\.\s+/g, '<div class="msg-item"><span class="msg-emoji">✦</span><span>');
+
+      // Close unclosed spans from numbered items
+      const openItems = (html.match(/<div class="msg-item">/g) || []).length;
+      const closeSpans = (html.match(/<\/span><\/div>/g) || []).length;
+      if (openItems > closeSpans) {
+        // Add closing tags at line breaks or end
+        html = html.replace(/([^>])\n/g, '$1</span></div>\n');
+      }
+
+      // Convert line breaks to proper spacing
+      html = html.replace(/\n\n/g, '</p><p style="margin: 12px 0;">');
+      html = html.replace(/\n/g, '<br>');
+
+      // Wrap in paragraph if not already structured
+      if (!html.includes('<div') && !html.includes('<p')) {
+        html = '<p style="margin: 0;">' + html + '</p>';
+      }
+
+      // Highlight prices
+      html = html.replace(/\$(\d+[\d,\.]*)/g, '<span class="msg-highlight">$$$1</span>');
+
+      // Highlight special words
+      html = html.replace(/(30%|reservar|unico|especial|garantia)/gi, '<span class="msg-highlight">$1</span>');
+
+      return html;
+    },
+
     addMessage(text, type, productos) {
       const container = document.getElementById('tito-messages');
       const msg = document.createElement('div');
       msg.className = 'tito-msg ' + type;
-      msg.textContent = text;
+
+      if (type === 'bot') {
+        msg.innerHTML = this.formatBotMessage(text);
+      } else {
+        msg.textContent = text;
+      }
+
       container.appendChild(msg);
 
       if (productos && productos.length > 0) {
