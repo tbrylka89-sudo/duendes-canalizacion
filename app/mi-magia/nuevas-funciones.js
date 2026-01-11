@@ -522,7 +522,7 @@ export function GuiaCristales({ usuario }) {
     container: { paddingBottom: '20px', maxWidth: '100%', overflowX: 'hidden' },
     header: { textAlign: 'center', marginBottom: '20px' },
     headerH2: { color: '#d4af37', margin: '0 0 5px', fontSize: isMobile ? '1.3rem' : '1.5rem' },
-    headerP: { color: '#888', fontSize: isMobile ? '0.9rem' : '1rem' },
+    headerP: { color: '#bbb', fontSize: isMobile ? '0.9rem' : '1rem' },
     filtros: { marginBottom: '20px' },
     input: {
       width: '100%', padding: '12px 15px', background: '#1f1f1f', border: '1px solid #333',
@@ -536,7 +536,7 @@ export function GuiaCristales({ usuario }) {
       border: 'none', borderRadius: '20px', color: activo ? '#d4af37' : '#888',
       fontSize: isMobile ? '0.75rem' : '0.85rem', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap'
     }),
-    cargando: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px', color: '#888' },
+    cargando: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px', color: '#bbb' },
     // GRID: 1 columna en móvil para que se lea bien
     grid: {
       display: 'grid',
@@ -553,7 +553,7 @@ export function GuiaCristales({ usuario }) {
     cardEmoji: { fontSize: isMobile ? '2rem' : '2rem', marginBottom: isMobile ? '0' : '10px', flexShrink: 0 },
     cardContent: { flex: 1, minWidth: 0 },
     cardH4: { color: '#fff', margin: '0 0 4px', fontSize: isMobile ? '1.1rem' : '0.95rem', lineHeight: '1.3' },
-    cardColor: { color: '#888', fontSize: isMobile ? '0.85rem' : '0.8rem', margin: '0 0 6px' },
+    cardColor: { color: '#bbb', fontSize: isMobile ? '0.85rem' : '0.8rem', margin: '0 0 6px' },
     cardChakras: { display: 'flex', gap: '5px', marginBottom: '6px', flexWrap: 'wrap', justifyContent: isMobile ? 'flex-start' : 'center' },
     cardChakraTag: { background: '#d4af3722', color: '#d4af37', padding: '2px 8px', borderRadius: '10px', fontSize: '0.7rem' },
     cardProp: { color: '#aaa', fontSize: isMobile ? '0.85rem' : '0.75rem', margin: 0, lineHeight: '1.4' },
@@ -562,7 +562,7 @@ export function GuiaCristales({ usuario }) {
     btnVolver: { background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', padding: '10px 0', fontSize: '1rem' },
     detalleHeader: { marginBottom: '20px' },
     detalleH2: { color: '#d4af37', margin: '0 0 5px', fontSize: isMobile ? '1.4rem' : '1.6rem' },
-    nombresAlt: { color: '#888', fontSize: '0.9rem' },
+    nombresAlt: { color: '#bbb', fontSize: '0.9rem' },
     infoGrid: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' },
     infoItem: { background: '#1f1f1f', padding: '10px 12px', borderRadius: '8px', color: '#ccc', fontSize: isMobile ? '0.9rem' : '1rem' },
     seccion: { background: '#1f1f1f', padding: isMobile ? '12px' : '15px', borderRadius: '12px', marginBottom: '12px' },
@@ -947,7 +947,7 @@ export const estilosNuevos = `
 }
 .senal-luna { font-size: 2.5rem; }
 .senal-header h3 { margin: 0; color: #d4af37; }
-.senal-fase { margin: 0; color: #aaa; font-size: 0.9rem; }
+.senal-fase { margin: 0; color: #ddd; font-size: 0.9rem; }
 .senal-numero {
   margin-left: auto;
   background: #d4af3722;
@@ -1016,7 +1016,7 @@ export const estilosNuevos = `
 }
 .senal-cristal span { font-size: 1.5rem; }
 .senal-cristal div strong { color: #d4af37; font-size: 0.95rem; }
-.senal-cristal div small { color: #aaa; font-size: 0.75rem; display: block; }
+.senal-cristal div small { color: #ddd; font-size: 0.75rem; display: block; }
 .senal-numero-significado span {
   display: block;
   font-size: 1.5rem;
@@ -1024,7 +1024,7 @@ export const estilosNuevos = `
 }
 .senal-numero-significado small {
   font-size: 0.75rem;
-  color: #aaa;
+  color: #ddd;
 }
 .senal-luna-mensaje {
   margin-top: 15px;
@@ -1076,7 +1076,7 @@ export const estilosNuevos = `
 .elem-prev.agua { background: #1e90ff33; color: #74b9ff; }
 .elem-prev.tierra { background: #2ecc7133; color: #55efc4; }
 .elem-prev.aire { background: #74b9ff33; color: #a29bfe; }
-.test-tiempo { color: #888; font-size: 0.9rem; }
+.test-tiempo { color: #bbb; font-size: 0.9rem; }
 .test-progress {
   display: flex;
   align-items: center;
@@ -1165,7 +1165,7 @@ export const estilosNuevos = `
   margin-bottom: 20px;
 }
 .cosmos-header h2 { color: #d4af37; margin: 0; }
-.cosmos-header p { color: #888; }
+.cosmos-header p { color: #bbb; }
 .cosmos-tabs {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1181,7 +1181,7 @@ export const estilosNuevos = `
   background: #1f1f1f;
   border: none;
   border-radius: 10px;
-  color: #888;
+  color: #bbb;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -1202,7 +1202,7 @@ export const estilosNuevos = `
 .luna-emoji-xl { font-size: 4rem; }
 .luna-actual h3 { color: #fff; margin: 0 0 5px; }
 .luna-actual p { color: #ccc; margin: 0; }
-.luna-actual small { color: #888; }
+.luna-actual small { color: #bbb; }
 .luna-ritual {
   background: #1f1f1f;
   padding: 15px;
@@ -1226,7 +1226,7 @@ export const estilosNuevos = `
 }
 .fecha-item span { font-size: 1.5rem; }
 .fecha-item strong { display: block; color: #fff; }
-.fecha-item small { color: #888; }
+.fecha-item small { color: #bbb; }
 .sol-actual {
   display: flex;
   align-items: center;
@@ -1264,7 +1264,7 @@ export const estilosNuevos = `
   margin-bottom: 15px;
 }
 .cosmos-guardian h3 { color: #d4af37; margin: 0 0 5px; }
-.guardian-tipo { color: #888; font-size: 0.9rem; margin-bottom: 10px; }
+.guardian-tipo { color: #bbb; font-size: 0.9rem; margin-bottom: 10px; }
 .guardian-mensaje {
   background: #0a0a0a;
   padding: 15px;
@@ -1299,8 +1299,8 @@ export const estilosNuevos = `
 }
 .fecha-item-full span { font-size: 1.5rem; }
 .fecha-item-full strong { color: #fff; }
-.fecha-item-full small { display: block; color: #888; }
-.fecha-desc { color: #aaa; font-size: 0.85rem; margin: 5px 0 0; }
+.fecha-item-full small { display: block; color: #bbb; }
+.fecha-desc { color: #ddd; font-size: 0.85rem; margin: 5px 0 0; }
 .astro-info {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1349,7 +1349,7 @@ export const estilosNuevos = `
   margin-bottom: 20px;
 }
 .guia-header h2 { color: #d4af37; margin: 0 0 5px; }
-.guia-header p { color: #888; }
+.guia-header p { color: #bbb; }
 .guia-filtros {
   margin-bottom: 20px;
 }
@@ -1377,7 +1377,7 @@ export const estilosNuevos = `
   background: #1f1f1f;
   border: none;
   border-radius: 20px;
-  color: #888;
+  color: #bbb;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -1406,7 +1406,7 @@ export const estilosNuevos = `
 }
 .cristal-emoji { font-size: 2rem; margin-bottom: 10px; }
 .cristal-card h4 { color: #fff; margin: 0 0 5px; font-size: 0.95rem; }
-.cristal-color { color: #888; font-size: 0.8rem; margin: 0 0 8px; }
+.cristal-color { color: #bbb; font-size: 0.8rem; margin: 0 0 8px; }
 .cristal-chakras-mini {
   display: flex;
   justify-content: center;
@@ -1421,7 +1421,7 @@ export const estilosNuevos = `
   font-size: 0.7rem;
 }
 .cristal-prop-mini {
-  color: #aaa;
+  color: #ddd;
   font-size: 0.75rem;
   margin: 0;
   line-height: 1.3;
@@ -1441,7 +1441,7 @@ export const estilosNuevos = `
   margin-bottom: 20px;
 }
 .cristal-header-det h2 { color: #d4af37; margin: 0 0 5px; }
-.nombres-alt { color: #888; font-size: 0.9rem; margin: 0; }
+.nombres-alt { color: #bbb; font-size: 0.9rem; margin: 0; }
 .cristal-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1510,7 +1510,7 @@ export const estilosNuevos = `
   margin-bottom: 20px;
 }
 .catalogo-header h2 { color: #d4af37; margin: 0 0 5px; }
-.catalogo-header p { color: #888; }
+.catalogo-header p { color: #bbb; }
 .categorias-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -1522,7 +1522,7 @@ export const estilosNuevos = `
   background: #1f1f1f;
   border: none;
   border-radius: 20px;
-  color: #888;
+  color: #bbb;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -1563,7 +1563,7 @@ export const estilosNuevos = `
 .badge-premium { background: #9b59b6; color: #fff; }
 .exp-icono { font-size: 2rem; display: block; margin-bottom: 10px; }
 .exp-card-new h4 { color: #fff; margin: 0 0 8px; }
-.exp-desc { color: #888; font-size: 0.9rem; margin: 0 0 12px; line-height: 1.4; }
+.exp-desc { color: #bbb; font-size: 0.9rem; margin: 0 0 12px; line-height: 1.4; }
 .exp-footer {
   display: flex;
   justify-content: space-between;
@@ -1583,7 +1583,7 @@ export const estilosNuevos = `
   padding-top: 20px;
   border-top: 1px solid #333;
 }
-.runas-info p { margin: 0 0 10px; color: #aaa; }
+.runas-info p { margin: 0 0 10px; color: #ddd; }
 .runas-info strong { color: #d4af37; }
 .exp-detalle {
   padding: 20px 0;
@@ -1649,7 +1649,7 @@ export const estilosNuevos = `
   margin-bottom: 15px;
 }
 .runas-actuales {
-  color: #888;
+  color: #bbb;
   margin-top: 15px;
 }
 .exp-resultado {
@@ -1674,7 +1674,7 @@ export const estilosNuevos = `
   margin-bottom: 10px;
 }
 .resultado-palabras {
-  color: #888;
+  color: #bbb;
   font-size: 0.85rem;
   text-align: right;
   margin-top: 15px;
@@ -1726,7 +1726,7 @@ export const estilosNuevos = `
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #888;
+  color: #bbb;
 }
 
 /* ═══ RESPONSIVE MÓVIL ═══ */

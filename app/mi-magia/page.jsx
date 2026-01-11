@@ -2807,9 +2807,10 @@ Mensaje actual: ${m}`;
     touchAction: 'manipulation',
     WebkitTapHighlightColor: 'transparent'
   };
-  // CHAT: Posicionamiento con left/right para móvil (sin width fijo)
-  const chatStyle = mobile ? {
-    // MÓVIL: Usar left/right para calcular ancho automáticamente
+  // CHAT: Ancho fijo calculado para no causar overflow
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 400;
+  const chatWidth = mobile ? Math.min(screenWidth - 20, 380) : 340;
+  const chatStyle = {
     position: 'fixed',
     zIndex: 999,
     background: '#fff',
@@ -2818,25 +2819,12 @@ Mensaje actual: ${m}`;
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    bottom: '70px',
-    left: '8px',
-    right: '8px',
-    // NO definir width - dejar que se calcule por left/right
-    maxHeight: '50vh'
-  } : {
-    // DESKTOP
-    position: 'fixed',
-    zIndex: 999,
-    background: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    bottom: '6rem',
-    right: '1.5rem',
-    width: '340px',
-    maxHeight: '450px'
+    boxSizing: 'border-box',
+    bottom: mobile ? '70px' : '6rem',
+    right: mobile ? '10px' : '1.5rem',
+    width: `${chatWidth}px`,
+    maxWidth: mobile ? 'calc(100vw - 20px)' : '340px',
+    maxHeight: mobile ? '50vh' : '450px'
   };
   // MENSAJES: Forzar saltos de línea
   const msgStyle = {
@@ -2920,13 +2908,13 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .rango-icono{font-size:2.5rem}
 .rango-info{display:flex;flex-direction:column}
 .rango-nombre{font-family:'Cinzel',serif;color:#d4af37;font-size:1rem}
-.rango-ben{font-size:0.8rem;color:rgba(255,255,255,0.6)}
+.rango-ben{font-size:0.8rem;color:rgba(255,255,255,0.85)}
 .progreso-rango{margin-top:1.5rem}
 .progreso-bar{height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden}
 .progreso-fill{height:100%;background:linear-gradient(90deg,#d4af37,#f4d03f);border-radius:3px;transition:width 0.5s}
-.progreso-rango small{display:block;margin-top:0.5rem;color:rgba(255,255,255,0.5);font-size:0.75rem}
+.progreso-rango small{display:block;margin-top:0.5rem;color:rgba(255,255,255,0.8);font-size:0.75rem}
 .banner h1{font-family:'Cinzel',serif;font-size:1.8rem;color:#fff;margin-bottom:0.5rem}
-.banner p{color:rgba(255,255,255,0.7)}
+.banner p{color:rgba(255,255,255,0.9)}
 .stats-g{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
 .stat-c{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center}
 .stat-c:hover{border-color:#d4af37}
@@ -2941,7 +2929,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .banner-circ{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1.25rem;cursor:pointer;margin-bottom:2rem}
 .banner-circ span:first-child{font-size:2rem;color:#d4af37}
 .banner-circ h3{font-family:'Cinzel',serif;color:#fff;font-size:1rem}
-.banner-circ p{color:rgba(255,255,255,0.7);font-size:0.85rem}
+.banner-circ p{color:rgba(255,255,255,0.9);font-size:0.85rem}
 .badge{background:#d4af37;color:#1a1a1a;padding:0.25rem 0.75rem;border-radius:20px;font-family:'Cinzel',serif;font-size:0.7rem;font-weight:600}
 .info-box{background:#fafafa;border-radius:12px;padding:1.5rem;margin-top:2rem}
 .info-box h3{font-family:'Cinzel',serif;margin-bottom:1rem}
@@ -3120,7 +3108,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .ritual-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden}
 .ritual-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:linear-gradient(135deg,#1a1a1a,#2a2a2a)}
 .ritual-header h4{font-family:'Cinzel',serif;color:#d4af37;margin:0;font-size:1rem}
-.ritual-duracion{font-size:0.8rem;color:rgba(255,255,255,0.7)}
+.ritual-duracion{font-size:0.8rem;color:rgba(255,255,255,0.9)}
 .ritual-pasos{margin:0;padding:1.25rem;padding-left:2.5rem}
 .ritual-pasos li{font-size:0.9rem;color:#555;margin-bottom:0.5rem;padding-left:0.5rem}
 .alquimia-section{max-width:800px}
@@ -3145,7 +3133,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .circulo-hero{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:2.5rem;margin-bottom:2rem}
 .circulo-hero span{font-size:3rem;color:#d4af37}
 .circulo-hero h1{font-family:'Cinzel',serif;color:#fff;font-size:2rem;margin:0.75rem 0 0.5rem}
-.circulo-hero p{color:rgba(255,255,255,0.7)}
+.circulo-hero p{color:rgba(255,255,255,0.9)}
 .circulo-intro-text{max-width:600px;margin:0 auto 2rem}
 .circulo-intro-text p{color:#666}
 .prueba-gratis{background:#f0fdf4;border:2px solid #bbf7d0;border-radius:16px;padding:2rem;margin-bottom:2rem}
@@ -3205,7 +3193,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .circulo-interno .circulo-header-int{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:2rem;text-align:center;margin-bottom:2rem}
 .circulo-header-int span{font-size:2.5rem;color:#d4af37}
 .circulo-header-int h1{font-family:'Cinzel',serif;color:#fff;margin:0.5rem 0}
-.circulo-header-int p{color:rgba(255,255,255,0.7);font-size:0.9rem}
+.circulo-header-int p{color:rgba(255,255,255,0.9);font-size:0.9rem}
 .circulo-tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem}
 .circulo-tabs .tab{display:flex;align-items:center;gap:0.4rem}
 .circulo-tabs .tab span{color:#d4af37}
@@ -3346,8 +3334,8 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .tito-av{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .tito-head div{flex:1}
 .tito-head strong{display:block;color:#d4af37;font-family:'Cinzel',serif;font-size:0.9rem}
-.tito-head small{font-size:0.75rem;color:rgba(255,255,255,0.6)}
-.tito-head button{background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;cursor:pointer}
+.tito-head small{font-size:0.75rem;color:rgba(255,255,255,0.85)}
+.tito-head button{background:none;border:none;color:rgba(255,255,255,0.8);font-size:1.1rem;cursor:pointer}
 .tito-msgs{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.6rem}
 .msg-t,.msg-u{max-width:85%;padding:0.6rem 0.9rem;border-radius:12px;white-space:pre-wrap;word-break:break-word;line-height:1.5}
 .msg-t{background:#f5f5f5;align-self:flex-start}
@@ -3412,13 +3400,13 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .luna-mini{display:flex;align-items:center;gap:1rem}
 .luna-emoji{font-size:2.5rem}
 .luna-mini strong{color:#d4af37;font-family:'Cinzel',serif}
-.luna-mini p{color:rgba(255,255,255,0.7);font-size:0.9rem;margin:0}
+.luna-mini p{color:rgba(255,255,255,0.9);font-size:0.9rem;margin:0}
 .luna-hero{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2rem}
 .luna-fase-grande{background:#1a1a1a;border-radius:16px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
 .luna-emoji-lg{font-size:4rem}
 .luna-fase-grande h3{font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.25rem}
 .luna-energia{color:rgba(255,255,255,0.8);font-size:0.95rem;margin:0}
-.luna-fase-grande small{color:rgba(255,255,255,0.5);font-size:0.8rem}
+.luna-fase-grande small{color:rgba(255,255,255,0.8);font-size:0.8rem}
 .signo-lunar{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:1.5rem;display:flex;align-items:center;gap:1.25rem}
 .signo-lunar span{font-size:2.5rem}
 .signo-lunar strong{font-family:'Cinzel',serif;display:block}
@@ -3757,7 +3745,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .faq-respuesta p{color:#555;margin:0}
 .faq-contacto{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:2rem;text-align:center;margin-top:2rem}
 .faq-contacto h3{font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.5rem}
-.faq-contacto p{color:rgba(255,255,255,0.7);margin-bottom:1.5rem}
+.faq-contacto p{color:rgba(255,255,255,0.9);margin-bottom:1.5rem}
 
 @media(max-width:768px){.senal-footer{grid-template-columns:1fr}.elementos-preview{grid-template-columns:repeat(2,1fr)}.cosmos-tabs{grid-template-columns:repeat(2,1fr)}.cristales-grid{grid-template-columns:repeat(2,1fr)}.experiencias-grid-new{grid-template-columns:1fr}.utils-grid{grid-template-columns:repeat(2,1fr)}.foro-categorias{overflow-x:auto;flex-wrap:nowrap}.faq-categorias{overflow-x:auto;flex-wrap:nowrap}}
 @media(max-width:480px){.utils-grid{grid-template-columns:1fr}}
