@@ -154,6 +154,60 @@ const CATEGORIAS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
+// PLANTILLAS DE PUBLICACIÓN (Cómo se va a ver el contenido)
+// ═══════════════════════════════════════════════════════════════
+const PLANTILLAS_PUBLICACION = [
+  {
+    id: 'clasica',
+    nombre: 'Clásica',
+    icono: '📄',
+    descripcion: 'Imagen arriba, texto abajo',
+    preview: 'imagen-arriba',
+    color: COLORS.purple
+  },
+  {
+    id: 'revista',
+    nombre: 'Revista',
+    icono: '📰',
+    descripcion: 'Imagen grande con texto superpuesto',
+    preview: 'hero-overlay',
+    color: COLORS.cyan
+  },
+  {
+    id: 'lateral',
+    nombre: 'Lateral',
+    icono: '📐',
+    descripcion: 'Imagen a la izquierda, texto a la derecha',
+    preview: 'side-by-side',
+    color: COLORS.emerald
+  },
+  {
+    id: 'minimal',
+    nombre: 'Minimal',
+    icono: '✨',
+    descripcion: 'Solo texto, sin imagen destacada',
+    preview: 'text-only',
+    color: COLORS.amber
+  },
+  {
+    id: 'audio-focus',
+    nombre: 'Audio Focus',
+    icono: '🎙️',
+    descripcion: 'Destacar el audio con reproductor grande',
+    preview: 'audio-hero',
+    color: COLORS.pink
+  },
+  {
+    id: 'card',
+    nombre: 'Card Compacta',
+    icono: '🃏',
+    descripcion: 'Formato tarjeta para listas',
+    preview: 'card',
+    color: COLORS.orange
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
 // ESTILOS DE IMAGEN (para DALL-E)
 // ═══════════════════════════════════════════════════════════════
 const ESTILOS_IMAGEN = [
@@ -225,6 +279,8 @@ export default function ContenidoPage() {
   // Estado de publicación
   const [fechaPublicacion, setFechaPublicacion] = useState('');
   const [publicarEn, setPublicarEn] = useState(['circulo']);
+  const [plantillaPublicacion, setPlantillaPublicacion] = useState(PLANTILLAS_PUBLICACION[0]);
+  const [vistaPrevia, setVistaPrevia] = useState(false);
 
   // Estados de UI
   const [generando, setGenerando] = useState(false);
@@ -1966,220 +2022,533 @@ export default function ContenidoPage() {
       {/* ═══ PASO 5: PUBLICAR ═══ */}
       {paso === 5 && (
         <div>
-          <h2 style={{ color: COLORS.text, fontSize: 20, marginBottom: 24 }}>
-            Publicar contenido
-          </h2>
-
           <div style={{
-            background: COLORS.bgCard,
-            borderRadius: 20,
-            padding: 28,
-            border: `1px solid ${COLORS.border}`
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 24
           }}>
-            {/* Vista previa final */}
+            <h2 style={{ color: COLORS.text, fontSize: 20, margin: 0 }}>
+              Publicar contenido
+            </h2>
+            <button
+              onClick={() => setVistaPrevia(!vistaPrevia)}
+              style={{
+                padding: '12px 24px',
+                background: vistaPrevia ? COLORS.purple : COLORS.bgElevated,
+                border: `2px solid ${vistaPrevia ? COLORS.purple : COLORS.border}`,
+                borderRadius: 12,
+                color: vistaPrevia ? '#fff' : COLORS.text,
+                cursor: 'pointer',
+                fontSize: 14,
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                transition: 'all 0.2s'
+              }}
+            >
+              👁️ {vistaPrevia ? 'Ocultar' : 'Ver'} Vista Previa
+            </button>
+          </div>
+
+          {/* Modal de Vista Previa */}
+          {vistaPrevia && (
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: imagen ? '240px 1fr' : '1fr',
-              gap: 24,
-              marginBottom: 28,
-              padding: 24,
-              background: COLORS.bgElevated,
-              borderRadius: 16,
+              background: COLORS.bgCard,
+              borderRadius: 20,
+              padding: 28,
+              border: `2px solid ${COLORS.purple}`,
+              marginBottom: 24,
+              position: 'relative'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 4,
+                background: `linear-gradient(90deg, ${COLORS.purple}, ${COLORS.pink}, ${COLORS.cyan})`,
+                borderRadius: '20px 20px 0 0'
+              }} />
+
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 20
+              }}>
+                <h3 style={{ color: COLORS.text, fontSize: 18, margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    background: `${COLORS.purple}22`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    👁️
+                  </span>
+                  Vista Previa - {plantillaPublicacion.nombre}
+                </h3>
+                <span style={{
+                  padding: '6px 14px',
+                  background: `${plantillaPublicacion.color}22`,
+                  color: plantillaPublicacion.color,
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600
+                }}>
+                  {plantillaPublicacion.icono} {plantillaPublicacion.nombre}
+                </span>
+              </div>
+
+              {/* Preview según plantilla seleccionada */}
+              <div style={{
+                background: '#0d0d14',
+                borderRadius: 16,
+                overflow: 'hidden',
+                border: `1px solid ${COLORS.border}`
+              }}>
+                {/* Plantilla Clásica */}
+                {plantillaPublicacion.id === 'clasica' && (
+                  <div>
+                    {imagen && (
+                      <img src={imagen} alt={titulo} style={{ width: '100%', height: 280, objectFit: 'cover' }} />
+                    )}
+                    <div style={{ padding: 28 }}>
+                      <h1 style={{ color: COLORS.text, fontSize: 28, margin: '0 0 16px', lineHeight: 1.3 }}>{titulo}</h1>
+                      <p style={{ color: COLORS.textMuted, fontSize: 13, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre} • {contenido?.split(/\s+/).length.toLocaleString()} palabras
+                      </p>
+                      {audio && (
+                        <div style={{ marginBottom: 24, padding: 16, background: `${COLORS.purple}11`, borderRadius: 12, border: `1px solid ${COLORS.purple}33` }}>
+                          <p style={{ color: COLORS.purple, fontSize: 13, margin: '0 0 10px', fontWeight: 600 }}>🎙️ Escuchá este contenido</p>
+                          <audio controls src={`data:audio/mpeg;base64,${audio}`} style={{ width: '100%' }} />
+                        </div>
+                      )}
+                      <div style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                        {contenido?.substring(0, 800)}...
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Plantilla Revista (Hero) */}
+                {plantillaPublicacion.id === 'revista' && (
+                  <div>
+                    <div style={{
+                      position: 'relative',
+                      height: 400,
+                      background: imagen ? `url(${imagen}) center/cover` : `linear-gradient(135deg, ${COLORS.purple}44, ${COLORS.pink}44)`
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: '80px 28px 28px',
+                        background: 'linear-gradient(transparent, rgba(0,0,0,0.9))'
+                      }}>
+                        <span style={{ color: plantilla?.color || COLORS.purple, fontSize: 13, fontWeight: 600, marginBottom: 8, display: 'block' }}>
+                          {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre}
+                        </span>
+                        <h1 style={{ color: '#fff', fontSize: 32, margin: 0, lineHeight: 1.2, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{titulo}</h1>
+                      </div>
+                    </div>
+                    <div style={{ padding: 28 }}>
+                      {audio && (
+                        <div style={{ marginBottom: 24 }}>
+                          <audio controls src={`data:audio/mpeg;base64,${audio}`} style={{ width: '100%' }} />
+                        </div>
+                      )}
+                      <div style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.8 }}>
+                        {contenido?.substring(0, 600)}...
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Plantilla Lateral */}
+                {plantillaPublicacion.id === 'lateral' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: imagen ? '45% 1fr' : '1fr', minHeight: 400 }}>
+                    {imagen && (
+                      <img src={imagen} alt={titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    )}
+                    <div style={{ padding: 28 }}>
+                      <span style={{ color: plantilla?.color || COLORS.purple, fontSize: 12, fontWeight: 600, marginBottom: 12, display: 'block' }}>
+                        {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre}
+                      </span>
+                      <h1 style={{ color: COLORS.text, fontSize: 24, margin: '0 0 16px', lineHeight: 1.3 }}>{titulo}</h1>
+                      {audio && (
+                        <div style={{ marginBottom: 20 }}>
+                          <audio controls src={`data:audio/mpeg;base64,${audio}`} style={{ width: '100%' }} />
+                        </div>
+                      )}
+                      <div style={{ color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>
+                        {contenido?.substring(0, 500)}...
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Plantilla Minimal */}
+                {plantillaPublicacion.id === 'minimal' && (
+                  <div style={{ padding: 40, maxWidth: 700, margin: '0 auto' }}>
+                    <span style={{ color: plantilla?.color || COLORS.purple, fontSize: 13, fontWeight: 600, marginBottom: 16, display: 'block' }}>
+                      {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre}
+                    </span>
+                    <h1 style={{ color: COLORS.text, fontSize: 32, margin: '0 0 24px', lineHeight: 1.3, fontWeight: 700 }}>{titulo}</h1>
+                    {audio && (
+                      <div style={{ marginBottom: 28, padding: 20, background: COLORS.bgElevated, borderRadius: 14 }}>
+                        <audio controls src={`data:audio/mpeg;base64,${audio}`} style={{ width: '100%' }} />
+                      </div>
+                    )}
+                    <div style={{ color: COLORS.textSecondary, fontSize: 16, lineHeight: 1.9 }}>
+                      {contenido?.substring(0, 800)}...
+                    </div>
+                  </div>
+                )}
+
+                {/* Plantilla Audio Focus */}
+                {plantillaPublicacion.id === 'audio-focus' && (
+                  <div style={{ padding: 28 }}>
+                    <div style={{
+                      background: `linear-gradient(135deg, ${COLORS.purple}22, ${COLORS.pink}22)`,
+                      borderRadius: 20,
+                      padding: 32,
+                      textAlign: 'center',
+                      marginBottom: 24,
+                      border: `1px solid ${COLORS.purple}33`
+                    }}>
+                      {imagen && (
+                        <img src={imagen} alt={titulo} style={{ width: 160, height: 160, borderRadius: 20, objectFit: 'cover', margin: '0 auto 20px', display: 'block', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }} />
+                      )}
+                      <h1 style={{ color: COLORS.text, fontSize: 24, margin: '0 0 8px' }}>{titulo}</h1>
+                      <p style={{ color: COLORS.textMuted, fontSize: 14, marginBottom: 24 }}>
+                        {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre}
+                      </p>
+                      {audio && (
+                        <div style={{ maxWidth: 400, margin: '0 auto' }}>
+                          <audio controls src={`data:audio/mpeg;base64,${audio}`} style={{ width: '100%' }} />
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.8 }}>
+                      {contenido?.substring(0, 600)}...
+                    </div>
+                  </div>
+                )}
+
+                {/* Plantilla Card */}
+                {plantillaPublicacion.id === 'card' && (
+                  <div style={{ padding: 28 }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: imagen ? '180px 1fr' : '1fr',
+                      gap: 20,
+                      background: COLORS.bgElevated,
+                      borderRadius: 16,
+                      overflow: 'hidden'
+                    }}>
+                      {imagen && (
+                        <img src={imagen} alt={titulo} style={{ width: '100%', height: 180, objectFit: 'cover' }} />
+                      )}
+                      <div style={{ padding: imagen ? '16px 20px 16px 0' : 20 }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '4px 10px',
+                          background: `${plantilla?.color || COLORS.purple}22`,
+                          color: plantilla?.color || COLORS.purple,
+                          borderRadius: 6,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          marginBottom: 10
+                        }}>
+                          {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre}
+                        </span>
+                        <h3 style={{ color: COLORS.text, fontSize: 18, margin: '0 0 10px', lineHeight: 1.3 }}>{titulo}</h3>
+                        <p style={{ color: COLORS.textMuted, fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                          {contenido?.substring(0, 150)}...
+                        </p>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                          {imagen && <span style={{ fontSize: 12, color: COLORS.cyan }}>🖼️</span>}
+                          {audio && <span style={{ fontSize: 12, color: COLORS.purple }}>🔊</span>}
+                          <span style={{ fontSize: 12, color: COLORS.textDim }}>{contenido?.split(/\s+/).length} palabras</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+            {/* Columna izquierda: Configuración */}
+            <div style={{
+              background: COLORS.bgCard,
+              borderRadius: 20,
+              padding: 28,
               border: `1px solid ${COLORS.border}`
             }}>
-              {imagen && (
-                <img
-                  src={imagen}
-                  alt={titulo}
-                  style={{ width: '100%', borderRadius: 12 }}
-                />
-              )}
-              <div>
-                <h3 style={{ color: COLORS.text, margin: '0 0 12px', fontSize: 20 }}>{titulo}</h3>
-                <p style={{ color: COLORS.textMuted, fontSize: 14, margin: '0 0 16px' }}>
-                  {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre} • {contenido?.split(/\s+/).length.toLocaleString()} palabras
+              {/* Selector de plantilla de publicación */}
+              <div style={{ marginBottom: 28 }}>
+                <label style={{ display: 'block', color: COLORS.text, marginBottom: 14, fontWeight: 600, fontSize: 15 }}>
+                  📐 Plantilla de Publicación
+                </label>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 10
+                }}>
+                  {PLANTILLAS_PUBLICACION.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setPlantillaPublicacion(p)}
+                      style={{
+                        padding: '14px 10px',
+                        background: plantillaPublicacion.id === p.id ? `${p.color}22` : COLORS.bgElevated,
+                        border: `2px solid ${plantillaPublicacion.id === p.id ? p.color : COLORS.border}`,
+                        borderRadius: 12,
+                        color: plantillaPublicacion.id === p.id ? p.color : COLORS.textMuted,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <span style={{ fontSize: 22, display: 'block', marginBottom: 6 }}>{p.icono}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600 }}>{p.nombre}</span>
+                    </button>
+                  ))}
+                </div>
+                <p style={{ color: COLORS.textMuted, fontSize: 12, marginTop: 10 }}>
+                  {plantillaPublicacion.descripcion}
                 </p>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  {imagen && (
-                    <span style={{
-                      padding: '6px 14px',
-                      background: `${COLORS.cyan}15`,
-                      color: COLORS.cyan,
-                      borderRadius: 8,
-                      fontSize: 13,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6
-                    }}>
-                      🖼️ Imagen
-                    </span>
-                  )}
-                  {audio && (
-                    <span style={{
-                      padding: '6px 14px',
-                      background: `${COLORS.purple}15`,
-                      color: COLORS.purple,
-                      borderRadius: 8,
-                      fontSize: 13,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6
-                    }}>
-                      🔊 Audio
-                    </span>
-                  )}
+              </div>
+
+              {/* Título editable */}
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: 'block', color: COLORS.text, marginBottom: 10, fontWeight: 600, fontSize: 15 }}>
+                  Título
+                </label>
+                <input
+                  type="text"
+                  value={titulo}
+                  onChange={(e) => setTitulo(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '16px 18px',
+                    background: COLORS.bgElevated,
+                    border: `2px solid ${COLORS.border}`,
+                    borderRadius: 14,
+                    color: COLORS.text,
+                    fontSize: 16,
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Dónde publicar */}
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: 'block', color: COLORS.text, marginBottom: 10, fontWeight: 600, fontSize: 15 }}>
+                  Publicar en
+                </label>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  {[
+                    { id: 'circulo', label: '☽ Círculo', desc: 'Solo miembros', color: COLORS.purple },
+                    { id: 'publico', label: '🌐 Público', desc: 'Visible para todos', color: COLORS.emerald },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setPublicarEn(prev =>
+                          prev.includes(opt.id)
+                            ? prev.filter(p => p !== opt.id)
+                            : [...prev, opt.id]
+                        );
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '14px',
+                        background: publicarEn.includes(opt.id) ? `${opt.color}15` : COLORS.bgElevated,
+                        border: `2px solid ${publicarEn.includes(opt.id) ? opt.color : COLORS.border}`,
+                        borderRadius: 12,
+                        color: publicarEn.includes(opt.id) ? opt.color : COLORS.textMuted,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <strong style={{ display: 'block', fontSize: 14, marginBottom: 2 }}>{opt.label}</strong>
+                      <small style={{ fontSize: 11, opacity: 0.8 }}>{opt.desc}</small>
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
 
-            {/* Título editable */}
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', color: COLORS.text, marginBottom: 10, fontWeight: 600, fontSize: 15 }}>
-                Título
-              </label>
-              <input
-                type="text"
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '16px 18px',
-                  background: COLORS.bgElevated,
-                  border: `2px solid ${COLORS.border}`,
-                  borderRadius: 14,
-                  color: COLORS.text,
-                  fontSize: 16,
-                  outline: 'none'
-                }}
-              />
-            </div>
-
-            {/* Dónde publicar */}
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', color: COLORS.text, marginBottom: 10, fontWeight: 600, fontSize: 15 }}>
-                Publicar en
-              </label>
-              <div style={{ display: 'flex', gap: 12 }}>
-                {[
-                  { id: 'circulo', label: '☽ Círculo', desc: 'Solo miembros premium', color: COLORS.purple },
-                  { id: 'publico', label: '🌐 Blog público', desc: 'Visible para todos', color: COLORS.emerald },
-                ].map((opt) => (
-                  <button
-                    key={opt.id}
-                    onClick={() => {
-                      setPublicarEn(prev =>
-                        prev.includes(opt.id)
-                          ? prev.filter(p => p !== opt.id)
-                          : [...prev, opt.id]
-                      );
-                    }}
-                    style={{
-                      flex: 1,
-                      padding: '18px',
-                      background: publicarEn.includes(opt.id) ? `${opt.color}15` : COLORS.bgElevated,
-                      border: `2px solid ${publicarEn.includes(opt.id) ? opt.color : COLORS.border}`,
-                      borderRadius: 14,
-                      color: publicarEn.includes(opt.id) ? opt.color : COLORS.textMuted,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <strong style={{ display: 'block', fontSize: 16, marginBottom: 4 }}>{opt.label}</strong>
-                    <small style={{ opacity: 0.8 }}>{opt.desc}</small>
-                  </button>
-                ))}
+              {/* Programar */}
+              <div>
+                <label style={{ display: 'block', color: COLORS.text, marginBottom: 10, fontWeight: 600, fontSize: 15 }}>
+                  Programar (opcional)
+                </label>
+                <input
+                  type="datetime-local"
+                  value={fechaPublicacion}
+                  onChange={(e) => setFechaPublicacion(e.target.value)}
+                  style={{
+                    padding: '14px 18px',
+                    background: COLORS.bgElevated,
+                    border: `2px solid ${COLORS.border}`,
+                    borderRadius: 14,
+                    color: COLORS.text,
+                    fontSize: 14,
+                    outline: 'none',
+                    width: '100%'
+                  }}
+                />
               </div>
             </div>
 
-            {/* Programar */}
-            <div style={{ marginBottom: 28 }}>
-              <label style={{ display: 'block', color: COLORS.text, marginBottom: 10, fontWeight: 600, fontSize: 15 }}>
-                Programar publicación (opcional)
-              </label>
-              <input
-                type="datetime-local"
-                value={fechaPublicacion}
-                onChange={(e) => setFechaPublicacion(e.target.value)}
-                style={{
-                  padding: '16px 18px',
-                  background: COLORS.bgElevated,
-                  border: `2px solid ${COLORS.border}`,
-                  borderRadius: 14,
-                  color: COLORS.text,
-                  fontSize: 15,
-                  outline: 'none'
-                }}
-              />
-            </div>
+            {/* Columna derecha: Resumen */}
+            <div style={{
+              background: COLORS.bgCard,
+              borderRadius: 20,
+              padding: 28,
+              border: `1px solid ${COLORS.border}`
+            }}>
+              <h3 style={{ color: COLORS.text, fontSize: 17, margin: '0 0 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: `${COLORS.success}22`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  📋
+                </span>
+                Resumen
+              </h3>
 
-            {/* Botones finales */}
-            <div style={{ display: 'flex', gap: 14 }}>
-              <button
-                onClick={() => setPaso(4)}
-                style={{
-                  padding: '16px 28px',
-                  background: 'transparent',
-                  border: `2px solid ${COLORS.border}`,
-                  borderRadius: 14,
-                  color: COLORS.textMuted,
-                  cursor: 'pointer',
-                  fontSize: 15
-                }}
-              >
-                ← Atrás
-              </button>
-              <button
-                onClick={() => guardarContenido('borrador')}
-                disabled={guardando}
-                style={{
-                  padding: '16px 28px',
-                  background: COLORS.bgElevated,
-                  border: `2px solid ${COLORS.border}`,
-                  borderRadius: 14,
-                  color: COLORS.text,
-                  cursor: 'pointer',
-                  fontSize: 15,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8
-                }}
-              >
-                💾 Guardar Borrador
-              </button>
-              <button
-                onClick={() => guardarContenido(fechaPublicacion ? 'programado' : 'publicado')}
-                disabled={guardando}
-                style={{
-                  flex: 1,
-                  padding: '16px 28px',
-                  background: `linear-gradient(135deg, ${COLORS.success}, #16a34a)`,
-                  border: 'none',
-                  borderRadius: 14,
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: 16,
-                  cursor: guardando ? 'wait' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                  boxShadow: `0 4px 20px ${COLORS.success}44`
-                }}
-              >
-                {guardando ? (
-                  <>
-                    <div style={{
-                      width: 20, height: 20,
-                      border: '3px solid transparent',
-                      borderTopColor: '#fff',
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite'
-                    }} />
-                    Guardando...
-                  </>
-                ) : fechaPublicacion ? '📅 Programar' : '🚀 Publicar Ahora'}
-              </button>
+              {/* Mini preview */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: imagen ? '100px 1fr' : '1fr',
+                gap: 16,
+                padding: 16,
+                background: COLORS.bgElevated,
+                borderRadius: 14,
+                marginBottom: 20,
+                border: `1px solid ${COLORS.border}`
+              }}>
+                {imagen && (
+                  <img src={imagen} alt={titulo} style={{ width: 100, height: 100, borderRadius: 10, objectFit: 'cover' }} />
+                )}
+                <div>
+                  <h4 style={{ color: COLORS.text, fontSize: 15, margin: '0 0 8px', lineHeight: 1.3 }}>{titulo}</h4>
+                  <p style={{ color: COLORS.textMuted, fontSize: 12, margin: 0 }}>
+                    {plantilla?.icono} {CATEGORIAS.find(c => c.id === plantilla?.categoria)?.nombre}
+                  </p>
+                </div>
+              </div>
+
+              {/* Info items */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${COLORS.border}` }}>
+                  <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Palabras</span>
+                  <span style={{ color: COLORS.text, fontSize: 14, fontWeight: 600 }}>{contenido?.split(/\s+/).length.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${COLORS.border}` }}>
+                  <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Plantilla</span>
+                  <span style={{ color: plantillaPublicacion.color, fontSize: 14, fontWeight: 600 }}>{plantillaPublicacion.icono} {plantillaPublicacion.nombre}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${COLORS.border}` }}>
+                  <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Imagen</span>
+                  <span style={{ color: imagen ? COLORS.success : COLORS.textDim, fontSize: 14 }}>{imagen ? '✓ Incluida' : '✗ Sin imagen'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${COLORS.border}` }}>
+                  <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Audio</span>
+                  <span style={{ color: audio ? COLORS.success : COLORS.textDim, fontSize: 14 }}>{audio ? '✓ Incluido' : '✗ Sin audio'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
+                  <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Publicar en</span>
+                  <span style={{ color: COLORS.text, fontSize: 14 }}>{publicarEn.map(p => p === 'circulo' ? '☽ Círculo' : '🌐 Público').join(', ')}</span>
+                </div>
+              </div>
+
+              {/* Botones finales */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <button
+                  onClick={() => guardarContenido(fechaPublicacion ? 'programado' : 'publicado')}
+                  disabled={guardando}
+                  style={{
+                    width: '100%',
+                    padding: '18px',
+                    background: `linear-gradient(135deg, ${COLORS.success}, #16a34a)`,
+                    border: 'none',
+                    borderRadius: 14,
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    cursor: guardando ? 'wait' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    boxShadow: `0 4px 20px ${COLORS.success}44`
+                  }}
+                >
+                  {guardando ? (
+                    <>
+                      <div style={{
+                        width: 20, height: 20,
+                        border: '3px solid transparent',
+                        borderTopColor: '#fff',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                      Guardando...
+                    </>
+                  ) : fechaPublicacion ? '📅 Programar Publicación' : '🚀 Publicar Ahora'}
+                </button>
+
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button
+                    onClick={() => setPaso(4)}
+                    style={{
+                      flex: 1,
+                      padding: '14px',
+                      background: 'transparent',
+                      border: `2px solid ${COLORS.border}`,
+                      borderRadius: 12,
+                      color: COLORS.textMuted,
+                      cursor: 'pointer',
+                      fontSize: 14
+                    }}
+                  >
+                    ← Atrás
+                  </button>
+                  <button
+                    onClick={() => guardarContenido('borrador')}
+                    disabled={guardando}
+                    style={{
+                      flex: 1,
+                      padding: '14px',
+                      background: COLORS.bgElevated,
+                      border: `2px solid ${COLORS.border}`,
+                      borderRadius: 12,
+                      color: COLORS.text,
+                      cursor: 'pointer',
+                      fontSize: 14
+                    }}
+                  >
+                    💾 Borrador
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
