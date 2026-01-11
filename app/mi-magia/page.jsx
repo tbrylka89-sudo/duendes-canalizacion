@@ -483,8 +483,17 @@ export default function MiMagia() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [token, setToken] = useState('');
   const [pais, setPais] = useState('UY');
+  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => { cargarUsuario(); detectarPais(); }, []);
+  useEffect(() => {
+    cargarUsuario();
+    detectarPais();
+    // Detectar móvil
+    const checkMobile = () => setIsMobile(window.innerWidth <= 900);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const detectarPais = async () => {
     try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); setPais(data.country_code || 'UY'); } catch(e) { setPais('UY'); }
@@ -532,18 +541,53 @@ export default function MiMagia() {
     }
   };
 
+  // Estilos inline para móvil (bypass CSS cache)
+  const mobileMenuBtn = {
+    display: isMobile ? 'flex' : 'none',
+    flexDirection: 'column',
+    gap: '5px',
+    background: '#d4af37',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '12px',
+    minWidth: '48px',
+    minHeight: '48px',
+    cursor: 'pointer',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+  const mobileMenuLine = { width: '22px', height: '3px', background: '#fff', borderRadius: '2px', display: 'block' };
+  const mobileNav = {
+    position: 'fixed', top: '65px', left: 0, bottom: 0, width: '260px',
+    background: '#fff', borderRight: '1px solid #e0e0e0', padding: '1rem 0',
+    display: 'flex', flexDirection: 'column', zIndex: 99, overflowY: 'auto',
+    transform: menuAbierto ? 'translateX(0)' : 'translateX(-100%)',
+    transition: 'transform 0.3s ease',
+    boxShadow: menuAbierto ? '4px 0 20px rgba(0,0,0,0.2)' : 'none'
+  };
+  const mobileOverlay = {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 98
+  };
+
   return (
     <div className="app">
       <style jsx global>{estilos}</style>
-      <header className="header">
+      <header className="header" style={isMobile ? {padding: '0 12px'} : {}}>
         <div className="logo"><span>✦</span> MI MAGIA</div>
-        <div className="user-info">Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'}, {usuario?.nombrePreferido}</div>
-        <div className="hstats"><span>☘ {usuario?.treboles || 0}</span><span>ᚱ {usuario?.runas || 0}</span></div>
-        <button className="menu-btn" onClick={() => setMenuAbierto(!menuAbierto)} onTouchEnd={(e) => { e.preventDefault(); setMenuAbierto(!menuAbierto); }}><span></span><span></span><span></span></button>
+        {!isMobile && <div className="user-info">Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'}, {usuario?.nombrePreferido}</div>}
+        <div className="hstats" style={isMobile ? {gap: '6px'} : {}}>
+          <span style={{background: '#1a1a1a', color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: isMobile ? '0.75rem' : '0.85rem'}}>☘ {usuario?.treboles || 0}</span>
+          <span style={{background: '#1a1a1a', color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: isMobile ? '0.75rem' : '0.85rem'}}>ᚱ {usuario?.runas || 0}</span>
+        </div>
+        <button style={mobileMenuBtn} onClick={() => setMenuAbierto(!menuAbierto)}>
+          <span style={mobileMenuLine}></span>
+          <span style={mobileMenuLine}></span>
+          <span style={mobileMenuLine}></span>
+        </button>
       </header>
-      
-      {menuAbierto && <div className="nav-overlay" onClick={() => setMenuAbierto(false)} />}
-      <nav className={`nav ${menuAbierto ? 'abierto' : ''}`}>
+
+      {menuAbierto && isMobile && <div style={mobileOverlay} onClick={() => setMenuAbierto(false)} />}
+      <nav className={`nav ${menuAbierto ? 'abierto' : ''}`} style={isMobile ? mobileNav : {}}>
         {[['inicio','◇','Inicio'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
@@ -2695,14 +2739,21 @@ function Tito({ usuario, abierto, setAbierto }) {
   const [msgs, setMsgs] = useState([]);
   const [input, setInput] = useState('');
   const [env, setEnv] = useState(false);
-  
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   const enviar = async () => {
     if (!input.trim() || env) return;
     const m = input.trim(); setInput('');
     const nuevosMsgs = [...msgs, { r: 'u', t: m }];
     setMsgs(nuevosMsgs); setEnv(true);
     try {
-      // Enviar historial de conversación para mantener contexto
       const historial = nuevosMsgs.slice(-10).map(msg => ({
         role: msg.r === 'u' ? 'user' : 'assistant',
         content: msg.t
@@ -2716,27 +2767,46 @@ Mensaje actual: ${m}`;
     } catch(e) { setMsgs(prev => [...prev, { r: 't', t: 'Error de conexión.' }]); }
     setEnv(false);
   };
-  
+
+  // Estilos inline para Tito móvil
+  const btnStyle = {
+    position: 'fixed', bottom: isMobile ? '10px' : '1.5rem', right: isMobile ? '10px' : '1.5rem',
+    width: isMobile ? '50px' : '60px', height: isMobile ? '50px' : '60px',
+    borderRadius: '50%', background: '#1a1a1a', border: '2px solid #d4af37',
+    cursor: 'pointer', overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+  };
+  const chatStyle = {
+    position: 'fixed', zIndex: 999, background: '#fff', borderRadius: '12px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden',
+    ...(isMobile ? {
+      bottom: '70px', left: '10px', right: '10px', width: 'auto', maxHeight: '60vh'
+    } : {
+      bottom: '6rem', right: '1.5rem', width: '340px', maxHeight: '450px'
+    })
+  };
+  const msgStyle = { whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: '1.5', margin: 0 };
+
   return (
     <>
-      <button className="tito-btn" onClick={() => setAbierto(!abierto)}>
-        <img src={TITO_IMG} alt="Tito" onError={e => e.target.style.display='none'} />
-        <span className="tito-fb">T</span>
+      <button style={btnStyle} onClick={() => setAbierto(!abierto)}>
+        <img src={TITO_IMG} alt="Tito" style={{width:'100%',height:'100%',objectFit:'cover',position:'absolute'}} onError={e => e.target.style.display='none'} />
+        <span style={{fontFamily:'Cinzel,serif',fontSize:'1.5rem',color:'#d4af37'}}>T</span>
       </button>
       {abierto && (
-        <div className="tito-chat">
-          <div className="tito-head">
-            <img src={TITO_IMG} alt="" className="tito-av" onError={e => e.target.style.display='none'} />
-            <div><strong>Tito</strong><small>Tu guía</small></div>
-            <button onClick={() => setAbierto(false)}>✕</button>
+        <div style={chatStyle}>
+          <div className="tito-head" style={{padding: isMobile ? '0.6rem' : '1rem'}}>
+            <img src={TITO_IMG} alt="" style={{width: isMobile ? '28px' : '36px', height: isMobile ? '28px' : '36px', borderRadius:'50%',objectFit:'cover'}} onError={e => e.target.style.display='none'} />
+            <div style={{flex:1}}><strong style={{display:'block',color:'#d4af37',fontFamily:'Cinzel,serif',fontSize:'0.9rem'}}>Tito</strong><small style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.6)'}}>Tu guía</small></div>
+            <button onClick={() => setAbierto(false)} style={{background:'none',border:'none',color:'rgba(255,255,255,0.5)',fontSize:'1.1rem',cursor:'pointer'}}>✕</button>
           </div>
-          <div className="tito-msgs">
-            <div className="msg-t"><p>¡Hola {usuario?.nombrePreferido}! Soy Tito. Preguntame sobre Mi Magia, los tréboles, las runas, las experiencias, o lo que necesites.</p></div>
-            {msgs.map((m,i) => <div key={i} className={m.r==='u'?'msg-u':'msg-t'}><p>{m.t}</p></div>)}
-            {env && <div className="msg-t"><p>...</p></div>}
+          <div className="tito-msgs" style={{flex:1,padding: isMobile ? '0.6rem' : '1rem',overflowY:'auto',display:'flex',flexDirection:'column',gap:'0.6rem',maxHeight: isMobile ? '35vh' : 'none'}}>
+            <div className="msg-t"><p style={msgStyle}>¡Hola {usuario?.nombrePreferido}! Soy Tito. Preguntame lo que necesites.</p></div>
+            {msgs.map((m,i) => <div key={i} className={m.r==='u'?'msg-u':'msg-t'}><p style={msgStyle}>{m.t}</p></div>)}
+            {env && <div className="msg-t"><p style={msgStyle}>...</p></div>}
           </div>
-          <div className="tito-input">
-            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} />
+          <div className="tito-input" style={{padding: isMobile ? '0.4rem' : '0.75rem'}}>
+            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} style={{fontSize: isMobile ? '0.8rem' : '0.85rem'}} />
             <button onClick={enviar} disabled={env}>→</button>
           </div>
         </div>
