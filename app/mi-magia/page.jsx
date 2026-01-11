@@ -3203,7 +3203,7 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .tito-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:60px;height:60px;border-radius:50%;background:#1a1a1a;border:2px solid #d4af37;cursor:pointer;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:1000;display:flex;align-items:center;justify-content:center}
 .tito-btn img{width:100%;height:100%;object-fit:cover;position:absolute}
 .tito-fb{font-family:'Cinzel',serif;font-size:1.5rem;color:#d4af37}
-.tito-chat{position:fixed;bottom:6rem;right:1.5rem;width:340px;height:450px;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);display:flex;flex-direction:column;z-index:999;overflow:hidden}
+.tito-chat{position:fixed;bottom:6rem;right:1.5rem;width:340px;max-height:450px;height:60vh;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);display:flex;flex-direction:column;z-index:999;overflow:hidden}
 .tito-head{display:flex;align-items:center;gap:0.75rem;padding:1rem;background:#1a1a1a}
 .tito-av{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .tito-head div{flex:1}
@@ -3262,8 +3262,8 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .carga-c p{margin-top:1rem;color:#666}
 @keyframes pulsar{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
 @media(max-width:1100px){.stats-g,.beneficios-grid,.membresias-grid,.cristales-grid{grid-template-columns:repeat(2,1fr)}.exp-grid,.elementos-grid,.regalos-grid,.grim-intro-cards{grid-template-columns:1fr}.canjes-grid,.packs-grid{grid-template-columns:repeat(2,1fr)}.info-grid,.benef-grid-int,.fases-mes{grid-template-columns:1fr}}
-@media(max-width:900px){.menu-btn{display:flex}.header{padding:0 1rem}.nav-overlay{display:block}.nav{transform:translateX(-100%);transition:transform 0.3s;box-shadow:none}.nav.abierto{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,0.15)}.contenido{margin-left:0}.user-info{display:none}.hstats{gap:0.5rem}.hstats span{padding:0.2rem 0.5rem;font-size:0.75rem}}
-@media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tito-chat{right:1rem;left:1rem;width:auto;bottom:5rem}.tito-btn{width:50px;height:50px;bottom:1rem;right:1rem}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
+@media(max-width:900px){.menu-btn{display:flex!important;background:#d4af37!important;border:none!important}.menu-btn span{background:#fff!important}.header{padding:0 0.75rem!important}.nav-overlay{display:block!important}.nav{transform:translateX(-100%)!important;transition:transform 0.3s}.nav.abierto{transform:translateX(0)!important;box-shadow:4px 0 20px rgba(0,0,0,0.15)}.contenido{margin-left:0!important}.user-info{display:none!important}.logo{font-size:0.85rem!important}.hstats{gap:0.4rem!important}.hstats span{padding:0.15rem 0.4rem!important;font-size:0.7rem!important}}
+@media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tito-chat{right:0.5rem!important;left:0.5rem!important;width:auto!important;bottom:4.5rem!important;max-height:55vh!important;height:auto!important;border-radius:12px!important}.tito-btn{width:45px!important;height:45px!important;bottom:0.5rem!important;right:0.5rem!important}.tito-head{padding:0.75rem!important}.tito-msgs{max-height:35vh!important}.tito-input{padding:0.5rem!important}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
 
 /* ═══════════════════════════════════════════════════════════════
    LUNA CALENDAR STYLES - PREMIUM
