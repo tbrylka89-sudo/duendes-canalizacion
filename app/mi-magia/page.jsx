@@ -1481,9 +1481,17 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
           <p>{usuario.circuloPrueba ? `Prueba gratuita` : `Miembro activo`}{usuario.circuloExpira ? ` hasta ${new Date(usuario.circuloExpira).toLocaleDateString('es-UY')}` : ''}</p>
         </div>
 
-        <div className="circulo-tabs">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'8px',marginBottom:'1.5rem'}}>
           {[['inicio','◇','Inicio'],['contenido','✦','Contenido'],['guia','☽','Guía Lunar'],['comunidad','❧','Comunidad']].map(([k,i,t]) =>
-            <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}><span>{i}</span>{t}</button>
+            <button key={k} onClick={() => setTab(k)} style={{
+              display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',
+              padding:'12px 8px',background: tab===k ? '#1a1a1a' : '#fff',
+              color: tab===k ? '#fff' : '#1a1a1a',
+              border:'1px solid',borderColor: tab===k ? '#1a1a1a' : '#e0e0e0',
+              borderRadius:'10px',fontSize:'0.9rem',cursor:'pointer',fontFamily:'Cinzel,serif'
+            }}>
+              <span style={{color: tab===k ? '#d4af37' : '#d4af37'}}>{i}</span>{t}
+            </button>
           )}
         </div>
 
