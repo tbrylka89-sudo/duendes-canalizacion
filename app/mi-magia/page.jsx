@@ -2862,7 +2862,7 @@ Mensaje actual: ${m}`;
             {env && <div style={{background:'#f5f5f5',padding:'0.6rem 0.9rem',borderRadius:'12px',maxWidth:'85%',alignSelf:'flex-start'}}><p style={msgStyle}>...</p></div>}
           </div>
           <div style={{display:'flex',gap:'0.5rem',padding: mobile ? '0.5rem' : '0.75rem',borderTop:'1px solid #f0f0f0',background:'#fff'}}>
-            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} style={{flex:1,padding:'0.6rem 1rem',border:'1px solid #e0e0e0',borderRadius:'50px',fontSize: mobile ? '0.8rem' : '0.85rem',fontFamily:'Cormorant Garamond,serif'}} />
+            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} style={{flex:1,padding:'0.6rem 1rem',border:'1px solid #e0e0e0',borderRadius:'50px',fontSize:'16px',fontFamily:'Cormorant Garamond,serif'}} />
             <button onClick={enviar} disabled={env} style={{width:'36px',height:'36px',borderRadius:'50%',background:env?'#ddd':'#d4af37',border:'none',color:'#1a1a1a',fontSize:'1.1rem',cursor:env?'not-allowed':'pointer'}}>→</button>
           </div>
         </div>
@@ -2878,6 +2878,7 @@ Mensaje actual: ${m}`;
 const estilos = `
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box!important}
+input,textarea,select{font-size:16px!important}
 html{overflow-x:hidden!important;width:100%!important;max-width:100%!important}
 body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a1a1a;font-size:18px;line-height:1.6;position:relative}
 .app{min-height:100vh;overflow-x:hidden!important;max-width:100%!important;width:100%!important}

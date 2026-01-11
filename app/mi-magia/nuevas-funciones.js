@@ -95,24 +95,24 @@ export function SenalDelDia({ usuario }) {
       )}
 
       <div className="senal-footer">
-        <div className="senal-accion">
-          <strong>Acción sugerida:</strong>
-          <p>{senal.accion_sugerida}</p>
+        <div className="senal-accion" style={{background:'#0a0a0a',padding:'10px',borderRadius:'8px',textAlign:'center'}}>
+          <strong style={{color:'#d4af37',display:'block',fontSize:'0.8rem',marginBottom:'5px'}}>Acción sugerida:</strong>
+          <p style={{color:'#fff',margin:0,fontSize:'0.85rem'}}>{senal.accion_sugerida}</p>
         </div>
 
         {senal.cristal_del_dia && (
-          <div className="senal-cristal">
-            <span>💎</span>
+          <div className="senal-cristal" style={{background:'#0a0a0a',padding:'10px',borderRadius:'8px',textAlign:'center'}}>
+            <span style={{fontSize:'1.5rem'}}>💎</span>
             <div>
-              <strong>{senal.cristal_del_dia.nombre}</strong>
-              <small>{senal.cristal_del_dia.poder}</small>
+              <strong style={{color:'#d4af37',fontSize:'0.95rem'}}>{senal.cristal_del_dia.nombre}</strong>
+              <small style={{color:'#fff',display:'block',fontSize:'0.75rem'}}>{senal.cristal_del_dia.poder}</small>
             </div>
           </div>
         )}
 
-        <div className="senal-numero-significado">
-          <span>{senal.numero_dia}</span>
-          <small>{senal.significado_numero}</small>
+        <div className="senal-numero-significado" style={{background:'#0a0a0a',padding:'10px',borderRadius:'8px',textAlign:'center'}}>
+          <span style={{display:'block',fontSize:'1.5rem',color:'#d4af37'}}>{senal.numero_dia}</span>
+          <small style={{color:'#fff',fontSize:'0.75rem'}}>{senal.significado_numero}</small>
         </div>
       </div>
 
@@ -354,32 +354,36 @@ export function CosmosMes({ usuario }) {
 
       {tabActivo === 'luna' && cosmos.luna && (
         <div className="cosmos-luna">
-          <div className="luna-actual">
-            <span className="luna-emoji-xl">{cosmos.luna.emoji}</span>
+          <div style={{display:'flex',alignItems:'center',gap:'20px',background:'#0a0a0a',padding:'20px',borderRadius:'16px',marginBottom:'20px'}}>
+            <span style={{fontSize:'4rem'}}>{cosmos.luna.emoji}</span>
             <div>
-              <h3>{cosmos.luna.nombre}</h3>
-              <p>{cosmos.luna.energia}</p>
-              <small>{cosmos.luna.porcentajeIluminacion || cosmos.luna.iluminacion}% iluminada</small>
+              <h3 style={{color:'#fff',margin:'0 0 5px'}}>{cosmos.luna.nombre}</h3>
+              <p style={{color:'#fff',margin:0}}>{cosmos.luna.energia}</p>
+              <small style={{color:'#fff'}}>{cosmos.luna.porcentajeIluminacion || cosmos.luna.iluminacion}% iluminada</small>
             </div>
           </div>
 
-          <div className="luna-ritual">
-            <h4>Ritual recomendado:</h4>
-            <p>{cosmos.luna.ritual}</p>
+          <div style={{background:'#1f1f1f',padding:'15px',borderRadius:'12px',marginBottom:'15px'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>Ritual recomendado:</h4>
+            <p style={{color:'#fff',margin:0}}>{cosmos.luna.ritual}</p>
           </div>
 
-          <div className="proximas-fases">
-            <h4>Próximas fechas importantes:</h4>
-            <div className="fechas-grid">
-              <div className="fecha-item">
-                <span>🌑</span>
-                <strong>Luna Nueva</strong>
-                <small>{cosmos.luna.proximaNueva ? new Date(cosmos.luna.proximaNueva).toLocaleDateString('es-UY') : '-'}</small>
+          <div>
+            <h4 style={{color:'#d4af37',margin:'0 0 15px'}}>Próximas fechas importantes:</h4>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'10px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',background:'#1f1f1f',padding:'12px',borderRadius:'10px'}}>
+                <span style={{fontSize:'1.5rem'}}>🌑</span>
+                <div>
+                  <strong style={{display:'block',color:'#fff'}}>Luna Nueva</strong>
+                  <small style={{color:'#fff'}}>{cosmos.luna.proximaNueva ? new Date(cosmos.luna.proximaNueva).toLocaleDateString('es-UY') : '-'}</small>
+                </div>
               </div>
-              <div className="fecha-item">
-                <span>🌕</span>
-                <strong>Luna Llena</strong>
-                <small>{cosmos.luna.proximaLlena ? new Date(cosmos.luna.proximaLlena).toLocaleDateString('es-UY') : '-'}</small>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',background:'#1f1f1f',padding:'12px',borderRadius:'10px'}}>
+                <span style={{fontSize:'1.5rem'}}>🌕</span>
+                <div>
+                  <strong style={{display:'block',color:'#fff'}}>Luna Llena</strong>
+                  <small style={{color:'#fff'}}>{cosmos.luna.proximaLlena ? new Date(cosmos.luna.proximaLlena).toLocaleDateString('es-UY') : '-'}</small>
+                </div>
               </div>
             </div>
           </div>
@@ -391,24 +395,24 @@ export function CosmosMes({ usuario }) {
           <div className="sol-actual">
             <span>☀️</span>
             <div>
-              <strong>Sol en {cosmos.astrologia.signo}</strong>
-              <p>{cosmos.astrologia.energia}</p>
+              <strong style={{color:'#fff'}}>Sol en {cosmos.astrologia.signo}</strong>
+              <p style={{color:'#fff',margin:'5px 0 0'}}>{cosmos.astrologia.energia}</p>
             </div>
           </div>
 
           <div className="astro-info">
-            <div className="astro-item">
-              <strong>Elemento:</strong> {cosmos.astrologia.elemento}
+            <div className="astro-item" style={{color:'#fff'}}>
+              <strong style={{color:'#d4af37'}}>Elemento:</strong> {cosmos.astrologia.elemento}
             </div>
-            <div className="astro-item">
-              <strong>Regente:</strong> {cosmos.astrologia.regente}
+            <div className="astro-item" style={{color:'#fff'}}>
+              <strong style={{color:'#d4af37'}}>Regente:</strong> {cosmos.astrologia.regente}
             </div>
           </div>
 
           {cosmos.astrologia.mensaje && (
-            <div className="energia-colectiva">
-              <h4>Energía del mes:</h4>
-              <p>{cosmos.astrologia.mensaje}</p>
+            <div className="energia-colectiva" style={{background:'#1f1f1f',padding:'15px',borderRadius:'12px'}}>
+              <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>Energía del mes:</h4>
+              <p style={{color:'#fff',margin:0}}>{cosmos.astrologia.mensaje}</p>
             </div>
           )}
         </div>
@@ -418,46 +422,46 @@ export function CosmosMes({ usuario }) {
         <div className="cosmos-cristal">
           <div className="cristal-mes">
             <span>💎</span>
-            <h3>{cosmos.cristal.nombre}</h3>
+            <h3 style={{color:'#fff',margin:0}}>{cosmos.cristal.nombre}</h3>
           </div>
-          <p className="cristal-poder">{cosmos.cristal.poder}</p>
-          <div className="cristal-elemento">
-            <strong>Elemento:</strong> {cosmos.cristal.elemento}
+          <p style={{color:'#fff',fontStyle:'italic',marginBottom:'15px'}}>{cosmos.cristal.poder}</p>
+          <div style={{background:'#1f1f1f',padding:'12px',borderRadius:'10px',marginBottom:'10px',color:'#fff'}}>
+            <strong style={{color:'#d4af37'}}>Elemento:</strong> {cosmos.cristal.elemento}
           </div>
-          <div className="cristal-ritual">
-            <h4>Cómo trabajar con él este mes:</h4>
-            <p>{cosmos.cristal.como_usar}</p>
+          <div style={{background:'#1f1f1f',padding:'15px',borderRadius:'12px',marginBottom:'15px'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>Cómo trabajar con él este mes:</h4>
+            <p style={{color:'#fff',margin:0}}>{cosmos.cristal.como_usar}</p>
           </div>
-          <div className="cristal-limpiar">
-            <h4>Limpieza:</h4>
-            <p>{cosmos.cristal.limpiar}</p>
+          <div style={{background:'#1f1f1f',padding:'15px',borderRadius:'12px',marginBottom:'15px'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>Limpieza:</h4>
+            <p style={{color:'#fff',margin:0}}>{cosmos.cristal.limpiar}</p>
           </div>
         </div>
       )}
 
       {tabActivo === 'guardian' && cosmos.guardian && (
         <div className="cosmos-guardian">
-          <h3>Guardián del Mes: {cosmos.guardian.tipo}</h3>
-          <p className="guardian-desc">{cosmos.guardian.mensaje}</p>
+          <h3 style={{color:'#d4af37',margin:'0 0 10px'}}>Guardián del Mes: {cosmos.guardian.tipo}</h3>
+          <p style={{color:'#fff',marginBottom:'15px'}}>{cosmos.guardian.mensaje}</p>
 
-          <div className="guardian-mensaje">
-            <h4>✦ Recomendación</h4>
-            <p className="mensaje-destacado">{cosmos.guardian.recomendacion}</p>
+          <div style={{background:'#0a0a0a',padding:'15px',borderRadius:'12px',borderLeft:'3px solid #d4af37'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>✦ Recomendación</h4>
+            <p style={{color:'#fff',fontSize:'1.1rem',lineHeight:'1.6',margin:0}}>{cosmos.guardian.recomendacion}</p>
           </div>
         </div>
       )}
 
       {cosmos.fechas && cosmos.fechas.length > 0 && (
-        <div className="fechas-importantes">
-          <h3>Fechas Importantes del Mes</h3>
-          <div className="fechas-lista">
+        <div style={{marginTop:'20px',paddingTop:'20px',borderTop:'1px solid #333'}}>
+          <h3 style={{color:'#d4af37',margin:'0 0 15px'}}>Fechas Importantes del Mes</h3>
+          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
             {cosmos.fechas.map((f, i) => (
-              <div key={i} className="fecha-item-full">
-                <span>✦</span>
+              <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px',background:'#1f1f1f',borderRadius:'10px'}}>
+                <span style={{fontSize:'1.5rem'}}>✦</span>
                 <div>
-                  <strong>{f.evento}</strong>
-                  <small>{new Date(f.fecha).toLocaleDateString('es-UY')}</small>
-                  <p className="fecha-desc">{f.descripcion}</p>
+                  <strong style={{color:'#fff'}}>{f.evento}</strong>
+                  <small style={{display:'block',color:'#ccc'}}>{new Date(f.fecha).toLocaleDateString('es-UY')}</small>
+                  <p style={{color:'#fff',fontSize:'0.85rem',margin:'5px 0 0'}}>{f.descripcion}</p>
                 </div>
               </div>
             ))}
