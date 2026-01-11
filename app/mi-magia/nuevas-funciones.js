@@ -346,7 +346,7 @@ export function CosmosMes({ usuario }) {
             <div>
               <h3>{cosmos.luna.nombre}</h3>
               <p>{cosmos.luna.energia}</p>
-              <small>{cosmos.luna.iluminacion}% iluminada</small>
+              <small>{cosmos.luna.porcentajeIluminacion || cosmos.luna.iluminacion}% iluminada</small>
             </div>
           </div>
 
@@ -361,12 +361,12 @@ export function CosmosMes({ usuario }) {
               <div className="fecha-item">
                 <span>🌑</span>
                 <strong>Luna Nueva</strong>
-                <small>{new Date(cosmos.luna.proximaNueva).toLocaleDateString('es-UY')}</small>
+                <small>{cosmos.luna.proximaNueva ? new Date(cosmos.luna.proximaNueva).toLocaleDateString('es-UY') : '-'}</small>
               </div>
               <div className="fecha-item">
                 <span>🌕</span>
                 <strong>Luna Llena</strong>
-                <small>{new Date(cosmos.luna.proximaLlena).toLocaleDateString('es-UY')}</small>
+                <small>{cosmos.luna.proximaLlena ? new Date(cosmos.luna.proximaLlena).toLocaleDateString('es-UY') : '-'}</small>
               </div>
             </div>
           </div>
@@ -376,73 +376,86 @@ export function CosmosMes({ usuario }) {
       {tabActivo === 'astro' && cosmos.astrologia && (
         <div className="cosmos-astro">
           <div className="sol-actual">
-            <span>{cosmos.astrologia.sol.emoji}</span>
+            <span>☀️</span>
             <div>
-              <strong>Sol en {cosmos.astrologia.sol.signo}</strong>
-              <p>{cosmos.astrologia.sol.energia}</p>
+              <strong>Sol en {cosmos.astrologia.signo}</strong>
+              <p>{cosmos.astrologia.energia}</p>
             </div>
           </div>
 
-          {cosmos.astrologia.mercurio_retrogrado && (
-            <div className="alerta-retrogrado">
-              <span>⚠️</span>
-              <p>Mercurio Retrógrado activo - cuidado con comunicaciones y tecnología</p>
+          <div className="astro-info">
+            <div className="astro-item">
+              <strong>Elemento:</strong> {cosmos.astrologia.elemento}
             </div>
-          )}
+            <div className="astro-item">
+              <strong>Regente:</strong> {cosmos.astrologia.regente}
+            </div>
+          </div>
 
-          {cosmos.astrologia.energia_colectiva && (
+          {cosmos.astrologia.mensaje && (
             <div className="energia-colectiva">
-              <h4>Energía colectiva del mes:</h4>
-              <p>{cosmos.astrologia.energia_colectiva}</p>
+              <h4>Energía del mes:</h4>
+              <p>{cosmos.astrologia.mensaje}</p>
             </div>
           )}
         </div>
       )}
 
-      {tabActivo === 'cristal' && cosmos.cristal_del_mes && (
+      {tabActivo === 'cristal' && cosmos.cristal && (
         <div className="cosmos-cristal">
           <div className="cristal-mes">
             <span>💎</span>
-            <h3>{cosmos.cristal_del_mes.nombre}</h3>
+            <h3>{cosmos.cristal.nombre}</h3>
           </div>
-          <p className="cristal-poder">{cosmos.cristal_del_mes.poder}</p>
-          <div className="cristal-chakra">
-            <strong>Chakra:</strong> {cosmos.cristal_del_mes.chakra}
+          <p className="cristal-poder">{cosmos.cristal.poder}</p>
+          <div className="cristal-elemento">
+            <strong>Elemento:</strong> {cosmos.cristal.elemento}
           </div>
           <div className="cristal-ritual">
             <h4>Cómo trabajar con él este mes:</h4>
-            <p>Colocalo cerca de tu guardián durante la luna llena. Meditá 5 minutos diarios sosteniéndolo. Llevalo contigo los días importantes.</p>
+            <p>{cosmos.cristal.como_usar}</p>
+          </div>
+          <div className="cristal-limpiar">
+            <h4>Limpieza:</h4>
+            <p>{cosmos.cristal.limpiar}</p>
           </div>
         </div>
       )}
 
-      {tabActivo === 'guardian' && cosmos.guardian_del_mes && (
+      {tabActivo === 'guardian' && cosmos.guardian && (
         <div className="cosmos-guardian">
-          <h3>{cosmos.guardian_del_mes.nombre}</h3>
-          <p className="guardian-tipo">{cosmos.guardian_del_mes.tipo}</p>
-          <p className="guardian-desc">{cosmos.guardian_del_mes.descripcion}</p>
+          <h3>Guardián del Mes: {cosmos.guardian.tipo}</h3>
+          <p className="guardian-desc">{cosmos.guardian.mensaje}</p>
 
           <div className="guardian-mensaje">
-            <h4>✦ Mensaje del Guardián</h4>
-            <p className="mensaje-destacado">{cosmos.guardian_del_mes.mensaje}</p>
+            <h4>✦ Recomendación</h4>
+            <p className="mensaje-destacado">{cosmos.guardian.recomendacion}</p>
           </div>
         </div>
       )}
 
-      {cosmos.fechas_importantes && cosmos.fechas_importantes.length > 0 && (
+      {cosmos.fechas && cosmos.fechas.length > 0 && (
         <div className="fechas-importantes">
           <h3>Fechas Importantes del Mes</h3>
           <div className="fechas-lista">
-            {cosmos.fechas_importantes.map((f, i) => (
+            {cosmos.fechas.map((f, i) => (
               <div key={i} className="fecha-item-full">
-                <span>{f.emoji}</span>
+                <span>✦</span>
                 <div>
-                  <strong>{f.nombre}</strong>
+                  <strong>{f.evento}</strong>
                   <small>{new Date(f.fecha).toLocaleDateString('es-UY')}</small>
+                  <p className="fecha-desc">{f.descripcion}</p>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {cosmos.afirmacion && (
+        <div className="cosmos-afirmacion">
+          <h4>✦ Afirmación del Mes</h4>
+          <p className="afirmacion-texto">"{cosmos.afirmacion}"</p>
         </div>
       )}
     </div>
@@ -971,6 +984,13 @@ export const estilosNuevos = `
   padding: 10px;
   background: #0a0a0a;
   border-radius: 8px;
+  color: #e0e0e0;
+}
+.senal-accion p, .senal-cristal p, .senal-numero-significado p,
+.senal-accion small, .senal-cristal small {
+  color: #ccc;
+  margin: 0;
+  font-size: 0.85rem;
 }
 .senal-accion strong, .senal-cristal strong {
   display: block;
@@ -979,6 +999,8 @@ export const estilosNuevos = `
   margin-bottom: 5px;
 }
 .senal-cristal span { font-size: 1.5rem; }
+.senal-cristal div strong { color: #d4af37; font-size: 0.95rem; }
+.senal-cristal div small { color: #aaa; font-size: 0.75rem; display: block; }
 .senal-numero-significado span {
   display: block;
   font-size: 1.5rem;
@@ -986,7 +1008,7 @@ export const estilosNuevos = `
 }
 .senal-numero-significado small {
   font-size: 0.75rem;
-  color: #888;
+  color: #aaa;
 }
 .senal-luna-mensaje {
   margin-top: 15px;
@@ -1262,6 +1284,45 @@ export const estilosNuevos = `
 .fecha-item-full span { font-size: 1.5rem; }
 .fecha-item-full strong { color: #fff; }
 .fecha-item-full small { display: block; color: #888; }
+.fecha-desc { color: #aaa; font-size: 0.85rem; margin: 5px 0 0; }
+.astro-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.astro-item {
+  background: #1f1f1f;
+  padding: 12px;
+  border-radius: 10px;
+  color: #ccc;
+}
+.astro-item strong { color: #d4af37; }
+.sol-actual p { color: #ccc; margin: 5px 0 0; }
+.cristal-elemento, .cristal-limpiar {
+  background: #1f1f1f;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  color: #ccc;
+}
+.cristal-elemento strong, .cristal-limpiar h4 { color: #d4af37; }
+.cristal-limpiar p { margin: 5px 0 0; }
+.cosmos-afirmacion {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #d4af3722, #d4af3711);
+  border-radius: 16px;
+  border: 1px solid #d4af3744;
+  text-align: center;
+}
+.cosmos-afirmacion h4 { color: #d4af37; margin: 0 0 10px; }
+.afirmacion-texto {
+  font-size: 1.2rem;
+  color: #fff;
+  font-style: italic;
+  line-height: 1.5;
+}
 
 /* GUÍA DE CRISTALES */
 .guia-cristales {

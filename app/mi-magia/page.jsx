@@ -1032,6 +1032,7 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
   const [contenidos, setContenidos] = useState([]);
   const [cargandoLuna, setCargandoLuna] = useState(false);
   const [cargandoContenido, setCargandoContenido] = useState(false);
+  const [contenidoModal, setContenidoModal] = useState(null);
   const esUY = pais === 'UY';
 
   useEffect(() => {
@@ -1135,16 +1136,43 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
                     <h4>{c.titulo}</h4>
                     <p>{c.extracto}</p>
                     <small>Por {c.autor} • {c.vistas} vistas</small>
-                    <button className="btn-sec">Ver {c.tipo}</button>
+                    <button className="btn-sec" onClick={() => setContenidoModal(c)}>Ver {c.tipo}</button>
                   </div>
                 )) : (
-                  <>
-                    <div className="contenido-item"><span>📖</span><h4>Guía: Los 8 Sabbats del Año</h4><p>Calendario esotérico completo con rituales para cada celebración.</p><button className="btn-sec">Ver guía</button></div>
-                    <div className="contenido-item"><span>🕯️</span><h4>DIY: Velas con intención</h4><p>Cómo hacer tus propias velas rituales paso a paso.</p><button className="btn-sec">Ver tutorial</button></div>
-                    <div className="contenido-item"><span>🎧</span><h4>Meditación: Conexión con tu guardián</h4><p>Audio guiado de 15 minutos para fortalecer el vínculo.</p><button className="btn-sec">Escuchar</button></div>
-                  </>
+                  <p className="sin-contenido">Cargando contenido exclusivo...</p>
                 )}
               </div>
+
+              {/* Modal de Contenido */}
+              {contenidoModal && (
+                <div className="contenido-modal-overlay" onClick={() => setContenidoModal(null)}>
+                  <div className="contenido-modal" onClick={e => e.stopPropagation()}>
+                    <button className="modal-cerrar" onClick={() => setContenidoModal(null)}>×</button>
+                    <div className="modal-header">
+                      <span>{contenidoModal.tipo === 'ritual' ? '🕯️' : contenidoModal.tipo === 'meditacion' ? '🎧' : contenidoModal.tipo === 'guia' ? '📖' : '✦'}</span>
+                      <div>
+                        <h2>{contenidoModal.titulo}</h2>
+                        <p className="modal-meta">Por {contenidoModal.autor} • {contenidoModal.vistas} vistas</p>
+                      </div>
+                    </div>
+                    <div className="modal-contenido">
+                      {contenidoModal.contenido ? (
+                        contenidoModal.contenido.split('\n').map((p, i) => {
+                          if (p.startsWith('## ')) return <h2 key={i}>{p.replace('## ', '')}</h2>;
+                          if (p.startsWith('### ')) return <h3 key={i}>{p.replace('### ', '')}</h3>;
+                          if (p.startsWith('**') && p.endsWith('**')) return <h4 key={i}>{p.replace(/\*\*/g, '')}</h4>;
+                          if (p.startsWith('- ')) return <li key={i}>{p.replace('- ', '')}</li>;
+                          if (p.startsWith('✦')) return <p key={i} className="mensaje-cierre">{p}</p>;
+                          if (p.trim() === '') return <br key={i} />;
+                          return <p key={i}>{p.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>;
+                        })
+                      ) : (
+                        <p>{contenidoModal.extracto}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             )}
             <div className="temas-explorar">
               <h3>Temas que exploramos:</h3>
@@ -1897,7 +1925,30 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .luna-error{text-align:center;padding:2rem;color:#dc2626;background:#fef2f2;border-radius:12px}
 .prueba-usada{color:#888;font-size:0.85rem;margin-top:0.5rem!important}
 .contenido-item small{display:block;font-size:0.75rem;color:#888;margin-bottom:0.5rem}
-@media(max-width:768px){.luna-hero{grid-template-columns:1fr}.fases-grid{grid-template-columns:1fr}}
+.sin-contenido{text-align:center;color:#888;padding:2rem}
+
+/* MODAL DE CONTENIDO */
+.contenido-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.contenido-modal{background:linear-gradient(180deg,#141414 0%,#0a0a0a 100%);border-radius:20px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;border:1px solid #d4af3744;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal-cerrar{position:absolute;top:15px;right:20px;background:none;border:none;color:#888;font-size:28px;cursor:pointer;transition:color 0.2s;z-index:10}
+.modal-cerrar:hover{color:#d4af37}
+.modal-header{display:flex;align-items:center;gap:15px;padding:25px 25px 15px;border-bottom:1px solid #333;position:relative}
+.modal-header span{font-size:2.5rem}
+.modal-header h2{margin:0;color:#d4af37;font-size:1.4rem}
+.modal-meta{margin:5px 0 0;color:#888;font-size:0.85rem}
+.modal-contenido{padding:25px;color:#ddd;line-height:1.8}
+.modal-contenido h2{color:#d4af37;font-size:1.3rem;margin:25px 0 15px;padding-bottom:8px;border-bottom:1px solid #333}
+.modal-contenido h3{color:#fff;font-size:1.1rem;margin:20px 0 10px}
+.modal-contenido h4{color:#d4af37;font-size:1rem;margin:15px 0 8px}
+.modal-contenido p{margin:10px 0}
+.modal-contenido li{margin:8px 0;padding-left:10px;list-style:none}
+.modal-contenido li::before{content:"◆";color:#d4af37;margin-right:10px;font-size:0.7rem}
+.modal-contenido em{font-style:italic;color:#aaa}
+.modal-contenido strong{color:#fff}
+.mensaje-cierre{margin-top:25px;padding:15px;background:#d4af3711;border-radius:10px;border-left:3px solid #d4af37;font-style:italic;color:#d4af37}
+
+@media(max-width:768px){.luna-hero{grid-template-columns:1fr}.fases-grid{grid-template-columns:1fr}.contenido-modal{margin:10px;max-height:90vh}}
 
 /* ═══ NUEVAS FUNCIONES ESTILOS ═══ */
 .senal-card{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #d4af3733}
