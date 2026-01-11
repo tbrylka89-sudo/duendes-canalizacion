@@ -4,10 +4,12 @@
 // Voces personalizadas de Thibisay + voces de Eleven Labs
 const VOCES = {
   // === VOCES PROPIAS DE DUENDES ===
-  // Voice ID compartido de Thibisay: knhUzs4lao5jJEzGotGw
-  'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'knhUzs4lao5jJEzGotGw',
-  'thibisay-rapido': process.env.ELEVENLABS_VOZ_THIBISAY_RAPIDO || 'knhUzs4lao5jJEzGotGw',
-  'duende': process.env.ELEVENLABS_VOZ_THIBISAY || 'knhUzs4lao5jJEzGotGw',
+  // Thibisay profesional: knhUzs4lao5jJEzGotGw
+  // Thibisay rápido: ofSX50hgXXAqhe3nRhJI
+  'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'ofSX50hgXXAqhe3nRhJI',
+  'thibisay-rapido': 'ofSX50hgXXAqhe3nRhJI',
+  'thibisay-pro': 'knhUzs4lao5jJEzGotGw',
+  'duende': 'ofSX50hgXXAqhe3nRhJI',
 
   // === VOCES DE ELEVEN LABS ===
   'rachel': '21m00Tcm4TlvDq8ikWAM',      // Cálida, narradora
@@ -68,11 +70,17 @@ export async function POST(request) {
     // Intentar con la voz seleccionada
     let response = await llamarElevenLabs(voiceId);
 
-    // Si falla con 404, intentar con voz de fallback (Rachel - voz cálida)
+    // Si falla con 404, intentar con Thibisay rápido, luego Rachel
     if (response.status === 404) {
-      console.log('Voz no encontrada, usando fallback Rachel');
-      voiceId = VOCES.rachel; // 21m00Tcm4TlvDq8ikWAM
+      console.log('Voz no encontrada, probando Thibisay rápido');
+      voiceId = 'ofSX50hgXXAqhe3nRhJI';
       response = await llamarElevenLabs(voiceId);
+
+      if (response.status === 404) {
+        console.log('Thibisay rápido no encontrado, usando Rachel');
+        voiceId = VOCES.rachel;
+        response = await llamarElevenLabs(voiceId);
+      }
     }
 
     if (!response.ok) {
