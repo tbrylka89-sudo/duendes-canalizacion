@@ -132,11 +132,16 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 13. BUSCAR PEDIDO: {"accion": "buscar_pedido", "datos": {"query": "email, nombre o numero de pedido"}}
 14. VER PRODUCTOS: {"accion": "ver_productos", "datos": {"filtro": "nombre o categoria"}}
 15. DESTACAR PRODUCTO: {"accion": "destacar_producto", "datos": {"productoId": "123", "destacado": true}}
+16. SINCRONIZAR PRODUCTOS: {"accion": "sincronizar_productos"}
 
 ### ESTADISTICAS
 16. STATS COMPLETAS: {"accion": "ver_stats"}
 17. ACTIVIDAD RECIENTE: {"accion": "ver_actividad"}
 18. REPORTE VENTAS: {"accion": "reporte_ventas", "datos": {"periodo": "hoy|semana|mes"}}
+
+### CREATIVIDAD (IA)
+19. GENERAR IMAGEN: {"accion": "generar_imagen", "datos": {"prompt": "descripcion de la imagen", "estilo": "magico|duende|watercolor|realista|natural"}}
+20. GENERAR VOZ: {"accion": "generar_voz", "datos": {"texto": "texto a convertir en audio", "voz": "duende|bella|rachel"}}
 
 ## EJEMPLOS DE USO NATURAL
 
@@ -149,6 +154,9 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 - "A todos los del circulo dales 20 treboles" -> regalo_masivo
 - "Quien compro mas este mes?" -> respondes con los datos
 - "Cuantos circulos vencen esta semana?" -> circulos_por_vencer
+- "Sincroniza los productos de WooCommerce" -> sincronizar_productos
+- "Genera una imagen de un duende en el bosque" -> generar_imagen
+- "Convierte este texto a voz" -> generar_voz
 
 ## REGLAS DE ORO
 
@@ -552,6 +560,96 @@ _El contenido completo esta disponible en la seccion de Contenido del admin._`
       };
     }
 
+    case 'sincronizar_productos': {
+      try {
+        const WOO_URL = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+        const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+        const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
+
+        if (!WOO_KEY || !WOO_SECRET) {
+          return { mensaje: '⚠️ Credenciales de WooCommerce no configuradas. Verifica las variables de entorno WC_CONSUMER_KEY y WC_CONSUMER_SECRET.' };
+        }
+
+        const auth = Buffer.from(`${WOO_KEY}:${WOO_SECRET}`).toString('base64');
+
+        // Obtener productos de WooCommerce
+        let todosProductos = [];
+        let page = 1;
+        let hasMore = true;
+
+        while (hasMore && page <= 5) {
+          const response = await fetch(
+            `${WOO_URL}/wp-json/wc/v3/products?per_page=100&page=${page}`,
+            {
+              headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          if (!response.ok) {
+            return { mensaje: `❌ Error conectando con WooCommerce: ${response.status}` };
+          }
+
+          const productos = await response.json();
+          if (productos.length === 0) {
+            hasMore = false;
+          } else {
+            todosProductos = [...todosProductos, ...productos];
+            page++;
+          }
+        }
+
+        // Mapear productos
+        const productosWoo = todosProductos.map(p => ({
+          id: `woo_${p.id}`,
+          wooId: p.id,
+          nombre: p.name,
+          precio: parseFloat(p.price) || 0,
+          precioRegular: parseFloat(p.regular_price) || 0,
+          precioOferta: parseFloat(p.sale_price) || null,
+          stock: p.stock_quantity || 0,
+          stockStatus: p.stock_status,
+          categoria: p.categories?.[0]?.name || 'Sin categoria',
+          categorias: p.categories?.map(c => c.name) || [],
+          imagen: p.images?.[0]?.src || null,
+          imagenes: p.images?.map(i => i.src) || [],
+          descripcion: (p.short_description || '').replace(/<[^>]*>/g, ''),
+          slug: p.slug,
+          sku: p.sku,
+          wooUrl: p.permalink,
+          vendidos: p.total_sales || 0,
+          destacado: p.featured || false,
+          estado: p.status,
+          origen: 'woocommerce',
+          sincronizadoEn: new Date().toISOString()
+        }));
+
+        // Guardar en KV
+        await kv.set('productos:catalogo', productosWoo);
+        await kv.set('productos:ultima_sincronizacion', {
+          fecha: new Date().toISOString(),
+          total: productosWoo.length
+        });
+
+        // Contar categorias
+        const categorias = [...new Set(productosWoo.map(p => p.categoria))];
+
+        return {
+          mensaje: `✅ **Sincronizacion completada!**
+
+📦 **${productosWoo.length} productos** sincronizados desde WooCommerce
+📁 **${categorias.length} categorias:** ${categorias.slice(0, 5).join(', ')}${categorias.length > 5 ? '...' : ''}
+🕐 Sincronizado: ${new Date().toLocaleString('es-UY')}
+
+_Podes ver los productos en la seccion Productos del admin._`
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error sincronizando: ${e.message}` };
+      }
+    }
+
     case 'ver_actividad': {
       const userKeys = await kv.keys('user:*');
       const elegidoKeys = await kv.keys('elegido:*');
@@ -656,6 +754,118 @@ _El contenido completo esta disponible en la seccion de Contenido del admin._`
       await kv.set(userKey, user);
 
       return { mensaje: `✓ Nota agregada para ${user.nombre || email}:\n"${nota}"` };
+    }
+
+    case 'generar_imagen': {
+      const { prompt, estilo = 'magico' } = datos;
+      if (!prompt) {
+        return { mensaje: 'Necesito que me digas que imagen queres generar.' };
+      }
+
+      if (!process.env.OPENAI_API_KEY) {
+        return { mensaje: '⚠️ OPENAI_API_KEY no esta configurada.' };
+      }
+
+      try {
+        const estilos = {
+          magico: 'magical forest, golden hour, mystical, soft bokeh, fantasy art',
+          watercolor: 'watercolor painting, soft edges, dreamy, artistic',
+          realista: 'photorealistic, high detail, professional photography',
+          natural: 'nature photography, green forest, moss, crystals, earth tones',
+          duende: 'whimsical forest creature, magical, enchanted, soft lighting, fairy tale style'
+        };
+
+        const promptFinal = `${prompt}, ${estilos[estilo] || estilos.magico}, high quality, beautiful`;
+
+        const res = await fetch('https://api.openai.com/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'dall-e-3',
+            prompt: promptFinal,
+            n: 1,
+            size: '1024x1024',
+            quality: 'standard'
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          return { mensaje: `❌ Error de OpenAI: ${data.error.message}` };
+        }
+
+        if (data.data?.[0]?.url) {
+          return {
+            mensaje: `🎨 **Imagen generada!**\n\nPrompt: "${prompt}"\nEstilo: ${estilo}\n\n[Ver imagen](${data.data[0].url})\n\n_La imagen estara disponible por 1 hora._`,
+            imagenUrl: data.data[0].url
+          };
+        }
+
+        return { mensaje: '❌ No se pudo generar la imagen.' };
+      } catch (e) {
+        return { mensaje: `❌ Error: ${e.message}` };
+      }
+    }
+
+    case 'generar_voz': {
+      const { texto, voz = 'duende' } = datos;
+      if (!texto) {
+        return { mensaje: 'Necesito el texto que queres convertir a voz.' };
+      }
+
+      if (!process.env.ELEVENLABS_API_KEY) {
+        return { mensaje: '⚠️ ELEVENLABS_API_KEY no esta configurada.' };
+      }
+
+      try {
+        const VOCES = {
+          'rachel': '21m00Tcm4TlvDq8ikWAM',
+          'bella': 'EXAVITQu4vr4xnSDxMaL',
+          'duende': 'EXAVITQu4vr4xnSDxMaL'
+        };
+
+        const voiceId = VOCES[voz] || VOCES.duende;
+
+        const res = await fetch(
+          `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+          {
+            method: 'POST',
+            headers: {
+              'Accept': 'audio/mpeg',
+              'Content-Type': 'application/json',
+              'xi-api-key': process.env.ELEVENLABS_API_KEY
+            },
+            body: JSON.stringify({
+              text: texto,
+              model_id: 'eleven_multilingual_v2',
+              voice_settings: {
+                stability: 0.5,
+                similarity_boost: 0.75
+              }
+            })
+          }
+        );
+
+        if (!res.ok) {
+          return { mensaje: `❌ Error de Eleven Labs: ${res.status}` };
+        }
+
+        // Convertir a base64
+        const audioBuffer = await res.arrayBuffer();
+        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+
+        return {
+          mensaje: `🎙️ **Audio generado!**\n\nTexto: "${texto.substring(0, 100)}${texto.length > 100 ? '...' : ''}"\nVoz: ${voz}\nCaracteres: ${texto.length}`,
+          audio: base64Audio,
+          audioFormato: 'audio/mpeg'
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error: ${e.message}` };
+      }
     }
 
     default:

@@ -27,13 +27,28 @@ export default function AdminLayout({ children }) {
   const [titoCargando, setTitoCargando] = useState(false);
   const pathname = usePathname();
 
+  // Cargar historial de Tito y clave guardada
   useEffect(() => {
     const claveGuardada = localStorage.getItem('admin_key');
     if (claveGuardada === 'DuendesAdmin2026') {
       setAutenticado(true);
     }
+    // Recuperar historial de Tito
+    try {
+      const historialGuardado = localStorage.getItem('tito_historial_admin');
+      if (historialGuardado) {
+        setTitoMensajes(JSON.parse(historialGuardado));
+      }
+    } catch (e) {}
     setCargando(false);
   }, []);
+
+  // Persistir historial de Tito cuando cambie
+  useEffect(() => {
+    if (titoMensajes.length > 0) {
+      localStorage.setItem('tito_historial_admin', JSON.stringify(titoMensajes.slice(-30)));
+    }
+  }, [titoMensajes]);
 
   const login = () => {
     if (clave === 'DuendesAdmin2026') {
@@ -166,7 +181,18 @@ export default function AdminLayout({ children }) {
                     <small style={{color:'#888',fontSize:'12px'}}>Tu asistente magico</small>
                   </div>
                 </div>
-                <button onClick={() => setTitoAbierto(false)} style={estilos.titoCerrar}>×</button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {titoMensajes.length > 0 && (
+                    <button
+                      onClick={() => { setTitoMensajes([]); localStorage.removeItem('tito_historial_admin'); }}
+                      style={{ ...estilos.titoCerrar, fontSize: '14px', opacity: 0.7 }}
+                      title="Limpiar historial"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                  <button onClick={() => setTitoAbierto(false)} style={estilos.titoCerrar}>×</button>
+                </div>
               </div>
 
               <div style={estilos.titoMensajes}>

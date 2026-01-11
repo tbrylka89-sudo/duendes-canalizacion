@@ -38,8 +38,8 @@ const TIPOS_REGALO = [
     id: 'descuento',
     nombre: 'Cupon Descuento',
     icono: '🎟️',
-    desc: 'Descuento en la tienda',
-    opciones: ['10%', '15%', '20%', '25%', '30%']
+    desc: 'Monto fijo USD',
+    opciones: ['$5 USD', '$10 USD', '$15 USD', '$20 USD', '$25 USD']
   }
 ];
 

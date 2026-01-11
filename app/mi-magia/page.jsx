@@ -155,15 +155,23 @@ Este servicio es directo y al punto. Hacés tu pregunta, canalizamos la respuest
 // ═══════════════════════════════════════════════════════════════
 
 const CANJES = [
-  { id: 'cupon-5', nombre: 'Cupón 5%', treboles: 30, desc: 'Válido en cualquier guardián', tipo: 'cupon', valor: 5 },
-  { id: 'cupon-10', nombre: 'Cupón 10%', treboles: 60, desc: 'Compras +$50 USD', tipo: 'cupon', valor: 10, minCompra: 50 },
-  { id: 'cupon-15', nombre: 'Cupón 15%', treboles: 100, desc: 'Compras +$100 USD', tipo: 'cupon', valor: 15, minCompra: 100 },
-  { id: 'cupon-20', nombre: 'Cupón 20%', treboles: 150, desc: 'Compras +$150 USD', tipo: 'cupon', valor: 20, minCompra: 150 },
-  { id: 'envio-gratis', nombre: 'Envío Gratis', treboles: 100, desc: 'Pedido nacional', tipo: 'envio' },
-  { id: 'envio-int', nombre: 'Desc. Envío Int.', treboles: 80, desc: '-$15 USD en envío', tipo: 'envio-int' },
-  { id: 'mini-guardian', nombre: 'Mini Guardián', treboles: 150, desc: 'Pequeño protector', tipo: 'producto' },
-  { id: 'cristal', nombre: 'Cristal Sorpresa', treboles: 50, desc: 'Cristal pulido', tipo: 'producto' },
-  { id: 'tirada-gratis', nombre: 'Tirada Gratis', treboles: 25, desc: 'Sin usar runas', tipo: 'lectura' }
+  // Cupones de descuento fijo en USD
+  { id: 'cupon-5usd', nombre: 'Cupón $5 USD', treboles: 30, desc: 'Válido en cualquier compra', tipo: 'cupon', valor: 5, valorUY: 225 },
+  { id: 'cupon-10usd', nombre: 'Cupón $10 USD', treboles: 60, desc: 'Sin mínimo de compra', tipo: 'cupon', valor: 10, valorUY: 450 },
+  { id: 'cupon-15usd', nombre: 'Cupón $15 USD', treboles: 100, desc: 'Cualquier guardián', tipo: 'cupon', valor: 15, valorUY: 675 },
+  // Envíos
+  { id: 'envio-gratis-uy', nombre: 'Envío Gratis UY', treboles: 60, desc: 'Nacional Uruguay', tipo: 'envio' },
+  { id: 'envio-gratis-int', nombre: 'Envío Gratis Int.', treboles: 100, desc: 'Internacional DHL', tipo: 'envio-int' },
+  // Productos
+  { id: 'mini-guardian', nombre: 'Mini Guardián', treboles: 150, desc: 'Pequeño protector (10cm)', tipo: 'producto' },
+  { id: 'cristal', nombre: 'Cristal Sorpresa', treboles: 50, desc: 'Cristal energizado', tipo: 'producto' },
+  // Lecturas y experiencias con tréboles
+  { id: 'tirada-runas-treboles', nombre: 'Tirada de Runas', treboles: 40, desc: 'Sin gastar runas', tipo: 'lectura' },
+  { id: 'lectura-energia-treboles', nombre: 'Lectura Energética', treboles: 80, desc: 'Análisis completo', tipo: 'lectura' },
+  { id: 'oraculo-mes-treboles', nombre: 'Oráculo del Mes', treboles: 100, desc: 'Guía mensual', tipo: 'lectura' },
+  // Círculo con tréboles
+  { id: 'circulo-7dias', nombre: '7 días de Círculo', treboles: 80, desc: 'Acceso completo', tipo: 'circulo' },
+  { id: 'circulo-30dias', nombre: '30 días de Círculo', treboles: 250, desc: 'Un mes completo', tipo: 'circulo' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -171,18 +179,84 @@ const CANJES = [
 // ═══════════════════════════════════════════════════════════════
 
 const MEMBRESIAS = [
-  { nombre: 'Mensual', precio: 9.99, precioUY: 450, dias: 30, url: 'https://duendesuy.10web.cloud/producto/circulo-mensual/' },
-  { nombre: 'Trimestral', precio: 24.99, precioUY: 1150, dias: 90, ahorro: '17%', url: 'https://duendesuy.10web.cloud/producto/circulo-trimestral/' },
-  { nombre: 'Semestral', precio: 44.99, precioUY: 2050, dias: 180, ahorro: '25%', url: 'https://duendesuy.10web.cloud/producto/circulo-semestral/' },
-  { nombre: 'Anual', precio: 79.99, precioUY: 3650, dias: 365, ahorro: '33%', url: 'https://duendesuy.10web.cloud/producto/circulo-anual/' }
+  {
+    nombre: 'Mensual',
+    precio: 9.99,
+    precioUY: 450,
+    dias: 30,
+    url: 'https://duendesuy.10web.cloud/producto/circulo-mensual/',
+    beneficios: [
+      'Contenido semanal exclusivo',
+      '10 runas por mes',
+      '2 tréboles por mes',
+      '1 tirada de runas gratis/mes',
+      '24h acceso anticipado',
+      '5% en guardianes nuevos'
+    ]
+  },
+  {
+    nombre: 'Trimestral',
+    precio: 24.99,
+    precioUY: 1150,
+    dias: 90,
+    ahorro: '17%',
+    url: 'https://duendesuy.10web.cloud/producto/circulo-trimestral/',
+    beneficios: [
+      'Todo lo del plan Mensual',
+      '15 runas por mes',
+      '4 tréboles por mes',
+      '2 tiradas de runas gratis/mes',
+      '1 lectura de energía gratis/mes',
+      '5% en toda la tienda',
+      'Tito te reconoce'
+    ]
+  },
+  {
+    nombre: 'Semestral',
+    precio: 44.99,
+    precioUY: 2050,
+    dias: 180,
+    ahorro: '25%',
+    url: 'https://duendesuy.10web.cloud/producto/circulo-semestral/',
+    beneficios: [
+      'Todo lo del plan Trimestral',
+      '20 runas por mes',
+      '6 tréboles por mes',
+      '3 tiradas de runas gratis/mes',
+      '2 lecturas de energía gratis/mes',
+      '1 guía de cristal gratis/mes',
+      '48h acceso anticipado',
+      '10% en guardianes nuevos'
+    ]
+  },
+  {
+    nombre: 'Anual',
+    precio: 79.99,
+    precioUY: 3650,
+    dias: 365,
+    ahorro: '33%',
+    url: 'https://duendesuy.10web.cloud/producto/circulo-anual/',
+    beneficios: [
+      'Todo lo del plan Semestral',
+      '25 runas por mes',
+      '10 tréboles por mes',
+      '5 tiradas de runas gratis/mes',
+      '3 lecturas de energía gratis/mes',
+      '2 guías de cristal gratis/mes',
+      '1 Estudio del Alma gratis/año',
+      '72h acceso anticipado',
+      '10% en TODA la tienda',
+      'Sorpresa de aniversario'
+    ]
+  }
 ];
 
 const CIRCULO_CONTENIDO = {
   beneficios: [
-    { icono: "◈", titulo: "15% descuento permanente", desc: "En absolutamente todos los guardianes y productos de la tienda, siempre, sin mínimo de compra." },
-    { icono: "✦", titulo: "Acceso anticipado 48hs", desc: "Ves los nuevos guardianes 48 horas antes de que se publiquen. Reservá los que te llaman antes que nadie." },
-    { icono: "ᚱ", titulo: "1 lectura gratis al mes", desc: "Cada mes podés elegir una Tirada de Runas o una Pregunta Específica sin gastar runas." },
-    { icono: "☽", titulo: "Guía lunar mensual", desc: "Documento completo con las energías de cada fase lunar del mes y rituales sugeridos." },
+    { icono: "◈", titulo: "Descuentos exclusivos", desc: "5% a 10% según tu plan. Mensual: 5% guardianes nuevos. Anual: 10% en toda la tienda." },
+    { icono: "✦", titulo: "Acceso anticipado", desc: "24h a 72h antes según tu plan. Reservá los guardianes que te llaman antes que nadie." },
+    { icono: "ᚱ", titulo: "Runas y tréboles mensuales", desc: "De 10 a 25 runas y 2 a 10 tréboles por mes según tu plan." },
+    { icono: "☽", titulo: "Tiradas y lecturas gratis", desc: "1 a 5 tiradas de runas gratis al mes según tu plan." },
     { icono: "❧", titulo: "DIY mágicos mensuales", desc: "Proyectos para hacer en casa: crear tu altar, hacer velas rituales, preparar aguas mágicas, etc." },
     { icono: "◎", titulo: "Meditaciones guiadas", desc: "Audios exclusivos para conectar con tu guardián, limpiar chakras, y más." },
     { icono: "★", titulo: "Contenido semanal", desc: "Cada semana nuevo contenido: mini-lecturas colectivas, tips, información esotérica." },
@@ -451,6 +525,9 @@ export default function MiMagia() {
       case 'cosmos': return <CosmosMes usuario={usuario} />;
       case 'circulo': return <CirculoSec usuario={usuario} setUsuario={setUsuario} token={token} pais={pais} />;
       case 'grimorio': return <GrimorioSec usuario={usuario} token={token} setUsuario={setUsuario} />;
+      case 'foro': return <ForoSec usuario={usuario} setUsuario={setUsuario} />;
+      case 'utilidades': return <UtilidadesSec usuario={usuario} />;
+      case 'faq': return <FaqSec />;
       default: return <Inicio usuario={usuario} ir={setSeccion} />;
     }
   };
@@ -474,7 +551,11 @@ export default function MiMagia() {
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">Tu Espacio</div>
-        {[['circulo','★','Círculo'],['cosmos','☽','Cosmos del Mes'],['grimorio','▣','Grimorio']].map(([k,i,t]) =>
+        {[['circulo','★','Círculo'],['cosmos','☽','Cosmos del Mes'],['grimorio','▣','Grimorio'],['foro','💬','Foro Mágico']].map(([k,i,t]) =>
+          <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
+        )}
+        <div className="nav-sep">Recursos</div>
+        {[['utilidades','⚡','Utilidades'],['faq','❓','FAQ Duendes']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="nav-volver">↗ Ir a la tienda</a>
@@ -1339,9 +1420,9 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
             <div className="beneficios-activos">
               <h2>Tus Beneficios Activos</h2>
               <div className="benef-grid-int">
-                <div className="benef-item-int"><span>◈</span><strong>15% OFF</strong><p>En toda la tienda</p></div>
-                <div className="benef-item-int"><span>✦</span><strong>Acceso 48hs antes</strong><p>A nuevos guardianes</p></div>
-                <div className="benef-item-int"><span>ᚱ</span><strong>1 lectura/mes</strong><p>Tirada o Pregunta gratis</p></div>
+                <div className="benef-item-int"><span>◈</span><strong>5-10% OFF</strong><p>Según tu plan</p></div>
+                <div className="benef-item-int"><span>✦</span><strong>Acceso anticipado</strong><p>24-72hs antes</p></div>
+                <div className="benef-item-int"><span>ᚱ</span><strong>Tiradas gratis/mes</strong><p>1 a 5 según plan</p></div>
               </div>
             </div>
 
@@ -1386,37 +1467,37 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
                   <p className="sin-contenido">Cargando contenido exclusivo...</p>
                 )}
               </div>
+            )}
 
-              {/* Modal de Contenido */}
-              {contenidoModal && (
-                <div className="contenido-modal-overlay" onClick={() => setContenidoModal(null)}>
-                  <div className="contenido-modal" onClick={e => e.stopPropagation()}>
-                    <button className="modal-cerrar" onClick={() => setContenidoModal(null)}>×</button>
-                    <div className="modal-header">
-                      <span>{contenidoModal.tipo === 'ritual' ? '🕯️' : contenidoModal.tipo === 'meditacion' ? '🎧' : contenidoModal.tipo === 'guia' ? '📖' : '✦'}</span>
-                      <div>
-                        <h2>{contenidoModal.titulo}</h2>
-                        <p className="modal-meta">Por {contenidoModal.autor} • {contenidoModal.vistas} vistas</p>
-                      </div>
-                    </div>
-                    <div className="modal-contenido">
-                      {contenidoModal.contenido ? (
-                        contenidoModal.contenido.split('\n').map((p, i) => {
-                          if (p.startsWith('## ')) return <h2 key={i}>{p.replace('## ', '')}</h2>;
-                          if (p.startsWith('### ')) return <h3 key={i}>{p.replace('### ', '')}</h3>;
-                          if (p.startsWith('**') && p.endsWith('**')) return <h4 key={i}>{p.replace(/\*\*/g, '')}</h4>;
-                          if (p.startsWith('- ')) return <li key={i}>{p.replace('- ', '')}</li>;
-                          if (p.startsWith('✦')) return <p key={i} className="mensaje-cierre">{p}</p>;
-                          if (p.trim() === '') return <br key={i} />;
-                          return <p key={i}>{p.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>;
-                        })
-                      ) : (
-                        <p>{contenidoModal.extracto}</p>
-                      )}
+            {/* Modal de Contenido */}
+            {contenidoModal && (
+              <div className="contenido-modal-overlay" onClick={() => setContenidoModal(null)}>
+                <div className="contenido-modal" onClick={e => e.stopPropagation()}>
+                  <button className="modal-cerrar" onClick={() => setContenidoModal(null)}>×</button>
+                  <div className="modal-header">
+                    <span>{contenidoModal.tipo === 'ritual' ? '🕯️' : contenidoModal.tipo === 'meditacion' ? '🎧' : contenidoModal.tipo === 'guia' ? '📖' : '✦'}</span>
+                    <div>
+                      <h2>{contenidoModal.titulo}</h2>
+                      <p className="modal-meta">Por {contenidoModal.autor} • {contenidoModal.vistas} vistas</p>
                     </div>
                   </div>
+                  <div className="modal-contenido">
+                    {contenidoModal.contenido ? (
+                      contenidoModal.contenido.split('\n').map((p, i) => {
+                        if (p.startsWith('## ')) return <h2 key={i}>{p.replace('## ', '')}</h2>;
+                        if (p.startsWith('### ')) return <h3 key={i}>{p.replace('### ', '')}</h3>;
+                        if (p.startsWith('**') && p.endsWith('**')) return <h4 key={i}>{p.replace(/\*\*/g, '')}</h4>;
+                        if (p.startsWith('- ')) return <li key={i}>{p.replace('- ', '')}</li>;
+                        if (p.startsWith('✦')) return <p key={i} className="mensaje-cierre">{p}</p>;
+                        if (p.trim() === '') return <br key={i} />;
+                        return <p key={i}>{p.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>;
+                      })
+                    ) : (
+                      <p>{contenidoModal.extracto}</p>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
             )}
             <div className="temas-explorar">
               <h3>Temas que exploramos:</h3>
@@ -1569,9 +1650,9 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
             </div>
             <div className="cta-benefits">
               <div className="cta-benefit"><span>✓</span> Acceso a todo el contenido exclusivo</div>
-              <div className="cta-benefit"><span>✓</span> 50 Runas de regalo para experiencias</div>
-              <div className="cta-benefit"><span>✓</span> 1 Tirada de Runas gratis</div>
-              <div className="cta-benefit"><span>✓</span> 15% OFF en la tienda</div>
+              <div className="cta-benefit"><span>✓</span> 10 Runas + 2 tréboles por mes</div>
+              <div className="cta-benefit"><span>✓</span> 1 Tirada de Runas gratis/mes</div>
+              <div className="cta-benefit"><span>✓</span> 5% en guardianes nuevos</div>
               <div className="cta-benefit"><span>✓</span> Sin compromiso, cancelás cuando quieras</div>
             </div>
             <button className="btn-gold btn-lg cta-button" onClick={activarPrueba} disabled={activandoPrueba}>
@@ -1630,6 +1711,67 @@ function GrimorioSec({ usuario, token, setUsuario }) {
   const [tipoEntrada, setTipoEntrada] = useState('libre');
   const [guardando, setGuardando] = useState(false);
   const [msg, setMsg] = useState(null);
+
+  // Estados del calendario interactivo
+  const [mesActual, setMesActual] = useState(new Date());
+  const [diaSeleccionado, setDiaSeleccionado] = useState(null);
+  const [vistaCalendario, setVistaCalendario] = useState(true);
+
+  // Calcular fase lunar para una fecha
+  const calcularFaseLunar = (fecha) => {
+    const cicloLunar = 29.530588853;
+    const lunaLlena = new Date(2024, 0, 25); // Luna llena conocida
+    const diff = (fecha - lunaLlena) / (1000 * 60 * 60 * 24);
+    const fase = ((diff % cicloLunar) + cicloLunar) % cicloLunar;
+    if (fase < 1.84566) return { nombre: 'Nueva', icono: '🌑', energia: 'Nuevos comienzos, introspección' };
+    if (fase < 7.38264) return { nombre: 'Creciente', icono: '🌒', energia: 'Manifestación, acción' };
+    if (fase < 9.22830) return { nombre: 'Cuarto Creciente', icono: '🌓', energia: 'Decisiones, compromiso' };
+    if (fase < 14.76528) return { nombre: 'Gibosa Creciente', icono: '🌔', energia: 'Refinamiento, paciencia' };
+    if (fase < 16.61094) return { nombre: 'Llena', icono: '🌕', energia: 'Culminación, gratitud, magia potente' };
+    if (fase < 22.14792) return { nombre: 'Gibosa Menguante', icono: '🌖', energia: 'Gratitud, compartir' };
+    if (fase < 23.99358) return { nombre: 'Cuarto Menguante', icono: '🌗', energia: 'Soltar, liberar' };
+    return { nombre: 'Menguante', icono: '🌘', energia: 'Descanso, limpieza' };
+  };
+
+  // Obtener días del mes para el calendario
+  const obtenerDiasMes = () => {
+    const year = mesActual.getFullYear();
+    const month = mesActual.getMonth();
+    const primerDia = new Date(year, month, 1);
+    const ultimoDia = new Date(year, month + 1, 0);
+    const diasEnMes = ultimoDia.getDate();
+    const diaSemanaInicio = primerDia.getDay();
+    const dias = [];
+
+    // Días vacíos al inicio
+    for (let i = 0; i < diaSemanaInicio; i++) {
+      dias.push({ vacio: true });
+    }
+
+    // Días del mes
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fecha = new Date(year, month, d);
+      const fechaStr = fecha.toLocaleDateString('es-UY');
+      const entradasDia = (usuario?.diario || []).filter(e => e.fecha === fechaStr);
+      const faseLunar = calcularFaseLunar(fecha);
+      const esHoy = new Date().toDateString() === fecha.toDateString();
+      dias.push({
+        dia: d,
+        fecha: fechaStr,
+        fechaObj: fecha,
+        entradas: entradasDia,
+        tieneEntradas: entradasDia.length > 0,
+        faseLunar,
+        esHoy
+      });
+    }
+    return dias;
+  };
+
+  // Obtener entradas del día seleccionado
+  const entradasDelDia = diaSeleccionado
+    ? (usuario?.diario || []).filter(e => e.fecha === diaSeleccionado)
+    : [];
   
   const guardarEntrada = async () => {
     if (!entrada.trim()) return;
@@ -1706,33 +1848,102 @@ function GrimorioSec({ usuario, token, setUsuario }) {
       
       {tab === 'diario' && (
         <div className="grim-diario">
-          <h2>Mi Diario</h2>
-          <p className="diario-intro">Tu espacio privado. Escribí lo que quieras: sueños, reflexiones, señales, rituales, o simplemente cómo te sentís hoy.</p>
-          
-          <div className="diario-nuevo">
-            <h3>Nueva entrada</h3>
-            <div className="tipos-entrada">
-              {TIPOS_DIARIO.map(t => (
-                <button key={t.id} className={`tipo-btn ${tipoEntrada === t.id ? 'act' : ''}`} onClick={() => setTipoEntrada(t.id)} title={t.desc}>
-                  <span>{t.i}</span>{t.n}
-                </button>
-              ))}
-            </div>
-            <div className="tipo-desc">{TIPOS_DIARIO.find(t => t.id === tipoEntrada)?.desc}</div>
-            <textarea 
-              placeholder="Escribí lo que tengas en mente... No hay reglas, es tu espacio." 
-              value={entrada} 
-              onChange={e => setEntrada(e.target.value)} 
-              rows={5}
-            />
-            <button className="btn-gold" onClick={guardarEntrada} disabled={!entrada.trim() || guardando}>
-              {guardando ? 'Guardando...' : 'Guardar en mi grimorio'}
+          <h2>Mi Diario Mágico</h2>
+          <p className="diario-intro">Tu espacio sagrado. Cada entrada es un hechizo, cada reflexión una semilla de magia.</p>
+
+          {/* Barra de vista */}
+          <div className="diario-vistas">
+            <button className={`vista-btn ${vistaCalendario ? 'act' : ''}`} onClick={() => setVistaCalendario(true)}>
+              📅 Calendario Lunar
+            </button>
+            <button className={`vista-btn ${!vistaCalendario ? 'act' : ''}`} onClick={() => setVistaCalendario(false)}>
+              📜 Lista Cronológica
             </button>
           </div>
-          
-          {usuario?.diario?.length > 0 && (
+
+          {/* VISTA CALENDARIO */}
+          {vistaCalendario && (
+            <div className="diario-calendario">
+              {/* Navegación del mes */}
+              <div className="cal-nav">
+                <button onClick={() => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() - 1))} className="cal-nav-btn">◀</button>
+                <div className="cal-mes">
+                  <span className="cal-mes-nombre">{mesActual.toLocaleDateString('es-UY', { month: 'long', year: 'numeric' })}</span>
+                  <span className="cal-fase-hoy">{calcularFaseLunar(new Date()).icono} Luna {calcularFaseLunar(new Date()).nombre}</span>
+                </div>
+                <button onClick={() => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() + 1))} className="cal-nav-btn">▶</button>
+              </div>
+
+              {/* Cabecera días de la semana */}
+              <div className="cal-header">
+                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
+                  <div key={d} className="cal-header-dia">{d}</div>
+                ))}
+              </div>
+
+              {/* Grid del calendario */}
+              <div className="cal-grid">
+                {obtenerDiasMes().map((d, i) => (
+                  <div
+                    key={i}
+                    className={`cal-dia ${d.vacio ? 'vacio' : ''} ${d.esHoy ? 'hoy' : ''} ${d.tieneEntradas ? 'con-entradas' : ''} ${diaSeleccionado === d.fecha ? 'sel' : ''}`}
+                    onClick={() => !d.vacio && setDiaSeleccionado(d.fecha === diaSeleccionado ? null : d.fecha)}
+                  >
+                    {!d.vacio && (
+                      <>
+                        <span className="cal-dia-num">{d.dia}</span>
+                        <span className="cal-dia-luna" title={`Luna ${d.faseLunar.nombre}: ${d.faseLunar.energia}`}>{d.faseLunar.icono}</span>
+                        {d.tieneEntradas && <span className="cal-dia-marker">✦</span>}
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Leyenda */}
+              <div className="cal-leyenda">
+                <span><span className="marker-dot hoy"></span> Hoy</span>
+                <span><span className="marker-dot entradas"></span> Tiene entradas</span>
+                <span>🌑 Nueva → 🌕 Llena → 🌑</span>
+              </div>
+
+              {/* Entradas del día seleccionado */}
+              {diaSeleccionado && (
+                <div className="dia-seleccionado">
+                  <h3>📖 {diaSeleccionado}</h3>
+                  {(() => {
+                    const fechaSel = obtenerDiasMes().find(d => d.fecha === diaSeleccionado);
+                    return fechaSel && (
+                      <div className="dia-info-luna">
+                        {fechaSel.faseLunar.icono} Luna {fechaSel.faseLunar.nombre}
+                        <span className="luna-energia">{fechaSel.faseLunar.energia}</span>
+                      </div>
+                    );
+                  })()}
+                  {entradasDelDia.length > 0 ? (
+                    <div className="entradas-dia">
+                      {entradasDelDia.map((e, i) => {
+                        const tipo = TIPOS_DIARIO.find(t => t.id === e.tipo) || TIPOS_DIARIO[TIPOS_DIARIO.length - 1];
+                        return (
+                          <div key={i} className="entrada-mini">
+                            <span className="entrada-mini-tipo">{tipo.i} {tipo.n}</span>
+                            <p>{e.contenido}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="sin-entradas">No hay entradas este día. ¿Querés agregar una reflexión?</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VISTA LISTA */}
+          {!vistaCalendario && usuario?.diario?.length > 0 && (
             <div className="diario-entradas">
-              <h3>Entradas anteriores</h3>
+              <h3>Todas tus entradas</h3>
               {usuario.diario.slice().reverse().map((e, i) => {
                 const tipo = TIPOS_DIARIO.find(t => t.id === e.tipo) || TIPOS_DIARIO[TIPOS_DIARIO.length - 1];
                 return (
@@ -1744,8 +1955,733 @@ function GrimorioSec({ usuario, token, setUsuario }) {
               })}
             </div>
           )}
+
+          {!vistaCalendario && (!usuario?.diario || usuario.diario.length === 0) && (
+            <div className="empty-grim">
+              <span>📜</span>
+              <h3>Tu diario está vacío</h3>
+              <p>Cada entrada que escribas aquí se guarda para siempre. Es tu registro mágico personal.</p>
+            </div>
+          )}
+
+          {/* NUEVA ENTRADA */}
+          <div className="diario-nuevo">
+            <h3>✎ Nueva entrada</h3>
+            <div className="tipos-entrada">
+              {TIPOS_DIARIO.map(t => (
+                <button key={t.id} className={`tipo-btn ${tipoEntrada === t.id ? 'act' : ''}`} onClick={() => setTipoEntrada(t.id)} title={t.desc}>
+                  <span>{t.i}</span>{t.n}
+                </button>
+              ))}
+            </div>
+            <div className="tipo-desc">{TIPOS_DIARIO.find(t => t.id === tipoEntrada)?.desc}</div>
+            <textarea
+              placeholder="Escribí lo que tengas en mente... No hay reglas, es tu espacio sagrado."
+              value={entrada}
+              onChange={e => setEntrada(e.target.value)}
+              rows={5}
+            />
+            <div className="diario-acciones">
+              <button className="btn-gold" onClick={guardarEntrada} disabled={!entrada.trim() || guardando}>
+                {guardando ? 'Guardando...' : 'Guardar en mi grimorio'}
+              </button>
+              <span className="tip-runa">+1 Runa por día de práctica</span>
+            </div>
+          </div>
+
+          {/* Estadísticas del diario */}
+          {usuario?.diario?.length > 0 && (
+            <div className="diario-stats">
+              <h4>Tu camino en números</h4>
+              <div className="stats-grid">
+                <div className="stat">
+                  <span className="stat-num">{usuario.diario.length}</span>
+                  <span className="stat-label">Entradas</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-num">{[...new Set(usuario.diario.map(e => e.fecha))].length}</span>
+                  <span className="stat-label">Días practicando</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-num">{TIPOS_DIARIO.find(t => t.id === (usuario.diario.reduce((acc, e) => { acc[e.tipo] = (acc[e.tipo] || 0) + 1; return acc; }, {}), Object.entries(usuario.diario.reduce((acc, e) => { acc[e.tipo] = (acc[e.tipo] || 0) + 1; return acc; }, {})).sort((a, b) => b[1] - a[1])[0]?.[0]))?.i || '✦'}</span>
+                  <span className="stat-label">Tipo favorito</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORO MÁGICO - Comunidad
+// ═══════════════════════════════════════════════════════════════
+
+const CATEGORIAS_FORO = [
+  { id: 'general', nombre: 'General', icono: '💬', desc: 'Conversaciones libres de la comunidad' },
+  { id: 'guardianes', nombre: 'Guardianes', icono: '🧙', desc: 'Experiencias con tus duendes' },
+  { id: 'magia', nombre: 'Magia y Rituales', icono: '✨', desc: 'Comparte tus prácticas mágicas' },
+  { id: 'suenos', nombre: 'Sueños y Visiones', icono: '🌙', desc: 'Interpretación de sueños' },
+  { id: 'cristales', nombre: 'Cristales', icono: '💎', desc: 'Todo sobre cristales' },
+  { id: 'ayuda', nombre: 'Ayuda', icono: '❓', desc: 'Preguntas y dudas' }
+];
+
+function ForoSec({ usuario, setUsuario }) {
+  const [categoria, setCategoria] = useState('general');
+  const [posts, setPosts] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [nuevoPost, setNuevoPost] = useState('');
+  const [titulo, setTitulo] = useState('');
+  const [mostrarNuevo, setMostrarNuevo] = useState(false);
+  const [postSeleccionado, setPostSeleccionado] = useState(null);
+  const [respuesta, setRespuesta] = useState('');
+  const [enviando, setEnviando] = useState(false);
+
+  useEffect(() => {
+    cargarPosts();
+  }, [categoria]);
+
+  const cargarPosts = async () => {
+    setCargando(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/foro?categoria=${categoria}`);
+      const data = await res.json();
+      if (data.success) {
+        setPosts(data.posts || []);
+      }
+    } catch (e) {
+      // Usar posts de ejemplo si no hay API
+      setPosts(getPostsEjemplo(categoria));
+    }
+    setCargando(false);
+  };
+
+  const publicar = async () => {
+    if (!titulo.trim() || !nuevoPost.trim()) return;
+    setEnviando(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/foro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: usuario.email,
+          autor: usuario.nombrePreferido,
+          categoria,
+          titulo: titulo.trim(),
+          contenido: nuevoPost.trim()
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPosts([data.post, ...posts]);
+        setNuevoPost('');
+        setTitulo('');
+        setMostrarNuevo(false);
+      }
+    } catch (e) {
+      // Agregar localmente si falla
+      const nuevoPostLocal = {
+        id: Date.now(),
+        autor: usuario.nombrePreferido,
+        autorEmail: usuario.email,
+        titulo: titulo.trim(),
+        contenido: nuevoPost.trim(),
+        categoria,
+        fecha: new Date().toISOString(),
+        respuestas: [],
+        likes: 0
+      };
+      setPosts([nuevoPostLocal, ...posts]);
+      setNuevoPost('');
+      setTitulo('');
+      setMostrarNuevo(false);
+    }
+    setEnviando(false);
+  };
+
+  const responderPost = async () => {
+    if (!respuesta.trim() || !postSeleccionado) return;
+    setEnviando(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/foro/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId: postSeleccionado.id,
+          email: usuario.email,
+          autor: usuario.nombrePreferido,
+          contenido: respuesta.trim()
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const nuevaRespuesta = {
+          id: Date.now(),
+          autor: usuario.nombrePreferido,
+          contenido: respuesta.trim(),
+          fecha: new Date().toISOString()
+        };
+        setPostSeleccionado({
+          ...postSeleccionado,
+          respuestas: [...(postSeleccionado.respuestas || []), nuevaRespuesta]
+        });
+        setRespuesta('');
+      }
+    } catch (e) {
+      // Agregar localmente
+      const nuevaRespuesta = {
+        id: Date.now(),
+        autor: usuario.nombrePreferido,
+        contenido: respuesta.trim(),
+        fecha: new Date().toISOString()
+      };
+      setPostSeleccionado({
+        ...postSeleccionado,
+        respuestas: [...(postSeleccionado.respuestas || []), nuevaRespuesta]
+      });
+      setRespuesta('');
+    }
+    setEnviando(false);
+  };
+
+  const formatearFecha = (fecha) => {
+    const d = new Date(fecha);
+    const ahora = new Date();
+    const diff = Math.floor((ahora - d) / (1000 * 60));
+    if (diff < 1) return 'Ahora mismo';
+    if (diff < 60) return `Hace ${diff} min`;
+    if (diff < 1440) return `Hace ${Math.floor(diff / 60)}h`;
+    return d.toLocaleDateString('es-UY', { day: 'numeric', month: 'short' });
+  };
+
+  const getPostsEjemplo = (cat) => [
+    {
+      id: 1,
+      autor: 'Valeria',
+      titulo: cat === 'guardianes' ? 'Mi Finnegan me salvó el día!' : '¿Cómo limpiar mi espacio?',
+      contenido: cat === 'guardianes'
+        ? 'Les cuento que ayer tuve un día muy difícil en el trabajo. Cuando llegué a casa, mi Finnegan estaba en un lugar diferente (juro que lo dejé en el altar). Lo tomé en mis manos y sentí una paz increíble. ¿Les pasa que sienten que sus guardianes les "hablan"?'
+        : 'Hola a todos! Soy nueva en esto y quería preguntarles cómo hacen para limpiar energéticamente su hogar. Mi guardián acaba de llegar y quiero que su espacio esté impecable.',
+      categoria: cat,
+      fecha: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      respuestas: [
+        { id: 1, autor: 'Mariana', contenido: '¡Me pasa todo el tiempo! Son increíbles.', fecha: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
+        { id: 2, autor: 'Lucia', contenido: 'Finnegan es muy especial. Mi Bramble también me acompaña mucho.', fecha: new Date(Date.now() - 30 * 60 * 1000).toISOString() }
+      ],
+      likes: 12
+    },
+    {
+      id: 2,
+      autor: 'Carolina',
+      titulo: cat === 'cristales' ? 'Cuarzo rosa vs Rodocrosita' : 'Ritual de luna llena',
+      contenido: cat === 'cristales'
+        ? 'Estoy buscando un cristal para trabajar el amor propio. ¿Qué me recomiendan, cuarzo rosa o rodocrosita? Mi guardián tiene citrino y cuarzo ahumado.'
+        : 'Este viernes es luna llena! ¿Alguien quiere compartir sus rituales? Yo siempre cargo mis cristales y escribo intenciones.',
+      categoria: cat,
+      fecha: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+      respuestas: [],
+      likes: 8
+    },
+    {
+      id: 3,
+      autor: 'Sofía',
+      titulo: 'Nuevo en la familia!',
+      contenido: 'Les presento a mi primer guardián! Es un Willow y estoy emocionadísima. ¿Algún consejo para conectar mejor con él en los primeros días?',
+      categoria: cat,
+      fecha: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      respuestas: [
+        { id: 1, autor: 'Duendes del Uruguay', contenido: '¡Bienvenida Sofía! Lo más importante es hablarle, contarle tus cosas, ponerlo en un lugar especial. La conexión crece con el tiempo. ✨', fecha: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString() }
+      ],
+      likes: 24
+    }
+  ];
+
+  if (postSeleccionado) {
+    return (
+      <div className="sec">
+        <button className="btn-back" onClick={() => setPostSeleccionado(null)}>← Volver al foro</button>
+
+        <div className="foro-post-full">
+          <div className="post-header">
+            <div className="post-avatar">{postSeleccionado.autor.charAt(0)}</div>
+            <div className="post-meta">
+              <strong>{postSeleccionado.autor}</strong>
+              <span>{formatearFecha(postSeleccionado.fecha)}</span>
+            </div>
+          </div>
+          <h2 className="post-titulo">{postSeleccionado.titulo}</h2>
+          <p className="post-contenido">{postSeleccionado.contenido}</p>
+
+          <div className="post-acciones">
+            <span>❤️ {postSeleccionado.likes || 0} me gusta</span>
+            <span>💬 {(postSeleccionado.respuestas || []).length} respuestas</span>
+          </div>
+        </div>
+
+        {(postSeleccionado.respuestas || []).length > 0 && (
+          <div className="foro-respuestas">
+            <h3>Respuestas</h3>
+            {postSeleccionado.respuestas.map((r, i) => (
+              <div key={r.id || i} className="respuesta-card">
+                <div className="respuesta-avatar">{r.autor.charAt(0)}</div>
+                <div className="respuesta-content">
+                  <div className="respuesta-meta">
+                    <strong>{r.autor}</strong>
+                    <span>{formatearFecha(r.fecha)}</span>
+                  </div>
+                  <p>{r.contenido}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="foro-responder">
+          <h3>Tu respuesta</h3>
+          <textarea
+            placeholder="Comparte tu experiencia o ayuda a tu compañera..."
+            value={respuesta}
+            onChange={e => setRespuesta(e.target.value)}
+            rows={3}
+          />
+          <button className="btn-gold" onClick={responderPost} disabled={!respuesta.trim() || enviando}>
+            {enviando ? 'Enviando...' : 'Responder'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="sec">
+      <div className="sec-head">
+        <h1>💬 Foro Mágico</h1>
+        <p>Conectá con la comunidad de guardianas y guardianes.</p>
+      </div>
+
+      <div className="foro-categorias">
+        {CATEGORIAS_FORO.map(cat => (
+          <button
+            key={cat.id}
+            className={`foro-cat ${categoria === cat.id ? 'act' : ''}`}
+            onClick={() => setCategoria(cat.id)}
+          >
+            <span>{cat.icono}</span>
+            <span>{cat.nombre}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="foro-acciones">
+        <button className="btn-gold" onClick={() => setMostrarNuevo(!mostrarNuevo)}>
+          {mostrarNuevo ? 'Cancelar' : '+ Nueva publicación'}
+        </button>
+      </div>
+
+      {mostrarNuevo && (
+        <div className="foro-nuevo">
+          <h3>Nueva publicación en {CATEGORIAS_FORO.find(c => c.id === categoria)?.nombre}</h3>
+          <input
+            type="text"
+            placeholder="Título de tu publicación"
+            value={titulo}
+            onChange={e => setTitulo(e.target.value)}
+            className="foro-titulo-input"
+          />
+          <textarea
+            placeholder="¿Qué querés compartir con la comunidad?"
+            value={nuevoPost}
+            onChange={e => setNuevoPost(e.target.value)}
+            rows={5}
+          />
+          <button className="btn-gold" onClick={publicar} disabled={!titulo.trim() || !nuevoPost.trim() || enviando}>
+            {enviando ? 'Publicando...' : 'Publicar'}
+          </button>
+        </div>
+      )}
+
+      {cargando ? (
+        <div className="foro-loading">Cargando publicaciones...</div>
+      ) : posts.length === 0 ? (
+        <div className="foro-empty">
+          <span>✦</span>
+          <h3>Sé la primera en publicar</h3>
+          <p>Esta categoría está esperando tu voz. ¡Compartí algo con la comunidad!</p>
+        </div>
+      ) : (
+        <div className="foro-posts">
+          {posts.map(post => (
+            <div key={post.id} className="foro-post-card" onClick={() => setPostSeleccionado(post)}>
+              <div className="post-avatar">{post.autor.charAt(0)}</div>
+              <div className="post-content">
+                <h4>{post.titulo}</h4>
+                <p>{post.contenido.substring(0, 150)}{post.contenido.length > 150 ? '...' : ''}</p>
+                <div className="post-footer">
+                  <span className="post-autor">{post.autor}</span>
+                  <span className="post-fecha">{formatearFecha(post.fecha)}</span>
+                  <span className="post-stats">💬 {(post.respuestas || []).length} · ❤️ {post.likes || 0}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILIDADES MÁGICAS
+// ═══════════════════════════════════════════════════════════════
+
+function UtilidadesSec({ usuario }) {
+  const [utilidad, setUtilidad] = useState(null);
+
+  const UTILIDADES = [
+    {
+      id: 'luna',
+      nombre: 'Fase Lunar',
+      icono: '🌙',
+      desc: 'Consulta la fase lunar actual y su energía',
+      render: () => {
+        const calcularFase = () => {
+          const fecha = new Date();
+          const cicloLunar = 29.530588853;
+          const lunaLlena = new Date(2024, 0, 25);
+          const diff = (fecha - lunaLlena) / (1000 * 60 * 60 * 24);
+          const fase = ((diff % cicloLunar) + cicloLunar) % cicloLunar;
+          if (fase < 1.84566) return { nombre: 'Luna Nueva', icono: '🌑', energia: 'Nuevos comienzos, siembra intenciones, introspección', ritual: 'Escribe tus intenciones en papel, medita sobre lo que quieres crear' };
+          if (fase < 7.38264) return { nombre: 'Luna Creciente', icono: '🌒', energia: 'Manifestación, tomar acción, crecimiento', ritual: 'Trabaja activamente hacia tus metas, haz rituales de atracción' };
+          if (fase < 9.22830) return { nombre: 'Cuarto Creciente', icono: '🌓', energia: 'Decisiones, compromiso, superar obstáculos', ritual: 'Toma decisiones importantes, rompe bloqueos' };
+          if (fase < 14.76528) return { nombre: 'Luna Gibosa', icono: '🌔', energia: 'Refinamiento, paciencia, ajustes', ritual: 'Ajusta tus planes, ten paciencia, confía en el proceso' };
+          if (fase < 16.61094) return { nombre: 'Luna Llena', icono: '🌕', energia: 'Culminación, gratitud, magia potente', ritual: 'Carga cristales, celebra logros, haz rituales poderosos' };
+          if (fase < 22.14792) return { nombre: 'Luna Diseminante', icono: '🌖', energia: 'Compartir, gratitud, enseñar', ritual: 'Comparte tu sabiduría, practica gratitud' };
+          if (fase < 23.99358) return { nombre: 'Cuarto Menguante', icono: '🌗', energia: 'Soltar, liberar, perdonar', ritual: 'Libera lo que no te sirve, rituales de limpieza' };
+          return { nombre: 'Luna Balsámica', icono: '🌘', energia: 'Descanso, limpieza, preparación', ritual: 'Descansa, limpia espacios, prepárate para el nuevo ciclo' };
+        };
+        const fase = calcularFase();
+        return (
+          <div className="util-content">
+            <div className="luna-actual">
+              <span className="luna-icono">{fase.icono}</span>
+              <h3>{fase.nombre}</h3>
+            </div>
+            <div className="luna-info">
+              <div className="luna-energia">
+                <strong>Energía:</strong>
+                <p>{fase.energia}</p>
+              </div>
+              <div className="luna-ritual">
+                <strong>Ritual sugerido:</strong>
+                <p>{fase.ritual}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'numerologia',
+      nombre: 'Número del Día',
+      icono: '🔢',
+      desc: 'Tu número personal para hoy',
+      render: () => {
+        const hoy = new Date();
+        const dia = hoy.getDate();
+        const mes = hoy.getMonth() + 1;
+        const anio = hoy.getFullYear();
+        const suma = String(dia + mes + anio).split('').reduce((a, b) => a + parseInt(b), 0);
+        const numero = suma > 9 ? String(suma).split('').reduce((a, b) => a + parseInt(b), 0) : suma;
+        const significados = {
+          1: { nombre: 'Liderazgo', mensaje: 'Día para iniciar proyectos, tomar la iniciativa. Tu energía es de creador/a.' },
+          2: { nombre: 'Cooperación', mensaje: 'Día para trabajar en equipo, escuchar, ser diplomático/a. La paciencia es clave.' },
+          3: { nombre: 'Creatividad', mensaje: 'Día para expresarte, crear, comunicar. Tu alegría inspira a otros.' },
+          4: { nombre: 'Estabilidad', mensaje: 'Día para construir bases sólidas, organizar, planificar.' },
+          5: { nombre: 'Cambio', mensaje: 'Día para aventurarte, cambiar rutinas, ser flexible.' },
+          6: { nombre: 'Amor', mensaje: 'Día para nutrir relaciones, el hogar, la familia. El amor sana.' },
+          7: { nombre: 'Introspección', mensaje: 'Día para meditar, estudiar, buscar respuestas internas.' },
+          8: { nombre: 'Abundancia', mensaje: 'Día para manifestar, trabajar en proyectos materiales.' },
+          9: { nombre: 'Completud', mensaje: 'Día para cerrar ciclos, soltar, servir a otros.' }
+        };
+        const sig = significados[numero] || significados[9];
+        return (
+          <div className="util-content">
+            <div className="numero-dia">
+              <span className="numero-grande">{numero}</span>
+              <h3>{sig.nombre}</h3>
+            </div>
+            <p className="numero-mensaje">{sig.mensaje}</p>
+            <small>Basado en {hoy.toLocaleDateString('es-UY')}</small>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'color',
+      nombre: 'Color del Día',
+      icono: '🎨',
+      desc: 'Qué color te favorece hoy',
+      render: () => {
+        const colores = [
+          { nombre: 'Rojo', hex: '#e74c3c', energia: 'Pasión, energía, acción. Úsalo cuando necesites motivación.' },
+          { nombre: 'Naranja', hex: '#e67e22', energia: 'Creatividad, alegría, socialización. Ideal para conectar.' },
+          { nombre: 'Amarillo', hex: '#f1c40f', energia: 'Claridad mental, optimismo, intelecto. Bueno para estudiar.' },
+          { nombre: 'Verde', hex: '#27ae60', energia: 'Sanación, equilibrio, naturaleza. Perfecto para sanar.' },
+          { nombre: 'Azul', hex: '#3498db', energia: 'Calma, comunicación, verdad. Ideal para hablar desde el corazón.' },
+          { nombre: 'Índigo', hex: '#8e44ad', energia: 'Intuición, espiritualidad, visión. Bueno para meditar.' },
+          { nombre: 'Violeta', hex: '#9b59b6', energia: 'Transformación, conexión divina, magia. Día de rituales.' }
+        ];
+        const diaSemana = new Date().getDay();
+        const color = colores[diaSemana];
+        return (
+          <div className="util-content">
+            <div className="color-dia" style={{ background: color.hex }}>
+              <span className="color-nombre">{color.nombre}</span>
+            </div>
+            <p className="color-energia">{color.energia}</p>
+            <small>Color asociado al día de hoy</small>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'afirmacion',
+      nombre: 'Afirmación',
+      icono: '✨',
+      desc: 'Tu afirmación positiva del día',
+      render: () => {
+        const afirmaciones = [
+          'Soy merecedor/a de todo lo bueno que la vida tiene para mí.',
+          'Mi intuición me guía hacia las decisiones correctas.',
+          'Cada día me acerco más a la versión más mágica de mí.',
+          'El universo conspira a mi favor.',
+          'Soy un imán para la abundancia y las bendiciones.',
+          'Mi energía es poderosa y transforma todo lo que toca.',
+          'Confío en el timing divino de mi vida.',
+          'Soy luz, soy magia, soy poder.',
+          'Libero lo que no me sirve y abrazo lo nuevo.',
+          'Mis sueños son válidos y están en camino.',
+          'La magia fluye a través de mí en todo momento.',
+          'Merezco amor, paz y felicidad.'
+        ];
+        const hoy = new Date();
+        const indice = (hoy.getDate() + hoy.getMonth()) % afirmaciones.length;
+        return (
+          <div className="util-content afirmacion-box">
+            <div className="afirmacion-icono">✦</div>
+            <p className="afirmacion-texto">"{afirmaciones[indice]}"</p>
+            <small>Repetí esta afirmación 3 veces frente al espejo</small>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'elemento',
+      nombre: 'Elemento del Día',
+      icono: '🌍',
+      desc: 'Qué elemento te acompaña hoy',
+      render: () => {
+        const elementos = [
+          { nombre: 'Tierra', icono: '🌿', color: '#27ae60', consejo: 'Conectá con la naturaleza, caminá descalza si podés. Hoy es buen día para la estabilidad y la práctica.' },
+          { nombre: 'Agua', icono: '💧', color: '#3498db', consejo: 'Fluí con las emociones, tomá un baño ritual, limpiá con agua sagrada. Día de intuición.' },
+          { nombre: 'Fuego', icono: '🔥', color: '#e74c3c', consejo: 'Encendé una vela, trabajá con tu pasión. Hoy es día de acción y transformación.' },
+          { nombre: 'Aire', icono: '🌬️', color: '#9b59b6', consejo: 'Meditá, respirá profundo, quemá incienso. Día de claridad mental y comunicación.' }
+        ];
+        const diaDelAnio = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        const elemento = elementos[diaDelAnio % 4];
+        return (
+          <div className="util-content">
+            <div className="elemento-dia" style={{ background: elemento.color }}>
+              <span className="elemento-icono">{elemento.icono}</span>
+              <h3>{elemento.nombre}</h3>
+            </div>
+            <p className="elemento-consejo">{elemento.consejo}</p>
+          </div>
+        );
+      }
+    }
+  ];
+
+  if (utilidad) {
+    const util = UTILIDADES.find(u => u.id === utilidad);
+    return (
+      <div className="sec">
+        <button className="btn-back" onClick={() => setUtilidad(null)}>← Volver</button>
+        <div className="util-header">
+          <span className="util-icono-grande">{util.icono}</span>
+          <h2>{util.nombre}</h2>
+        </div>
+        {util.render()}
+      </div>
+    );
+  }
+
+  return (
+    <div className="sec">
+      <div className="sec-head">
+        <h1>⚡ Utilidades Mágicas</h1>
+        <p>Herramientas diarias para tu práctica espiritual.</p>
+      </div>
+
+      <div className="utils-grid">
+        {UTILIDADES.map(util => (
+          <div key={util.id} className="util-card" onClick={() => setUtilidad(util.id)}>
+            <span className="util-icono">{util.icono}</span>
+            <h3>{util.nombre}</h3>
+            <p>{util.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FAQ DUENDES
+// ═══════════════════════════════════════════════════════════════
+
+const FAQS = [
+  {
+    categoria: 'Sobre los Guardianes',
+    preguntas: [
+      {
+        q: '¿Qué es un guardián/duende?',
+        a: 'Los guardianes son seres elementales que canalizamos en forma física a través de figuras únicas. Cada uno tiene su propia energía, personalidad y propósito. No son simples decoraciones: son compañeros espirituales que te acompañan y protegen.'
+      },
+      {
+        q: '¿Cómo se "activa" mi guardián?',
+        a: 'Cada guardián viene ya activado energéticamente. Al recibirlo, te recomendamos presentarte (decirle tu nombre y bienvenirlo), colocarlo en un lugar especial, y hablarle como si fuera un amigo. La conexión se profundiza con el tiempo.'
+      },
+      {
+        q: '¿Puedo tener más de un guardián?',
+        a: '¡Absolutamente! Muchas personas tienen varios guardianes, cada uno con diferentes propósitos. Algunos protegen el hogar, otros acompañan la meditación, otros cuidan los sueños. Entre ellos se llevan bien.'
+      },
+      {
+        q: '¿Los guardianes se rompen o dañan?',
+        a: 'Físicamente son resistentes, pero si alguna vez se daña, no significa que la energía se haya ido. Podés contactarnos para ver opciones de reparación, o simplemente agradecerle por su servicio y enterrarlo en la tierra.'
+      }
+    ]
+  },
+  {
+    categoria: 'Runas y Tréboles',
+    preguntas: [
+      {
+        q: '¿Qué son las runas?',
+        a: 'Las runas son nuestra moneda mágica para experiencias. Las ganás al comprar guardianes y las usás para acceder a lecturas, tiradas, y experiencias espirituales personalizadas.'
+      },
+      {
+        q: '¿Qué son los tréboles?',
+        a: 'Los tréboles son nuestra moneda de descuento. Cada trébol vale $10 USD y podés usarlos para canjear por descuentos, envíos gratis, productos y más. Los ganás al comprar y participar en la comunidad.'
+      },
+      {
+        q: '¿Las runas y tréboles expiran?',
+        a: 'No, nunca expiran. Permanecen en tu cuenta para siempre hasta que decidas usarlos.'
+      }
+    ]
+  },
+  {
+    categoria: 'El Círculo de Duendes',
+    preguntas: [
+      {
+        q: '¿Qué es el Círculo?',
+        a: 'El Círculo de Duendes es nuestra membresía premium. Te da acceso a contenido exclusivo semanal, runas y tréboles extra cada mes, tiradas gratuitas, acceso anticipado a nuevos guardianes, y más beneficios según tu plan.'
+      },
+      {
+        q: '¿Puedo cancelar cuando quiera?',
+        a: 'Sí, podés cancelar en cualquier momento. Tu acceso continúa hasta el final del período pagado.'
+      },
+      {
+        q: '¿Qué incluye cada plan?',
+        a: 'Cada plan tiene beneficios diferentes. Consultá la sección Círculo en Mi Magia para ver el detalle de runas, tréboles, tiradas y descuentos de cada uno.'
+      }
+    ]
+  },
+  {
+    categoria: 'Envíos y Pedidos',
+    preguntas: [
+      {
+        q: '¿Hacen envíos internacionales?',
+        a: '¡Sí! Enviamos a todo el mundo. Los guardianes viajan con mucho amor y protección. El envío internacional es por DHL y tarda aproximadamente 7-15 días.'
+      },
+      {
+        q: '¿Cuánto tarda mi pedido?',
+        a: 'En Uruguay: 2-5 días hábiles. Internacional: 7-15 días. Cada guardián es único y a veces necesitamos unos días extra para prepararlo con el cuidado que merece.'
+      },
+      {
+        q: '¿Puedo rastrear mi pedido?',
+        a: 'Sí, te enviamos el número de seguimiento por email cuando tu guardián sale de viaje hacia vos.'
+      }
+    ]
+  },
+  {
+    categoria: 'Cristales y Energía',
+    preguntas: [
+      {
+        q: '¿Cómo limpio mis cristales?',
+        a: 'Hay varias formas: luz de luna (ideal luna llena), humo de salvia o palo santo, enterrarlos en sal gruesa por 24h, o ponerlos sobre selenita. Cada cristal tiene sus preferencias - consultá nuestra guía de cristales.'
+      },
+      {
+        q: '¿Cada cuánto debo limpiarlos?',
+        a: 'Depende del uso. Si trabajás mucho con ellos, una vez por semana. Si son decorativos, una vez al mes en luna llena es suficiente. Confía en tu intuición - si sentís que lo necesitan, limpiálos.'
+      }
+    ]
+  }
+];
+
+function FaqSec() {
+  const [categoriaAbierta, setCategoriaAbierta] = useState(FAQS[0].categoria);
+  const [preguntaAbierta, setPreguntaAbierta] = useState(null);
+
+  return (
+    <div className="sec">
+      <div className="sec-head">
+        <h1>❓ Preguntas Frecuentes</h1>
+        <p>Todo lo que necesitás saber sobre Duendes del Uruguay.</p>
+      </div>
+
+      <div className="faq-categorias">
+        {FAQS.map(cat => (
+          <button
+            key={cat.categoria}
+            className={`faq-cat ${categoriaAbierta === cat.categoria ? 'act' : ''}`}
+            onClick={() => { setCategoriaAbierta(cat.categoria); setPreguntaAbierta(null); }}
+          >
+            {cat.categoria}
+          </button>
+        ))}
+      </div>
+
+      <div className="faq-lista">
+        {FAQS.find(c => c.categoria === categoriaAbierta)?.preguntas.map((faq, i) => (
+          <div
+            key={i}
+            className={`faq-item ${preguntaAbierta === i ? 'abierta' : ''}`}
+          >
+            <button
+              className="faq-pregunta"
+              onClick={() => setPreguntaAbierta(preguntaAbierta === i ? null : i)}
+            >
+              <span>{faq.q}</span>
+              <span className="faq-arrow">{preguntaAbierta === i ? '−' : '+'}</span>
+            </button>
+            {preguntaAbierta === i && (
+              <div className="faq-respuesta">
+                <p>{faq.a}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="faq-contacto">
+        <h3>¿No encontraste lo que buscabas?</h3>
+        <p>Escribinos y te ayudamos.</p>
+        <a href="https://wa.me/59899123456" target="_blank" rel="noopener" className="btn-gold">
+          💬 Contactar por WhatsApp
+        </a>
+      </div>
     </div>
   );
 }
@@ -1762,11 +2698,18 @@ function Tito({ usuario, abierto, setAbierto }) {
   const enviar = async () => {
     if (!input.trim() || env) return;
     const m = input.trim(); setInput('');
-    setMsgs(prev => [...prev, { r: 'u', t: m }]); setEnv(true);
+    const nuevosMsgs = [...msgs, { r: 'u', t: m }];
+    setMsgs(nuevosMsgs); setEnv(true);
     try {
-      const contexto = `[El usuario está en Mi Magia. Tiene ${usuario?.runas||0} runas y ${usuario?.treboles||0} tréboles. Las secciones son: Mis Canalizaciones (guardianes, lecturas, regalos hechos/recibidos), Jardín Mágico (tréboles y runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas guardadas y diario). Tréboles: $10 USD = 1, se canjean por descuentos. Runas: para experiencias mágicas.]
-Pregunta: ${m}`;
-      const res = await fetch(`${API_BASE}/api/tito/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: contexto, email: usuario?.email }) });
+      // Enviar historial de conversación para mantener contexto
+      const historial = nuevosMsgs.slice(-10).map(msg => ({
+        role: msg.r === 'u' ? 'user' : 'assistant',
+        content: msg.t
+      }));
+      const contexto = `[CONTEXTO MI MAGIA: Usuario con ${usuario?.runas||0} runas, ${usuario?.treboles||0} tréboles. Secciones: Canalizaciones (guardianes, lecturas, regalos), Jardín Mágico (tréboles/runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas y diario). 1 trébol = $10 USD. Runas para experiencias.]
+IMPORTANTE: Mantené el contexto de la conversación. Si el usuario dice "ayudame" o "sí" o "dale", referite a lo que acabás de decir/ofrecer.
+Mensaje actual: ${m}`;
+      const res = await fetch(`${API_BASE}/api/tito/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: contexto, email: usuario?.email, history: historial }) });
       const data = await res.json();
       setMsgs(prev => [...prev, { r: 't', t: data.response || 'Hubo un error, intentá de nuevo.' }]);
     } catch(e) { setMsgs(prev => [...prev, { r: 't', t: 'Error de conexión.' }]); }
@@ -2194,6 +3137,65 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .entrada-head span:first-child{color:#d4af37}
 .entrada-head span:last-child{color:#999}
 .entrada-card p{color:#666;font-size:0.95rem}
+
+/* CALENDARIO INTERACTIVO DEL DIARIO */
+.diario-vistas{display:flex;gap:0.5rem;margin-bottom:1.5rem}
+.vista-btn{padding:0.6rem 1rem;background:#fff;border:1px solid #e0e0e0;border-radius:8px;font-family:'Cinzel',serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+.vista-btn:hover{border-color:#d4af37}
+.vista-btn.act{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.diario-calendario{background:#fff;border-radius:12px;padding:1.5rem;margin-bottom:2rem;border:1px solid #f0f0f0}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.cal-nav-btn{background:none;border:none;font-size:1.25rem;color:#d4af37;cursor:pointer;padding:0.5rem 1rem}
+.cal-nav-btn:hover{color:#b8962e}
+.cal-mes{text-align:center}
+.cal-mes-nombre{display:block;font-family:'Cinzel',serif;font-size:1.1rem;text-transform:capitalize}
+.cal-fase-hoy{font-size:0.85rem;color:#666}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;padding:0.5rem 0;border-bottom:1px solid #f0f0f0;margin-bottom:0.5rem}
+.cal-header-dia{font-family:'Cinzel',serif;font-size:0.75rem;color:#999}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dia{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0.25rem;border-radius:8px;cursor:pointer;position:relative;transition:all 0.2s;background:#fafafa}
+.cal-dia:hover:not(.vacio){background:#f0f0f0}
+.cal-dia.vacio{background:transparent;cursor:default}
+.cal-dia.hoy{background:#d4af37;color:#1a1a1a}
+.cal-dia.hoy .cal-dia-num{font-weight:600}
+.cal-dia.con-entradas{border:2px solid #d4af37}
+.cal-dia.sel{background:#1a1a1a;color:#fff}
+.cal-dia.sel .cal-dia-luna{color:#d4af37}
+.cal-dia-num{font-family:'Cinzel',serif;font-size:0.9rem}
+.cal-dia-luna{font-size:0.7rem;margin-top:2px}
+.cal-dia-marker{position:absolute;top:2px;right:4px;font-size:0.6rem;color:#d4af37}
+.cal-leyenda{display:flex;gap:1.5rem;justify-content:center;padding:1rem 0;border-top:1px solid #f0f0f0;margin-top:1rem;font-size:0.8rem;color:#666}
+.marker-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.marker-dot.hoy{background:#d4af37}
+.marker-dot.entradas{border:2px solid #d4af37;background:#fff}
+.dia-seleccionado{margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #f0f0f0}
+.dia-seleccionado h3{font-family:'Cinzel',serif;margin-bottom:0.5rem}
+.dia-info-luna{display:flex;align-items:center;gap:0.5rem;color:#666;font-size:0.9rem;margin-bottom:1rem}
+.luna-energia{font-size:0.8rem;opacity:0.8;font-style:italic}
+.entradas-dia{display:flex;flex-direction:column;gap:0.75rem}
+.entrada-mini{background:#fafafa;padding:1rem;border-radius:8px}
+.entrada-mini-tipo{font-family:'Cinzel',serif;font-size:0.85rem;color:#d4af37;display:block;margin-bottom:0.5rem}
+.entrada-mini p{font-size:0.9rem;color:#555;margin:0}
+.sin-entradas{color:#999;font-style:italic;text-align:center;padding:1rem}
+.diario-acciones{display:flex;align-items:center;gap:1rem}
+.tip-runa{font-size:0.8rem;color:#888}
+.diario-stats{background:linear-gradient(135deg,#f8f4eb,#fff);border-radius:12px;padding:1.5rem;border:1px solid #e5d9c3}
+.diario-stats h4{font-family:'Cinzel',serif;text-align:center;margin-bottom:1rem;color:#8B4513}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center}
+.stat{display:flex;flex-direction:column;gap:0.25rem}
+.stat-num{font-family:'Cinzel',serif;font-size:1.75rem;color:#d4af37}
+.stat-label{font-size:0.8rem;color:#666}
+@media(max-width:600px){
+  .cal-grid{gap:1px}
+  .cal-dia{padding:0.1rem}
+  .cal-dia-num{font-size:0.75rem}
+  .cal-dia-luna{font-size:0.6rem}
+  .cal-leyenda{flex-wrap:wrap;gap:0.75rem}
+  .diario-vistas{flex-direction:column}
+  .vista-btn{width:100%}
+  .stats-grid{grid-template-columns:1fr}
+}
+
 .tito-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:60px;height:60px;border-radius:50%;background:#1a1a1a;border:2px solid #d4af37;cursor:pointer;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:1000;display:flex;align-items:center;justify-content:center}
 .tito-btn img{width:100%;height:100%;object-fit:cover;position:absolute}
 .tito-fb{font-family:'Cinzel',serif;font-size:1.5rem;color:#d4af37}
@@ -2520,5 +3522,100 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .resultado-palabras{color:#888;font-size:0.85rem;text-align:right;margin-top:15px}
 .resultado-pendiente{background:#1f1f1f;padding:20px;border-radius:16px;text-align:center;margin-bottom:20px}
 .guia-cargando,.catalogo-cargando,.cosmos-cargando{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;color:#888}
-@media(max-width:768px){.senal-footer{grid-template-columns:1fr}.elementos-preview{grid-template-columns:repeat(2,1fr)}.cosmos-tabs{grid-template-columns:repeat(2,1fr)}.cristales-grid{grid-template-columns:repeat(2,1fr)}.experiencias-grid-new{grid-template-columns:1fr}}
+
+/* FORO MÁGICO */
+.foro-categorias{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem}
+.foro-cat{display:flex;align-items:center;gap:0.4rem;padding:0.6rem 1rem;background:#fff;border:1px solid #f0f0f0;border-radius:8px;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.foro-cat:hover{border-color:#d4af37}
+.foro-cat.act{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.foro-acciones{margin-bottom:1.5rem}
+.foro-nuevo{background:#fafafa;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.foro-nuevo h3{font-family:'Cinzel',serif;margin-bottom:1rem}
+.foro-titulo-input{width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-bottom:1rem}
+.foro-nuevo textarea{width:100%;padding:1rem;border:1px solid #ddd;border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-bottom:1rem;resize:vertical}
+.foro-loading,.foro-empty{text-align:center;padding:3rem;color:#888}
+.foro-empty span{font-size:2.5rem;color:#ddd;display:block}
+.foro-empty h3{font-family:'Cinzel',serif;margin:0.5rem 0}
+.foro-posts{display:flex;flex-direction:column;gap:1rem}
+.foro-post-card{display:flex;gap:1rem;background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s}
+.foro-post-card:hover{border-color:#d4af37}
+.post-avatar{width:45px;height:45px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#b8962e);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cinzel',serif;font-weight:600;flex-shrink:0}
+.post-content{flex:1;min-width:0}
+.post-content h4{font-family:'Cinzel',serif;margin:0 0 0.5rem;font-size:1rem}
+.post-content p{color:#666;font-size:0.9rem;margin:0 0 0.75rem;overflow:hidden;text-overflow:ellipsis}
+.post-footer{display:flex;gap:1rem;font-size:0.8rem;color:#999;flex-wrap:wrap}
+.post-autor{color:#d4af37}
+.foro-post-full{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.post-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.post-meta{display:flex;flex-direction:column}
+.post-meta strong{font-family:'Cinzel',serif}
+.post-meta span{font-size:0.8rem;color:#999}
+.post-titulo{font-family:'Cinzel',serif;font-size:1.3rem;margin-bottom:1rem}
+.post-contenido{color:#555;line-height:1.7;margin-bottom:1.5rem}
+.post-acciones{display:flex;gap:1.5rem;color:#888;font-size:0.9rem;padding-top:1rem;border-top:1px solid #f0f0f0}
+.foro-respuestas{margin-bottom:1.5rem}
+.foro-respuestas h3{font-family:'Cinzel',serif;margin-bottom:1rem}
+.respuesta-card{display:flex;gap:1rem;background:#fafafa;border-radius:8px;padding:1rem;margin-bottom:0.75rem}
+.respuesta-avatar{width:32px;height:32px;border-radius:50%;background:#d4af37;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;flex-shrink:0}
+.respuesta-content{flex:1}
+.respuesta-meta{display:flex;gap:0.75rem;margin-bottom:0.4rem}
+.respuesta-meta strong{font-size:0.9rem}
+.respuesta-meta span{font-size:0.8rem;color:#999}
+.respuesta-content p{color:#555;font-size:0.95rem;margin:0}
+.foro-responder{background:#f5f5f5;border-radius:12px;padding:1.5rem}
+.foro-responder h3{font-family:'Cinzel',serif;margin-bottom:1rem}
+.foro-responder textarea{width:100%;padding:1rem;border:1px solid #ddd;border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-bottom:1rem;resize:vertical}
+
+/* UTILIDADES */
+.utils-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.util-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s}
+.util-card:hover{border-color:#d4af37;transform:translateY(-2px)}
+.util-icono{font-size:2rem;display:block;margin-bottom:0.75rem}
+.util-card h3{font-family:'Cinzel',serif;font-size:1rem;margin-bottom:0.5rem}
+.util-card p{font-size:0.85rem;color:#666;margin:0}
+.util-header{text-align:center;margin-bottom:2rem}
+.util-icono-grande{font-size:3rem;display:block;margin-bottom:0.5rem}
+.util-header h2{font-family:'Cinzel',serif}
+.util-content{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:2rem}
+.luna-actual{text-align:center;margin-bottom:2rem}
+.luna-icono{font-size:4rem;display:block;margin-bottom:0.5rem}
+.luna-actual h3{font-family:'Cinzel',serif;font-size:1.3rem}
+.luna-info{display:grid;gap:1.5rem}
+.luna-energia strong,.luna-ritual strong{display:block;font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.5rem}
+.luna-energia p,.luna-ritual p{color:#555;margin:0}
+.numero-dia{text-align:center;margin-bottom:1.5rem}
+.numero-grande{font-family:'Cinzel',serif;font-size:4rem;color:#d4af37;display:block}
+.numero-dia h3{font-family:'Cinzel',serif}
+.numero-mensaje{color:#555;text-align:center;margin-bottom:1rem}
+.util-content small{color:#999;text-align:center;display:block}
+.color-dia{padding:3rem 2rem;border-radius:12px;text-align:center;margin-bottom:1.5rem}
+.color-nombre{font-family:'Cinzel',serif;font-size:1.5rem;color:#fff}
+.color-energia{color:#555;text-align:center;margin-bottom:1rem}
+.afirmacion-box{text-align:center;background:linear-gradient(135deg,#fef3c7,#fff)}
+.afirmacion-icono{font-size:2.5rem;color:#d4af37;margin-bottom:1rem}
+.afirmacion-texto{font-size:1.3rem;font-style:italic;color:#555;margin-bottom:1.5rem}
+.elemento-dia{padding:2.5rem;border-radius:12px;text-align:center;margin-bottom:1.5rem;color:#fff}
+.elemento-icono{font-size:2.5rem;display:block;margin-bottom:0.5rem}
+.elemento-dia h3{font-family:'Cinzel',serif;margin:0}
+.elemento-consejo{color:#555;text-align:center}
+
+/* FAQ */
+.faq-categorias{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem}
+.faq-cat{padding:0.6rem 1rem;background:#fff;border:1px solid #f0f0f0;border-radius:8px;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.faq-cat:hover{border-color:#d4af37}
+.faq-cat.act{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.faq-lista{display:flex;flex-direction:column;gap:0.5rem}
+.faq-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;overflow:hidden}
+.faq-item.abierta{border-color:#d4af37}
+.faq-pregunta{width:100%;padding:1rem 1.25rem;background:none;border:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer;text-align:left;font-family:'Cormorant Garamond',serif;font-size:1rem}
+.faq-pregunta:hover{background:#fafafa}
+.faq-arrow{font-size:1.25rem;color:#d4af37}
+.faq-respuesta{padding:0 1.25rem 1.25rem;background:#fafafa}
+.faq-respuesta p{color:#555;margin:0}
+.faq-contacto{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:2rem;text-align:center;margin-top:2rem}
+.faq-contacto h3{font-family:'Cinzel',serif;color:#d4af37;margin-bottom:0.5rem}
+.faq-contacto p{color:rgba(255,255,255,0.7);margin-bottom:1.5rem}
+
+@media(max-width:768px){.senal-footer{grid-template-columns:1fr}.elementos-preview{grid-template-columns:repeat(2,1fr)}.cosmos-tabs{grid-template-columns:repeat(2,1fr)}.cristales-grid{grid-template-columns:repeat(2,1fr)}.experiencias-grid-new{grid-template-columns:1fr}.utils-grid{grid-template-columns:repeat(2,1fr)}.foro-categorias{overflow-x:auto;flex-wrap:nowrap}.faq-categorias{overflow-x:auto;flex-wrap:nowrap}}
+@media(max-width:480px){.utils-grid{grid-template-columns:1fr}}
 `;

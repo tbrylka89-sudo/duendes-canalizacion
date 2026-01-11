@@ -72,19 +72,47 @@ const CANJES = {
     nombre: 'Cristal sorpresa',
     descripcion: 'Un cristal energizado elegido intuitivamente para vos'
   },
-  'descuento-10': {
-    treboles: 50,
-    tipo: 'descuento',
-    valor: 10,
-    nombre: '10% de descuento',
-    descripcion: 'Aplicable en tu proxima compra de productos'
+
+  // ═══ CUPONES FIJOS USD ═══
+  'cupon-5usd': {
+    treboles: 30,
+    tipo: 'cupon-fijo',
+    valorUSD: 5,
+    valorUY: 225,
+    nombre: 'Cupón $5 USD',
+    descripcion: 'Válido en cualquier compra, sin mínimo'
   },
-  'descuento-15': {
+  'cupon-10usd': {
+    treboles: 60,
+    tipo: 'cupon-fijo',
+    valorUSD: 10,
+    valorUY: 450,
+    nombre: 'Cupón $10 USD',
+    descripcion: 'Válido en cualquier compra, sin mínimo'
+  },
+  'cupon-15usd': {
+    treboles: 100,
+    tipo: 'cupon-fijo',
+    valorUSD: 15,
+    valorUY: 675,
+    nombre: 'Cupón $15 USD',
+    descripcion: 'Válido en cualquier compra'
+  },
+
+  // ═══ CÍRCULO CON TRÉBOLES ═══
+  'circulo-7dias': {
     treboles: 80,
-    tipo: 'descuento',
-    valor: 15,
-    nombre: '15% de descuento',
-    descripcion: 'Aplicable en tu proxima compra de productos'
+    tipo: 'circulo',
+    dias: 7,
+    nombre: '7 días de Círculo',
+    descripcion: 'Acceso completo al Círculo de Duendes por 1 semana'
+  },
+  'circulo-30dias': {
+    treboles: 250,
+    tipo: 'circulo',
+    dias: 30,
+    nombre: '30 días de Círculo',
+    descripcion: 'Un mes completo de membresía Círculo'
   }
 };
 
@@ -166,18 +194,61 @@ export async function POST(request) {
         break;
 
       case 'descuento':
-        const codigoCupon = `TREBOL${Date.now().toString(36).toUpperCase()}`;
+        const codigoCuponDesc = `TREBOL${Date.now().toString(36).toUpperCase()}`;
         if (!usuario.cupones) usuario.cupones = [];
         usuario.cupones.push({
-          codigo: codigoCupon,
+          codigo: codigoCuponDesc,
           descuento: canje.valor,
           tipo: 'porcentaje',
           creado: ahora.toISOString(),
           usado: false,
           origen: 'canje-treboles'
         });
-        resultado.mensaje = `Cupon de ${canje.valor}% generado: ${codigoCupon}`;
-        resultado.detalles = { tipo: 'descuento', codigo: codigoCupon, valor: canje.valor };
+        resultado.mensaje = `Cupon de ${canje.valor}% generado: ${codigoCuponDesc}`;
+        resultado.detalles = { tipo: 'descuento', codigo: codigoCuponDesc, valor: canje.valor };
+        break;
+
+      case 'cupon-fijo':
+        const codigoCuponFijo = `CUPON${canje.valorUSD}USD${Date.now().toString(36).toUpperCase()}`;
+        if (!usuario.cupones) usuario.cupones = [];
+        usuario.cupones.push({
+          codigo: codigoCuponFijo,
+          valorUSD: canje.valorUSD,
+          valorUY: canje.valorUY,
+          tipo: 'fijo-usd',
+          creado: ahora.toISOString(),
+          usado: false,
+          origen: 'canje-treboles'
+        });
+        resultado.mensaje = `Cupón de $${canje.valorUSD} USD generado: ${codigoCuponFijo}`;
+        resultado.detalles = { tipo: 'cupon-fijo', codigo: codigoCuponFijo, valorUSD: canje.valorUSD, valorUY: canje.valorUY };
+        break;
+
+      case 'circulo':
+        const fechaExpira = new Date(ahora.getTime() + canje.dias * 24 * 60 * 60 * 1000);
+
+        // Verificar si ya tiene círculo activo y extender
+        if (usuario.esCirculo && usuario.circuloExpira && new Date(usuario.circuloExpira) > ahora) {
+          // Extender desde la fecha actual de expiración
+          const expiraActual = new Date(usuario.circuloExpira);
+          usuario.circuloExpira = new Date(expiraActual.getTime() + canje.dias * 24 * 60 * 60 * 1000).toISOString();
+        } else {
+          // Nueva membresía
+          usuario.esCirculo = true;
+          usuario.circuloExpira = fechaExpira.toISOString();
+        }
+
+        usuario.circuloOrigen = 'canje-treboles';
+        if (!usuario.historialCirculo) usuario.historialCirculo = [];
+        usuario.historialCirculo.push({
+          tipo: 'canje-treboles',
+          dias: canje.dias,
+          fecha: ahora.toISOString(),
+          expira: usuario.circuloExpira
+        });
+
+        resultado.mensaje = `${canje.dias} días de Círculo activados! Expira: ${new Date(usuario.circuloExpira).toLocaleDateString('es-UY')}`;
+        resultado.detalles = { tipo: 'circulo', dias: canje.dias, expira: usuario.circuloExpira };
         break;
     }
 
