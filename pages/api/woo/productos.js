@@ -9,8 +9,8 @@ export default async function handler(req, res) {
   try {
     // Credenciales WooCommerce
     const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-    const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-    const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+    const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+    const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
     if (!WOO_KEY || !WOO_SECRET) {
       // Si no hay credenciales, devolver productos de ejemplo con placeholders

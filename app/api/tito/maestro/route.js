@@ -882,8 +882,8 @@ async function verCirculo(filtro = 'activos') {
 
 async function buscarOrdenes(filtro = 'pendientes', limite = 20) {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     return { success: false, mensaje: 'WooCommerce no esta configurado. Necesito las credenciales.' };
@@ -931,8 +931,8 @@ async function buscarOrdenes(filtro = 'pendientes', limite = 20) {
 
 async function verOrden(ordenId) {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     return { success: false, mensaje: 'WooCommerce no esta configurado.' };
@@ -982,8 +982,8 @@ ${o.customer_note ? `### Nota del cliente\n${o.customer_note}` : ''}`
 
 async function actualizarOrden(ordenId, estado, nota) {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     return { success: false, mensaje: 'WooCommerce no esta configurado.' };
@@ -1020,8 +1020,8 @@ async function actualizarOrden(ordenId, estado, nota) {
 
 async function ordenesDelDia() {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     return { success: false, mensaje: 'WooCommerce no esta configurado.' };
@@ -1153,8 +1153,8 @@ async function productosSinStock() {
 
 async function sincronizarWoo() {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     return { success: false, mensaje: 'WooCommerce no esta configurado.' };
@@ -1215,8 +1215,8 @@ async function crearCupon(datos) {
   }
 
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     // Guardar localmente si no hay WooCommerce
@@ -1279,8 +1279,8 @@ ${minimo ? `- Compra minima: $${minimo}` : ''}`
 
 async function verCupones(estado = 'activos') {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     const cupones = await kv.get('cupones:lista') || [];
@@ -1383,8 +1383,8 @@ async function statsGenerales() {
 async function statsVentas(periodo = 'mes', desde = null, hasta = null) {
   // Para stats reales necesitamos WooCommerce
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+  const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!WOO_KEY || !WOO_SECRET) {
     return { success: false, mensaje: 'Necesito WooCommerce configurado para stats de ventas reales.' };

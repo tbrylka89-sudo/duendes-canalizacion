@@ -6,9 +6,9 @@ import { kv } from '@vercel/kv';
 
 export async function POST() {
   try {
-    const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-    const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-    const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+    const WOO_URL = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+    const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+    const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
     if (!WOO_KEY || !WOO_SECRET) {
       return Response.json({

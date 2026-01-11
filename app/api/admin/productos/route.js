@@ -68,7 +68,7 @@ export async function PUT(request) {
     await kv.set('productos:catalogo', productos);
 
     // Si tiene wooId, intentar actualizar en WooCommerce tambien
-    if (producto.wooId && process.env.WOO_CONSUMER_KEY) {
+    if (producto.wooId && (process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY)) {
       await actualizarEnWoo(producto);
     }
 
@@ -137,8 +137,8 @@ export async function POST(request) {
 
 async function fetchWooProducts() {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = (process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY);
+  const WOO_SECRET = (process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET);
 
   if (!WOO_KEY || !WOO_SECRET) {
     // Productos de ejemplo si no hay WooCommerce
@@ -278,8 +278,8 @@ async function fetchWooProducts() {
 
 async function actualizarEnWoo(producto) {
   const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
-  const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-  const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+  const WOO_KEY = (process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY);
+  const WOO_SECRET = (process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET);
 
   if (!WOO_KEY || !WOO_SECRET || !producto.wooId) return;
 
