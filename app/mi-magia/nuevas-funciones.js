@@ -305,7 +305,9 @@ export function CosmosMes({ usuario }) {
 
   const cargarCosmos = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/circulo/cosmos?email=${usuario?.email}`);
+      // Detectar país del usuario o default a Uruguay
+      const pais = usuario?.pais || 'UY';
+      const res = await fetch(`${API_BASE}/api/circulo/cosmos?email=${usuario?.email}&pais=${pais}`);
       const data = await res.json();
       if (data.success) {
         setCosmos(data.cosmos);
@@ -332,6 +334,11 @@ export function CosmosMes({ usuario }) {
       <div className="cosmos-header">
         <h2>Cosmos del Mes</h2>
         <p>{cosmos.mes}</p>
+        {cosmos.geolocalizacion && (
+          <small style={{color:'#888',fontSize:'0.75rem'}}>
+            🌍 Hemisferio {cosmos.geolocalizacion.hemisferio}
+          </small>
+        )}
       </div>
 
       {/* Mostrar Sabbat si hay uno próximo */}

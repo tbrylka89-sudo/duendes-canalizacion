@@ -6,50 +6,88 @@ const anthropic = new Anthropic({
 });
 
 // ═══════════════════════════════════════════════════════════════
-// SABBATS Y EVENTOS MÁGICOS DEL AÑO
+// SABBATS Y EVENTOS MÁGICOS - ADAPTADOS POR HEMISFERIO
 // ═══════════════════════════════════════════════════════════════
 
-const SABBATS = [
+// Hemisferio Norte (fechas originales celtas)
+const SABBATS_NORTE = [
   { nombre: 'Imbolc', fecha: [2, 1], emoji: '🕯️',
     descripcion: 'Despertar de la tierra, primeros brotes de primavera',
     ritual: 'Encendé velas blancas para purificar tu hogar. Limpiá tus cristales y tu altar.',
     guardian: 'Los guardianes de Tierra despiertan. Ideal para conectar con Gnomos y hacer rituales de abundancia.' },
-
   { nombre: 'Ostara', fecha: [3, 20], emoji: '🌸',
     descripcion: 'Equinoccio de primavera, equilibrio luz-oscuridad, fertilidad',
     ritual: 'Plantá semillas (físicas o simbólicas). Decorá tu altar con flores frescas.',
     guardian: 'Los Elfos del Aire están muy activos. Excelente para pedir claridad mental y nuevos comienzos.' },
-
   { nombre: 'Beltane', fecha: [5, 1], emoji: '🔥',
     descripcion: 'Celebración de la vida, pasión, unión de lo masculino y femenino',
     ritual: 'Encendé una fogata o velas rojas. Bailá, celebrá la vida y el amor.',
     guardian: 'Los Magos del Fuego están en su máximo poder. Ideal para rituales de pasión y transformación.' },
-
   { nombre: 'Litha', fecha: [6, 21], emoji: '☀️',
     descripcion: 'Solsticio de verano, día más largo, máximo poder solar',
     ritual: 'Cargá todos tus cristales al sol. Hacé rituales de prosperidad y éxito.',
     guardian: 'Todos los guardianes de Fuego brillan. Pedí fuerza, coraje y protección.' },
-
   { nombre: 'Lammas', fecha: [8, 1], emoji: '🌾',
     descripcion: 'Primera cosecha, gratitud por la abundancia recibida',
     ritual: 'Horneá pan o compartí comida. Agradecé todo lo que cosechaste este año.',
     guardian: 'Los Gnomos de Tierra ayudan a manifestar abundancia material. Agradeceles.' },
-
   { nombre: 'Mabon', fecha: [9, 22], emoji: '🍂',
     descripcion: 'Equinoccio de otoño, segunda cosecha, balance y gratitud',
     ritual: 'Hacé una lista de gratitud. Decorá tu altar con hojas y frutos de otoño.',
     guardian: 'Equilibrio entre todos los elementos. Buen momento para conectar con cualquier guardián.' },
-
   { nombre: 'Samhain', fecha: [10, 31], emoji: '🎃',
     descripcion: 'Año nuevo celta, el velo entre mundos es más fino, honrar ancestros',
     ritual: 'Poné una vela en la ventana para guiar a los espíritus. Meditá con tu guardián sobre el año.',
     guardian: 'El velo es fino: los guardianes pueden comunicarse más claramente. Escuchá sus mensajes.' },
-
   { nombre: 'Yule', fecha: [12, 21], emoji: '🎄',
     descripcion: 'Solsticio de invierno, renacimiento del sol, esperanza en la oscuridad',
     ritual: 'Encendé velas para llamar al sol. Decorá con verde (pino, muérdago). Intercambiá regalos.',
     guardian: 'Las Hadas del Agua traen sueños proféticos. Los guardianes descansan y recargan energía.' }
 ];
+
+// Hemisferio Sur (fechas invertidas - Uruguay, Argentina, Chile, etc.)
+const SABBATS_SUR = [
+  { nombre: 'Imbolc', fecha: [8, 1], emoji: '🕯️',
+    descripcion: 'Despertar de la tierra, primeros brotes de primavera',
+    ritual: 'Encendé velas blancas para purificar tu hogar. Limpiá tus cristales y tu altar.',
+    guardian: 'Los guardianes de Tierra despiertan. Ideal para conectar con Gnomos y hacer rituales de abundancia.' },
+  { nombre: 'Ostara', fecha: [9, 22], emoji: '🌸',
+    descripcion: 'Equinoccio de primavera, equilibrio luz-oscuridad, fertilidad',
+    ritual: 'Plantá semillas (físicas o simbólicas). Decorá tu altar con flores frescas.',
+    guardian: 'Los Elfos del Aire están muy activos. Excelente para pedir claridad mental y nuevos comienzos.' },
+  { nombre: 'Beltane', fecha: [11, 1], emoji: '🔥',
+    descripcion: 'Celebración de la vida, pasión, unión de lo masculino y femenino',
+    ritual: 'Encendé una fogata o velas rojas. Bailá, celebrá la vida y el amor.',
+    guardian: 'Los Magos del Fuego están en su máximo poder. Ideal para rituales de pasión y transformación.' },
+  { nombre: 'Litha', fecha: [12, 21], emoji: '☀️',
+    descripcion: 'Solsticio de verano, día más largo, máximo poder solar',
+    ritual: 'Cargá todos tus cristales al sol. Hacé rituales de prosperidad y éxito.',
+    guardian: 'Todos los guardianes de Fuego brillan. Pedí fuerza, coraje y protección.' },
+  { nombre: 'Lammas', fecha: [2, 1], emoji: '🌾',
+    descripcion: 'Primera cosecha, gratitud por la abundancia recibida',
+    ritual: 'Horneá pan o compartí comida. Agradecé todo lo que cosechaste este año.',
+    guardian: 'Los Gnomos de Tierra ayudan a manifestar abundancia material. Agradeceles.' },
+  { nombre: 'Mabon', fecha: [3, 20], emoji: '🍂',
+    descripcion: 'Equinoccio de otoño, segunda cosecha, balance y gratitud',
+    ritual: 'Hacé una lista de gratitud. Decorá tu altar con hojas y frutos de otoño.',
+    guardian: 'Equilibrio entre todos los elementos. Buen momento para conectar con cualquier guardián.' },
+  { nombre: 'Samhain', fecha: [4, 30], emoji: '🎃',
+    descripcion: 'Año nuevo celta, el velo entre mundos es más fino, honrar ancestros',
+    ritual: 'Poné una vela en la ventana para guiar a los espíritus. Meditá con tu guardián sobre el año.',
+    guardian: 'El velo es fino: los guardianes pueden comunicarse más claramente. Escuchá sus mensajes.' },
+  { nombre: 'Yule', fecha: [6, 21], emoji: '🎄',
+    descripcion: 'Solsticio de invierno, renacimiento del sol, esperanza en la oscuridad',
+    ritual: 'Encendé velas para llamar al sol. Decorá con verde (pino, muérdago). Intercambiá regalos.',
+    guardian: 'Las Hadas del Agua traen sueños proféticos. Los guardianes descansan y recargan energía.' }
+];
+
+// Países del hemisferio sur
+const PAISES_SUR = ['UY', 'AR', 'CL', 'BR', 'PY', 'BO', 'PE', 'EC', 'CO', 'VE', 'AU', 'NZ', 'ZA'];
+
+function getSabbats(pais) {
+  if (!pais) return SABBATS_SUR; // Default Uruguay
+  return PAISES_SUR.includes(pais.toUpperCase()) ? SABBATS_SUR : SABBATS_NORTE;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // GUÍA DE GUARDIANES POR FASE LUNAR
@@ -100,15 +138,16 @@ const GUARDIANES_LUNAR = {
   }
 };
 
-// Función para obtener el Sabbat más cercano
-function getSabbatProximo() {
+// Función para obtener el Sabbat más cercano (con país)
+function getSabbatProximo(pais) {
   const ahora = new Date();
   const año = ahora.getFullYear();
+  const sabbats = getSabbats(pais);
 
   let sabbatProximo = null;
   let diasHasta = 366;
 
-  for (const sabbat of SABBATS) {
+  for (const sabbat of sabbats) {
     const [mes, dia] = sabbat.fecha;
     let fechaSabbat = new Date(año, mes - 1, dia);
 
@@ -135,12 +174,13 @@ function getSabbatProximo() {
 }
 
 // Función para obtener el Sabbat actual (si estamos en uno)
-function getSabbatActual() {
+function getSabbatActual(pais) {
   const ahora = new Date();
   const mes = ahora.getMonth() + 1;
   const dia = ahora.getDate();
+  const sabbats = getSabbats(pais);
 
-  for (const sabbat of SABBATS) {
+  for (const sabbat of sabbats) {
     const [sMes, sDia] = sabbat.fecha;
     // Consideramos "activo" el sabbat 3 días antes y después
     if (mes === sMes && Math.abs(dia - sDia) <= 3) {
@@ -272,6 +312,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const generar = searchParams.get('generar') === 'true';
+    const pais = searchParams.get('pais') || 'UY'; // Default Uruguay
 
     const luna = calcularFaseLunar();
     const signo = getInfoAstrologica();
@@ -323,9 +364,9 @@ export async function GET(request) {
       descripcion: 'Momento de plenitud, celebración y limpieza'
     });
 
-    // Obtener sabbat próximo y actual
-    const sabbatProximo = getSabbatProximo();
-    const sabbatActual = getSabbatActual();
+    // Obtener sabbat próximo y actual (geolocalizado)
+    const sabbatProximo = getSabbatProximo(pais);
+    const sabbatActual = getSabbatActual(pais);
 
     // Agregar sabbat próximo a fechas importantes
     if (sabbatProximo && sabbatProximo.diasRestantes <= 30) {
@@ -380,6 +421,15 @@ export async function GET(request) {
 
       // NUEVO: Sabbat actual (si estamos en uno)
       sabbatActual: sabbatActual,
+
+      // Geolocalización
+      geolocalizacion: {
+        pais: pais,
+        hemisferio: PAISES_SUR.includes(pais.toUpperCase()) ? 'Sur' : 'Norte',
+        nota: PAISES_SUR.includes(pais.toUpperCase())
+          ? 'Sabbats ajustados para el Hemisferio Sur'
+          : 'Sabbats del Hemisferio Norte'
+      },
 
       fechas: fechasImportantes,
 

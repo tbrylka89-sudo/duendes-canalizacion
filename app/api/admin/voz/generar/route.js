@@ -4,9 +4,10 @@
 // Voces personalizadas de Thibisay + voces de Eleven Labs
 const VOCES = {
   // === VOCES PROPIAS DE DUENDES ===
-  'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
-  'thibisay-rapido': process.env.ELEVENLABS_VOZ_THIBISAY_RAPIDO || 'EXAVITQu4vr4xnSDxMaL',
-  'duende': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
+  // Voice ID compartido de Thibisay: knhUzs4lao5jJEzGotGw
+  'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'knhUzs4lao5jJEzGotGw',
+  'thibisay-rapido': process.env.ELEVENLABS_VOZ_THIBISAY_RAPIDO || 'knhUzs4lao5jJEzGotGw',
+  'duende': process.env.ELEVENLABS_VOZ_THIBISAY || 'knhUzs4lao5jJEzGotGw',
 
   // === VOCES DE ELEVEN LABS ===
   'rachel': '21m00Tcm4TlvDq8ikWAM',      // Cálida, narradora
