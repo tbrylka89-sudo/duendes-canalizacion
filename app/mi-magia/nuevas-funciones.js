@@ -16,6 +16,19 @@ function limpiarTexto(texto) {
     .replace(/\*/g, '');
 }
 
+// Helper: Formatear fecha sin problemas de timezone
+// Evita que "2026-02-01" se muestre como 31/1 por conversión UTC
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return '-';
+  // Si es formato ISO YYYY-MM-DD, parseamos manualmente
+  if (typeof fechaStr === 'string' && fechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const [año, mes, dia] = fechaStr.split('-');
+    return `${parseInt(dia)}/${parseInt(mes)}/${año}`;
+  }
+  // Si tiene hora, usar Date normal
+  return new Date(fechaStr).toLocaleDateString('es-UY');
+}
+
 // ═══════════════════════════════════════════════════════════════
 // SEÑAL DEL DÍA - Mensaje personalizado diario
 // ═══════════════════════════════════════════════════════════════
@@ -414,14 +427,14 @@ export function CosmosMes({ usuario }) {
                 <span style={{fontSize:'1.5rem'}}>🌑</span>
                 <div>
                   <strong style={{display:'block',color:'#fff'}}>Luna Nueva</strong>
-                  <small style={{color:'#fff'}}>{cosmos.luna.proximaNueva ? new Date(cosmos.luna.proximaNueva).toLocaleDateString('es-UY') : '-'}</small>
+                  <small style={{color:'#fff'}}>{formatearFecha(cosmos.luna.proximaNueva)}</small>
                 </div>
               </div>
               <div style={{display:'flex',alignItems:'center',gap:'10px',background:'#1f1f1f',padding:'12px',borderRadius:'10px'}}>
                 <span style={{fontSize:'1.5rem'}}>🌕</span>
                 <div>
                   <strong style={{display:'block',color:'#fff'}}>Luna Llena</strong>
-                  <small style={{color:'#fff'}}>{cosmos.luna.proximaLlena ? new Date(cosmos.luna.proximaLlena).toLocaleDateString('es-UY') : '-'}</small>
+                  <small style={{color:'#fff'}}>{formatearFecha(cosmos.luna.proximaLlena)}</small>
                 </div>
               </div>
             </div>
@@ -523,7 +536,7 @@ export function CosmosMes({ usuario }) {
                 <span style={{fontSize:'1.5rem'}}>{f.emoji || '✦'}</span>
                 <div>
                   <strong style={{color:'#fff'}}>{f.evento}</strong>
-                  <small style={{display:'block',color:'#ccc'}}>{f.fecha ? new Date(f.fecha).toLocaleDateString('es-UY') : ''}</small>
+                  <small style={{display:'block',color:'#ccc'}}>{formatearFecha(f.fecha)}</small>
                   <p style={{color:'#fff',fontSize:'0.85rem',margin:'5px 0 0'}}>{f.descripcion}</p>
                 </div>
               </div>
