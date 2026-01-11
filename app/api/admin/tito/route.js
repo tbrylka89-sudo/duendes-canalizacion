@@ -141,7 +141,7 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 
 ### CREATIVIDAD (IA)
 19. GENERAR IMAGEN: {"accion": "generar_imagen", "datos": {"prompt": "descripcion de la imagen", "estilo": "magico|duende|watercolor|realista|natural"}}
-20. GENERAR VOZ: {"accion": "generar_voz", "datos": {"texto": "texto a convertir en audio", "voz": "duende|bella|rachel"}}
+20. GENERAR VOZ: {"accion": "generar_voz", "datos": {"texto": "texto a convertir en audio", "voz": "thibisay|thibisay-rapido|duende|bella|rachel"}}
 
 ## EJEMPLOS DE USO NATURAL
 
@@ -822,10 +822,13 @@ _Podes ver los productos en la seccion Productos del admin._`
       }
 
       try {
+        // Voces personalizadas de Thibisay (Duendes del Uruguay)
         const VOCES = {
+          'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
+          'thibisay-rapido': process.env.ELEVENLABS_VOZ_THIBISAY_RAPIDO || 'EXAVITQu4vr4xnSDxMaL',
+          'duende': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
           'rachel': '21m00Tcm4TlvDq8ikWAM',
-          'bella': 'EXAVITQu4vr4xnSDxMaL',
-          'duende': 'EXAVITQu4vr4xnSDxMaL'
+          'bella': 'EXAVITQu4vr4xnSDxMaL'
         };
 
         const voiceId = VOCES[voz] || VOCES.duende;

@@ -1,20 +1,21 @@
 // API para generar voz con Eleven Labs
 // Voces sugeridas para contenido mágico/esotérico
 
+// Voces personalizadas de Thibisay + voces de Eleven Labs
 const VOCES = {
-  // Voces femeninas (ideales para contenido de Duendes)
+  // === VOCES PROPIAS DE DUENDES ===
+  'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
+  'thibisay-rapido': process.env.ELEVENLABS_VOZ_THIBISAY_RAPIDO || 'EXAVITQu4vr4xnSDxMaL',
+  'duende': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
+
+  // === VOCES DE ELEVEN LABS ===
   'rachel': '21m00Tcm4TlvDq8ikWAM',      // Cálida, narradora
-  'domi': 'AZnzlk1XvdvUeBnXmlld',         // Expresiva, joven
   'bella': 'EXAVITQu4vr4xnSDxMaL',        // Suave, íntima
+  'domi': 'AZnzlk1XvdvUeBnXmlld',         // Expresiva, joven
   'elli': 'MF3mGyEYCl7XYWbV9V6O',         // Clara, amigable
   'charlotte': 'XB0fDUnXU5powFXDhCwa',    // Elegante, madura
-
-  // Voces masculinas
   'adam': 'pNInz6obpgDQGcFmaJgB',         // Profunda, narración
-  'antoni': 'ErXwobaYiN019PkySvjV',       // Cálida, conversacional
-
-  // Voz por defecto para Duendes
-  'duende': 'EXAVITQu4vr4xnSDxMaL'        // Bella - suave e íntima
+  'antoni': 'ErXwobaYiN019PkySvjV'        // Cálida, conversacional
 };
 
 export async function POST(request) {
