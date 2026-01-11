@@ -3,17 +3,58 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 // ═══════════════════════════════════════════════════════════════
+// NUEVA PALETA DE COLORES VIBRANTE
+// ═══════════════════════════════════════════════════════════════
+const COLORS = {
+  // Fondos
+  bg: '#0a0a0f',
+  bgCard: '#12121a',
+  bgElevated: '#1a1a25',
+  bgHover: '#22222f',
+
+  // Bordes
+  border: '#2a2a3a',
+  borderLight: '#3a3a4a',
+
+  // Texto
+  text: '#ffffff',
+  textMuted: '#9ca3af',
+  textDim: '#6b7280',
+
+  // Colores principales (Dashboard = Cyan)
+  cyan: '#06B6D4',
+  cyanLight: '#22D3EE',
+  cyanDark: '#0891B2',
+
+  // Colores secundarios
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+  emerald: '#10B981',
+  orange: '#F97316',
+  rose: '#F43F5E',
+  amber: '#F59E0B',
+  blue: '#3B82F6',
+  gold: '#D4A853',
+
+  // Estados
+  success: '#22c55e',
+  error: '#ef4444',
+  warning: '#f59e0b',
+  info: '#3b82f6',
+};
+
+// ═══════════════════════════════════════════════════════════════
 // CONSTANTES
 // ═══════════════════════════════════════════════════════════════
 
 const RANGOS = [
-  { id: 'semilla', nombre: 'Semilla Magica', min: 0, icono: '🌱', color: '#90EE90' },
-  { id: 'brote', nombre: 'Brote de Luz', min: 50, icono: '🌿', color: '#98FB98' },
-  { id: 'aprendiz', nombre: 'Aprendiz Elemental', min: 150, icono: '✨', color: '#d4af37' },
-  { id: 'guardian', nombre: 'Guardiana del Bosque', min: 300, icono: '🌳', color: '#228B22' },
-  { id: 'hechicera', nombre: 'Hechicera de Cristal', min: 500, icono: '💎', color: '#9b59b6' },
-  { id: 'alquimista', nombre: 'Alquimista del Alba', min: 800, icono: '⚗️', color: '#e74c3c' },
-  { id: 'maestra', nombre: 'Maestra Elemental', min: 1200, icono: '👑', color: '#f39c12' }
+  { id: 'semilla', nombre: 'Semilla Magica', min: 0, icono: '🌱', color: COLORS.emerald },
+  { id: 'brote', nombre: 'Brote de Luz', min: 50, icono: '🌿', color: '#4ade80' },
+  { id: 'aprendiz', nombre: 'Aprendiz Elemental', min: 150, icono: '✨', color: COLORS.amber },
+  { id: 'guardian', nombre: 'Guardiana del Bosque', min: 300, icono: '🌳', color: '#16a34a' },
+  { id: 'hechicera', nombre: 'Hechicera de Cristal', min: 500, icono: '💎', color: COLORS.purple },
+  { id: 'alquimista', nombre: 'Alquimista del Alba', min: 800, icono: '⚗️', color: COLORS.rose },
+  { id: 'maestra', nombre: 'Maestra Elemental', min: 1200, icono: '👑', color: COLORS.gold }
 ];
 
 function getRango(gastado) {
@@ -80,524 +121,666 @@ export default function Dashboard() {
 
   if (cargando) {
     return (
-      <div style={estilos.loading}>
-        <div style={estilos.spinner}></div>
-        <p style={{ color: '#666', marginTop: '16px' }}>Cargando estadisticas...</p>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '400px'
+      }}>
+        <div style={{
+          width: 48,
+          height: 48,
+          border: `3px solid ${COLORS.border}`,
+          borderTopColor: COLORS.cyan,
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <p style={{ color: COLORS.textMuted, marginTop: 20 }}>Cargando estadisticas...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div style={estilos.dashboard}>
-      {/* Header */}
-      <div style={estilos.header}>
+    <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+      {/* Header con gradiente */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 32,
+        padding: 24,
+        background: COLORS.bgCard,
+        borderRadius: 20,
+        border: `1px solid ${COLORS.border}`,
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Gradiente decorativo */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: `linear-gradient(90deg, ${COLORS.cyan}, ${COLORS.purple}, ${COLORS.pink})`
+        }} />
+
         <div>
-          <h1 style={estilos.titulo}>{saludo.texto} {saludo.icono}</h1>
-          <p style={estilos.fecha}>{hoy}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <div style={{
+              width: 52,
+              height: 52,
+              borderRadius: 16,
+              background: `linear-gradient(135deg, ${COLORS.cyan}33, ${COLORS.cyan}11)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 28
+            }}>
+              {saludo.icono}
+            </div>
+            <div>
+              <h1 style={{ color: COLORS.text, fontSize: 28, fontWeight: 700, margin: 0 }}>
+                {saludo.texto}
+              </h1>
+              <p style={{ color: COLORS.textMuted, margin: 0, fontSize: 14, textTransform: 'capitalize' }}>
+                {hoy}
+              </p>
+            </div>
+          </div>
         </div>
-        <button onClick={cargarTodo} style={estilos.refreshBtn}>
-          &#8635; Actualizar
+
+        <button
+          onClick={cargarTodo}
+          style={{
+            padding: '12px 24px',
+            background: COLORS.bgElevated,
+            border: `1px solid ${COLORS.border}`,
+            borderRadius: 12,
+            color: COLORS.textMuted,
+            fontSize: 14,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            transition: 'all 0.2s'
+          }}
+        >
+          <span style={{ fontSize: 18 }}>↻</span>
+          Actualizar
         </button>
       </div>
 
-      {/* Stats Grid - WooCommerce primero */}
-      <div style={estilos.statsGrid}>
-        <div style={{ ...estilos.statCard, ...estilos.statCardGold }}>
-          <span style={estilos.statIcono}>💰</span>
-          <div style={estilos.statValor}>${wooStats?.ingresosMes || stats?.ingresosMes || 0}</div>
-          <div style={estilos.statLabel}>Ingresos este mes</div>
+      {/* Info Box */}
+      <div style={{
+        padding: 20,
+        background: `linear-gradient(135deg, ${COLORS.cyan}11, ${COLORS.purple}11)`,
+        borderRadius: 16,
+        border: `1px solid ${COLORS.cyan}33`,
+        marginBottom: 28,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16
+      }}>
+        <span style={{ fontSize: 28 }}>📊</span>
+        <div>
+          <p style={{ color: COLORS.text, margin: 0, fontWeight: 500 }}>
+            Panel de Control
+          </p>
+          <p style={{ color: COLORS.textMuted, margin: '4px 0 0', fontSize: 14 }}>
+            Resumen de ventas, miembros del Circulo, pedidos y actividad de tu tienda magica.
+          </p>
+        </div>
+      </div>
+
+      {/* Stats Grid Principal */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: 16,
+        marginBottom: 32
+      }}>
+        {/* Ingresos del mes - Destacado */}
+        <div style={{
+          background: `linear-gradient(135deg, ${COLORS.emerald}22, ${COLORS.emerald}11)`,
+          border: `2px solid ${COLORS.emerald}44`,
+          borderRadius: 20,
+          padding: 24,
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            background: `linear-gradient(90deg, ${COLORS.emerald}, ${COLORS.cyan})`
+          }} />
+          <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>💰</span>
+          <div style={{ color: COLORS.emerald, fontSize: 36, fontWeight: 700, marginBottom: 4 }}>
+            ${wooStats?.ingresosMes || stats?.ingresosMes || 0}
+          </div>
+          <div style={{ color: COLORS.textMuted, fontSize: 14 }}>Ingresos este mes</div>
           {wooStats?.comparativaMes && (
             <div style={{
-              ...estilos.statComparativa,
-              color: wooStats.comparativaMes >= 0 ? '#22c55e' : '#ef4444'
+              marginTop: 10,
+              padding: '6px 14px',
+              background: wooStats.comparativaMes >= 0 ? `${COLORS.success}22` : `${COLORS.error}22`,
+              borderRadius: 10,
+              fontSize: 13,
+              color: wooStats.comparativaMes >= 0 ? COLORS.success : COLORS.error,
+              display: 'inline-block'
             }}>
               {wooStats.comparativaMes >= 0 ? '↑' : '↓'} {Math.abs(wooStats.comparativaMes)}% vs mes anterior
             </div>
           )}
         </div>
 
-        <div style={estilos.statCard}>
-          <span style={estilos.statIcono}>🛒</span>
-          <div style={estilos.statValor}>{wooStats?.ventasMes || stats?.ventasMes || 0}</div>
-          <div style={estilos.statLabel}>Pedidos este mes</div>
+        {/* Pedidos del mes */}
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24,
+          textAlign: 'center'
+        }}>
+          <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>🛒</span>
+          <div style={{ color: COLORS.text, fontSize: 32, fontWeight: 700, marginBottom: 4 }}>
+            {wooStats?.ventasMes || stats?.ventasMes || 0}
+          </div>
+          <div style={{ color: COLORS.textMuted, fontSize: 14 }}>Pedidos este mes</div>
           {wooStats?.ventasHoy > 0 && (
-            <div style={estilos.statComparativa}>+{wooStats.ventasHoy} hoy</div>
+            <div style={{
+              marginTop: 10,
+              padding: '6px 14px',
+              background: `${COLORS.cyan}22`,
+              borderRadius: 10,
+              fontSize: 13,
+              color: COLORS.cyan,
+              display: 'inline-block'
+            }}>
+              +{wooStats.ventasHoy} hoy
+            </div>
           )}
         </div>
 
-        <div style={estilos.statCard}>
-          <span style={estilos.statIcono}>★</span>
-          <div style={estilos.statValor}>{stats?.miembrosCirculo || 0}</div>
-          <div style={estilos.statLabel}>Miembros Circulo</div>
+        {/* Miembros Circulo */}
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24,
+          textAlign: 'center'
+        }}>
+          <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>☽</span>
+          <div style={{ color: COLORS.text, fontSize: 32, fontWeight: 700, marginBottom: 4 }}>
+            {stats?.miembrosCirculo || 0}
+          </div>
+          <div style={{ color: COLORS.textMuted, fontSize: 14 }}>Miembros Circulo</div>
           {stats?.pruebasActivas > 0 && (
-            <div style={estilos.statComparativa}>{stats.pruebasActivas} en prueba</div>
+            <div style={{
+              marginTop: 10,
+              padding: '6px 14px',
+              background: `${COLORS.purple}22`,
+              borderRadius: 10,
+              fontSize: 13,
+              color: COLORS.purple,
+              display: 'inline-block'
+            }}>
+              {stats.pruebasActivas} en prueba
+            </div>
           )}
         </div>
 
-        <div style={estilos.statCard}>
-          <span style={estilos.statIcono}>👥</span>
-          <div style={estilos.statValor}>{wooStats?.clientesWoo || stats?.clientesTotal || 0}</div>
-          <div style={estilos.statLabel}>Total clientes</div>
+        {/* Total clientes */}
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24,
+          textAlign: 'center'
+        }}>
+          <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>👥</span>
+          <div style={{ color: COLORS.text, fontSize: 32, fontWeight: 700, marginBottom: 4 }}>
+            {wooStats?.clientesWoo || stats?.clientesTotal || 0}
+          </div>
+          <div style={{ color: COLORS.textMuted, fontSize: 14 }}>Total clientes</div>
         </div>
 
-        <div style={estilos.statCard}>
-          <span style={estilos.statIcono}>📦</span>
-          <div style={estilos.statValor}>{wooStats?.pendientes || 0}</div>
-          <div style={estilos.statLabel}>Pedidos pendientes</div>
+        {/* Pedidos pendientes */}
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24,
+          textAlign: 'center'
+        }}>
+          <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>📦</span>
+          <div style={{ color: COLORS.text, fontSize: 32, fontWeight: 700, marginBottom: 4 }}>
+            {wooStats?.pendientes || 0}
+          </div>
+          <div style={{ color: COLORS.textMuted, fontSize: 14 }}>Pedidos pendientes</div>
         </div>
 
-        <div style={estilos.statCard}>
-          <span style={estilos.statIcono}>⏰</span>
-          <div style={estilos.statValor}>{stats?.circulosPorVencer || 0}</div>
-          <div style={estilos.statLabel}>Circulos por vencer</div>
+        {/* Circulos por vencer */}
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24,
+          textAlign: 'center'
+        }}>
+          <span style={{ fontSize: 28, display: 'block', marginBottom: 8 }}>⏰</span>
+          <div style={{ color: COLORS.text, fontSize: 32, fontWeight: 700, marginBottom: 4 }}>
+            {stats?.circulosPorVencer || 0}
+          </div>
+          <div style={{ color: COLORS.textMuted, fontSize: 14 }}>Circulos por vencer</div>
         </div>
       </div>
 
       {/* Pedidos recientes de WooCommerce */}
       {wooStats?.ultimosPedidos?.length > 0 && (
-        <div style={estilos.seccion}>
-          <h2 style={estilos.seccionTitulo}>Pedidos recientes</h2>
-          <div style={estilos.pedidosGrid}>
+        <div style={{ marginBottom: 32 }}>
+          <h2 style={{
+            color: COLORS.text,
+            fontSize: 18,
+            fontWeight: 600,
+            marginBottom: 16,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <span style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: `${COLORS.orange}22`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 18
+            }}>🛍️</span>
+            Pedidos recientes
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 16
+          }}>
             {wooStats.ultimosPedidos.slice(0, 4).map((pedido, i) => (
-              <div key={i} style={estilos.pedidoCard}>
-                <div style={estilos.pedidoHeader}>
-                  <span style={estilos.pedidoId}>#{pedido.id}</span>
+              <div key={i} style={{
+                background: COLORS.bgCard,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 16,
+                padding: 20,
+                transition: 'all 0.2s'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 12
+                }}>
+                  <span style={{ color: COLORS.cyan, fontWeight: 600, fontSize: 15 }}>#{pedido.id}</span>
                   <span style={{
-                    ...estilos.pedidoEstado,
-                    background: pedido.status === 'processing' ? 'rgba(245, 158, 11, 0.15)' :
-                               pedido.status === 'completed' ? 'rgba(34, 197, 94, 0.15)' :
-                               'rgba(107, 114, 128, 0.15)',
-                    color: pedido.status === 'processing' ? '#f59e0b' :
-                           pedido.status === 'completed' ? '#22c55e' : '#888'
+                    padding: '5px 12px',
+                    borderRadius: 10,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    background: pedido.status === 'processing' ? `${COLORS.amber}22` :
+                               pedido.status === 'completed' ? `${COLORS.success}22` :
+                               `${COLORS.textMuted}22`,
+                    color: pedido.status === 'processing' ? COLORS.amber :
+                           pedido.status === 'completed' ? COLORS.success : COLORS.textMuted
                   }}>
                     {pedido.status === 'processing' ? 'Procesando' :
                      pedido.status === 'completed' ? 'Completado' :
                      pedido.status === 'on-hold' ? 'En espera' : pedido.status}
                   </span>
                 </div>
-                <div style={estilos.pedidoCliente}>{pedido.cliente}</div>
-                <div style={estilos.pedidoTotal}>${pedido.total}</div>
-                <div style={estilos.pedidoFecha}>{pedido.fecha}</div>
+                <div style={{ color: COLORS.text, fontSize: 15, marginBottom: 6 }}>{pedido.cliente}</div>
+                <div style={{ color: COLORS.emerald, fontSize: 22, fontWeight: 700, marginBottom: 6 }}>${pedido.total}</div>
+                <div style={{ color: COLORS.textDim, fontSize: 13 }}>{pedido.fecha}</div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Stats Mi Magia */}
-      <div style={estilos.seccion}>
-        <h2 style={estilos.seccionTitulo}>Mi Magia</h2>
-        <div style={estilos.miMagiaGrid}>
-          <div style={estilos.miMagiaCard}>
-            <span style={estilos.miMagiaIcono}>📖</span>
-            <span style={estilos.miMagiaValor}>{stats?.totalGrimorioEntradas || 0}</span>
-            <span style={estilos.miMagiaLabel}>Entradas grimorio</span>
-          </div>
-          <div style={estilos.miMagiaCard}>
-            <span style={estilos.miMagiaIcono}>☘</span>
-            <span style={estilos.miMagiaValor}>{stats?.totalCanjes || 0}</span>
-            <span style={estilos.miMagiaLabel}>Canjes realizados</span>
-          </div>
-          <div style={estilos.miMagiaCard}>
-            <span style={estilos.miMagiaIcono}>🎁</span>
-            <span style={estilos.miMagiaValor}>{stats?.totalRegalosEnviados || 0}</span>
-            <span style={estilos.miMagiaLabel}>Regalos enviados</span>
-          </div>
-          <div style={estilos.miMagiaCard}>
-            <span style={estilos.miMagiaIcono}>🌟</span>
-            <span style={estilos.miMagiaValor}>{stats?.pruebasActivas || 0}</span>
-            <span style={estilos.miMagiaLabel}>Pruebas activas</span>
-          </div>
+      {/* Mi Magia Stats */}
+      <div style={{ marginBottom: 32 }}>
+        <h2 style={{
+          color: COLORS.text,
+          fontSize: 18,
+          fontWeight: 600,
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10
+        }}>
+          <span style={{
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: `${COLORS.purple}22`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 18
+          }}>✨</span>
+          Mi Magia
+        </h2>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 16
+        }}>
+          {[
+            { icono: '📖', valor: stats?.totalGrimorioEntradas || 0, label: 'Entradas grimorio', color: COLORS.purple },
+            { icono: '☘️', valor: stats?.totalCanjes || 0, label: 'Canjes realizados', color: COLORS.emerald },
+            { icono: '🎁', valor: stats?.totalRegalosEnviados || 0, label: 'Regalos enviados', color: COLORS.pink },
+            { icono: '🌟', valor: stats?.pruebasActivas || 0, label: 'Pruebas activas', color: COLORS.amber }
+          ].map((item, i) => (
+            <div key={i} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: 24,
+              background: `linear-gradient(135deg, ${item.color}15, ${item.color}05)`,
+              border: `1px solid ${item.color}33`,
+              borderRadius: 16
+            }}>
+              <span style={{ fontSize: 24, marginBottom: 10 }}>{item.icono}</span>
+              <span style={{ color: COLORS.text, fontSize: 28, fontWeight: 700, marginBottom: 4 }}>{item.valor}</span>
+              <span style={{ color: COLORS.textMuted, fontSize: 13, textAlign: 'center' }}>{item.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Acciones rapidas */}
-      <div style={estilos.seccion}>
-        <h2 style={estilos.seccionTitulo}>Acciones rapidas</h2>
-        <div style={estilos.accionesGrid}>
-          <Link href="/admin/clientes" style={estilos.accionBtn}>
-            <span style={estilos.accionIcono}>👥</span>
-            <span>Buscar cliente</span>
-          </Link>
-          <Link href="/admin/contenido" style={estilos.accionBtn}>
-            <span style={estilos.accionIcono}>📝</span>
-            <span>Crear contenido</span>
-          </Link>
-          <Link href="/admin/regalos" style={estilos.accionBtn}>
-            <span style={estilos.accionIcono}>🎁</span>
-            <span>Enviar regalo</span>
-          </Link>
-          <Link href="/admin/circulo" style={estilos.accionBtn}>
-            <span style={estilos.accionIcono}>★</span>
-            <span>Ver circulo</span>
-          </Link>
+      <div style={{ marginBottom: 32 }}>
+        <h2 style={{
+          color: COLORS.text,
+          fontSize: 18,
+          fontWeight: 600,
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10
+        }}>
+          <span style={{
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: `${COLORS.cyan}22`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 18
+          }}>⚡</span>
+          Acciones rapidas
+        </h2>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 16
+        }}>
+          {[
+            { href: '/admin/clientes', icono: '👥', label: 'Buscar cliente', color: COLORS.blue },
+            { href: '/admin/contenido', icono: '✨', label: 'Crear contenido', color: COLORS.purple },
+            { href: '/admin/regalos', icono: '🎁', label: 'Enviar regalo', color: COLORS.pink },
+            { href: '/admin/circulo', icono: '☽', label: 'Ver circulo', color: COLORS.emerald }
+          ].map((item, i) => (
+            <Link
+              key={i}
+              href={item.href}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 10,
+                padding: '24px 20px',
+                background: COLORS.bgCard,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 16,
+                color: COLORS.text,
+                textDecoration: 'none',
+                fontSize: 15,
+                transition: 'all 0.2s'
+              }}
+            >
+              <span style={{
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                background: `${item.color}22`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24
+              }}>
+                {item.icono}
+              </span>
+              {item.label}
+            </Link>
+          ))}
         </div>
       </div>
 
       {/* Top Clientes y Por vencer */}
-      <div style={estilos.dosColumnas}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+        gap: 24,
+        marginBottom: 32
+      }}>
         {/* Top clientes */}
-        <div style={estilos.tarjeta}>
-          <h3 style={estilos.tarjetaTitulo}>🏆 Top clientes</h3>
-          <div style={estilos.listaClientes}>
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24
+        }}>
+          <h3 style={{
+            color: COLORS.text,
+            fontSize: 16,
+            fontWeight: 600,
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <span style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              background: `${COLORS.gold}22`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 16
+            }}>🏆</span>
+            Top clientes
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {stats?.topClientes?.length > 0 ? (
               stats.topClientes.slice(0, 8).map((cliente, i) => {
                 const rango = getRango(cliente.gastado || 0);
                 return (
-                  <div key={i} style={estilos.clienteItem}>
-                    <div style={estilos.clienteInfo}>
-                      <span style={estilos.clientePosicion}>#{i + 1}</span>
-                      <span style={estilos.clienteRango}>{rango.icono}</span>
-                      <span style={estilos.clienteNombre}>{cliente.nombre || cliente.email}</span>
+                  <div key={i} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 14px',
+                    background: COLORS.bgElevated,
+                    borderRadius: 12,
+                    border: `1px solid ${i < 3 ? `${COLORS.gold}33` : COLORS.border}`
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        background: i < 3 ? `${COLORS.gold}22` : COLORS.bgCard,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: i < 3 ? COLORS.gold : COLORS.textDim,
+                        fontSize: 12,
+                        fontWeight: 700
+                      }}>
+                        {i + 1}
+                      </span>
+                      <span style={{ fontSize: 18 }}>{rango.icono}</span>
+                      <span style={{ color: COLORS.text, fontSize: 14 }}>
+                        {cliente.nombre || cliente.email?.split('@')[0]}
+                      </span>
                     </div>
-                    <span style={estilos.clienteGastado}>${cliente.gastado || 0}</span>
+                    <span style={{ color: COLORS.gold, fontWeight: 600, fontSize: 15 }}>
+                      ${cliente.gastado || 0}
+                    </span>
                   </div>
                 );
               })
             ) : (
-              <p style={estilos.vacio}>No hay datos de clientes</p>
+              <p style={{ color: COLORS.textDim, textAlign: 'center', padding: 30 }}>
+                No hay datos de clientes
+              </p>
             )}
           </div>
         </div>
 
         {/* Por vencer */}
-        <div style={estilos.tarjeta}>
-          <h3 style={estilos.tarjetaTitulo}>⏰ Circulos por vencer (7 dias)</h3>
-          <div style={estilos.listaClientes}>
+        <div style={{
+          background: COLORS.bgCard,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: 20,
+          padding: 24
+        }}>
+          <h3 style={{
+            color: COLORS.text,
+            fontSize: 16,
+            fontWeight: 600,
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <span style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              background: `${COLORS.rose}22`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 16
+            }}>⏰</span>
+            Circulos por vencer (7 dias)
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {stats?.proximosVencer?.length > 0 ? (
               stats.proximosVencer.map((cliente, i) => (
-                <div key={i} style={estilos.clienteItem}>
-                  <div style={estilos.clienteInfo}>
-                    <span style={estilos.clienteNombre}>{cliente.nombre || cliente.email}</span>
-                  </div>
-                  <span style={{ ...estilos.clienteGastado, color: '#e74c3c' }}>
+                <div key={i} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 14px',
+                  background: COLORS.bgElevated,
+                  borderRadius: 12
+                }}>
+                  <span style={{ color: COLORS.text, fontSize: 14 }}>
+                    {cliente.nombre || cliente.email?.split('@')[0]}
+                  </span>
+                  <span style={{
+                    padding: '5px 12px',
+                    background: `${COLORS.rose}22`,
+                    borderRadius: 8,
+                    color: COLORS.rose,
+                    fontSize: 13,
+                    fontWeight: 600
+                  }}>
                     {cliente.diasRestantes} dias
                   </span>
                 </div>
               ))
             ) : (
-              <p style={estilos.vacio}>No hay circulos por vencer</p>
+              <div style={{
+                textAlign: 'center',
+                padding: 30,
+                color: COLORS.textDim
+              }}>
+                <span style={{ fontSize: 32, display: 'block', marginBottom: 10 }}>✨</span>
+                No hay circulos por vencer
+              </div>
             )}
           </div>
         </div>
       </div>
 
       {/* Actividad reciente */}
-      <div style={estilos.tarjeta}>
-        <h3 style={estilos.tarjetaTitulo}>📋 Actividad reciente</h3>
-        <div style={estilos.actividad}>
+      <div style={{
+        background: COLORS.bgCard,
+        border: `1px solid ${COLORS.border}`,
+        borderRadius: 20,
+        padding: 24
+      }}>
+        <h3 style={{
+          color: COLORS.text,
+          fontSize: 16,
+          fontWeight: 600,
+          marginBottom: 20,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10
+        }}>
+          <span style={{
+            width: 32,
+            height: 32,
+            borderRadius: 10,
+            background: `${COLORS.cyan}22`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 16
+          }}>📋</span>
+          Actividad reciente
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {stats?.actividad?.length > 0 ? (
             stats.actividad.slice(0, 10).map((act, i) => (
-              <div key={i} style={estilos.actividadItem}>
-                <span style={estilos.actividadIcono}>{act.icono || '•'}</span>
-                <span style={estilos.actividadTexto}>{act.texto}</span>
-                <span style={estilos.actividadTiempo}>{act.tiempo}</span>
+              <div key={i} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                padding: '12px 14px',
+                background: COLORS.bgElevated,
+                borderRadius: 12
+              }}>
+                <span style={{ fontSize: 18 }}>{act.icono || '•'}</span>
+                <span style={{ flex: 1, color: COLORS.text, fontSize: 14 }}>{act.texto}</span>
+                <span style={{ color: COLORS.textDim, fontSize: 13 }}>{act.tiempo}</span>
               </div>
             ))
           ) : (
-            <p style={estilos.vacio}>No hay actividad reciente</p>
+            <div style={{
+              textAlign: 'center',
+              padding: 40,
+              color: COLORS.textDim
+            }}>
+              <span style={{ fontSize: 32, display: 'block', marginBottom: 10 }}>🌿</span>
+              No hay actividad reciente
+            </div>
           )}
         </div>
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════
-// ESTILOS
-// ═══════════════════════════════════════════════════════════════
-
-const estilos = {
-  dashboard: {
-    maxWidth: '1200px',
-    margin: '0 auto'
-  },
-  loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '400px'
-  },
-  spinner: {
-    width: '40px',
-    height: '40px',
-    border: '3px solid #222',
-    borderTopColor: '#C6A962',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite'
-  },
-
-  // Header
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '32px'
-  },
-  titulo: {
-    color: '#fff',
-    fontSize: '28px',
-    fontWeight: '600',
-    marginBottom: '4px'
-  },
-  fecha: {
-    color: '#666',
-    fontSize: '14px',
-    textTransform: 'capitalize'
-  },
-  refreshBtn: {
-    padding: '10px 16px',
-    background: '#1f1f1f',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#888',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'all 0.2s'
-  },
-
-  // Stats Grid
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-    gap: '16px',
-    marginBottom: '32px'
-  },
-  statCard: {
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '12px',
-    padding: '20px',
-    textAlign: 'center'
-  },
-  statCardGold: {
-    background: 'linear-gradient(135deg, rgba(198,169,98,0.15) 0%, rgba(198,169,98,0.05) 100%)',
-    borderColor: 'rgba(198,169,98,0.3)'
-  },
-  statIcono: {
-    fontSize: '24px',
-    marginBottom: '8px',
-    display: 'block'
-  },
-  statValor: {
-    color: '#fff',
-    fontSize: '28px',
-    fontWeight: '700',
-    marginBottom: '4px'
-  },
-  statLabel: {
-    color: '#666',
-    fontSize: '13px'
-  },
-  statComparativa: {
-    marginTop: '6px',
-    fontSize: '11px',
-    color: '#888'
-  },
-
-  // Pedidos
-  pedidosGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '12px'
-  },
-  pedidoCard: {
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '10px',
-    padding: '16px'
-  },
-  pedidoHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px'
-  },
-  pedidoId: {
-    color: '#C6A962',
-    fontWeight: '600',
-    fontSize: '14px'
-  },
-  pedidoEstado: {
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '11px',
-    fontWeight: '500'
-  },
-  pedidoCliente: {
-    color: '#fff',
-    fontSize: '14px',
-    marginBottom: '4px'
-  },
-  pedidoTotal: {
-    color: '#22c55e',
-    fontSize: '18px',
-    fontWeight: '700',
-    marginBottom: '4px'
-  },
-  pedidoFecha: {
-    color: '#666',
-    fontSize: '12px'
-  },
-
-  // Seccion
-  seccion: {
-    marginBottom: '32px'
-  },
-  seccionTitulo: {
-    color: '#fff',
-    fontSize: '16px',
-    fontWeight: '600',
-    marginBottom: '16px'
-  },
-
-  // Mi Magia stats
-  miMagiaGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '12px'
-  },
-  miMagiaCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px 16px',
-    background: 'linear-gradient(135deg, rgba(75,85,99,0.2) 0%, rgba(55,65,81,0.1) 100%)',
-    border: '1px solid #2a2a2a',
-    borderRadius: '12px'
-  },
-  miMagiaIcono: {
-    fontSize: '20px',
-    marginBottom: '8px'
-  },
-  miMagiaValor: {
-    color: '#fff',
-    fontSize: '24px',
-    fontWeight: '700',
-    marginBottom: '4px'
-  },
-  miMagiaLabel: {
-    color: '#888',
-    fontSize: '12px',
-    textAlign: 'center'
-  },
-
-  // Acciones
-  accionesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-    gap: '12px'
-  },
-  accionBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '20px 16px',
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '12px',
-    color: '#ccc',
-    textDecoration: 'none',
-    fontSize: '14px',
-    transition: 'all 0.2s',
-    cursor: 'pointer'
-  },
-  accionIcono: {
-    fontSize: '24px'
-  },
-
-  // Dos columnas
-  dosColumnas: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '24px',
-    marginBottom: '24px'
-  },
-
-  // Tarjeta
-  tarjeta: {
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '12px',
-    padding: '20px'
-  },
-  tarjetaTitulo: {
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: '600',
-    marginBottom: '16px'
-  },
-
-  // Lista clientes
-  listaClientes: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  clienteItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 12px',
-    background: '#0a0a0a',
-    borderRadius: '8px'
-  },
-  clienteInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px'
-  },
-  clientePosicion: {
-    color: '#666',
-    fontSize: '12px',
-    width: '24px'
-  },
-  clienteRango: {
-    fontSize: '16px'
-  },
-  clienteNombre: {
-    color: '#ccc',
-    fontSize: '14px'
-  },
-  clienteGastado: {
-    color: '#C6A962',
-    fontWeight: '600',
-    fontSize: '14px'
-  },
-
-  // Actividad
-  actividad: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  actividadItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '10px 12px',
-    background: '#0a0a0a',
-    borderRadius: '8px'
-  },
-  actividadIcono: {
-    fontSize: '16px'
-  },
-  actividadTexto: {
-    flex: 1,
-    color: '#ccc',
-    fontSize: '14px'
-  },
-  actividadTiempo: {
-    color: '#666',
-    fontSize: '12px'
-  },
-
-  vacio: {
-    color: '#555',
-    fontSize: '14px',
-    textAlign: 'center',
-    padding: '20px'
-  }
-};
