@@ -190,13 +190,13 @@ const detectarCaracteristicas = (producto) => {
   };
 };
 
-// Mapeo de elemento a voz recomendada
+// Mapeo de elemento a voz recomendada (SOLO VOCES PREMIUM)
 const ELEMENTO_A_VOZ = {
-  tierra: { masculino: 'anciano-sabio', femenino: 'abuela-magica', neutro: 'guardian-bosque' },
-  agua: { masculino: 'druida', femenino: 'ninfa', neutro: 'hada' },
-  fuego: { masculino: 'hechicero', femenino: 'bruja-simpatica', neutro: 'merlin' },
-  aire: { masculino: 'elfo-alegre', femenino: 'hada', neutro: 'pixie' },
-  eter: { masculino: 'merlin', femenino: 'dryada', neutro: 'thibisay' }
+  tierra: { masculino: 'roger', femenino: 'matilda', neutro: 'guardian-bosque' },
+  agua: { masculino: 'george', femenino: 'sarah', neutro: 'ninfa' },
+  fuego: { masculino: 'daniel', femenino: 'aria', neutro: 'hechicero' },
+  aire: { masculino: 'callum', femenino: 'lily', neutro: 'hada' },
+  eter: { masculino: 'merlin', femenino: 'charlotte', neutro: 'thibisay' }
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1545,9 +1545,9 @@ FORMATO ESCRITO:
               background: `linear-gradient(135deg, ${COLORS.purple}15, ${COLORS.bgCard})`
             }}>
               <div>
-                <h3 style={{ color: COLORS.text, fontSize: 22, margin: 0 }}>🎙️ Biblioteca de Voces</h3>
+                <h3 style={{ color: COLORS.text, fontSize: 22, margin: 0 }}>🎙️ Voces Premium</h3>
                 <p style={{ color: COLORS.textMuted, fontSize: 14, margin: '4px 0 0' }}>
-                  {catalogoVoces?.total || 0} voces disponibles • Hacé clic en Preview para escuchar
+                  {catalogoVoces?.total || 0} voces ultra-realistas • <span style={{ color: COLORS.success }}>Suenan humanas, no a IA</span>
                 </p>
               </div>
               <button
@@ -1565,6 +1565,23 @@ FORMATO ESCRITO:
               >
                 ✕
               </button>
+            </div>
+
+            {/* Info Premium */}
+            <div style={{
+              padding: '14px 28px',
+              background: `linear-gradient(90deg, ${COLORS.gold}15, transparent)`,
+              borderBottom: `1px solid ${COLORS.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12
+            }}>
+              <span style={{ fontSize: 20 }}>⭐</span>
+              <p style={{ color: COLORS.textSecondary, fontSize: 13, margin: 0 }}>
+                <strong style={{ color: COLORS.gold }}>Todas las voces son premium</strong> -
+                Seleccionamos solo las voces que suenan más naturales y humanas de ElevenLabs.
+                Las marcadas con <span style={{ color: COLORS.success }}>✓ Recomendada</span> son las mejores para cada caso.
+              </p>
             </div>
 
             {/* Filtros */}
@@ -1639,7 +1656,21 @@ FORMATO ESCRITO:
                       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                         <span style={{ fontSize: 36 }}>{voz.icono}</span>
                         <div style={{ flex: 1 }}>
-                          <div style={{ color: COLORS.text, fontWeight: 600, fontSize: 15 }}>{voz.nombre}</div>
+                          <div style={{ color: COLORS.text, fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            {voz.nombre}
+                            {voz.recomendada && (
+                              <span style={{
+                                padding: '2px 6px',
+                                background: `${COLORS.success}25`,
+                                borderRadius: 4,
+                                fontSize: 9,
+                                color: COLORS.success,
+                                fontWeight: 700
+                              }}>
+                                ✓ RECOMENDADA
+                              </span>
+                            )}
+                          </div>
                           <div style={{ color: COLORS.textMuted, fontSize: 12 }}>
                             {voz.genero} • {voz.edad} • {voz.estilo}
                           </div>
