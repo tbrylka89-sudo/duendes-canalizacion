@@ -128,20 +128,23 @@ TECNICAS DE NEUROMARKETING PARA APLICAR:
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { categoria, tipo, tema, longitud = 3500 } = body;
+    const { categoria, tipo, tema, longitud, palabras, instruccionesExtra } = body;
 
-    if (!categoria || !tipo || !tema) {
+    // Usar palabras o longitud (el frontend envía "palabras")
+    const longitudFinal = palabras || longitud || 3500;
+
+    if (!tema) {
       return Response.json({
         success: false,
-        error: 'Categoria, tipo y tema son requeridos'
+        error: 'El tema es requerido'
       }, { status: 400 });
     }
 
-    const catInfo = CATEGORIAS_INFO[categoria] || { nombre: categoria, desc: categoria, emociones: [], elementos: [] };
-    const tipoInfo = TIPOS_INFO[tipo] || { nombre: tipo, estructura: 'contenido estructurado' };
+    const catInfo = CATEGORIAS_INFO[categoria] || { nombre: categoria || 'general', desc: categoria || 'contenido magico', emociones: ['conexion', 'magia'], elementos: ['energia', 'naturaleza'] };
+    const tipoInfo = TIPOS_INFO[tipo] || { nombre: tipo || 'articulo', estructura: 'contenido estructurado' };
 
     // Calcular longitud real basada en el parametro
-    const palabrasObjetivo = Math.max(3000, Math.min(5000, longitud));
+    const palabrasObjetivo = Math.max(1000, Math.min(5000, longitudFinal));
     const seccionesMinimas = Math.floor(palabrasObjetivo / 400);
 
     const systemPrompt = `Sos Thibisay, escritora principal del equipo de Duendes del Uruguay, una marca de productos artesanales magicos y experiencias espirituales de Uruguay.
@@ -243,6 +246,7 @@ ESTRUCTURA ESPERADA: ${tipoInfo.estructura}
 
 LONGITUD MINIMA: ${palabrasObjetivo} palabras
 
+${instruccionesExtra ? `INSTRUCCIONES ADICIONALES DEL CREADOR:\n${instruccionesExtra}\n` : ''}
 INSTRUCCIONES FINALES:
 1. Este contenido es para miembros PREMIUM del Circulo de Duendes
 2. Debe ser PROFUNDO, no superficial
@@ -265,9 +269,14 @@ Escribi el contenido completo ahora, respetando todas las estructuras y la longi
     const contenido = message.content[0]?.text || '';
     const palabrasGeneradas = contenido.split(/\s+/).length;
 
+    // Extraer título del contenido (primer # header)
+    const tituloMatch = contenido.match(/^#\s+(.+)$/m);
+    const titulo = tituloMatch ? tituloMatch[1].trim() : tema;
+
     return Response.json({
       success: true,
       contenido,
+      titulo,
       palabras: palabrasGeneradas,
       categoria,
       tipo,
@@ -278,9 +287,13 @@ Escribi el contenido completo ahora, respetando todas las estructuras y la longi
 
   } catch (error) {
     console.error('Error generando contenido:', error);
+
+    // Asegurar que siempre devolvemos JSON válido
+    const errorMessage = error?.message || 'Error desconocido al generar contenido';
+
     return Response.json({
       success: false,
-      error: error.message || 'Error al generar contenido'
+      error: errorMessage
     }, { status: 500 });
   }
 }
