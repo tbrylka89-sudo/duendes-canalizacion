@@ -472,14 +472,14 @@ const CUIDADOS = [
 ];
 
 const CRISTALES = [
-  { nombre: "Amatista", color: "#9b59b6", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol." },
-  { nombre: "Cuarzo Rosa", color: "#f8bbd9", props: "Amor, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
-  { nombre: "Citrino", color: "#f4d03f", props: "Abundancia, alegría", cuidado: "Auto-limpiante. Carga al sol." },
-  { nombre: "Turmalina Negra", color: "#2c3e50", props: "Protección máxima", cuidado: "Enterrar en sal o tierra." },
-  { nombre: "Labradorita", color: "#3498db", props: "Magia, transformación", cuidado: "Bajo las estrellas." },
-  { nombre: "Cuarzo Transparente", color: "#ecf0f1", props: "Amplificador universal", cuidado: "Acepta todo. Limpiar seguido." },
-  { nombre: "Selenita", color: "#f5f5f5", props: "Limpieza, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
-  { nombre: "Ojo de Tigre", color: "#b8860b", props: "Coraje, prosperidad", cuidado: "Sol de mañana." }
+  { nombre: "Amatista", color: "#9b59b6", emoji: "💜", img: "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=400&h=300&fit=crop", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol." },
+  { nombre: "Cuarzo Rosa", color: "#f8bbd9", emoji: "💗", img: "https://images.unsplash.com/photo-1603344797033-f0f4f587ab60?w=400&h=300&fit=crop", props: "Amor, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
+  { nombre: "Citrino", color: "#f4d03f", emoji: "💛", img: "https://images.unsplash.com/photo-1602752250015-52934bc45613?w=400&h=300&fit=crop", props: "Abundancia, alegría", cuidado: "Auto-limpiante. Carga al sol." },
+  { nombre: "Turmalina Negra", color: "#2c3e50", emoji: "🖤", img: "https://images.unsplash.com/photo-1610557892470-55d9e80c0eb2?w=400&h=300&fit=crop", props: "Protección máxima", cuidado: "Enterrar en sal o tierra." },
+  { nombre: "Labradorita", color: "#3498db", emoji: "🔮", img: "https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=400&h=300&fit=crop", props: "Magia, transformación", cuidado: "Bajo las estrellas." },
+  { nombre: "Cuarzo Transparente", color: "#ecf0f1", emoji: "🤍", img: "https://images.unsplash.com/photo-1519744346361-7a029b427a59?w=400&h=300&fit=crop", props: "Amplificador universal", cuidado: "Acepta todo. Limpiar seguido." },
+  { nombre: "Selenita", color: "#f5f5f5", emoji: "🤍", img: "https://images.unsplash.com/photo-1596438214437-59b0fbdac8e3?w=400&h=300&fit=crop", props: "Limpieza, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
+  { nombre: "Ojo de Tigre", color: "#b8860b", emoji: "🧡", img: "https://images.unsplash.com/photo-1632765854612-9b02b6ec2b15?w=400&h=300&fit=crop", props: "Coraje, prosperidad", cuidado: "Sol de mañana." }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -1400,16 +1400,31 @@ function CuidadosSec() {
 }
 
 function CristalesSec() {
+  const [imgError, setImgError] = useState({});
+
   return (
     <div className="sec">
       <div className="sec-head"><h1>Cristales y Gemas</h1><p>Aliados poderosos. Cada guardián viene acompañado de cristales específicos para su energía.</p></div>
       <div className="cristales-grid">
         {CRISTALES.map((c,i) => (
           <div key={i} className="cristal-card">
-            <div className="cristal-color" style={{background:c.color}}></div>
-            <h4>{c.nombre}</h4>
-            <p className="cristal-props">{c.props}</p>
-            <small className="cristal-cuidado">{c.cuidado}</small>
+            {c.img && !imgError[i] ? (
+              <img
+                src={c.img}
+                alt={c.nombre}
+                className="cristal-img"
+                onError={() => setImgError(prev => ({...prev, [i]: true}))}
+              />
+            ) : (
+              <div className="cristal-img-placeholder" style={{background: `linear-gradient(135deg, ${c.color}22, ${c.color}44)`}}>
+                <span>{c.emoji}</span>
+              </div>
+            )}
+            <div className="cristal-body">
+              <h4>{c.nombre}</h4>
+              <p className="cristal-props">{c.props}</p>
+              <small className="cristal-cuidado">{c.cuidado}</small>
+            </div>
           </div>
         ))}
       </div>
@@ -2897,9 +2912,9 @@ const estilos = `
 input,textarea,select{font-size:16px!important}
 html{overflow-x:hidden!important;width:100%!important;max-width:100%!important}
 body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a1a1a;font-size:18px;line-height:1.6;position:relative}
-.app{min-height:100vh;overflow-x:hidden!important;max-width:100%!important;width:100%!important}
-.contenido{overflow-x:hidden!important;max-width:100%!important;width:100%!important}
-.sec{overflow-x:hidden!important;max-width:100%!important;word-wrap:break-word}
+.app{min-height:100vh;overflow-x:hidden!important;max-width:100vw!important;width:100%!important;box-sizing:border-box}
+.contenido{overflow-x:hidden!important;max-width:calc(100vw - 240px)!important;width:100%!important;box-sizing:border-box}
+.sec{overflow-x:hidden!important;max-width:100%!important;word-wrap:break-word;box-sizing:border-box}
 .header{position:fixed;top:0;left:0;right:0;height:65px;background:#fff;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;z-index:100}
 .logo{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:2px;display:flex;align-items:center;gap:0.5rem}
 .logo span{color:#d4af37}
@@ -2917,8 +2932,8 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .nav-i{color:#d4af37;width:20px;text-align:center}
 .nav-sep{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:1px;color:#999;padding:1.25rem 1.5rem 0.5rem;text-transform:uppercase}
 .nav-volver{margin-top:auto;padding:1rem 1.5rem;color:#d4af37;text-decoration:none;font-size:0.9rem}
-.contenido{margin-left:240px;margin-top:65px;min-height:calc(100vh - 65px)}
-.sec{padding:2rem 2.5rem;max-width:1100px}
+.contenido{margin-left:240px;margin-top:65px;min-height:calc(100vh - 65px);max-width:calc(100vw - 240px);overflow-x:hidden}
+.sec{padding:2rem 2.5rem;max-width:1100px;margin:0 auto;box-sizing:border-box}
 .sec-head{margin-bottom:2rem}
 .sec-head h1{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:500;margin-bottom:0.5rem}
 .sec-head p{color:#666}
@@ -3143,12 +3158,15 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .cuidado-body p{font-size:0.9rem;color:#666;margin-bottom:0.5rem}
 .cuidado-body ul{margin-left:1.25rem;font-size:0.9rem;color:#666}
 .cuidado-body li{margin-bottom:0.25rem}
-.cristales-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.cristal-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
-.cristal-color{width:50px;height:50px;border-radius:50%;margin:0 auto 0.75rem}
-.cristal-card h4{font-family:'Cinzel',serif;font-size:0.9rem;margin-bottom:0.25rem}
-.cristal-props{font-size:0.8rem;color:#d4af37;margin-bottom:0.5rem}
-.cristal-cuidado{font-size:0.75rem;color:#888}
+.cristales-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.cristal-card{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:0;text-align:center;overflow:hidden;transition:all 0.3s;cursor:pointer}
+.cristal-card:hover{border-color:#d4af37;transform:translateY(-3px);box-shadow:0 8px 25px rgba(212,175,55,0.15)}
+.cristal-img{width:100%;height:180px;object-fit:cover;background:linear-gradient(135deg,#f8f4eb,#fff)}
+.cristal-img-placeholder{width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:4rem}
+.cristal-body{padding:1.25rem}
+.cristal-card h4{font-family:'Cinzel',serif;font-size:1.1rem;margin-bottom:0.5rem;color:#1a1a1a}
+.cristal-props{font-size:0.9rem;color:#d4af37;margin-bottom:0.75rem;line-height:1.4}
+.cristal-cuidado{font-size:0.8rem;color:#666;background:#f8f8f8;padding:0.5rem 0.75rem;border-radius:8px;display:inline-block}
 .circulo-landing{text-align:center}
 .circulo-hero{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:2.5rem;margin-bottom:2rem}
 .circulo-hero span{font-size:3rem;color:#d4af37}
@@ -3409,7 +3427,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .carga-c p{margin-top:1rem;color:#666}
 @keyframes pulsar{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
 @media(max-width:1100px){.stats-g,.beneficios-grid,.membresias-grid,.cristales-grid{grid-template-columns:repeat(2,1fr)}.exp-grid,.elementos-grid,.regalos-grid,.grim-intro-cards{grid-template-columns:1fr}.canjes-grid,.packs-grid{grid-template-columns:repeat(2,1fr)}.info-grid,.benef-grid-int,.fases-mes{grid-template-columns:1fr}}
-@media(max-width:900px){.menu-btn{display:flex!important;background:#d4af37!important;border:none!important}.menu-btn span{background:#fff!important}.header{padding:0 0.75rem!important}.nav-overlay{display:block!important}.nav{transform:translateX(-100%)!important;transition:transform 0.3s}.nav.abierto{transform:translateX(0)!important;box-shadow:4px 0 20px rgba(0,0,0,0.15)}.contenido{margin-left:0!important}.user-info{display:none!important}.logo{font-size:0.85rem!important}.hstats{gap:0.4rem!important}.hstats span{padding:0.15rem 0.4rem!important;font-size:0.7rem!important}}
+@media(max-width:900px){.menu-btn{display:flex!important;background:#d4af37!important;border:none!important}.menu-btn span{background:#fff!important}.header{padding:0 0.75rem!important}.nav-overlay{display:block!important}.nav{transform:translateX(-100%)!important;transition:transform 0.3s}.nav.abierto{transform:translateX(0)!important;box-shadow:4px 0 20px rgba(0,0,0,0.15)}.contenido{margin-left:0!important;max-width:100vw!important}.user-info{display:none!important}.logo{font-size:0.85rem!important}.hstats{gap:0.4rem!important}.hstats span{padding:0.15rem 0.4rem!important;font-size:0.7rem!important}}
 @media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
 
 /* ═══════════════════════════════════════════════════════════════
