@@ -100,15 +100,16 @@ const CANJES = {
   },
 
   // ═══ CÍRCULO CON TRÉBOLES ═══
+  // Precios ajustados: menos que un mini duende ($70 USD)
   'circulo-7dias': {
-    treboles: 80,
+    treboles: 25,
     tipo: 'circulo',
     dias: 7,
     nombre: '7 días de Círculo',
     descripcion: 'Acceso completo al Círculo de Duendes por 1 semana'
   },
   'circulo-30dias': {
-    treboles: 250,
+    treboles: 60,
     tipo: 'circulo',
     dias: 30,
     nombre: '30 días de Círculo',

@@ -2560,7 +2560,7 @@ const FAQS = [
       },
       {
         q: '¿Los guardianes se rompen o dañan?',
-        a: 'Físicamente son resistentes, pero si alguna vez se daña, no significa que la energía se haya ido. Podés contactarnos para ver opciones de reparación, o simplemente agradecerle por su servicio y enterrarlo en la tierra.'
+        a: 'Físicamente son muy resistentes, pero si alguna vez se daña, no significa que la energía se haya ido. IMPORTANTE: No realizamos reparaciones de guardianes. Si tu guardián se daña, podés agradecerle por su servicio y enterrarlo en la tierra para devolver su energía a la naturaleza.'
       }
     ]
   },
@@ -2569,11 +2569,11 @@ const FAQS = [
     preguntas: [
       {
         q: '¿Qué son las runas?',
-        a: 'Las runas son nuestra moneda mágica para experiencias. Las ganás al comprar guardianes y las usás para acceder a lecturas, tiradas, y experiencias espirituales personalizadas.'
+        a: 'Las runas (ᚱ) son nuestra moneda mágica para experiencias. Las podés obtener de tres formas: comprándolas directamente en packs, recibiéndolas como beneficio de tu membresía del Círculo, o como regalo especial en ocasiones. Las usás para acceder a lecturas, tiradas, y experiencias espirituales personalizadas. NO se ganan al comprar guardianes.'
       },
       {
         q: '¿Qué son los tréboles?',
-        a: 'Los tréboles son nuestra moneda de descuento. Cada trébol vale $10 USD y podés usarlos para canjear por descuentos, envíos gratis, productos y más. Los ganás al comprar y participar en la comunidad.'
+        a: 'Los tréboles (☘️) son nuestra moneda de fidelidad. Ganás 1 trébol por cada $10 USD (o equivalente en pesos uruguayos) que gastás en la tienda. Podés canjearlos por descuentos, envío gratis, días de Círculo, productos y más. A veces también los regalamos en ocasiones especiales.'
       },
       {
         q: '¿Las runas y tréboles expiran?',
