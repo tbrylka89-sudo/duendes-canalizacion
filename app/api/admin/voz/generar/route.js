@@ -38,30 +38,42 @@ export async function POST(request) {
       }, { status: 500 });
     }
 
-    const voiceId = VOCES[voz] || VOCES.duende;
+    let voiceId = VOCES[voz] || VOCES.duende;
 
-    // Llamar a Eleven Labs API
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': apiKey
-        },
-        body: JSON.stringify({
-          text: texto,
-          model_id: modelo,
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.5,
-            use_speaker_boost: true
-          }
-        })
-      }
-    );
+    // Función para llamar a Eleven Labs
+    async function llamarElevenLabs(vid) {
+      return await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${vid}`,
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': apiKey
+          },
+          body: JSON.stringify({
+            text: texto,
+            model_id: modelo,
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+              style: 0.5,
+              use_speaker_boost: true
+            }
+          })
+        }
+      );
+    }
+
+    // Intentar con la voz seleccionada
+    let response = await llamarElevenLabs(voiceId);
+
+    // Si falla con 404, intentar con voz de fallback (Rachel - voz cálida)
+    if (response.status === 404) {
+      console.log('Voz no encontrada, usando fallback Rachel');
+      voiceId = VOCES.rachel; // 21m00Tcm4TlvDq8ikWAM
+      response = await llamarElevenLabs(voiceId);
+    }
 
     if (!response.ok) {
       const errorData = await response.text();
