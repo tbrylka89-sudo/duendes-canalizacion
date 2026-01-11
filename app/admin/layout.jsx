@@ -86,28 +86,29 @@ const GLASS = {
 // ═══════════════════════════════════════════════════════════════
 const NAV_ITEMS = [
   { id: 'dashboard', path: '/admin', icon: '📊', label: 'Dashboard', shortcut: '1', color: COLORS.cyan, desc: 'Métricas y estadísticas' },
-  { id: 'clientes', path: '/admin/clientes', icon: '👥', label: 'Clientes', shortcut: '2', color: COLORS.blue, desc: 'Gestión de usuarios' },
-  { id: 'contenido', path: '/admin/contenido', icon: '✨', label: 'Contenido', shortcut: '3', color: COLORS.purple, badge: 'IA', desc: 'Crear con inteligencia artificial' },
-  { id: 'calendario', path: '/admin/calendario', icon: '📅', label: 'Calendario', shortcut: '4', color: COLORS.teal, badge: 'AUTO', desc: 'Planificar semanas y meses' },
-  { id: 'personajes', path: '/admin/personajes', icon: '🧙', label: 'Guardianes', shortcut: '5', color: COLORS.violet, badge: 'PRO', desc: 'Canalizar desde productos' },
-  { id: 'circulo', path: '/admin/circulo', icon: '🌙', label: 'Círculo', shortcut: '6', color: COLORS.amber, desc: 'Membresías premium' },
-  { id: 'regalos', path: '/admin/regalos', icon: '🎁', label: 'Regalos', shortcut: '7', color: COLORS.pink, desc: 'Enviar runas y tréboles' },
-  { id: 'banners', path: '/admin/banners', icon: '🖼️', label: 'Banners', shortcut: '8', color: COLORS.orange, desc: 'Imágenes promocionales' },
-  { id: 'productos', path: '/admin/productos', icon: '💎', label: 'Productos', shortcut: '9', color: COLORS.emerald, desc: 'Catálogo WooCommerce' },
-  { id: 'insights', path: '/admin/insights', icon: '📈', label: 'Insights', color: COLORS.teal, desc: 'Análisis de datos' },
+  { id: 'estudio', path: '/admin/estudio', icon: '🎨', label: 'Estudio', shortcut: '2', color: COLORS.pink, badge: 'PRO', desc: 'Editor visual completo' },
+  { id: 'calendario', path: '/admin/calendario', icon: '📅', label: 'Calendario', shortcut: '3', color: COLORS.teal, badge: 'AUTO', desc: 'Planificar semanas y meses' },
+  { id: 'clientes', path: '/admin/clientes', icon: '👥', label: 'Clientes', shortcut: '4', color: COLORS.blue, desc: 'Gestión de usuarios' },
+  { id: 'circulo', path: '/admin/circulo', icon: '🌙', label: 'Círculo', shortcut: '5', color: COLORS.amber, desc: 'Membresías premium' },
+  { id: 'regalos', path: '/admin/regalos', icon: '🎁', label: 'Regalos', shortcut: '6', color: COLORS.pink, desc: 'Enviar runas y tréboles' },
+  { id: 'personajes', path: '/admin/personajes', icon: '🧙', label: 'Guardianes', shortcut: '7', color: COLORS.violet, badge: 'PRO', desc: 'Canalizar desde productos' },
+  { id: 'contenido', path: '/admin/contenido', icon: '✨', label: 'Contenido', shortcut: '8', color: COLORS.purple, desc: 'Generación rápida' },
+  { id: 'banners', path: '/admin/banners', icon: '🖼️', label: 'Banners', shortcut: '9', color: COLORS.orange, desc: 'Imágenes promocionales' },
   { id: 'tito', path: '/admin/tito', icon: '🤖', label: 'Tito AI', shortcut: '0', color: COLORS.rose, desc: 'Asistente inteligente' },
+  { id: 'productos', path: '/admin/productos', icon: '💎', label: 'Productos', color: COLORS.emerald, desc: 'Catálogo WooCommerce' },
+  { id: 'insights', path: '/admin/insights', icon: '📈', label: 'Insights', color: COLORS.teal, desc: 'Análisis de datos' },
 ];
 
 // ═══════════════════════════════════════════════════════════════
 // ACCIONES RÁPIDAS
 // ═══════════════════════════════════════════════════════════════
 const QUICK_ACTIONS = [
+  { id: 'abrir-estudio', icon: '🎨', label: 'Abrir Estudio', color: COLORS.pink },
+  { id: 'generar-calendario', icon: '📅', label: 'Generar Calendario', color: COLORS.teal },
   { id: 'dar-runas', icon: '🔮', label: 'Dar Runas', color: COLORS.purple },
   { id: 'dar-treboles', icon: '☘️', label: 'Dar Tréboles', color: COLORS.emerald },
   { id: 'activar-circulo', icon: '🌙', label: 'Activar Círculo', color: COLORS.amber },
   { id: 'enviar-regalo', icon: '🎁', label: 'Enviar Regalo', color: COLORS.pink },
-  { id: 'crear-contenido', icon: '✨', label: 'Crear Contenido', color: COLORS.purple },
-  { id: 'generar-calendario', icon: '📅', label: 'Generar Calendario', color: COLORS.teal },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -252,12 +253,12 @@ export default function AdminLayout({ children }) {
   const executeQuickAction = (action) => {
     setShowQuickActions(false);
     const routes = {
+      'abrir-estudio': '/admin/estudio',
+      'generar-calendario': '/admin/calendario',
       'dar-runas': '/admin/regalos?tipo=runas',
       'dar-treboles': '/admin/regalos?tipo=treboles',
       'activar-circulo': '/admin/circulo?accion=activar',
       'enviar-regalo': '/admin/regalos',
-      'crear-contenido': '/admin/contenido?nuevo=true',
-      'generar-calendario': '/admin/calendario',
     };
     if (routes[action.id]) window.location.href = routes[action.id];
     logAction('quick-action', action.label);
