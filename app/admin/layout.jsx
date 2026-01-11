@@ -88,12 +88,13 @@ const NAV_ITEMS = [
   { id: 'dashboard', path: '/admin', icon: '📊', label: 'Dashboard', shortcut: '1', color: COLORS.cyan, desc: 'Métricas y estadísticas' },
   { id: 'clientes', path: '/admin/clientes', icon: '👥', label: 'Clientes', shortcut: '2', color: COLORS.blue, desc: 'Gestión de usuarios' },
   { id: 'contenido', path: '/admin/contenido', icon: '✨', label: 'Contenido', shortcut: '3', color: COLORS.purple, badge: 'IA', desc: 'Crear con inteligencia artificial' },
-  { id: 'personajes', path: '/admin/personajes', icon: '🧙', label: 'Guardianes', shortcut: '4', color: COLORS.violet, badge: 'PRO', desc: 'Canalizar desde productos' },
-  { id: 'circulo', path: '/admin/circulo', icon: '🌙', label: 'Círculo', shortcut: '5', color: COLORS.amber, desc: 'Membresías premium' },
-  { id: 'regalos', path: '/admin/regalos', icon: '🎁', label: 'Regalos', shortcut: '6', color: COLORS.pink, desc: 'Enviar runas y tréboles' },
-  { id: 'banners', path: '/admin/banners', icon: '🖼️', label: 'Banners', shortcut: '7', color: COLORS.orange, desc: 'Imágenes promocionales' },
-  { id: 'productos', path: '/admin/productos', icon: '💎', label: 'Productos', shortcut: '8', color: COLORS.emerald, desc: 'Catálogo WooCommerce' },
-  { id: 'insights', path: '/admin/insights', icon: '📈', label: 'Insights', shortcut: '9', color: COLORS.teal, desc: 'Análisis de datos' },
+  { id: 'calendario', path: '/admin/calendario', icon: '📅', label: 'Calendario', shortcut: '4', color: COLORS.teal, badge: 'AUTO', desc: 'Planificar semanas y meses' },
+  { id: 'personajes', path: '/admin/personajes', icon: '🧙', label: 'Guardianes', shortcut: '5', color: COLORS.violet, badge: 'PRO', desc: 'Canalizar desde productos' },
+  { id: 'circulo', path: '/admin/circulo', icon: '🌙', label: 'Círculo', shortcut: '6', color: COLORS.amber, desc: 'Membresías premium' },
+  { id: 'regalos', path: '/admin/regalos', icon: '🎁', label: 'Regalos', shortcut: '7', color: COLORS.pink, desc: 'Enviar runas y tréboles' },
+  { id: 'banners', path: '/admin/banners', icon: '🖼️', label: 'Banners', shortcut: '8', color: COLORS.orange, desc: 'Imágenes promocionales' },
+  { id: 'productos', path: '/admin/productos', icon: '💎', label: 'Productos', shortcut: '9', color: COLORS.emerald, desc: 'Catálogo WooCommerce' },
+  { id: 'insights', path: '/admin/insights', icon: '📈', label: 'Insights', color: COLORS.teal, desc: 'Análisis de datos' },
   { id: 'tito', path: '/admin/tito', icon: '🤖', label: 'Tito AI', shortcut: '0', color: COLORS.rose, desc: 'Asistente inteligente' },
 ];
 
@@ -106,7 +107,7 @@ const QUICK_ACTIONS = [
   { id: 'activar-circulo', icon: '🌙', label: 'Activar Círculo', color: COLORS.amber },
   { id: 'enviar-regalo', icon: '🎁', label: 'Enviar Regalo', color: COLORS.pink },
   { id: 'crear-contenido', icon: '✨', label: 'Crear Contenido', color: COLORS.purple },
-  { id: 'generar-cupon', icon: '🏷️', label: 'Generar Cupón', color: COLORS.orange },
+  { id: 'generar-calendario', icon: '📅', label: 'Generar Calendario', color: COLORS.teal },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -256,7 +257,7 @@ export default function AdminLayout({ children }) {
       'activar-circulo': '/admin/circulo?accion=activar',
       'enviar-regalo': '/admin/regalos',
       'crear-contenido': '/admin/contenido?nuevo=true',
-      'generar-cupon': '/admin/regalos?tipo=cupon',
+      'generar-calendario': '/admin/calendario',
     };
     if (routes[action.id]) window.location.href = routes[action.id];
     logAction('quick-action', action.label);
