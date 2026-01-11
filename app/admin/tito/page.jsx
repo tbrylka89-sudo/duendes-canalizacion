@@ -3,10 +3,20 @@ import { useState, useEffect, useRef } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // TITO MAESTRO - PAGINA COMPLETA DE ADMIN
-// El asistente omnipotente
+// El asistente omnipotente con historial
 // ═══════════════════════════════════════════════════════════════
 
 const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
+
+// Acciones rápidas para contenido
+const ACCIONES_CONTENIDO = [
+  { icon: '📱', label: 'Post Instagram', prompt: 'Generame un post para Instagram sobre ' },
+  { icon: '📘', label: 'Post Facebook', prompt: 'Generame un post para Facebook sobre ' },
+  { icon: '📝', label: 'Caption Story', prompt: 'Generame un caption para una story de Instagram sobre ' },
+  { icon: '🧵', label: 'Hilo Twitter', prompt: 'Generame un hilo de Twitter/X sobre ' },
+  { icon: '📧', label: 'Email Marketing', prompt: 'Generame un email de marketing para el Círculo sobre ' },
+  { icon: '🎬', label: 'Guión Reel', prompt: 'Generame un guión para un reel corto sobre ' },
+];
 
 export default function TitoMaestroPage() {
   const [mensajes, setMensajes] = useState([]);
@@ -14,10 +24,29 @@ export default function TitoMaestroPage() {
   const [cargando, setCargando] = useState(false);
   const [historial, setHistorial] = useState([]);
   const [stats, setStats] = useState(null);
+  const [conversaciones, setConversaciones] = useState([]);
+  const [conversacionActual, setConversacionActual] = useState(null);
+  const [showHistorial, setShowHistorial] = useState(false);
+  const [modoContenido, setModoContenido] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // Cargar conversaciones guardadas
   useEffect(() => {
     cargarStats();
+    cargarConversaciones();
+  }, []);
+
+  const cargarConversaciones = () => {
+    try {
+      const saved = localStorage.getItem('tito_conversaciones');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setConversaciones(parsed);
+      }
+    } catch (e) {
+      console.error('Error cargando conversaciones:', e);
+    }
+
     // Mensaje de bienvenida
     setMensajes([{
       rol: 'asistente',
@@ -31,19 +60,19 @@ Puedo ayudarte con absolutamente todo:
 📦 **Productos** - Stock, precios, sincronizar WooCommerce
 🎫 **Cupones** - Crear, ver, desactivar
 📊 **Stats** - Ventas, clientes, productos, proyecciones
-📝 **Contenido** - Articulos, emails marketing, posts redes
+📝 **Contenido** - Articulos, posts para redes, emails marketing
+🎨 **Creatividad** - Generar imágenes y audio
 💡 **Inteligencia** - Sugerencias, clientes en riesgo, oportunidades
 
 **Ejemplos de lo que podes pedirme:**
 - "Busca a maria"
 - "Dale 50 runas a juan@mail.com por su cumpleaños"
-- "Mostrame las ordenes pendientes"
-- "Crea un cupon del 20% para el dia de la madre"
+- "Genera un post de Instagram sobre luna llena"
 - "Que deberia hacer hoy?"
 
 ¡Preguntame lo que necesites!`
     }]);
-  }, []);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -57,6 +86,47 @@ Puedo ayudarte con absolutamente todo:
         setStats(data);
       }
     } catch (e) {}
+  };
+
+  // Guardar conversación actual
+  const guardarConversacion = () => {
+    if (mensajes.length <= 1) return; // Solo bienvenida
+
+    const titulo = mensajes.find(m => m.rol === 'usuario')?.texto?.substring(0, 50) || 'Conversación';
+    const conv = {
+      id: Date.now(),
+      titulo,
+      mensajes: mensajes,
+      fecha: new Date().toISOString()
+    };
+
+    const nuevas = [conv, ...conversaciones].slice(0, 20); // Max 20 conversaciones
+    setConversaciones(nuevas);
+    setConversacionActual(conv.id);
+    localStorage.setItem('tito_conversaciones', JSON.stringify(nuevas));
+  };
+
+  // Cargar conversación guardada
+  const cargarConversacion = (conv) => {
+    setMensajes(conv.mensajes);
+    setConversacionActual(conv.id);
+    setShowHistorial(false);
+  };
+
+  // Nueva conversación
+  const nuevaConversacion = () => {
+    if (mensajes.length > 1) {
+      guardarConversacion();
+    }
+    setConversacionActual(null);
+    cargarConversaciones();
+  };
+
+  // Eliminar conversación
+  const eliminarConversacion = (id) => {
+    const nuevas = conversaciones.filter(c => c.id !== id);
+    setConversaciones(nuevas);
+    localStorage.setItem('tito_conversaciones', JSON.stringify(nuevas));
   };
 
   const enviarMensaje = async () => {
@@ -87,8 +157,31 @@ Puedo ayudarte con absolutamente todo:
       const data = await res.json();
 
       if (data.success) {
-        setMensajes([...nuevosMensajes, { rol: 'asistente', texto: data.respuesta }]);
+        const mensajesFinal = [...nuevosMensajes, { rol: 'asistente', texto: data.respuesta }];
+        setMensajes(mensajesFinal);
         setHistorial([...nuevoHistorial, { rol: 'tito', texto: data.respuesta }]);
+
+        // Auto-guardar conversación después de cada respuesta
+        setTimeout(() => {
+          const titulo = nuevosMensajes.find(m => m.rol === 'usuario')?.texto?.substring(0, 50) || 'Conversación';
+          const convId = conversacionActual || Date.now();
+          const conv = {
+            id: convId,
+            titulo,
+            mensajes: mensajesFinal,
+            fecha: new Date().toISOString()
+          };
+
+          let nuevas;
+          if (conversacionActual) {
+            nuevas = conversaciones.map(c => c.id === conversacionActual ? conv : c);
+          } else {
+            nuevas = [conv, ...conversaciones].slice(0, 20);
+            setConversacionActual(convId);
+          }
+          setConversaciones(nuevas);
+          localStorage.setItem('tito_conversaciones', JSON.stringify(nuevas));
+        }, 100);
       } else {
         setMensajes([...nuevosMensajes, { rol: 'asistente', texto: data.respuesta || 'Error procesando tu mensaje.' }]);
       }
@@ -144,11 +237,105 @@ Puedo ayudarte con absolutamente todo:
             <p style={estilos.subtitulo}>Tu asistente omnipotente - Sin limitaciones</p>
           </div>
         </div>
-        <div style={estilos.status}>
-          <span style={estilos.statusDot}></span>
-          En linea
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button
+            onClick={() => setShowHistorial(!showHistorial)}
+            style={{
+              padding: '8px 16px',
+              background: showHistorial ? 'rgba(198,169,98,0.2)' : '#1f1f1f',
+              border: '1px solid #2a2a2a',
+              borderRadius: '8px',
+              color: showHistorial ? '#C6A962' : '#888',
+              fontSize: '13px',
+              cursor: 'pointer'
+            }}
+          >
+            📜 Historial ({conversaciones.length})
+          </button>
+          <button
+            onClick={nuevaConversacion}
+            style={{
+              padding: '8px 16px',
+              background: 'linear-gradient(135deg, rgba(198,169,98,0.2), rgba(198,169,98,0.1))',
+              border: '1px solid rgba(198,169,98,0.3)',
+              borderRadius: '8px',
+              color: '#C6A962',
+              fontSize: '13px',
+              cursor: 'pointer'
+            }}
+          >
+            + Nueva
+          </button>
+          <div style={estilos.status}>
+            <span style={estilos.statusDot}></span>
+            En linea
+          </div>
         </div>
       </div>
+
+      {/* Panel de historial */}
+      {showHistorial && (
+        <div style={{
+          position: 'absolute',
+          top: '70px',
+          right: '20px',
+          width: '350px',
+          maxHeight: '500px',
+          background: '#141414',
+          border: '1px solid #2a2a2a',
+          borderRadius: '12px',
+          zIndex: 100,
+          overflow: 'hidden'
+        }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid #2a2a2a' }}>
+            <h3 style={{ color: '#C6A962', fontSize: '14px', margin: 0 }}>📜 Conversaciones guardadas</h3>
+          </div>
+          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            {conversaciones.length === 0 ? (
+              <p style={{ color: '#666', textAlign: 'center', padding: '30px', fontSize: '13px' }}>
+                No hay conversaciones guardadas
+              </p>
+            ) : (
+              conversaciones.map(conv => (
+                <div
+                  key={conv.id}
+                  style={{
+                    padding: '12px 16px',
+                    borderBottom: '1px solid #1f1f1f',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: conv.id === conversacionActual ? 'rgba(198,169,98,0.1)' : 'transparent',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => cargarConversacion(conv)}
+                >
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: '#fff', fontSize: '13px', margin: 0, marginBottom: '4px' }}>
+                      {conv.titulo}...
+                    </p>
+                    <p style={{ color: '#666', fontSize: '11px', margin: 0 }}>
+                      {new Date(conv.fecha).toLocaleDateString('es-UY')} • {conv.mensajes.length} mensajes
+                    </p>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); eliminarConversacion(conv.id); }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      cursor: 'pointer',
+                      fontSize: '16px'
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       <div style={estilos.main}>
         {/* Chat */}
@@ -269,6 +456,29 @@ Puedo ayudarte con absolutamente todo:
             </div>
           </div>
 
+          {/* Generación de Contenido */}
+          <div style={estilos.card}>
+            <h3 style={estilos.cardTitle}>📝 Generar Contenido</h3>
+            <p style={{ color: '#666', fontSize: '11px', marginBottom: '12px' }}>
+              Pedile a Tito que genere contenido para redes sociales
+            </p>
+            <div style={estilos.quickActions}>
+              {ACCIONES_CONTENIDO.map((action, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    const tema = prompt(`¿Sobre qué tema querés el ${action.label}?`);
+                    if (tema) enviarRapido(action.prompt + tema);
+                  }}
+                  style={estilos.quickBtn}
+                >
+                  <span>{action.icon}</span>
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Ejemplos */}
           <div style={estilos.card}>
             <h3 style={estilos.cardTitle}>🎯 Ejemplos de uso</h3>
@@ -278,8 +488,8 @@ Puedo ayudarte con absolutamente todo:
                 { icon: '🎁', text: 'Dar runas', msg: 'Dale 50 runas a ejemplo@mail.com por su cumpleaños' },
                 { icon: '⭐', text: 'Activar circulo', msg: 'Activa el circulo de ejemplo@mail.com por 30 dias' },
                 { icon: '🎫', text: 'Crear cupon', msg: 'Crea un cupon del 20% llamado PROMO20' },
-                { icon: '📱', text: 'Post Instagram', msg: 'Genera un post para Instagram sobre guardianes' },
-                { icon: '📧', text: 'Email promo', msg: 'Genera un email de promocion para el circulo' },
+                { icon: '🎨', text: 'Generar imagen', msg: 'Genera una imagen de un duende en un bosque magico' },
+                { icon: '🎙️', text: 'Generar audio', msg: 'Convierte este texto a voz: Bienvenida al Círculo de Duendes' },
               ].map((action, i) => (
                 <button
                   key={i}

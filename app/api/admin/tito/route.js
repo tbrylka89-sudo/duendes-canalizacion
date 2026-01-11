@@ -143,6 +143,13 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 19. GENERAR IMAGEN: {"accion": "generar_imagen", "datos": {"prompt": "descripcion de la imagen", "estilo": "magico|duende|watercolor|realista|natural"}}
 20. GENERAR VOZ: {"accion": "generar_voz", "datos": {"texto": "texto a convertir en audio", "voz": "thibisay|thibisay-rapido|duende|bella|rachel"}}
 
+### CONTENIDO PARA REDES SOCIALES
+21. POST INSTAGRAM: {"accion": "generar_post_redes", "datos": {"red": "instagram", "tema": "tema del post", "tipo": "feed|story|reel"}}
+22. POST FACEBOOK: {"accion": "generar_post_redes", "datos": {"red": "facebook", "tema": "tema del post"}}
+23. HILO TWITTER: {"accion": "generar_post_redes", "datos": {"red": "twitter", "tema": "tema del hilo"}}
+24. EMAIL MARKETING: {"accion": "generar_email", "datos": {"tipo": "promo|newsletter|bienvenida|circulo", "tema": "tema del email"}}
+25. GUION REEL: {"accion": "generar_guion_reel", "datos": {"tema": "tema del reel", "duracion": "30|60|90"}}
+
 ## EJEMPLOS DE USO NATURAL
 
 - "Busca a maria" -> buscar_cliente
@@ -157,6 +164,9 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 - "Sincroniza los productos de WooCommerce" -> sincronizar_productos
 - "Genera una imagen de un duende en el bosque" -> generar_imagen
 - "Convierte este texto a voz" -> generar_voz
+- "Genera un post de Instagram sobre luna llena" -> generar_post_redes
+- "Escribe un email de bienvenida para el circulo" -> generar_email
+- "Crea un guion para un reel de 30 segundos sobre cristales" -> generar_guion_reel
 
 ## REGLAS DE ORO
 
@@ -941,6 +951,175 @@ _Podes ver los productos en la seccion Productos del admin._`
         };
       } catch (e) {
         return { mensaje: `❌ Error: ${e.message}` };
+      }
+    }
+
+    case 'generar_post_redes': {
+      const { red, tema, tipo = 'feed' } = datos;
+      if (!tema) {
+        return { mensaje: 'Necesito saber sobre que tema queres el post.' };
+      }
+
+      const redNombre = {
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        twitter: 'Twitter/X'
+      }[red] || 'Instagram';
+
+      try {
+        const promptRedes = `Generá un post para ${redNombre} sobre: "${tema}"
+
+REGLAS:
+- Tono: místico, cercano, español rioplatense (vos, tenés, podés)
+- Marca: Duendes del Uruguay (productos artesanales mágicos)
+- Incluí emojis relevantes
+- ${red === 'instagram' ? 'Incluí 20-25 hashtags relevantes al final' : ''}
+- ${red === 'twitter' ? 'Formato de hilo: numera cada tweet (1/, 2/, etc.)' : ''}
+- ${tipo === 'story' ? 'Texto corto y llamativo para story' : ''}
+- ${tipo === 'reel' ? 'Texto que invite a ver el reel completo' : ''}
+
+ESTRUCTURA:
+1. Hook inicial que capture atención
+2. Contenido principal
+3. Call to action
+${red === 'instagram' ? '4. Hashtags' : ''}`;
+
+        const response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1500,
+          messages: [{ role: 'user', content: promptRedes }],
+          system: 'Sos Thibisay, la voz de Duendes del Uruguay. Creás contenido mágico y espiritual para redes sociales. Usás español rioplatense (vos, tenés). Tono cálido, místico pero accesible.'
+        });
+
+        const contenido = response.content[0]?.text || '';
+
+        return {
+          mensaje: `📱 **Post para ${redNombre} generado!**
+
+${contenido}
+
+---
+_Copiá y pegá el contenido arriba para publicar._`
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error generando post: ${e.message}` };
+      }
+    }
+
+    case 'generar_email': {
+      const { tipo = 'newsletter', tema } = datos;
+      if (!tema) {
+        return { mensaje: 'Necesito saber sobre que tema queres el email.' };
+      }
+
+      const tipoNombre = {
+        promo: 'promocional',
+        newsletter: 'newsletter',
+        bienvenida: 'de bienvenida',
+        circulo: 'para el Círculo'
+      }[tipo] || tipo;
+
+      try {
+        const promptEmail = `Generá un email ${tipoNombre} sobre: "${tema}"
+
+REGLAS:
+- Marca: Duendes del Uruguay
+- Tono: cálido, místico, español rioplatense
+- Asunto que genere apertura
+- Contenido que enganche desde el inicio
+- Call to action claro
+
+ESTRUCTURA:
+1. **Asunto:** (línea de asunto atractiva)
+2. **Preview:** (texto de preview para bandejas)
+3. **Cuerpo:**
+   - Saludo personalizado
+   - Introducción que conecte
+   - Contenido principal
+   - Call to action
+   - Despedida cálida
+   - Firma de Duendes`;
+
+        const response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2000,
+          messages: [{ role: 'user', content: promptEmail }],
+          system: 'Sos Thibisay de Duendes del Uruguay. Escribís emails de marketing mágicos y efectivos. Español rioplatense. Creás conexión emocional con las lectoras.'
+        });
+
+        const contenido = response.content[0]?.text || '';
+
+        return {
+          mensaje: `📧 **Email ${tipoNombre} generado!**
+
+${contenido}
+
+---
+_Revisá y personalizá antes de enviar._`
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error generando email: ${e.message}` };
+      }
+    }
+
+    case 'generar_guion_reel': {
+      const { tema, duracion = '30' } = datos;
+      if (!tema) {
+        return { mensaje: 'Necesito saber sobre que tema queres el guión del reel.' };
+      }
+
+      try {
+        const promptGuion = `Generá un guión para un reel de ${duracion} segundos sobre: "${tema}"
+
+FORMATO REEL:
+- Duración: ${duracion} segundos
+- Hook inicial: primeros 3 segundos CLAVE
+- Contenido dinámico y visual
+- Texto en pantalla sugerido
+- Call to action final
+
+ESTRUCTURA:
+🎬 **GUIÓN REEL (${duracion}s)**
+
+**[0-3s] HOOK:**
+[Texto/acción que capture atención]
+
+**[3-${Math.floor(duracion * 0.7)}s] DESARROLLO:**
+[Contenido principal, tips, información]
+- Texto en pantalla: "..."
+- Acción: ...
+
+**[${Math.floor(duracion * 0.7)}-${duracion}s] CIERRE:**
+[Call to action, seguir cuenta, etc.]
+
+**MÚSICA SUGERIDA:** [tipo de música]
+**HASHTAGS:** [5-10 hashtags]
+
+REGLAS:
+- Marca: Duendes del Uruguay (productos mágicos artesanales)
+- Tono: místico pero moderno y dinámico
+- Incluí timestamps aproximados
+- Sugiere transiciones`;
+
+        const response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1500,
+          messages: [{ role: 'user', content: promptGuion }],
+          system: 'Sos experta en contenido de video para redes. Creás guiones para reels de Duendes del Uruguay (productos mágicos). Formato visual, dinámico, que enganche.'
+        });
+
+        const contenido = response.content[0]?.text || '';
+
+        return {
+          mensaje: `🎬 **Guión de Reel (${duracion}s) generado!**
+
+${contenido}
+
+---
+_Adaptá según tu estilo y los elementos visuales que tengas disponibles._`
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error generando guión: ${e.message}` };
       }
     }
 
