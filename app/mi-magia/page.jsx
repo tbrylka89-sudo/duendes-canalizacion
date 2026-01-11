@@ -483,12 +483,14 @@ export default function MiMagia() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [token, setToken] = useState('');
   const [pais, setPais] = useState('UY');
+  // FORZAR MOBILE: Siempre mostrar hamburguesa en pantallas pequeñas
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     cargarUsuario();
     detectarPais();
-    // Detectar móvil
     const checkMobile = () => setIsMobile(window.innerWidth <= 900);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -542,8 +544,10 @@ export default function MiMagia() {
   };
 
   // Estilos inline para móvil (bypass CSS cache)
+  // IMPORTANTE: Usar 'none' antes de mount para evitar hidratación
+  const showMobileMenu = mounted && isMobile;
   const mobileMenuBtn = {
-    display: isMobile ? 'flex' : 'none',
+    display: showMobileMenu ? 'flex' : 'none',
     flexDirection: 'column',
     gap: '5px',
     background: '#d4af37',
@@ -554,7 +558,13 @@ export default function MiMagia() {
     minHeight: '48px',
     cursor: 'pointer',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    // TOUCH FIX
+    touchAction: 'manipulation',
+    WebkitTapHighlightColor: 'transparent',
+    pointerEvents: 'auto',
+    userSelect: 'none',
+    zIndex: 101
   };
   const mobileMenuLine = { width: '22px', height: '3px', background: '#fff', borderRadius: '2px', display: 'block' };
   const mobileNav = {
@@ -579,7 +589,12 @@ export default function MiMagia() {
           <span style={{background: '#1a1a1a', color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: isMobile ? '0.75rem' : '0.85rem'}}>☘ {usuario?.treboles || 0}</span>
           <span style={{background: '#1a1a1a', color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: isMobile ? '0.75rem' : '0.85rem'}}>ᚱ {usuario?.runas || 0}</span>
         </div>
-        <button style={mobileMenuBtn} onClick={() => setMenuAbierto(!menuAbierto)}>
+        <button
+          style={mobileMenuBtn}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuAbierto(!menuAbierto); }}
+          onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); setMenuAbierto(!menuAbierto); }}
+          aria-label="Menú"
+        >
           <span style={mobileMenuLine}></span>
           <span style={mobileMenuLine}></span>
           <span style={mobileMenuLine}></span>
@@ -2740,8 +2755,10 @@ function Tito({ usuario, abierto, setAbierto }) {
   const [input, setInput] = useState('');
   const [env, setEnv] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const check = () => setIsMobile(window.innerWidth <= 768);
     check();
     window.addEventListener('resize', check);
@@ -2760,6 +2777,7 @@ function Tito({ usuario, abierto, setAbierto }) {
       }));
       const contexto = `[CONTEXTO MI MAGIA: Usuario con ${usuario?.runas||0} runas, ${usuario?.treboles||0} tréboles. Secciones: Canalizaciones (guardianes, lecturas, regalos), Jardín Mágico (tréboles/runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas y diario). 1 trébol = $10 USD. Runas para experiencias.]
 IMPORTANTE: Mantené el contexto de la conversación. Si el usuario dice "ayudame" o "sí" o "dale", referite a lo que acabás de decir/ofrecer.
+FORMATO: Usá párrafos cortos separados por líneas en blanco. NO escribas todo junto. Hacé el texto fácil de leer.
 Mensaje actual: ${m}`;
       const res = await fetch(`${API_BASE}/api/tito/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: contexto, email: usuario?.email, history: historial }) });
       const data = await res.json();
@@ -2768,46 +2786,80 @@ Mensaje actual: ${m}`;
     setEnv(false);
   };
 
-  // Estilos inline para Tito móvil
+  // ESTILOS FORZADOS PARA MÓVIL - Sin depender de CSS externo
+  const mobile = mounted && isMobile;
   const btnStyle = {
-    position: 'fixed', bottom: isMobile ? '10px' : '1.5rem', right: isMobile ? '10px' : '1.5rem',
-    width: isMobile ? '50px' : '60px', height: isMobile ? '50px' : '60px',
-    borderRadius: '50%', background: '#1a1a1a', border: '2px solid #d4af37',
-    cursor: 'pointer', overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-    zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+    position: 'fixed',
+    bottom: mobile ? '12px' : '1.5rem',
+    right: mobile ? '12px' : '1.5rem',
+    width: mobile ? '52px' : '60px',
+    height: mobile ? '52px' : '60px',
+    borderRadius: '50%',
+    background: '#1a1a1a',
+    border: '2px solid #d4af37',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+    zIndex: 1000,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    touchAction: 'manipulation',
+    WebkitTapHighlightColor: 'transparent'
   };
+  // CHAT: Ancho fijo para móvil
   const chatStyle = {
-    position: 'fixed', zIndex: 999, background: '#fff', borderRadius: '12px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden',
-    ...(isMobile ? {
-      bottom: '70px', left: '10px', right: '10px', width: 'auto', maxHeight: '60vh'
-    } : {
-      bottom: '6rem', right: '1.5rem', width: '340px', maxHeight: '450px'
-    })
+    position: 'fixed',
+    zIndex: 999,
+    background: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    // MÓVIL: Ancho calculado para que no se salga de pantalla
+    bottom: mobile ? '70px' : '6rem',
+    left: mobile ? '12px' : 'auto',
+    right: mobile ? '12px' : '1.5rem',
+    width: mobile ? 'calc(100vw - 24px)' : '340px',
+    maxWidth: mobile ? '100%' : '340px',
+    maxHeight: mobile ? '55vh' : '450px'
   };
-  const msgStyle = { whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: '1.5', margin: 0 };
+  // MENSAJES: Forzar saltos de línea
+  const msgStyle = {
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    lineHeight: '1.6',
+    margin: 0,
+    fontSize: mobile ? '0.85rem' : '0.9rem'
+  };
 
   return (
     <>
-      <button style={btnStyle} onClick={() => setAbierto(!abierto)}>
+      <button
+        style={btnStyle}
+        onClick={() => setAbierto(!abierto)}
+        onTouchEnd={(e) => { e.preventDefault(); setAbierto(!abierto); }}
+        aria-label="Abrir chat con Tito"
+      >
         <img src={TITO_IMG} alt="Tito" style={{width:'100%',height:'100%',objectFit:'cover',position:'absolute'}} onError={e => e.target.style.display='none'} />
         <span style={{fontFamily:'Cinzel,serif',fontSize:'1.5rem',color:'#d4af37'}}>T</span>
       </button>
       {abierto && (
         <div style={chatStyle}>
-          <div className="tito-head" style={{padding: isMobile ? '0.6rem' : '1rem'}}>
-            <img src={TITO_IMG} alt="" style={{width: isMobile ? '28px' : '36px', height: isMobile ? '28px' : '36px', borderRadius:'50%',objectFit:'cover'}} onError={e => e.target.style.display='none'} />
+          <div className="tito-head" style={{padding: mobile ? '0.6rem' : '1rem', background:'#1a1a1a', display:'flex', alignItems:'center', gap:'0.75rem'}}>
+            <img src={TITO_IMG} alt="" style={{width: mobile ? '28px' : '36px', height: mobile ? '28px' : '36px', borderRadius:'50%',objectFit:'cover'}} onError={e => e.target.style.display='none'} />
             <div style={{flex:1}}><strong style={{display:'block',color:'#d4af37',fontFamily:'Cinzel,serif',fontSize:'0.9rem'}}>Tito</strong><small style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.6)'}}>Tu guía</small></div>
-            <button onClick={() => setAbierto(false)} style={{background:'none',border:'none',color:'rgba(255,255,255,0.5)',fontSize:'1.1rem',cursor:'pointer'}}>✕</button>
+            <button onClick={() => setAbierto(false)} onTouchEnd={(e) => { e.preventDefault(); setAbierto(false); }} style={{background:'none',border:'none',color:'rgba(255,255,255,0.5)',fontSize:'1.1rem',cursor:'pointer',padding:'8px'}}>✕</button>
           </div>
-          <div className="tito-msgs" style={{flex:1,padding: isMobile ? '0.6rem' : '1rem',overflowY:'auto',display:'flex',flexDirection:'column',gap:'0.6rem',maxHeight: isMobile ? '35vh' : 'none'}}>
-            <div className="msg-t"><p style={msgStyle}>¡Hola {usuario?.nombrePreferido}! Soy Tito. Preguntame lo que necesites.</p></div>
-            {msgs.map((m,i) => <div key={i} className={m.r==='u'?'msg-u':'msg-t'}><p style={msgStyle}>{m.t}</p></div>)}
-            {env && <div className="msg-t"><p style={msgStyle}>...</p></div>}
+          <div style={{flex:1,padding: mobile ? '0.6rem' : '1rem',overflowY:'auto',display:'flex',flexDirection:'column',gap:'0.6rem',maxHeight: mobile ? '35vh' : '300px', background:'#fff'}}>
+            <div style={{background:'#f5f5f5',padding:'0.6rem 0.9rem',borderRadius:'12px',maxWidth:'85%',alignSelf:'flex-start'}}><p style={msgStyle}>¡Hola {usuario?.nombrePreferido}! Soy Tito. Preguntame lo que necesites.</p></div>
+            {msgs.map((m,i) => <div key={i} style={{background: m.r==='u' ? '#1a1a1a' : '#f5f5f5', color: m.r==='u' ? '#fff' : '#1a1a1a', padding:'0.6rem 0.9rem', borderRadius:'12px', maxWidth:'85%', alignSelf: m.r==='u' ? 'flex-end' : 'flex-start'}}><p style={msgStyle}>{m.t}</p></div>)}
+            {env && <div style={{background:'#f5f5f5',padding:'0.6rem 0.9rem',borderRadius:'12px',maxWidth:'85%',alignSelf:'flex-start'}}><p style={msgStyle}>...</p></div>}
           </div>
-          <div className="tito-input" style={{padding: isMobile ? '0.4rem' : '0.75rem'}}>
-            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} style={{fontSize: isMobile ? '0.8rem' : '0.85rem'}} />
-            <button onClick={enviar} disabled={env}>→</button>
+          <div style={{display:'flex',gap:'0.5rem',padding: mobile ? '0.5rem' : '0.75rem',borderTop:'1px solid #f0f0f0',background:'#fff'}}>
+            <input placeholder="Tu pregunta..." value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key==='Enter' && enviar()} style={{flex:1,padding:'0.6rem 1rem',border:'1px solid #e0e0e0',borderRadius:'50px',fontSize: mobile ? '0.8rem' : '0.85rem',fontFamily:'Cormorant Garamond,serif'}} />
+            <button onClick={enviar} disabled={env} style={{width:'36px',height:'36px',borderRadius:'50%',background:env?'#ddd':'#d4af37',border:'none',color:'#1a1a1a',fontSize:'1.1rem',cursor:env?'not-allowed':'pointer'}}>→</button>
           </div>
         </div>
       )}
