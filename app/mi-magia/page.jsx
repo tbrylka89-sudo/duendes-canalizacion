@@ -2887,8 +2887,9 @@ Mensaje actual: ${m}`;
 const estilos = `
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100vw}
 body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a1a1a;font-size:18px;line-height:1.6}
-.app{min-height:100vh}
+.app{min-height:100vh;overflow-x:hidden;max-width:100%}
 .header{position:fixed;top:0;left:0;right:0;height:65px;background:#fff;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;z-index:100}
 .logo{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:2px;display:flex;align-items:center;gap:0.5rem}
 .logo span{color:#d4af37}
