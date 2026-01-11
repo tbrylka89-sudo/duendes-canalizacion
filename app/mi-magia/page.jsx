@@ -1528,12 +1528,14 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
             ) : (
               <div className="contenido-lista">
                 {contenidos.length > 0 ? contenidos.map((c, i) => (
-                  <div key={c.id || i} className="contenido-item">
-                    <span>{c.tipo === 'ritual' ? '🕯️' : c.tipo === 'meditacion' ? '🎧' : c.tipo === 'guia' ? '📖' : '✦'}</span>
-                    <h4>{c.titulo}</h4>
-                    <p>{c.extracto}</p>
-                    <small>Por {c.autor} • {c.vistas} vistas</small>
-                    <button className="btn-sec" onClick={() => setContenidoModal(c)}>Ver {c.tipo}</button>
+                  <div key={c.id || i} style={{background:'#fff',border:'1px solid #f0f0f0',borderRadius:'12px',padding:'15px',display:'flex',gap:'12px',alignItems:'flex-start'}}>
+                    <span style={{fontSize:'2rem',flexShrink:0}}>{c.tipo === 'ritual' ? '🕯️' : c.tipo === 'meditacion' ? '🎧' : c.tipo === 'guia' ? '📖' : '✦'}</span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <h4 style={{fontFamily:'Cinzel,serif',marginBottom:'5px',fontSize:'1rem'}}>{c.titulo}</h4>
+                      <p style={{fontSize:'0.9rem',color:'#666',marginBottom:'8px',lineHeight:'1.4'}}>{c.extracto}</p>
+                      <small style={{display:'block',fontSize:'0.75rem',color:'#888',marginBottom:'10px'}}>Por {c.autor} • {c.vistas} vistas</small>
+                      <button className="btn-sec" onClick={() => setContenidoModal(c)} style={{fontSize:'0.85rem',padding:'8px 16px'}}>Ver {c.tipo}</button>
+                    </div>
                   </div>
                 )) : (
                   <p className="sin-contenido">Cargando contenido exclusivo...</p>
