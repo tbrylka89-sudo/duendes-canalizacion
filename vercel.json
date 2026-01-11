@@ -7,6 +7,10 @@
     {
       "path": "/api/experiencias/procesar",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/admin/circulo/cron",
+      "schedule": "0 9 * * *"
     }
   ]
 }
