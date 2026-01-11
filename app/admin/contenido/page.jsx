@@ -179,6 +179,8 @@ export default function ContenidoPage() {
   const [estiloImagen, setEstiloImagen] = useState(ESTILOS_IMAGEN[0]);
   const [promptImagen, setPromptImagen] = useState('');
   const [audio, setAudio] = useState(null);
+  const [parteAudio, setParteAudio] = useState('inicio');
+  const [textoAudioPersonalizado, setTextoAudioPersonalizado] = useState('');
 
   // Estado de publicación
   const [fechaPublicacion, setFechaPublicacion] = useState('');
@@ -305,8 +307,13 @@ export default function ContenidoPage() {
   // GENERAR AUDIO CON ELEVEN LABS (VOZ THIBISAY)
   // ═══════════════════════════════════════════════════════════════
   const generarAudio = async () => {
-    if (!contenido) {
+    if (!contenido && parteAudio !== 'personalizado') {
       setError('Primero generá el contenido de texto');
+      return;
+    }
+
+    if (parteAudio === 'personalizado' && !textoAudioPersonalizado.trim()) {
+      setError('Ingresá el texto personalizado para convertir a audio');
       return;
     }
 
@@ -314,8 +321,24 @@ export default function ContenidoPage() {
     setError('');
 
     try {
-      // Tomar solo los primeros 2000 caracteres para el audio
-      const textoParaAudio = contenido.substring(0, 2000);
+      // Determinar qué texto usar según la opción seleccionada
+      let textoParaAudio;
+      if (parteAudio === 'personalizado') {
+        textoParaAudio = textoAudioPersonalizado.substring(0, 5000);
+      } else if (parteAudio === 'completo') {
+        textoParaAudio = contenido.substring(0, 5000);
+      } else {
+        textoParaAudio = contenido.substring(0, 2000);
+      }
+
+      // Limpiar markdown del texto para mejor audio
+      textoParaAudio = textoParaAudio
+        .replace(/#{1,6}\s/g, '') // Quitar headers
+        .replace(/\*\*/g, '')     // Quitar bold
+        .replace(/\*/g, '')       // Quitar italic
+        .replace(/`/g, '')        // Quitar code
+        .replace(/\n{2,}/g, '\n') // Reducir saltos múltiples
+        .trim();
 
       const res = await fetch('/api/admin/voz/generar', {
         method: 'POST',
@@ -330,8 +353,8 @@ export default function ContenidoPage() {
 
       if (data.success) {
         setAudio(data.audio);
-        setExito('¡Audio generado con voz de Thibisay!');
-        setTimeout(() => setExito(''), 3000);
+        setExito(`¡Audio generado con voz de Thibisay! (${textoParaAudio.length} caracteres)`);
+        setTimeout(() => setExito(''), 4000);
       } else {
         setError(data.error || 'Error generando audio');
       }
@@ -392,6 +415,8 @@ export default function ContenidoPage() {
     setContenido('');
     setImagen(null);
     setAudio(null);
+    setParteAudio('inicio');
+    setTextoAudioPersonalizado('');
     setPaso(1);
     setError('');
     setExito('');
@@ -1232,17 +1257,112 @@ export default function ContenidoPage() {
             <div style={{
               ...GLASS,
               borderRadius: 16,
-              padding: 24
+              padding: 24,
+              border: plantilla?.tipo === 'meditacion' ? `2px solid ${C.purple}` : undefined
             }}>
-              <h3 style={{ color: C.text, fontSize: 16, margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                🔊 Audio (Voz Thibisay)
+              <h3 style={{ color: C.text, fontSize: 16, margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                🎙️ Audio con Voz de Thibisay
+                {plantilla?.tipo === 'meditacion' && (
+                  <span style={{
+                    fontSize: 10,
+                    background: C.purple,
+                    color: 'white',
+                    padding: '2px 8px',
+                    borderRadius: 10
+                  }}>
+                    IDEAL PARA MEDITACIÓN
+                  </span>
+                )}
               </h3>
 
-              <p style={{ color: C.textMuted, fontSize: 13, marginBottom: 16 }}>
-                Genera una versión de audio del contenido con la voz de Thibisay (Eleven Labs).
-                <br />
-                <small>Se usarán los primeros 2000 caracteres.</small>
+              <p style={{ color: C.textMuted, fontSize: 13, marginBottom: 12 }}>
+                Convierte el contenido a audio con la voz de Thibisay (Eleven Labs).
+                {plantilla?.tipo === 'meditacion' && (
+                  <span style={{ color: C.purple, display: 'block', marginTop: 4 }}>
+                    ✨ Perfecto para que tus usuarias escuchen la meditación guiada
+                  </span>
+                )}
               </p>
+
+              {/* Selector de parte del contenido */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', color: C.textMuted, marginBottom: 8, fontSize: 13 }}>
+                  ¿Qué parte convertir a audio?
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => setParteAudio('inicio')}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      background: parteAudio === 'inicio' ? `${C.purple}22` : C.bgCard,
+                      border: `1px solid ${parteAudio === 'inicio' ? C.purple : C.border}`,
+                      borderRadius: 6,
+                      color: parteAudio === 'inicio' ? C.purple : C.textMuted,
+                      fontSize: 12,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Inicio (2000 chars)
+                  </button>
+                  <button
+                    onClick={() => setParteAudio('completo')}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      background: parteAudio === 'completo' ? `${C.purple}22` : C.bgCard,
+                      border: `1px solid ${parteAudio === 'completo' ? C.purple : C.border}`,
+                      borderRadius: 6,
+                      color: parteAudio === 'completo' ? C.purple : C.textMuted,
+                      fontSize: 12,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Completo (5000 chars)
+                  </button>
+                  <button
+                    onClick={() => setParteAudio('personalizado')}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      background: parteAudio === 'personalizado' ? `${C.purple}22` : C.bgCard,
+                      border: `1px solid ${parteAudio === 'personalizado' ? C.purple : C.border}`,
+                      borderRadius: 6,
+                      color: parteAudio === 'personalizado' ? C.purple : C.textMuted,
+                      fontSize: 12,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Personalizado
+                  </button>
+                </div>
+              </div>
+
+              {/* Texto personalizado para audio */}
+              {parteAudio === 'personalizado' && (
+                <div style={{ marginBottom: 16 }}>
+                  <textarea
+                    value={textoAudioPersonalizado}
+                    onChange={(e) => setTextoAudioPersonalizado(e.target.value)}
+                    placeholder="Pegá aquí el texto que querés convertir a audio..."
+                    style={{
+                      width: '100%',
+                      minHeight: 100,
+                      padding: 12,
+                      background: C.bgCard,
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 8,
+                      color: C.text,
+                      fontSize: 13,
+                      resize: 'vertical'
+                    }}
+                    maxLength={5000}
+                  />
+                  <div style={{ textAlign: 'right', color: C.textDim, fontSize: 11, marginTop: 4 }}>
+                    {textoAudioPersonalizado.length}/5000 caracteres
+                  </div>
+                </div>
+              )}
 
               {audio ? (
                 <div style={{ marginBottom: 16 }}>
@@ -1251,6 +1371,9 @@ export default function ContenidoPage() {
                     src={`data:audio/mpeg;base64,${audio}`}
                     style={{ width: '100%' }}
                   />
+                  <p style={{ color: C.success, fontSize: 12, marginTop: 8, textAlign: 'center' }}>
+                    ✓ Audio generado con voz de Thibisay
+                  </p>
                 </div>
               ) : (
                 <div style={{
@@ -1263,7 +1386,7 @@ export default function ContenidoPage() {
                   color: C.textDim,
                   marginBottom: 16
                 }}>
-                  Sin audio generado
+                  🎙️ Sin audio generado
                 </div>
               )}
 
@@ -1272,11 +1395,12 @@ export default function ContenidoPage() {
                 disabled={generandoAudio || !contenido}
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  background: generandoAudio || !contenido ? C.bgHover : `${C.purple}22`,
-                  border: `1px solid ${C.purple}`,
+                  padding: '14px',
+                  background: generandoAudio || !contenido ? C.bgHover : `linear-gradient(135deg, ${C.purple}, #a855f7)`,
+                  border: 'none',
                   borderRadius: 10,
-                  color: !contenido ? C.textDim : C.purple,
+                  color: !contenido ? C.textDim : 'white',
+                  fontWeight: 600,
                   cursor: generandoAudio || !contenido ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1289,13 +1413,13 @@ export default function ContenidoPage() {
                     <div style={{
                       width: 16, height: 16,
                       border: '2px solid transparent',
-                      borderTopColor: C.purple,
+                      borderTopColor: 'white',
                       borderRadius: '50%',
                       animation: 'spin 1s linear infinite'
                     }} />
-                    Generando audio...
+                    Generando audio con Thibisay...
                   </>
-                ) : audio ? '↻ Regenerar Audio' : '🔊 Generar Audio'}
+                ) : audio ? '↻ Regenerar Audio' : '🎙️ Generar Audio con Thibisay'}
               </button>
             </div>
           </div>
