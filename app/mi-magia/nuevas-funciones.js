@@ -472,8 +472,17 @@ export function GuiaCristales({ usuario }) {
   const [filtro, setFiltro] = useState('');
   const [filtroChakra, setFiltroChakra] = useState('');
   const [cargando, setCargando] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   const chakras = ['Raíz', 'Sacro', 'Plexo Solar', 'Corazón', 'Garganta', 'Tercer Ojo', 'Corona'];
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    cargarCristales();
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     cargarCristales();
@@ -484,12 +493,9 @@ export function GuiaCristales({ usuario }) {
     try {
       let url = `${API_BASE}/api/cristales`;
       if (filtroChakra) url += `?chakra=${filtroChakra}`;
-
       const res = await fetch(url);
       const data = await res.json();
-      if (data.success) {
-        setCristales(data.cristales);
-      }
+      if (data.success) setCristales(data.cristales);
     } catch (e) {
       console.error('Error cargando cristales:', e);
     }
@@ -500,9 +506,7 @@ export function GuiaCristales({ usuario }) {
     try {
       const res = await fetch(`${API_BASE}/api/cristales?id=${id}`);
       const data = await res.json();
-      if (data.success) {
-        setCristalActivo(data.cristal);
-      }
+      if (data.success) setCristalActivo(data.cristal);
     } catch (e) {
       console.error('Error cargando cristal:', e);
     }
@@ -513,154 +517,166 @@ export function GuiaCristales({ usuario }) {
     c.propiedades?.toLowerCase().includes(filtro.toLowerCase())
   );
 
+  // ═══ ESTILOS INLINE FORZADOS ═══
+  const estilos = {
+    container: { paddingBottom: '20px', maxWidth: '100%', overflowX: 'hidden' },
+    header: { textAlign: 'center', marginBottom: '20px' },
+    headerH2: { color: '#d4af37', margin: '0 0 5px', fontSize: isMobile ? '1.3rem' : '1.5rem' },
+    headerP: { color: '#888', fontSize: isMobile ? '0.9rem' : '1rem' },
+    filtros: { marginBottom: '20px' },
+    input: {
+      width: '100%', padding: '12px 15px', background: '#1f1f1f', border: '1px solid #333',
+      borderRadius: '10px', color: '#fff', fontSize: '1rem', marginBottom: '10px', boxSizing: 'border-box'
+    },
+    chakraFiltros: {
+      display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '8px', flexWrap: 'nowrap'
+    },
+    chakraBtn: (activo) => ({
+      padding: isMobile ? '6px 10px' : '6px 12px', background: activo ? '#d4af3722' : '#1f1f1f',
+      border: 'none', borderRadius: '20px', color: activo ? '#d4af37' : '#888',
+      fontSize: isMobile ? '0.75rem' : '0.85rem', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap'
+    }),
+    cargando: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px', color: '#888' },
+    // GRID: 1 columna en móvil para que se lea bien
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(150px, 1fr))',
+      gap: isMobile ? '12px' : '12px'
+    },
+    // CARD: Más grande en móvil, horizontal layout
+    card: {
+      background: '#1f1f1f', borderRadius: '12px', padding: isMobile ? '15px' : '15px',
+      cursor: 'pointer', border: '1px solid transparent',
+      display: isMobile ? 'flex' : 'block', alignItems: 'center', gap: isMobile ? '15px' : '0',
+      textAlign: isMobile ? 'left' : 'center'
+    },
+    cardEmoji: { fontSize: isMobile ? '2rem' : '2rem', marginBottom: isMobile ? '0' : '10px', flexShrink: 0 },
+    cardContent: { flex: 1, minWidth: 0 },
+    cardH4: { color: '#fff', margin: '0 0 4px', fontSize: isMobile ? '1.1rem' : '0.95rem', lineHeight: '1.3' },
+    cardColor: { color: '#888', fontSize: isMobile ? '0.85rem' : '0.8rem', margin: '0 0 6px' },
+    cardChakras: { display: 'flex', gap: '5px', marginBottom: '6px', flexWrap: 'wrap', justifyContent: isMobile ? 'flex-start' : 'center' },
+    cardChakraTag: { background: '#d4af3722', color: '#d4af37', padding: '2px 8px', borderRadius: '10px', fontSize: '0.7rem' },
+    cardProp: { color: '#aaa', fontSize: isMobile ? '0.85rem' : '0.75rem', margin: 0, lineHeight: '1.4' },
+    // DETALLE
+    detalle: { padding: '10px 0', maxWidth: '100%' },
+    btnVolver: { background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', padding: '10px 0', fontSize: '1rem' },
+    detalleHeader: { marginBottom: '20px' },
+    detalleH2: { color: '#d4af37', margin: '0 0 5px', fontSize: isMobile ? '1.4rem' : '1.6rem' },
+    nombresAlt: { color: '#888', fontSize: '0.9rem' },
+    infoGrid: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' },
+    infoItem: { background: '#1f1f1f', padding: '10px 12px', borderRadius: '8px', color: '#ccc', fontSize: isMobile ? '0.9rem' : '1rem' },
+    seccion: { background: '#1f1f1f', padding: isMobile ? '12px' : '15px', borderRadius: '12px', marginBottom: '12px' },
+    seccionH3: { color: '#d4af37', margin: '0 0 10px', fontSize: isMobile ? '1rem' : '1.1rem' },
+    seccionP: { color: '#ccc', margin: 0, lineHeight: '1.5', fontSize: isMobile ? '0.9rem' : '1rem' },
+    tags: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
+    tag: { background: '#d4af3722', color: '#d4af37', padding: '4px 10px', borderRadius: '15px', fontSize: '0.85rem' },
+    mensaje: { background: 'linear-gradient(135deg, #d4af3722, #1f1f1f)', padding: '20px', borderRadius: '12px', textAlign: 'center', marginTop: '20px' },
+    mensajeP: { color: '#d4af37', fontSize: '1.1rem', fontStyle: 'italic', margin: 0, lineHeight: '1.5' }
+  };
+
   if (cristalActivo) {
     return (
-      <div className="cristal-detalle">
-        <button className="btn-volver" onClick={() => setCristalActivo(null)}>
-          ← Volver
-        </button>
-
-        <div className="cristal-header-det">
-          <h2>{cristalActivo.nombre}</h2>
+      <div style={estilos.detalle}>
+        <button style={estilos.btnVolver} onClick={() => setCristalActivo(null)}>← Volver</button>
+        <div style={estilos.detalleHeader}>
+          <h2 style={estilos.detalleH2}>{cristalActivo.nombre}</h2>
           {cristalActivo.nombres_alternativos?.length > 0 && (
-            <p className="nombres-alt">También: {cristalActivo.nombres_alternativos.join(', ')}</p>
+            <p style={estilos.nombresAlt}>También: {cristalActivo.nombres_alternativos.join(', ')}</p>
           )}
         </div>
-
-        <div className="cristal-info-grid">
-          <div className="info-item">
-            <strong>Color:</strong> {cristalActivo.color}
-          </div>
-          <div className="info-item">
-            <strong>Elemento:</strong> {cristalActivo.elemento}
-          </div>
-          <div className="info-item">
-            <strong>Chakras:</strong> {cristalActivo.chakras?.join(', ')}
-          </div>
-          <div className="info-item">
-            <strong>Signos:</strong> {cristalActivo.signos?.join(', ')}
-          </div>
+        <div style={estilos.infoGrid}>
+          <div style={estilos.infoItem}><strong>Color:</strong> {cristalActivo.color}</div>
+          <div style={estilos.infoItem}><strong>Elemento:</strong> {cristalActivo.elemento}</div>
+          <div style={estilos.infoItem}><strong>Chakras:</strong> {cristalActivo.chakras?.join(', ')}</div>
+          <div style={estilos.infoItem}><strong>Signos:</strong> {cristalActivo.signos?.join(', ')}</div>
         </div>
-
-        <div className="cristal-seccion">
-          <h3>Propiedades Energéticas</h3>
-          <p>{cristalActivo.propiedades_energeticas}</p>
+        <div style={estilos.seccion}>
+          <h3 style={estilos.seccionH3}>Propiedades Energéticas</h3>
+          <p style={estilos.seccionP}>{cristalActivo.propiedades_energeticas}</p>
         </div>
-
         {cristalActivo.propiedades_fisicas && (
-          <div className="cristal-seccion">
-            <h3>Propiedades Físicas</h3>
-            <p>{cristalActivo.propiedades_fisicas}</p>
+          <div style={estilos.seccion}>
+            <h3 style={estilos.seccionH3}>Propiedades Físicas</h3>
+            <p style={estilos.seccionP}>{cristalActivo.propiedades_fisicas}</p>
           </div>
         )}
-
-        <div className="cristal-seccion">
-          <h3>Cómo Limpiar</h3>
-          <p>{cristalActivo.como_limpiar}</p>
+        <div style={estilos.seccion}>
+          <h3 style={estilos.seccionH3}>Cómo Limpiar</h3>
+          <p style={estilos.seccionP}>{cristalActivo.como_limpiar}</p>
         </div>
-
-        <div className="cristal-seccion">
-          <h3>Cómo Programar</h3>
-          <p>{cristalActivo.como_programar}</p>
+        <div style={estilos.seccion}>
+          <h3 style={estilos.seccionH3}>Cómo Programar</h3>
+          <p style={estilos.seccionP}>{cristalActivo.como_programar}</p>
         </div>
-
         {cristalActivo.combinaciones_potentes?.length > 0 && (
-          <div className="cristal-seccion">
-            <h3>Combinaciones Potentes</h3>
-            <div className="combinaciones-tags">
-              {cristalActivo.combinaciones_potentes.map((c, i) => (
-                <span key={i}>{c}</span>
-              ))}
+          <div style={estilos.seccion}>
+            <h3 style={estilos.seccionH3}>Combinaciones Potentes</h3>
+            <div style={estilos.tags}>
+              {cristalActivo.combinaciones_potentes.map((c, i) => <span key={i} style={estilos.tag}>{c}</span>)}
             </div>
           </div>
         )}
-
         {cristalActivo.guardianes_afines?.length > 0 && (
-          <div className="cristal-seccion">
-            <h3>Guardianes Afines</h3>
-            <div className="guardianes-tags">
-              {cristalActivo.guardianes_afines.map((g, i) => (
-                <span key={i}>{g}</span>
-              ))}
+          <div style={estilos.seccion}>
+            <h3 style={estilos.seccionH3}>Guardianes Afines</h3>
+            <div style={estilos.tags}>
+              {cristalActivo.guardianes_afines.map((g, i) => <span key={i} style={estilos.tag}>{g}</span>)}
             </div>
           </div>
         )}
-
-        <div className="cristal-seccion ritual">
-          <h3>✦ Ritual de Activación</h3>
-          <p>{cristalActivo.ritual_activacion}</p>
+        <div style={{...estilos.seccion, background: 'linear-gradient(135deg, #2a1f0a, #1f1f1f)'}}>
+          <h3 style={estilos.seccionH3}>✦ Ritual de Activación</h3>
+          <p style={estilos.seccionP}>{cristalActivo.ritual_activacion}</p>
         </div>
-
         {cristalActivo.advertencias && (
-          <div className="cristal-seccion advertencia">
-            <h3>⚠️ Advertencias</h3>
-            <p>{cristalActivo.advertencias}</p>
+          <div style={{...estilos.seccion, background: '#3a1f1f', borderLeft: '3px solid #ff6b6b'}}>
+            <h3 style={{...estilos.seccionH3, color: '#ff6b6b'}}>⚠️ Advertencias</h3>
+            <p style={estilos.seccionP}>{cristalActivo.advertencias}</p>
           </div>
         )}
-
-        <div className="cristal-mensaje">
-          <p>"{cristalActivo.mensaje}"</p>
+        <div style={estilos.mensaje}>
+          <p style={estilos.mensajeP}>"{cristalActivo.mensaje}"</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="guia-cristales">
-      <div className="guia-header">
-        <h2>Guía de Cristales</h2>
-        <p>30+ cristales con propiedades, rituales y más</p>
+    <div style={estilos.container}>
+      <div style={estilos.header}>
+        <h2 style={estilos.headerH2}>Guía de Cristales</h2>
+        <p style={estilos.headerP}>30+ cristales con propiedades, rituales y más</p>
       </div>
-
-      <div className="guia-filtros">
+      <div style={estilos.filtros}>
         <input
           type="text"
           placeholder="Buscar cristal..."
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
-          className="buscar-input"
+          style={estilos.input}
         />
-        <div className="chakra-filtros">
-          <button
-            className={`chakra-btn ${!filtroChakra ? 'activo' : ''}`}
-            onClick={() => setFiltroChakra('')}
-          >
-            Todos
-          </button>
+        <div style={estilos.chakraFiltros}>
+          <button style={estilos.chakraBtn(!filtroChakra)} onClick={() => setFiltroChakra('')}>Todos</button>
           {chakras.map(ch => (
-            <button
-              key={ch}
-              className={`chakra-btn ${filtroChakra === ch ? 'activo' : ''}`}
-              onClick={() => setFiltroChakra(ch)}
-            >
-              {ch}
-            </button>
+            <button key={ch} style={estilos.chakraBtn(filtroChakra === ch)} onClick={() => setFiltroChakra(ch)}>{ch}</button>
           ))}
         </div>
       </div>
-
       {cargando ? (
-        <div className="guia-cargando">
-          <span className="pulse">💎</span>
-          <p>Cargando cristales...</p>
-        </div>
+        <div style={estilos.cargando}><span style={{fontSize: '2rem'}}>💎</span><p>Cargando cristales...</p></div>
       ) : (
-        <div className="cristales-grid">
+        <div style={estilos.grid}>
           {cristalesFiltrados.map(cristal => (
-            <div
-              key={cristal.id}
-              className="cristal-card"
-              onClick={() => cargarDetalle(cristal.id)}
-            >
-              <div className="cristal-emoji">💎</div>
-              <h4>{cristal.nombre}</h4>
-              <p className="cristal-color">{cristal.color}</p>
-              <div className="cristal-chakras-mini">
-                {cristal.chakras?.slice(0, 2).map((ch, i) => (
-                  <span key={i}>{ch}</span>
-                ))}
+            <div key={cristal.id} style={estilos.card} onClick={() => cargarDetalle(cristal.id)}>
+              <div style={estilos.cardEmoji}>💎</div>
+              <div style={estilos.cardContent}>
+                <h4 style={estilos.cardH4}>{cristal.nombre}</h4>
+                <p style={estilos.cardColor}>{cristal.color}</p>
+                <div style={estilos.cardChakras}>
+                  {cristal.chakras?.slice(0, 2).map((ch, i) => <span key={i} style={estilos.cardChakraTag}>{ch}</span>)}
+                </div>
+                <p style={estilos.cardProp}>{cristal.propiedades}</p>
               </div>
-              <p className="cristal-prop-mini">{cristal.propiedades}</p>
             </div>
           ))}
         </div>
