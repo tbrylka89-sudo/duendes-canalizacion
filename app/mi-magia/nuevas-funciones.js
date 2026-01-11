@@ -1712,4 +1712,69 @@ export const estilosNuevos = `
   padding: 40px;
   color: #888;
 }
+
+/* ═══ RESPONSIVE MÓVIL ═══ */
+@media (max-width: 768px) {
+  .cristales-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .cristal-card {
+    padding: 12px;
+  }
+  .cristal-card h4 {
+    font-size: 0.85rem;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .cristal-emoji {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+  .cristal-color {
+    font-size: 0.7rem;
+    margin-bottom: 5px;
+  }
+  .cristal-chakras-mini {
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+  }
+  .cristal-chakras-mini span {
+    font-size: 0.6rem;
+    padding: 2px 5px;
+  }
+  .cristal-prop-mini {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .chakra-filtros {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+  }
+  .chakra-btn {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+  .cristal-detalle {
+    padding: 10px 0;
+  }
+  .cristal-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .cristal-seccion {
+    padding: 12px;
+  }
+  .cristal-seccion h3 {
+    font-size: 1rem;
+  }
+  .cristal-seccion p {
+    font-size: 0.9rem;
+  }
+}
 `;
