@@ -181,6 +181,7 @@ export default function ContenidoPage() {
   const [audio, setAudio] = useState(null);
   const [parteAudio, setParteAudio] = useState('inicio');
   const [textoAudioPersonalizado, setTextoAudioPersonalizado] = useState('');
+  const [generarAudioAuto, setGenerarAudioAuto] = useState(false); // Generar audio automáticamente
 
   // Estado de publicación
   const [fechaPublicacion, setFechaPublicacion] = useState('');
@@ -254,9 +255,17 @@ export default function ContenidoPage() {
       if (data.success) {
         setTitulo(data.titulo || tema);
         setContenido(data.contenido);
-        setPaso(4); // Ir a multimedia
-        setExito('¡Contenido generado! Ahora podés agregar imagen y audio.');
-        setTimeout(() => setExito(''), 3000);
+
+        // Si está activado generar audio automáticamente
+        if (generarAudioAuto && data.contenido) {
+          setExito('¡Contenido generado! Generando audio con Thibisay...');
+          await generarAudioDesdeContenido(data.contenido);
+          setPaso(4);
+        } else {
+          setPaso(4); // Ir a multimedia
+          setExito('¡Contenido generado! Ahora podés agregar imagen y audio.');
+          setTimeout(() => setExito(''), 3000);
+        }
       } else {
         setError(data.error || 'Error generando contenido');
       }
@@ -366,6 +375,48 @@ export default function ContenidoPage() {
   };
 
   // ═══════════════════════════════════════════════════════════════
+  // GENERAR AUDIO DESDE CONTENIDO (para auto-generación)
+  // ═══════════════════════════════════════════════════════════════
+  const generarAudioDesdeContenido = async (textoContenido) => {
+    setGenerandoAudio(true);
+
+    try {
+      // Limpiar markdown del texto para mejor audio
+      let textoParaAudio = textoContenido
+        .substring(0, 5000)
+        .replace(/#{1,6}\s/g, '')
+        .replace(/\*\*/g, '')
+        .replace(/\*/g, '')
+        .replace(/`/g, '')
+        .replace(/\n{2,}/g, '\n')
+        .trim();
+
+      const res = await fetch('/api/admin/voz/generar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          texto: textoParaAudio,
+          voz: 'thibisay'
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setAudio(data.audio);
+        setExito(`¡Contenido y audio generados! (${textoParaAudio.length} caracteres de audio)`);
+        setTimeout(() => setExito(''), 4000);
+      } else {
+        setError('Contenido generado, pero hubo error en el audio: ' + (data.error || 'Error desconocido'));
+      }
+    } catch (e) {
+      setError('Contenido generado, pero hubo error en el audio: ' + e.message);
+    }
+
+    setGenerandoAudio(false);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
   // GUARDAR/PUBLICAR CONTENIDO
   // ═══════════════════════════════════════════════════════════════
   const guardarContenido = async (estado = 'borrador') => {
@@ -417,6 +468,7 @@ export default function ContenidoPage() {
     setAudio(null);
     setParteAudio('inicio');
     setTextoAudioPersonalizado('');
+    setGenerarAudioAuto(false);
     setPaso(1);
     setError('');
     setExito('');
@@ -709,7 +761,15 @@ export default function ContenidoPage() {
             {PLANTILLAS.map((p) => (
               <button
                 key={p.id}
-                onClick={() => { setPlantilla(p); setPalabras(p.palabras); setPaso(2); }}
+                onClick={() => {
+                  setPlantilla(p);
+                  setPalabras(p.palabras);
+                  // Auto-activar audio para meditaciones
+                  if (p.tipo === 'meditacion') {
+                    setGenerarAudioAuto(true);
+                  }
+                  setPaso(2);
+                }}
                 style={{
                   ...GLASS,
                   padding: 20,
@@ -910,7 +970,7 @@ export default function ContenidoPage() {
             </div>
 
             {/* Instrucciones extra */}
-            <div style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', color: C.text, marginBottom: 8, fontWeight: 500 }}>
                 Instrucciones adicionales (opcional)
               </label>
@@ -931,6 +991,58 @@ export default function ContenidoPage() {
                   resize: 'vertical'
                 }}
               />
+            </div>
+
+            {/* Opción de generar audio automáticamente */}
+            <div style={{
+              marginBottom: 24,
+              padding: 16,
+              background: plantilla?.tipo === 'meditacion' ? `${C.purple}15` : C.bgCard,
+              border: `1px solid ${plantilla?.tipo === 'meditacion' ? C.purple : C.border}`,
+              borderRadius: 12,
+              cursor: 'pointer'
+            }}
+            onClick={() => setGenerarAudioAuto(!generarAudioAuto)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 6,
+                  border: `2px solid ${generarAudioAuto ? C.purple : C.border}`,
+                  background: generarAudioAuto ? C.purple : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}>
+                  {generarAudioAuto && <span style={{ color: 'white', fontSize: 14 }}>✓</span>}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: C.text, fontWeight: 500 }}>
+                      🎙️ Generar audio automáticamente con Thibisay
+                    </span>
+                    {plantilla?.tipo === 'meditacion' && (
+                      <span style={{
+                        fontSize: 10,
+                        background: C.purple,
+                        color: 'white',
+                        padding: '2px 8px',
+                        borderRadius: 10
+                      }}>
+                        RECOMENDADO
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ color: C.textMuted, fontSize: 12, margin: '4px 0 0' }}>
+                    Al generar el contenido, se creará automáticamente el audio con la voz de Thibisay
+                    {plantilla?.tipo === 'meditacion' && (
+                      <span style={{ color: C.purple }}> - perfecto para meditaciones guiadas</span>
+                    )}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Botones */}
