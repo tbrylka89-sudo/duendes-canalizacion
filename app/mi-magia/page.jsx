@@ -2320,18 +2320,24 @@ function ForoSec({ usuario, setUsuario }) {
   }
 
   return (
-    <div className="sec">
+    <div className="sec" style={{maxWidth:'100%',overflowX:'hidden'}}>
       <div className="sec-head">
         <h1>💬 Foro Mágico</h1>
         <p>Conectá con la comunidad de guardianas y guardianes.</p>
       </div>
 
-      <div className="foro-categorias">
+      <div style={{display:'flex',flexWrap:'wrap',gap:'8px',marginBottom:'1rem',maxWidth:'100%'}}>
         {CATEGORIAS_FORO.map(cat => (
           <button
             key={cat.id}
-            className={`foro-cat ${categoria === cat.id ? 'act' : ''}`}
             onClick={() => setCategoria(cat.id)}
+            style={{
+              display:'flex',alignItems:'center',gap:'6px',
+              padding:'8px 12px',background: categoria === cat.id ? '#1a1a1a' : '#fff',
+              color: categoria === cat.id ? '#fff' : '#1a1a1a',
+              border:'1px solid',borderColor: categoria === cat.id ? '#1a1a1a' : '#e0e0e0',
+              borderRadius:'8px',fontSize:'0.85rem',cursor:'pointer'
+            }}
           >
             <span>{cat.icono}</span>
             <span>{cat.nombre}</span>
@@ -2339,8 +2345,8 @@ function ForoSec({ usuario, setUsuario }) {
         ))}
       </div>
 
-      <div className="foro-acciones">
-        <button className="btn-gold" onClick={() => setMostrarNuevo(!mostrarNuevo)}>
+      <div style={{marginBottom:'1rem'}}>
+        <button className="btn-gold" onClick={() => setMostrarNuevo(!mostrarNuevo)} style={{width:'100%',padding:'12px',fontSize:'1rem'}}>
           {mostrarNuevo ? 'Cancelar' : '+ Nueva publicación'}
         </button>
       </div>
