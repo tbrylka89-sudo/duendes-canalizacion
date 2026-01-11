@@ -60,6 +60,7 @@ export default function PersonajesPage() {
   const [paso, setPaso] = useState(1);
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [sincronizando, setSincronizando] = useState(false);
   const [guardianSeleccionado, setGuardianSeleccionado] = useState(null);
   const [tipoContenido, setTipoContenido] = useState(null);
   const [tema, setTema] = useState('');
@@ -83,19 +84,65 @@ export default function PersonajesPage() {
 
   const cargarGuardianes = async () => {
     try {
+      // Primero intentar sincronizar desde WooCommerce
+      const syncRes = await fetch('/api/admin/productos/sincronizar', { method: 'POST' });
+
+      // Luego obtener todos los productos
       const res = await fetch('/api/admin/productos');
       const data = await res.json();
-      if (data.success) {
-        // Filtrar solo productos que son guardianes
-        const guardianes = data.productos.filter(p =>
-          p.guardian || p.categoria?.toLowerCase().includes('guardian')
-        );
-        setProductos(guardianes);
+      if (data.success && data.productos) {
+        // Mostrar TODOS los productos, no solo los que tienen "guardian"
+        // Extraer nombre del guardian del nombre del producto si no existe
+        const productosConGuardian = data.productos.map(p => ({
+          ...p,
+          guardian: p.guardian || extraerNombreGuardian(p.nombre) || p.nombre?.split(' - ')[0] || p.nombre
+        }));
+        setProductos(productosConGuardian);
       }
     } catch (e) {
       console.error('Error cargando guardianes:', e);
     }
     setCargando(false);
+  };
+
+  // Extraer nombre del guardian del nombre del producto
+  const extraerNombreGuardian = (nombre) => {
+    if (!nombre) return null;
+    // Patrones comunes: "Finnegan - Guardian", "Oak el Protector", etc.
+    const match = nombre.match(/^([A-Za-zÀ-ÿ]+)[\s\-–]/);
+    return match ? match[1] : null;
+  };
+
+  // Sincronizar manualmente
+  const sincronizarProductos = async () => {
+    setSincronizando(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/admin/productos/sincronizar', { method: 'POST' });
+      const data = await res.json();
+
+      if (data.success) {
+        setExito(`¡Sincronizado! ${data.total} productos (${data.woocommerce} de WooCommerce)`);
+        setTimeout(() => setExito(''), 4000);
+        // Recargar productos
+        const prodRes = await fetch('/api/admin/productos');
+        const prodData = await prodRes.json();
+        if (prodData.success && prodData.productos) {
+          const productosConGuardian = prodData.productos.map(p => ({
+            ...p,
+            guardian: p.guardian || extraerNombreGuardian(p.nombre) || p.nombre?.split(' - ')[0] || p.nombre
+          }));
+          setProductos(productosConGuardian);
+        }
+      } else {
+        setError(data.error || 'Error sincronizando');
+      }
+    } catch (e) {
+      setError('Error de conexión: ' + e.message);
+    }
+
+    setSincronizando(false);
   };
 
   // Generar contenido
@@ -361,9 +408,42 @@ ESTILO:
         {/* ═══ PASO 1: ELEGIR GUARDIAN ═══ */}
         {paso === 1 && (
           <div>
-            <h2 style={{ color: C.text, fontSize: 20, marginBottom: 24 }}>
-              ✨ Elegí el guardián que va a canalizar el contenido
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ color: C.text, fontSize: 20, margin: 0 }}>
+                ✨ Elegí el guardián que va a canalizar el contenido
+              </h2>
+              <button
+                onClick={sincronizarProductos}
+                disabled={sincronizando}
+                style={{
+                  padding: '10px 20px',
+                  background: sincronizando ? C.bgHover : `${C.blue}22`,
+                  border: `1px solid ${C.blue}`,
+                  borderRadius: 8,
+                  color: C.blue,
+                  cursor: sincronizando ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 13
+                }}
+              >
+                {sincronizando ? (
+                  <>
+                    <div style={{
+                      width: 14, height: 14,
+                      border: '2px solid transparent',
+                      borderTopColor: C.blue,
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
+                    Sincronizando...
+                  </>
+                ) : (
+                  <>🔄 Sincronizar con WooCommerce</>
+                )}
+              </button>
+            </div>
 
             {cargando ? (
               <div style={{ textAlign: 'center', padding: 60, color: C.textMuted }}>
@@ -386,9 +466,27 @@ ESTILO:
               }}>
                 <span style={{ fontSize: 48, display: 'block', marginBottom: 16 }}>🌲</span>
                 <h3 style={{ color: C.text }}>No hay guardianes disponibles</h3>
-                <p style={{ color: C.textMuted }}>
-                  Sincronizá tus productos o agregá guardianes en la sección Productos
+                <p style={{ color: C.textMuted, marginBottom: 24 }}>
+                  Hacé clic en el botón para sincronizar con WooCommerce
                 </p>
+                <button
+                  onClick={sincronizarProductos}
+                  disabled={sincronizando}
+                  style={{
+                    padding: '14px 28px',
+                    background: `linear-gradient(135deg, ${C.gold}, ${C.goldDark})`,
+                    border: 'none',
+                    borderRadius: 10,
+                    color: '#000',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8
+                  }}
+                >
+                  {sincronizando ? 'Sincronizando...' : '🔄 Sincronizar Productos'}
+                </button>
               </div>
             ) : (
               <div style={{
