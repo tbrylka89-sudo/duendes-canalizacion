@@ -1293,22 +1293,36 @@ const CATEGORIAS_VOCES = {
   fantasia: { nombre: 'Fantasía y Leyendas', icono: '🐉', descripcion: 'Elfos, dragones, unicornios y criaturas míticas', orden: 12 }
 };
 
-// Configuraciones de voz por tipo de contenido
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURACIONES DE VOZ - OPTIMIZADAS PARA EMOCIÓN Y NATURALIDAD
+// ═══════════════════════════════════════════════════════════════
+// stability BAJO (0.25-0.45) = más variación, más vida, más humano
+// style ALTO (0.5-0.9) = más expresividad emocional
+// similarity_boost moderado (0.5-0.75) = no forzar la voz
+
 const VOZ_SETTINGS = {
-  meditacion: { stability: 0.80, similarity_boost: 0.5, style: 0.2 },   // Muy lento, muy calmado
-  ritual: { stability: 0.70, similarity_boost: 0.65, style: 0.35 },     // Místico, pausado
-  sanacion: { stability: 0.75, similarity_boost: 0.55, style: 0.25 },   // Suave, reconfortante
-  cuento: { stability: 0.55, similarity_boost: 0.75, style: 0.6 },      // Expresivo, narrativo
-  leccion: { stability: 0.60, similarity_boost: 0.70, style: 0.45 },    // Claro, didáctico
-  mensaje: { stability: 0.50, similarity_boost: 0.80, style: 0.55 },    // Personal, emotivo
-  narracion: { stability: 0.55, similarity_boost: 0.75, style: 0.5 },   // Normal
-  personaje: { stability: 0.45, similarity_boost: 0.85, style: 0.7 },   // Muy expresivo
-  divertido: { stability: 0.40, similarity_boost: 0.85, style: 0.8 },   // Animado
-  default: { stability: 0.60, similarity_boost: 0.70, style: 0.4 }
+  // Contenido emotivo/espiritual - MUY expresivo
+  meditacion: { stability: 0.35, similarity_boost: 0.50, style: 0.45 },   // Calmado pero con alma
+  ritual: { stability: 0.30, similarity_boost: 0.55, style: 0.60 },       // Místico, con presencia
+  sanacion: { stability: 0.40, similarity_boost: 0.50, style: 0.50 },     // Cálido, reconfortante
+
+  // Narrativo - expresivo y envolvente
+  cuento: { stability: 0.28, similarity_boost: 0.65, style: 0.75 },       // Muy expresivo, cuenta historias
+  narracion: { stability: 0.32, similarity_boost: 0.60, style: 0.65 },    // Natural, fluido
+  leccion: { stability: 0.38, similarity_boost: 0.60, style: 0.55 },      // Claro pero cálido
+
+  // Personal/Emocional - máxima conexión
+  mensaje: { stability: 0.25, similarity_boost: 0.70, style: 0.80 },      // Íntimo, muy personal
+  personaje: { stability: 0.22, similarity_boost: 0.75, style: 0.85 },    // Actor, lleno de vida
+  divertido: { stability: 0.20, similarity_boost: 0.70, style: 0.90 },    // Animado, alegre
+
+  // Preview - mostrar la voz con emoción
+  preview: { stability: 0.30, similarity_boost: 0.60, style: 0.70 },      // Demostrar personalidad
+  default: { stability: 0.32, similarity_boost: 0.60, style: 0.65 }       // Equilibrado pero vivo
 };
 
-// Texto de muestra para preview de voces
-const TEXTO_MUESTRA = "Bienvenida al mundo mágico de los duendes. Aquí encontrarás sabiduría ancestral y amor infinito.";
+// Texto de muestra - con puntuación que genera emoción natural
+const TEXTO_MUESTRA = "¡Bienvenida, alma querida! Te estaba esperando... Aquí, en este rincón mágico, encontrarás la paz que tu corazón tanto anhela.";
 
 export async function POST(request) {
   try {
@@ -1341,8 +1355,9 @@ export async function POST(request) {
       textoFinal = vozInfo.intro + textoBase;
     }
 
-    // Obtener settings según tipo de contenido
-    const settings = VOZ_SETTINGS[tipo] || VOZ_SETTINGS.default;
+    // Obtener settings según tipo de contenido (preview usa settings especiales)
+    const tipoFinal = preview ? 'preview' : tipo;
+    const settings = VOZ_SETTINGS[tipoFinal] || VOZ_SETTINGS.default;
 
     let voiceId = vozInfo.id || VOCES['thibisay'];
 
