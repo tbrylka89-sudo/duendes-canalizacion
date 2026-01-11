@@ -45,12 +45,13 @@ const NAV_ITEMS = [
   { id: 'dashboard', path: '/admin', icon: '◐', label: 'Dashboard', shortcut: '1' },
   { id: 'clientes', path: '/admin/clientes', icon: '◉', label: 'Clientes', shortcut: '2' },
   { id: 'contenido', path: '/admin/contenido', icon: '✦', label: 'Contenido', shortcut: '3', badge: 'ÉPICO' },
-  { id: 'circulo', path: '/admin/circulo', icon: '☽', label: 'Círculo', shortcut: '4' },
-  { id: 'regalos', path: '/admin/regalos', icon: '❋', label: 'Regalos', shortcut: '5' },
-  { id: 'banners', path: '/admin/banners', icon: '🖼️', label: 'Banners', shortcut: '6', badge: 'NUEVO' },
-  { id: 'productos', path: '/admin/productos', icon: '◈', label: 'Productos', shortcut: '7' },
-  { id: 'insights', path: '/admin/insights', icon: '◎', label: 'Insights', shortcut: '8' },
-  { id: 'tito', path: '/admin/tito', icon: '🧙', label: 'Tito AI', shortcut: '9' },
+  { id: 'personajes', path: '/admin/personajes', icon: '🧙', label: 'Guardianes', shortcut: '4', badge: 'NUEVO' },
+  { id: 'circulo', path: '/admin/circulo', icon: '☽', label: 'Círculo', shortcut: '5' },
+  { id: 'regalos', path: '/admin/regalos', icon: '❋', label: 'Regalos', shortcut: '6' },
+  { id: 'banners', path: '/admin/banners', icon: '🖼️', label: 'Banners', shortcut: '7' },
+  { id: 'productos', path: '/admin/productos', icon: '◈', label: 'Productos', shortcut: '8' },
+  { id: 'insights', path: '/admin/insights', icon: '◎', label: 'Insights', shortcut: '9' },
+  { id: 'tito', path: '/admin/tito', icon: '🤖', label: 'Tito AI', shortcut: '0' },
 ];
 
 // ═══════════════════════════════════════════════════════════════
