@@ -2807,8 +2807,9 @@ Mensaje actual: ${m}`;
     touchAction: 'manipulation',
     WebkitTapHighlightColor: 'transparent'
   };
-  // CHAT: Ancho fijo para móvil
-  const chatStyle = {
+  // CHAT: Posicionamiento con left/right para móvil (sin width fijo)
+  const chatStyle = mobile ? {
+    // MÓVIL: Usar left/right para calcular ancho automáticamente
     position: 'fixed',
     zIndex: 999,
     background: '#fff',
@@ -2817,13 +2818,25 @@ Mensaje actual: ${m}`;
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    // MÓVIL: Ancho calculado para que no se salga de pantalla
-    bottom: mobile ? '70px' : '6rem',
-    left: mobile ? '12px' : 'auto',
-    right: mobile ? '12px' : '1.5rem',
-    width: mobile ? 'calc(100vw - 24px)' : '340px',
-    maxWidth: mobile ? '100%' : '340px',
-    maxHeight: mobile ? '55vh' : '450px'
+    bottom: '70px',
+    left: '8px',
+    right: '8px',
+    // NO definir width - dejar que se calcule por left/right
+    maxHeight: '50vh'
+  } : {
+    // DESKTOP
+    position: 'fixed',
+    zIndex: 999,
+    background: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    bottom: '6rem',
+    right: '1.5rem',
+    width: '340px',
+    maxHeight: '450px'
   };
   // MENSAJES: Forzar saltos de línea
   const msgStyle = {
@@ -3386,7 +3399,7 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 @keyframes pulsar{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
 @media(max-width:1100px){.stats-g,.beneficios-grid,.membresias-grid,.cristales-grid{grid-template-columns:repeat(2,1fr)}.exp-grid,.elementos-grid,.regalos-grid,.grim-intro-cards{grid-template-columns:1fr}.canjes-grid,.packs-grid{grid-template-columns:repeat(2,1fr)}.info-grid,.benef-grid-int,.fases-mes{grid-template-columns:1fr}}
 @media(max-width:900px){.menu-btn{display:flex!important;background:#d4af37!important;border:none!important}.menu-btn span{background:#fff!important}.header{padding:0 0.75rem!important}.nav-overlay{display:block!important}.nav{transform:translateX(-100%)!important;transition:transform 0.3s}.nav.abierto{transform:translateX(0)!important;box-shadow:4px 0 20px rgba(0,0,0,0.15)}.contenido{margin-left:0!important}.user-info{display:none!important}.logo{font-size:0.85rem!important}.hstats{gap:0.4rem!important}.hstats span{padding:0.15rem 0.4rem!important;font-size:0.7rem!important}}
-@media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tito-chat{right:8px!important;left:8px!important;width:calc(100% - 16px)!important;max-width:none!important;bottom:70px!important;max-height:50vh!important;height:auto!important;border-radius:12px!important;margin-left:0!important}.tito-btn{width:55px!important;height:55px!important;bottom:8px!important;right:8px!important}.tito-head{padding:0.6rem!important}.tito-av{width:28px!important;height:28px!important}.tito-msgs{max-height:30vh!important;padding:0.6rem!important}.tito-input{padding:0.4rem!important}.tito-input input{padding:0.4rem 0.8rem!important;font-size:0.8rem!important}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
+@media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
 
 /* ═══════════════════════════════════════════════════════════════
    LUNA CALENDAR STYLES - PREMIUM
