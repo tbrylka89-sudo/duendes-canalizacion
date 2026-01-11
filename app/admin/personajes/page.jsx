@@ -190,13 +190,13 @@ const detectarCaracteristicas = (producto) => {
   };
 };
 
-// Mapeo de elemento a voz recomendada (SOLO VOCES PREMIUM)
+// Mapeo de elemento a voz recomendada (IDs verificados de ElevenLabs)
 const ELEMENTO_A_VOZ = {
-  tierra: { masculino: 'roger', femenino: 'matilda', neutro: 'guardian-bosque' },
-  agua: { masculino: 'george', femenino: 'sarah', neutro: 'ninfa' },
-  fuego: { masculino: 'daniel', femenino: 'aria', neutro: 'hechicero' },
-  aire: { masculino: 'callum', femenino: 'lily', neutro: 'hada' },
-  eter: { masculino: 'merlin', femenino: 'charlotte', neutro: 'thibisay' }
+  tierra: { masculino: 'patrick', femenino: 'glinda', neutro: 'guardian-bosque' },
+  agua: { masculino: 'josh', femenino: 'bella', neutro: 'ninfa' },
+  fuego: { masculino: 'arnold', femenino: 'domi', neutro: 'hechicero' },
+  aire: { masculino: 'antoni', femenino: 'elli', neutro: 'hada' },
+  eter: { masculino: 'clyde', femenino: 'charlotte', neutro: 'thibisay' }
 };
 
 // ═══════════════════════════════════════════════════════════════

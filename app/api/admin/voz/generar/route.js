@@ -1,12 +1,12 @@
 // API para generar voz con Eleven Labs
-// Sistema completo de voces categorizadas - SOLO VOCES PREMIUM
+// Sistema completo de voces - IDs verificados de la biblioteca pública
 
 // ═══════════════════════════════════════════════════════════════
-// CATÁLOGO DE VOCES PREMIUM (Suenan naturales, no a IA)
+// CATÁLOGO DE VOCES (IDs verificados de ElevenLabs)
 // ═══════════════════════════════════════════════════════════════
 
 const CATALOGO_VOCES = {
-  // ═══ VOCES PROPIAS DE DUENDES ═══
+  // ═══ VOCES PROPIAS DE DUENDES (Clones personalizados) ═══
   'thibisay': {
     id: 'ofSX50hgXXAqhe3nRhJI',
     nombre: 'Thibisay',
@@ -32,174 +32,206 @@ const CATALOGO_VOCES = {
     premium: true
   },
 
-  // ═══ VOCES PREMIUM FEMENINAS (Ultra realistas) ═══
-  'aria': {
-    id: '9BWtsMINqrJLrRacOk9x',
-    nombre: 'Aria',
-    categoria: 'premium',
-    genero: 'femenino',
-    edad: 'joven',
-    estilo: 'expresiva',
-    descripcion: 'Voz ultra-realista, muy expresiva y natural',
-    personalidad: 'Cálida, cercana, emotiva',
-    icono: '🎵',
-    premium: true,
-    recomendada: true
-  },
-  'sarah': {
-    id: 'EXAVITQu4vr4xnSDxMaL',
-    nombre: 'Sarah',
-    categoria: 'premium',
+  // ═══ VOCES FEMENINAS DE LA BIBLIOTECA PÚBLICA ═══
+  'rachel': {
+    id: '21m00Tcm4TlvDq8ikWAM',
+    nombre: 'Rachel',
+    categoria: 'femeninas',
     genero: 'femenino',
     edad: 'adulta',
-    estilo: 'suave',
-    descripcion: 'Voz suave perfecta para meditaciones',
-    personalidad: 'Serena, reconfortante, íntima',
-    icono: '🌸',
-    premium: true,
+    estilo: 'narradora',
+    descripcion: 'Voz americana cálida para narración',
+    personalidad: 'Amigable, clara, profesional',
+    icono: '📖',
     recomendada: true
+  },
+  'bella': {
+    id: 'EXAVITQu4vr4xnSDxMaL',
+    nombre: 'Bella',
+    categoria: 'femeninas',
+    genero: 'femenino',
+    edad: 'joven',
+    estilo: 'suave',
+    descripcion: 'Voz suave e íntima, ideal para meditaciones',
+    personalidad: 'Serena, dulce, reconfortante',
+    icono: '🌸',
+    recomendada: true
+  },
+  'elli': {
+    id: 'MF3mGyEYCl7XYWbV9V6O',
+    nombre: 'Elli',
+    categoria: 'femeninas',
+    genero: 'femenino',
+    edad: 'joven',
+    estilo: 'brillante',
+    descripcion: 'Voz joven y energética',
+    personalidad: 'Alegre, vivaz, optimista',
+    icono: '💫'
+  },
+  'domi': {
+    id: 'AZnzlk1XvdvUeBnXmlld',
+    nombre: 'Domi',
+    categoria: 'femeninas',
+    genero: 'femenino',
+    edad: 'joven',
+    estilo: 'fuerte',
+    descripcion: 'Voz joven con personalidad fuerte',
+    personalidad: 'Decidida, clara, segura',
+    icono: '⚡'
   },
   'charlotte': {
     id: 'XB0fDUnXU5powFXDhCwa',
     nombre: 'Charlotte',
-    categoria: 'premium',
+    categoria: 'femeninas',
     genero: 'femenino',
     edad: 'madura',
     estilo: 'elegante',
-    descripcion: 'Voz elegante estilo europeo, muy natural',
+    descripcion: 'Voz elegante estilo europeo',
     personalidad: 'Refinada, sabia, maternal',
     icono: '👑',
-    premium: true,
     recomendada: true
   },
-  'laura': {
-    id: 'FGY2WhTYpPnrIDTdsKH5',
-    nombre: 'Laura',
-    categoria: 'premium',
-    genero: 'femenino',
-    edad: 'adulta',
-    estilo: 'cálida',
-    descripcion: 'Voz americana cálida y muy humana',
-    personalidad: 'Amigable, confiable, cercana',
-    icono: '🌻',
-    premium: true
-  },
-  'lily': {
-    id: 'pFZP5JQG7iQjIQuC4Bku',
-    nombre: 'Lily',
-    categoria: 'premium',
+  'dorothy': {
+    id: 'ThT5KcBeYPX3keUQqHPh',
+    nombre: 'Dorothy',
+    categoria: 'femeninas',
     genero: 'femenino',
     edad: 'joven',
-    estilo: 'británica',
-    descripcion: 'Voz británica joven y encantadora',
-    personalidad: 'Dulce, elegante, refinada',
-    icono: '🌷',
-    premium: true
+    estilo: 'agradable',
+    descripcion: 'Voz británica joven y amigable',
+    personalidad: 'Cercana, simpática, natural',
+    icono: '🌻'
   },
-  'alice': {
-    id: 'Xb7hH8MSUJpSbSDYk0k2',
-    nombre: 'Alice',
-    categoria: 'premium',
+  'glinda': {
+    id: 'z9fAnlkpzviPz146aGWa',
+    nombre: 'Glinda',
+    categoria: 'femeninas',
+    genero: 'femenino',
+    edad: 'madura',
+    estilo: 'maternal',
+    descripcion: 'Voz cálida como una abuela',
+    personalidad: 'Protectora, amorosa, sabia',
+    icono: '🧡'
+  },
+  'grace': {
+    id: 'oWAxZDx7w5VEj9dCyTzz',
+    nombre: 'Grace',
+    categoria: 'femeninas',
     genero: 'femenino',
     edad: 'adulta',
-    estilo: 'confiable',
-    descripcion: 'Voz clara y articulada, muy profesional',
-    personalidad: 'Seria, confiable, clara',
-    icono: '📘',
-    premium: true
+    estilo: 'sureña',
+    descripcion: 'Voz americana con acento sureño',
+    personalidad: 'Cálida, acogedora, amable',
+    icono: '🌺'
   },
-  'matilda': {
-    id: 'XrExE9yKIg1WjnnlVkGX',
-    nombre: 'Matilda',
-    categoria: 'premium',
+  'serena': {
+    id: 'pMsXgVXv3BLzUgSXRplE',
+    nombre: 'Serena',
+    categoria: 'femeninas',
     genero: 'femenino',
     edad: 'adulta',
-    estilo: 'cálida',
-    descripcion: 'Voz cálida y amigable, ideal para guías',
-    personalidad: 'Maternal, acogedora, paciente',
-    icono: '🧡',
-    premium: true
+    estilo: 'calma',
+    descripcion: 'Voz perfecta para meditaciones',
+    personalidad: 'Tranquila, serena, guía',
+    icono: '🧘',
+    recomendada: true
   },
 
-  // ═══ VOCES PREMIUM MASCULINAS (Ultra realistas) ═══
-  'roger': {
-    id: 'CwhRBWXzGAHq8TQ4Fs17',
-    nombre: 'Roger',
-    categoria: 'premium',
+  // ═══ VOCES MASCULINAS DE LA BIBLIOTECA PÚBLICA ═══
+  'adam': {
+    id: 'pNInz6obpgDQGcFmaJgB',
+    nombre: 'Adam',
+    categoria: 'masculinas',
     genero: 'masculino',
-    edad: 'maduro',
+    edad: 'adulto',
     estilo: 'profunda',
-    descripcion: 'Voz profunda y autorizada, muy natural',
-    personalidad: 'Sabio, confiable, paternal',
+    descripcion: 'Voz profunda ideal para narración',
+    personalidad: 'Autoritario, confiable, sabio',
     icono: '🎭',
-    premium: true,
     recomendada: true
   },
-  'george': {
-    id: 'JBFqnCBsd6RMkjVDRZzb',
-    nombre: 'George',
-    categoria: 'premium',
+  'josh': {
+    id: 'TxGEqnHWrfWFTfGW9XjX',
+    nombre: 'Josh',
+    categoria: 'masculinas',
+    genero: 'masculino',
+    edad: 'joven',
+    estilo: 'profunda',
+    descripcion: 'Voz joven y profunda',
+    personalidad: 'Dinámico, seguro, moderno',
+    icono: '🌊'
+  },
+  'arnold': {
+    id: 'VR6AewLTigWG4xSOukaG',
+    nombre: 'Arnold',
+    categoria: 'masculinas',
+    genero: 'masculino',
+    edad: 'adulto',
+    estilo: 'nítida',
+    descripcion: 'Voz nítida y potente',
+    personalidad: 'Misterioso, potente, imponente',
+    icono: '⚡'
+  },
+  'antoni': {
+    id: 'ErXwobaYiN019PkySvjV',
+    nombre: 'Antoni',
+    categoria: 'masculinas',
+    genero: 'masculino',
+    edad: 'joven',
+    estilo: 'amigable',
+    descripcion: 'Voz joven y amigable',
+    personalidad: 'Cercano, natural, simpático',
+    icono: '😊'
+  },
+  'sam': {
+    id: 'yoZ06aMxZJJ28mfd3POQ',
+    nombre: 'Sam',
+    categoria: 'masculinas',
+    genero: 'masculino',
+    edad: 'joven',
+    estilo: 'rasposa',
+    descripcion: 'Voz joven con tono rasposo',
+    personalidad: 'Rebelde, auténtico, cool',
+    icono: '🎸'
+  },
+  'clyde': {
+    id: '2EiwWnXFnvU5JabPnv8n',
+    nombre: 'Clyde',
+    categoria: 'masculinas',
+    genero: 'masculino',
+    edad: 'anciano',
+    estilo: 'veterano',
+    descripcion: 'Voz de anciano experimentado',
+    personalidad: 'Sabio, cálido, abuelo',
+    icono: '🧓',
+    recomendada: true
+  },
+  'harry': {
+    id: 'SOYHLrjzK2X1ezoPC6cr',
+    nombre: 'Harry',
+    categoria: 'masculinas',
+    genero: 'masculino',
+    edad: 'adulto',
+    estilo: 'expresiva',
+    descripcion: 'Voz muy expresiva y versátil',
+    personalidad: 'Dramático, expresivo, artístico',
+    icono: '🎪'
+  },
+  'patrick': {
+    id: 'ODq5zmih8GrVes37Dizd',
+    nombre: 'Patrick',
+    categoria: 'masculinas',
     genero: 'masculino',
     edad: 'maduro',
-    estilo: 'británica',
-    descripcion: 'Voz británica cálida y narradora',
-    personalidad: 'Elegante, sabio, reconfortante',
-    icono: '📖',
-    premium: true,
-    recomendada: true
-  },
-  'callum': {
-    id: 'N2lVS1w4EtoT3dr4eOWO',
-    nombre: 'Callum',
-    categoria: 'premium',
-    genero: 'masculino',
-    edad: 'adulto',
-    estilo: 'transatlántica',
-    descripcion: 'Voz versátil con acento transatlántico',
-    personalidad: 'Carismático, versátil, agradable',
-    icono: '🌊',
-    premium: true
-  },
-  'charlie': {
-    id: 'IKne3meq5aSn9XLyUdCD',
-    nombre: 'Charlie',
-    categoria: 'premium',
-    genero: 'masculino',
-    edad: 'adulto',
     estilo: 'natural',
-    descripcion: 'Voz australiana casual y amigable',
-    personalidad: 'Relajado, cercano, natural',
-    icono: '🌴',
-    premium: true
-  },
-  'liam': {
-    id: 'TX3LPaxmHKxFdv7VOQHJ',
-    nombre: 'Liam',
-    categoria: 'premium',
-    genero: 'masculino',
-    edad: 'adulto',
-    estilo: 'articulada',
-    descripcion: 'Voz americana clara y bien articulada',
-    personalidad: 'Profesional, claro, confiable',
-    icono: '⭐',
-    premium: true
-  },
-  'daniel': {
-    id: 'onwK4e9ZLuTAKqWW03F9',
-    nombre: 'Daniel',
-    categoria: 'premium',
-    genero: 'masculino',
-    edad: 'adulto',
-    estilo: 'británica-profunda',
-    descripcion: 'Voz británica profunda y autorizada',
-    personalidad: 'Serio, confiable, imponente',
-    icono: '🦁',
-    premium: true
+    descripcion: 'Voz profunda y natural',
+    personalidad: 'Tranquilo, confiable, estable',
+    icono: '🌿'
   },
 
-  // ═══ PERSONAJES MÁGICOS (Con voces premium) ═══
+  // ═══ PERSONAJES MÁGICOS ═══
   'merlin': {
-    id: 'JBFqnCBsd6RMkjVDRZzb', // George - británica perfecta para Merlín
+    id: '2EiwWnXFnvU5JabPnv8n', // Clyde - anciano sabio
     nombre: 'Merlín',
     categoria: 'personajes',
     genero: 'masculino',
@@ -208,11 +240,10 @@ const CATALOGO_VOCES = {
     descripcion: 'El gran hechicero, sabio y milenario',
     personalidad: 'Sabio, misterioso, poderoso',
     intro: "Saludos, viajero del tiempo. Soy Merlín, hechicero y alquimista milenario...\n\n",
-    icono: '🧙‍♂️',
-    premium: true
+    icono: '🧙‍♂️'
   },
   'hechicero': {
-    id: 'onwK4e9ZLuTAKqWW03F9', // Daniel - profunda para misterio
+    id: 'VR6AewLTigWG4xSOukaG', // Arnold - misterioso
     nombre: 'Hechicero Oscuro',
     categoria: 'personajes',
     genero: 'masculino',
@@ -221,11 +252,10 @@ const CATALOGO_VOCES = {
     descripcion: 'Guardián de secretos ancestrales',
     personalidad: 'Misterioso, profundo, enigmático',
     intro: "Bienvenida, alma curiosa. Soy un hechicero ancestral, guardián de los secretos...\n\n",
-    icono: '🔮',
-    premium: true
+    icono: '🔮'
   },
   'druida': {
-    id: 'CwhRBWXzGAHq8TQ4Fs17', // Roger - paternal y sabio
+    id: 'ODq5zmih8GrVes37Dizd', // Patrick - natural
     nombre: 'Druida del Bosque',
     categoria: 'personajes',
     genero: 'masculino',
@@ -234,11 +264,10 @@ const CATALOGO_VOCES = {
     descripcion: 'Conectado con la madre tierra',
     personalidad: 'Sereno, natural, sabio',
     intro: "Paz y armonía, caminante. Soy un druida conectado con la madre tierra...\n\n",
-    icono: '🌿',
-    premium: true
+    icono: '🌿'
   },
   'anciano-sabio': {
-    id: 'JBFqnCBsd6RMkjVDRZzb', // George
+    id: '2EiwWnXFnvU5JabPnv8n', // Clyde
     nombre: 'Anciano Sabio',
     categoria: 'personajes',
     genero: 'masculino',
@@ -247,13 +276,12 @@ const CATALOGO_VOCES = {
     descripcion: 'Guardián de la sabiduría antigua',
     personalidad: 'Abuelo cósmico, tierno, protector',
     intro: "Querida nieta del universo, soy un anciano guardián de la sabiduría antigua...\n\n",
-    icono: '👴',
-    premium: true
+    icono: '👴'
   },
 
-  // ═══ SERES MÁGICOS FEMENINOS (Con voces premium) ═══
+  // ═══ SERES MÁGICOS FEMENINOS ═══
   'hada': {
-    id: 'pFZP5JQG7iQjIQuC4Bku', // Lily - británica dulce
+    id: 'MF3mGyEYCl7XYWbV9V6O', // Elli - brillante
     nombre: 'Hada del Bosque',
     categoria: 'magicos',
     genero: 'femenino',
@@ -262,11 +290,10 @@ const CATALOGO_VOCES = {
     descripcion: 'Voz etérea y mágica de hada',
     personalidad: 'Dulce, juguetona, luminosa',
     intro: "¡Hola, ser de luz! Soy un hada del bosque encantado...\n\n",
-    icono: '🧚',
-    premium: true
+    icono: '🧚'
   },
   'ninfa': {
-    id: 'EXAVITQu4vr4xnSDxMaL', // Sarah - suave y fluida
+    id: 'EXAVITQu4vr4xnSDxMaL', // Bella - suave
     nombre: 'Ninfa del Agua',
     categoria: 'magicos',
     genero: 'femenino',
@@ -274,11 +301,10 @@ const CATALOGO_VOCES = {
     estilo: 'fluida',
     descripcion: 'Espíritu del agua, voz cristalina',
     personalidad: 'Serena, fluida, purificadora',
-    icono: '💧',
-    premium: true
+    icono: '💧'
   },
   'dryada': {
-    id: 'XrExE9yKIg1WjnnlVkGX', // Matilda - maternal
+    id: 'z9fAnlkpzviPz146aGWa', // Glinda - maternal
     nombre: 'Dríada',
     categoria: 'magicos',
     genero: 'femenino',
@@ -286,13 +312,12 @@ const CATALOGO_VOCES = {
     estilo: 'terrenal',
     descripcion: 'Espíritu del árbol, voz de la naturaleza',
     personalidad: 'Sabia, paciente, protectora',
-    icono: '🌳',
-    premium: true
+    icono: '🌳'
   },
 
-  // ═══ PERSONAJES TIERNOS (Con voces premium) ═══
+  // ═══ PERSONAJES TIERNOS ═══
   'abuela-magica': {
-    id: 'XrExE9yKIg1WjnnlVkGX', // Matilda - maternal
+    id: 'z9fAnlkpzviPz146aGWa', // Glinda - maternal
     nombre: 'Abuela Mágica',
     categoria: 'tiernos',
     genero: 'femenino',
@@ -300,11 +325,10 @@ const CATALOGO_VOCES = {
     estilo: 'amorosa',
     descripcion: 'Como una abuela que cuenta cuentos',
     personalidad: 'Amorosa, sabia, reconfortante',
-    icono: '👵',
-    premium: true
+    icono: '👵'
   },
   'guardian-bosque': {
-    id: 'CwhRBWXzGAHq8TQ4Fs17', // Roger
+    id: 'ODq5zmih8GrVes37Dizd', // Patrick
     nombre: 'Guardián del Bosque',
     categoria: 'tiernos',
     genero: 'masculino',
@@ -312,37 +336,34 @@ const CATALOGO_VOCES = {
     estilo: 'protectora',
     descripcion: 'Protector gentil de las criaturas',
     personalidad: 'Gentil, protector, cariñoso',
-    icono: '🦌',
-    premium: true
+    icono: '🦌'
   },
   'madre-tierra': {
-    id: 'XB0fDUnXU5powFXDhCwa', // Charlotte - elegante y maternal
+    id: 'XB0fDUnXU5powFXDhCwa', // Charlotte - elegante
     nombre: 'Madre Tierra',
     categoria: 'tiernos',
     genero: 'femenino',
     edad: 'madura',
     estilo: 'maternal',
-    descripcion: 'Voz de la madre naturaleza, reconfortante',
+    descripcion: 'Voz de la madre naturaleza',
     personalidad: 'Maternal, protectora, sabia',
-    icono: '🌍',
-    premium: true
+    icono: '🌍'
   },
 
-  // ═══ NARRADORES PROFESIONALES ═══
+  // ═══ NARRADORES ═══
   'narradora': {
-    id: '9BWtsMINqrJLrRacOk9x', // Aria
+    id: '21m00Tcm4TlvDq8ikWAM', // Rachel
     nombre: 'Narradora',
     categoria: 'narradores',
     genero: 'femenino',
     edad: 'adulta',
     estilo: 'profesional',
-    descripcion: 'Voz profesional para narración de contenido',
+    descripcion: 'Voz profesional para narración',
     personalidad: 'Clara, profesional, envolvente',
-    icono: '📚',
-    premium: true
+    icono: '📚'
   },
   'narrador': {
-    id: 'JBFqnCBsd6RMkjVDRZzb', // George
+    id: 'pNInz6obpgDQGcFmaJgB', // Adam
     nombre: 'Narrador',
     categoria: 'narradores',
     genero: 'masculino',
@@ -350,13 +371,12 @@ const CATALOGO_VOCES = {
     estilo: 'profesional',
     descripcion: 'Voz masculina profunda para narración',
     personalidad: 'Autoritario, claro, profesional',
-    icono: '🎙️',
-    premium: true
+    icono: '🎙️'
   },
 
   // ═══ VOCES PARA MEDITACIÓN ═══
   'guia-meditacion': {
-    id: 'EXAVITQu4vr4xnSDxMaL', // Sarah
+    id: 'EXAVITQu4vr4xnSDxMaL', // Bella - suave
     nombre: 'Guía de Meditación',
     categoria: 'meditacion',
     genero: 'femenino',
@@ -365,11 +385,10 @@ const CATALOGO_VOCES = {
     descripcion: 'Voz perfecta para meditaciones guiadas',
     personalidad: 'Serena, calmada, reconfortante',
     icono: '🧘',
-    premium: true,
     recomendada: true
   },
   'sanador': {
-    id: 'CwhRBWXzGAHq8TQ4Fs17', // Roger
+    id: 'ODq5zmih8GrVes37Dizd', // Patrick
     nombre: 'Sanador',
     categoria: 'meditacion',
     genero: 'masculino',
@@ -377,8 +396,7 @@ const CATALOGO_VOCES = {
     estilo: 'reconfortante',
     descripcion: 'Voz masculina calmada para sanación',
     personalidad: 'Paciente, sabio, sanador',
-    icono: '💚',
-    premium: true
+    icono: '💚'
   }
 };
 
@@ -387,10 +405,11 @@ const VOCES = Object.fromEntries(
   Object.entries(CATALOGO_VOCES).map(([key, value]) => [key, value.id])
 );
 
-// Categorías para el UI - Solo voces premium
+// Categorías para el UI
 const CATEGORIAS_VOCES = {
-  premium: { nombre: '⭐ Voces Premium', icono: '⭐', descripcion: 'Voces ultra-realistas de alta calidad (Recomendadas)' },
   duendes: { nombre: 'Voces Duendes', icono: '🌟', descripcion: 'Voces oficiales de Duendes del Uruguay' },
+  femeninas: { nombre: 'Voces Femeninas', icono: '👩', descripcion: 'Voces de mujer, varias edades y estilos' },
+  masculinas: { nombre: 'Voces Masculinas', icono: '👨', descripcion: 'Voces de hombre, varias edades y estilos' },
   meditacion: { nombre: 'Para Meditación', icono: '🧘', descripcion: 'Voces serenas para meditación y sanación' },
   narradores: { nombre: 'Narradores', icono: '🎙️', descripcion: 'Voces profesionales para narración' },
   personajes: { nombre: 'Personajes Mágicos', icono: '🧙', descripcion: 'Hechiceros, druidas y sabios' },
