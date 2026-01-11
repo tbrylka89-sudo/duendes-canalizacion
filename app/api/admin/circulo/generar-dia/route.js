@@ -1,10 +1,10 @@
 import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 // ═══════════════════════════════════════════════════════════════
-// GENERADOR DE CONTENIDO PARA UN DÍA ESPECÍFICO
+// GENERADOR DE CONTENIDO + IMAGEN PARA UN DÍA ESPECÍFICO
 // ═══════════════════════════════════════════════════════════════
 
 const ESTRUCTURA_SEMANAL = {
@@ -16,6 +16,68 @@ const ESTRUCTURA_SEMANAL = {
   5: { tipo: 'reflexion', categoria: 'cosmos', nombre: 'Conexión Lunar' },
   6: { tipo: 'articulo', categoria: 'sanacion', nombre: 'Sanación y Bienestar' },
 };
+
+// Estilos para DALL-E
+const ESTILO_BASE = `Mystical and enchanting digital art style. Warm earth tones with magical golden accents. Ethereal lighting with soft glows. Fantasy elements but grounded and elegant. No text or letters in the image. Professional quality, suitable for blog header.`;
+
+const ESTILOS_CATEGORIA = {
+  cosmos: 'Celestial theme with moon phases, stars, cosmic energy. Deep blues, purples, and silver.',
+  duendes: 'Forest spirits, magical woodland creatures, mushrooms, ancient trees. Earthy greens and golden browns.',
+  diy: 'Crafting elements, crystals, candles, natural materials arranged artistically. Warm and inviting.',
+  esoterico: 'Tarot cards, mystical symbols, crystals, sacred geometry. Deep purples and golds.',
+  sanacion: 'Healing energy, soft light, nature elements, peaceful atmosphere. Greens, soft pinks, white light.',
+  rituales: 'Ritual setup with candles, herbs, crystals, altar elements. Warm candlelight ambiance.',
+};
+
+async function generarImagen(titulo, extracto, categoria, tipo, openaiKey) {
+  if (!openaiKey) return null;
+
+  try {
+    const estiloCategoria = ESTILOS_CATEGORIA[categoria] || '';
+
+    const prompt = `Create a banner image for: "${titulo}"
+
+${ESTILO_BASE}
+
+Category style: ${estiloCategoria}
+
+${extracto ? `Context: ${extracto.substring(0, 200)}` : ''}
+
+Important:
+- Horizontal composition (16:9 aspect ratio feel)
+- No text, letters, or words in the image
+- Mystical but not cheesy
+- Professional quality for spiritual content platform`;
+
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openaiKey}`
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: prompt,
+        n: 1,
+        size: '1792x1024',
+        quality: 'standard',
+        response_format: 'url'
+      })
+    });
+
+    if (!response.ok) {
+      console.error('Error generando imagen:', await response.text());
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data?.[0]?.url || null;
+
+  } catch (error) {
+    console.error('Error imagen:', error);
+    return null;
+  }
+}
 
 const SYSTEM_PROMPT = `Sos Thibisay, la voz de Duendes del Uruguay. Escribís en español rioplatense.
 
@@ -31,13 +93,14 @@ ESTRUCTURA: intro (150 palabras), desarrollo (400 palabras), practica (300 palab
 
 export async function POST(request) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     return Response.json({ success: false, error: 'API key no configurada' }, { status: 500 });
   }
 
   try {
-    const { dia, mes, año, instruccionExtra } = await request.json();
+    const { dia, mes, año, instruccionExtra, soloImagen } = await request.json();
 
     if (!dia || !mes || !año) {
       return Response.json({ success: false, error: 'Día, mes y año requeridos' }, { status: 400 });
@@ -46,6 +109,31 @@ export async function POST(request) {
     const fecha = new Date(año, mes - 1, dia);
     const diaSemana = fecha.getDay();
     const estructura = ESTRUCTURA_SEMANAL[diaSemana];
+
+    // Si solo quiere regenerar imagen
+    if (soloImagen) {
+      const contenidoExistente = await kv.get(`circulo:contenido:${año}:${mes}:${dia}`);
+      if (!contenidoExistente) {
+        return Response.json({ success: false, error: 'No hay contenido para generar imagen' }, { status: 400 });
+      }
+
+      const imagen = await generarImagen(
+        contenidoExistente.titulo,
+        contenidoExistente.extracto,
+        contenidoExistente.categoria,
+        contenidoExistente.tipo,
+        openaiKey
+      );
+
+      contenidoExistente.imagen = imagen;
+      await kv.set(`circulo:contenido:${año}:${mes}:${dia}`, contenidoExistente);
+
+      return Response.json({
+        success: true,
+        contenido: contenidoExistente,
+        imagen
+      });
+    }
 
     const userPrompt = `Generá contenido para El Círculo de Duendes del Uruguay.
 
@@ -97,6 +185,15 @@ FORMATO:
 
     const contenido = JSON.parse(jsonMatch[0]);
 
+    // Generar imagen con DALL-E
+    const imagen = await generarImagen(
+      contenido.titulo,
+      contenido.extracto,
+      estructura.categoria,
+      estructura.tipo,
+      openaiKey
+    );
+
     const contenidoCompleto = {
       id: `${año}-${mes}-${dia}`,
       fecha: fecha.toISOString(),
@@ -117,7 +214,7 @@ FORMATO:
       estado: 'borrador',
       generadoEn: new Date().toISOString(),
       publicadoEn: null,
-      imagen: null,
+      imagen: imagen,
       audio: null
     };
 

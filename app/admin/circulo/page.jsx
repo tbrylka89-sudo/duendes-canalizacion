@@ -71,13 +71,14 @@ export default function CirculoPage() {
   };
 
   // Generar día individual
-  const generarDia = async (dia) => {
+  const generarDia = async (dia, soloImagen = false) => {
     setLoadingDia(dia);
+    mostrarMensaje(soloImagen ? 'Generando imagen...' : 'Generando contenido + imagen...', 'info');
     try {
       const res = await fetch('/api/admin/circulo/generar-dia', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dia, mes, año })
+        body: JSON.stringify({ dia, mes, año, soloImagen })
       });
       const data = await res.json();
 
@@ -86,7 +87,12 @@ export default function CirculoPage() {
           const filtered = prev.filter(c => c.dia !== dia);
           return [...filtered, data.contenido];
         });
-        mostrarMensaje('Contenido generado');
+        if (contenidoAbierto?.dia === dia) {
+          setContenidoAbierto(data.contenido);
+        }
+        mostrarMensaje(soloImagen ? 'Imagen generada' : 'Contenido + imagen generados');
+      } else {
+        mostrarMensaje(data.error || 'Error', 'error');
       }
     } catch (e) {
       mostrarMensaje(e.message, 'error');
@@ -236,8 +242,13 @@ export default function CirculoPage() {
               <div style={{ fontWeight: esHoy ? 700 : 500, color: esHoy ? '#D4A853' : 'white', marginBottom: 6 }}>{dia}</div>
 
               {contenido ? (
-                <div style={{ fontSize: 11, color: '#e5e7eb', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
-                  {contenido.titulo}
+                <div>
+                  {contenido.imagen && (
+                    <div style={{ fontSize: 10, color: '#22c55e', marginBottom: 4 }}>🖼️ con imagen</div>
+                  )}
+                  <div style={{ fontSize: 11, color: '#e5e7eb', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    {contenido.titulo}
+                  </div>
                 </div>
               ) : (
                 <button
@@ -291,6 +302,33 @@ export default function CirculoPage() {
 
             {/* Contenido */}
             <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1 }}>
+              {/* Imagen */}
+              {contenidoAbierto.imagen ? (
+                <div style={{ marginBottom: 20, position: 'relative' }}>
+                  <img src={contenidoAbierto.imagen} alt={contenidoAbierto.titulo}
+                    style={{ width: '100%', maxHeight: 300, objectFit: 'cover', borderRadius: 12 }} />
+                  <button onClick={() => generarDia(contenidoAbierto.dia, true)}
+                    disabled={loadingDia === contenidoAbierto.dia}
+                    style={{
+                      position: 'absolute', top: 10, right: 10,
+                      padding: '6px 12px', background: 'rgba(0,0,0,0.7)', border: 'none',
+                      borderRadius: 6, color: 'white', cursor: 'pointer', fontSize: 12
+                    }}>
+                    {loadingDia === contenidoAbierto.dia ? '...' : '🖼️ Nueva imagen'}
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => generarDia(contenidoAbierto.dia, true)}
+                  disabled={loadingDia === contenidoAbierto.dia}
+                  style={{
+                    width: '100%', padding: 20, marginBottom: 20,
+                    background: '#1a1a25', border: '2px dashed #3a3a4a',
+                    borderRadius: 12, color: '#9ca3af', cursor: 'pointer', fontSize: 14
+                  }}>
+                  {loadingDia === contenidoAbierto.dia ? '⏳ Generando imagen...' : '🖼️ Generar imagen con DALL-E'}
+                </button>
+              )}
+
               {contenidoAbierto.extracto && (
                 <p style={{ fontStyle: 'italic', color: '#D4A853', marginBottom: 20, fontSize: 15, lineHeight: 1.6 }}>
                   {contenidoAbierto.extracto}
