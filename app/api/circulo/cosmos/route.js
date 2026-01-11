@@ -5,6 +5,151 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
 
+// ═══════════════════════════════════════════════════════════════
+// SABBATS Y EVENTOS MÁGICOS DEL AÑO
+// ═══════════════════════════════════════════════════════════════
+
+const SABBATS = [
+  { nombre: 'Imbolc', fecha: [2, 1], emoji: '🕯️',
+    descripcion: 'Despertar de la tierra, primeros brotes de primavera',
+    ritual: 'Encendé velas blancas para purificar tu hogar. Limpiá tus cristales y tu altar.',
+    guardian: 'Los guardianes de Tierra despiertan. Ideal para conectar con Gnomos y hacer rituales de abundancia.' },
+
+  { nombre: 'Ostara', fecha: [3, 20], emoji: '🌸',
+    descripcion: 'Equinoccio de primavera, equilibrio luz-oscuridad, fertilidad',
+    ritual: 'Plantá semillas (físicas o simbólicas). Decorá tu altar con flores frescas.',
+    guardian: 'Los Elfos del Aire están muy activos. Excelente para pedir claridad mental y nuevos comienzos.' },
+
+  { nombre: 'Beltane', fecha: [5, 1], emoji: '🔥',
+    descripcion: 'Celebración de la vida, pasión, unión de lo masculino y femenino',
+    ritual: 'Encendé una fogata o velas rojas. Bailá, celebrá la vida y el amor.',
+    guardian: 'Los Magos del Fuego están en su máximo poder. Ideal para rituales de pasión y transformación.' },
+
+  { nombre: 'Litha', fecha: [6, 21], emoji: '☀️',
+    descripcion: 'Solsticio de verano, día más largo, máximo poder solar',
+    ritual: 'Cargá todos tus cristales al sol. Hacé rituales de prosperidad y éxito.',
+    guardian: 'Todos los guardianes de Fuego brillan. Pedí fuerza, coraje y protección.' },
+
+  { nombre: 'Lammas', fecha: [8, 1], emoji: '🌾',
+    descripcion: 'Primera cosecha, gratitud por la abundancia recibida',
+    ritual: 'Horneá pan o compartí comida. Agradecé todo lo que cosechaste este año.',
+    guardian: 'Los Gnomos de Tierra ayudan a manifestar abundancia material. Agradeceles.' },
+
+  { nombre: 'Mabon', fecha: [9, 22], emoji: '🍂',
+    descripcion: 'Equinoccio de otoño, segunda cosecha, balance y gratitud',
+    ritual: 'Hacé una lista de gratitud. Decorá tu altar con hojas y frutos de otoño.',
+    guardian: 'Equilibrio entre todos los elementos. Buen momento para conectar con cualquier guardián.' },
+
+  { nombre: 'Samhain', fecha: [10, 31], emoji: '🎃',
+    descripcion: 'Año nuevo celta, el velo entre mundos es más fino, honrar ancestros',
+    ritual: 'Poné una vela en la ventana para guiar a los espíritus. Meditá con tu guardián sobre el año.',
+    guardian: 'El velo es fino: los guardianes pueden comunicarse más claramente. Escuchá sus mensajes.' },
+
+  { nombre: 'Yule', fecha: [12, 21], emoji: '🎄',
+    descripcion: 'Solsticio de invierno, renacimiento del sol, esperanza en la oscuridad',
+    ritual: 'Encendé velas para llamar al sol. Decorá con verde (pino, muérdago). Intercambiá regalos.',
+    guardian: 'Las Hadas del Agua traen sueños proféticos. Los guardianes descansan y recargan energía.' }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// GUÍA DE GUARDIANES POR FASE LUNAR
+// ═══════════════════════════════════════════════════════════════
+
+const GUARDIANES_LUNAR = {
+  'nueva': {
+    mensaje: 'Tu guardián está en modo receptivo. Es momento de susurrarle tus intenciones.',
+    ritual: 'Sentate con tu guardián en un lugar oscuro y tranquilo. Contale tus deseos para este ciclo.',
+    accion: 'Colocá a tu guardián en tu altar o cerca de tu cama. Pedile que te guíe en tus sueños.',
+    elemento_potenciado: 'Agua - Las Hadas están especialmente receptivas'
+  },
+  'creciente': {
+    mensaje: 'Tu guardián está ganando fuerza. Usalo para impulsar tus proyectos.',
+    ritual: 'Llevá a tu guardián contigo cuando trabajes en algo importante.',
+    accion: 'Ponelo cerca de lo que querés que crezca: una planta, un proyecto, tu altar de abundancia.',
+    elemento_potenciado: 'Aire - Los Elfos traen ideas y claridad'
+  },
+  'cuarto_creciente': {
+    mensaje: 'Tu guardián te ayuda a superar obstáculos. Pedile fuerza.',
+    ritual: 'Sostenelo mientras visualizás que superás un desafío actual.',
+    accion: 'Colocalo mirando hacia la puerta principal para protección.',
+    elemento_potenciado: 'Fuego - Los Magos dan coraje y determinación'
+  },
+  'gibosa_creciente': {
+    mensaje: 'Tu guardián está casi en su máximo poder. Refiná tus intenciones.',
+    ritual: 'Limpiá a tu guardián con humo de salvia. Preparalo para la luna llena.',
+    accion: 'Dejalo en un lugar donde reciba luz indirecta del sol.',
+    elemento_potenciado: 'Todos los elementos se equilibran'
+  },
+  'llena': {
+    mensaje: '¡Máximo poder! Tu guardián puede manifestar y también liberar.',
+    ritual: 'Dejá a tu guardián bajo la luz de la luna llena toda la noche.',
+    accion: 'Hacé un ritual de gratitud junto a tu guardián. Agradecele todo lo que te ayudó.',
+    elemento_potenciado: 'Todos - Especialmente efectivo para cargar cristales y guardianes'
+  },
+  'menguante': {
+    mensaje: 'Tu guardián te ayuda a soltar. Pedile que se lleve lo que ya no te sirve.',
+    ritual: 'Escribí lo que querés soltar en un papel. Ponelo bajo tu guardián por 3 días.',
+    accion: 'Limpiá el espacio de tu guardián. Ordená su altar.',
+    elemento_potenciado: 'Agua - Las Hadas ayudan a liberar emociones'
+  },
+  'cuarto_menguante': {
+    mensaje: 'Tu guardián te invita a la introspección. Escuchá sus mensajes.',
+    ritual: 'Meditá 10 minutos sosteniendo a tu guardián. Preguntale qué debés aprender.',
+    accion: 'Llevá a tu guardián a un lugar tranquilo de tu casa.',
+    elemento_potenciado: 'Tierra - Los Gnomos ayudan a soltar lo material'
+  }
+};
+
+// Función para obtener el Sabbat más cercano
+function getSabbatProximo() {
+  const ahora = new Date();
+  const año = ahora.getFullYear();
+
+  let sabbatProximo = null;
+  let diasHasta = 366;
+
+  for (const sabbat of SABBATS) {
+    const [mes, dia] = sabbat.fecha;
+    let fechaSabbat = new Date(año, mes - 1, dia);
+
+    // Si ya pasó este año, usar el del próximo
+    if (fechaSabbat < ahora) {
+      fechaSabbat = new Date(año + 1, mes - 1, dia);
+    }
+
+    const diff = Math.ceil((fechaSabbat - ahora) / (1000 * 60 * 60 * 24));
+
+    if (diff < diasHasta) {
+      diasHasta = diff;
+      sabbatProximo = {
+        ...sabbat,
+        fechaCompleta: fechaSabbat.toISOString().split('T')[0],
+        diasRestantes: diff,
+        esHoy: diff === 0,
+        esCercano: diff <= 7
+      };
+    }
+  }
+
+  return sabbatProximo;
+}
+
+// Función para obtener el Sabbat actual (si estamos en uno)
+function getSabbatActual() {
+  const ahora = new Date();
+  const mes = ahora.getMonth() + 1;
+  const dia = ahora.getDate();
+
+  for (const sabbat of SABBATS) {
+    const [sMes, sDia] = sabbat.fecha;
+    // Consideramos "activo" el sabbat 3 días antes y después
+    if (mes === sMes && Math.abs(dia - sDia) <= 3) {
+      return sabbat;
+    }
+  }
+  return null;
+}
+
 // Calcular fase lunar actual
 function calcularFaseLunar() {
   const lunaLlenaConocida = new Date('2025-01-13T22:27:00Z');
@@ -168,13 +313,32 @@ export async function GET(request) {
     fechasImportantes.push({
       fecha: luna.proximaNueva,
       evento: 'Luna Nueva',
+      emoji: '🌑',
       descripcion: 'Ideal para nuevos comienzos y plantar intenciones'
     });
     fechasImportantes.push({
       fecha: luna.proximaLlena,
       evento: 'Luna Llena',
+      emoji: '🌕',
       descripcion: 'Momento de plenitud, celebración y limpieza'
     });
+
+    // Obtener sabbat próximo y actual
+    const sabbatProximo = getSabbatProximo();
+    const sabbatActual = getSabbatActual();
+
+    // Agregar sabbat próximo a fechas importantes
+    if (sabbatProximo && sabbatProximo.diasRestantes <= 30) {
+      fechasImportantes.push({
+        fecha: sabbatProximo.fechaCompleta,
+        evento: sabbatProximo.nombre,
+        emoji: sabbatProximo.emoji,
+        descripcion: sabbatProximo.descripcion
+      });
+    }
+
+    // Obtener guía de guardián para la fase lunar actual
+    const guiaGuardianLunar = GUARDIANES_LUNAR[luna.fase] || GUARDIANES_LUNAR['nueva'];
 
     const cosmos = {
       mes: nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1),
@@ -204,6 +368,18 @@ export async function GET(request) {
         ...guardianMes,
         recomendacion: `Si estás buscando un guardián este mes, los ${guardianMes.tipo}s están especialmente activos.`
       },
+
+      // NUEVO: Guía de tu guardián según la luna
+      tuGuardian: {
+        fase: luna.nombre,
+        ...guiaGuardianLunar
+      },
+
+      // NUEVO: Sabbat próximo
+      sabbatProximo: sabbatProximo,
+
+      // NUEVO: Sabbat actual (si estamos en uno)
+      sabbatActual: sabbatActual,
 
       fechas: fechasImportantes,
 

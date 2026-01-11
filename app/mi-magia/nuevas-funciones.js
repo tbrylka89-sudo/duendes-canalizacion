@@ -334,17 +334,45 @@ export function CosmosMes({ usuario }) {
         <p>{cosmos.mes}</p>
       </div>
 
-      <div className="cosmos-tabs">
+      {/* Mostrar Sabbat si hay uno próximo */}
+      {cosmos.sabbatProximo && cosmos.sabbatProximo.diasRestantes <= 14 && (
+        <div style={{background:'linear-gradient(135deg,#2d1f3d,#1a1a2e)',padding:'15px',borderRadius:'12px',marginBottom:'20px',border:'1px solid #d4af3744'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+            <span style={{fontSize:'2rem'}}>{cosmos.sabbatProximo.emoji}</span>
+            <div>
+              <strong style={{color:'#d4af37',fontSize:'1.1rem'}}>
+                {cosmos.sabbatProximo.esHoy ? `¡Hoy es ${cosmos.sabbatProximo.nombre}!` :
+                 cosmos.sabbatProximo.diasRestantes === 1 ? `Mañana: ${cosmos.sabbatProximo.nombre}` :
+                 `${cosmos.sabbatProximo.nombre} en ${cosmos.sabbatProximo.diasRestantes} días`}
+              </strong>
+              <p style={{color:'#fff',margin:'5px 0 0',fontSize:'0.9rem'}}>{cosmos.sabbatProximo.descripcion}</p>
+            </div>
+          </div>
+          {cosmos.sabbatProximo.diasRestantes <= 7 && (
+            <div style={{marginTop:'12px',padding:'12px',background:'#0a0a0a',borderRadius:'8px'}}>
+              <p style={{color:'#d4af37',margin:'0 0 5px',fontSize:'0.85rem'}}>🧙 Tu guardián:</p>
+              <p style={{color:'#fff',margin:0,fontSize:'0.9rem'}}>{cosmos.sabbatProximo.guardian}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'8px',marginBottom:'20px'}}>
         {[
           ['luna', '☽', 'Luna'],
           ['astro', '✦', 'Astro'],
           ['cristal', '💎', 'Cristal'],
-          ['guardian', '❧', 'Guardián']
+          ['tuGuardian', '🧙', 'Tu Guardián']
         ].map(([key, icon, label]) => (
           <button
             key={key}
-            className={`cosmos-tab ${tabActivo === key ? 'activo' : ''}`}
             onClick={() => setTabActivo(key)}
+            style={{
+              display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',
+              padding:'12px 8px',background: tabActivo === key ? '#d4af3722' : '#1f1f1f',
+              color: tabActivo === key ? '#d4af37' : '#888',
+              border:'none',borderRadius:'10px',fontSize:'0.85rem',cursor:'pointer'
+            }}
           >
             <span>{icon}</span>
             {label}
@@ -439,6 +467,30 @@ export function CosmosMes({ usuario }) {
         </div>
       )}
 
+      {tabActivo === 'tuGuardian' && cosmos.tuGuardian && (
+        <div>
+          <div style={{background:'linear-gradient(135deg,#1a2a1a,#0a1a0a)',padding:'20px',borderRadius:'16px',marginBottom:'15px',border:'1px solid #4a5d4a'}}>
+            <h3 style={{color:'#d4af37',margin:'0 0 5px'}}>🧙 Tu Guardián en {cosmos.tuGuardian.fase}</h3>
+            <p style={{color:'#fff',fontSize:'1.1rem',lineHeight:'1.5',margin:'10px 0'}}>{cosmos.tuGuardian.mensaje}</p>
+          </div>
+
+          <div style={{background:'#1f1f1f',padding:'15px',borderRadius:'12px',marginBottom:'12px'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>✦ Ritual con tu guardián</h4>
+            <p style={{color:'#fff',margin:0,lineHeight:'1.5'}}>{cosmos.tuGuardian.ritual}</p>
+          </div>
+
+          <div style={{background:'#1f1f1f',padding:'15px',borderRadius:'12px',marginBottom:'12px'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>⟡ Qué hacer hoy</h4>
+            <p style={{color:'#fff',margin:0,lineHeight:'1.5'}}>{cosmos.tuGuardian.accion}</p>
+          </div>
+
+          <div style={{background:'#0a0a0a',padding:'15px',borderRadius:'12px',borderLeft:'3px solid #d4af37'}}>
+            <h4 style={{color:'#d4af37',margin:'0 0 10px'}}>◈ Elemento potenciado</h4>
+            <p style={{color:'#fff',margin:0}}>{cosmos.tuGuardian.elemento_potenciado}</p>
+          </div>
+        </div>
+      )}
+
       {tabActivo === 'guardian' && cosmos.guardian && (
         <div className="cosmos-guardian">
           <h3 style={{color:'#d4af37',margin:'0 0 10px'}}>Guardián del Mes: {cosmos.guardian.tipo}</h3>
@@ -453,14 +505,14 @@ export function CosmosMes({ usuario }) {
 
       {cosmos.fechas && cosmos.fechas.length > 0 && (
         <div style={{marginTop:'20px',paddingTop:'20px',borderTop:'1px solid #333'}}>
-          <h3 style={{color:'#d4af37',margin:'0 0 15px'}}>Fechas Importantes del Mes</h3>
+          <h3 style={{color:'#d4af37',margin:'0 0 15px'}}>Fechas Importantes</h3>
           <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
             {cosmos.fechas.map((f, i) => (
               <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px',background:'#1f1f1f',borderRadius:'10px'}}>
-                <span style={{fontSize:'1.5rem'}}>✦</span>
+                <span style={{fontSize:'1.5rem'}}>{f.emoji || '✦'}</span>
                 <div>
                   <strong style={{color:'#fff'}}>{f.evento}</strong>
-                  <small style={{display:'block',color:'#ccc'}}>{new Date(f.fecha).toLocaleDateString('es-UY')}</small>
+                  <small style={{display:'block',color:'#ccc'}}>{f.fecha ? new Date(f.fecha).toLocaleDateString('es-UY') : ''}</small>
                   <p style={{color:'#fff',fontSize:'0.85rem',margin:'5px 0 0'}}>{f.descripcion}</p>
                 </div>
               </div>
