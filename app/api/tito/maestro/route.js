@@ -130,6 +130,11 @@ Podes encadenar multiples acciones en una respuesta.
 {"accion": "generar_post_redes", "plataforma": "instagram|facebook", "tema": "..."}
 {"accion": "generar_canalizacion", "datos": {"nombreGuardian": "...", "tipoSer": "duende", ...}}
 
+🎨 CREATIVIDAD Y MULTIMEDIA
+---------------------------
+{"accion": "generar_imagen", "prompt": "descripcion de la imagen", "estilo": "duendes|celestial|botanico|cristales|altar"}
+{"accion": "generar_audio", "texto": "texto a convertir en audio", "voz": "thibisay"}
+
 🌐 GESTION WORDPRESS
 --------------------
 {"accion": "crear_post", "titulo": "...", "contenido": "...", "categoria": "blog|noticias", "estado": "draft|publish"}
@@ -454,6 +459,13 @@ async function ejecutarAccionMaestro(accionData) {
 
       case 'generar_post_redes':
         return await generarPostRedes(accionData.plataforma, accionData.tema);
+
+      // ═══ MULTIMEDIA ═══
+      case 'generar_imagen':
+        return await generarImagen(accionData.prompt, accionData.estilo);
+
+      case 'generar_audio':
+        return await generarAudio(accionData.texto, accionData.voz);
 
       // ═══ INTELIGENCIA ═══
       case 'que_hacer_hoy':
@@ -1798,4 +1810,107 @@ async function oportunidadesVenta(email) {
     success: true,
     mensaje: `## 💰 Oportunidades para ${user.nombre || email}\n\n${oportunidades.join('\n\n')}`
   };
+}
+
+// --- MULTIMEDIA ---
+
+async function generarImagen(prompt, estilo = 'duendes') {
+  if (!prompt) {
+    return { success: false, mensaje: 'Necesito una descripcion de la imagen a generar.' };
+  }
+
+  try {
+    // Llamar a nuestra API de generacion de imagenes
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+    const res = await fetch(`${baseUrl}/api/admin/imagen/generar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, estilo })
+    });
+
+    const data = await res.json();
+
+    if (data.success && data.imagen) {
+      return {
+        success: true,
+        mensaje: `## 🎨 Imagen Generada
+
+**Prompt:** ${prompt}
+**Estilo:** ${estilo}
+
+![Imagen generada](${data.imagen})
+
+_La imagen fue generada exitosamente. Podes copiar la URL o guardarla._
+
+**URL:** ${data.imagen}`
+      };
+    } else {
+      return { success: false, mensaje: `Error generando imagen: ${data.error || 'Error desconocido'}` };
+    }
+
+  } catch (error) {
+    return { success: false, mensaje: `Error generando imagen: ${error.message}` };
+  }
+}
+
+async function generarAudio(texto, voz = 'thibisay') {
+  if (!texto) {
+    return { success: false, mensaje: 'Necesito el texto que queres convertir a audio.' };
+  }
+
+  try {
+    // Limpiar markdown del texto para mejor audio
+    const textoLimpio = texto
+      .replace(/#{1,6}\s/g, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/`/g, '')
+      .replace(/\n{2,}/g, '\n')
+      .substring(0, 5000) // Limite de caracteres
+      .trim();
+
+    // Llamar a nuestra API de generacion de voz
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+    const res = await fetch(`${baseUrl}/api/admin/voz/generar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        texto: textoLimpio,
+        voz: voz || 'thibisay'
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success && data.audio) {
+      const duracionMin = Math.floor((data.duracion || 0) / 60);
+      const duracionSeg = Math.floor((data.duracion || 0) % 60);
+
+      return {
+        success: true,
+        mensaje: `## 🎙️ Audio Generado con Thibisay
+
+**Voz:** ${voz || 'Thibisay'}
+**Caracteres:** ${textoLimpio.length}
+${data.duracion ? `**Duracion:** ${duracionMin}:${duracionSeg.toString().padStart(2, '0')}` : ''}
+
+🎧 [Escuchar Audio](${data.audio})
+
+_El audio fue generado exitosamente con la voz de Thibisay._
+
+**URL del audio:** ${data.audio}`
+      };
+    } else {
+      return { success: false, mensaje: `Error generando audio: ${data.error || 'Error desconocido'}` };
+    }
+
+  } catch (error) {
+    return { success: false, mensaje: `Error generando audio: ${error.message}` };
+  }
 }
