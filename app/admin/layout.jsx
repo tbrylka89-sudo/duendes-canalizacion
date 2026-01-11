@@ -520,7 +520,9 @@ const estilos = {
     borderRadius: '12px',
     maxWidth: '85%',
     fontSize: '14px',
-    lineHeight: '1.5'
+    lineHeight: '1.6',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
   },
   titoMensajeUsuario: {
     background: 'rgba(198, 169, 98, 0.15)',
