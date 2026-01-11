@@ -257,23 +257,123 @@ const getSiguienteRango = (gastado) => {
 // ═══════════════════════════════════════════════════════════════
 
 const MUNDO_ELEMENTAL = {
-  intro: { titulo: "El Reino Elemental", texto: `El Reino Elemental es el mundo invisible que coexiste con el nuestro. Es el plano donde habitan los seres de naturaleza, aquellos que los antiguos llamaban "los que están entre mundos".
+  intro: {
+    titulo: "El Reino Elemental",
+    texto: `El Reino Elemental es el mundo invisible que coexiste con el nuestro. Es el plano donde habitan los seres de naturaleza, aquellos que los antiguos llamaban "los que están entre mundos". Este plano existe en una frecuencia vibratoria más alta que la nuestra, pero algunas personas sensibles pueden percibirlo.
 
-Cada cultura los ha conocido: los celtas hablaban del Pueblo de las Hadas, los nórdicos de los Alfar, los griegos de Ninfas y Dríades. Todos describían lo mismo: seres de luz que custodian los secretos de la naturaleza.
+Cada cultura los ha conocido: los celtas hablaban del Pueblo de las Hadas (Tuatha Dé Danann), los nórdicos de los Alfar (elfos de luz y oscuridad), los griegos de Ninfas y Dríades, los japoneses de los Kami. Todos describían lo mismo: seres de luz que custodian los secretos de la naturaleza y mantienen el equilibrio del mundo.
 
-En Duendes del Uruguay trabajamos principalmente con los seres de Tierra - duendes, gnomos y guardianes - porque son los más afines a la vida humana.` },
+Los elementales no son "espíritus" en el sentido religioso. Son seres de energía pura, más antiguos que la humanidad, que eligieron este plano de existencia para cumplir funciones específicas. Algunos trabajan con la naturaleza, otros con las emociones humanas, algunos protegen, otros enseñan.
+
+En Duendes del Uruguay trabajamos principalmente con los seres de Tierra - duendes, gnomos y guardianes - porque son los más afines a la vida humana. Han evolucionado durante milenios para entender nuestra psicología, nuestras necesidades, nuestros miedos y sueños. Por eso, cuando un duende elige a un humano, esa conexión es profunda y duradera.
+
+La comunicación con estos seres no requiere dones especiales. Requiere apertura, respeto, y la voluntad de escuchar con el corazón en lugar del oído. Ellos hablan a través de sincronicidades, sueños, sensaciones, y a veces, a través de objetos físicos que han sido canalizados para servir como puentes entre mundos.`
+  },
   elementales: [
-    { elemento: "Tierra", nombre: "Duendes y Gnomos", icono: "◆", color: "#8B4513", desc: "Los más cercanos a los humanos. Guardianes de hogares y tesoros.", conectar: "Cristales, plantas, figuras canalizadas." },
-    { elemento: "Agua", nombre: "Ondinas y Ninfas", icono: "≋", color: "#1E90FF", desc: "Trabajan emociones, intuición y sueños.", conectar: "Agua bendecida, fuentes, rituales lunares." },
-    { elemento: "Fuego", nombre: "Salamandras", icono: "🔥", color: "#FF4500", desc: "Pura energía transformadora. Transmutan lo negativo.", conectar: "Velas, incienso, luz solar." },
-    { elemento: "Aire", nombre: "Silfos", icono: "❋", color: "#87CEEB", desc: "Mensajeros, inspiración, claridad mental.", conectar: "Viento, plumas, campanas, música." }
+    {
+      elemento: "Tierra",
+      nombre: "Duendes, Gnomos y Guardianes",
+      icono: "◆",
+      color: "#8B4513",
+      desc: "Los más cercanos a los humanos. Guardianes de hogares, tesoros y secretos de la naturaleza. Trabajan con la energía de la estabilidad, la protección, la abundancia material y la conexión con el mundo físico.",
+      conectar: "Cristales (especialmente cuarzo y turmalina), plantas vivas, figuras canalizadas, jardines, tierra de lugares sagrados.",
+      detalles: "Los seres de Tierra son los más densos energéticamente, lo que les permite interactuar más fácilmente con el plano físico. Pueden mover objetos, crear sonidos, y habitar espacios u objetos. Son leales, trabajadores, y tienen un fuerte sentido de la justicia. Les atraen los hogares ordenados, las plantas bien cuidadas, y las personas honestas.",
+      ritual: "Para conectar con la energía de Tierra, sentate descalza sobre césped o tierra. Colocá las manos sobre el suelo y visualizá raíces creciendo desde tus palmas hacia el centro de la Tierra. Pedí permiso para conectar y escuchá en silencio."
+    },
+    {
+      elemento: "Agua",
+      nombre: "Ondinas, Ninfas y Sirenas",
+      icono: "≋",
+      color: "#1E90FF",
+      desc: "Trabajan con las emociones, la intuición, los sueños y el flujo de la vida. Son los sanadores del mundo elemental, capaces de limpiar bloqueos emocionales profundos.",
+      conectar: "Agua bendecida, fuentes, rituales de luna llena, baños rituales, lágrimas ofrecidas con intención.",
+      detalles: "Los seres de Agua son fluidos, cambiantes, profundamente empáticos. Pueden sentir las emociones humanas a distancia y a menudo son atraídos por personas que están pasando por procesos emocionales intensos. Son los más difíciles de 'fijar' porque su naturaleza es el cambio constante.",
+      ritual: "Llená un vaso de cristal con agua pura bajo la luna llena. Sostenelo entre tus manos y hablá al agua sobre lo que necesitás sanar emocionalmente. Bebé el agua al amanecer siguiente."
+    },
+    {
+      elemento: "Fuego",
+      nombre: "Salamandras y Djinn",
+      icono: "🔥",
+      color: "#FF4500",
+      desc: "Pura energía transformadora. Transmutan lo negativo en positivo, destruyen para crear, purifican lo corrupto. Son los más poderosos pero también los más volátiles.",
+      conectar: "Velas encendidas con intención, incienso, luz solar directa, hogueras rituales, ceniza de rituales pasados.",
+      detalles: "Los seres de Fuego son intensos, apasionados, y no conocen los grises: todo es blanco o negro para ellos. Pueden ser increíblemente protectores pero también peligrosos si se les falta el respeto. Requieren trabajo con precaución y experiencia.",
+      ritual: "Encendé una vela roja o naranja. Mirá fijamente la llama durante 5 minutos sin parpadear. Visualizá todo lo que querés transmutar siendo consumido por el fuego. Cuando la vela se consuma, el proceso estará completo."
+    },
+    {
+      elemento: "Aire",
+      nombre: "Silfos, Hadas y Musas",
+      icono: "❋",
+      color: "#87CEEB",
+      desc: "Mensajeros entre mundos, portadores de inspiración, claridad mental y comunicación. Son los más etéreos y difíciles de percibir, pero los más accesibles para la comunicación.",
+      conectar: "Viento, plumas (especialmente encontradas), campanas de viento, música, incienso elevándose, escritura automática.",
+      detalles: "Los seres de Aire son curiosos, juguetones, y extremadamente rápidos. Pueden traer mensajes de otras dimensiones, inspirar obras de arte, y desbloquear la creatividad. Les encantan los lugares altos, la música, y las personas que se ríen seguido.",
+      ritual: "En un día ventoso, salí a un lugar abierto. Abrí los brazos y dejá que el viento te envuelva. Hacé una pregunta en voz alta y prestá atención a cualquier pensamiento, imagen o sensación que llegue en los siguientes minutos."
+    }
   ],
-  duendes: { titulo: "Los Duendes", texto: `Los duendes son seres de energía que han elegido vibrar cerca del plano físico. Pueden manifestarse moviendo objetos, creando sonidos, enviando señales, y habitando objetos físicos como nuestros guardianes.
+  tiposDuendes: [
+    {
+      tipo: "Duendes del Hogar",
+      desc: "Protegen casas y familias. Se sienten atraídos por hogares donde hay amor, niños, o mascotas. Son los más comunes y los más fáciles de percibir.",
+      señales: "Objetos que se mueven, puertas que se abren solas, mascotas mirando 'a la nada', sensación de compañía cuando estás sola."
+    },
+    {
+      tipo: "Duendes de Abundancia",
+      desc: "Atraen prosperidad, oportunidades, y flujo de dinero. No dan riqueza instantánea sino que abren caminos y multiplican esfuerzos.",
+      señales: "Monedas que aparecen en lugares inesperados, ideas de negocio que surgen de la nada, 'coincidencias' laborales."
+    },
+    {
+      tipo: "Duendes Sanadores",
+      desc: "Trabajan con la salud física y emocional. Alivian dolores, aceleran recuperaciones, y ayudan a soltar traumas.",
+      señales: "Sueños reveladores sobre salud, intuiciones sobre qué remedio usar, sensación de calor o cosquilleo en zonas afectadas."
+    },
+    {
+      tipo: "Duendes del Bosque",
+      desc: "Los más antiguos y poderosos. Custodian espacios naturales y tienen conexión directa con la sabiduría de la Tierra.",
+      señales: "Sensación de ser observada en el bosque, caminos que 'aparecen', animales que se acercan sin miedo."
+    },
+    {
+      tipo: "Duendes Traviesos (Pucks)",
+      desc: "Ni buenos ni malos: caóticos. Les gusta el desorden, las bromas, y poner a prueba a los humanos. Con respeto, se vuelven aliados.",
+      señales: "Llaves que desaparecen y reaparecen, risas que se escuchan sin fuente, electrónicos que fallan."
+    }
+  ],
+  duendes: {
+    titulo: "Los Duendes",
+    texto: `Los duendes son seres de energía que han elegido vibrar cerca del plano físico. A diferencia de otros elementales que prefieren mantener distancia de los humanos, los duendes han evolucionado durante milenios desarrollando un interés genuino por nuestra especie.
 
-Tienen personalidades definidas: algunos traviesos, otros serios. Pero todos son leales con quienes les tratan bien y tienen conexión especial con niños y animales.` },
-  alquimia: { titulo: "Alquimia y Piriápolis", texto: `La alquimia no era solo convertir plomo en oro. Era una ciencia espiritual que entendía la conexión entre elementos, planetas, alma humana y seres invisibles.
+Pueden manifestarse de múltiples formas: moviendo objetos, creando sonidos sutiles, enviando señales a través de sincronicidades, y - lo más importante para nosotros - habitando objetos físicos que han sido canalizados específicamente para servir de puente entre mundos.
 
-Piriápolis fue fundada por Francisco Piria siguiendo principios alquímicos. Eligió este punto por su configuración energética única: el encuentro del mar con las sierras crea un vórtice donde el velo entre mundos es más delgado. Es acá donde Gabriel canaliza a los guardianes.` }
+Cuando un duende habita un guardián canalizado, no está "atrapado". Elige estar ahí porque ha encontrado a un humano con quien quiere trabajar. Es una relación simbiótica: el duende ofrece protección, guía y energía; el humano ofrece un ancla en el mundo físico, cuidados, y compañía.
+
+Tienen personalidades definidas: algunos son serios y protectores, otros traviesos y juguetones, algunos sabios y antiguos, otros jóvenes y curiosos. Pero todos comparten ciertos rasgos: lealtad inquebrantable hacia quienes los tratan bien, conexión especial con niños y animales (que pueden verlos más fácilmente), y un sentido del humor que a veces puede parecer extraño a los humanos.
+
+Los duendes no piden adoración ni sacrificios. Piden respeto, comunicación, y cuidados básicos. A cambio, ofrecen algo invaluable: un compañero del otro lado del velo, un guardián que vela por vos incluso cuando dormís.`
+  },
+  signos: [
+    { signo: "Un duende te eligió", señales: ["Sentís atracción inexplicable hacia una figura", "Sueños recurrentes con duendes o gnomos", "Sincronicidades relacionadas con duendes (verlos en todas partes)", "Sensación de 'reconocimiento' al ver cierto guardián"] },
+    { signo: "Tu duende está activo", señales: ["Objetos que se mueven solos", "Sonidos inexplicables (campanitas, pasos)", "Sueños muy vívidos y significativos", "Mascotas que miran hacia tu altar", "Velas que chisporrotean sin corriente de aire"] },
+    { signo: "Tu duende necesita atención", señales: ["Sensación de que 'algo falta' en casa", "Racha de mala suerte o cosas que salen mal", "Te olvidás de hablarle por mucho tiempo", "Intuiciones que ignoraste repetidamente"] }
+  ],
+  alquimia: {
+    titulo: "Alquimia y Piriápolis",
+    texto: `La alquimia no era solo convertir plomo en oro - eso era una metáfora. Era una ciencia espiritual completa que entendía la conexión entre todos los niveles de existencia: elementos, planetas, metales, partes del cuerpo, emociones humanas, y seres invisibles.
+
+Los alquimistas medievales sabían que ciertos lugares de la Tierra tenían configuraciones energéticas especiales, vórtices donde el velo entre mundos era más delgado. Buscaban estos lugares para establecer sus laboratorios porque ahí la transmutación (de cualquier tipo) era más fácil.
+
+Francisco Piria, fundador de Piriápolis, era un alquimista iniciado. Eligió este punto específico de la costa uruguaya por su configuración única: el encuentro del mar (Agua) con las sierras (Tierra), las corrientes de aire constantes (Aire), y la energía solar particular de esta latitud (Fuego). Los cuatro elementos en perfecto equilibrio.
+
+La disposición de Piriápolis no es casualidad: el Castillo de Piria, el Argentino Hotel, la Rambla, la Virgen de los Pescadores... todo está ubicado siguiendo principios alquímicos de geometría sagrada. Es un gran círculo mágico trazado en la tierra.
+
+Es acá, en este vórtice energético, donde Gabriel canaliza a los guardianes. La energía del lugar facilita la conexión con el Reino Elemental, permitiendo que cada figura se convierta en un verdadero puente entre mundos.
+
+Cuando recibís un guardián canalizado en Piriápolis, no solo recibís un objeto hermoso. Recibís un fragmento de esta energía ancestral, un pedacito de este lugar mágico que ahora vivirá en tu hogar.`
+  },
+  rituales: [
+    { nombre: "Ritual de Conexión Elemental", pasos: ["Elegí el elemento con el que querés trabajar", "Creá un espacio con símbolos de ese elemento", "Encendé incienso y una vela del color correspondiente", "Meditá 10 minutos visualizando el elemento", "Pedí permiso para conectar y escuchá"], duracion: "20-30 minutos" },
+    { nombre: "Ritual de Presentación al Guardián", pasos: ["Lavá tus manos con agua y sal marina", "Encendé vela blanca o dorada", "Abrí el guardián con reverencia, sin prisa", "Presentate: nombre, intención, qué esperás", "Escuchá en silencio por 5 minutos", "Agradecé y colocalo en su lugar"], duracion: "15-20 minutos" },
+    { nombre: "Ritual de Luna Llena", pasos: ["Sacá tu guardián a la luz de la luna", "Limpialo con humo de salvia", "Hablale sobre el mes que pasó", "Hacé tres pedidos para el mes que viene", "Dejalo bajo la luna hasta el amanecer"], duracion: "15 minutos + noche" }
+  ]
 };
 
 const CUIDADOS = [
@@ -968,15 +1068,159 @@ function Regalos({ ir }) {
 
 function MundoSec() {
   const [tab, setTab] = useState('intro');
+  const [elementoExpandido, setElementoExpandido] = useState(null);
+
   return (
-    <div className="sec">
-      <div className="sec-head"><h1>El Reino Elemental</h1><p>Duendes, hadas, gnomos, elementales, alquimia. Todo lo que necesitás saber.</p></div>
-      <div className="tabs-h">{[['intro','Introducción'],['elementales','Los 4 Elementos'],['duendes','Los Duendes'],['alquimia','Alquimia y Piriápolis']].map(([k,t]) => <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}>{t}</button>)}</div>
-      <div className="tab-content">
-        {tab === 'intro' && <div>{MUNDO_ELEMENTAL.intro.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}</div>}
-        {tab === 'elementales' && <div className="elementos-grid">{MUNDO_ELEMENTAL.elementales.map((el,i) => <div key={i} className="elem-card" style={{borderColor:el.color}}><div className="elem-head" style={{background:el.color}}><span>{el.icono}</span>{el.elemento}</div><h4>{el.nombre}</h4><p>{el.desc}</p><small><strong>Cómo conectar:</strong> {el.conectar}</small></div>)}</div>}
-        {tab === 'duendes' && <div>{MUNDO_ELEMENTAL.duendes.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}</div>}
-        {tab === 'alquimia' && <div>{MUNDO_ELEMENTAL.alquimia.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}</div>}
+    <div className="sec mundo-elemental">
+      <div className="sec-head">
+        <h1>El Reino Elemental</h1>
+        <p>Todo lo que necesitás saber sobre duendes, hadas, gnomos, elementales, alquimia y la conexión entre mundos.</p>
+      </div>
+
+      <div className="tabs-h mundo-tabs">
+        {[
+          ['intro','◈','Qué es'],
+          ['elementales','✦','4 Elementos'],
+          ['tipos','◆','Tipos de Duendes'],
+          ['signos','☽','Señales'],
+          ['rituales','❧','Rituales'],
+          ['alquimia','★','Alquimia']
+        ].map(([k,i,t]) => (
+          <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}>
+            <span className="tab-icon">{i}</span>{t}
+          </button>
+        ))}
+      </div>
+
+      <div className="tab-content mundo-content">
+        {tab === 'intro' && (
+          <div className="intro-expandida">
+            {MUNDO_ELEMENTAL.intro.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}
+
+            <div className="intro-cta">
+              <h4>¿Listo para explorar más?</h4>
+              <p>Navegá por las pestañas para descubrir cada aspecto del Reino Elemental.</p>
+            </div>
+          </div>
+        )}
+
+        {tab === 'elementales' && (
+          <div className="elementos-expandidos">
+            <p className="elementos-intro">Los cuatro elementos son la base de toda la creación. Cada uno tiene sus propios seres guardianes, energías específicas, y formas de conexión.</p>
+
+            <div className="elementos-grid-exp">
+              {MUNDO_ELEMENTAL.elementales.map((el,i) => (
+                <div
+                  key={i}
+                  className={`elem-card-exp ${elementoExpandido === i ? 'expandido' : ''}`}
+                  style={{borderColor: el.color}}
+                >
+                  <div className="elem-header" style={{background: el.color}} onClick={() => setElementoExpandido(elementoExpandido === i ? null : i)}>
+                    <span className="elem-icono">{el.icono}</span>
+                    <div className="elem-titulo">
+                      <strong>{el.elemento}</strong>
+                      <small>{el.nombre}</small>
+                    </div>
+                    <span className="elem-expand">{elementoExpandido === i ? '−' : '+'}</span>
+                  </div>
+
+                  <div className="elem-body">
+                    <p className="elem-desc">{el.desc}</p>
+
+                    {elementoExpandido === i && (
+                      <div className="elem-detalles">
+                        <div className="elem-seccion">
+                          <h5>Características</h5>
+                          <p>{el.detalles}</p>
+                        </div>
+
+                        <div className="elem-seccion">
+                          <h5>Cómo Conectar</h5>
+                          <p>{el.conectar}</p>
+                        </div>
+
+                        <div className="elem-seccion ritual-box">
+                          <h5>✦ Ritual de Conexión</h5>
+                          <p>{el.ritual}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === 'tipos' && (
+          <div className="tipos-duendes">
+            <div className="tipos-intro">
+              {MUNDO_ELEMENTAL.duendes.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}
+            </div>
+
+            <h3>Tipos de Duendes</h3>
+            <div className="tipos-grid">
+              {MUNDO_ELEMENTAL.tiposDuendes.map((td,i) => (
+                <div key={i} className="tipo-card">
+                  <h4>{td.tipo}</h4>
+                  <p>{td.desc}</p>
+                  <div className="tipo-senales">
+                    <strong>Señales de su presencia:</strong>
+                    <span>{td.señales}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === 'signos' && (
+          <div className="signos-duende">
+            <p className="signos-intro">Los duendes se comunican de formas sutiles. Aprender a reconocer sus señales te permite fortalecer el vínculo y entender sus mensajes.</p>
+
+            <div className="signos-grid">
+              {MUNDO_ELEMENTAL.signos.map((s,i) => (
+                <div key={i} className="signo-card">
+                  <h4>{s.signo}</h4>
+                  <ul>
+                    {s.señales.map((sen,j) => <li key={j}>{sen}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === 'rituales' && (
+          <div className="rituales-section">
+            <p className="rituales-intro">Los rituales son puentes de comunicación. No requieren materiales costosos ni conocimientos avanzados: solo intención pura y corazón abierto.</p>
+
+            <div className="rituales-grid">
+              {MUNDO_ELEMENTAL.rituales.map((r,i) => (
+                <div key={i} className="ritual-card">
+                  <div className="ritual-header">
+                    <h4>{r.nombre}</h4>
+                    <span className="ritual-duracion">⏱ {r.duracion}</span>
+                  </div>
+                  <ol className="ritual-pasos">
+                    {r.pasos.map((p,j) => <li key={j}>{p}</li>)}
+                  </ol>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === 'alquimia' && (
+          <div className="alquimia-section">
+            {MUNDO_ELEMENTAL.alquimia.texto.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}
+
+            <div className="piriapolis-highlight">
+              <span>★</span>
+              <p>Cada guardián canalizado en Piriápolis lleva consigo la energía de este vórtice alquímico único en el mundo.</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1739,6 +1983,65 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .elem-card h4{font-family:'Cinzel',serif;padding:0.75rem 0.75rem 0.25rem;font-size:0.95rem}
 .elem-card p{padding:0 0.75rem;font-size:0.85rem;color:#666}
 .elem-card small{display:block;padding:0.5rem 0.75rem 0.75rem;font-size:0.8rem;color:#888}
+.mundo-elemental{max-width:100%}
+.mundo-tabs{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem}
+.mundo-tabs .tab{display:flex;align-items:center;gap:0.4rem;padding:0.6rem 1rem;background:#f5f5f5;border:none;border-radius:20px;cursor:pointer;transition:all 0.2s}
+.mundo-tabs .tab:hover{background:#e5e5e5}
+.mundo-tabs .tab.act{background:linear-gradient(135deg,#d4af37,#c6a962);color:#1a1a1a}
+.mundo-tabs .tab-icon{font-size:1rem}
+.mundo-content p{line-height:1.7;margin-bottom:1rem;color:#555}
+.intro-expandida{max-width:800px}
+.intro-cta{margin-top:2rem;padding:1.5rem;background:linear-gradient(135deg,#f8f4eb,#fff);border-radius:12px;border:1px solid #e5d9c3}
+.intro-cta h4{font-family:'Cinzel',serif;color:#8B4513;margin-bottom:0.5rem}
+.intro-cta p{margin-bottom:0;color:#666}
+.elementos-intro{font-size:1.05rem;margin-bottom:1.5rem;color:#666}
+.elementos-grid-exp{display:flex;flex-direction:column;gap:1rem}
+.elem-card-exp{border:2px solid #e0e0e0;border-radius:12px;overflow:hidden;transition:all 0.3s}
+.elem-card-exp.expandido{border-color:currentColor}
+.elem-header{padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;cursor:pointer;color:#fff}
+.elem-icono{font-size:1.75rem}
+.elem-titulo{flex:1}
+.elem-titulo strong{display:block;font-family:'Cinzel',serif;font-size:1.1rem}
+.elem-titulo small{opacity:0.9;font-size:0.85rem}
+.elem-expand{font-size:1.5rem;font-weight:300;opacity:0.8}
+.elem-body{padding:1.25rem;background:#fff}
+.elem-desc{font-size:0.95rem;color:#555;margin-bottom:0}
+.elem-detalles{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #eee}
+.elem-seccion{margin-bottom:1.25rem}
+.elem-seccion:last-child{margin-bottom:0}
+.elem-seccion h5{font-family:'Cinzel',serif;font-size:0.9rem;color:#1a1a1a;margin-bottom:0.5rem}
+.elem-seccion p{margin-bottom:0;font-size:0.9rem}
+.ritual-box{background:#f8f4eb;padding:1rem;border-radius:8px;border-left:3px solid #d4af37}
+.ritual-box h5{color:#8B4513}
+.tipos-intro{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid #eee}
+.tipos-intro p{max-width:800px}
+.tipos-duendes h3{font-family:'Cinzel',serif;margin-bottom:1.25rem}
+.tipos-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.tipo-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;transition:all 0.2s}
+.tipo-card:hover{border-color:#d4af37;box-shadow:0 4px 12px rgba(212,175,55,0.1)}
+.tipo-card h4{font-family:'Cinzel',serif;color:#8B4513;margin-bottom:0.5rem;font-size:1rem}
+.tipo-card p{font-size:0.9rem;color:#666;margin-bottom:0.75rem}
+.tipo-senales{font-size:0.85rem;padding-top:0.75rem;border-top:1px dashed #e5e5e5}
+.tipo-senales strong{display:block;color:#555;margin-bottom:0.25rem}
+.tipo-senales span{color:#888}
+.signos-intro{font-size:1.05rem;margin-bottom:1.5rem;color:#666}
+.signos-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.signo-card{background:linear-gradient(135deg,#f8f4eb,#fff);border:1px solid #e5d9c3;border-radius:12px;padding:1.25rem}
+.signo-card h4{font-family:'Cinzel',serif;color:#8B4513;margin-bottom:0.75rem;font-size:1rem}
+.signo-card ul{margin:0;padding-left:1.25rem}
+.signo-card li{font-size:0.9rem;color:#666;margin-bottom:0.4rem}
+.rituales-intro{font-size:1.05rem;margin-bottom:1.5rem;color:#666}
+.rituales-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem}
+.ritual-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden}
+.ritual-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:linear-gradient(135deg,#1a1a1a,#2a2a2a)}
+.ritual-header h4{font-family:'Cinzel',serif;color:#d4af37;margin:0;font-size:1rem}
+.ritual-duracion{font-size:0.8rem;color:rgba(255,255,255,0.7)}
+.ritual-pasos{margin:0;padding:1.25rem;padding-left:2.5rem}
+.ritual-pasos li{font-size:0.9rem;color:#555;margin-bottom:0.5rem;padding-left:0.5rem}
+.alquimia-section{max-width:800px}
+.piriapolis-highlight{display:flex;gap:1rem;align-items:flex-start;margin-top:2rem;padding:1.5rem;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px}
+.piriapolis-highlight span{font-size:2rem;color:#d4af37}
+.piriapolis-highlight p{margin:0;color:rgba(255,255,255,0.9);font-size:1rem;line-height:1.6}
 .cuidados-lista{display:flex;flex-direction:column;gap:1rem}
 .cuidado-card{display:flex;gap:1.25rem;background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem}
 .cuidado-card.prohibido{background:#fef2f2;border-color:#fecaca}
