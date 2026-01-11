@@ -98,7 +98,7 @@ export async function POST(request) {
         if (data.error) {
           console.error('OpenAI error:', data.error);
 
-          // Errores específicos
+          // Errores específicos con mensajes amigables
           if (data.error.code === 'content_policy_violation') {
             return Response.json({
               success: false,
@@ -113,7 +113,25 @@ export async function POST(request) {
             }, { status: 429 });
           }
 
-          return Response.json({ success: false, error: `OpenAI: ${data.error.message}` }, { status: 500 });
+          if (data.error.code === 'invalid_api_key' || data.error.message?.includes('Incorrect API key')) {
+            return Response.json({
+              success: false,
+              error: 'API Key de OpenAI inválida. Actualizá OPENAI_API_KEY en Vercel → Settings → Environment Variables'
+            }, { status: 401 });
+          }
+
+          if (data.error.code === 'insufficient_quota' || data.error.message?.includes('quota')) {
+            return Response.json({
+              success: false,
+              error: 'Sin créditos en OpenAI. Recargá tu cuenta en platform.openai.com/account/billing'
+            }, { status: 402 });
+          }
+
+          // Error genérico sin mostrar detalles sensibles
+          return Response.json({
+            success: false,
+            error: 'Error generando imagen. Revisá la configuración de OpenAI.'
+          }, { status: 500 });
         }
 
         if (data.data?.[0]?.url) {

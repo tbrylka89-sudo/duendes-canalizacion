@@ -308,8 +308,14 @@ async function actualizarEnWoo(producto) {
 
 function extraerGuardian(nombre) {
   // Intentar extraer nombre del guardian del nombre del producto
-  const match = nombre?.match(/^([A-Za-z]+)\s*[-–]/);
-  return match ? match[1] : null;
+  const match = nombre?.match(/^([A-Za-zÀ-ÿ]+)\s*[-–]/);
+  if (match) return match[1];
+
+  // Intentar con el primer nombre si no hay guion
+  const match2 = nombre?.match(/^([A-Za-zÀ-ÿ]+)\s/);
+  if (match2) return match2[1];
+
+  return nombre?.split(' ')[0] || null;
 }
 
 function calcularEstadisticas(productos) {
