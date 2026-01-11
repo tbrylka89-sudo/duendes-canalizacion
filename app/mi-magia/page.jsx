@@ -1284,49 +1284,91 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
     );
   }
 
-  // SI NO ES MIEMBRO - LANDING INTERNA
+  // SI NO ES MIEMBRO - LANDING CON BLUR PREVIEW
   return (
     <div className="sec circulo-landing">
       <div className="circulo-hero"><span>★</span><h1>Círculo de Duendes</h1><p>El santuario secreto para quienes sienten el llamado</p></div>
 
-      <div className="circulo-intro-text">
-        <p>El Círculo es más que una membresía. Es una comunidad de personas que, como vos, sienten que hay algo más allá de lo visible. Es acceso a conocimiento que no compartimos en ningún otro lugar. Es descuentos permanentes, lecturas gratis, y la sensación de pertenecer a algo especial.</p>
+      {/* Vista previa con blur */}
+      <div className="circulo-preview-blur">
+        <div className="preview-content">
+          <div className="preview-item">
+            <span>🕯️</span>
+            <h4>Ritual de Luna Llena para Manifestación</h4>
+            <p>Descubrí cómo aprovechar la energía de la luna llena...</p>
+          </div>
+          <div className="preview-item">
+            <span>🧙</span>
+            <h4>Los Duendes Protectores del Hogar</h4>
+            <p>Conoce a los guardianes elementales que cuidan tu espacio...</p>
+          </div>
+          <div className="preview-item">
+            <span>🎧</span>
+            <h4>Meditación: Conexión con tu Guardián</h4>
+            <p>Una meditación profunda para establecer un vínculo...</p>
+          </div>
+        </div>
+        <div className="preview-overlay">
+          <span className="lock-icon">🔒</span>
+          <h3>Contenido exclusivo del Círculo</h3>
+          <p>Accedé a rituales, guías, meditaciones y más</p>
+        </div>
       </div>
 
-      <div className="prueba-gratis">
-        <h2>🎁 15 días gratis</h2>
-        <p>Probá sin compromiso. Si no es para vos, no pasa nada.</p>
-        <p><strong>+ 50 Runas de regalo</strong> para que explores las experiencias mágicas.</p>
-        <p><strong>+ 1 Tirada de Runas gratis</strong> para empezar tu camino.</p>
-        <button className="btn-gold btn-lg" onClick={activarPrueba} disabled={activandoPrueba || usuario?.circuloPruebaUsada}>
-          {activandoPrueba ? 'Activando...' : usuario?.circuloPruebaUsada ? 'Prueba ya utilizada' : 'Activar prueba gratuita'}
-        </button>
-        {usuario?.circuloPruebaUsada && <p className="prueba-usada">Ya usaste tu prueba gratuita. Elegí una membresía para continuar.</p>}
+      {/* Caja de acción principal */}
+      <div className="circulo-cta-box">
+        {!usuario?.circuloPruebaUsada ? (
+          <>
+            <div className="cta-header">
+              <span className="cta-gift">🎁</span>
+              <h2>15 días gratis para vos</h2>
+            </div>
+            <div className="cta-benefits">
+              <div className="cta-benefit"><span>✓</span> Acceso a todo el contenido exclusivo</div>
+              <div className="cta-benefit"><span>✓</span> 50 Runas de regalo para experiencias</div>
+              <div className="cta-benefit"><span>✓</span> 1 Tirada de Runas gratis</div>
+              <div className="cta-benefit"><span>✓</span> 15% OFF en la tienda</div>
+              <div className="cta-benefit"><span>✓</span> Sin compromiso, cancelás cuando quieras</div>
+            </div>
+            <button className="btn-gold btn-lg cta-button" onClick={activarPrueba} disabled={activandoPrueba}>
+              {activandoPrueba ? '✨ Activando tu acceso...' : '✦ Comenzar prueba gratuita'}
+            </button>
+            <p className="cta-small">Sin tarjeta de crédito. Sin letra chica.</p>
+          </>
+        ) : (
+          <>
+            <div className="cta-header">
+              <span className="cta-gift">★</span>
+              <h2>Elegí tu membresía</h2>
+            </div>
+            <p className="cta-subtitle">Ya probaste el Círculo. ¡Es hora de quedarte!</p>
+            <div className="membresias-cta-grid">
+              {MEMBRESIAS.map(m => (
+                <div key={m.nombre} className={`membresia-cta-card ${m.nombre === 'Anual' ? 'destacada' : ''}`}>
+                  {m.nombre === 'Anual' && <span className="badge-popular">Más elegida</span>}
+                  <h4>{m.nombre}</h4>
+                  <div className="membresia-precio-cta">
+                    {esUY ? `$${m.precioUY.toLocaleString()}` : `$${m.precio}`}
+                    <small>{esUY ? 'UYU' : 'USD'}</small>
+                  </div>
+                  {m.ahorro && <span className="membresia-ahorro-cta">{m.ahorro}</span>}
+                  <p className="membresia-dias">{m.dias} días</p>
+                  <a href={m.url} target="_blank" rel="noopener" className="btn-membresia">
+                    Elegir →
+                  </a>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
-      <h2 className="sec-titulo">¿Qué incluye?</h2>
+      <h2 className="sec-titulo">¿Qué incluye el Círculo?</h2>
       <div className="beneficios-grid">
         {CIRCULO_CONTENIDO.beneficios.map((b,i) => (
           <div key={i} className="beneficio-card"><span>{b.icono}</span><h4>{b.titulo}</h4><p>{b.desc}</p></div>
         ))}
       </div>
-
-      <h2 className="sec-titulo" style={{cursor:'pointer'}} onClick={() => setVerMembresias(!verMembresias)}>
-        Membresías {verMembresias ? '▼' : '▶'}
-      </h2>
-      {verMembresias && (
-        <div className="membresias-grid">
-          {MEMBRESIAS.map(m => (
-            <div key={m.nombre} className="membresia-card">
-              <h4>{m.nombre}</h4>
-              <div className="membresia-precio">{esUY ? `$${m.precioUY} UYU` : `$${m.precio} USD`}</div>
-              {m.ahorro && <span className="membresia-ahorro">Ahorrás {m.ahorro}</span>}
-              <p>{m.dias} días de acceso</p>
-              <a href={m.url} target="_blank" rel="noopener" className="btn-gold-sm">Elegir ↗</a>
-            </div>
-          ))}
-        </div>
-      )}
 
       <h2 className="sec-titulo">Temas que exploramos</h2>
       <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
@@ -1721,6 +1763,44 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .prueba-gratis{background:#f0fdf4;border:2px solid #bbf7d0;border-radius:16px;padding:2rem;margin-bottom:2rem}
 .prueba-gratis h2{font-family:'Cinzel',serif;margin-bottom:0.5rem}
 .prueba-gratis p{color:#166534;margin-bottom:0.75rem}
+
+/* BLUR PREVIEW */
+.circulo-preview-blur{position:relative;margin-bottom:2rem;border-radius:16px;overflow:hidden}
+.preview-content{display:flex;flex-direction:column;gap:0.75rem;padding:1.5rem;filter:blur(6px);pointer-events:none}
+.preview-item{background:#fff;border-radius:12px;padding:1rem;display:flex;gap:1rem;align-items:flex-start;text-align:left}
+.preview-item span{font-size:1.5rem}
+.preview-item h4{margin:0 0 0.25rem;font-size:0.9rem}
+.preview-item p{margin:0;font-size:0.8rem;color:#666}
+.preview-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.85);text-align:center}
+.lock-icon{font-size:2.5rem;margin-bottom:0.5rem}
+.preview-overlay h3{font-family:'Cinzel',serif;margin:0 0 0.25rem;color:#1a1a1a}
+.preview-overlay p{color:#666;font-size:0.9rem}
+
+/* CTA BOX */
+.circulo-cta-box{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:20px;padding:2.5rem;margin-bottom:2.5rem;border:2px solid #d4af3744}
+.cta-header{display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:1.5rem}
+.cta-gift{font-size:2.5rem}
+.cta-header h2{font-family:'Cinzel',serif;color:#fff;margin:0;font-size:1.5rem}
+.cta-benefits{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem}
+.cta-benefit{display:flex;align-items:center;gap:0.75rem;color:#eee;font-size:0.95rem}
+.cta-benefit span{color:#22c55e;font-weight:bold}
+.cta-button{width:100%;max-width:400px;margin:0 auto;display:block;font-size:1.1rem;padding:1rem 2rem}
+.cta-small{color:#888;font-size:0.8rem;margin-top:1rem}
+.cta-subtitle{color:#aaa;margin-bottom:1.5rem}
+.membresias-cta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.membresia-cta-card{background:rgba(255,255,255,0.05);border:1px solid #444;border-radius:12px;padding:1.25rem;position:relative}
+.membresia-cta-card.destacada{border-color:#d4af37;background:rgba(212,175,55,0.1)}
+.badge-popular{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#d4af37;color:#0a0a0a;font-size:0.7rem;padding:0.25rem 0.75rem;border-radius:20px;font-weight:600}
+.membresia-cta-card h4{color:#fff;font-family:'Cinzel',serif;margin-bottom:0.5rem}
+.membresia-precio-cta{color:#d4af37;font-size:1.4rem;font-weight:600}
+.membresia-precio-cta small{font-size:0.8rem;margin-left:0.25rem;font-weight:normal}
+.membresia-ahorro-cta{display:inline-block;background:#22c55e22;color:#22c55e;font-size:0.75rem;padding:0.2rem 0.5rem;border-radius:4px;margin:0.5rem 0}
+.membresia-dias{color:#aaa;font-size:0.85rem;margin-bottom:0.75rem}
+.btn-membresia{display:inline-block;background:transparent;border:1px solid #d4af37;color:#d4af37;padding:0.6rem 1.25rem;border-radius:8px;font-size:0.85rem;text-decoration:none;transition:all 0.2s}
+.btn-membresia:hover{background:#d4af37;color:#0a0a0a}
+@media(max-width:768px){.membresias-cta-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.membresias-cta-grid{grid-template-columns:1fr}}
+
 .beneficios-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
 .beneficio-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1rem;text-align:center}
 .beneficio-card span{font-size:1.5rem;color:#d4af37}
