@@ -1,17 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk';
-
 export const dynamic = 'force-dynamic';
-export const maxDuration = 120; // Aumentado para contenido largo
-
-// Verificar API key al inicio
-const apiKey = process.env.ANTHROPIC_API_KEY;
-if (!apiKey) {
-  console.error('ANTHROPIC_API_KEY no está configurada');
-}
-
-const anthropic = new Anthropic({
-  apiKey: apiKey || ''
-});
+export const maxDuration = 120;
 
 // ═══════════════════════════════════════════════════════════════
 // CATEGORIAS Y TIPOS DE CONTENIDO
@@ -133,24 +121,16 @@ TECNICAS DE NEUROMARKETING PARA APLICAR:
 
 export async function POST(request) {
   try {
-    // Verificar API key
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+
     if (!apiKey) {
       return Response.json({
         success: false,
-        error: 'ANTHROPIC_API_KEY no está configurada en el servidor'
+        error: 'ANTHROPIC_API_KEY no está configurada'
       }, { status: 500 });
     }
 
-    let body;
-    try {
-      body = await request.json();
-    } catch (parseError) {
-      return Response.json({
-        success: false,
-        error: 'Error parseando el body de la request'
-      }, { status: 400 });
-    }
-
+    const body = await request.json();
     const { categoria, tipo, tema, longitud, palabras, instruccionesExtra } = body;
 
     // Usar palabras o longitud (el frontend envía "palabras")
@@ -280,25 +260,35 @@ INSTRUCCIONES FINALES:
 
 Escribi el contenido completo ahora, respetando todas las estructuras y la longitud minima.`;
 
-    let message;
-    try {
-      message = await anthropic.messages.create({
+    // Llamar a Anthropic API directamente con fetch
+    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 16000, // Aumentado para contenido largo
+        max_tokens: 8000,
+        system: systemPrompt,
         messages: [
           { role: 'user', content: userPrompt }
-        ],
-        system: systemPrompt
-      });
-    } catch (anthropicError) {
-      console.error('Error en Anthropic API:', anthropicError);
+        ]
+      })
+    });
+
+    if (!anthropicResponse.ok) {
+      const errorText = await anthropicResponse.text();
+      console.error('Error Anthropic:', errorText);
       return Response.json({
         success: false,
-        error: `Error en la API de Claude: ${anthropicError.message || 'Error desconocido'}`
+        error: `Error de Claude API: ${anthropicResponse.status}`
       }, { status: 500 });
     }
 
-    const contenido = message.content[0]?.text || '';
+    const message = await anthropicResponse.json();
+    const contenido = message.content?.[0]?.text || '';
     const palabrasGeneradas = contenido.split(/\s+/).length;
 
     // Extraer título del contenido (primer # header)
