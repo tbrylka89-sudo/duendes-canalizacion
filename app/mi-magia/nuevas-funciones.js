@@ -3,6 +3,19 @@ import { useState, useEffect } from 'react';
 
 const API_BASE = '';
 
+// Helper: Limpiar tags HTML que aparecen como texto (ej: <em>, <strong>)
+function limpiarTexto(texto) {
+  if (!texto) return '';
+  // Remover tags HTML y mantener solo el contenido
+  return texto
+    .replace(/<\/?em>/gi, '')
+    .replace(/<\/?strong>/gi, '')
+    .replace(/<\/?i>/gi, '')
+    .replace(/<\/?b>/gi, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '');
+}
+
 // ═══════════════════════════════════════════════════════════════
 // SEÑAL DEL DÍA - Mensaje personalizado diario
 // ═══════════════════════════════════════════════════════════════
@@ -455,7 +468,7 @@ export function CosmosMes({ usuario }) {
       {cosmos.afirmacion && (
         <div className="cosmos-afirmacion">
           <h4>✦ Afirmación del Mes</h4>
-          <p className="afirmacion-texto">"{cosmos.afirmacion}"</p>
+          <p className="afirmacion-texto">"{limpiarTexto(cosmos.afirmacion)}"</p>
         </div>
       )}
     </div>
@@ -1000,11 +1013,11 @@ export const estilosNuevos = `
   padding: 10px;
   background: #0a0a0a;
   border-radius: 8px;
-  color: #e0e0e0;
+  color: #fff !important;
 }
 .senal-accion p, .senal-cristal p, .senal-numero-significado p,
 .senal-accion small, .senal-cristal small {
-  color: #ccc;
+  color: #fff !important;
   margin: 0;
   font-size: 0.85rem;
 }
@@ -1311,19 +1324,19 @@ export const estilosNuevos = `
   background: #1f1f1f;
   padding: 12px;
   border-radius: 10px;
-  color: #ccc;
+  color: #fff !important;
 }
 .astro-item strong { color: #d4af37; }
-.sol-actual p { color: #ccc; margin: 5px 0 0; }
+.sol-actual p { color: #fff !important; margin: 5px 0 0; }
 .cristal-elemento, .cristal-limpiar {
   background: #1f1f1f;
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 10px;
-  color: #ccc;
+  color: #fff !important;
 }
 .cristal-elemento strong, .cristal-limpiar h4 { color: #d4af37; }
-.cristal-limpiar p { margin: 5px 0 0; }
+.cristal-limpiar p { margin: 5px 0 0; color: #fff !important; }
 .cosmos-afirmacion {
   margin-top: 20px;
   padding: 20px;

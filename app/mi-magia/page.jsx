@@ -3,6 +3,18 @@ import { useState, useEffect } from 'react';
 import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperiencias, estilosNuevos } from './nuevas-funciones';
 
 const API_BASE = '';
+
+// Helper: Limpiar tags HTML que aparecen como texto
+function limpiarTexto(texto) {
+  if (!texto) return '';
+  return texto
+    .replace(/<\/?em>/gi, '')
+    .replace(/<\/?strong>/gi, '')
+    .replace(/<\/?i>/gi, '')
+    .replace(/<\/?b>/gi, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '');
+}
 const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
 
 // ═══════════════════════════════════════════════════════════════
@@ -1596,12 +1608,12 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
 
                 <div className="mensaje-guardian-luna">
                   <h3>✦ Mensaje de tu Guardián</h3>
-                  <p className="mensaje-texto">{lunaData.mensajeGuardian}</p>
+                  <p className="mensaje-texto">{limpiarTexto(lunaData.mensajeGuardian)}</p>
                 </div>
 
                 <div className="afirmacion-dia">
                   <h3>Afirmación del día</h3>
-                  <p className="afirmacion">"{lunaData.afirmacionDia}"</p>
+                  <p className="afirmacion">"{limpiarTexto(lunaData.afirmacionDia)}"</p>
                 </div>
 
                 {lunaData.proximasFases && (
@@ -1654,16 +1666,7 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
         )}
 
         {tab === 'comunidad' && (
-          <div className="circulo-comunidad">
-            <h2>Comunidad del Círculo</h2>
-            <p className="comunidad-intro">Un espacio para compartir experiencias, hacer preguntas, y conectar con otros guardianes del mundo elemental.</p>
-            <div className="comunidad-prox">
-              <span>🚧</span>
-              <h3>Próximamente: Foro del Círculo</h3>
-              <p>Estamos desarrollando un espacio donde van a poder compartir sus experiencias con los guardianes, hacer preguntas, y conectar entre ustedes.</p>
-              <p>Mientras tanto, pueden enviar sus preguntas y las respondemos en el contenido semanal.</p>
-            </div>
-          </div>
+          <ForoSec usuario={usuario} setUsuario={setUsuario} />
         )}
       </div>
     );
@@ -3484,11 +3487,12 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .senal-elemento,.senal-guardian{display:flex;align-items:center;gap:10px;padding:10px;background:#ffffff08;border-radius:8px;margin-bottom:10px}
 .senal-elemento span,.senal-guardian span{color:#d4af37}
 .senal-footer{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px;padding-top:15px;border-top:1px solid #333}
-.senal-accion,.senal-cristal,.senal-numero-significado{text-align:center;padding:10px;background:#0a0a0a;border-radius:8px}
+.senal-accion,.senal-cristal,.senal-numero-significado{text-align:center;padding:10px;background:#0a0a0a;border-radius:8px;color:#fff!important}
+.senal-accion p,.senal-cristal p,.senal-numero-significado p,.senal-accion small,.senal-cristal small{color:#fff!important}
 .senal-accion strong,.senal-cristal strong{display:block;color:#d4af37;font-size:0.8rem;margin-bottom:5px}
 .senal-cristal span{font-size:1.5rem}
 .senal-numero-significado span{display:block;font-size:1.5rem;color:#d4af37}
-.senal-numero-significado small{font-size:0.75rem;color:#888}
+.senal-numero-significado small{font-size:0.75rem;color:#fff!important}
 .senal-luna-mensaje{margin-top:15px;padding:12px;background:#d4af3711;border-radius:8px;border-left:3px solid #d4af37}
 .senal-luna-mensaje p{margin:0;font-style:italic;color:#ccc}
 .senal-canalizado{margin-top:15px;padding:15px;background:linear-gradient(135deg,#1a1a3e,#0a0a2e);border-radius:12px;border:1px solid #d4af3744}
@@ -3529,7 +3533,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .cosmos-panel{background:#141414;border-radius:16px;padding:20px}
 .cosmos-header{text-align:center;margin-bottom:20px}
 .cosmos-header h2{color:#d4af37;margin:0}
-.cosmos-header p{color:#888}
+.cosmos-header p{color:#ddd}
 .cosmos-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:20px}
 .cosmos-tab{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px;background:#1f1f1f;border:none;border-radius:10px;color:#888;cursor:pointer;transition:all 0.2s}
 .cosmos-tab span{font-size:1.2rem}
@@ -3538,7 +3542,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .luna-emoji-xl{font-size:4rem}
 .luna-actual h3{color:#fff;margin:0 0 5px}
 .luna-actual p{color:#ccc;margin:0}
-.luna-actual small{color:#888}
+.luna-actual small{color:#fff}
 .luna-ritual{background:#1f1f1f;padding:15px;border-radius:12px;margin-bottom:15px}
 .luna-ritual h4{color:#d4af37;margin:0 0 10px}
 .fechas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -3554,7 +3558,9 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .cristal-mes span{font-size:3rem}
 .cristal-mes h3{color:#fff;margin:0}
 .cristal-poder{color:#ccc;font-style:italic;margin-bottom:15px}
-.cristal-chakra,.cristal-ritual{background:#1f1f1f;padding:15px;border-radius:12px;margin-bottom:15px}
+.cristal-chakra,.cristal-ritual{background:#1f1f1f;padding:15px;border-radius:12px;margin-bottom:15px;color:#fff!important}
+.cristal-ritual h4,.cristal-chakra h4{color:#d4af37}
+.cristal-ritual p,.cristal-chakra p{color:#fff!important}
 .cosmos-guardian h3{color:#d4af37;margin:0 0 5px}
 .guardian-tipo{color:#888;font-size:0.9rem;margin-bottom:10px}
 .guardian-mensaje{background:#0a0a0a;padding:15px;border-radius:12px;margin-top:15px;border-left:3px solid #d4af37}
