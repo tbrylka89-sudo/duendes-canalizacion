@@ -37,6 +37,36 @@ const CATALOGO_VOCES = {
   },
 
   // ═══════════════════════════════════════════════════════════════
+  // VOCES EN ESPAÑOL (Acento rioplatense, latino y español)
+  // ═══════════════════════════════════════════════════════════════
+  'agustin': {
+    id: 'ByVRQtaK1WDOvTmP1PKO',
+    nombre: 'Agustín',
+    categoria: 'espanol',
+    genero: 'masculino',
+    edad: 'adulto',
+    estilo: 'conversacional',
+    descripcion: 'Voz argentina relajada y cercana',
+    personalidad: 'Cálido, accesible, natural',
+    icono: '🇦🇷',
+    acento: 'rioplatense',
+    recomendada: true
+  },
+  'malena-tango': {
+    id: '1WXz8v08ntDcSTeVXMN2',
+    nombre: 'Malena Tango',
+    categoria: 'espanol',
+    genero: 'femenino',
+    edad: 'adulta',
+    estilo: 'storyteller',
+    descripcion: 'Voz argentina clara y melodiosa, perfecta para narración',
+    personalidad: 'Melodiosa, expresiva, cautivadora',
+    icono: '🎭',
+    acento: 'rioplatense',
+    recomendada: true
+  },
+
+  // ═══════════════════════════════════════════════════════════════
   // VOCES FEMENINAS PREMIUM (Biblioteca ElevenLabs)
   // ═══════════════════════════════════════════════════════════════
   'rachel': {
@@ -1247,19 +1277,20 @@ const VOCES = Object.fromEntries(
   Object.entries(CATALOGO_VOCES).map(([key, value]) => [key, value.id])
 );
 
-// Categorías para el UI - 13 categorías especializadas
+// Categorías para el UI - 12 categorías especializadas
 const CATEGORIAS_VOCES = {
   duendes: { nombre: 'Voces Duendes', icono: '🌟', descripcion: 'Voces oficiales de Duendes del Uruguay', orden: 1 },
-  femeninas: { nombre: 'Voces Femeninas', icono: '👩', descripcion: 'Voces de mujer premium - varias edades y estilos', orden: 2 },
-  masculinas: { nombre: 'Voces Masculinas', icono: '👨', descripcion: 'Voces de hombre premium - varias edades y estilos', orden: 3 },
-  misticos: { nombre: 'Místicos y Sabios', icono: '🔮', descripcion: 'Hechiceros, oráculos, alquimistas y chamanes', orden: 4 },
-  magicos: { nombre: 'Seres Mágicos', icono: '🧚', descripcion: 'Hadas, ninfas, elementales y criaturas encantadas', orden: 5 },
-  tiernos: { nombre: 'Tiernos y Amorosos', icono: '🍄', descripcion: 'Abuelas, ángeles y personajes reconfortantes', orden: 6 },
-  meditacion: { nombre: 'Meditación y Mindfulness', icono: '🧘', descripcion: 'Voces serenas para meditación, sanación y respiración', orden: 7 },
-  narradores: { nombre: 'Narradores Profesionales', icono: '🎙️', descripcion: 'Voces para cuentos, documentales, misterio y épica', orden: 8 },
-  jovenes: { nombre: 'Jóvenes y Energéticos', icono: '⚡', descripcion: 'Voces juveniles, modernas y llenas de energía', orden: 9 },
-  ancianos: { nombre: 'Ancianos Sabios', icono: '🦉', descripcion: 'Voces de sabiduría ancestral y experiencia', orden: 10 },
-  fantasia: { nombre: 'Fantasía y Leyendas', icono: '🐉', descripcion: 'Elfos, dragones, unicornios y criaturas míticas', orden: 11 }
+  espanol: { nombre: 'Voces en Español', icono: '🇦🇷', descripcion: 'Acento rioplatense, latino y español - nativas', orden: 2 },
+  femeninas: { nombre: 'Voces Femeninas', icono: '👩', descripcion: 'Voces de mujer premium - varias edades y estilos', orden: 3 },
+  masculinas: { nombre: 'Voces Masculinas', icono: '👨', descripcion: 'Voces de hombre premium - varias edades y estilos', orden: 4 },
+  misticos: { nombre: 'Místicos y Sabios', icono: '🔮', descripcion: 'Hechiceros, oráculos, alquimistas y chamanes', orden: 5 },
+  magicos: { nombre: 'Seres Mágicos', icono: '🧚', descripcion: 'Hadas, ninfas, elementales y criaturas encantadas', orden: 6 },
+  tiernos: { nombre: 'Tiernos y Amorosos', icono: '🍄', descripcion: 'Abuelas, ángeles y personajes reconfortantes', orden: 7 },
+  meditacion: { nombre: 'Meditación y Mindfulness', icono: '🧘', descripcion: 'Voces serenas para meditación, sanación y respiración', orden: 8 },
+  narradores: { nombre: 'Narradores Profesionales', icono: '🎙️', descripcion: 'Voces para cuentos, documentales, misterio y épica', orden: 9 },
+  jovenes: { nombre: 'Jóvenes y Energéticos', icono: '⚡', descripcion: 'Voces juveniles, modernas y llenas de energía', orden: 10 },
+  ancianos: { nombre: 'Ancianos Sabios', icono: '🦉', descripcion: 'Voces de sabiduría ancestral y experiencia', orden: 11 },
+  fantasia: { nombre: 'Fantasía y Leyendas', icono: '🐉', descripcion: 'Elfos, dragones, unicornios y criaturas míticas', orden: 12 }
 };
 
 // Configuraciones de voz por tipo de contenido
