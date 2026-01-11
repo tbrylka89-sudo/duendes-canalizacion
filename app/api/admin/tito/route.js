@@ -167,14 +167,33 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 5. Podes dar opiniones y sugerencias proactivas
 6. Si ves algo raro (circulo por vencer, cliente inactivo), mencionalo
 
-## ESTILO DE RESPUESTA
+## ESTILO DE RESPUESTA - MUY IMPORTANTE
 
-- Usa markdown para formatear (negritas, listas)
-- Datos concretos, nada de relleno
-- Emojis con moderacion
-- Personalidad: profesional pero cercano
-- Cuando das buenas noticias, celebralas
-- Cuando hay problemas, propon soluciones`;
+Tu formato debe ser LEGIBLE y AGRADABLE a la vista:
+
+1. **PÁRRAFOS SEPARADOS**: Siempre dejá una línea en blanco entre párrafos
+2. **LISTAS CON ESPACIO**: Cada ítem de lista en su propia línea
+3. **EMOJIS ESTRATÉGICOS**: Usá emojis al inicio de secciones importantes
+4. **NEGRITAS**: Resaltá datos importantes con **negritas**
+5. **NO TODO JUNTO**: NUNCA escribas todo pegado sin espacios
+
+### Ejemplo de formato CORRECTO:
+
+🎯 **Resultado de la búsqueda**
+
+Encontré a María García:
+
+- 📧 Email: maria@test.com
+- 💰 Compras: $150 USD
+- ☘️ Tréboles: 25
+- ᚱ Runas: 10
+
+✨ Es miembro del Círculo desde hace 30 días.
+
+### Ejemplo de formato INCORRECTO:
+Encontré a María García email maria@test.com compras $150 treboles 25 runas 10 es miembro del circulo
+
+SIEMPRE usá el formato correcto. Nunca el incorrecto.`;
 
     // Datos adicionales para contexto de circulos por vencer
     let circulosPorVencer = [];
@@ -228,17 +247,39 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
     let respuesta = response.content[0]?.text || 'No pude procesar tu mensaje.';
 
     // Verificar si hay una accion JSON para ejecutar
-    const jsonMatch = respuesta.match(/\{[\s\S]*?"accion"[\s\S]*?\}/);
-    if (jsonMatch) {
+    // Primero intentar extraer JSON de bloques de código markdown
+    let jsonStr = null;
+    let jsonToRemove = null;
+
+    // Buscar JSON en bloques de código markdown
+    const codeBlockMatch = respuesta.match(/```(?:json)?\s*(\{[\s\S]*?"accion"[\s\S]*?\})\s*```/);
+    if (codeBlockMatch) {
+      jsonStr = codeBlockMatch[1];
+      jsonToRemove = codeBlockMatch[0];
+    } else {
+      // Buscar JSON directo (sin bloques de código)
+      const directMatch = respuesta.match(/(\{[^{}]*"accion"[^{}]*"datos"[^{}]*\{[^{}]*\}[^{}]*\})/);
+      if (directMatch) {
+        jsonStr = directMatch[1];
+        jsonToRemove = directMatch[0];
+      }
+    }
+
+    if (jsonStr) {
       try {
-        const accion = JSON.parse(jsonMatch[0]);
+        // Limpiar el JSON de caracteres problemáticos
+        jsonStr = jsonStr.trim().replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
+        const accion = JSON.parse(jsonStr);
         const resultado = await ejecutarAccion(accion);
 
         // Reemplazar JSON con resultado
-        respuesta = respuesta.replace(jsonMatch[0], '').trim();
+        respuesta = respuesta.replace(jsonToRemove, '').trim();
+        // Limpiar líneas vacías múltiples
+        respuesta = respuesta.replace(/\n{3,}/g, '\n\n');
         respuesta = resultado.mensaje + (respuesta ? `\n\n${respuesta}` : '');
       } catch (e) {
-        respuesta += `\n\nError al ejecutar: ${e.message}`;
+        console.error('JSON parse error:', e, 'JSON:', jsonStr);
+        respuesta += `\n\n⚠️ Error al ejecutar la acción. Intenta de nuevo.`;
       }
     }
 
