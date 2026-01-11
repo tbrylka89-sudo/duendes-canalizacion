@@ -2,17 +2,46 @@
 import { useState, useEffect } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
+// NUEVA PALETA DE COLORES VIBRANTE
+// ═══════════════════════════════════════════════════════════════
+const COLORS = {
+  bg: '#0a0a0f',
+  bgCard: '#12121a',
+  bgElevated: '#1a1a25',
+  bgHover: '#22222f',
+  border: '#2a2a3a',
+  borderLight: '#3a3a4a',
+  text: '#ffffff',
+  textMuted: '#9ca3af',
+  textDim: '#6b7280',
+  // Círculo = Emerald
+  emerald: '#10B981',
+  emeraldLight: '#34D399',
+  emeraldDark: '#059669',
+  // Secundarios
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+  cyan: '#06B6D4',
+  blue: '#3B82F6',
+  orange: '#F97316',
+  rose: '#F43F5E',
+  amber: '#F59E0B',
+  gold: '#D4A853',
+  success: '#22c55e',
+  error: '#ef4444',
+  warning: '#f59e0b',
+};
+
+// ═══════════════════════════════════════════════════════════════
 // CIRCULO PAGE
 // ═══════════════════════════════════════════════════════════════
 
 export default function CirculoPage() {
   const [miembros, setMiembros] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [filtro, setFiltro] = useState('todos'); // todos, activos, por-vencer, vencidos
+  const [filtro, setFiltro] = useState('todos');
   const [busqueda, setBusqueda] = useState('');
   const [toast, setToast] = useState(null);
-
-  // Modal extender
   const [modalExtender, setModalExtender] = useState(null);
   const [diasExtender, setDiasExtender] = useState(30);
   const [guardando, setGuardando] = useState(false);
@@ -90,7 +119,6 @@ export default function CirculoPage() {
   const en7Dias = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
 
   const miembrosFiltrados = miembros.filter(m => {
-    // Filtro de busqueda
     if (busqueda) {
       const q = busqueda.toLowerCase();
       if (!m.email?.toLowerCase().includes(q) && !m.nombre?.toLowerCase().includes(q)) {
@@ -98,7 +126,6 @@ export default function CirculoPage() {
       }
     }
 
-    // Filtro de estado
     const expira = m.expira ? new Date(m.expira) : null;
 
     if (filtro === 'activos') return m.activo && expira && expira > ahora;
@@ -119,63 +146,223 @@ export default function CirculoPage() {
   }).length;
 
   return (
-    <div style={estilos.container}>
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       {/* Toast */}
       {toast && (
         <div style={{
-          ...estilos.toast,
-          background: toast.tipo === 'error' ? '#ef4444' : '#22c55e'
+          position: 'fixed',
+          top: 20,
+          right: 20,
+          padding: '14px 24px',
+          borderRadius: 14,
+          color: '#fff',
+          fontSize: 14,
+          fontWeight: 500,
+          zIndex: 1000,
+          background: toast.tipo === 'error' ? COLORS.error : COLORS.success,
+          boxShadow: `0 4px 20px ${toast.tipo === 'error' ? COLORS.error : COLORS.success}44`
         }}>
           {toast.mensaje}
         </div>
       )}
 
       {/* Header */}
-      <div style={estilos.header}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 32,
+        padding: 24,
+        background: COLORS.bgCard,
+        borderRadius: 20,
+        border: `1px solid ${COLORS.border}`,
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: `linear-gradient(90deg, ${COLORS.emerald}, ${COLORS.cyan}, ${COLORS.purple})`
+        }} />
+
         <div>
-          <h1 style={estilos.titulo}>★ Circulo</h1>
-          <p style={estilos.subtitulo}>Gestiona las membresias premium</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: 14,
+              background: `linear-gradient(135deg, ${COLORS.emerald}33, ${COLORS.emerald}11)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 24
+            }}>
+              ☽
+            </div>
+            <div>
+              <h1 style={{ color: COLORS.text, fontSize: 26, fontWeight: 700, margin: 0 }}>
+                Circulo
+              </h1>
+              <p style={{ color: COLORS.textMuted, margin: 0, fontSize: 14 }}>
+                Gestiona las membresias premium de tu comunidad magica
+              </p>
+            </div>
+          </div>
         </div>
-        <button onClick={cargarMiembros} style={estilos.refreshBtn}>
-          &#8635; Actualizar
+
+        <button
+          onClick={cargarMiembros}
+          style={{
+            padding: '12px 24px',
+            background: COLORS.bgElevated,
+            border: `1px solid ${COLORS.border}`,
+            borderRadius: 12,
+            color: COLORS.textMuted,
+            fontSize: 14,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
+          }}
+        >
+          <span style={{ fontSize: 18 }}>↻</span>
+          Actualizar
         </button>
       </div>
 
-      {/* Stats */}
-      <div style={estilos.statsGrid}>
-        <div style={estilos.statCard} onClick={() => setFiltro('activos')}>
-          <span style={estilos.statValor}>{totalActivos}</span>
-          <span style={estilos.statLabel}>Activos</span>
-        </div>
-        <div style={{ ...estilos.statCard, ...estilos.statCardWarning }} onClick={() => setFiltro('por-vencer')}>
-          <span style={estilos.statValor}>{porVencer}</span>
-          <span style={estilos.statLabel}>Por vencer (7d)</span>
-        </div>
-        <div style={{ ...estilos.statCard, ...estilos.statCardError }} onClick={() => setFiltro('vencidos')}>
-          <span style={estilos.statValor}>{vencidos}</span>
-          <span style={estilos.statLabel}>Vencidos</span>
-        </div>
-        <div style={estilos.statCard} onClick={() => setFiltro('todos')}>
-          <span style={estilos.statValor}>{miembros.length}</span>
-          <span style={estilos.statLabel}>Total</span>
+      {/* Info Box */}
+      <div style={{
+        padding: 20,
+        background: `linear-gradient(135deg, ${COLORS.emerald}11, ${COLORS.cyan}11)`,
+        borderRadius: 16,
+        border: `1px solid ${COLORS.emerald}33`,
+        marginBottom: 24,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16
+      }}>
+        <span style={{ fontSize: 28 }}>💡</span>
+        <div>
+          <p style={{ color: COLORS.text, margin: 0, fontWeight: 500 }}>
+            Membresias del Circulo
+          </p>
+          <p style={{ color: COLORS.textMuted, margin: '4px 0 0', fontSize: 14 }}>
+            Gestiona los miembros premium. Podes activar/desactivar membresias, extender tiempo y filtrar por estado.
+          </p>
         </div>
       </div>
 
-      {/* Filtros */}
-      <div style={estilos.filtros}>
-        <div style={estilos.filtrosBtns}>
+      {/* Stats */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: 16,
+        marginBottom: 28
+      }}>
+        <div
+          onClick={() => setFiltro('activos')}
+          style={{
+            background: filtro === 'activos' ? `${COLORS.emerald}22` : COLORS.bgCard,
+            border: `2px solid ${filtro === 'activos' ? COLORS.emerald : COLORS.border}`,
+            borderRadius: 20,
+            padding: 24,
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span style={{ display: 'block', color: COLORS.emerald, fontSize: 36, fontWeight: 700, marginBottom: 4 }}>
+            {totalActivos}
+          </span>
+          <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Activos</span>
+        </div>
+
+        <div
+          onClick={() => setFiltro('por-vencer')}
+          style={{
+            background: filtro === 'por-vencer' ? `${COLORS.amber}22` : COLORS.bgCard,
+            border: `2px solid ${filtro === 'por-vencer' ? COLORS.amber : COLORS.border}`,
+            borderRadius: 20,
+            padding: 24,
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span style={{ display: 'block', color: COLORS.amber, fontSize: 36, fontWeight: 700, marginBottom: 4 }}>
+            {porVencer}
+          </span>
+          <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Por vencer (7d)</span>
+        </div>
+
+        <div
+          onClick={() => setFiltro('vencidos')}
+          style={{
+            background: filtro === 'vencidos' ? `${COLORS.rose}22` : COLORS.bgCard,
+            border: `2px solid ${filtro === 'vencidos' ? COLORS.rose : COLORS.border}`,
+            borderRadius: 20,
+            padding: 24,
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span style={{ display: 'block', color: COLORS.rose, fontSize: 36, fontWeight: 700, marginBottom: 4 }}>
+            {vencidos}
+          </span>
+          <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Vencidos</span>
+        </div>
+
+        <div
+          onClick={() => setFiltro('todos')}
+          style={{
+            background: filtro === 'todos' ? `${COLORS.purple}22` : COLORS.bgCard,
+            border: `2px solid ${filtro === 'todos' ? COLORS.purple : COLORS.border}`,
+            borderRadius: 20,
+            padding: 24,
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span style={{ display: 'block', color: COLORS.purple, fontSize: 36, fontWeight: 700, marginBottom: 4 }}>
+            {miembros.length}
+          </span>
+          <span style={{ color: COLORS.textMuted, fontSize: 14 }}>Total</span>
+        </div>
+      </div>
+
+      {/* Filtros y busqueda */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24,
+        gap: 16
+      }}>
+        <div style={{ display: 'flex', gap: 10 }}>
           {[
-            { id: 'todos', label: 'Todos' },
-            { id: 'activos', label: 'Activos' },
-            { id: 'por-vencer', label: 'Por vencer' },
-            { id: 'vencidos', label: 'Vencidos' }
+            { id: 'todos', label: 'Todos', color: COLORS.purple },
+            { id: 'activos', label: 'Activos', color: COLORS.emerald },
+            { id: 'por-vencer', label: 'Por vencer', color: COLORS.amber },
+            { id: 'vencidos', label: 'Vencidos', color: COLORS.rose }
           ].map(f => (
             <button
               key={f.id}
               onClick={() => setFiltro(f.id)}
               style={{
-                ...estilos.filtroBtn,
-                ...(filtro === f.id ? estilos.filtroBtnActivo : {})
+                padding: '12px 20px',
+                background: filtro === f.id ? `${f.color}22` : COLORS.bgCard,
+                border: `2px solid ${filtro === f.id ? f.color : COLORS.border}`,
+                borderRadius: 12,
+                color: filtro === f.id ? f.color : COLORS.textMuted,
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
               }}
             >
               {f.label}
@@ -187,18 +374,49 @@ export default function CirculoPage() {
           placeholder="Buscar por email o nombre..."
           value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
-          style={estilos.busquedaInput}
+          style={{
+            padding: '14px 18px',
+            background: COLORS.bgCard,
+            border: `2px solid ${busqueda ? COLORS.emerald : COLORS.border}`,
+            borderRadius: 12,
+            color: COLORS.text,
+            fontSize: 14,
+            width: 280,
+            outline: 'none',
+            transition: 'border-color 0.2s'
+          }}
         />
       </div>
 
       {/* Lista de miembros */}
-      <div style={estilos.lista}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {cargando ? (
-          <div style={estilos.cargando}>
-            <div style={estilos.spinner}></div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 80
+          }}>
+            <div style={{
+              width: 48,
+              height: 48,
+              border: `3px solid ${COLORS.border}`,
+              borderTopColor: COLORS.emerald,
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+            <p style={{ color: COLORS.textMuted, marginTop: 16 }}>Cargando miembros...</p>
           </div>
         ) : miembrosFiltrados.length === 0 ? (
-          <div style={estilos.vacio}>No hay miembros en esta categoria</div>
+          <div style={{
+            textAlign: 'center',
+            padding: 80,
+            color: COLORS.textDim
+          }}>
+            <span style={{ fontSize: 48, display: 'block', marginBottom: 16 }}>🌙</span>
+            <p>No hay miembros en esta categoria</p>
+          </div>
         ) : (
           miembrosFiltrados.map((miembro, i) => {
             const expira = miembro.expira ? new Date(miembro.expira) : null;
@@ -207,48 +425,91 @@ export default function CirculoPage() {
             const porVencerProx = diasRestantes !== null && diasRestantes <= 7 && diasRestantes > 0;
 
             return (
-              <div key={i} style={estilos.miembroCard}>
-                <div style={estilos.miembroInfo}>
-                  <div style={estilos.miembroNombre}>
+              <div key={i} style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 24,
+                background: COLORS.bgCard,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 16,
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: COLORS.text, fontSize: 16, fontWeight: 500, marginBottom: 4 }}>
                     {miembro.nombre || miembro.nombrePreferido || 'Sin nombre'}
                   </div>
-                  <div style={estilos.miembroEmail}>{miembro.email}</div>
-                  <div style={estilos.miembroPlan}>
-                    {miembro.plan || 'Sin plan'}
-                    {miembro.esPrueba && <span style={estilos.tagPrueba}>Prueba</span>}
+                  <div style={{ color: COLORS.textMuted, fontSize: 14, marginBottom: 8 }}>{miembro.email}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ color: COLORS.textDim, fontSize: 13 }}>
+                      {miembro.plan || 'Sin plan'}
+                    </span>
+                    {miembro.esPrueba && (
+                      <span style={{
+                        padding: '4px 10px',
+                        background: `${COLORS.blue}22`,
+                        borderRadius: 8,
+                        color: COLORS.blue,
+                        fontSize: 12,
+                        fontWeight: 600
+                      }}>
+                        Prueba
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                <div style={estilos.miembroExpira}>
+                <div style={{ textAlign: 'center', minWidth: 120 }}>
                   {expira ? (
                     <>
                       <div style={{
-                        ...estilos.expiraFecha,
-                        color: vencido ? '#ef4444' : porVencerProx ? '#f59e0b' : '#22c55e'
+                        fontSize: 20,
+                        fontWeight: 700,
+                        marginBottom: 2,
+                        color: vencido ? COLORS.rose : porVencerProx ? COLORS.amber : COLORS.emerald
                       }}>
                         {vencido ? 'Vencido' : `${diasRestantes} dias`}
                       </div>
-                      <div style={estilos.expiraDetalle}>
+                      <div style={{ color: COLORS.textDim, fontSize: 13 }}>
                         {expira.toLocaleDateString('es-UY')}
                       </div>
                     </>
                   ) : (
-                    <div style={estilos.expiraFecha}>Sin fecha</div>
+                    <div style={{ color: COLORS.textDim, fontSize: 14 }}>Sin fecha</div>
                   )}
                 </div>
 
-                <div style={estilos.miembroAcciones}>
+                <div style={{ display: 'flex', gap: 12, marginLeft: 24 }}>
                   <button
                     onClick={() => setModalExtender(miembro)}
-                    style={estilos.accionBtn}
+                    style={{
+                      padding: '12px 20px',
+                      background: `${COLORS.emerald}22`,
+                      border: `1px solid ${COLORS.emerald}44`,
+                      borderRadius: 12,
+                      color: COLORS.emerald,
+                      fontSize: 14,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
                   >
-                    + Extender
+                    <span>+</span> Extender
                   </button>
                   <button
                     onClick={() => toggleMiembro(miembro.email, !miembro.activo)}
                     style={{
-                      ...estilos.toggleBtn,
-                      ...(miembro.activo ? estilos.toggleBtnActivo : estilos.toggleBtnInactivo)
+                      padding: '12px 20px',
+                      background: miembro.activo ? `${COLORS.success}22` : `${COLORS.error}22`,
+                      border: 'none',
+                      borderRadius: 12,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      minWidth: 100,
+                      color: miembro.activo ? COLORS.success : COLORS.error
                     }}
                   >
                     {miembro.activo ? 'Activo' : 'Inactivo'}
@@ -262,19 +523,88 @@ export default function CirculoPage() {
 
       {/* Modal extender */}
       {modalExtender && (
-        <div style={estilos.modalOverlay} onClick={() => setModalExtender(null)}>
-          <div style={estilos.modal} onClick={e => e.stopPropagation()}>
-            <h3 style={estilos.modalTitulo}>Extender membresia</h3>
-            <p style={estilos.modalSubtitulo}>{modalExtender.nombre || modalExtender.email}</p>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            backdropFilter: 'blur(8px)'
+          }}
+          onClick={() => setModalExtender(null)}
+        >
+          <div
+            style={{
+              background: COLORS.bgCard,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: 24,
+              padding: 28,
+              width: '100%',
+              maxWidth: 480,
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: `linear-gradient(90deg, ${COLORS.emerald}, ${COLORS.cyan})`
+            }} />
 
-            <div style={estilos.diasGrid}>
+            <h3 style={{
+              color: COLORS.text,
+              fontSize: 20,
+              fontWeight: 600,
+              marginBottom: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12
+            }}>
+              <span style={{
+                width: 44,
+                height: 44,
+                borderRadius: 14,
+                background: `${COLORS.emerald}22`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 22
+              }}>
+                ☽
+              </span>
+              Extender membresia
+            </h3>
+            <p style={{ color: COLORS.textMuted, fontSize: 14, marginBottom: 28 }}>
+              {modalExtender.nombre || modalExtender.email}
+            </p>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+              gap: 10,
+              marginBottom: 28
+            }}>
               {[7, 15, 30, 60, 90].map(d => (
                 <button
                   key={d}
                   onClick={() => setDiasExtender(d)}
                   style={{
-                    ...estilos.diaBtn,
-                    ...(diasExtender === d ? estilos.diaBtnActivo : {})
+                    padding: '16px 8px',
+                    background: diasExtender === d ? `${COLORS.emerald}22` : COLORS.bgElevated,
+                    border: `2px solid ${diasExtender === d ? COLORS.emerald : COLORS.border}`,
+                    borderRadius: 12,
+                    color: diasExtender === d ? COLORS.emerald : COLORS.textMuted,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
                   }}
                 >
                   {d} dias
@@ -282,14 +612,37 @@ export default function CirculoPage() {
               ))}
             </div>
 
-            <div style={estilos.modalAcciones}>
-              <button onClick={() => setModalExtender(null)} style={estilos.cancelarBtn}>
+            <div style={{ display: 'flex', gap: 14 }}>
+              <button
+                onClick={() => setModalExtender(null)}
+                style={{
+                  flex: 1,
+                  padding: '16px',
+                  background: COLORS.bgElevated,
+                  border: `2px solid ${COLORS.border}`,
+                  borderRadius: 14,
+                  color: COLORS.textMuted,
+                  fontSize: 15,
+                  cursor: 'pointer'
+                }}
+              >
                 Cancelar
               </button>
               <button
                 onClick={extenderMembresia}
                 disabled={guardando}
-                style={estilos.guardarBtn}
+                style={{
+                  flex: 1,
+                  padding: '16px',
+                  background: `linear-gradient(135deg, ${COLORS.emerald}, ${COLORS.emeraldDark})`,
+                  border: 'none',
+                  borderRadius: 14,
+                  color: '#fff',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: guardando ? 'wait' : 'pointer',
+                  boxShadow: `0 4px 20px ${COLORS.emerald}44`
+                }}
               >
                 {guardando ? 'Guardando...' : 'Extender'}
               </button>
@@ -297,316 +650,8 @@ export default function CirculoPage() {
           </div>
         </div>
       )}
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════
-// ESTILOS
-// ═══════════════════════════════════════════════════════════════
-
-const estilos = {
-  container: {
-    maxWidth: '1000px',
-    margin: '0 auto'
-  },
-
-  // Toast
-  toast: {
-    position: 'fixed',
-    top: '20px',
-    right: '20px',
-    padding: '12px 20px',
-    borderRadius: '8px',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: '500',
-    zIndex: 1000
-  },
-
-  // Header
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '24px'
-  },
-  titulo: {
-    color: '#fff',
-    fontSize: '24px',
-    fontWeight: '600',
-    marginBottom: '4px'
-  },
-  subtitulo: {
-    color: '#666',
-    fontSize: '14px'
-  },
-  refreshBtn: {
-    padding: '10px 16px',
-    background: '#1f1f1f',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#888',
-    fontSize: '14px',
-    cursor: 'pointer'
-  },
-
-  // Stats
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '16px',
-    marginBottom: '24px'
-  },
-  statCard: {
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '12px',
-    padding: '20px',
-    textAlign: 'center',
-    cursor: 'pointer',
-    transition: 'all 0.2s'
-  },
-  statCardWarning: {
-    borderColor: 'rgba(245, 158, 11, 0.3)',
-    background: 'rgba(245, 158, 11, 0.05)'
-  },
-  statCardError: {
-    borderColor: 'rgba(239, 68, 68, 0.3)',
-    background: 'rgba(239, 68, 68, 0.05)'
-  },
-  statValor: {
-    display: 'block',
-    color: '#fff',
-    fontSize: '32px',
-    fontWeight: '700',
-    marginBottom: '4px'
-  },
-  statLabel: {
-    color: '#666',
-    fontSize: '13px'
-  },
-
-  // Filtros
-  filtros: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-    gap: '16px'
-  },
-  filtrosBtns: {
-    display: 'flex',
-    gap: '8px'
-  },
-  filtroBtn: {
-    padding: '10px 16px',
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#888',
-    fontSize: '13px',
-    cursor: 'pointer',
-    transition: 'all 0.2s'
-  },
-  filtroBtnActivo: {
-    background: 'rgba(198, 169, 98, 0.15)',
-    borderColor: 'rgba(198, 169, 98, 0.4)',
-    color: '#C6A962'
-  },
-  busquedaInput: {
-    padding: '10px 16px',
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#fff',
-    fontSize: '14px',
-    width: '250px',
-    outline: 'none'
-  },
-
-  // Lista
-  lista: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  cargando: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '60px'
-  },
-  spinner: {
-    width: '32px',
-    height: '32px',
-    border: '3px solid #222',
-    borderTopColor: '#C6A962',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite'
-  },
-  vacio: {
-    textAlign: 'center',
-    padding: '60px',
-    color: '#555',
-    fontSize: '14px'
-  },
-
-  // Miembro card
-  miembroCard: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '20px',
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '12px'
-  },
-  miembroInfo: {
-    flex: 1
-  },
-  miembroNombre: {
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: '500',
-    marginBottom: '4px'
-  },
-  miembroEmail: {
-    color: '#666',
-    fontSize: '13px',
-    marginBottom: '6px'
-  },
-  miembroPlan: {
-    color: '#888',
-    fontSize: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  tagPrueba: {
-    padding: '2px 8px',
-    background: 'rgba(59, 130, 246, 0.15)',
-    borderRadius: '10px',
-    color: '#3b82f6',
-    fontSize: '11px'
-  },
-  miembroExpira: {
-    textAlign: 'center',
-    minWidth: '100px'
-  },
-  expiraFecha: {
-    fontSize: '16px',
-    fontWeight: '600',
-    marginBottom: '2px'
-  },
-  expiraDetalle: {
-    color: '#666',
-    fontSize: '12px'
-  },
-  miembroAcciones: {
-    display: 'flex',
-    gap: '10px',
-    marginLeft: '20px'
-  },
-  accionBtn: {
-    padding: '10px 16px',
-    background: '#1f1f1f',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#ccc',
-    fontSize: '13px',
-    cursor: 'pointer'
-  },
-  toggleBtn: {
-    padding: '10px 16px',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    minWidth: '80px'
-  },
-  toggleBtnActivo: {
-    background: 'rgba(34, 197, 94, 0.15)',
-    color: '#22c55e'
-  },
-  toggleBtnInactivo: {
-    background: 'rgba(239, 68, 68, 0.15)',
-    color: '#ef4444'
-  },
-
-  // Modal
-  modalOverlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.7)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000
-  },
-  modal: {
-    background: '#141414',
-    border: '1px solid #2a2a2a',
-    borderRadius: '16px',
-    padding: '24px',
-    width: '100%',
-    maxWidth: '400px'
-  },
-  modalTitulo: {
-    color: '#fff',
-    fontSize: '18px',
-    fontWeight: '600',
-    marginBottom: '4px'
-  },
-  modalSubtitulo: {
-    color: '#888',
-    fontSize: '14px',
-    marginBottom: '24px'
-  },
-  diasGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)',
-    gap: '8px',
-    marginBottom: '24px'
-  },
-  diaBtn: {
-    padding: '12px 8px',
-    background: '#0a0a0a',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#888',
-    fontSize: '13px',
-    cursor: 'pointer',
-    transition: 'all 0.2s'
-  },
-  diaBtnActivo: {
-    background: 'rgba(198, 169, 98, 0.15)',
-    borderColor: 'rgba(198, 169, 98, 0.4)',
-    color: '#C6A962'
-  },
-  modalAcciones: {
-    display: 'flex',
-    gap: '12px'
-  },
-  cancelarBtn: {
-    flex: 1,
-    padding: '12px',
-    background: '#0a0a0a',
-    border: '1px solid #2a2a2a',
-    borderRadius: '8px',
-    color: '#888',
-    fontSize: '14px',
-    cursor: 'pointer'
-  },
-  guardarBtn: {
-    flex: 1,
-    padding: '12px',
-    background: '#C6A962',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#0a0a0a',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer'
-  }
-};
