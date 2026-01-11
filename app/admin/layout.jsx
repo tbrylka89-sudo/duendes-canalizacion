@@ -12,12 +12,12 @@ export const useAdmin = () => useContext(AdminContext);
 // PALETA DE COLORES VIBRANTE
 // ═══════════════════════════════════════════════════════════════
 const COLORS = {
-  // Fondos
-  bg: '#0a0a0f',
-  bgCard: '#12121a',
-  bgElevated: '#1a1a25',
-  bgHover: '#22222f',
-  bgGlass: 'rgba(18, 18, 26, 0.85)',
+  // Fondos - más cálidos, no tan negro
+  bg: '#1a1a2e',
+  bgCard: '#16213e',
+  bgElevated: '#1f3460',
+  bgHover: '#2a4a7a',
+  bgGlass: 'rgba(22, 33, 62, 0.92)',
 
   // Acentos principales
   gold: '#D4A853',
@@ -56,9 +56,9 @@ const COLORS = {
   warning: '#EAB308',
   info: '#3B82F6',
 
-  // Bordes
-  border: '#27272A',
-  borderLight: '#3F3F46',
+  // Bordes - más suaves
+  border: '#2a3f5f',
+  borderLight: '#3a5070',
 };
 
 // Gradientes
@@ -71,7 +71,7 @@ const GRADIENTS = {
   orange: `linear-gradient(135deg, ${COLORS.orange}, ${COLORS.amber})`,
   blue: `linear-gradient(135deg, ${COLORS.blue}, ${COLORS.indigo})`,
   mixed: `linear-gradient(135deg, ${COLORS.purple}, ${COLORS.pink}, ${COLORS.orange})`,
-  sidebar: `linear-gradient(180deg, ${COLORS.bgElevated} 0%, ${COLORS.bg} 100%)`,
+  sidebar: `linear-gradient(180deg, #1f3460 0%, #1a1a2e 100%)`,
 };
 
 const GLASS = {
