@@ -1,10 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 120; // Aumentado para contenido largo
+
+// Verificar API key al inicio
+const apiKey = process.env.ANTHROPIC_API_KEY;
+if (!apiKey) {
+  console.error('ANTHROPIC_API_KEY no está configurada');
+}
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
+  apiKey: apiKey || ''
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -127,7 +133,24 @@ TECNICAS DE NEUROMARKETING PARA APLICAR:
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    // Verificar API key
+    if (!apiKey) {
+      return Response.json({
+        success: false,
+        error: 'ANTHROPIC_API_KEY no está configurada en el servidor'
+      }, { status: 500 });
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return Response.json({
+        success: false,
+        error: 'Error parseando el body de la request'
+      }, { status: 400 });
+    }
+
     const { categoria, tipo, tema, longitud, palabras, instruccionesExtra } = body;
 
     // Usar palabras o longitud (el frontend envía "palabras")
@@ -257,14 +280,23 @@ INSTRUCCIONES FINALES:
 
 Escribi el contenido completo ahora, respetando todas las estructuras y la longitud minima.`;
 
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 16000, // Aumentado para contenido largo
-      messages: [
-        { role: 'user', content: userPrompt }
-      ],
-      system: systemPrompt
-    });
+    let message;
+    try {
+      message = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 16000, // Aumentado para contenido largo
+        messages: [
+          { role: 'user', content: userPrompt }
+        ],
+        system: systemPrompt
+      });
+    } catch (anthropicError) {
+      console.error('Error en Anthropic API:', anthropicError);
+      return Response.json({
+        success: false,
+        error: `Error en la API de Claude: ${anthropicError.message || 'Error desconocido'}`
+      }, { status: 500 });
+    }
 
     const contenido = message.content[0]?.text || '';
     const palabrasGeneradas = contenido.split(/\s+/).length;
