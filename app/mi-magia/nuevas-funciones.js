@@ -307,7 +307,11 @@ export function CosmosMes({ usuario }) {
     try {
       // Detectar país del usuario o default a Uruguay
       const pais = usuario?.pais || 'UY';
-      const res = await fetch(`${API_BASE}/api/circulo/cosmos?email=${usuario?.email}&pais=${pais}`);
+      const cacheBuster = Date.now();
+      const res = await fetch(`${API_BASE}/api/circulo/cosmos?email=${usuario?.email}&pais=${pais}&_=${cacheBuster}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       const data = await res.json();
       if (data.success) {
         setCosmos(data.cosmos);

@@ -1,6 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import canon from '@/lib/canon.json';
 
+// Forzar que esta ruta sea dinámica (sin cache)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
@@ -453,7 +457,14 @@ export async function GET(request) {
 
     return Response.json({
       success: true,
-      cosmos
+      cosmos,
+      _timestamp: Date.now() // Para verificar que no hay cache
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     });
 
   } catch (error) {
@@ -461,7 +472,12 @@ export async function GET(request) {
     return Response.json({
       success: false,
       error: error.message
-    }, { status: 500 });
+    }, {
+      status: 500,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
+      }
+    });
   }
 }
 
