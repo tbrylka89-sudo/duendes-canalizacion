@@ -169,9 +169,9 @@ const CANJES = [
   { id: 'tirada-runas-treboles', nombre: 'Tirada de Runas', treboles: 40, desc: 'Sin gastar runas', tipo: 'lectura' },
   { id: 'lectura-energia-treboles', nombre: 'Lectura Energética', treboles: 80, desc: 'Análisis completo', tipo: 'lectura' },
   { id: 'oraculo-mes-treboles', nombre: 'Oráculo del Mes', treboles: 100, desc: 'Guía mensual', tipo: 'lectura' },
-  // Círculo con tréboles
-  { id: 'circulo-7dias', nombre: '7 días de Círculo', treboles: 80, desc: 'Acceso completo', tipo: 'circulo' },
-  { id: 'circulo-30dias', nombre: '30 días de Círculo', treboles: 250, desc: 'Un mes completo', tipo: 'circulo' }
+  // Círculo con tréboles (menos que un mini duende $70)
+  { id: 'circulo-7dias', nombre: '7 días de Círculo', treboles: 25, desc: 'Acceso completo', tipo: 'circulo' },
+  { id: 'circulo-30dias', nombre: '30 días de Círculo', treboles: 60, desc: 'Un mes completo', tipo: 'circulo' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -2757,9 +2757,10 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .logo{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:2px;display:flex;align-items:center;gap:0.5rem}
 .logo span{color:#d4af37}
 .user-info{color:#666;font-size:0.95rem}
-.hstats{display:flex;gap:1.5rem;font-family:'Cinzel',serif;font-size:0.9rem}
-.menu-btn{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:0.5rem}
-.menu-btn span{width:20px;height:2px;background:#1a1a1a}
+.hstats{display:flex;gap:1.5rem;font-family:'Cinzel',serif;font-size:0.9rem;color:#1a1a1a}
+.hstats span{color:#d4af37}
+.menu-btn{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:12px;min-width:44px;min-height:44px;justify-content:center;align-items:center}
+.menu-btn span{width:24px;height:3px;background:#1a1a1a;border-radius:2px;transition:all 0.3s}
 .nav{position:fixed;top:65px;left:0;bottom:0;width:240px;background:#fff;border-right:1px solid #f0f0f0;padding:1rem 0;display:flex;flex-direction:column;z-index:99;overflow-y:auto}
 .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.5rem;background:none;border:none;text-align:left;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:1rem;color:#666;transition:all 0.2s}
 .nav-item:hover{background:#fafafa;color:#1a1a1a}
@@ -3258,7 +3259,7 @@ body{font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a
 .carga-c p{margin-top:1rem;color:#666}
 @keyframes pulsar{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
 @media(max-width:1100px){.stats-g,.beneficios-grid,.membresias-grid,.cristales-grid{grid-template-columns:repeat(2,1fr)}.exp-grid,.elementos-grid,.regalos-grid,.grim-intro-cards{grid-template-columns:1fr}.canjes-grid,.packs-grid{grid-template-columns:repeat(2,1fr)}.info-grid,.benef-grid-int,.fases-mes{grid-template-columns:1fr}}
-@media(max-width:900px){.menu-btn{display:flex}.nav{transform:translateX(-100%);transition:transform 0.3s}.nav.abierto{transform:translateX(0)}.contenido{margin-left:0}.user-info{display:none}}
+@media(max-width:900px){.menu-btn{display:flex}.header{padding:0 1rem}.nav{transform:translateX(-100%);transition:transform 0.3s;box-shadow:none}.nav.abierto{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,0.15)}.contenido{margin-left:0}.user-info{display:none}.hstats{font-size:0.8rem;gap:1rem}}
 @media(max-width:768px){.sec{padding:1.25rem}.banner{padding:1.5rem}.banner h1{font-size:1.4rem}.stats-g,.balances,.accesos-g{grid-template-columns:1fr}.canjes-grid,.packs-grid,.items-grid{grid-template-columns:1fr}.tito-chat{right:1rem;left:1rem;width:auto;bottom:5rem}.tito-btn{width:50px;height:50px;bottom:1rem;right:1rem}.tabs-h{flex-direction:column}.exp-d-cta{flex-direction:column;gap:1rem;text-align:center}}
 
 /* ═══════════════════════════════════════════════════════════════

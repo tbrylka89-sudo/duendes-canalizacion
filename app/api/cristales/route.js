@@ -54,7 +54,7 @@ export async function GET(request) {
       cristales = cristales.filter(c =>
         c.nombre.toLowerCase().includes(q) ||
         c.nombres_alternativos.some(n => n.toLowerCase().includes(q)) ||
-        c.propiedades_energeticas.toLowerCase().includes(q) ||
+        (c.propiedades_energeticas_detalladas || '').toLowerCase().includes(q) ||
         c.color.toLowerCase().includes(q)
       );
     }
@@ -67,7 +67,7 @@ export async function GET(request) {
       chakras: c.chakras,
       elemento: c.elemento,
       mensaje: c.mensaje,
-      propiedades: c.propiedades_energeticas.substring(0, 100) + '...'
+      propiedades: (c.propiedades_energeticas_detalladas || c.propiedades_energeticas || '').substring(0, 100) + '...'
     }));
 
     return Response.json({

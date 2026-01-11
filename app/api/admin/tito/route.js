@@ -895,7 +895,39 @@ _Podes ver los productos en la seccion Productos del admin._`
         );
 
         if (!res.ok) {
-          return { mensaje: `❌ Error de Eleven Labs: ${res.status}` };
+          const errorText = await res.text();
+          console.error('Eleven Labs error:', res.status, errorText);
+
+          // Si falla con voz personalizada, intentar con Rachel (voz pública)
+          if (voiceId !== '21m00Tcm4TlvDq8ikWAM') {
+            const fallbackRes = await fetch(
+              'https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM',
+              {
+                method: 'POST',
+                headers: {
+                  'Accept': 'audio/mpeg',
+                  'Content-Type': 'application/json',
+                  'xi-api-key': process.env.ELEVENLABS_API_KEY
+                },
+                body: JSON.stringify({
+                  text: texto,
+                  model_id: 'eleven_multilingual_v2',
+                  voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+                })
+              }
+            );
+            if (fallbackRes.ok) {
+              const audioBuffer = await fallbackRes.arrayBuffer();
+              const base64Audio = Buffer.from(audioBuffer).toString('base64');
+              return {
+                mensaje: `🎙️ **Audio generado** (usando voz Rachel porque "${voz}" no está disponible)\n\nTexto: "${texto.substring(0, 100)}${texto.length > 100 ? '...' : ''}"`,
+                audio: base64Audio,
+                audioFormato: 'audio/mpeg'
+              };
+            }
+          }
+
+          return { mensaje: `❌ Error de Eleven Labs: ${res.status}. La voz "${voz}" (ID: ${voiceId}) no está disponible. Verificá que la voz esté en tu librería de Eleven Labs.` };
         }
 
         // Convertir a base64
