@@ -1372,16 +1372,23 @@ export async function POST(request) {
     }
 
     // Intentar con la voz seleccionada
+    console.log(`[VOZ] Intentando con: ${voz} (ID: ${voiceId})`);
     let response = await llamarElevenLabs(voiceId);
+    console.log(`[VOZ] Respuesta: ${response.status} ${response.statusText}`);
 
-    // Si falla con 404, intentar con Thibisay rápido, luego Rachel
-    if (response.status === 404) {
-      console.log('Voz no encontrada, probando Thibisay rápido');
+    // Si falla con 404 o 401, intentar con fallbacks
+    if (response.status === 404 || response.status === 401) {
+      const errorText = await response.text();
+      console.log(`[VOZ] Error con ${voz}: ${response.status} - ${errorText}`);
+
+      // Primer fallback: Thibisay
+      console.log('[VOZ] Fallback a Thibisay');
       voiceId = 'ofSX50hgXXAqhe3nRhJI';
       response = await llamarElevenLabs(voiceId);
 
-      if (response.status === 404) {
-        console.log('Thibisay rápido no encontrado, usando Rachel');
+      if (response.status === 404 || response.status === 401) {
+        // Segundo fallback: Rachel (voz pública garantizada)
+        console.log('[VOZ] Fallback a Rachel');
         voiceId = VOCES.rachel;
         response = await llamarElevenLabs(voiceId);
       }
