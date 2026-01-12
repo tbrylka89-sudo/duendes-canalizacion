@@ -580,18 +580,46 @@ function duendes_guardian_metabox_html($post) {
             <div class="duendes-section">
                 <h3 class="duendes-section-title">🆕 Características Exclusivas</h3>
 
+                <?php if ($post->ID && get_post_status($post->ID) === 'publish'): ?>
+                <!-- QR y Links (solo si está publicado) -->
+                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 20px; margin-bottom: 20px; padding: 20px; background: #0d1117; border-radius: 12px; border: 2px solid #C6A962;">
+                    <div style="text-align: center;">
+                        <img src="https://duendes-vercel.vercel.app/api/qr/<?php echo $post->ID; ?>" alt="QR" style="width: 120px; height: 120px; border-radius: 8px;">
+                        <p style="color: #888; font-size: 11px; margin: 8px 0 0 0;">QR del Certificado</p>
+                    </div>
+                    <div>
+                        <p style="color: #C6A962; font-size: 14px; margin: 0 0 15px 0; font-weight: 600;">Links del Guardián:</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <a href="https://duendes-vercel.vercel.app/certificado/<?php echo $post->ID; ?>" target="_blank" style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; background: #21262d; border-radius: 8px; color: #e6edf3; text-decoration: none; font-size: 13px;">
+                                🎫 Certificado de Autenticidad
+                                <span style="margin-left: auto; color: #888;">↗</span>
+                            </a>
+                            <a href="https://duendes-vercel.vercel.app/portal/<?php echo $post->ID; ?>" target="_blank" style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; background: #21262d; border-radius: 8px; color: #e6edf3; text-decoration: none; font-size: 13px;">
+                                🌐 Portal del Guardián (con Chat IA)
+                                <span style="margin-left: auto; color: #888;">↗</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <?php else: ?>
                 <div class="duendes-innovacion">
                     <h4>🔐 Código QR de Autenticidad</h4>
                     <p>Se genera automáticamente al publicar. El adoptante escanea para ver certificado e historia.</p>
                 </div>
+                <?php endif; ?>
 
                 <div class="duendes-innovacion" style="background: linear-gradient(135deg, rgba(198, 169, 98, 0.1), rgba(198, 169, 98, 0.05)); border-color: rgba(198, 169, 98, 0.3);">
                     <h4 style="color: #C6A962;">🌐 Portal del Guardián</h4>
-                    <p>Página privada con actualizaciones de energía y mensajes exclusivos.</p>
+                    <p>Página privada con estado energético lunar + chat con el guardián usando IA.</p>
                     <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; color: #e6edf3;">
                         <input type="checkbox" name="_duendes_portal_activo" value="1" <?php checked(get_post_meta($post->ID, '_duendes_portal_activo', true), '1'); ?>>
                         Activar Portal del Guardián
                     </label>
+                </div>
+
+                <div class="duendes-innovacion" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(138, 43, 226, 0.05)); border-color: rgba(138, 43, 226, 0.3); margin-top: 10px;">
+                    <h4 style="color: #9f7aea;">💬 Chat con el Guardián</h4>
+                    <p>Los adoptantes pueden chatear con su guardián. La IA responde según su personalidad.</p>
                 </div>
 
                 <div class="duendes-field" style="margin-top: 15px;">

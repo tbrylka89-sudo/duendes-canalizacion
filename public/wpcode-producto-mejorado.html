@@ -299,6 +299,79 @@ Agrega secciones de información del guardián al diseño existente
   font-size: 20px;
 }
 
+/* Exclusivo - Certificado y Portal */
+.dm-exclusivo {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+  border: 2px solid rgba(198, 169, 98, 0.4);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  text-align: center;
+}
+
+.dm-exclusivo h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 24px;
+  margin: 0 0 10px 0;
+}
+
+.dm-exclusivo-intro {
+  color: #888;
+  font-size: 16px;
+  margin: 0 0 30px 0;
+}
+
+.dm-exclusivo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.dm-exclusivo-card {
+  background: #111;
+  border: 1px solid rgba(198, 169, 98, 0.2);
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.dm-exclusivo-card:hover {
+  border-color: #C6A962;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(198, 169, 98, 0.15);
+}
+
+.dm-exclusivo-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.dm-exclusivo-card h3 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 18px;
+  margin: 0 0 10px 0;
+}
+
+.dm-exclusivo-card p {
+  font-family: 'Cormorant Garamond', serif;
+  color: #999;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 15px 0;
+}
+
+.dm-exclusivo-link {
+  color: #C6A962;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .dm-historia-completa { padding: 40px 20px; }
@@ -306,6 +379,7 @@ Agrega secciones de información del guardián al diseño existente
   .dm-mensaje-texto { font-size: 20px; }
   .dm-fortalezas-grid { grid-template-columns: 1fr; }
   .dm-testimonios-grid { grid-template-columns: 1fr; }
+  .dm-exclusivo-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -467,6 +541,28 @@ Agrega secciones de información del guardián al diseño existente
       const envioTexto = pais === 'UY'
         ? 'Envío por DAC (5-7 días)'
         : 'Envío DHL Express (5-10 días)';
+
+      // Certificado y Portal
+      html += `
+        <div class="dm-exclusivo">
+          <h2>✨ Exclusivo Para Vos</h2>
+          <p class="dm-exclusivo-intro">Al adoptar este guardián, accedés a experiencias únicas:</p>
+          <div class="dm-exclusivo-grid">
+            <a href="https://duendes-vercel.vercel.app/certificado/${productId}" target="_blank" class="dm-exclusivo-card">
+              <div class="dm-exclusivo-icon">🎫</div>
+              <h3>Certificado de Autenticidad</h3>
+              <p>Documento único que certifica que tu guardián es original y fue canalizado en Piriápolis</p>
+              <span class="dm-exclusivo-link">Ver certificado →</span>
+            </a>
+            <a href="https://duendes-vercel.vercel.app/portal/${productId}" target="_blank" class="dm-exclusivo-card">
+              <div class="dm-exclusivo-icon">💬</div>
+              <h3>Portal del Guardián</h3>
+              <p>Chateá con tu guardián usando inteligencia artificial y mirá su estado energético según la luna</p>
+              <span class="dm-exclusivo-link">Abrir portal →</span>
+            </a>
+          </div>
+        </div>
+      `;
 
       // Garantías
       html += `
