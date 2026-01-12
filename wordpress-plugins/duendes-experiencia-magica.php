@@ -7,12 +7,13 @@
 
 if (!defined('ABSPATH')) exit;
 
-// Interceptar paginas
+// Solo interceptar paginas de PRODUCTO individual (no la tienda)
+// La tienda usa el tema normal con su menu
 add_action('template_redirect', function() {
-    if (is_shop() || is_product_category()) {
-        duendes_render_tienda();
-        exit;
-    }
+    // NO interceptar tienda - dejar que use el tema normal con menu
+    // if (is_shop() || is_product_category()) { ... }
+
+    // Solo producto individual
     if (is_product()) {
         duendes_render_producto();
         exit;

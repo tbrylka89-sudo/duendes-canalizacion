@@ -3,6 +3,18 @@ import { kv } from '@vercel/kv';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
+// Headers CORS para permitir requests desde WordPress
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Manejar preflight OPTIONS request
+export async function OPTIONS() {
+  return new Response(null, { status: 200, headers: corsHeaders });
+}
+
 // ═══════════════════════════════════════════════════════════════
 // GENERADOR DE HISTORIAS DE GUARDIANES CON CLAUDE
 // Crea contenido único para cada producto/guardián
@@ -288,14 +300,14 @@ export async function GET() {
       id: val.id,
       slug: val.slug
     }))
-  });
+  }, { headers: corsHeaders });
 }
 
 export async function POST(request) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
-    return Response.json({ success: false, error: 'API key no configurada' }, { status: 500 });
+    return Response.json({ success: false, error: 'API key no configurada' }, { status: 500, headers: corsHeaders });
   }
 
   try {
@@ -317,7 +329,7 @@ export async function POST(request) {
     } = body;
 
     if (!nombre) {
-      return Response.json({ success: false, error: 'Nombre del guardián requerido' }, { status: 400 });
+      return Response.json({ success: false, error: 'Nombre del guardián requerido' }, { status: 400, headers: corsHeaders });
     }
 
     // Construir el prompt con el formato simplificado
@@ -428,13 +440,13 @@ export async function POST(request) {
         elementos: ELEMENTOS,
         propositos: PROPOSITOS
       }
-    });
+    }, { headers: corsHeaders });
 
   } catch (error) {
     console.error('Error generando historia:', error);
     return Response.json({
       success: false,
       error: error.message
-    }, { status: 500 });
+    }, { status: 500, headers: corsHeaders });
   }
 }
