@@ -508,8 +508,8 @@ export async function GET(request) {
   try {
     const auth = Buffer.from(`${wcKey}:${wcSecret}`).toString('base64');
 
-    // Obtener todos los productos
-    const response = await fetch(`${wcUrl}/wp-json/wc/v3/products?per_page=100&status=publish,draft`, {
+    // Obtener todos los productos publicados
+    const response = await fetch(`${wcUrl}/wp-json/wc/v3/products?per_page=100&status=publish`, {
       headers: { 'Authorization': `Basic ${auth}` },
       cache: 'no-store'
     });
