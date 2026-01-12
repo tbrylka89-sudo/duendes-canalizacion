@@ -185,28 +185,82 @@ export async function GET(request, { params }) {
       descripcionCorta: productoWoo.short_description?.replace(/<[^>]*>/g, ''),
       descripcion: productoWoo.description?.replace(/<[^>]*>/g, ''),
 
-      // Historia y contenido enriquecido (de KV si existe)
-      historia: datosEnriquecidos?.historia || {
-        origen: null,
-        personalidad: null,
-        fortalezas: [],
-        afinidades: [],
-        mensajePoder: null,
-        ritual: null,
-        cuidados: null
+      // ═══════════════════════════════════════════════════════════════
+      // NUEVA ESTRUCTURA V2.0 - Contenido épico completo
+      // ═══════════════════════════════════════════════════════════════
+
+      // Encabezado
+      encabezado: datosEnriquecidos?.encabezado || null,
+
+      // Vida Anterior - LA SECCIÓN MÁS IMPORTANTE
+      vidaAnterior: datosEnriquecidos?.vidaAnterior || null,
+
+      // El Encuentro - Cómo cruzó el portal
+      elEncuentro: datosEnriquecidos?.elEncuentro || null,
+
+      // Personalidad
+      personalidad: datosEnriquecidos?.personalidad || null,
+
+      // Dones/Fortalezas
+      dones: datosEnriquecidos?.dones || null,
+
+      // Mensaje directo del guardián (primera persona)
+      mensajeDirecto: datosEnriquecidos?.mensajeDirecto || null,
+
+      // Señales de que es para vos
+      señales: datosEnriquecidos?.señales || null,
+
+      // Ritual de bienvenida
+      ritual: datosEnriquecidos?.ritual || null,
+
+      // Cuidados
+      cuidados: datosEnriquecidos?.cuidados || null,
+
+      // Afinidades con otros guardianes
+      afinidades: datosEnriquecidos?.afinidades || null,
+
+      // Garantía mágica
+      garantiaMagica: datosEnriquecidos?.garantiaMagica || null,
+
+      // Urgencia/escasez
+      urgencia: datosEnriquecidos?.urgencia || {
+        principal: `${productoWoo.name} eligió manifestarse UNA sola vez`,
+        escasez: 'Cuando se va, desaparece del universo para siempre',
+        llamadoFinal: 'Si sentiste algo al verlo, eso es real. Es tu alma reconociendo lo que necesita.'
       },
 
-      // Neuromarketing
+      // SEO
+      seo: datosEnriquecidos?.seo || null,
+
+      // Metadatos
+      metaDatos: datosEnriquecidos?.metaDatos || null,
+
+      // ═══════════════════════════════════════════════════════════════
+      // COMPATIBILIDAD V1.0 - Formato anterior
+      // ═══════════════════════════════════════════════════════════════
+
+      // Historia (formato anterior)
+      historia: datosEnriquecidos?.historia || {
+        origen: datosEnriquecidos?.vidaAnterior?.texto || null,
+        personalidad: datosEnriquecidos?.personalidad?.texto || null,
+        fortalezas: datosEnriquecidos?.dones?.lista?.map(d => d.nombre) || [],
+        afinidades: datosEnriquecidos?.afinidades?.guardianes?.map(g => g.nombre) || [],
+        mensajePoder: datosEnriquecidos?.mensajeDirecto?.mensaje?.substring(0, 100) || null,
+        ritual: datosEnriquecidos?.ritual?.pasos?.map(p => p.descripcion).join(' ') || null,
+        cuidados: datosEnriquecidos?.cuidados?.ubicacion || null
+      },
+
+      // Neuromarketing (formato anterior)
       neuromarketing: datosEnriquecidos?.neuromarketing || {
-        urgencia: 'Pieza única e irrepetible en el mundo',
-        escasez: 'Cuando se va, desaparece para siempre',
-        beneficios: [
+        urgencia: datosEnriquecidos?.urgencia?.principal || 'Pieza única e irrepetible en el mundo',
+        escasez: datosEnriquecidos?.urgencia?.escasez || 'Cuando se va, desaparece para siempre',
+        beneficios: datosEnriquecidos?.dones?.lista?.map(d => d.descripcion) || [
           `${proposito.charAt(0).toUpperCase() + proposito.slice(1)} energética para tu vida`,
           'Compañero silencioso que cuida tu espacio',
           'Conexión con lo ancestral y mágico',
           'Recordatorio diario de tu poder interior'
         ],
-        garantia: '30 días de garantía mágica',
+        garantia: datosEnriquecidos?.garantiaMagica?.texto || '30 días de garantía mágica',
         envio: 'Envío seguro a todo el mundo',
         canalización: 'Canalización personalizada incluida'
       },

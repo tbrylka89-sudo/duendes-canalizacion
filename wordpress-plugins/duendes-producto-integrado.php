@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Duendes Producto Integrado
- * Description: TODO integrado en la pagina de producto - datos, historia IA, SEO automatico
- * Version: 1.0
+ * Description: Panel completo en pagina de producto - datos, historia IA, SEO, QR, certificado
+ * Version: 2.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -14,13 +14,18 @@ if (!defined('ABSPATH')) exit;
 add_action('add_meta_boxes', function() {
     add_meta_box(
         'duendes_producto_magico',
-        '✨ Datos del Producto Mágico + IA',
+        '✨ Datos del Guardián + IA',
         'duendes_metabox_principal',
         'product',
         'normal',
         'high'
     );
-});
+}, 5);
+
+// Ocultar metaboxes innecesarios de WooCommerce
+add_action('add_meta_boxes', function() {
+    remove_meta_box('postexcerpt', 'product', 'normal');
+}, 99);
 
 function duendes_metabox_principal($post) {
     wp_nonce_field('duendes_producto_nonce', 'duendes_nonce');
@@ -36,19 +41,24 @@ function duendes_metabox_principal($post) {
     $proposito = get_post_meta($post->ID, '_guardian_proposito', true) ?: '';
     $notas = get_post_meta($post->ID, '_guardian_notas', true) ?: '';
 
-    // Dimensiones fisicas
-    $peso_g = get_post_meta($post->ID, '_guardian_peso', true) ?: '';
-    $ancho_cm = get_post_meta($post->ID, '_guardian_ancho', true) ?: '';
-    $profundidad_cm = get_post_meta($post->ID, '_guardian_profundidad', true) ?: '';
+    // Precios
+    $product = wc_get_product($post->ID);
+    $precio_usd = $product ? $product->get_regular_price() : '';
+    $precio_uyu = get_post_meta($post->ID, '_precio_uyu', true) ?: '';
 
     // SEO
     $seo_titulo = get_post_meta($post->ID, '_duendes_seo_titulo', true) ?: '';
     $seo_descripcion = get_post_meta($post->ID, '_duendes_seo_descripcion', true) ?: '';
     $seo_keywords = get_post_meta($post->ID, '_duendes_seo_keywords', true) ?: '';
 
-    // Historia generada
+    // Historia y certificado
     $historia = get_post_meta($post->ID, '_guardian_historia', true);
     $fecha_generado = get_post_meta($post->ID, '_historia_fecha', true);
+    $codigo_guardian = get_post_meta($post->ID, '_codigo_guardian', true);
+    if (!$codigo_guardian && $post->ID) {
+        $codigo_guardian = 'DU' . str_pad($post->ID, 5, '0', STR_PAD_LEFT);
+        update_post_meta($post->ID, '_codigo_guardian', $codigo_guardian);
+    }
 
     ?>
     <style>
@@ -78,13 +88,11 @@ function duendes_metabox_principal($post) {
         }
         .duendes-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
-        .duendes-row:last-child {
-            margin-bottom: 0;
-        }
+        .duendes-row:last-child { margin-bottom: 0; }
         .duendes-field label {
             display: block;
             color: #8b949e;
@@ -110,10 +118,6 @@ function duendes_metabox_principal($post) {
             outline: none;
             border-color: #C6A962;
         }
-        .duendes-field textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
         .duendes-field small {
             display: block;
             color: #6e7681;
@@ -126,57 +130,74 @@ function duendes_metabox_principal($post) {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .tipo-tab {
-            padding: 10px 18px;
+            padding: 8px 16px;
             background: #21262d;
             border: 1px solid #30363d;
-            border-radius: 8px;
+            border-radius: 6px;
             color: #8b949e;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             transition: all 0.2s;
         }
-        .tipo-tab:hover {
-            border-color: #C6A962;
-            color: #fff;
-        }
+        .tipo-tab:hover { border-color: #C6A962; color: #fff; }
         .tipo-tab.active {
             background: rgba(198, 169, 98, 0.15);
             border-color: #C6A962;
             color: #C6A962;
         }
-        .tipo-tab input {
-            display: none;
+        .tipo-tab input { display: none; }
+
+        /* Precios */
+        .precio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .precio-box {
+            background: #21262d;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .precio-box label {
+            display: block;
+            color: #8b949e;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .precio-box input {
+            background: transparent;
+            border: none;
+            color: #C6A962;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+        .precio-box input:focus { outline: none; }
+        .precio-box .currency {
+            color: #C6A962;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .precio-box.calculated {
+            background: #1a1f24;
+            border: 1px dashed #30363d;
         }
 
-        /* Secciones condicionales */
-        .seccion-guardian { display: none; }
-        .seccion-virtual { display: none; }
-        .seccion-membresia { display: none; }
-        .seccion-cristal { display: none; }
-        .seccion-accesorio { display: none; }
-        .seccion-libro { display: none; }
-        .seccion-estudio { display: none; }
-
-        [data-tipo="guardian"] .seccion-guardian { display: block; }
-        [data-tipo="virtual"] .seccion-virtual { display: block; }
-        [data-tipo="membresia"] .seccion-membresia { display: block; }
-        [data-tipo="cristal"] .seccion-cristal { display: block; }
-        [data-tipo="accesorio"] .seccion-accesorio { display: block; }
-        [data-tipo="libro"] .seccion-libro { display: block; }
-        [data-tipo="estudio"] .seccion-estudio { display: block; }
-
-        /* Boton generar */
+        /* Botones */
         .btn-generar {
             background: linear-gradient(135deg, #C6A962, #a88a42);
             color: #0a0a0a;
             border: none;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s;
             display: inline-flex;
@@ -187,20 +208,13 @@ function duendes_metabox_principal($post) {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(198, 169, 98, 0.3);
         }
-        .btn-generar:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn-generar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-secondary {
             background: #21262d;
             color: #8b949e;
             border: 1px solid #30363d;
         }
-        .btn-secondary:hover {
-            border-color: #C6A962;
-            color: #fff;
-        }
+        .btn-secondary:hover { border-color: #C6A962; color: #fff; }
 
         /* Status */
         .gen-status {
@@ -229,26 +243,7 @@ function duendes_metabox_principal($post) {
             color: #ef4444;
         }
 
-        /* Historia preview */
-        .historia-preview {
-            background: #21262d;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .historia-preview h4 {
-            color: #C6A962;
-            font-size: 13px;
-            margin: 0 0 10px 0;
-        }
-        .historia-preview p {
-            color: #8b949e;
-            font-size: 13px;
-            line-height: 1.6;
-            margin: 0;
-        }
+        /* Badge historia */
         .historia-badge {
             display: inline-flex;
             align-items: center;
@@ -265,35 +260,65 @@ function duendes_metabox_principal($post) {
             color: #f59e0b;
         }
 
-        /* SEO section */
-        .seo-preview {
+        /* QR Section */
+        .qr-section {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        .qr-preview {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        .qr-preview img {
+            width: 100%;
+            max-width: 170px;
+        }
+        .qr-code-text {
+            font-family: monospace;
+            font-size: 11px;
+            color: #333;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+        .qr-info h4 {
+            color: #C6A962;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        .qr-info p {
+            color: #8b949e;
+            font-size: 13px;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Certificado info */
+        .cert-info {
             background: #21262d;
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
         }
-        .seo-preview-title {
-            color: #1a0dab;
-            font-size: 18px;
-            margin: 0 0 5px 0;
-            font-family: Arial, sans-serif;
-        }
-        .seo-preview-url {
-            color: #006621;
-            font-size: 13px;
-            margin: 0 0 5px 0;
-            font-family: Arial, sans-serif;
-        }
-        .seo-preview-desc {
-            color: #545454;
-            font-size: 13px;
-            line-height: 1.4;
+        .cert-info p {
             margin: 0;
-            font-family: Arial, sans-serif;
+            color: #8b949e;
+            font-size: 13px;
+        }
+        .cert-info strong {
+            color: #C6A962;
         }
     </style>
 
-    <div class="duendes-box" id="duendes-main-box" data-tipo="<?php echo esc_attr($tipo_producto); ?>">
+    <div class="duendes-box" id="duendes-main-box">
 
         <!-- TIPO DE PRODUCTO -->
         <div class="duendes-section">
@@ -301,37 +326,33 @@ function duendes_metabox_principal($post) {
             <div class="tipo-producto-tabs">
                 <label class="tipo-tab <?php echo $tipo_producto === 'guardian' ? 'active' : ''; ?>">
                     <input type="radio" name="_duendes_tipo_producto" value="guardian" <?php checked($tipo_producto, 'guardian'); ?>>
-                    🧙 Guardián Físico
+                    🧙 Guardián
                 </label>
                 <label class="tipo-tab <?php echo $tipo_producto === 'virtual' ? 'active' : ''; ?>">
                     <input type="radio" name="_duendes_tipo_producto" value="virtual" <?php checked($tipo_producto, 'virtual'); ?>>
-                    💎 Runas / Virtual
+                    💎 Runas/Virtual
                 </label>
                 <label class="tipo-tab <?php echo $tipo_producto === 'membresia' ? 'active' : ''; ?>">
                     <input type="radio" name="_duendes_tipo_producto" value="membresia" <?php checked($tipo_producto, 'membresia'); ?>>
-                    ⭐ Membresía Círculo
+                    ⭐ Círculo
                 </label>
                 <label class="tipo-tab <?php echo $tipo_producto === 'cristal' ? 'active' : ''; ?>">
                     <input type="radio" name="_duendes_tipo_producto" value="cristal" <?php checked($tipo_producto, 'cristal'); ?>>
-                    💠 Cristal / Piedra
+                    💠 Cristal
                 </label>
                 <label class="tipo-tab <?php echo $tipo_producto === 'accesorio' ? 'active' : ''; ?>">
                     <input type="radio" name="_duendes_tipo_producto" value="accesorio" <?php checked($tipo_producto, 'accesorio'); ?>>
-                    📿 Accesorio / Joya
-                </label>
-                <label class="tipo-tab <?php echo $tipo_producto === 'libro' ? 'active' : ''; ?>">
-                    <input type="radio" name="_duendes_tipo_producto" value="libro" <?php checked($tipo_producto, 'libro'); ?>>
-                    📚 Libro / Ebook
+                    📿 Accesorio
                 </label>
                 <label class="tipo-tab <?php echo $tipo_producto === 'estudio' ? 'active' : ''; ?>">
                     <input type="radio" name="_duendes_tipo_producto" value="estudio" <?php checked($tipo_producto, 'estudio'); ?>>
-                    🔮 Estudio / Consulta
+                    🔮 Estudio
                 </label>
             </div>
         </div>
 
-        <!-- SECCION GUARDIAN FISICO -->
-        <div class="duendes-section seccion-guardian">
+        <!-- DATOS DEL GUARDIAN -->
+        <div class="duendes-section" id="seccion-guardian">
             <h3 class="duendes-section-title">🧙 Datos del Guardián</h3>
 
             <div class="duendes-row">
@@ -344,7 +365,6 @@ function duendes_metabox_principal($post) {
                             <option value="Hada" <?php selected($tipo_ser, 'Hada'); ?>>Hada</option>
                             <option value="Gnomo" <?php selected($tipo_ser, 'Gnomo'); ?>>Gnomo</option>
                             <option value="Ninfa" <?php selected($tipo_ser, 'Ninfa'); ?>>Ninfa</option>
-                            <option value="Trasgo" <?php selected($tipo_ser, 'Trasgo'); ?>>Trasgo</option>
                             <option value="Driade" <?php selected($tipo_ser, 'Driade'); ?>>Dríade</option>
                         </optgroup>
                         <optgroup label="Practicantes de Magia">
@@ -353,20 +373,17 @@ function duendes_metabox_principal($post) {
                             <option value="Mago" <?php selected($tipo_ser, 'Mago'); ?>>Mago</option>
                             <option value="Hechicero" <?php selected($tipo_ser, 'Hechicero'); ?>>Hechicero</option>
                             <option value="Hechicera" <?php selected($tipo_ser, 'Hechicera'); ?>>Hechicera</option>
-                            <option value="Archimago" <?php selected($tipo_ser, 'Archimago'); ?>>Archimago</option>
                         </optgroup>
-                        <optgroup label="Místicos y Videntes">
+                        <optgroup label="Místicos">
                             <option value="Chaman" <?php selected($tipo_ser, 'Chaman'); ?>>Chamán</option>
                             <option value="Druida" <?php selected($tipo_ser, 'Druida'); ?>>Druida</option>
                             <option value="Oraculo" <?php selected($tipo_ser, 'Oraculo'); ?>>Oráculo</option>
                             <option value="Vidente" <?php selected($tipo_ser, 'Vidente'); ?>>Vidente</option>
-                            <option value="Alquimista" <?php selected($tipo_ser, 'Alquimista'); ?>>Alquimista</option>
                         </optgroup>
-                        <optgroup label="Espíritus y Guardianes">
+                        <optgroup label="Guardianes">
                             <option value="Guardian" <?php selected($tipo_ser, 'Guardian'); ?>>Guardián</option>
                             <option value="Protector" <?php selected($tipo_ser, 'Protector'); ?>>Protector</option>
                             <option value="Sanador" <?php selected($tipo_ser, 'Sanador'); ?>>Sanador</option>
-                            <option value="Espiritu" <?php selected($tipo_ser, 'Espiritu'); ?>>Espíritu</option>
                         </optgroup>
                     </select>
                 </div>
@@ -375,12 +392,16 @@ function duendes_metabox_principal($post) {
                     <select name="_guardian_genero" id="guardian_genero">
                         <option value="femenino" <?php selected($genero, 'femenino'); ?>>Femenino</option>
                         <option value="masculino" <?php selected($genero, 'masculino'); ?>>Masculino</option>
-                        <option value="neutro" <?php selected($genero, 'neutro'); ?>>Neutro / Sin definir</option>
+                        <option value="neutro" <?php selected($genero, 'neutro'); ?>>Neutro</option>
                     </select>
                 </div>
                 <div class="duendes-field">
+                    <label>Altura (cm)</label>
+                    <input type="number" name="_guardian_altura" id="guardian_altura" value="<?php echo esc_attr($altura_cm); ?>" min="5" max="100">
+                </div>
+                <div class="duendes-field">
                     <label>Color de Ojos</label>
-                    <input type="text" name="_guardian_ojos" id="guardian_ojos" value="<?php echo esc_attr($color_ojos); ?>" placeholder="ej: celestes, verdes brillantes...">
+                    <input type="text" name="_guardian_ojos" id="guardian_ojos" value="<?php echo esc_attr($color_ojos); ?>" placeholder="celestes, verdes...">
                 </div>
             </div>
 
@@ -394,20 +415,17 @@ function duendes_metabox_principal($post) {
                         <option value="Fuego" <?php selected($elemento, 'Fuego'); ?>>🔥 Fuego</option>
                         <option value="Aire" <?php selected($elemento, 'Aire'); ?>>💨 Aire</option>
                         <option value="Eter" <?php selected($elemento, 'Eter'); ?>>✨ Éter</option>
-                        <option value="Luz" <?php selected($elemento, 'Luz'); ?>>☀️ Luz</option>
-                        <option value="Sombra" <?php selected($elemento, 'Sombra'); ?>>🌙 Sombra</option>
-                        <option value="Cristal" <?php selected($elemento, 'Cristal'); ?>>💎 Cristal</option>
                     </select>
                 </div>
                 <div class="duendes-field">
-                    <label>Propósito / Categoría</label>
+                    <label>Propósito</label>
                     <select name="_guardian_proposito" id="guardian_proposito">
                         <option value="Que Claude decida" <?php selected($proposito, 'Que Claude decida'); ?>>Claude decide</option>
                         <option value="Proteccion" <?php selected($proposito, 'Proteccion'); ?>>🛡️ Protección</option>
                         <option value="Amor" <?php selected($proposito, 'Amor'); ?>>💜 Amor</option>
-                        <option value="Abundancia" <?php selected($proposito, 'Abundancia'); ?>>✨ Abundancia / Dinero</option>
-                        <option value="Sanacion" <?php selected($proposito, 'Sanacion'); ?>>🌿 Sanación / Salud</option>
-                        <option value="Sabiduria" <?php selected($proposito, 'Sabiduria'); ?>>🔮 Sabiduría / Guía</option>
+                        <option value="Abundancia" <?php selected($proposito, 'Abundancia'); ?>>✨ Abundancia</option>
+                        <option value="Sanacion" <?php selected($proposito, 'Sanacion'); ?>>🌿 Sanación</option>
+                        <option value="Sabiduria" <?php selected($proposito, 'Sabiduria'); ?>>🔮 Sabiduría</option>
                     </select>
                 </div>
             </div>
@@ -415,301 +433,144 @@ function duendes_metabox_principal($post) {
             <div class="duendes-row">
                 <div class="duendes-field" style="grid-column: 1 / -1;">
                     <label>Accesorios / Detalles Físicos</label>
-                    <input type="text" name="_guardian_accesorios" id="guardian_accesorios" value="<?php echo esc_attr($accesorios); ?>" placeholder="ej: escoba, calabaza, sombrero puntiagudo, flores en el pelo, capa azul...">
-                    <small>Describe todo lo que se ve en la figura: ropa, objetos, detalles especiales</small>
+                    <input type="text" name="_guardian_accesorios" id="guardian_accesorios" value="<?php echo esc_attr($accesorios); ?>" placeholder="escoba, sombrero, flores, capa...">
                 </div>
             </div>
 
             <div class="duendes-row">
                 <div class="duendes-field" style="grid-column: 1 / -1;">
-                    <label>Notas adicionales para Claude</label>
-                    <textarea name="_guardian_notas" id="guardian_notas" placeholder="ej: es anciana, tiene aspecto misterioso, parece sabio..."><?php echo esc_textarea($notas); ?></textarea>
+                    <label>Notas para Claude (opcional)</label>
+                    <textarea name="_guardian_notas" id="guardian_notas" rows="2" placeholder="es anciana, aspecto misterioso..."><?php echo esc_textarea($notas); ?></textarea>
                 </div>
             </div>
         </div>
 
-        <!-- DIMENSIONES FISICAS (para productos fisicos) -->
-        <div class="duendes-section seccion-guardian seccion-cristal seccion-accesorio">
-            <h3 class="duendes-section-title">📏 Dimensiones Físicas</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Altura (cm)</label>
-                    <input type="number" name="_guardian_altura" id="guardian_altura" value="<?php echo esc_attr($altura_cm); ?>" min="1" max="200" step="0.5">
+        <!-- PRECIOS -->
+        <div class="duendes-section">
+            <h3 class="duendes-section-title">💰 Precios</h3>
+            <div class="precio-grid">
+                <div class="precio-box">
+                    <label>Precio USD</label>
+                    <input type="number" id="precio_usd" value="<?php echo esc_attr($precio_usd); ?>" min="1" step="1" placeholder="150">
                 </div>
-                <div class="duendes-field">
-                    <label>Ancho (cm)</label>
-                    <input type="number" name="_guardian_ancho" value="<?php echo esc_attr($ancho_cm); ?>" min="1" max="200" step="0.5">
+                <div class="precio-box">
+                    <label>Precio UYU</label>
+                    <input type="number" name="_precio_uyu" id="precio_uyu" value="<?php echo esc_attr($precio_uyu); ?>" min="1" step="1" placeholder="6450">
+                    <small style="color:#6e7681;font-size:10px;">Manual o auto x43</small>
                 </div>
-                <div class="duendes-field">
-                    <label>Profundidad (cm)</label>
-                    <input type="number" name="_guardian_profundidad" value="<?php echo esc_attr($profundidad_cm); ?>" min="1" max="200" step="0.5">
-                </div>
-                <div class="duendes-field">
-                    <label>Peso (gramos)</label>
-                    <input type="number" name="_guardian_peso" value="<?php echo esc_attr($peso_g); ?>" min="1" max="50000" step="1">
+                <div class="precio-box calculated">
+                    <label>Precio ARS (ref)</label>
+                    <span class="currency" id="precio_ars">$<?php echo number_format(($precio_usd ?: 0) * 1050, 0, ',', '.'); ?></span>
                 </div>
             </div>
         </div>
 
-        <!-- SECCION VIRTUAL -->
-        <div class="duendes-section seccion-virtual">
-            <h3 class="duendes-section-title">💎 Producto Virtual</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Tipo de producto virtual</label>
-                    <select name="_virtual_tipo">
-                        <option value="runas">Runas de Poder</option>
-                        <option value="monedas">Monedas Mágicas</option>
-                        <option value="tokens">Tokens Energéticos</option>
-                        <option value="creditos">Créditos para servicios</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Cantidad incluida</label>
-                    <input type="number" name="_virtual_cantidad" value="1" min="1">
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCION MEMBRESIA -->
-        <div class="duendes-section seccion-membresia">
-            <h3 class="duendes-section-title">⭐ Plan del Círculo</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Tipo de membresía</label>
-                    <select name="_membresia_tipo">
-                        <option value="mensual">Mensual</option>
-                        <option value="trimestral">Trimestral</option>
-                        <option value="anual">Anual</option>
-                        <option value="vitalicia">Vitalicia</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Beneficios incluidos</label>
-                    <textarea name="_membresia_beneficios" placeholder="Lista de beneficios..."></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCION CRISTAL -->
-        <div class="duendes-section seccion-cristal">
-            <h3 class="duendes-section-title">💠 Datos del Cristal</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Tipo de piedra</label>
-                    <select name="_cristal_tipo">
-                        <option value="cuarzo_claro">Cuarzo Claro</option>
-                        <option value="amatista">Amatista</option>
-                        <option value="cuarzo_rosa">Cuarzo Rosa</option>
-                        <option value="citrino">Citrino</option>
-                        <option value="obsidiana">Obsidiana</option>
-                        <option value="turmalina">Turmalina</option>
-                        <option value="labradorita">Labradorita</option>
-                        <option value="selenita">Selenita</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Propiedades energéticas</label>
-                    <input type="text" name="_cristal_propiedades" placeholder="ej: limpieza energética, protección...">
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCION ACCESORIO -->
-        <div class="duendes-section seccion-accesorio">
-            <h3 class="duendes-section-title">📿 Datos del Accesorio</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Tipo de accesorio</label>
-                    <select name="_accesorio_tipo">
-                        <option value="collar">Collar</option>
-                        <option value="pulsera">Pulsera</option>
-                        <option value="anillo">Anillo</option>
-                        <option value="pendientes">Pendientes</option>
-                        <option value="colgante">Colgante</option>
-                        <option value="amuleto">Amuleto</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Material principal</label>
-                    <input type="text" name="_accesorio_material" placeholder="ej: plata, cuero, piedras naturales...">
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCION LIBRO -->
-        <div class="duendes-section seccion-libro">
-            <h3 class="duendes-section-title">📚 Datos del Libro</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Formato</label>
-                    <select name="_libro_formato">
-                        <option value="ebook">Ebook (PDF)</option>
-                        <option value="fisico">Libro físico</option>
-                        <option value="ambos">Ambos formatos</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Número de páginas</label>
-                    <input type="number" name="_libro_paginas" min="1">
-                </div>
-                <div class="duendes-field">
-                    <label>Tema principal</label>
-                    <input type="text" name="_libro_tema" placeholder="ej: magia natural, rituales...">
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCION ESTUDIO -->
-        <div class="duendes-section seccion-estudio">
-            <h3 class="duendes-section-title">🔮 Datos del Estudio/Consulta</h3>
-            <div class="duendes-row">
-                <div class="duendes-field">
-                    <label>Tipo de servicio</label>
-                    <select name="_estudio_tipo">
-                        <option value="carta_astral">Carta Astral</option>
-                        <option value="lectura_tarot">Lectura de Tarot</option>
-                        <option value="canalizacion">Canalización</option>
-                        <option value="limpieza">Limpieza Energética</option>
-                        <option value="consulta">Consulta General</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Duración aproximada</label>
-                    <select name="_estudio_duracion">
-                        <option value="30">30 minutos</option>
-                        <option value="60">1 hora</option>
-                        <option value="90">1.5 horas</option>
-                        <option value="120">2 horas</option>
-                    </select>
-                </div>
-                <div class="duendes-field">
-                    <label>Modalidad</label>
-                    <select name="_estudio_modalidad">
-                        <option value="online">Online (Zoom/Meet)</option>
-                        <option value="presencial">Presencial</option>
-                        <option value="escrito">Informe escrito</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- GENERADOR DE HISTORIA CON IA -->
-        <div class="duendes-section seccion-guardian">
-            <h3 class="duendes-section-title">🤖 Generador de Historia con IA</h3>
+        <!-- GENERADOR IA -->
+        <div class="duendes-section" id="seccion-ia">
+            <h3 class="duendes-section-title">🤖 Generador con IA</h3>
 
             <?php if ($historia && $fecha_generado): ?>
-                <div class="historia-badge">
-                    ✓ Historia generada el <?php echo date('d/m/Y H:i', strtotime($fecha_generado)); ?>
-                </div>
+                <div class="historia-badge">✓ Historia generada el <?php echo date('d/m/Y H:i', strtotime($fecha_generado)); ?></div>
             <?php else: ?>
-                <div class="historia-badge pending">
-                    ○ Sin historia generada
-                </div>
+                <div class="historia-badge pending">○ Sin historia generada</div>
             <?php endif; ?>
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button type="button" class="btn-generar" id="btn-generar-historia">
-                    <?php echo $historia ? '🔄 Regenerar Historia' : '✨ Generar Historia'; ?>
+                <button type="button" class="btn-generar" id="btn-generar-todo">
+                    ⚡ Generar Historia + SEO
                 </button>
-                <button type="button" class="btn-generar btn-secondary" id="btn-generar-seo">
-                    🎯 Generar SEO
-                </button>
-                <button type="button" class="btn-generar btn-secondary" id="btn-generar-todo">
-                    ⚡ Generar TODO (Historia + SEO)
+                <button type="button" class="btn-generar btn-secondary" id="btn-solo-seo">
+                    🎯 Solo SEO
                 </button>
             </div>
 
             <div class="gen-status" id="gen-status"></div>
-
-            <?php if ($historia):
-                $historia_data = json_decode($historia, true);
-            ?>
-            <div class="historia-preview">
-                <h4>Vista previa de la historia</h4>
-                <p><?php echo esc_html(mb_substr($historia_data['origen'] ?? '', 0, 500)); ?>...</p>
-            </div>
-            <?php endif; ?>
         </div>
 
         <!-- SEO -->
         <div class="duendes-section">
-            <h3 class="duendes-section-title">🎯 SEO (Generado por IA)</h3>
-
+            <h3 class="duendes-section-title">🎯 SEO</h3>
             <div class="duendes-row">
                 <div class="duendes-field" style="grid-column: 1 / -1;">
-                    <label>Título SEO (max 60 caracteres)</label>
+                    <label>Título SEO (max 60)</label>
                     <input type="text" name="_duendes_seo_titulo" id="seo_titulo" value="<?php echo esc_attr($seo_titulo); ?>" maxlength="60">
-                    <small>Caracteres: <span id="seo-titulo-count"><?php echo strlen($seo_titulo); ?></span>/60</small>
                 </div>
             </div>
-
             <div class="duendes-row">
                 <div class="duendes-field" style="grid-column: 1 / -1;">
-                    <label>Meta Descripción (max 160 caracteres)</label>
-                    <textarea name="_duendes_seo_descripcion" id="seo_descripcion" maxlength="160"><?php echo esc_textarea($seo_descripcion); ?></textarea>
-                    <small>Caracteres: <span id="seo-desc-count"><?php echo strlen($seo_descripcion); ?></span>/160</small>
+                    <label>Meta Descripción (max 160)</label>
+                    <textarea name="_duendes_seo_descripcion" id="seo_descripcion" maxlength="160" rows="2"><?php echo esc_textarea($seo_descripcion); ?></textarea>
                 </div>
             </div>
-
             <div class="duendes-row">
                 <div class="duendes-field" style="grid-column: 1 / -1;">
-                    <label>Palabras clave (separadas por coma)</label>
+                    <label>Keywords</label>
                     <input type="text" name="_duendes_seo_keywords" id="seo_keywords" value="<?php echo esc_attr($seo_keywords); ?>">
                 </div>
             </div>
+        </div>
 
-            <?php if ($seo_titulo || $seo_descripcion): ?>
-            <div class="seo-preview">
-                <div class="seo-preview-title"><?php echo esc_html($seo_titulo ?: get_the_title($post->ID)); ?></div>
-                <div class="seo-preview-url">duendesuy.10web.cloud › <?php echo sanitize_title(get_the_title($post->ID)); ?></div>
-                <div class="seo-preview-desc"><?php echo esc_html($seo_descripcion ?: 'Descripción del producto...'); ?></div>
+        <!-- QR Y CERTIFICADO -->
+        <div class="duendes-section">
+            <h3 class="duendes-section-title">📜 Certificado y QR para Caja</h3>
+
+            <div class="qr-section">
+                <div class="qr-preview">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo urlencode(home_url('/mi-magia/?codigo=' . $codigo_guardian)); ?>" alt="QR Code">
+                    <div class="qr-code-text"><?php echo esc_html($codigo_guardian); ?></div>
+                </div>
+                <div class="qr-info">
+                    <h4>Código único: <?php echo esc_html($codigo_guardian); ?></h4>
+                    <p>Este QR lleva a la página "Mi Magia" donde el cliente puede ver el certificado de autenticidad, la historia completa del guardián y contenido exclusivo.</p>
+
+                    <div class="qr-actions">
+                        <a href="<?php echo admin_url('admin-ajax.php?action=duendes_imprimir_qr&id=' . $post->ID); ?>" target="_blank" class="btn-generar btn-secondary">
+                            🖨️ Imprimir QR (Tarot)
+                        </a>
+                        <a href="<?php echo admin_url('admin-ajax.php?action=duendes_ver_certificado&id=' . $post->ID); ?>" target="_blank" class="btn-generar btn-secondary">
+                            📜 Ver Certificado
+                        </a>
+                    </div>
+
+                    <div class="cert-info">
+                        <p><strong>URL para el cliente:</strong><br>
+                        <?php echo home_url('/mi-magia/'); ?></p>
+                        <p style="margin-top:10px;"><strong>Con código:</strong><br>
+                        <?php echo home_url('/mi-magia/?codigo=' . $codigo_guardian); ?></p>
+                    </div>
+                </div>
             </div>
-            <?php endif; ?>
         </div>
 
     </div>
 
     <script>
     jQuery(document).ready(function($) {
-        // Cambio de tipo de producto
+        // Tabs tipo producto
         $('.tipo-tab input').on('change', function() {
-            const tipo = $(this).val();
             $('.tipo-tab').removeClass('active');
             $(this).closest('.tipo-tab').addClass('active');
-            $('#duendes-main-box').attr('data-tipo', tipo);
         });
 
-        // Contador SEO
-        $('#seo_titulo').on('input', function() {
-            $('#seo-titulo-count').text($(this).val().length);
-        });
-        $('#seo_descripcion').on('input', function() {
-            $('#seo-desc-count').text($(this).val().length);
-        });
-
-        // Generar historia
-        $('#btn-generar-historia').on('click', function() {
-            generarContenido('historia');
+        // Calcular precios
+        $('#precio_usd').on('input', function() {
+            const usd = parseFloat($(this).val()) || 0;
+            // Auto calcular UYU si está vacío
+            if (!$('#precio_uyu').val()) {
+                $('#precio_uyu').attr('placeholder', Math.round(usd * 43));
+            }
+            $('#precio_ars').text('$' + (usd * 1050).toLocaleString('es-AR'));
         });
 
-        // Generar SEO
-        $('#btn-generar-seo').on('click', function() {
-            generarContenido('seo');
-        });
-
-        // Generar todo
-        $('#btn-generar-todo').on('click', function() {
-            generarContenido('todo');
-        });
-
-        function generarContenido(tipo) {
+        // Generar con IA
+        $('#btn-generar-todo, #btn-solo-seo').on('click', function() {
+            const soloSeo = $(this).attr('id') === 'btn-solo-seo';
+            const $btn = $(this);
             const $status = $('#gen-status');
-            const $btn = $('#btn-generar-' + (tipo === 'todo' ? 'todo' : tipo === 'historia' ? 'historia' : 'seo'));
 
             $btn.prop('disabled', true);
-            $status.removeClass('success error').addClass('loading').text('Generando con Claude... (30-60 segundos)').show();
+            $status.removeClass('success error').addClass('loading')
+                   .text('Generando con Claude... (30-60 seg)').show();
 
             const datos = {
                 nombre: $('#title').val() || $('input[name="post_title"]').val(),
@@ -722,8 +583,7 @@ function duendes_metabox_principal($post) {
                 proposito: $('#guardian_proposito').val(),
                 notas: $('#guardian_notas').val(),
                 productId: 'woo_<?php echo $post->ID; ?>',
-                generarSeo: tipo === 'seo' || tipo === 'todo',
-                generarHistoria: tipo === 'historia' || tipo === 'todo'
+                soloSeo: soloSeo
             };
 
             $.ajax({
@@ -731,33 +591,33 @@ function duendes_metabox_principal($post) {
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(datos),
+                timeout: 120000,
                 success: function(res) {
                     if (res.success) {
-                        $status.removeClass('loading').addClass('success').text('¡Contenido generado exitosamente! Guardá el producto para aplicar los cambios.');
+                        $status.removeClass('loading').addClass('success')
+                               .text('¡Generado! Guardá el producto para aplicar.');
 
-                        // Actualizar SEO si se generó
                         if (res.contenido?.seo) {
-                            $('#seo_titulo').val(res.contenido.seo.titulo).trigger('input');
-                            $('#seo_descripcion').val(res.contenido.seo.descripcion).trigger('input');
+                            $('#seo_titulo').val(res.contenido.seo.titulo);
+                            $('#seo_descripcion').val(res.contenido.seo.descripcion);
                             $('#seo_keywords').val(res.contenido.seo.keywords);
                         }
 
-                        // Recargar después de 2 segundos
-                        setTimeout(function() {
-                            location.reload();
-                        }, 2000);
+                        setTimeout(() => location.reload(), 2000);
                     } else {
-                        $status.removeClass('loading').addClass('error').text('Error: ' + (res.error || 'desconocido'));
+                        $status.removeClass('loading').addClass('error')
+                               .text('Error: ' + (res.error || 'desconocido'));
                     }
                 },
                 error: function(xhr, status, error) {
-                    $status.removeClass('loading').addClass('error').text('Error de conexión: ' + error);
+                    $status.removeClass('loading').addClass('error')
+                           .text('Error: ' + error);
                 },
                 complete: function() {
                     $btn.prop('disabled', false);
                 }
             });
-        }
+        });
     });
     </script>
     <?php
@@ -768,73 +628,500 @@ function duendes_metabox_principal($post) {
 // ═══════════════════════════════════════════════════════════════
 
 add_action('save_post_product', function($post_id) {
-    if (!isset($_POST['duendes_nonce']) || !wp_verify_nonce($_POST['duendes_nonce'], 'duendes_producto_nonce')) {
-        return;
-    }
-
+    if (!isset($_POST['duendes_nonce']) || !wp_verify_nonce($_POST['duendes_nonce'], 'duendes_producto_nonce')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!current_user_can('edit_post', $post_id)) return;
 
-    // Guardar tipo de producto
-    if (isset($_POST['_duendes_tipo_producto'])) {
-        update_post_meta($post_id, '_duendes_tipo_producto', sanitize_text_field($_POST['_duendes_tipo_producto']));
-    }
+    $campos = [
+        '_duendes_tipo_producto', '_guardian_tipo', '_guardian_genero', '_guardian_altura',
+        '_guardian_ojos', '_guardian_accesorios', '_guardian_elemento', '_guardian_proposito',
+        '_guardian_notas', '_precio_uyu', '_duendes_seo_titulo', '_duendes_seo_descripcion',
+        '_duendes_seo_keywords'
+    ];
 
-    // Guardar datos del guardian
-    $campos_guardian = ['_guardian_tipo', '_guardian_genero', '_guardian_altura', '_guardian_ojos', '_guardian_accesorios', '_guardian_elemento', '_guardian_proposito', '_guardian_notas', '_guardian_peso', '_guardian_ancho', '_guardian_profundidad'];
-
-    foreach ($campos_guardian as $campo) {
-        if (isset($_POST[$campo])) {
-            update_post_meta($post_id, $campo, sanitize_text_field($_POST[$campo]));
-        }
-    }
-
-    // Guardar SEO
-    $campos_seo = ['_duendes_seo_titulo', '_duendes_seo_descripcion', '_duendes_seo_keywords'];
-    foreach ($campos_seo as $campo) {
-        if (isset($_POST[$campo])) {
-            update_post_meta($post_id, $campo, sanitize_text_field($_POST[$campo]));
-        }
-    }
-
-    // Guardar campos específicos por tipo
-    $campos_extra = ['_virtual_tipo', '_virtual_cantidad', '_membresia_tipo', '_membresia_beneficios', '_cristal_tipo', '_cristal_propiedades', '_accesorio_tipo', '_accesorio_material', '_libro_formato', '_libro_paginas', '_libro_tema', '_estudio_tipo', '_estudio_duracion', '_estudio_modalidad'];
-
-    foreach ($campos_extra as $campo) {
+    foreach ($campos as $campo) {
         if (isset($_POST[$campo])) {
             update_post_meta($post_id, $campo, sanitize_textarea_field($_POST[$campo]));
         }
     }
+
+    // Generar código único si no existe
+    if (!get_post_meta($post_id, '_codigo_guardian', true)) {
+        update_post_meta($post_id, '_codigo_guardian', 'DU' . str_pad($post_id, 5, '0', STR_PAD_LEFT));
+    }
 });
 
 // ═══════════════════════════════════════════════════════════════
-// AGREGAR META TAGS SEO AL HEAD
+// AJAX: IMPRIMIR QR ESTILO TAROT
+// ═══════════════════════════════════════════════════════════════
+
+add_action('wp_ajax_duendes_imprimir_qr', function() {
+    $id = intval($_GET['id'] ?? 0);
+    if (!$id) wp_die('ID inválido');
+
+    $product = wc_get_product($id);
+    if (!$product) wp_die('Producto no encontrado');
+
+    $nombre = $product->get_name();
+    $codigo = get_post_meta($id, '_codigo_guardian', true) ?: 'DU' . str_pad($id, 5, '0', STR_PAD_LEFT);
+    $tipo = get_post_meta($id, '_guardian_tipo', true) ?: 'Guardián';
+    $url_mi_magia = home_url('/mi-magia/?codigo=' . $codigo);
+    $qr_url = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($url_mi_magia);
+
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>QR - <?php echo esc_html($nombre); ?></title>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital@0;1&display=swap" rel="stylesheet">
+        <style>
+            @page { size: 10cm 14cm; margin: 0; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: 'Cormorant Garamond', serif;
+                background: #0a0a0a;
+                color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .qr-card {
+                width: 10cm;
+                height: 14cm;
+                background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+                border: 2px solid #C6A962;
+                border-radius: 20px;
+                padding: 25px;
+                position: relative;
+                overflow: hidden;
+            }
+            .card-frame {
+                position: absolute;
+                inset: 8px;
+                border: 1px solid rgba(198,169,98,0.3);
+                border-radius: 16px;
+                pointer-events: none;
+            }
+            .corner {
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                border: 2px solid #C6A962;
+            }
+            .corner.tl { top: 15px; left: 15px; border-right: none; border-bottom: none; border-radius: 8px 0 0 0; }
+            .corner.tr { top: 15px; right: 15px; border-left: none; border-bottom: none; border-radius: 0 8px 0 0; }
+            .corner.bl { bottom: 15px; left: 15px; border-right: none; border-top: none; border-radius: 0 0 0 8px; }
+            .corner.br { bottom: 15px; right: 15px; border-left: none; border-top: none; border-radius: 0 0 8px 0; }
+
+            .header {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .header h1 {
+                font-family: 'Cinzel', serif;
+                font-size: 16px;
+                color: #C6A962;
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }
+            .header p {
+                font-size: 12px;
+                color: rgba(255,255,255,0.6);
+                font-style: italic;
+            }
+
+            .qr-container {
+                background: #fff;
+                border-radius: 15px;
+                padding: 15px;
+                margin: 15px auto;
+                width: fit-content;
+            }
+            .qr-container img {
+                display: block;
+                width: 180px;
+                height: 180px;
+            }
+
+            .guardian-name {
+                text-align: center;
+                margin: 15px 0;
+            }
+            .guardian-name h2 {
+                font-family: 'Cinzel', serif;
+                font-size: 22px;
+                color: #fff;
+                margin-bottom: 5px;
+            }
+            .guardian-name span {
+                font-size: 11px;
+                color: rgba(255,255,255,0.5);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            .codigo {
+                text-align: center;
+                margin: 10px 0;
+            }
+            .codigo span {
+                font-family: 'Cinzel', serif;
+                font-size: 14px;
+                color: #C6A962;
+                letter-spacing: 3px;
+            }
+
+            .instructions {
+                text-align: center;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid rgba(198,169,98,0.2);
+            }
+            .instructions p {
+                font-size: 11px;
+                color: rgba(255,255,255,0.6);
+                line-height: 1.5;
+                margin-bottom: 8px;
+            }
+            .instructions .url {
+                font-family: monospace;
+                font-size: 9px;
+                color: #C6A962;
+                word-break: break-all;
+            }
+
+            .logo {
+                text-align: center;
+                margin-top: 15px;
+                font-family: 'Cinzel', serif;
+                font-size: 10px;
+                color: rgba(198,169,98,0.5);
+                letter-spacing: 2px;
+            }
+
+            @media print {
+                body { background: white; }
+                .qr-card { box-shadow: none; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="qr-card">
+            <div class="card-frame"></div>
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+
+            <div class="header">
+                <h1>✨ Tu Guardián te Espera</h1>
+                <p>Escaneá el código para acceder a tu espacio mágico</p>
+            </div>
+
+            <div class="qr-container">
+                <img src="<?php echo esc_url($qr_url); ?>" alt="QR Code">
+            </div>
+
+            <div class="guardian-name">
+                <h2><?php echo esc_html($nombre); ?></h2>
+                <span><?php echo esc_html($tipo); ?></span>
+            </div>
+
+            <div class="codigo">
+                <span><?php echo esc_html($codigo); ?></span>
+            </div>
+
+            <div class="instructions">
+                <p>Escaneá el QR o ingresá a:</p>
+                <p class="url"><?php echo esc_html(str_replace(['https://', 'http://'], '', home_url('/mi-magia/'))); ?></p>
+                <p style="margin-top:5px;">e ingresá tu código: <strong style="color:#C6A962;"><?php echo esc_html($codigo); ?></strong></p>
+            </div>
+
+            <div class="logo">Duendes del Uruguay</div>
+        </div>
+
+        <script>window.onload = function() { window.print(); }</script>
+    </body>
+    </html>
+    <?php
+    exit;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// AJAX: VER CERTIFICADO
+// ═══════════════════════════════════════════════════════════════
+
+add_action('wp_ajax_duendes_ver_certificado', function() {
+    $id = intval($_GET['id'] ?? 0);
+    if (!$id) wp_die('ID inválido');
+
+    $product = wc_get_product($id);
+    if (!$product) wp_die('Producto no encontrado');
+
+    $nombre = $product->get_name();
+    $codigo = get_post_meta($id, '_codigo_guardian', true) ?: 'DU' . str_pad($id, 5, '0', STR_PAD_LEFT);
+    $tipo = get_post_meta($id, '_guardian_tipo', true) ?: 'Guardián';
+    $elemento = get_post_meta($id, '_guardian_elemento', true) ?: 'Misterioso';
+    $proposito = get_post_meta($id, '_guardian_proposito', true) ?: 'Protección';
+    $altura = get_post_meta($id, '_guardian_altura', true) ?: '25';
+    $fecha = get_the_date('d/m/Y', $id);
+    $img = get_the_post_thumbnail_url($id, 'medium');
+
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Certificado - <?php echo esc_html($nombre); ?></title>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+        <style>
+            @page { size: A4 landscape; margin: 0; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: 'Cormorant Garamond', serif;
+                background: #0a0a0a;
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+            .certificado {
+                width: 29.7cm;
+                height: 21cm;
+                background: linear-gradient(145deg, #1a1510 0%, #0a0a0a 100%);
+                border: 3px solid #C6A962;
+                border-radius: 20px;
+                padding: 40px 50px;
+                position: relative;
+                overflow: hidden;
+            }
+            .cert-pattern {
+                position: absolute;
+                inset: 0;
+                opacity: 0.03;
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0z' fill='%23C6A962'/%3E%3C/svg%3E");
+                background-size: 40px 40px;
+            }
+            .cert-frame {
+                position: absolute;
+                inset: 15px;
+                border: 1px solid rgba(198,169,98,0.3);
+                border-radius: 15px;
+            }
+            .cert-frame::before {
+                content: '';
+                position: absolute;
+                inset: 8px;
+                border: 1px solid rgba(198,169,98,0.15);
+                border-radius: 12px;
+            }
+
+            .cert-header {
+                text-align: center;
+                position: relative;
+                z-index: 1;
+                margin-bottom: 30px;
+            }
+            .cert-header h1 {
+                font-family: 'Cinzel', serif;
+                font-size: 42px;
+                color: #C6A962;
+                letter-spacing: 8px;
+                text-transform: uppercase;
+                margin-bottom: 10px;
+            }
+            .cert-header p {
+                font-size: 18px;
+                color: rgba(255,255,255,0.6);
+                font-style: italic;
+            }
+
+            .cert-body {
+                display: grid;
+                grid-template-columns: 250px 1fr;
+                gap: 40px;
+                position: relative;
+                z-index: 1;
+            }
+            .cert-image {
+                width: 250px;
+                height: 300px;
+                border-radius: 15px;
+                overflow: hidden;
+                border: 2px solid #C6A962;
+            }
+            .cert-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .cert-details {
+                padding: 20px 0;
+            }
+            .cert-name {
+                font-family: 'Cinzel', serif;
+                font-size: 36px;
+                color: #fff;
+                margin-bottom: 10px;
+            }
+            .cert-tipo {
+                font-size: 14px;
+                color: rgba(255,255,255,0.5);
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                margin-bottom: 25px;
+            }
+
+            .cert-info-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+            .cert-info-item {
+                background: rgba(198,169,98,0.05);
+                border: 1px solid rgba(198,169,98,0.2);
+                border-radius: 10px;
+                padding: 15px;
+            }
+            .cert-info-item label {
+                display: block;
+                font-size: 10px;
+                color: rgba(255,255,255,0.5);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 5px;
+            }
+            .cert-info-item span {
+                font-family: 'Cinzel', serif;
+                font-size: 16px;
+                color: #C6A962;
+            }
+
+            .cert-message {
+                font-size: 16px;
+                color: rgba(255,255,255,0.7);
+                line-height: 1.6;
+                font-style: italic;
+                border-left: 2px solid #C6A962;
+                padding-left: 20px;
+            }
+
+            .cert-footer {
+                position: absolute;
+                bottom: 40px;
+                left: 50px;
+                right: 50px;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+            }
+            .cert-codigo {
+                font-family: 'Cinzel', serif;
+                font-size: 14px;
+                color: rgba(198,169,98,0.6);
+                letter-spacing: 3px;
+            }
+            .cert-logo {
+                font-family: 'Cinzel', serif;
+                font-size: 12px;
+                color: rgba(198,169,98,0.4);
+                text-align: right;
+            }
+
+            @media print {
+                body { background: white; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="certificado">
+            <div class="cert-pattern"></div>
+            <div class="cert-frame"></div>
+
+            <div class="cert-header">
+                <h1>Certificado de Autenticidad</h1>
+                <p>Pieza única canalizada en Piriápolis, Uruguay</p>
+            </div>
+
+            <div class="cert-body">
+                <div class="cert-image">
+                    <?php if ($img): ?>
+                    <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($nombre); ?>">
+                    <?php endif; ?>
+                </div>
+
+                <div class="cert-details">
+                    <h2 class="cert-name"><?php echo esc_html($nombre); ?></h2>
+                    <p class="cert-tipo"><?php echo esc_html($tipo); ?></p>
+
+                    <div class="cert-info-grid">
+                        <div class="cert-info-item">
+                            <label>Código Único</label>
+                            <span><?php echo esc_html($codigo); ?></span>
+                        </div>
+                        <div class="cert-info-item">
+                            <label>Elemento</label>
+                            <span><?php echo esc_html($elemento); ?></span>
+                        </div>
+                        <div class="cert-info-item">
+                            <label>Propósito</label>
+                            <span><?php echo esc_html($proposito); ?></span>
+                        </div>
+                        <div class="cert-info-item">
+                            <label>Altura</label>
+                            <span><?php echo esc_html($altura); ?> cm</span>
+                        </div>
+                    </div>
+
+                    <p class="cert-message">
+                        "Este guardián ha cruzado el portal ancestral para encontrarte. No fue casualidad que llegara a vos. Cuidalo, respetalo, y él te acompañará con su energía protectora por el resto de tus días."
+                    </p>
+                </div>
+            </div>
+
+            <div class="cert-footer">
+                <div class="cert-codigo">N° <?php echo esc_html($codigo); ?> · <?php echo esc_html($fecha); ?></div>
+                <div class="cert-logo">
+                    Duendes del Uruguay<br>
+                    <span style="font-size:10px;">Canalizados en Piriápolis</span>
+                </div>
+            </div>
+        </div>
+
+        <script>window.onload = function() { window.print(); }</script>
+    </body>
+    </html>
+    <?php
+    exit;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// META TAGS SEO
 // ═══════════════════════════════════════════════════════════════
 
 add_action('wp_head', function() {
     if (!is_product()) return;
-
     global $post;
-    $seo_titulo = get_post_meta($post->ID, '_duendes_seo_titulo', true);
-    $seo_descripcion = get_post_meta($post->ID, '_duendes_seo_descripcion', true);
-    $seo_keywords = get_post_meta($post->ID, '_duendes_seo_keywords', true);
 
-    if ($seo_descripcion) {
-        echo '<meta name="description" content="' . esc_attr($seo_descripcion) . '">' . "\n";
-    }
-    if ($seo_keywords) {
-        echo '<meta name="keywords" content="' . esc_attr($seo_keywords) . '">' . "\n";
-    }
+    $seo_desc = get_post_meta($post->ID, '_duendes_seo_descripcion', true);
+    $seo_keys = get_post_meta($post->ID, '_duendes_seo_keywords', true);
+
+    if ($seo_desc) echo '<meta name="description" content="' . esc_attr($seo_desc) . '">' . "\n";
+    if ($seo_keys) echo '<meta name="keywords" content="' . esc_attr($seo_keys) . '">' . "\n";
 }, 1);
 
-// Modificar titulo SEO
 add_filter('pre_get_document_title', function($title) {
     if (is_product()) {
         global $post;
         $seo_titulo = get_post_meta($post->ID, '_duendes_seo_titulo', true);
-        if ($seo_titulo) {
-            return $seo_titulo . ' - Duendes del Uruguay';
-        }
+        if ($seo_titulo) return $seo_titulo . ' - Duendes del Uruguay';
     }
     return $title;
 }, 999);

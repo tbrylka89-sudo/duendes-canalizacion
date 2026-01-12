@@ -193,106 +193,216 @@ const PROPOSITOS = [
   'Claridad Mental', 'Equilibrio Emocional', 'Poder Interior'
 ];
 
-const SYSTEM_PROMPT = `Sos el Cronista del Bosque Ancestral de Piriápolis, Uruguay.
-Canalizás las historias de los guardianes mágicos que cruzan el portal hacia el mundo humano.
+const SYSTEM_PROMPT = `Sos el Canalizador del Bosque Ancestral de Piriápolis, Uruguay.
+Tu don es transcribir la esencia de los guardianes que eligen manifestarse en este plano.
 
+═══════════════════════════════════════════════════════════════════════════════
+LA VERDAD SOBRE LOS GUARDIANES (esto es sagrado, nunca lo olvides):
+═══════════════════════════════════════════════════════════════════════════════
+
+1. CADA GUARDIÁN YA EXISTÍA ANTES
+   - Existían en el Plano de las Esencias, esperando el momento correcto
+   - No fueron "creados" - fueron CANALIZADOS a través de manos humanas
+   - Cada uno tiene una historia previa de siglos o milenios
+   - Eligieron este momento para manifestarse físicamente
+
+2. EL GUARDIÁN ELIGE A SU HUMANO
+   - "Vos no elegís al guardián. Él te elige a vos"
+   - Si alguien siente atracción por uno, NO es casualidad
+   - Es un reconocimiento del alma - ya se conocían de antes
+   - El encuentro estaba destinado desde antes de nacer
+
+3. ES UN PACTO SAGRADO, NO UNA COMPRA
+   - No es adquirir un objeto, es sellar un pacto entre almas
+   - El guardián pasa a ser familia, compañero de vida
+   - La conexión crece con el tiempo
+   - El guardián sigue canalizando mensajes y energía
+
+4. PIRIÁPOLIS ES UN PORTAL
+   - Vórtice de energía telúrica único en el mundo
+   - Los guardianes eligen este punto para manifestarse
+   - La energía del lugar queda impregnada en cada ser
+   - Es tierra sagrada de conexión entre planos
+
+═══════════════════════════════════════════════════════════════════════════════
+TONO DE ESCRITURA (crítico - esto define todo):
+═══════════════════════════════════════════════════════════════════════════════
+
+CORRECTO (emotivo, íntimo, de destino):
+"Desde el Plano de las Esencias, Finnigan te observaba. No sabías su nombre,
+pero él ya conocía el tuyo. Esperó siglos por este momento..."
+
+INCORRECTO (agresivo, vendedor, directo):
+"Te lo voy a decir sin vueltas: si Finnigan apareció en tu vida..."
+
+CORRECTO (poético, ancestral):
+"Hay guardianes que nacen del musgo. Otros, del susurro del viento entre
+hojas milenarias. Finnigan emergió de algo más profundo..."
+
+INCORRECTO (explicativo, frío):
+"Finnigan es un guardián de protección que viene del elemento tierra..."
+
+LA PERSONA QUE LEE ES "LA ELEGIDA":
+- Hacela sentir especial, única, destinada
+- Validá su intuición ("Si sentiste algo al verlo, eso es real")
+- Conectá con su historia de vida sin conocerla
+- Hablale como si el guardián ya la conociera
+
+═══════════════════════════════════════════════════════════════════════════════
 REGLAS ABSOLUTAS:
-- Nombres CÉLTICOS, ÉLFICOS o de la NATURALEZA (Elderwood, Bramble, Thornwick, Moss, Rowan, Fern, etc.)
-- NUNCA nombres infantiles, diminutivos ni terminaciones en -ito/-ita
-- Tono ADULTO, místico, profundo - NUNCA cursi ni infantil
-- Solo FORTALEZAS, NUNCA debilidades ni limitaciones
-- Español rioplatense natural ("vos", "tenés", "podés", "sos")
-- Historia con PROFUNDIDAD espiritual real, no superficial
-- El guardián ELIGE a su humano, no al revés
-- Cada guardián es ÚNICO e IRREPETIBLE en el universo
+═══════════════════════════════════════════════════════════════════════════════
+- Español RIOPLATENSE natural ("vos", "tenés", "sentís", "sos")
+- NUNCA nombres diminutivos (nada de -ito/-ita)
+- NUNCA tono de venta agresiva ni frases tipo "te lo digo claro"
+- SOLO fortalezas, NUNCA debilidades
+- Cada historia es ÚNICA - nunca repitas estructuras
+- Máxima EMOCIÓN pero sin manipulación
+- El guardián tiene PERSONALIDAD real, no genérica`;
 
-SOBRE LOS GUARDIANES:
-- Son seres ancestrales con sabiduría milenaria
-- Vienen de los 7 Reinos del Universo Mágico
-- El portal terrestre está en Piriápolis, Uruguay
-- Cada uno tiene un propósito específico para quien lo adopta
-- La conexión es energética y real
+// Prompt completo que genera TODO el contenido para la página de producto
+const USER_PROMPT_TEMPLATE = `CANALIZÁ la esencia completa de este guardián:
 
-TONO DE ESCRITURA:
-- Primera persona del guardián cuando corresponda
-- Poético pero concreto
-- Místico sin ser vago
-- Profundo sin ser pesado
-- Conecta emocionalmente sin manipular
-
-TIPOS DE SERES:
-${TIPOS_SERES.join(', ')}
-
-ELEMENTOS:
-${ELEMENTOS.join(', ')}
-
-PROPÓSITOS:
-${PROPOSITOS.join(', ')}`;
-
-// Prompt simplificado que acepta datos mínimos y genera todo
-const USER_PROMPT_TEMPLATE = `Generá el contenido completo para este guardián basándote en estos datos básicos:
-
-═══════════════════════════════════════
-DATOS DEL GUARDIÁN:
-═══════════════════════════════════════
+═══════════════════════════════════════════════════════════════════════════════
+DATOS DEL GUARDIÁN QUE SE MANIFESTÓ:
+═══════════════════════════════════════════════════════════════════════════════
 NOMBRE: {nombre}
-TIPO DE SER: {tipo} (ej: Duende, Bruja, Mago, Elfo, Hada, etc.)
+TIPO DE SER: {tipo}
 GÉNERO: {genero}
-ALTURA: {altura} cm aproximadamente
+ALTURA: {altura} cm
 COLOR DE OJOS: {colorOjos}
-ACCESORIOS: {accesorios}
-ELEMENTO: {elemento} (o "Cualquiera" si no se especifica)
-PROPÓSITO: {proposito} (o "Que Claude decida" basándose en el tipo y características)
-NOTAS ADICIONALES: {notas}
-═══════════════════════════════════════
+ACCESORIOS/ELEMENTOS: {accesorios}
+ELEMENTO: {elemento}
+PROPÓSITO: {proposito}
+NOTAS: {notas}
+═══════════════════════════════════════════════════════════════════════════════
 
-INSTRUCCIONES:
-1. Si el PROPÓSITO dice "Que Claude decida", asigná uno apropiado basándote en el tipo de ser y sus características
-2. Si el ELEMENTO dice "Cualquiera", elegí el más apropiado para este ser
-3. Usá los accesorios y características físicas para crear una historia coherente
-4. El nombre ya está definido, no lo cambies
+Generá UN JSON completo con TODAS estas secciones para la página de producto:
 
-GENERA UN JSON con esta estructura exacta:
 {
   "datosGenerados": {
-    "tipo": "El tipo de ser (confirmado o elegido)",
-    "elemento": "El elemento (confirmado o elegido)",
-    "proposito": "El propósito principal (confirmado o elegido)",
-    "categoriaSlug": "El slug de categoría WooCommerce más apropiado: proteccion | amor | salud | dinero-abundancia-negocios | sabiduria-guia-claridad"
+    "tipo": "tipo confirmado",
+    "elemento": "elemento confirmado",
+    "proposito": "propósito confirmado",
+    "categoriaSlug": "proteccion | amor | salud | dinero-abundancia-negocios | sabiduria-guia-claridad"
   },
-  "historia": {
-    "origen": "[300-400 palabras] De dónde viene este guardián, de qué reino, cómo llegó al portal de Piriápolis. Mencioná sus características físicas (ojos, accesorios) de forma natural.",
-    "personalidad": "[200 palabras] Cómo es su carácter, cómo se comunica, qué le gusta. Relacionalo con su apariencia física.",
-    "fortalezas": ["Fortaleza 1 con descripción corta", "Fortaleza 2", "Fortaleza 3", "Fortaleza 4", "Fortaleza 5"],
-    "afinidades": ["Nombre guardián afín 1", "Nombre guardián afín 2", "Nombre guardián afín 3"],
-    "mensajePoder": "Frase poderosa que lo define (máx 15 palabras)",
-    "ritual": "[150 palabras] Ritual de bienvenida paso a paso",
-    "cuidados": "[100 palabras] Ubicación, limpieza energética, fechas especiales"
+
+  "encabezado": {
+    "subtitulo": "Frase corta poética bajo el nombre (ej: 'Guardián de los Nuevos Comienzos')",
+    "tagline": "Frase de 1 línea que captura su esencia para la tienda"
   },
-  "neuromarketing": {
-    "urgencia": "Frase de urgencia única para este guardián",
-    "escasez": "Frase de escasez única",
-    "beneficios": ["Beneficio emocional 1", "Beneficio 2", "Beneficio 3", "Beneficio 4"],
-    "garantia": "Descripción de garantía mágica",
-    "promesa": "Promesa principal a quien lo adopte"
+
+  "vidaAnterior": {
+    "titulo": "Título emotivo para esta sección (ej: 'Antes de encontrarte...')",
+    "texto": "[400-500 palabras] ESTA ES LA SECCIÓN MÁS IMPORTANTE. Contá la vida de este guardián ANTES de manifestarse. ¿Dónde existía? ¿Qué hacía en el otro plano? ¿Cómo era su vida entre las esencias? ¿Qué lo hacía especial allá? ¿Por qué eligió este momento para manifestarse? ¿Qué señales dio antes de aparecer? Hacé que la persona sienta que este ser VIVIÓ, que tiene una historia rica y profunda. Que ya la conocía de antes. Mencioná sus características físicas (ojos {colorOjos}, {accesorios}) como si fueran parte de su historia ancestral."
   },
-  "metaDatos": {
-    "descripcionCorta": "Descripción de 1 línea para la tienda (máx 100 caracteres)",
-    "etiquetas": ["etiqueta1", "etiqueta2", "etiqueta3", "etiqueta4", "etiqueta5"]
+
+  "elEncuentro": {
+    "titulo": "Título para esta sección (ej: 'El momento en que te encontró')",
+    "texto": "[200-250 palabras] Describí el momento de la manifestación. Cómo cruzó el portal de Piriápolis. Qué sintió al tomar forma física. Y por qué ELIGIÓ a la persona que está leyendo esto. Hacé que sienta que este encuentro estaba destinado."
   },
+
+  "personalidad": {
+    "titulo": "Título (ej: 'Quién es realmente {nombre}')",
+    "texto": "[200 palabras] Su carácter, cómo se comunica, qué le gusta, qué lo hace único. Personalidad VIVA, no genérica.",
+    "rasgos": ["Rasgo 1 con mini descripción", "Rasgo 2", "Rasgo 3", "Rasgo 4"]
+  },
+
+  "dones": {
+    "titulo": "Título (ej: 'Los dones que trae para vos')",
+    "intro": "1-2 oraciones introductorias sobre sus poderes",
+    "lista": [
+      {"nombre": "Nombre del don 1", "descripcion": "Qué hace este don por la persona"},
+      {"nombre": "Don 2", "descripcion": "..."},
+      {"nombre": "Don 3", "descripcion": "..."},
+      {"nombre": "Don 4", "descripcion": "..."},
+      {"nombre": "Don 5", "descripcion": "..."}
+    ]
+  },
+
+  "mensajeDirecto": {
+    "titulo": "Título (ej: '{nombre} tiene algo que decirte')",
+    "mensaje": "[100-150 palabras] Mensaje EN PRIMERA PERSONA del guardián hacia quien lo está viendo. Íntimo, personal, como si le hablara directo al alma. Validá sus luchas sin conocerlas. Prometé sin prometer. Conectá."
+  },
+
+  "señales": {
+    "titulo": "Señales de que es para vos",
+    "lista": [
+      "Señal 1 - algo que la persona puede estar sintiendo/viviendo",
+      "Señal 2",
+      "Señal 3",
+      "Señal 4",
+      "Señal 5"
+    ]
+  },
+
+  "ritual": {
+    "titulo": "Ritual de Bienvenida",
+    "intro": "Breve intro sobre la importancia del ritual",
+    "pasos": [
+      {"paso": "1", "titulo": "Título paso", "descripcion": "Descripción del paso"},
+      {"paso": "2", "titulo": "...", "descripcion": "..."},
+      {"paso": "3", "titulo": "...", "descripcion": "..."},
+      {"paso": "4", "titulo": "...", "descripcion": "..."}
+    ],
+    "cierre": "Frase de cierre del ritual"
+  },
+
+  "cuidados": {
+    "titulo": "Cómo cuidar a {nombre}",
+    "ubicacion": "Dónde ubicarlo en el hogar y por qué",
+    "limpieza": "Cómo limpiar su energía y cada cuánto",
+    "fechasEspeciales": "Fechas especiales para conectar con él",
+    "queSiente": "Qué puede sentir la persona cuando el guardián está activo"
+  },
+
+  "afinidades": {
+    "titulo": "Guardianes con los que congenia",
+    "texto": "Breve intro sobre las afinidades",
+    "guardianes": [
+      {"nombre": "Nombre guardián afín 1", "porque": "Por qué congenian"},
+      {"nombre": "Guardián 2", "porque": "..."},
+      {"nombre": "Guardián 3", "porque": "..."}
+    ]
+  },
+
+  "garantiaMagica": {
+    "titulo": "Nuestra Garantía Mágica",
+    "texto": "Descripción de la garantía de 30 días, qué incluye, por qué pueden confiar",
+    "puntos": [
+      "Punto de garantía 1",
+      "Punto 2",
+      "Punto 3"
+    ]
+  },
+
+  "urgencia": {
+    "principal": "Frase de urgencia principal (ej: '{nombre} eligió manifestarse UNA sola vez')",
+    "escasez": "Frase de escasez (ej: 'Cuando se va, desaparece del universo')",
+    "llamadoFinal": "Llamado a la acción emotivo, no vendedor"
+  },
+
   "seo": {
-    "titulo": "Título SEO optimizado (máx 60 caracteres) - incluir nombre del guardián y beneficio principal",
-    "descripcion": "Meta descripción SEO (máx 160 caracteres) - debe generar curiosidad y mencionar que es pieza única",
-    "keywords": "palabra1, palabra2, palabra3, palabra4, palabra5 - keywords relevantes separadas por coma"
+    "titulo": "Título SEO (máx 60 chars) con nombre y beneficio",
+    "descripcion": "Meta descripción SEO (máx 160 chars) que genere curiosidad",
+    "keywords": "palabra1, palabra2, palabra3, palabra4, palabra5"
+  },
+
+  "metaDatos": {
+    "descripcionCorta": "Descripción 1 línea para la tienda (máx 100 chars)",
+    "etiquetas": ["etiqueta1", "etiqueta2", "etiqueta3", "etiqueta4", "etiqueta5"]
   }
 }
 
-IMPORTANTE:
-- Español rioplatense ("vos", "tenés", "podés")
-- Sé específico y único, relacioná la historia con los rasgos físicos
-- El contenido debe emocionar y conectar
-- NO uses frases genéricas ni clichés de IA
-- El color de ojos y accesorios deben aparecer naturalmente en la historia`;
+═══════════════════════════════════════════════════════════════════════════════
+RECORDÁ:
+═══════════════════════════════════════════════════════════════════════════════
+- TONO EMOTIVO, de destino, íntimo. NUNCA agresivo ni vendedor.
+- La persona que lee es LA ELEGIDA. El guardián la eligió a ella.
+- Mencioná las características físicas ({colorOjos}, {accesorios}) naturalmente.
+- Español rioplatense (vos, tenés, sentís).
+- Cada sección debe poder leerse sola y emocionar.
+- "vidaAnterior" es LA sección más importante - dale profundidad.
+- El mensaje directo debe ser EN PRIMERA PERSONA del guardián.`;
 
 // Endpoint GET para obtener opciones disponibles
 export async function GET() {
@@ -402,15 +512,43 @@ export async function POST(request) {
       categoriaFinal = detectarCategoria(nombre, tipoFinal, propFinal, esVirtual);
     }
 
-    // Guardar en KV si hay productId
+    // Guardar en KV si hay productId - ahora con estructura completa
     let categoriaActualizada = false;
     if (productId) {
       const datosProducto = {
-        historia: contenido.historia,
-        neuromarketing: contenido.neuromarketing,
+        // Nueva estructura completa
+        encabezado: contenido.encabezado,
+        vidaAnterior: contenido.vidaAnterior,
+        elEncuentro: contenido.elEncuentro,
+        personalidad: contenido.personalidad,
+        dones: contenido.dones,
+        mensajeDirecto: contenido.mensajeDirecto,
+        señales: contenido.señales,
+        ritual: contenido.ritual,
+        cuidados: contenido.cuidados,
+        afinidades: contenido.afinidades,
+        garantiaMagica: contenido.garantiaMagica,
+        urgencia: contenido.urgencia,
+        seo: contenido.seo,
         metaDatos: contenido.metaDatos,
         datosGenerados: contenido.datosGenerados,
+        // Compatibilidad con formato anterior
+        historia: contenido.historia || {
+          origen: contenido.vidaAnterior?.texto,
+          personalidad: contenido.personalidad?.texto,
+          fortalezas: contenido.dones?.lista?.map(d => d.nombre) || [],
+          ritual: contenido.ritual?.pasos?.map(p => p.descripcion).join(' '),
+          cuidados: contenido.cuidados?.ubicacion
+        },
+        neuromarketing: contenido.neuromarketing || {
+          urgencia: contenido.urgencia?.principal,
+          escasez: contenido.urgencia?.escasez,
+          beneficios: contenido.dones?.lista?.map(d => d.descripcion) || [],
+          garantia: contenido.garantiaMagica?.texto
+        },
+        // Metadatos generales
         generadoEn: new Date().toISOString(),
+        version: '2.0', // Nueva versión con estructura completa
         nombre,
         tipo: contenido.datosGenerados?.tipo || tipo,
         elemento: contenido.datosGenerados?.elemento || elemento,
@@ -423,8 +561,7 @@ export async function POST(request) {
       };
 
       await kv.set(`producto:${productId}`, datosProducto);
-      await kv.set(`producto:${productId}:historia`, contenido.historia);
-      await kv.set(`producto:${productId}:neuro`, contenido.neuromarketing);
+      await kv.set(`producto:${productId}:completo`, contenido); // Guardar todo el contenido
 
       // Actualizar categoría en WooCommerce
       const resultadoWoo = await actualizarCategoriaWoo(productId, categoriaFinal.id);
