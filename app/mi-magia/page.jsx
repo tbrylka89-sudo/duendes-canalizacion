@@ -494,6 +494,7 @@ export default function MiMagia() {
   const [onboarding, setOnboarding] = useState(false);
   const [chatAbierto, setChatAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [token, setToken] = useState('');
   const [pais, setPais] = useState('UY');
   // FORZAR MOBILE: Siempre mostrar hamburguesa en pantallas pequeñas
@@ -634,7 +635,113 @@ export default function MiMagia() {
         <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="nav-volver">↗ Ir a la tienda</a>
       </nav>
       
-      <main className="contenido">{renderSeccion()}</main>
+      <main className={`contenido ${sidebarAbierto && !isMobile ? 'con-sidebar' : ''}`}>
+        {renderSeccion()}
+      </main>
+
+      {/* SIDEBAR OPORTUNIDADES MÁGICAS */}
+      {!isMobile && (
+        <>
+          <button
+            className={`sidebar-toggle ${sidebarAbierto ? 'abierto' : ''}`}
+            onClick={() => setSidebarAbierto(!sidebarAbierto)}
+            title={sidebarAbierto ? 'Cerrar ofertas' : 'Ver ofertas mágicas'}
+          >
+            <span className="toggle-icon">{sidebarAbierto ? '→' : '★'}</span>
+            {!sidebarAbierto && <span className="toggle-badge">OFERTAS</span>}
+          </button>
+
+          <aside className={`sidebar-oportunidades ${sidebarAbierto ? 'abierto' : ''}`}>
+            <div className="sidebar-header">
+              <h3>✦ Oportunidades Mágicas</h3>
+              <p>Ofertas exclusivas para ti</p>
+            </div>
+
+            {/* CÍRCULO PROMOCIÓN */}
+            {!usuario?.esCirculo && (
+              <div className="sidebar-card circulo-promo">
+                <div className="promo-badge">15 DÍAS GRATIS</div>
+                <span className="promo-icon">★</span>
+                <h4>Círculo de Duendes</h4>
+                <p>Tu santuario secreto con beneficios exclusivos</p>
+                <ul className="promo-beneficios">
+                  <li>✓ Contenido semanal exclusivo</li>
+                  <li>✓ Runas y tréboles extra</li>
+                  <li>✓ Tiradas gratis mensuales</li>
+                  <li>✓ Descuentos de 5% a 10%</li>
+                  <li>✓ Acceso anticipado</li>
+                </ul>
+                <button className="btn-promo" onClick={() => {setSeccion('circulo'); setSidebarAbierto(false);}}>
+                  Probar gratis →
+                </button>
+              </div>
+            )}
+
+            {usuario?.esCirculo && (
+              <div className="sidebar-card circulo-activo">
+                <span className="promo-icon">★</span>
+                <h4>Sos parte del Círculo</h4>
+                <p>Membresía activa</p>
+                <button className="btn-outline" onClick={() => {setSeccion('circulo'); setSidebarAbierto(false);}}>
+                  Ver contenido exclusivo
+                </button>
+              </div>
+            )}
+
+            {/* OFERTA RUNAS */}
+            <div className="sidebar-card">
+              <div className="oferta-mini">
+                <span>ᚱ</span>
+                <div>
+                  <strong>Pack Destello</strong>
+                  <p>30 runas - El más popular</p>
+                </div>
+                <span className="precio">$12</span>
+              </div>
+              <a href="https://duendesuy.10web.cloud/producto/runas-destello/" target="_blank" rel="noopener" className="btn-outline-sm">
+                Ver pack
+              </a>
+            </div>
+
+            {/* EXPERIENCIA DESTACADA */}
+            <div className="sidebar-card">
+              <div className="oferta-mini">
+                <span>✦</span>
+                <div>
+                  <strong>Tirada de Runas</strong>
+                  <p>5 runas • 20-30 min</p>
+                </div>
+              </div>
+              <button className="btn-outline-sm" onClick={() => {setSeccion('experiencias'); setSidebarAbierto(false);}}>
+                Solicitar
+              </button>
+            </div>
+
+            {/* GUARDIANES */}
+            <div className="sidebar-card">
+              <div className="oferta-mini">
+                <span>🧙</span>
+                <div>
+                  <strong>Nuevos Guardianes</strong>
+                  <p>Descubrí quién te llama</p>
+                </div>
+              </div>
+              <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-outline-sm">
+                Ver tienda
+              </a>
+            </div>
+
+            {/* FOOTER SIDEBAR */}
+            <div className="sidebar-footer">
+              <p>¿Preguntas sobre ofertas?</p>
+              <button className="btn-tito" onClick={() => {setChatAbierto(true); setSidebarAbierto(false);}}>
+                Preguntale a Tito 🤖
+              </button>
+            </div>
+          </aside>
+        </>
+      )}
+
       <Tito usuario={usuario} abierto={chatAbierto} setAbierto={setChatAbierto} />
     </div>
   );
@@ -3799,4 +3906,60 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
 @media(max-width:768px){.senal-footer{grid-template-columns:1fr}.elementos-preview{grid-template-columns:repeat(2,1fr)}.cosmos-tabs{grid-template-columns:repeat(2,1fr)}.cristales-grid{grid-template-columns:repeat(2,1fr)}.experiencias-grid-new{grid-template-columns:1fr}.utils-grid{grid-template-columns:repeat(2,1fr)}.foro-categorias{overflow-x:auto;flex-wrap:nowrap}.faq-categorias{overflow-x:auto;flex-wrap:nowrap}}
 @media(max-width:480px){.utils-grid{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* SIDEBAR OPORTUNIDADES MÁGICAS */
+/* ═══════════════════════════════════════════════════════════════ */
+.sidebar-toggle{position:fixed;right:0;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border:none;border-radius:12px 0 0 12px;padding:12px 8px;cursor:pointer;z-index:97;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all 0.3s;box-shadow:-2px 0 15px rgba(0,0,0,0.2)}
+.sidebar-toggle:hover{padding-right:12px;background:linear-gradient(135deg,#2a2a2a,#3a3a3a)}
+.sidebar-toggle.abierto{right:280px}
+.toggle-icon{color:#d4af37;font-size:1.2rem}
+.toggle-badge{writing-mode:vertical-rl;text-orientation:mixed;font-size:0.65rem;font-weight:600;color:#d4af37;letter-spacing:1px;font-family:'Cinzel',serif}
+
+.sidebar-oportunidades{position:fixed;right:-280px;top:65px;bottom:0;width:280px;background:linear-gradient(180deg,#fff 0%,#fafafa 100%);border-left:1px solid #e0e0e0;z-index:96;display:flex;flex-direction:column;transition:right 0.3s ease;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.08)}
+.sidebar-oportunidades.abierto{right:0}
+
+.sidebar-header{padding:1.5rem;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);text-align:center}
+.sidebar-header h3{color:#d4af37;font-family:'Cinzel',serif;font-size:1rem;margin:0 0 0.25rem}
+.sidebar-header p{color:rgba(255,255,255,0.8);font-size:0.8rem;margin:0}
+
+.sidebar-card{padding:1.25rem;border-bottom:1px solid #f0f0f0}
+.sidebar-card:last-of-type{border-bottom:none}
+
+.circulo-promo{background:linear-gradient(135deg,#f8f4eb 0%,#fff 100%);position:relative}
+.promo-badge{position:absolute;top:10px;right:10px;background:#d4af37;color:#1a1a1a;font-size:0.65rem;font-weight:700;padding:3px 8px;border-radius:4px;font-family:'Cinzel',serif}
+.promo-icon{display:block;font-size:2.5rem;color:#d4af37;margin-bottom:0.75rem}
+.sidebar-card h4{font-family:'Cinzel',serif;font-size:1rem;margin:0 0 0.5rem;color:#1a1a1a}
+.sidebar-card p{font-size:0.85rem;color:#666;margin:0 0 1rem}
+.promo-beneficios{list-style:none;padding:0;margin:0 0 1rem}
+.promo-beneficios li{font-size:0.8rem;color:#555;padding:0.25rem 0;border-bottom:1px dashed #e0e0e0}
+.promo-beneficios li:last-child{border-bottom:none}
+
+.btn-promo{width:100%;padding:12px;background:linear-gradient(135deg,#d4af37,#b8962e);border:none;border-radius:8px;color:#1a1a1a;font-family:'Cinzel',serif;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.2s}
+.btn-promo:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(212,175,55,0.3)}
+
+.circulo-activo{background:linear-gradient(135deg,#f0fff0,#fff);text-align:center}
+.circulo-activo h4{color:#2a7a2a}
+
+.btn-outline{padding:10px 16px;background:transparent;border:1px solid #d4af37;border-radius:6px;color:#d4af37;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.btn-outline:hover{background:#d4af3711}
+
+.oferta-mini{display:flex;align-items:center;gap:10px;margin-bottom:0.75rem}
+.oferta-mini span:first-child{font-size:1.5rem;color:#d4af37;width:35px;text-align:center}
+.oferta-mini div{flex:1}
+.oferta-mini strong{display:block;font-size:0.9rem;color:#1a1a1a}
+.oferta-mini p{margin:0;font-size:0.75rem;color:#888}
+.oferta-mini .precio{font-family:'Cinzel',serif;font-weight:600;color:#d4af37}
+
+.btn-outline-sm{padding:8px 12px;background:transparent;border:1px solid #ddd;border-radius:6px;color:#666;font-size:0.8rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;text-align:center}
+.btn-outline-sm:hover{border-color:#d4af37;color:#d4af37}
+
+.sidebar-footer{padding:1.25rem;background:#fafafa;margin-top:auto;text-align:center}
+.sidebar-footer p{font-size:0.8rem;color:#888;margin:0 0 0.75rem}
+.btn-tito{padding:10px 16px;background:#1a1a1a;border:none;border-radius:8px;color:#fff;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.btn-tito:hover{background:#2a2a2a}
+
+.contenido.con-sidebar{width:calc(100% - 240px - 280px);padding-right:1rem}
+
+@media(max-width:1200px){.contenido.con-sidebar{width:calc(100% - 240px)}.sidebar-oportunidades{display:none}.sidebar-toggle{display:none}}
 `;
