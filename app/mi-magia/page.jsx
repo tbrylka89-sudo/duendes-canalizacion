@@ -688,19 +688,26 @@ export default function MiMagia() {
               </div>
             )}
 
-            {/* OFERTA RUNAS */}
+            {/* RUNAS DE PODER */}
             <div className="sidebar-card">
               <div className="oferta-mini">
                 <span>ᚱ</span>
                 <div>
-                  <strong>Pack Destello</strong>
-                  <p>30 runas - El más popular</p>
+                  <strong>Runas de Poder</strong>
+                  <p>Para experiencias mágicas</p>
                 </div>
-                <span className="precio">$12</span>
               </div>
-              <a href="https://duendesuy.10web.cloud/producto/runas-destello/" target="_blank" rel="noopener" className="btn-outline-sm">
-                Ver pack
-              </a>
+              <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                <a href="https://duendesuy.10web.cloud/product/runas-de-poder-30/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>30 Runas</span><span style={{color:'#d4af37'}}>$12</span>
+                </a>
+                <a href="https://duendesuy.10web.cloud/product/runas-de-poder-50/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>50 Runas</span><span style={{color:'#d4af37'}}>$18</span>
+                </a>
+                <a href="https://duendesuy.10web.cloud/product/runas-de-poder-100/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>100 Runas</span><span style={{color:'#d4af37'}}>$32</span>
+                </a>
+              </div>
             </div>
 
             {/* EXPERIENCIA DESTACADA */}
