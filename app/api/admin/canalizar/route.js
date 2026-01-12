@@ -179,6 +179,45 @@ CHAMÁN/CHAMANA:
 - Pinturas faciales
 - Conexión con animales
 
+═══════════════════════════════════════════════════════════════════════════════
+NOMBRES SEGÚN TIPO DE SER (OBLIGATORIO):
+═══════════════════════════════════════════════════════════════════════════════
+
+Los nombres DEBEN corresponder al tipo de ser identificado. NUNCA nombres genéricos.
+
+LEPRECHAUN → Nombres irlandeses/celtas:
+  Finnegan, Seamus, Padraig, Cormac, Declan, Ronan, Liam, Connor, Murphy, Sullivan
+
+DUENDE/GNOMO → Nombres de naturaleza/bosque:
+  Bramble, Oakroot, Thornwick, Moss, Elderwood, Pebblefoot, Acorn, Fernleaf, Burrow
+
+ELFO/ELFA → Nombres élficos/etéreos:
+  Thalindor, Aelindra, Silvethil, Lorien, Galadwen, Elowen, Faelar, Nimrodel, Celeborn
+
+VIKINGO/VIKINGA → Nombres nórdicos:
+  Bjorn, Ragnar, Thorin, Freya, Astrid, Sigrid, Leif, Ingrid, Odin, Valka, Eira
+
+BRUJA/BRUJO → Nombres místicos oscuros:
+  Morgana, Ravenna, Ebonweave, Nightshade, Shadowmere, Grimwood, Hexara, Vesper
+
+MAGO/MAGA → Nombres de sabiduría:
+  Merwyn, Aldric, Cassian, Isolde, Thalassa, Cedric, Evanora, Magnus, Seraphina
+
+HADA → Nombres delicados/luminosos:
+  Aurora, Willow, Starshine, Dewdrop, Shimmer, Crystalline, Lumina, Petalwing
+
+CHAMÁN/CHAMANA → Nombres de espíritu/naturaleza:
+  Spiritwalker, Thunderhawk, Moonstone, Earthsong, Windwhisper, Stormcrow
+
+GUERRERO/GUERRERA → Nombres de fuerza:
+  Valorian, Braveheart, Ironwill, Steelheart, Dragonbane, Stormbreaker
+
+DRUIDA → Nombres celtas de naturaleza:
+  Rowan, Ashwood, Hawthorn, Willowmist, Greenmantle, Oakenshield
+
+NUNCA usar: nombres diminutivos (-ito/-ita), nombres comunes (Juan, María),
+nombres de fantasía infantil (Sparkles, Twinkle), nombres sin sentido.
+
 Tipos disponibles: ${TIPOS_SERES.join(', ')}
 
 ═══════════════════════════════════════════════════════════════════════════════

@@ -728,6 +728,183 @@ function duendes_render_producto_epico() {
             }
         }
 
+        /* ═══════════════════════════════════════════════════════════════
+           FORZAR COLORES - Evitar conflictos con WooCommerce/Theme
+        ═══════════════════════════════════════════════════════════════ */
+
+        /* Secciones con fondo oscuro = texto blanco */
+        .hero-banner,
+        .hero-banner *,
+        .seccion.fondo-oscuro,
+        .seccion.fondo-oscuro *,
+        .mensaje-directo-seccion,
+        .mensaje-directo-seccion * {
+            color: #fff !important;
+        }
+
+        .hero-banner .hero-badge,
+        .hero-banner .hero-subtitulo,
+        .seccion.fondo-oscuro .seccion-titulo,
+        .seccion.fondo-oscuro h2,
+        .seccion.fondo-oscuro h3,
+        .mensaje-directo-seccion .seccion-titulo {
+            color: var(--dorado) !important;
+        }
+
+        .hero-banner .hero-spec {
+            color: rgba(255,255,255,0.6) !important;
+        }
+
+        .hero-banner .hero-spec span {
+            color: var(--dorado) !important;
+        }
+
+        /* Secciones con fondo claro = texto oscuro */
+        .contenido-principal,
+        .contenido-principal *,
+        .seccion:not(.fondo-oscuro),
+        .seccion:not(.fondo-oscuro) * {
+            color: #2a2a2a;
+        }
+
+        .contenido-principal .seccion-titulo,
+        .contenido-principal h2,
+        .contenido-principal h3,
+        .seccion:not(.fondo-oscuro) .seccion-titulo {
+            color: var(--dorado) !important;
+        }
+
+        /* Info producto */
+        .info-producto, .info-producto * {
+            color: #2a2a2a !important;
+        }
+
+        .info-producto .precio-principal {
+            color: var(--negro) !important;
+        }
+
+        .info-producto .precio-secundario {
+            color: #888 !important;
+        }
+
+        /* Dones */
+        .don-nombre {
+            color: var(--dorado) !important;
+        }
+
+        .don-descripcion {
+            color: #666 !important;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MÓVIL - Estilos completos
+        ═══════════════════════════════════════════════════════════════ */
+
+        @media (max-width: 768px) {
+            /* Asegurar que el body tenga fondo correcto */
+            body {
+                background: var(--crema) !important;
+            }
+
+            /* Header de WordPress visible */
+            .site-header,
+            header,
+            #masthead,
+            .main-navigation,
+            nav {
+                position: relative !important;
+                z-index: 9999 !important;
+            }
+
+            /* Ocultar admin bar en móvil si molesta */
+            #wpadminbar {
+                display: none !important;
+            }
+
+            html {
+                margin-top: 0 !important;
+            }
+
+            /* Hero más pequeño en móvil */
+            .hero-banner {
+                height: auto !important;
+                min-height: 350px !important;
+                padding: 60px 20px !important;
+            }
+
+            .hero-nombre {
+                font-size: 32px !important;
+                letter-spacing: 3px !important;
+            }
+
+            .hero-subtitulo {
+                font-size: 16px !important;
+            }
+
+            .hero-specs {
+                gap: 15px !important;
+            }
+
+            .hero-spec {
+                font-size: 12px !important;
+            }
+
+            /* Galería en móvil */
+            .galeria-principal img {
+                aspect-ratio: 1/1 !important;
+            }
+
+            .galeria-thumbs {
+                overflow-x: auto !important;
+                padding-bottom: 10px !important;
+            }
+
+            .galeria-thumb {
+                flex-shrink: 0 !important;
+            }
+
+            /* Precios en móvil */
+            .precio-principal {
+                font-size: 32px !important;
+            }
+
+            /* Botones en móvil */
+            .btn-sellar-pacto,
+            .btn-sena {
+                padding: 15px 20px !important;
+                font-size: 14px !important;
+            }
+
+            /* Secciones en móvil */
+            .seccion {
+                padding: 40px 15px !important;
+            }
+
+            .seccion-titulo {
+                font-size: 24px !important;
+            }
+
+            /* Ritual en móvil */
+            .ritual-paso {
+                grid-template-columns: 50px 1fr !important;
+            }
+
+            .paso-numero {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+            }
+
+            /* CTA final en móvil */
+            .cta-final {
+                padding: 40px 20px !important;
+            }
+
+            .cta-nombre {
+                font-size: 28px !important;
+            }
+        }
+
         /* FONTS */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
     </style>
