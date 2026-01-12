@@ -499,7 +499,10 @@ export async function GET(request) {
   const wcSecret = process.env.WC_CONSUMER_SECRET;
 
   if (!wcKey || !wcSecret) {
-    return Response.json({ error: 'Credenciales WooCommerce no configuradas' }, { status: 500, headers: corsHeaders });
+    return Response.json({
+      error: 'Credenciales WooCommerce no configuradas',
+      debug: { hasKey: !!wcKey, hasSecret: !!wcSecret }
+    }, { status: 500, headers: corsHeaders });
   }
 
   try {
@@ -507,28 +510,48 @@ export async function GET(request) {
 
     // Obtener todos los productos
     const response = await fetch(`${wcUrl}/wp-json/wc/v3/products?per_page=100&status=publish,draft`, {
-      headers: { 'Authorization': `Basic ${auth}` }
+      headers: { 'Authorization': `Basic ${auth}` },
+      cache: 'no-store'
     });
 
     if (!response.ok) {
-      throw new Error('Error obteniendo productos');
+      const errorText = await response.text();
+      console.error('WooCommerce error:', response.status, errorText);
+      throw new Error(`Error WooCommerce: ${response.status}`);
     }
 
     const productos = await response.json();
 
+    // Verificar que sea un array
+    if (!Array.isArray(productos)) {
+      throw new Error('Respuesta inesperada de WooCommerce');
+    }
+
     // Separar canalizados y pendientes
     const resultado = {
       pendientes: [],
-      canalizados: []
+      canalizados: [],
+      debug: {
+        totalProductos: productos.length,
+        conImagen: 0,
+        sinImagen: 0
+      }
     };
 
     for (const p of productos) {
+      const tieneImagen = Array.isArray(p.images) && p.images.length > 0;
       const canalizado = p.meta_data?.find(m => m.key === '_duendes_canalizado')?.value === 'si';
+
+      if (tieneImagen) {
+        resultado.debug.conImagen++;
+      } else {
+        resultado.debug.sinImagen++;
+      }
 
       const producto = {
         id: p.id,
         nombre: p.name,
-        imagen: p.images?.[0]?.src,
+        imagen: tieneImagen ? p.images[0].src : null,
         precio: p.price,
         estado: p.status,
         fechaCreacion: p.date_created,
@@ -539,7 +562,7 @@ export async function GET(request) {
         producto.fechaCanalizacion = p.meta_data?.find(m => m.key === '_duendes_fecha_canalizacion')?.value;
         producto.tipo = p.meta_data?.find(m => m.key === '_duendes_tipo')?.value;
         resultado.canalizados.push(producto);
-      } else if (p.images?.length > 0) {
+      } else if (tieneImagen) {
         // Solo incluir si tiene imagen
         resultado.pendientes.push(producto);
       }
