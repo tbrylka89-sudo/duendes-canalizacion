@@ -186,6 +186,123 @@ export default function ProductosMagicos() {
   );
 
   // ═══════════════════════════════════════════════════════════════
+  // GENERACIÓN MASIVA DE HISTORIAS
+  // ═══════════════════════════════════════════════════════════════
+  const [generacionMasiva, setGeneracionMasiva] = useState({
+    activa: false,
+    progreso: 0,
+    total: 0,
+    actual: '',
+    errores: [],
+    completados: []
+  });
+
+  const generarHistoriasMasivas = async () => {
+    // Filtrar productos sin historia
+    const sinHistoria = productos.filter(p => !p.tieneHistoria && p.imagen);
+
+    if (sinHistoria.length === 0) {
+      mostrarMensaje('Todos los productos ya tienen historia', 'info');
+      return;
+    }
+
+    if (!confirm(`¿Generar historias para ${sinHistoria.length} productos? Esto puede tardar varios minutos.`)) {
+      return;
+    }
+
+    setGeneracionMasiva({
+      activa: true,
+      progreso: 0,
+      total: sinHistoria.length,
+      actual: '',
+      errores: [],
+      completados: []
+    });
+
+    for (let i = 0; i < sinHistoria.length; i++) {
+      const producto = sinHistoria[i];
+
+      setGeneracionMasiva(prev => ({
+        ...prev,
+        progreso: i + 1,
+        actual: producto.nombre
+      }));
+
+      try {
+        // Detectar tipo automáticamente
+        const nombreLower = producto.nombre.toLowerCase();
+        let tipo = 'Duende';
+        if (nombreLower.includes('elfo') || nombreLower.includes('elfa')) tipo = 'Elfo';
+        else if (nombreLower.includes('hada')) tipo = 'Hada';
+        else if (nombreLower.includes('mago')) tipo = 'Mago';
+        else if (nombreLower.includes('bruja')) tipo = 'Bruja';
+        else if (nombreLower.includes('gnomo')) tipo = 'Gnomo';
+
+        // Detectar elemento por categoría o aleatoriamente
+        const elementos = ['Tierra', 'Agua', 'Fuego', 'Aire', 'Éter'];
+        const elemento = elementos[i % elementos.length]; // Distribuir elementos
+
+        // Detectar propósito
+        const propositos = ['Protección', 'Abundancia', 'Amor', 'Sanación', 'Sabiduría', 'Creatividad'];
+        const proposito = propositos[Math.floor(Math.random() * propositos.length)];
+
+        const res = await fetch('/api/admin/productos/generar-historia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre: producto.nombre,
+            tipo,
+            elemento,
+            proposito,
+            caracteristicas: '',
+            productId: producto.id
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          setGeneracionMasiva(prev => ({
+            ...prev,
+            completados: [...prev.completados, producto.nombre]
+          }));
+
+          // Actualizar lista de productos
+          setProductos(prev => prev.map(p =>
+            p.id === producto.id
+              ? { ...p, tieneHistoria: true, tieneNeuro: true }
+              : p
+          ));
+        } else {
+          setGeneracionMasiva(prev => ({
+            ...prev,
+            errores: [...prev.errores, `${producto.nombre}: ${data.error}`]
+          }));
+        }
+
+        // Esperar 3 segundos entre requests para no sobrecargar
+        if (i < sinHistoria.length - 1) {
+          await new Promise(r => setTimeout(r, 3000));
+        }
+
+      } catch (e) {
+        setGeneracionMasiva(prev => ({
+          ...prev,
+          errores: [...prev.errores, `${producto.nombre}: ${e.message}`]
+        }));
+      }
+    }
+
+    setGeneracionMasiva(prev => ({
+      ...prev,
+      activa: false,
+      actual: 'Completado'
+    }));
+
+    mostrarMensaje(`Generación completada: ${sinHistoria.length - generacionMasiva.errores.length} exitosos`);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════════
   return (
@@ -228,6 +345,49 @@ export default function ProductosMagicos() {
               borderRadius: 8, color: C.text, fontSize: 14
             }}
           />
+
+          {/* Botón Generación Masiva */}
+          <button
+            onClick={generarHistoriasMasivas}
+            disabled={generacionMasiva.activa}
+            style={{
+              width: '100%', marginTop: 12, padding: '12px 16px',
+              background: generacionMasiva.activa ? C.elevated : `linear-gradient(135deg, ${C.purple}, ${C.cyan})`,
+              border: 'none', borderRadius: 8, color: C.text,
+              fontWeight: 600, cursor: generacionMasiva.activa ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+            }}
+          >
+            <span>✨</span>
+            {generacionMasiva.activa ? 'Generando...' : 'Generar Todas las Historias'}
+          </button>
+
+          {/* Progreso de generación masiva */}
+          {generacionMasiva.activa && (
+            <div style={{
+              marginTop: 12, padding: 12, background: C.elevated,
+              borderRadius: 8, border: `1px solid ${C.border}`
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: C.muted }}>Progreso</span>
+                <span style={{ fontSize: 12, color: C.gold }}>
+                  {generacionMasiva.progreso}/{generacionMasiva.total}
+                </span>
+              </div>
+              <div style={{
+                height: 6, background: C.border, borderRadius: 3, overflow: 'hidden'
+              }}>
+                <div style={{
+                  height: '100%', width: `${(generacionMasiva.progreso / generacionMasiva.total) * 100}%`,
+                  background: `linear-gradient(90deg, ${C.gold}, ${C.cyan})`,
+                  transition: 'width 0.3s'
+                }} />
+              </div>
+              <p style={{ fontSize: 11, color: C.muted, marginTop: 8 }}>
+                Generando: <span style={{ color: C.text }}>{generacionMasiva.actual}</span>
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Lista */}

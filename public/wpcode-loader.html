@@ -1,0 +1,75 @@
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+🧙 CARGADOR DE PÁGINA MÁGICA - Duendes del Uruguay
+Versión: 1.0 (Enero 2026)
+
+INSTRUCCIONES:
+1. En WordPress → WPCode → Add New Snippet
+2. Tipo: HTML Snippet
+3. Pegá este código
+4. Location: Site Wide Footer
+5. Conditional Logic: Show on → Page Type → Is Single Product
+6. Activar y guardar
+═══════════════════════════════════════════════════════════════════════════════
+-->
+
+<script>
+(function() {
+  'use strict';
+
+  // Solo ejecutar en páginas de producto
+  const esProducto = document.body.classList.contains('single-product') ||
+                     document.body.classList.contains('woocommerce-page');
+
+  if (!esProducto) {
+    console.log('[DuendesLoader] No es página de producto');
+    return;
+  }
+
+  console.log('[DuendesLoader] Cargando página mágica...');
+
+  // Cargar el archivo HTML completo
+  fetch('/wp-content/duendes-magic/producto-magico-full.html')
+    .then(response => {
+      if (!response.ok) throw new Error('No se pudo cargar');
+      return response.text();
+    })
+    .then(html => {
+      console.log('[DuendesLoader] Archivo cargado, inyectando...');
+
+      // Crear un contenedor temporal
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+
+      // Extraer estilos
+      const styles = temp.querySelectorAll('style');
+      styles.forEach(style => document.head.appendChild(style));
+
+      // Extraer el contenedor principal
+      const container = temp.querySelector('#dm-producto-magico');
+      if (container) {
+        document.body.appendChild(container);
+      }
+
+      // Extraer el modal
+      const modal = temp.querySelector('#dmModal');
+      if (modal) {
+        document.body.appendChild(modal);
+      }
+
+      // Extraer y ejecutar scripts
+      const scripts = temp.querySelectorAll('script');
+      scripts.forEach(script => {
+        const newScript = document.createElement('script');
+        newScript.textContent = script.textContent;
+        document.body.appendChild(newScript);
+      });
+
+      console.log('[DuendesLoader] Página mágica inyectada!');
+    })
+    .catch(err => {
+      console.error('[DuendesLoader] Error:', err);
+    });
+
+})();
+</script>
