@@ -428,18 +428,39 @@ function duendes_render_tienda_tarot() {
             border-radius: 9px;
         }
 
-        /* Esquinas decorativas */
+        /* Esquinas decorativas con colores de categoría */
         .tarot-corner {
             position: absolute;
             width: 25px;
             height: 25px;
-            border: 2px solid #C6A962;
+            border: 2px solid var(--card-color, #C6A962);
             z-index: 3;
+            transition: all 0.3s ease;
         }
         .tarot-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
         .tarot-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; border-radius: 0 6px 0 0; }
         .tarot-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; border-radius: 0 0 0 6px; }
         .tarot-corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; border-radius: 0 0 6px 0; }
+
+        /* Colores por categoría en las cartas de producto */
+        .tarot-card[data-cat="proteccion"] { --card-color: #3b82f6; --card-glow: rgba(59, 130, 246, 0.3); }
+        .tarot-card[data-cat="amor"] { --card-color: #ec4899; --card-glow: rgba(236, 72, 153, 0.3); }
+        .tarot-card[data-cat="abundancia"] { --card-color: #f59e0b; --card-glow: rgba(245, 158, 11, 0.3); }
+        .tarot-card[data-cat="salud"] { --card-color: #22c55e; --card-glow: rgba(34, 197, 94, 0.3); }
+        .tarot-card[data-cat="sabiduria"] { --card-color: #8b5cf6; --card-glow: rgba(139, 92, 246, 0.3); }
+
+        /* Brillo de hover según categoría */
+        .tarot-card:hover .tarot-corner {
+            box-shadow: 0 0 10px var(--card-glow, rgba(198,169,98,0.3));
+        }
+
+        /* Marco también toma el color */
+        .tarot-card[data-cat] .tarot-frame {
+            border-color: rgba(198,169,98,0.2);
+        }
+        .tarot-card[data-cat]:hover .tarot-frame {
+            border-color: var(--card-color, #C6A962);
+        }
 
         /* Badge categoria */
         .tarot-badge {
@@ -709,21 +730,33 @@ function duendes_render_tienda_tarot() {
                 $cats = wp_get_post_terms(get_the_ID(), 'product_cat');
                 $cat_principal = !empty($cats) ? $cats[0] : null;
 
-                // Determinar icono
+                // Determinar categoría y icono
                 $icono = '✨';
+                $cat_key = '';
                 if ($cat_principal) {
                     $cat_slug = $cat_principal->slug;
-                    if (strpos($cat_slug, 'protec') !== false) $icono = '🛡️';
-                    elseif (strpos($cat_slug, 'amor') !== false) $icono = '💜';
-                    elseif (strpos($cat_slug, 'dinero') !== false || strpos($cat_slug, 'abundan') !== false) $icono = '✨';
-                    elseif (strpos($cat_slug, 'salud') !== false || strpos($cat_slug, 'sana') !== false) $icono = '🌿';
-                    elseif (strpos($cat_slug, 'sabid') !== false) $icono = '🔮';
+                    if (strpos($cat_slug, 'protec') !== false) {
+                        $icono = '🛡️';
+                        $cat_key = 'proteccion';
+                    } elseif (strpos($cat_slug, 'amor') !== false) {
+                        $icono = '💜';
+                        $cat_key = 'amor';
+                    } elseif (strpos($cat_slug, 'dinero') !== false || strpos($cat_slug, 'abundan') !== false) {
+                        $icono = '✨';
+                        $cat_key = 'abundancia';
+                    } elseif (strpos($cat_slug, 'salud') !== false || strpos($cat_slug, 'sana') !== false) {
+                        $icono = '🌿';
+                        $cat_key = 'salud';
+                    } elseif (strpos($cat_slug, 'sabid') !== false) {
+                        $icono = '🔮';
+                        $cat_key = 'sabiduria';
+                    }
                 }
 
-                $tipo = get_post_meta(get_the_ID(), '_guardian_tipo', true) ?: 'Guardián';
+                $tipo = get_post_meta(get_the_ID(), '_guardian_tipo', true) ?: get_post_meta(get_the_ID(), '_duendes_tipo', true) ?: 'Guardián';
                 $nombre = get_the_title();
             ?>
-            <article class="tarot-card" data-product-id="<?php echo get_the_ID(); ?>">
+            <article class="tarot-card" data-product-id="<?php echo get_the_ID(); ?>" data-cat="<?php echo esc_attr($cat_key); ?>">
                 <a href="<?php the_permalink(); ?>" class="tarot-inner">
                     <div class="tarot-frame"></div>
                     <div class="tarot-corner tl"></div>

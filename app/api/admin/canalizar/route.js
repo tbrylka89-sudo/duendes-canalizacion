@@ -138,8 +138,32 @@ ${PROPOSITOS.join(', ')}`;
 
 const USER_PROMPT = `ANALIZA esta imagen del guardián y GENERA TODO su contenido completo.
 
-Si el guardián tiene nombre previo, es: {nombre_previo}
-Si no tiene nombre, CREA uno apropiado (céltico, nórdico, élfico, de la naturaleza - NUNCA diminutivos).
+═══════════════════════════════════════════════════════════════════════════════
+INFORMACIÓN DEL DUEÑO/A (USAR OBLIGATORIAMENTE):
+═══════════════════════════════════════════════════════════════════════════════
+Nombre previo (si tiene): {nombre_previo}
+Notas del dueño/a: {notas_dueno}
+
+IMPORTANTE: Las notas del dueño/a contienen información CRÍTICA que DEBÉS usar:
+- Si dice "mide X cm" → usar esa altura exacta
+- Si dice "tiene amatista/cuarzo/etc" → incluir en accesorios y en la historia
+- Si dice "es anciana/joven/etc" → reflejar en personalidad e historia
+- Si dice "femenino/masculino" → usar ese género SIEMPRE
+
+═══════════════════════════════════════════════════════════════════════════════
+REGLA DE GÉNERO (CRÍTICA - NO IGNORAR):
+═══════════════════════════════════════════════════════════════════════════════
+Si el guardián es FEMENINO:
+- Usar "ella", "la", "guardiana", "recibirla", "cuidarla", "conectar con ella"
+- NUNCA usar "él", "lo", "guardián", "recibirlo"
+
+Si el guardián es MASCULINO:
+- Usar "él", "lo", "guardián", "recibirlo", "cuidarlo", "conectar con él"
+- NUNCA usar "ella", "la", "guardiana", "recibirla"
+
+Si el guardián es NEUTRO:
+- Usar "este ser", "el guardián", "recibirle"
+═══════════════════════════════════════════════════════════════════════════════
 
 GENERA UN JSON COMPLETO con esta estructura exacta:
 
@@ -362,7 +386,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { productId, imageUrl, nombrePrevio } = body;
+    const { productId, imageUrl, nombrePrevio, notas } = body;
 
     if (!productId) {
       return Response.json({ success: false, error: 'productId requerido' }, { status: 400, headers: corsHeaders });
@@ -372,8 +396,10 @@ export async function POST(request) {
       return Response.json({ success: false, error: 'imageUrl requerida' }, { status: 400, headers: corsHeaders });
     }
 
-    // Construir el prompt con el nombre previo si existe
-    const userPrompt = USER_PROMPT.replace('{nombre_previo}', nombrePrevio || 'No tiene nombre aún, creá uno apropiado');
+    // Construir el prompt con nombre previo y notas
+    const userPrompt = USER_PROMPT
+      .replace('{nombre_previo}', nombrePrevio || 'No tiene nombre aún, creá uno apropiado')
+      .replace('{notas_dueno}', notas || 'Sin notas adicionales - analizar todo desde la imagen');
 
     // Llamar a Claude con Vision
     const response = await fetch('https://api.anthropic.com/v1/messages', {

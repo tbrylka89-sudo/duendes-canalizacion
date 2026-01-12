@@ -579,6 +579,84 @@ function duendes_canalizador_page() {
                 margin-bottom: 20px;
             }
 
+            /* Campo de notas */
+            .notas-container {
+                margin-bottom: 15px;
+                padding: 15px;
+                background: rgba(0,0,0,0.3);
+                border-radius: 12px;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .notas-label {
+                display: block;
+                font-size: 13px;
+                color: #C6A962;
+                margin-bottom: 8px;
+                font-weight: 500;
+            }
+
+            .notas-input {
+                width: 100%;
+                padding: 12px;
+                background: rgba(0,0,0,0.4);
+                border: 1px solid rgba(198,169,98,0.3);
+                border-radius: 8px;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                font-size: 13px;
+                resize: vertical;
+                transition: all 0.3s;
+            }
+
+            .notas-input:focus {
+                outline: none;
+                border-color: #C6A962;
+                box-shadow: 0 0 20px rgba(198,169,98,0.2);
+            }
+
+            .notas-input::placeholder {
+                color: rgba(255,255,255,0.3);
+                font-style: italic;
+            }
+
+            .notas-hint {
+                font-size: 11px;
+                color: rgba(255,255,255,0.4);
+                margin-top: 6px;
+                font-style: italic;
+            }
+
+            /* Botones secundarios */
+            .btn-recanalizar {
+                width: 100%;
+                padding: 12px;
+                background: transparent;
+                border: 1px solid rgba(245,158,11,0.5);
+                border-radius: 10px;
+                color: #f59e0b;
+                font-size: 13px;
+                cursor: pointer;
+                transition: all 0.3s;
+                margin-top: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-recanalizar:hover {
+                background: rgba(245,158,11,0.1);
+                border-color: #f59e0b;
+            }
+
+            .botones-canalizado {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 15px;
+            }
+
             /* Responsive */
             @media (max-width: 768px) {
                 .canalizador-app {
@@ -600,6 +678,10 @@ function duendes_canalizador_page() {
 
                 .resultado-datos {
                     grid-template-columns: 1fr;
+                }
+
+                .notas-input {
+                    font-size: 14px;
                 }
             }
         </style>
@@ -719,6 +801,19 @@ function duendes_canalizador_page() {
                             <span class="producto-precio">$${p.precio || 0} USD</span>
                             <span>ID: ${p.id}</span>
                         </div>
+
+                        <!-- Campo de notas personalizadas -->
+                        <div class="notas-container">
+                            <label class="notas-label">📝 Notas para la IA (opcional)</label>
+                            <textarea
+                                id="notas-${p.id}"
+                                class="notas-input"
+                                placeholder="Ej: Mide 25 cm, tiene amatista en el báculo, es anciana, femenino, energía tranquila..."
+                                rows="3"
+                            ></textarea>
+                            <div class="notas-hint">La IA interpretará estas notas e incluirá los detalles en la historia</div>
+                        </div>
+
                         <button class="btn-canalizar" onclick="iniciarCanalizacion(${p.id}, '${p.imagen}', '${p.nombre || ''}')">
                             🪄 Canalizar con IA
                         </button>
@@ -774,9 +869,25 @@ function duendes_canalizador_page() {
                             </div>
                         </div>
 
-                        <a href="${p.url}" target="_blank" class="btn-ver" style="margin-top: 15px;">
-                            Ver producto →
-                        </a>
+                        <!-- Notas para recanalización -->
+                        <div class="notas-container" style="margin-top: 15px;">
+                            <label class="notas-label">📝 Notas para recanalizar (opcional)</label>
+                            <textarea
+                                id="notas-rec-${p.id}"
+                                class="notas-input"
+                                placeholder="Agregar detalles nuevos o corregir información..."
+                                rows="2"
+                            ></textarea>
+                        </div>
+
+                        <div class="botones-canalizado">
+                            <a href="${p.url}" target="_blank" class="btn-ver">
+                                Ver producto →
+                            </a>
+                            <button class="btn-recanalizar" onclick="recanalizar(${p.id}, '${p.imagen}', '${p.nombre || ''}')">
+                                🔄 Recanalizar
+                            </button>
+                        </div>
                     </div>
                 </div>
             `}).join('');
@@ -795,13 +906,17 @@ function duendes_canalizador_page() {
             const modalTitulo = document.getElementById('modal-titulo');
             const modalBody = document.getElementById('modal-body');
 
+            // Obtener notas del textarea
+            const notasTextarea = document.getElementById(`notas-${productId}`);
+            const notas = notasTextarea ? notasTextarea.value.trim() : '';
+
             modal.classList.add('visible');
             modalTitulo.textContent = 'Canalizando...';
             modalBody.innerHTML = `
                 <div class="canalizando-estado">
                     <div class="canalizando-spinner"></div>
                     <div class="canalizando-mensaje">Analizando la imagen del guardián...</div>
-                    <div class="canalizando-detalle">Claude está percibiendo su esencia. Esto puede tardar 30-60 segundos.</div>
+                    <div class="canalizando-detalle">Claude está percibiendo su esencia${notas ? ' y tus notas' : ''}. Esto puede tardar 30-60 segundos.</div>
                 </div>
             `;
 
@@ -812,7 +927,8 @@ function duendes_canalizador_page() {
                     body: JSON.stringify({
                         productId,
                         imageUrl,
-                        nombrePrevio: nombrePrevio || null
+                        nombrePrevio: nombrePrevio || null,
+                        notas: notas || null
                     })
                 });
 
@@ -838,12 +954,71 @@ function duendes_canalizador_page() {
             }
         }
 
-        function mostrarResultadoExitoso(data) {
+        // Función para recanalizar un guardián ya canalizado
+        async function recanalizar(productId, imageUrl, nombrePrevio) {
+            if (!confirm('¿Estás segura de que querés recanalizar este guardián? Se generará una nueva historia y datos.')) {
+                return;
+            }
+
+            const modal = document.getElementById('modal');
+            const modalTitulo = document.getElementById('modal-titulo');
+            const modalBody = document.getElementById('modal-body');
+
+            // Obtener notas del textarea de recanalización
+            const notasTextarea = document.getElementById(`notas-rec-${productId}`);
+            const notas = notasTextarea ? notasTextarea.value.trim() : '';
+
+            modal.classList.add('visible');
+            modalTitulo.textContent = 'Recanalizando...';
+            modalBody.innerHTML = `
+                <div class="canalizando-estado">
+                    <div class="canalizando-spinner"></div>
+                    <div class="canalizando-mensaje">Reconectando con la esencia del guardián...</div>
+                    <div class="canalizando-detalle">Claude está recanalizando${notas ? ' con las nuevas notas' : ''}. Esto puede tardar 30-60 segundos.</div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId,
+                        imageUrl,
+                        nombrePrevio: nombrePrevio || null,
+                        notas: notas || null,
+                        recanalizar: true
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    mostrarResultadoExitoso(data, true);
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+
+            } catch (e) {
+                modalBody.innerHTML = `
+                    <div class="canalizando-estado">
+                        <div style="font-size: 60px; margin-bottom: 20px;">❌</div>
+                        <div class="canalizando-mensaje" style="color: #ef4444;">Error en la recanalización</div>
+                        <div class="canalizando-detalle">${e.message}</div>
+                        <button class="btn-canalizar" style="margin-top: 30px; max-width: 200px;" onclick="cerrarModal()">
+                            Cerrar
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function mostrarResultadoExitoso(data, esRecanalizado = false) {
             const modalTitulo = document.getElementById('modal-titulo');
             const modalBody = document.getElementById('modal-body');
             const c = data.contenido;
 
-            modalTitulo.textContent = '¡Guardián Canalizado!';
+            modalTitulo.textContent = esRecanalizado ? '¡Guardián Recanalizado!' : '¡Guardián Canalizado!';
 
             modalBody.innerHTML = `
                 <div class="resultado-exitoso">
