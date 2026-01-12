@@ -600,6 +600,20 @@ function duendes_canalizador_page() {
                 margin-bottom: 30px;
             }
 
+            .resultado-modificar {
+                background: rgba(245,158,11,0.1);
+                border: 1px solid rgba(245,158,11,0.3);
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .resultado-modificar h4 {
+                color: #f59e0b;
+                margin-bottom: 15px;
+                font-size: 14px;
+            }
+
             .resultado-qr-box img {
                 width: 100px;
                 height: 100px;
@@ -1148,10 +1162,22 @@ function duendes_canalizador_page() {
             }
         }
 
+        // Variable global para guardar datos del último resultado
+        let ultimoResultado = null;
+
         function mostrarResultadoExitoso(data, esRecanalizado = false) {
             const modalTitulo = document.getElementById('modal-titulo');
             const modalBody = document.getElementById('modal-body');
             const c = data.contenido;
+
+            // Guardar para posibles modificaciones
+            ultimoResultado = data;
+
+            // Detener animación de fases
+            detenerAnimacionFases();
+
+            // Sonido de éxito
+            playSuccessSound();
 
             modalTitulo.textContent = esRecanalizado ? '¡Guardián Recanalizado!' : '¡Guardián Canalizado!';
 
@@ -1191,16 +1217,87 @@ function duendes_canalizador_page() {
                     </div>
                     ` : ''}
 
+                    <!-- Sección de modificación -->
+                    <div class="resultado-modificar">
+                        <h4>¿Querés modificar algo?</h4>
+                        <textarea id="modificacion-texto" class="notas-input" rows="3" placeholder="Ej: Cambiar el nombre a 'Elderwood', no es leprechaun es duende común, agregar que tiene amatista..."></textarea>
+                        <button class="btn-recanalizar" onclick="aplicarModificacion()" style="margin-top: 10px;">
+                            🔄 Regenerar con cambios
+                        </button>
+                    </div>
+
                     <div class="resultado-acciones">
                         <button class="btn-canalizar" onclick="cerrarModalYRecargar()">
-                            ✓ Perfecto
+                            ✓ Todo perfecto, guardar
                         </button>
-                        <a href="<?php echo admin_url('post.php?action=edit&post='); ?>${data.contenido.productId || ''}" class="btn-ver" style="flex: 1;">
-                            Editar producto
+                        <a href="/wp-admin/post.php?post=${data.productId || c.productId || ''}&action=edit" target="_blank" class="btn-ver" style="flex: 1;">
+                            Ver en WooCommerce →
                         </a>
                     </div>
                 </div>
             `;
+        }
+
+        // Función para aplicar modificaciones
+        async function aplicarModificacion() {
+            const texto = document.getElementById('modificacion-texto')?.value?.trim();
+            if (!texto) {
+                alert('Escribí qué querés modificar');
+                return;
+            }
+
+            if (!ultimoResultado) {
+                alert('Error: no hay datos para modificar');
+                return;
+            }
+
+            // Recanalizar con las notas de modificación
+            const productId = ultimoResultado.productId || ultimoResultado.contenido?.productId;
+            const imageUrl = ultimoResultado.imageUrl || ultimoResultado.contenido?.imageUrl;
+            const nombreActual = ultimoResultado.contenido?.datosGenerados?.nombre;
+
+            if (!productId || !imageUrl) {
+                alert('Error: faltan datos del producto');
+                return;
+            }
+
+            // Mostrar estado de recanalización
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="canalizando-estado">
+                    <div class="canalizando-spinner">
+                        <div class="canalizando-spinner-inner"></div>
+                        <div class="canalizando-icono">🔄</div>
+                    </div>
+                    <div class="canalizando-mensaje">Aplicando tus cambios...</div>
+                    <div class="canalizando-detalle">${texto}</div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId,
+                        imageUrl,
+                        nombrePrevio: nombreActual,
+                        notas: `MODIFICACIÓN SOLICITADA: ${texto}`,
+                        recanalizar: true
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    mostrarResultadoExitoso(data, true);
+                } else {
+                    throw new Error(data.error || 'Error');
+                }
+            } catch (e) {
+                alert('Error al modificar: ' + e.message);
+                mostrarResultadoExitoso(ultimoResultado);
+            }
         }
 
         function cerrarModal() {

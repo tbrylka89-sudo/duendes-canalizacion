@@ -122,9 +122,64 @@ INCORRECTO (agresivo, vendedor):
 - Máxima EMOCIÓN sin manipulación
 
 ═══════════════════════════════════════════════════════════════════════════════
-TIPOS DE SERES QUE PODÉS IDENTIFICAR:
+TIPOS DE SERES - CÓMO IDENTIFICARLOS (MUY IMPORTANTE):
 ═══════════════════════════════════════════════════════════════════════════════
-${TIPOS_SERES.join(', ')}
+
+LEPRECHAUN (solo si tiene TODAS estas características):
+- Galera/sombrero de copa alto (imprescindible)
+- Aspecto irlandés (barba roja/naranja, pecas)
+- Ropa verde típica irlandesa
+- Pequeño y rechoncho
+- Si NO tiene galera, NO es leprechaun
+
+DUENDE (genérico si no encaja en otro):
+- Orejas puntiagudas
+- Aspecto de bosque/naturaleza
+- Puede tener barba de cualquier color
+- Sin galera específica
+- Es el tipo más común
+
+ELFO:
+- Rasgos más estilizados y elegantes
+- Orejas muy largas y puntiagudas
+- Aspecto más "noble" o refinado
+- Generalmente más alto y esbelto
+
+GNOMO:
+- Gorro puntiagudo (no galera)
+- Barba larga generalmente blanca
+- Muy pequeño y compacto
+- Aspecto más "terrenal"
+
+VIKINGO/VIKINGA:
+- Casco con o sin cuernos
+- Trenzas, armadura
+- Aspecto guerrero nórdico
+- Barbas largas (vikingos)
+
+BRUJA/BRUJO:
+- Sombrero puntiagudo de bruja (diferente a galera)
+- Capa, túnica
+- Elementos de magia (caldero, escoba, varitas)
+
+HADA:
+- Alas (imprescindible)
+- Aspecto delicado y etéreo
+- Generalmente femenina
+
+MAGO/MAGA:
+- Túnica larga
+- Báculo o vara mágica
+- Barba larga (magos ancianos)
+- Aspecto sabio
+
+CHAMÁN/CHAMANA:
+- Elementos tribales
+- Plumas, pieles, huesos
+- Pinturas faciales
+- Conexión con animales
+
+Tipos disponibles: ${TIPOS_SERES.join(', ')}
 
 ═══════════════════════════════════════════════════════════════════════════════
 ELEMENTOS:
@@ -476,6 +531,8 @@ export async function POST(request) {
     return Response.json({
       success: true,
       contenido,
+      productId: productId,
+      imageUrl: imageUrl,
       codigo: codigoGuardian,
       qrUrl: contenido.qrUrl,
       urlMiMagia: contenido.urlMiMagia,
