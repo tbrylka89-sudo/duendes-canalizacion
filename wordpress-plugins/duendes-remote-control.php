@@ -121,6 +121,24 @@ function duendes_snippets_handler($request) {
             }
             return duendes_get_snippet($snippet_id);
 
+        case 'delete':
+            if (!$snippet_id) {
+                return new WP_REST_Response(['success' => false, 'error' => 'ID requerido'], 400);
+            }
+            return duendes_delete_snippet($snippet_id);
+
+        case 'create':
+            $title = $request->get_param('title');
+            $code = $request->get_param('code');
+            $code_type = $request->get_param('code_type') ?: 'html';
+            $location = $request->get_param('location') ?: 'site_wide_footer';
+            $activate = $request->get_param('activate') === 'true' || $request->get_param('activate') === true;
+
+            if (!$title || !$code) {
+                return new WP_REST_Response(['success' => false, 'error' => 'title y code requeridos'], 400);
+            }
+            return duendes_create_snippet($title, $code, $code_type, $location, $activate);
+
         default:
             return duendes_list_snippets();
     }
@@ -236,6 +254,89 @@ function duendes_get_snippet($snippet_id) {
  */
 function duendes_snippets_via_cpt($request) {
     return duendes_list_snippets();
+}
+
+/**
+ * Eliminar snippet
+ */
+function duendes_delete_snippet($snippet_id) {
+    $snippet = get_post($snippet_id);
+
+    if (!$snippet || $snippet->post_type !== 'wpcode') {
+        return new WP_REST_Response([
+            'success' => false,
+            'error' => 'Snippet no encontrado'
+        ], 404);
+    }
+
+    $title = $snippet->post_title;
+    $result = wp_delete_post($snippet_id, true); // true = forzar eliminación permanente
+
+    if ($result) {
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => 'Snippet eliminado',
+            'deleted_id' => $snippet_id,
+            'deleted_title' => $title
+        ], 200);
+    }
+
+    return new WP_REST_Response([
+        'success' => false,
+        'error' => 'No se pudo eliminar el snippet'
+    ], 500);
+}
+
+/**
+ * Crear nuevo snippet
+ */
+function duendes_create_snippet($title, $code, $code_type = 'html', $location = 'site_wide_footer', $activate = false) {
+    // Crear el post
+    $post_data = [
+        'post_title' => $title,
+        'post_type' => 'wpcode',
+        'post_status' => 'publish',
+        'post_content' => ''
+    ];
+
+    $post_id = wp_insert_post($post_data);
+
+    if (is_wp_error($post_id)) {
+        return new WP_REST_Response([
+            'success' => false,
+            'error' => $post_id->get_error_message()
+        ], 500);
+    }
+
+    // Guardar meta datos de WPCode
+    update_post_meta($post_id, '_wpcode_code', $code);
+    update_post_meta($post_id, '_wpcode_code_type', $code_type);
+    update_post_meta($post_id, '_wpcode_location', $location);
+    update_post_meta($post_id, '_wpcode_active', $activate ? '1' : '0');
+    update_post_meta($post_id, '_wpcode_auto_insert', '1');
+
+    // Configurar para que se ejecute en el footer del sitio
+    if ($location === 'site_wide_footer') {
+        update_post_meta($post_id, '_wpcode_location', 'site_wide_footer');
+    } elseif ($location === 'site_wide_header') {
+        update_post_meta($post_id, '_wpcode_location', 'site_wide_header');
+    } elseif ($location === 'woocommerce_single_product') {
+        update_post_meta($post_id, '_wpcode_location', 'woocommerce_single_product');
+        update_post_meta($post_id, '_wpcode_auto_insert_location', 'woocommerce_after_single_product');
+    }
+
+    // Limpiar caché
+    if (function_exists('wpcode_clear_snippet_cache')) {
+        wpcode_clear_snippet_cache();
+    }
+
+    return new WP_REST_Response([
+        'success' => true,
+        'message' => 'Snippet creado',
+        'snippet_id' => $post_id,
+        'title' => $title,
+        'active' => $activate
+    ], 200);
 }
 
 /**
@@ -370,3 +471,22 @@ add_action('init', function() {
         error_log('Duendes Remote Control: Plugin cargado correctamente');
     }
 });
+
+/**
+ * PÁGINA DE PRODUCTO MÁGICA
+ * Inyecta el HTML/CSS/JS en páginas de producto de WooCommerce
+ */
+add_action('wp_footer', function() {
+    // Solo en páginas de producto individuales
+    if (!function_exists('is_product') || !is_product()) {
+        return;
+    }
+
+    $file_path = WP_CONTENT_DIR . '/duendes-magic/producto-magico.html';
+
+    if (file_exists($file_path)) {
+        echo "\n<!-- Duendes Magic Product Page -->\n";
+        readfile($file_path);
+        echo "\n<!-- /Duendes Magic Product Page -->\n";
+    }
+}, 999); // Prioridad alta para que se ejecute al final

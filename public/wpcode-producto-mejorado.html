@@ -1,0 +1,540 @@
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+MEJORAS PÁGINA DE PRODUCTO - Duendes del Uruguay
+Agrega secciones de información del guardián al diseño existente
+═══════════════════════════════════════════════════════════════════════════════
+-->
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   SECCIONES ADICIONALES DEL GUARDIÁN
+═══════════════════════════════════════════════════════════════ */
+
+.dm-guardian-extra {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Historia expandida */
+.dm-historia-completa {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+  padding: 60px 20px;
+  margin: 40px 0;
+  border-radius: 20px;
+  border: 1px solid rgba(198, 169, 98, 0.2);
+}
+
+.dm-historia-completa h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 28px;
+  text-align: center;
+  margin: 0 0 30px 0;
+}
+
+.dm-historia-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  line-height: 1.9;
+  color: #e8e4dc;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: justify;
+}
+
+/* Mensaje de poder (quote) */
+.dm-mensaje-poder {
+  background: linear-gradient(135deg, #1B4D3E 0%, #0d2d24 100%);
+  padding: 50px 30px;
+  margin: 40px 0;
+  border-radius: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.dm-mensaje-poder::before {
+  content: '"';
+  font-family: 'Cinzel', serif;
+  font-size: 100px;
+  color: rgba(198, 169, 98, 0.15);
+  position: absolute;
+  top: 10px;
+  left: 30px;
+}
+
+.dm-mensaje-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-style: italic;
+  color: #fff;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fortalezas */
+.dm-fortalezas {
+  padding: 40px 0;
+}
+
+.dm-fortalezas h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 24px;
+  text-align: center;
+  margin: 0 0 30px 0;
+}
+
+.dm-fortalezas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dm-fortaleza-card {
+  background: #111;
+  border: 1px solid rgba(198, 169, 98, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.dm-fortaleza-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(198, 169, 98, 0.5);
+}
+
+.dm-fortaleza-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.dm-fortaleza-titulo {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+.dm-fortaleza-desc {
+  font-family: 'Cormorant Garamond', serif;
+  color: #999;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Beneficios emocionales */
+.dm-beneficios {
+  background: #0a0a0a;
+  padding: 50px 20px;
+  margin: 40px 0;
+  border-radius: 20px;
+}
+
+.dm-beneficios h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 24px;
+  text-align: center;
+  margin: 0 0 30px 0;
+}
+
+.dm-beneficios-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.dm-beneficio-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.dm-beneficio-item:last-child {
+  border-bottom: none;
+}
+
+.dm-beneficio-check {
+  width: 28px;
+  height: 28px;
+  background: rgba(198, 169, 98, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C6A962;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.dm-beneficio-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  color: #e8e4dc;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Ritual de bienvenida */
+.dm-ritual {
+  background: linear-gradient(135deg, rgba(198, 169, 98, 0.1) 0%, rgba(198, 169, 98, 0.05) 100%);
+  border: 1px solid rgba(198, 169, 98, 0.3);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dm-ritual h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 22px;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dm-ritual-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #e8e4dc;
+  margin: 0;
+}
+
+/* Testimonios mejorados */
+.dm-testimonios {
+  padding: 50px 20px;
+}
+
+.dm-testimonios h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 24px;
+  text-align: center;
+  margin: 0 0 30px 0;
+}
+
+.dm-testimonios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dm-testimonio {
+  background: #111;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.dm-testimonio-estrellas {
+  color: #C6A962;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.dm-testimonio-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: #ccc;
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+}
+
+.dm-testimonio-autor {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Garantías finales */
+.dm-garantias-final {
+  background: #0a0a0a;
+  border: 2px solid rgba(198, 169, 98, 0.3);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  text-align: center;
+}
+
+.dm-garantias-final h2 {
+  font-family: 'Cinzel', serif;
+  color: #C6A962;
+  font-size: 22px;
+  margin: 0 0 24px 0;
+}
+
+.dm-garantias-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.dm-garantia-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e8e4dc;
+  font-size: 15px;
+}
+
+.dm-garantia-icon {
+  font-size: 20px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .dm-historia-completa { padding: 40px 20px; }
+  .dm-historia-texto { font-size: 16px; }
+  .dm-mensaje-texto { font-size: 20px; }
+  .dm-fortalezas-grid { grid-template-columns: 1fr; }
+  .dm-testimonios-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  const API_BASE = 'https://duendes-vercel.vercel.app';
+
+  // Solo ejecutar en páginas de producto
+  function esProductPage() {
+    return document.body.classList.contains('single-product');
+  }
+
+  // Obtener ID del producto
+  function getProductId() {
+    const bodyClasses = document.body.className.split(' ');
+    for (const cls of bodyClasses) {
+      if (cls.startsWith('postid-')) {
+        return cls.replace('postid-', '');
+      }
+    }
+    return null;
+  }
+
+  // Detectar país
+  async function detectarPais() {
+    try {
+      const res = await fetch('https://ipapi.co/json/', { timeout: 3000 });
+      const data = await res.json();
+      return data.country_code || 'UY';
+    } catch (e) {
+      return 'UY';
+    }
+  }
+
+  // Cargar datos y agregar secciones
+  async function mejorarPagina() {
+    const productId = getProductId();
+    if (!productId) return;
+
+    try {
+      const pais = await detectarPais();
+      const res = await fetch(`${API_BASE}/api/producto/${productId}?pais=${pais}`);
+      const data = await res.json();
+
+      if (!data.success) return;
+
+      // Usar descripción como fallback para historia
+      const historia = data.historia?.origen || data.descripcion || null;
+      const personalidad = data.historia?.personalidad || null;
+      const fortalezas = data.historia?.fortalezas || [];
+      const mensajePoder = data.historia?.mensajePoder || null;
+      const ritual = data.historia?.ritual || null;
+      const beneficios = data.neuromarketing?.beneficios || [];
+      const testimonios = data.testimonios || [];
+
+      // Encontrar dónde insertar las secciones
+      const productoContainer = document.querySelector('.dupc-producto');
+      const relacionados = document.querySelector('.dupc-relacionados');
+
+      if (!productoContainer) return;
+
+      // Crear contenedor de secciones extra
+      const extraSections = document.createElement('div');
+      extraSections.className = 'dm-guardian-extra';
+
+      let html = '';
+
+      // Historia completa (si hay más que la descripción corta)
+      if (historia && historia.length > 200) {
+        html += `
+          <div class="dm-historia-completa">
+            <h2>Su Historia</h2>
+            <p class="dm-historia-texto">${historia}</p>
+          </div>
+        `;
+      }
+
+      // Mensaje de poder
+      if (mensajePoder) {
+        html += `
+          <div class="dm-mensaje-poder">
+            <p class="dm-mensaje-texto">${mensajePoder}</p>
+          </div>
+        `;
+      }
+
+      // Fortalezas
+      if (fortalezas.length > 0) {
+        const iconos = ['🛡️', '✨', '🌿', '⚡', '💜', '🔮'];
+        html += `
+          <div class="dm-fortalezas">
+            <h2>Sus Fortalezas</h2>
+            <div class="dm-fortalezas-grid">
+              ${fortalezas.map((f, i) => {
+                const partes = f.split(':');
+                const titulo = partes[0] || f;
+                const desc = partes[1] || '';
+                return `
+                  <div class="dm-fortaleza-card">
+                    <div class="dm-fortaleza-icon">${iconos[i % iconos.length]}</div>
+                    <h3 class="dm-fortaleza-titulo">${titulo}</h3>
+                    ${desc ? `<p class="dm-fortaleza-desc">${desc}</p>` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // Beneficios emocionales
+      if (beneficios.length > 0) {
+        html += `
+          <div class="dm-beneficios">
+            <h2>Lo Que Puede Aportar a Tu Vida</h2>
+            <ul class="dm-beneficios-lista">
+              ${beneficios.map(b => `
+                <li class="dm-beneficio-item">
+                  <span class="dm-beneficio-check">✓</span>
+                  <p class="dm-beneficio-texto">${b}</p>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      // Ritual de bienvenida
+      if (ritual) {
+        html += `
+          <div class="dm-ritual">
+            <h2>📜 Ritual de Bienvenida</h2>
+            <p class="dm-ritual-texto">${ritual}</p>
+          </div>
+        `;
+      }
+
+      // Testimonios
+      if (testimonios.length > 0) {
+        html += `
+          <div class="dm-testimonios">
+            <h2>Lo Que Dicen Otras Elegidas</h2>
+            <div class="dm-testimonios-grid">
+              ${testimonios.map(t => `
+                <div class="dm-testimonio">
+                  <div class="dm-testimonio-estrellas">${'★'.repeat(t.estrellas || 5)}</div>
+                  <p class="dm-testimonio-texto">"${t.texto}"</p>
+                  <p class="dm-testimonio-autor">— ${t.autor}, ${t.pais}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // Determinar texto de envío según país
+      const envioTexto = pais === 'UY'
+        ? 'Envío por DAC (5-7 días)'
+        : 'Envío DHL Express (5-10 días)';
+
+      // Garantías
+      html += `
+        <div class="dm-garantias-final">
+          <h2>Nuestra Garantía Mágica</h2>
+          <div class="dm-garantias-grid">
+            <div class="dm-garantia-item">
+              <span class="dm-garantia-icon">✓</span>
+              <span>30 días para conectar</span>
+            </div>
+            <div class="dm-garantia-item">
+              <span class="dm-garantia-icon">📦</span>
+              <span>${envioTexto}</span>
+            </div>
+            <div class="dm-garantia-item">
+              <span class="dm-garantia-icon">📜</span>
+              <span>Canalización incluida</span>
+            </div>
+            <div class="dm-garantia-item">
+              <span class="dm-garantia-icon">💬</span>
+              <span>Soporte de por vida</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Actualizar el texto de DHL en la página original si existe
+      const dhlElement = document.querySelector('.dupc-info-item');
+      if (dhlElement) {
+        const textoElements = document.querySelectorAll('.dupc-info-texto');
+        textoElements.forEach(el => {
+          if (el.textContent.includes('DHL') || el.textContent.includes('5-10')) {
+            el.innerHTML = pais === 'UY'
+              ? '<strong>DAC</strong><br>5-7 días'
+              : '<strong>DHL EXPRESS</strong><br>5-10 días';
+          }
+        });
+        // También actualizar el título si dice DHL
+        const tituloElements = document.querySelectorAll('.dupc-info-item h4, .dupc-info-item strong');
+        tituloElements.forEach(el => {
+          if (el.textContent.includes('DHL')) {
+            el.textContent = pais === 'UY' ? 'DAC' : 'DHL EXPRESS';
+          }
+        });
+      }
+
+      extraSections.innerHTML = html;
+
+      // Insertar antes de los relacionados o al final del producto
+      if (relacionados) {
+        relacionados.parentNode.insertBefore(extraSections, relacionados);
+      } else {
+        productoContainer.appendChild(extraSections);
+      }
+
+    } catch (e) {
+      console.error('Error mejorando página:', e);
+    }
+  }
+
+  // Ejecutar cuando el DOM esté listo
+  if (esProductPage()) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mejorarPagina);
+    } else {
+      mejorarPagina();
+    }
+  }
+
+})();
+</script>

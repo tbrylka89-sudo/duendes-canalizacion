@@ -33,23 +33,56 @@ INSTRUCCIONES:
   --dm-muted: #5C5447;
 }
 
-/* Ocultar página original de WooCommerce */
-.woocommerce-page.single-product .entry-content,
-.woocommerce-page.single-product .product,
-.single-product .woocommerce-product-gallery,
-.single-product .summary,
-.single-product .woocommerce-tabs,
-.single-product .related.products,
-.single-product .product_meta {
+/* Ocultar contenido original cuando la magia está activa */
+/* Diseño personalizado Duendes (dupc-*) */
+body.dm-magic-active .dupc-producto,
+body.dm-magic-active .dupc-orbes,
+body.dm-magic-active .dupc-notif,
+body.dm-magic-active .dupc-relacionados,
+/* WooCommerce estándar */
+body.dm-magic-active .content-area,
+body.dm-magic-active .type-product,
+body.dm-magic-active .woocommerce-product-gallery,
+body.dm-magic-active .product_title,
+body.dm-magic-active .woocommerce-product-rating,
+body.dm-magic-active .price,
+body.dm-magic-active .woocommerce-product-details__short-description,
+body.dm-magic-active form.cart,
+body.dm-magic-active .product_meta,
+body.dm-magic-active .woocommerce-tabs,
+body.dm-magic-active .related.products,
+body.dm-magic-active .summary.entry-summary,
+body.dm-magic-active div.product > .woocommerce-breadcrumb,
+body.dm-magic-active .single-product-content,
+body.dm-magic-active .product-single-summary,
+body.dm-magic-active .product-image-wrap,
+body.dm-magic-active #ast-content,
+body.dm-magic-active .ast-woocommerce-container,
+body.dm-magic-active .single-product div.product,
+body.dm-magic-active main.site-main > article {
   display: none !important;
 }
 
-/* Mostrar cuando no hay datos mágicos */
-body.dm-no-magic .woocommerce-page.single-product .entry-content,
-body.dm-no-magic .woocommerce-page.single-product .product {
-  display: block !important;
+/* Elementor/10web */
+body.dm-magic-active .elementor-widget-woocommerce-product-content,
+body.dm-magic-active [data-elementor-type="product"],
+body.dm-magic-active .elementor-location-single {
+  display: none !important;
 }
 
+/* Mostrar nuestro contenedor mágico */
+#dm-producto-magico {
+  display: block !important;
+  position: relative;
+  z-index: 100;
+}
+
+/* Posicionar correctamente después del header */
+#dm-producto-magico.dm-positioned {
+  margin-top: 0;
+}
+
+/* Cuando NO hay magia, ocultar nuestro contenedor */
 body.dm-no-magic #dm-producto-magico {
   display: none !important;
 }
@@ -841,6 +874,32 @@ body.dm-no-magic #dm-producto-magico {
   font-weight: 600;
 }
 
+.dm-pago-resumen {
+  margin: 24px 0;
+  padding: 20px;
+  background: rgba(198, 169, 98, 0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.dm-pago-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.dm-pago-total .dm-pago-precio {
+  font-size: 24px;
+}
+
+.dm-pago-nota {
+  font-size: 13px;
+  color: var(--dm-muted);
+  margin: 0;
+}
+
 .dm-modal-footer {
   padding: 20px 30px 30px;
 }
@@ -954,23 +1013,12 @@ body.dm-no-magic #dm-producto-magico {
         <label class="dm-form-label">💬 Mensaje para tu guardián (opcional)</label>
         <textarea class="dm-form-input dm-form-textarea" id="dmMensaje" placeholder="¿Qué le querés decir?"></textarea>
       </div>
-      <div class="dm-pago-opciones">
-        <div class="dm-pago-opcion" onclick="dmSeleccionarPago('completo')">
-          <div class="dm-pago-radio"></div>
-          <div class="dm-pago-info">
-            <p class="dm-pago-titulo">Adopción completa</p>
-            <p class="dm-pago-desc">Pago total ahora</p>
-          </div>
-          <div class="dm-pago-precio" id="dmPrecioCompleto">$0</div>
+      <div class="dm-pago-resumen">
+        <div class="dm-pago-total">
+          <span>Total a pagar:</span>
+          <span class="dm-pago-precio" id="dmPrecioCompleto">$0</span>
         </div>
-        <div class="dm-pago-opcion selected" onclick="dmSeleccionarPago('sena')">
-          <div class="dm-pago-radio"></div>
-          <div class="dm-pago-info">
-            <p class="dm-pago-titulo">Reservar con seña</p>
-            <p class="dm-pago-desc">30 días para completar</p>
-          </div>
-          <div class="dm-pago-precio" id="dmPrecioSena">$0</div>
-        </div>
+        <p class="dm-pago-nota">¿Querés consultar por otras opciones de pago? <a href="https://wa.me/59899000000" target="_blank" style="color: var(--dm-gold);">Escribinos</a></p>
       </div>
     </div>
     <div class="dm-modal-footer">
@@ -992,7 +1040,6 @@ body.dm-no-magic #dm-producto-magico {
 
   const API_BASE = 'https://duendes-vercel.vercel.app';
   let productoData = null;
-  let tipoPagoSeleccionado = 'sena';
 
   // Detectar si estamos en página de producto
   function esProductPage() {
@@ -1009,9 +1056,12 @@ body.dm-no-magic #dm-producto-magico {
         return cls.replace('postid-', '');
       }
     }
-    // Intentar desde URL
-    const match = window.location.pathname.match(/\/producto\/([^\/]+)/);
+    // Intentar desde URL (producto o product)
+    const match = window.location.pathname.match(/\/produc(?:to|t)\/([^\/]+)/);
     if (match) return match[1];
+    // Intentar con cualquier slug como ID
+    const slugMatch = window.location.pathname.match(/\/([^\/]+)\/?$/);
+    if (slugMatch && slugMatch[1]) return slugMatch[1];
     return null;
   }
 
@@ -1029,26 +1079,50 @@ body.dm-no-magic #dm-producto-magico {
   // Cargar datos del producto desde Vercel
   async function cargarProducto() {
     const productId = getProductId();
+    console.log('[DuendesMagic] Product ID:', productId);
+
     if (!productId) {
+      console.log('[DuendesMagic] No se encontró ID, abortando');
       document.body.classList.add('dm-no-magic');
       return;
     }
 
     try {
       const pais = await detectarPais();
-      const res = await fetch(`${API_BASE}/api/producto/${productId}?pais=${pais}`);
-      const data = await res.json();
+      console.log('[DuendesMagic] País detectado:', pais);
 
-      if (!data.success || !data.historia?.origen) {
-        // No hay datos mágicos, mostrar página normal
+      const url = `${API_BASE}/api/producto/${productId}?pais=${pais}`;
+      console.log('[DuendesMagic] Llamando API:', url);
+
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log('[DuendesMagic] Respuesta API:', data.success, data.nombre);
+
+      if (!data.success) {
+        console.log('[DuendesMagic] API no exitosa, mostrando página normal');
         document.body.classList.add('dm-no-magic');
         return;
       }
 
+      // Usar descripción de WooCommerce como fallback si no hay historia enriquecida
+      if (!data.historia?.origen && data.descripcion) {
+        data.historia = data.historia || {};
+        data.historia.origen = data.descripcion;
+        console.log('[DuendesMagic] Usando descripción como historia');
+      }
+      if (!data.historia?.origen && data.descripcionCorta) {
+        data.historia = data.historia || {};
+        data.historia.origen = data.descripcionCorta;
+      }
+
       productoData = data;
+      console.log('[DuendesMagic] Agregando clase dm-magic-active al body');
+      document.body.classList.add('dm-magic-active');
+      console.log('[DuendesMagic] Renderizando página...');
       renderizarPagina(data);
+      console.log('[DuendesMagic] Página renderizada!');
     } catch (e) {
-      console.error('Error cargando producto:', e);
+      console.error('[DuendesMagic] Error:', e);
       document.body.classList.add('dm-no-magic');
     }
   }
@@ -1096,11 +1170,6 @@ body.dm-no-magic #dm-producto-magico {
               ${data.precio.original ? `<span class="dm-precio-original">${data.precio.original}</span>` : ''}
             </div>
 
-            ${data.sena.habilitada ? `
-              <div class="dm-sena-info">
-                <p>💫 Reservalo con <strong>${data.sena.mostrar}</strong> y completá el pago en ${data.sena.diasReserva} días</p>
-              </div>
-            ` : ''}
 
             <button class="dm-btn-comprar" onclick="dmAbrirModal()">
               ★ Sellar el Pacto ★
@@ -1116,12 +1185,14 @@ body.dm-no-magic #dm-producto-magico {
         </div>
 
         <!-- HISTORIA -->
+        ${data.historia?.origen ? `
         <div class="dm-seccion">
           <h2 class="dm-seccion-titulo"><span>🔮</span> Su Historia</h2>
           <div class="dm-historia-texto">
             <p>${data.historia.origen}</p>
           </div>
         </div>
+        ` : ''}
 
         <!-- PERSONALIDAD -->
         ${data.historia.personalidad ? `
@@ -1256,7 +1327,6 @@ body.dm-no-magic #dm-producto-magico {
     // Actualizar modal
     document.getElementById('dmModalNombre').textContent = data.nombre;
     document.getElementById('dmPrecioCompleto').textContent = data.precio.mostrar;
-    document.getElementById('dmPrecioSena').textContent = data.sena.mostrar;
 
     // Activar sticky CTA al scrollear
     window.addEventListener('scroll', function() {
@@ -1278,12 +1348,6 @@ body.dm-no-magic #dm-producto-magico {
   window.dmCerrarModal = function() {
     document.getElementById('dmModal').classList.remove('visible');
     document.body.style.overflow = '';
-  };
-
-  window.dmSeleccionarPago = function(tipo) {
-    tipoPagoSeleccionado = tipo;
-    document.querySelectorAll('.dm-pago-opcion').forEach(el => el.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
   };
 
   window.dmPreviewFoto = function(input) {
@@ -1309,10 +1373,9 @@ body.dm-no-magic #dm-producto-magico {
 
     // Agregar al carrito de WooCommerce
     const productId = getProductId();
-    const precio = tipoPagoSeleccionado === 'sena' ? productoData.sena.USD : productoData.precio.USD;
 
     // Redireccionar al checkout con parámetros
-    window.location.href = `/checkout/?add-to-cart=${productId}&dm_nombre=${encodeURIComponent(nombre)}&dm_email=${encodeURIComponent(email)}&dm_tipo=${tipoPagoSeleccionado}`;
+    window.location.href = `/checkout/?add-to-cart=${productId}&dm_nombre=${encodeURIComponent(nombre)}&dm_email=${encodeURIComponent(email)}`;
   };
 
   // Click fuera del modal para cerrar
@@ -1322,9 +1385,67 @@ body.dm-no-magic #dm-producto-magico {
     }
   });
 
+  // Mover el contenedor mágico al lugar correcto (después del header)
+  function posicionarContenedor() {
+    const container = document.getElementById('dm-producto-magico');
+    console.log('[DuendesMagic] Container encontrado:', !!container);
+    if (!container) return;
+
+    // Buscar el header (específico para este tema)
+    const header = document.getElementById('duendesHeader') ||
+                   document.querySelector('header.duendes-header') ||
+                   document.querySelector('header') ||
+                   document.querySelector('.elementor-location-header') ||
+                   document.querySelector('[data-elementor-type="header"]');
+
+    console.log('[DuendesMagic] Header encontrado:', !!header, header?.id || header?.className);
+
+    if (header) {
+      // Buscar el siguiente elemento que no sea texto
+      let nextElement = header.nextElementSibling;
+      console.log('[DuendesMagic] Siguiente elemento:', nextElement?.tagName, nextElement?.className?.substring(0, 50));
+
+      if (nextElement) {
+        // Insertar antes del contenido principal
+        nextElement.parentNode.insertBefore(container, nextElement);
+        console.log('[DuendesMagic] Insertado antes de:', nextElement.tagName);
+      } else if (header.parentNode) {
+        // Insertar después del header
+        header.parentNode.insertBefore(container, header.nextSibling);
+        console.log('[DuendesMagic] Insertado después del header');
+      }
+      container.classList.add('dm-positioned');
+    } else {
+      // Fallback: insertar al principio del body después del primer elemento
+      const firstChild = document.body.firstElementChild;
+      if (firstChild) {
+        document.body.insertBefore(container, firstChild.nextSibling);
+      } else {
+        document.body.insertBefore(container, document.body.firstChild);
+      }
+      container.classList.add('dm-positioned');
+      console.log('[DuendesMagic] Fallback: insertado al principio del body');
+    }
+  }
+
   // Init
-  if (esProductPage()) {
-    cargarProducto();
+  function init() {
+    console.log('[DuendesMagic] Iniciando...');
+    console.log('[DuendesMagic] esProductPage:', esProductPage());
+
+    if (esProductPage()) {
+      console.log('[DuendesMagic] Es página de producto, posicionando...');
+      posicionarContenedor();
+      console.log('[DuendesMagic] Cargando producto...');
+      cargarProducto();
+    }
+  }
+
+  // Ejecutar cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 
 })();
