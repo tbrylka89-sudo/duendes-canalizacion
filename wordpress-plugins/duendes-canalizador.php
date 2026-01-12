@@ -405,16 +405,72 @@ function duendes_canalizador_page() {
             .canalizando-estado {
                 text-align: center;
                 padding: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Efecto de particulas magicas */
+            .canalizando-estado::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(circle at 50% 50%, rgba(198,169,98,0.1) 0%, transparent 70%);
+                animation: pulse-bg 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse-bg {
+                0%, 100% { opacity: 0.5; transform: scale(1); }
+                50% { opacity: 1; transform: scale(1.1); }
             }
 
             .canalizando-spinner {
-                width: 80px;
-                height: 80px;
-                border: 3px solid rgba(198,169,98,0.2);
+                width: 100px;
+                height: 100px;
+                position: relative;
+                margin: 0 auto 30px;
+            }
+
+            .canalizando-spinner::before,
+            .canalizando-spinner::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border: 3px solid transparent;
+                border-radius: 50%;
+            }
+
+            .canalizando-spinner::before {
+                border-top-color: #C6A962;
+                animation: spin 1s linear infinite;
+            }
+
+            .canalizando-spinner::after {
+                border-right-color: rgba(198,169,98,0.5);
+                animation: spin 1.5s linear infinite reverse;
+            }
+
+            .canalizando-spinner-inner {
+                position: absolute;
+                inset: 15px;
+                border: 2px solid rgba(198,169,98,0.3);
                 border-top-color: #C6A962;
                 border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 30px;
+                animation: spin 0.8s linear infinite;
+            }
+
+            .canalizando-icono {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 40px;
+                animation: float-icon 2s ease-in-out infinite;
+            }
+
+            @keyframes float-icon {
+                0%, 100% { transform: translateY(0) scale(1); }
+                50% { transform: translateY(-5px) scale(1.1); }
             }
 
             @keyframes spin {
@@ -422,14 +478,64 @@ function duendes_canalizador_page() {
             }
 
             .canalizando-mensaje {
-                font-size: 18px;
+                font-family: 'Cinzel', serif;
+                font-size: 20px;
                 color: #C6A962;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
+                position: relative;
+                animation: glow-text 2s ease-in-out infinite;
+            }
+
+            @keyframes glow-text {
+                0%, 100% { text-shadow: 0 0 10px rgba(198,169,98,0.3); }
+                50% { text-shadow: 0 0 30px rgba(198,169,98,0.6); }
             }
 
             .canalizando-detalle {
                 font-size: 14px;
                 color: rgba(255,255,255,0.5);
+                position: relative;
+            }
+
+            .canalizando-fases {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 30px;
+                position: relative;
+            }
+
+            .canalizando-fase {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                opacity: 0.3;
+                transition: all 0.5s;
+            }
+
+            .canalizando-fase.activa {
+                opacity: 1;
+            }
+
+            .canalizando-fase.completada {
+                opacity: 0.7;
+            }
+
+            .canalizando-fase.completada .fase-icono {
+                color: #22c55e;
+            }
+
+            .fase-icono {
+                font-size: 24px;
+                transition: all 0.3s;
+            }
+
+            .fase-texto {
+                font-size: 11px;
+                color: rgba(255,255,255,0.6);
+                text-transform: uppercase;
+                letter-spacing: 1px;
             }
 
             /* Resultado de canalización */
@@ -912,13 +1018,42 @@ function duendes_canalizador_page() {
 
             modal.classList.add('visible');
             modalTitulo.textContent = 'Canalizando...';
+
+            // Reproducir sonido místico
+            playMagicSound();
+
             modalBody.innerHTML = `
                 <div class="canalizando-estado">
-                    <div class="canalizando-spinner"></div>
-                    <div class="canalizando-mensaje">Analizando la imagen del guardián...</div>
-                    <div class="canalizando-detalle">Claude está percibiendo su esencia${notas ? ' y tus notas' : ''}. Esto puede tardar 30-60 segundos.</div>
+                    <div class="canalizando-spinner">
+                        <div class="canalizando-spinner-inner"></div>
+                        <div class="canalizando-icono">🔮</div>
+                    </div>
+                    <div class="canalizando-mensaje">Conectando con el plano etérico...</div>
+                    <div class="canalizando-detalle">Claude está canalizando la esencia del guardián${notas ? ' con tus notas' : ''}</div>
+
+                    <div class="canalizando-fases">
+                        <div class="canalizando-fase activa" id="fase-1">
+                            <span class="fase-icono">👁️</span>
+                            <span class="fase-texto">Observando</span>
+                        </div>
+                        <div class="canalizando-fase" id="fase-2">
+                            <span class="fase-icono">✨</span>
+                            <span class="fase-texto">Canalizando</span>
+                        </div>
+                        <div class="canalizando-fase" id="fase-3">
+                            <span class="fase-icono">📜</span>
+                            <span class="fase-texto">Escribiendo</span>
+                        </div>
+                        <div class="canalizando-fase" id="fase-4">
+                            <span class="fase-icono">🔮</span>
+                            <span class="fase-texto">Sellando</span>
+                        </div>
+                    </div>
                 </div>
             `;
+
+            // Animar fases
+            animarFases();
 
             try {
                 const res = await fetch(API_URL, {
@@ -1168,6 +1303,140 @@ function duendes_canalizador_page() {
             navigator.clipboard.writeText(codigo);
             alert('Código copiado: ' + codigo);
         }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EFECTOS DE SONIDO MÍSTICOS
+        // ═══════════════════════════════════════════════════════════════
+
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function playMagicSound() {
+            try {
+                const ctx = initAudio();
+
+                // Crear un sonido místico con múltiples frecuencias
+                const frequencies = [220, 277, 330, 440, 554];
+                const duration = 3;
+
+                frequencies.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    osc.type = 'sine';
+
+                    const delay = i * 0.3;
+
+                    // Fade in suave
+                    gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+                    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + delay + 0.5);
+                    // Mantener
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime + delay + duration - 1);
+                    // Fade out
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + delay + duration);
+
+                    osc.start(ctx.currentTime + delay);
+                    osc.stop(ctx.currentTime + delay + duration);
+                });
+            } catch(e) {
+                console.log('Audio no disponible');
+            }
+        }
+
+        function playSuccessSound() {
+            try {
+                const ctx = initAudio();
+
+                // Arpegio ascendente de éxito
+                const notes = [523, 659, 784, 1047, 1319, 1568];
+
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    osc.type = 'sine';
+
+                    const delay = i * 0.1;
+
+                    gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+                    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + delay + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 1.5);
+
+                    osc.start(ctx.currentTime + delay);
+                    osc.stop(ctx.currentTime + delay + 1.5);
+                });
+            } catch(e) {}
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ANIMACIÓN DE FASES
+        // ═══════════════════════════════════════════════════════════════
+
+        let faseInterval = null;
+
+        function animarFases() {
+            let faseActual = 1;
+            const mensajes = [
+                'Observando los detalles físicos...',
+                'Canalizando la esencia ancestral...',
+                'Escribiendo su historia milenaria...',
+                'Sellando el pacto mágico...'
+            ];
+
+            faseInterval = setInterval(() => {
+                // Marcar fase anterior como completada
+                const faseAnterior = document.getElementById(`fase-${faseActual}`);
+                if (faseAnterior) {
+                    faseAnterior.classList.remove('activa');
+                    faseAnterior.classList.add('completada');
+                }
+
+                faseActual++;
+
+                if (faseActual <= 4) {
+                    // Activar siguiente fase
+                    const faseSiguiente = document.getElementById(`fase-${faseActual}`);
+                    if (faseSiguiente) {
+                        faseSiguiente.classList.add('activa');
+                    }
+
+                    // Actualizar mensaje
+                    const mensajeEl = document.querySelector('.canalizando-mensaje');
+                    if (mensajeEl) {
+                        mensajeEl.textContent = mensajes[faseActual - 1];
+                    }
+                } else {
+                    clearInterval(faseInterval);
+                }
+            }, 8000); // Cada 8 segundos cambiar de fase
+        }
+
+        function detenerAnimacionFases() {
+            if (faseInterval) {
+                clearInterval(faseInterval);
+                faseInterval = null;
+            }
+        }
+
+        // Inicializar audio en primer click
+        document.addEventListener('click', function initOnClick() {
+            initAudio();
+            document.removeEventListener('click', initOnClick);
+        }, { once: true });
         </script>
     </body>
     </html>

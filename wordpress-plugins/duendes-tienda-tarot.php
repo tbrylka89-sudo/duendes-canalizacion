@@ -778,7 +778,7 @@ function duendes_render_tienda_tarot() {
                     <div class="tarot-info">
                         <div class="tarot-tipo"><?php echo esc_html($tipo); ?></div>
                         <h3 class="tarot-name"><?php echo esc_html($nombre); ?></h3>
-                        <div class="tarot-price">$<?php echo number_format($product->get_price(), 0); ?> USD</div>
+                        <div class="tarot-price" data-precio-usd="<?php echo $product->get_price(); ?>">$<?php echo number_format($product->get_price(), 0); ?> USD</div>
                     </div>
 
                     <div class="tarot-glow"></div>
@@ -966,6 +966,70 @@ function duendes_render_tienda_tarot() {
             initAudio();
             document.removeEventListener('click', initOnClick);
         }, { once: true });
+
+        // ═══════════════════════════════════════════════════════════════
+        // SISTEMA DE PRECIOS GEOLOCALIZADOS
+        // ═══════════════════════════════════════════════════════════════
+
+        async function actualizarPreciosGeo() {
+            try {
+                // Detectar país del usuario
+                const geoRes = await fetch('https://ipapi.co/json/');
+                const geoData = await geoRes.json();
+                const pais = geoData.country_code || 'US';
+
+                // Si es Uruguay, mostrar en UYU
+                if (pais === 'UY') {
+                    const divisasRes = await fetch('https://duendes-vercel.vercel.app/api/divisas?tasas=true');
+                    const divisasData = await divisasRes.json();
+
+                    if (divisasData.success) {
+                        const tasaUYU = divisasData.tasas?.UYU || 43;
+
+                        document.querySelectorAll('.tarot-price[data-precio-usd]').forEach(el => {
+                            const precioUSD = parseFloat(el.dataset.precioUsd);
+                            const precioUYU = Math.round(precioUSD * tasaUYU);
+                            el.innerHTML = `$${precioUYU.toLocaleString('es-UY')} <small style="opacity:0.6">UYU</small>`;
+                        });
+
+                        // Mostrar banner de envío local
+                        mostrarBannerEnvio('uy');
+                    }
+                } else {
+                    // Mostrar precio en USD con aproximación local
+                    const divisasRes = await fetch(`https://duendes-vercel.vercel.app/api/divisas?precio=100&pais=${pais}`);
+                    const divisasData = await divisasRes.json();
+
+                    if (divisasData.success && divisasData.precio.moneda !== 'USD') {
+                        const config = divisasData.precio.config;
+
+                        document.querySelectorAll('.tarot-price[data-precio-usd]').forEach(el => {
+                            const precioUSD = parseFloat(el.dataset.precioUsd);
+                            const precioLocal = precioUSD * (divisasData.tasas?.[divisasData.precio.moneda] || 1);
+                            el.innerHTML = `$${precioUSD} USD <small style="opacity:0.5">(~${config.simbolo}${Math.round(precioLocal).toLocaleString()})</small>`;
+                        });
+                    }
+
+                    mostrarBannerEnvio('intl');
+                }
+            } catch(e) {
+                console.log('Geo no disponible:', e);
+            }
+        }
+
+        function mostrarBannerEnvio(tipo) {
+            const hero = document.querySelector('.tienda-hero p');
+            if (!hero) return;
+
+            if (tipo === 'uy') {
+                hero.innerHTML += '<br><span style="color:#C6A962;font-size:14px;">🇺🇾 Envío a todo Uruguay · Hasta 12 cuotas sin interés</span>';
+            } else {
+                hero.innerHTML += '<br><span style="color:#C6A962;font-size:14px;">🌎 Envío Express Internacional · PayPal & Tarjetas</span>';
+            }
+        }
+
+        // Actualizar precios al cargar
+        actualizarPreciosGeo();
     })();
     </script>
 
