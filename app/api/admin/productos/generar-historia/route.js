@@ -279,6 +279,11 @@ GENERA UN JSON con esta estructura exacta:
   "metaDatos": {
     "descripcionCorta": "Descripción de 1 línea para la tienda (máx 100 caracteres)",
     "etiquetas": ["etiqueta1", "etiqueta2", "etiqueta3", "etiqueta4", "etiqueta5"]
+  },
+  "seo": {
+    "titulo": "Título SEO optimizado (máx 60 caracteres) - incluir nombre del guardián y beneficio principal",
+    "descripcion": "Meta descripción SEO (máx 160 caracteres) - debe generar curiosidad y mencionar que es pieza única",
+    "keywords": "palabra1, palabra2, palabra3, palabra4, palabra5 - keywords relevantes separadas por coma"
   }
 }
 
