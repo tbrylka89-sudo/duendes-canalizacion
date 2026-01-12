@@ -1,0 +1,1331 @@
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+🧙 PÁGINA DE PRODUCTO MÁGICA - Duendes del Uruguay
+Versión: 1.0 (Enero 2026)
+
+INSTRUCCIONES:
+1. Copiá TODO este código
+2. En WordPress → WPCode → Add New Snippet
+3. Tipo: HTML Snippet
+4. Location: Site Wide Footer
+5. Conditional Logic: Only show on Product pages
+6. Activar y guardar
+═══════════════════════════════════════════════════════════════════════════════
+-->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════
+   VARIABLES Y RESET
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --dm-gold: #C6A962;
+  --dm-gold-light: #D4BC7D;
+  --dm-gold-dark: #A88A42;
+  --dm-black: #0a0a0a;
+  --dm-black-soft: #141414;
+  --dm-white: #faf9f7;
+  --dm-cream: #FDF8F0;
+  --dm-green: #4A5D4A;
+  --dm-green-dark: #1B4D3E;
+  --dm-text: #2C2416;
+  --dm-muted: #5C5447;
+}
+
+/* Ocultar página original de WooCommerce */
+.woocommerce-page.single-product .entry-content,
+.woocommerce-page.single-product .product,
+.single-product .woocommerce-product-gallery,
+.single-product .summary,
+.single-product .woocommerce-tabs,
+.single-product .related.products,
+.single-product .product_meta {
+  display: none !important;
+}
+
+/* Mostrar cuando no hay datos mágicos */
+body.dm-no-magic .woocommerce-page.single-product .entry-content,
+body.dm-no-magic .woocommerce-page.single-product .product {
+  display: block !important;
+}
+
+body.dm-no-magic #dm-producto-magico {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENEDOR PRINCIPAL
+═══════════════════════════════════════════════════════════════ */
+#dm-producto-magico {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: linear-gradient(180deg, var(--dm-cream) 0%, #fff 100%);
+  color: var(--dm-text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+#dm-producto-magico * {
+  box-sizing: border-box;
+}
+
+.dm-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BANNER HERO
+═══════════════════════════════════════════════════════════════ */
+.dm-hero {
+  position: relative;
+  height: 70vh;
+  min-height: 500px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.dm-hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.7);
+}
+
+.dm-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 10, 0.95) 0%,
+    rgba(10, 10, 10, 0.5) 50%,
+    transparent 100%
+  );
+}
+
+.dm-hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 60px 20px;
+  color: white;
+}
+
+.dm-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(198, 169, 98, 0.2);
+  border: 1px solid var(--dm-gold);
+  color: var(--dm-gold);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.dm-hero-nombre {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 600;
+  color: var(--dm-gold);
+  margin: 0 0 10px 0;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+
+.dm-hero-tipo {
+  font-size: 20px;
+  color: rgba(255,255,255,0.8);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECCIÓN PRINCIPAL (Galería + Compra)
+═══════════════════════════════════════════════════════════════ */
+.dm-main {
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 40px;
+  padding: 60px 0;
+  margin-top: -100px;
+  position: relative;
+  z-index: 20;
+}
+
+@media (max-width: 900px) {
+  .dm-main {
+    grid-template-columns: 1fr;
+    margin-top: -60px;
+  }
+}
+
+/* Galería */
+.dm-galeria {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.dm-galeria-img {
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.dm-galeria-img:first-child {
+  grid-column: span 2;
+  aspect-ratio: 16/10;
+}
+
+.dm-galeria-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.dm-galeria-img:hover img {
+  transform: scale(1.05);
+}
+
+/* Card de compra */
+.dm-compra-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  padding: 40px;
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.dm-tipo-badges {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.dm-tipo-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: rgba(198, 169, 98, 0.1);
+  color: var(--dm-gold-dark);
+  border: 1px solid rgba(198, 169, 98, 0.3);
+}
+
+.dm-compra-nombre {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  color: var(--dm-green-dark);
+  margin: 0 0 8px 0;
+}
+
+.dm-compra-subtitulo {
+  font-size: 15px;
+  color: var(--dm-muted);
+  margin: 0 0 24px 0;
+}
+
+.dm-precio-container {
+  margin-bottom: 24px;
+}
+
+.dm-precio-actual {
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  color: var(--dm-gold-dark);
+  font-weight: 600;
+}
+
+.dm-precio-original {
+  font-size: 18px;
+  color: var(--dm-muted);
+  text-decoration: line-through;
+  margin-left: 12px;
+}
+
+.dm-sena-info {
+  background: rgba(198, 169, 98, 0.1);
+  border: 1px dashed var(--dm-gold);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.dm-sena-info p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--dm-text);
+}
+
+.dm-sena-info strong {
+  color: var(--dm-gold-dark);
+}
+
+/* Botón CTA */
+.dm-btn-comprar {
+  width: 100%;
+  padding: 18px 32px;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--dm-gold), var(--dm-gold-dark));
+  color: white;
+  box-shadow: 0 10px 30px rgba(198, 169, 98, 0.3);
+}
+
+.dm-btn-comprar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(198, 169, 98, 0.4);
+}
+
+.dm-garantias {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.dm-garantia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--dm-muted);
+}
+
+.dm-garantia-icon {
+  font-size: 16px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECCIONES DE CONTENIDO
+═══════════════════════════════════════════════════════════════ */
+.dm-seccion {
+  padding: 60px 0;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.dm-seccion-titulo {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  color: var(--dm-green-dark);
+  margin: 0 0 30px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dm-seccion-titulo span {
+  font-size: 28px;
+}
+
+/* Historia */
+.dm-historia-texto {
+  font-size: 18px;
+  line-height: 1.9;
+  color: var(--dm-text);
+  max-width: 800px;
+}
+
+.dm-historia-texto p {
+  margin: 0 0 20px 0;
+}
+
+/* Fortalezas Grid */
+.dm-fortalezas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.dm-fortaleza-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid rgba(198, 169, 98, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dm-fortaleza-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.dm-fortaleza-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.dm-fortaleza-titulo {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--dm-green-dark);
+  margin: 0 0 8px 0;
+}
+
+.dm-fortaleza-desc {
+  font-size: 14px;
+  color: var(--dm-muted);
+  margin: 0;
+}
+
+/* Mensaje de Poder (Quote) */
+.dm-quote {
+  background: linear-gradient(135deg, var(--dm-green-dark), var(--dm-green));
+  color: white;
+  padding: 60px 40px;
+  border-radius: 24px;
+  text-align: center;
+  position: relative;
+  margin: 40px 0;
+}
+
+.dm-quote::before {
+  content: '"';
+  font-family: 'Cinzel', serif;
+  font-size: 120px;
+  position: absolute;
+  top: -20px;
+  left: 30px;
+  color: rgba(255,255,255,0.1);
+}
+
+.dm-quote-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-style: italic;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Beneficios */
+.dm-beneficios-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.dm-beneficio-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.dm-beneficio-check {
+  width: 32px;
+  height: 32px;
+  background: rgba(198, 169, 98, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dm-gold);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.dm-beneficio-texto {
+  font-size: 16px;
+  color: var(--dm-text);
+  margin: 0;
+}
+
+/* Relacionados */
+.dm-relacionados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.dm-relacionado-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease;
+}
+
+.dm-relacionado-card:hover {
+  transform: translateY(-5px);
+}
+
+.dm-relacionado-img {
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.dm-relacionado-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dm-relacionado-info {
+  padding: 16px;
+}
+
+.dm-relacionado-nombre {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--dm-green-dark);
+  margin: 0 0 8px 0;
+}
+
+.dm-relacionado-precio {
+  color: var(--dm-gold);
+  font-weight: 600;
+}
+
+/* Testimonios */
+.dm-testimonios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.dm-testimonio-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.dm-testimonio-estrellas {
+  color: var(--dm-gold);
+  margin-bottom: 12px;
+}
+
+.dm-testimonio-texto {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--dm-text);
+  margin: 0 0 16px 0;
+}
+
+.dm-testimonio-autor {
+  font-size: 13px;
+  color: var(--dm-muted);
+}
+
+/* Ritual */
+.dm-ritual-box {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  max-width: 800px;
+}
+
+.dm-ritual-texto {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--dm-text);
+}
+
+/* Garantía Final */
+.dm-garantia-box {
+  background: linear-gradient(135deg, rgba(198, 169, 98, 0.1), rgba(198, 169, 98, 0.05));
+  border: 2px solid rgba(198, 169, 98, 0.3);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.dm-garantia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.dm-garantia-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dm-garantia-item-icon {
+  font-size: 24px;
+}
+
+.dm-garantia-item-texto {
+  font-size: 15px;
+  color: var(--dm-text);
+}
+
+/* CTA Sticky Bottom */
+.dm-sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding: 16px 20px;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
+}
+
+.dm-sticky-cta.visible {
+  display: block;
+}
+
+.dm-sticky-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.dm-sticky-info {
+  flex: 1;
+}
+
+.dm-sticky-nombre {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--dm-green-dark);
+  margin: 0;
+}
+
+.dm-sticky-precio {
+  color: var(--dm-gold);
+  font-weight: 600;
+}
+
+.dm-sticky-btn {
+  padding: 14px 28px;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--dm-gold), var(--dm-gold-dark));
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL DE ADOPCIÓN
+═══════════════════════════════════════════════════════════════ */
+.dm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 10, 0.9);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dm-modal-overlay.visible {
+  display: flex;
+}
+
+.dm-modal {
+  background: white;
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dm-modal-header {
+  padding: 30px 30px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.dm-modal-titulo {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  color: var(--dm-gold);
+  margin: 0 0 8px 0;
+}
+
+.dm-modal-subtitulo {
+  font-size: 15px;
+  color: var(--dm-muted);
+  margin: 0;
+}
+
+.dm-modal-body {
+  padding: 30px;
+}
+
+.dm-form-grupo {
+  margin-bottom: 20px;
+}
+
+.dm-form-label {
+  display: block;
+  font-size: 14px;
+  color: var(--dm-text);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.dm-form-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--dm-text);
+  transition: border-color 0.3s ease;
+}
+
+.dm-form-input:focus {
+  outline: none;
+  border-color: var(--dm-gold);
+}
+
+.dm-form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Upload de foto */
+.dm-upload-area {
+  border: 2px dashed rgba(198, 169, 98, 0.4);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(198, 169, 98, 0.05);
+}
+
+.dm-upload-area:hover {
+  border-color: var(--dm-gold);
+  background: rgba(198, 169, 98, 0.1);
+}
+
+.dm-upload-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.dm-upload-texto {
+  font-size: 14px;
+  color: var(--dm-muted);
+  margin: 0;
+}
+
+.dm-upload-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto;
+  display: none;
+}
+
+.dm-upload-area.has-image .dm-upload-icon,
+.dm-upload-area.has-image .dm-upload-texto {
+  display: none;
+}
+
+.dm-upload-area.has-image .dm-upload-preview {
+  display: block;
+}
+
+/* Opciones de pago */
+.dm-pago-opciones {
+  margin: 24px 0;
+}
+
+.dm-pago-opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dm-pago-opcion:hover {
+  border-color: rgba(198, 169, 98, 0.5);
+}
+
+.dm-pago-opcion.selected {
+  border-color: var(--dm-gold);
+  background: rgba(198, 169, 98, 0.05);
+}
+
+.dm-pago-radio {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dm-pago-opcion.selected .dm-pago-radio {
+  border-color: var(--dm-gold);
+}
+
+.dm-pago-opcion.selected .dm-pago-radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: var(--dm-gold);
+  border-radius: 50%;
+}
+
+.dm-pago-info {
+  flex: 1;
+}
+
+.dm-pago-titulo {
+  font-weight: 600;
+  color: var(--dm-text);
+  margin: 0 0 4px 0;
+}
+
+.dm-pago-desc {
+  font-size: 13px;
+  color: var(--dm-muted);
+  margin: 0;
+}
+
+.dm-pago-precio {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--dm-gold);
+  font-weight: 600;
+}
+
+.dm-modal-footer {
+  padding: 20px 30px 30px;
+}
+
+.dm-btn-confirmar {
+  width: 100%;
+  padding: 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--dm-gold), var(--dm-gold-dark));
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dm-btn-confirmar:hover {
+  box-shadow: 0 10px 30px rgba(198, 169, 98, 0.4);
+}
+
+.dm-modal-garantias {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--dm-muted);
+}
+
+.dm-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--dm-muted);
+  cursor: pointer;
+}
+
+/* Loading */
+.dm-loading {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.dm-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(198, 169, 98, 0.2);
+  border-top-color: var(--dm-gold);
+  border-radius: 50%;
+  animation: dm-spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes dm-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .dm-hero { height: 50vh; min-height: 400px; }
+  .dm-hero-nombre { font-size: 32px; }
+  .dm-compra-card { padding: 24px; }
+  .dm-compra-nombre { font-size: 24px; }
+  .dm-precio-actual { font-size: 28px; }
+  .dm-seccion { padding: 40px 0; }
+  .dm-seccion-titulo { font-size: 22px; }
+  .dm-quote { padding: 40px 20px; }
+  .dm-quote-texto { font-size: 20px; }
+}
+</style>
+
+<div id="dm-producto-magico">
+  <div class="dm-loading">
+    <div class="dm-loading-spinner"></div>
+    <p>Cargando la magia...</p>
+  </div>
+</div>
+
+<!-- Modal de Adopción -->
+<div class="dm-modal-overlay" id="dmModal">
+  <div class="dm-modal" style="position: relative;">
+    <button class="dm-modal-close" onclick="dmCerrarModal()">×</button>
+    <div class="dm-modal-header">
+      <h2 class="dm-modal-titulo">🌟 Sellá el Pacto</h2>
+      <p class="dm-modal-subtitulo">con <span id="dmModalNombre">este guardián</span></p>
+    </div>
+    <div class="dm-modal-body">
+      <div class="dm-form-grupo">
+        <label class="dm-form-label">Tu nombre completo</label>
+        <input type="text" class="dm-form-input" id="dmNombre" placeholder="¿Cómo te llamás?">
+      </div>
+      <div class="dm-form-grupo">
+        <label class="dm-form-label">Tu email</label>
+        <input type="email" class="dm-form-input" id="dmEmail" placeholder="tu@email.com">
+      </div>
+      <div class="dm-form-grupo">
+        <label class="dm-form-label">📸 Tu foto (para que te reconozca)</label>
+        <div class="dm-upload-area" id="dmUploadArea" onclick="document.getElementById('dmFotoInput').click()">
+          <div class="dm-upload-icon">📷</div>
+          <p class="dm-upload-texto">Tocá para subir tu foto<br><small>Opcional pero recomendado</small></p>
+          <img class="dm-upload-preview" id="dmFotoPreview" alt="Preview">
+        </div>
+        <input type="file" id="dmFotoInput" accept="image/*" style="display:none" onchange="dmPreviewFoto(this)">
+      </div>
+      <div class="dm-form-grupo">
+        <label class="dm-form-label">💬 Mensaje para tu guardián (opcional)</label>
+        <textarea class="dm-form-input dm-form-textarea" id="dmMensaje" placeholder="¿Qué le querés decir?"></textarea>
+      </div>
+      <div class="dm-pago-opciones">
+        <div class="dm-pago-opcion" onclick="dmSeleccionarPago('completo')">
+          <div class="dm-pago-radio"></div>
+          <div class="dm-pago-info">
+            <p class="dm-pago-titulo">Adopción completa</p>
+            <p class="dm-pago-desc">Pago total ahora</p>
+          </div>
+          <div class="dm-pago-precio" id="dmPrecioCompleto">$0</div>
+        </div>
+        <div class="dm-pago-opcion selected" onclick="dmSeleccionarPago('sena')">
+          <div class="dm-pago-radio"></div>
+          <div class="dm-pago-info">
+            <p class="dm-pago-titulo">Reservar con seña</p>
+            <p class="dm-pago-desc">30 días para completar</p>
+          </div>
+          <div class="dm-pago-precio" id="dmPrecioSena">$0</div>
+        </div>
+      </div>
+    </div>
+    <div class="dm-modal-footer">
+      <button class="dm-btn-confirmar" onclick="dmConfirmarCompra()">
+        ★ Sellar el Pacto ★
+      </button>
+      <div class="dm-modal-garantias">
+        <span>🔒 Pago seguro</span>
+        <span>📦 Envío incluido</span>
+        <span>✓ 30 días garantía</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const API_BASE = 'https://duendes-vercel.vercel.app';
+  let productoData = null;
+  let tipoPagoSeleccionado = 'sena';
+
+  // Detectar si estamos en página de producto
+  function esProductPage() {
+    return document.body.classList.contains('single-product') ||
+           document.body.classList.contains('woocommerce-page');
+  }
+
+  // Obtener ID del producto
+  function getProductId() {
+    // Intentar desde body class
+    const bodyClasses = document.body.className.split(' ');
+    for (const cls of bodyClasses) {
+      if (cls.startsWith('postid-')) {
+        return cls.replace('postid-', '');
+      }
+    }
+    // Intentar desde URL
+    const match = window.location.pathname.match(/\/producto\/([^\/]+)/);
+    if (match) return match[1];
+    return null;
+  }
+
+  // Detectar país del usuario
+  async function detectarPais() {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      return data.country_code || 'UY';
+    } catch (e) {
+      return 'UY';
+    }
+  }
+
+  // Cargar datos del producto desde Vercel
+  async function cargarProducto() {
+    const productId = getProductId();
+    if (!productId) {
+      document.body.classList.add('dm-no-magic');
+      return;
+    }
+
+    try {
+      const pais = await detectarPais();
+      const res = await fetch(`${API_BASE}/api/producto/${productId}?pais=${pais}`);
+      const data = await res.json();
+
+      if (!data.success || !data.historia?.origen) {
+        // No hay datos mágicos, mostrar página normal
+        document.body.classList.add('dm-no-magic');
+        return;
+      }
+
+      productoData = data;
+      renderizarPagina(data);
+    } catch (e) {
+      console.error('Error cargando producto:', e);
+      document.body.classList.add('dm-no-magic');
+    }
+  }
+
+  // Renderizar la página mágica
+  function renderizarPagina(data) {
+    const container = document.getElementById('dm-producto-magico');
+
+    container.innerHTML = `
+      <!-- HERO -->
+      <div class="dm-hero">
+        <div class="dm-hero-bg" style="background-image: url('${data.imagenPrincipal}')"></div>
+        <div class="dm-hero-overlay"></div>
+        <div class="dm-hero-content">
+          <div class="dm-hero-badge">✨ Pieza Única</div>
+          <h1 class="dm-hero-nombre">${data.nombre}</h1>
+          <p class="dm-hero-tipo">${data.tipo} • ${data.elemento} • ${data.proposito}</p>
+        </div>
+      </div>
+
+      <div class="dm-container">
+        <!-- MAIN -->
+        <div class="dm-main">
+          <!-- Galería -->
+          <div class="dm-galeria">
+            ${data.imagenes.map((img, i) => `
+              <div class="dm-galeria-img">
+                <img src="${img}" alt="${data.nombre} - Imagen ${i + 1}">
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Card de compra -->
+          <div class="dm-compra-card">
+            <div class="dm-tipo-badges">
+              <span class="dm-tipo-badge">${data.tipo}</span>
+              <span class="dm-tipo-badge">${data.elemento}</span>
+              <span class="dm-tipo-badge">${data.proposito}</span>
+            </div>
+            <h2 class="dm-compra-nombre">${data.nombre}</h2>
+            <p class="dm-compra-subtitulo">Guardián de ${data.proposito}</p>
+
+            <div class="dm-precio-container">
+              <span class="dm-precio-actual">${data.precio.mostrar}</span>
+              ${data.precio.original ? `<span class="dm-precio-original">${data.precio.original}</span>` : ''}
+            </div>
+
+            ${data.sena.habilitada ? `
+              <div class="dm-sena-info">
+                <p>💫 Reservalo con <strong>${data.sena.mostrar}</strong> y completá el pago en ${data.sena.diasReserva} días</p>
+              </div>
+            ` : ''}
+
+            <button class="dm-btn-comprar" onclick="dmAbrirModal()">
+              ★ Sellar el Pacto ★
+            </button>
+
+            <div class="dm-garantias">
+              <div class="dm-garantia"><span class="dm-garantia-icon">🔒</span> Pago seguro</div>
+              <div class="dm-garantia"><span class="dm-garantia-icon">📦</span> Envío mundial</div>
+              <div class="dm-garantia"><span class="dm-garantia-icon">✓</span> 30 días garantía</div>
+              <div class="dm-garantia"><span class="dm-garantia-icon">📜</span> Canalización incluida</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIA -->
+        <div class="dm-seccion">
+          <h2 class="dm-seccion-titulo"><span>🔮</span> Su Historia</h2>
+          <div class="dm-historia-texto">
+            <p>${data.historia.origen}</p>
+          </div>
+        </div>
+
+        <!-- PERSONALIDAD -->
+        ${data.historia.personalidad ? `
+          <div class="dm-seccion">
+            <h2 class="dm-seccion-titulo"><span>✨</span> Su Personalidad</h2>
+            <div class="dm-historia-texto">
+              <p>${data.historia.personalidad}</p>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- MENSAJE DE PODER -->
+        ${data.historia.mensajePoder ? `
+          <div class="dm-quote">
+            <p class="dm-quote-texto">${data.historia.mensajePoder}</p>
+          </div>
+        ` : ''}
+
+        <!-- FORTALEZAS -->
+        ${data.historia.fortalezas?.length ? `
+          <div class="dm-seccion">
+            <h2 class="dm-seccion-titulo"><span>💪</span> Sus Fortalezas</h2>
+            <div class="dm-fortalezas-grid">
+              ${data.historia.fortalezas.map((f, i) => `
+                <div class="dm-fortaleza-card">
+                  <div class="dm-fortaleza-icon">${['🛡️', '✨', '🌿', '⚡', '💜', '🔮'][i % 6]}</div>
+                  <h3 class="dm-fortaleza-titulo">${f.split(':')[0] || f}</h3>
+                  <p class="dm-fortaleza-desc">${f.split(':')[1] || ''}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- BENEFICIOS -->
+        <div class="dm-seccion">
+          <h2 class="dm-seccion-titulo"><span>💜</span> Lo Que Puede Aportar a Tu Vida</h2>
+          <ul class="dm-beneficios-lista">
+            ${data.neuromarketing.beneficios.map(b => `
+              <li class="dm-beneficio-item">
+                <div class="dm-beneficio-check">✓</div>
+                <p class="dm-beneficio-texto">${b}</p>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+
+        <!-- RELACIONADOS -->
+        ${data.relacionados?.length ? `
+          <div class="dm-seccion">
+            <h2 class="dm-seccion-titulo"><span>🌿</span> Congenia Especialmente Con...</h2>
+            <div class="dm-relacionados-grid">
+              ${data.relacionados.map(r => `
+                <a href="${r.url}" class="dm-relacionado-card">
+                  <div class="dm-relacionado-img">
+                    <img src="${r.imagen}" alt="${r.nombre}">
+                  </div>
+                  <div class="dm-relacionado-info">
+                    <h3 class="dm-relacionado-nombre">${r.nombre}</h3>
+                    <span class="dm-relacionado-precio">$${r.precio} USD</span>
+                  </div>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- TESTIMONIOS -->
+        ${data.testimonios?.length ? `
+          <div class="dm-seccion">
+            <h2 class="dm-seccion-titulo"><span>⭐</span> Lo Que Dicen Otras Elegidas</h2>
+            <div class="dm-testimonios-grid">
+              ${data.testimonios.map(t => `
+                <div class="dm-testimonio-card">
+                  <div class="dm-testimonio-estrellas">${'★'.repeat(t.estrellas)}</div>
+                  <p class="dm-testimonio-texto">"${t.texto}"</p>
+                  <p class="dm-testimonio-autor">— ${t.autor}, ${t.pais}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- RITUAL -->
+        ${data.historia.ritual ? `
+          <div class="dm-seccion">
+            <h2 class="dm-seccion-titulo"><span>📜</span> Ritual de Bienvenida</h2>
+            <div class="dm-ritual-box">
+              <p class="dm-ritual-texto">${data.historia.ritual}</p>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- GARANTÍA -->
+        <div class="dm-seccion">
+          <h2 class="dm-seccion-titulo"><span>🛡️</span> Nuestra Garantía Mágica</h2>
+          <div class="dm-garantia-box">
+            <div class="dm-garantia-grid">
+              <div class="dm-garantia-item">
+                <span class="dm-garantia-item-icon">✓</span>
+                <span class="dm-garantia-item-texto">30 días para conectar con tu guardián</span>
+              </div>
+              <div class="dm-garantia-item">
+                <span class="dm-garantia-item-icon">📦</span>
+                <span class="dm-garantia-item-texto">Envío seguro a todo el mundo</span>
+              </div>
+              <div class="dm-garantia-item">
+                <span class="dm-garantia-item-icon">📜</span>
+                <span class="dm-garantia-item-texto">Canalización personalizada incluida</span>
+              </div>
+              <div class="dm-garantia-item">
+                <span class="dm-garantia-item-icon">💬</span>
+                <span class="dm-garantia-item-texto">Soporte mágico de por vida</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STICKY CTA -->
+      <div class="dm-sticky-cta" id="dmStickyCta">
+        <div class="dm-sticky-inner">
+          <div class="dm-sticky-info">
+            <p class="dm-sticky-nombre">${data.nombre}</p>
+            <span class="dm-sticky-precio">${data.precio.mostrar}</span>
+          </div>
+          <button class="dm-sticky-btn" onclick="dmAbrirModal()">★ Sellar el Pacto</button>
+        </div>
+      </div>
+    `;
+
+    // Actualizar modal
+    document.getElementById('dmModalNombre').textContent = data.nombre;
+    document.getElementById('dmPrecioCompleto').textContent = data.precio.mostrar;
+    document.getElementById('dmPrecioSena').textContent = data.sena.mostrar;
+
+    // Activar sticky CTA al scrollear
+    window.addEventListener('scroll', function() {
+      const sticky = document.getElementById('dmStickyCta');
+      if (window.scrollY > 800) {
+        sticky.classList.add('visible');
+      } else {
+        sticky.classList.remove('visible');
+      }
+    });
+  }
+
+  // Funciones del modal
+  window.dmAbrirModal = function() {
+    document.getElementById('dmModal').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.dmCerrarModal = function() {
+    document.getElementById('dmModal').classList.remove('visible');
+    document.body.style.overflow = '';
+  };
+
+  window.dmSeleccionarPago = function(tipo) {
+    tipoPagoSeleccionado = tipo;
+    document.querySelectorAll('.dm-pago-opcion').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+  };
+
+  window.dmPreviewFoto = function(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('dmFotoPreview');
+        preview.src = e.target.result;
+        document.getElementById('dmUploadArea').classList.add('has-image');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  };
+
+  window.dmConfirmarCompra = function() {
+    const nombre = document.getElementById('dmNombre').value;
+    const email = document.getElementById('dmEmail').value;
+
+    if (!nombre || !email) {
+      alert('Por favor completá tu nombre y email');
+      return;
+    }
+
+    // Agregar al carrito de WooCommerce
+    const productId = getProductId();
+    const precio = tipoPagoSeleccionado === 'sena' ? productoData.sena.USD : productoData.precio.USD;
+
+    // Redireccionar al checkout con parámetros
+    window.location.href = `/checkout/?add-to-cart=${productId}&dm_nombre=${encodeURIComponent(nombre)}&dm_email=${encodeURIComponent(email)}&dm_tipo=${tipoPagoSeleccionado}`;
+  };
+
+  // Click fuera del modal para cerrar
+  document.getElementById('dmModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      dmCerrarModal();
+    }
+  });
+
+  // Init
+  if (esProductPage()) {
+    cargarProducto();
+  }
+
+})();
+</script>

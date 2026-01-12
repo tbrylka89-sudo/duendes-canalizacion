@@ -9,6 +9,23 @@ import { useState, useEffect } from 'react';
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
+// IMÁGENES DE LOS GUARDIANES DEL CÍRCULO
+const GUARDIANES_IMAGENES = {
+  finnegan: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/guardian-finnegan.jpg',
+  willow: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/guardian-willow.jpg',
+  bramble: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/guardian-bramble.jpg',
+  ember: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/guardian-ember.jpg',
+  moss: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/guardian-moss.jpg',
+  thornwick: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/guardian-thornwick.jpg',
+};
+
+// Fallback con iniciales si no hay imagen
+const getGuardianAvatar = (guardian) => {
+  if (!guardian) return null;
+  const imagen = GUARDIANES_IMAGENES[guardian.id];
+  return imagen || null;
+};
+
 const ESTRUCTURA = {
   0: { nombre: 'Ritual', icono: '🕯️', color: '#F97316' },
   1: { nombre: 'Meditación', icono: '🧘', color: '#10B981' },
@@ -238,21 +255,36 @@ export default function EstudioCreativo() {
           </div>
         </div>
 
-        {/* Guardianes de la Semana */}
+        {/* Guardianes de la Semana - CON FOTOS */}
         {guardianesSemana.length > 0 && (
           <div style={{ marginBottom: 24, padding: 20, background: C.card, borderRadius: 16, border: `1px solid ${C.border}` }}>
             <h3 style={{ fontSize: 14, color: C.gold, marginBottom: 16, fontWeight: 600 }}>🧙 GUARDIANES DEL MES</h3>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {guardianesSemana.map(({ semana, guardian }) => (
-                <div key={semana} style={{
-                  padding: '12px 16px', background: C.elevated, borderRadius: 12,
-                  border: `2px solid ${guardian.color}44`, flex: '1 1 150px', minWidth: 150
-                }}>
-                  <div style={{ fontSize: 11, color: C.muted, marginBottom: 4 }}>Semana {semana}</div>
-                  <div style={{ fontWeight: 600, color: guardian.color }}>{guardian.nombre}</div>
-                  <div style={{ fontSize: 11, color: C.dim }}>{guardian.titulo}</div>
-                </div>
-              ))}
+              {guardianesSemana.map(({ semana, guardian }) => {
+                const imagenUrl = getGuardianAvatar(guardian);
+                return (
+                  <div key={semana} style={{
+                    padding: '16px', background: C.elevated, borderRadius: 16,
+                    border: `2px solid ${guardian.color}44`, flex: '1 1 160px', minWidth: 160,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center'
+                  }}>
+                    {/* Foto del guardián */}
+                    <div style={{
+                      width: 70, height: 70, borderRadius: '50%', marginBottom: 12,
+                      background: imagenUrl ? `url(${imagenUrl}) center/cover` : `linear-gradient(135deg, ${guardian.color}, ${guardian.color}88)`,
+                      border: `3px solid ${guardian.color}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: imagenUrl ? 0 : 28, color: '#fff',
+                      boxShadow: `0 4px 15px ${guardian.color}40`
+                    }}>
+                      {!imagenUrl && guardian.nombre?.charAt(0)}
+                    </div>
+                    <div style={{ fontSize: 11, color: C.muted, marginBottom: 4 }}>Semana {semana}</div>
+                    <div style={{ fontWeight: 600, color: guardian.color, fontSize: 15 }}>{guardian.nombre}</div>
+                    <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{guardian.titulo}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -396,26 +428,44 @@ export default function EstudioCreativo() {
 
             {contenidoSeleccionado ? (
               <>
-                {/* Info del Guardián */}
-                {contenidoSeleccionado.guardian && (
-                  <div style={{
-                    background: `${contenidoSeleccionado.guardian.color}15`,
-                    border: `1px solid ${contenidoSeleccionado.guardian.color}`,
-                    borderRadius: 12, padding: 16, marginBottom: 20
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ fontSize: 28 }}>🧙</span>
-                      <div>
-                        <div style={{ fontWeight: 600, color: contenidoSeleccionado.guardian.color }}>
-                          {contenidoSeleccionado.guardian.nombre}
+                {/* Info del Guardián con FOTO */}
+                {contenidoSeleccionado.guardian && (() => {
+                  const imagenUrl = getGuardianAvatar(contenidoSeleccionado.guardian);
+                  return (
+                    <div style={{
+                      background: `${contenidoSeleccionado.guardian.color}15`,
+                      border: `1px solid ${contenidoSeleccionado.guardian.color}`,
+                      borderRadius: 16, padding: 20, marginBottom: 20
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        {/* Foto circular del guardián */}
+                        <div style={{
+                          width: 60, height: 60, borderRadius: '50%', flexShrink: 0,
+                          background: imagenUrl
+                            ? `url(${imagenUrl}) center/cover`
+                            : `linear-gradient(135deg, ${contenidoSeleccionado.guardian.color}, ${contenidoSeleccionado.guardian.color}88)`,
+                          border: `3px solid ${contenidoSeleccionado.guardian.color}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: imagenUrl ? 0 : 24, color: '#fff',
+                          boxShadow: `0 4px 15px ${contenidoSeleccionado.guardian.color}40`
+                        }}>
+                          {!imagenUrl && contenidoSeleccionado.guardian.nombre?.charAt(0)}
                         </div>
-                        <div style={{ fontSize: 12, color: C.muted }}>
-                          {contenidoSeleccionado.guardian.titulo} • {contenidoSeleccionado.guardian.elemento}
+                        <div>
+                          <div style={{ fontWeight: 600, color: contenidoSeleccionado.guardian.color, fontSize: 16 }}>
+                            {contenidoSeleccionado.guardian.nombre}
+                          </div>
+                          <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
+                            {contenidoSeleccionado.guardian.titulo}
+                          </div>
+                          <div style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>
+                            ✨ Elemento: {contenidoSeleccionado.guardian.elemento}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Título */}
                 <div style={{ marginBottom: 16 }}>
