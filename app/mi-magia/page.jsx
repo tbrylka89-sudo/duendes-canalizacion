@@ -1091,25 +1091,69 @@ function Canalizaciones({ usuario }) {
             </div>
 
             <div className="elegidos-explore">
-              <p>Los guardianes siguen esperando en El Umbral.</p>
+              <p>Los guardianes siguen esperando.</p>
               <div className="explore-paths">
                 <a href="https://duendesuy.10web.cloud/categoria-producto/proteccion/" className="path-link path-proteccion">
-                  <span className="path-symbol">◇</span>
+                  <div className="path-icon-anim">
+                    <svg viewBox="0 0 40 40" className="icon-escudo">
+                      <path d="M20 5 L35 12 L35 22 C35 30, 20 38, 20 38 C20 38, 5 30, 5 22 L5 12 Z" fill="none" stroke="#4A90D9" strokeWidth="2" className="escudo-base"/>
+                      <path d="M20 10 L30 15 L30 22 C30 27, 20 33, 20 33 C20 33, 10 27, 10 22 L10 15 Z" fill="rgba(74,144,217,0.2)" className="escudo-inner"/>
+                      <circle cx="20" cy="20" r="3" fill="#4A90D9" className="escudo-centro"/>
+                    </svg>
+                    <div className="floating-icons shields">
+                      <span className="float-icon fi1">◇</span>
+                      <span className="float-icon fi2">◇</span>
+                      <span className="float-icon fi3">◇</span>
+                    </div>
+                  </div>
                   <span className="path-name">Protectores</span>
                   <span className="path-desc">Guardianes del escudo</span>
                 </a>
                 <a href="https://duendesuy.10web.cloud/categoria-producto/amor/" className="path-link path-amor">
-                  <span className="path-symbol">◇</span>
+                  <div className="path-icon-anim">
+                    <svg viewBox="0 0 40 40" className="icon-corazon">
+                      <path d="M20 35 C20 35, 5 25, 5 15 C5 8, 12 5, 20 12 C28 5, 35 8, 35 15 C35 25, 20 35, 20 35" fill="#E91E8C" className="corazon-base"/>
+                      <path d="M20 30 C20 30, 10 23, 10 16 C10 12, 14 10, 20 15 C26 10, 30 12, 30 16 C30 23, 20 30, 20 30" fill="rgba(255,255,255,0.2)" className="corazon-inner"/>
+                    </svg>
+                    <div className="floating-icons hearts">
+                      <span className="float-icon fi1">♥</span>
+                      <span className="float-icon fi2">♥</span>
+                      <span className="float-icon fi3">♥</span>
+                    </div>
+                  </div>
                   <span className="path-name">Sanadores del Corazón</span>
                   <span className="path-desc">Guardianes del vínculo</span>
                 </a>
                 <a href="https://duendesuy.10web.cloud/categoria-producto/dinero-abundancia-negocios/" className="path-link path-abundancia">
-                  <span className="path-symbol">◇</span>
+                  <div className="path-icon-anim">
+                    <svg viewBox="0 0 40 40" className="icon-moneda">
+                      <circle cx="20" cy="20" r="15" fill="#C6A962" className="moneda-base"/>
+                      <circle cx="20" cy="20" r="12" fill="none" stroke="#b8962e" strokeWidth="1" className="moneda-borde"/>
+                      <text x="20" y="25" textAnchor="middle" fill="#8B7355" fontSize="14" fontFamily="serif" fontWeight="bold">$</text>
+                    </svg>
+                    <div className="floating-icons coins">
+                      <span className="float-icon fi1">✦</span>
+                      <span className="float-icon fi2">✦</span>
+                      <span className="float-icon fi3">✦</span>
+                    </div>
+                  </div>
                   <span className="path-name">Portadores de Oro</span>
                   <span className="path-desc">Guardianes del flujo</span>
                 </a>
                 <a href="https://duendesuy.10web.cloud/categoria-producto/salud/" className="path-link path-sanacion">
-                  <span className="path-symbol">◇</span>
+                  <div className="path-icon-anim">
+                    <svg viewBox="0 0 40 40" className="icon-vida">
+                      <circle cx="20" cy="20" r="15" fill="none" stroke="#2ECC71" strokeWidth="2" className="vida-circulo"/>
+                      <path d="M20 8 Q25 15, 20 25 Q15 15, 20 8" fill="#2ECC71" className="vida-hoja1"/>
+                      <path d="M12 18 Q18 20, 20 20 Q18 22, 12 22" fill="#27ae60" className="vida-hoja2"/>
+                      <path d="M28 18 Q22 20, 20 20 Q22 22, 28 22" fill="#27ae60" className="vida-hoja3"/>
+                    </svg>
+                    <div className="floating-icons leaves">
+                      <span className="float-icon fi1">❋</span>
+                      <span className="float-icon fi2">❋</span>
+                      <span className="float-icon fi3">❋</span>
+                    </div>
+                  </div>
                   <span className="path-name">Tejedores de Vida</span>
                   <span className="path-desc">Guardianes del cuerpo</span>
                 </a>
@@ -1148,7 +1192,25 @@ function Canalizaciones({ usuario }) {
           ) : (
             <div className="seccion-cinematica seccion-talismanes">
               <div className="seccion-simbolo">
-                <span className="simbolo-glow">◈</span>
+                <div className="anim-varita">
+                  <svg viewBox="0 0 80 80" className="varita-svg">
+                    <defs>
+                      <linearGradient id="varitaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#d4af37"/>
+                        <stop offset="50%" stopColor="#9b59b6"/>
+                        <stop offset="100%" stopColor="#d4af37"/>
+                      </linearGradient>
+                    </defs>
+                    <line x1="20" y1="60" x2="60" y2="20" stroke="url(#varitaGrad)" strokeWidth="3" strokeLinecap="round" className="varita-line"/>
+                    <circle cx="60" cy="20" r="4" fill="#d4af37" className="varita-punta"/>
+                    <g className="varita-sparkles">
+                      <circle cx="65" cy="15" r="2" fill="#fff" className="sparkle s1"/>
+                      <circle cx="70" cy="22" r="1.5" fill="#9b59b6" className="sparkle s2"/>
+                      <circle cx="58" cy="10" r="1.5" fill="#d4af37" className="sparkle s3"/>
+                      <circle cx="72" cy="12" r="1" fill="#fff" className="sparkle s4"/>
+                    </g>
+                  </svg>
+                </div>
               </div>
 
               <div className="seccion-narrativa">
@@ -1157,42 +1219,41 @@ function Canalizaciones({ usuario }) {
                     Un guardián protege. Un talismán amplifica.
                   </p>
                   <p>
-                    Hay momentos en la vida donde necesitás algo más que compañía.
-                    Necesitás un ancla. Algo que te recuerde quién sos cuando
-                    el mundo intenta convencerte de lo contrario.
+                    Lo vas a sentir cuando lo veas. Un tirón en el pecho.
+                    Una certeza que no tiene explicación. Vas a cerrar la página
+                    y seguir con tu día — pero va a seguir ahí, en tu cabeza.
                   </p>
                 </div>
 
                 <div className="story-scene scene-2">
                   <p>
-                    Los talismanes no se eligen por estética. Se eligen por necesidad.
-                    El que necesita protección lo siente en el cuerpo — una urgencia
-                    que no tiene nombre pero tiene dirección.
+                    Vas a soñar con él. Te vas a despertar pensando en él.
+                    Vas a volver a mirarlo "solo para ver" y cada vez va a costar
+                    más cerrar la página.
                   </p>
                   <p>
-                    El que necesita claridad busca sin saber qué busca,
-                    hasta que lo encuentra.
+                    Eso es el llamado. Y las personas especiales lo sienten.
                   </p>
                 </div>
 
                 <div className="story-reveal">
                   <div className="reveal-line"></div>
                   <p className="reveal-text">
-                    Todavía no tenés ninguno.<br/>
-                    <em>Quizás todavía no lo necesitás.</em>
+                    Tu colección de talismanes<br/>
+                    <em>empieza cuando vos decidas</em>
                   </p>
                   <div className="reveal-line"></div>
                 </div>
 
                 <div className="story-scene scene-final">
                   <p className="scene-direct">
-                    Cuando llegue el momento, vas a saber.
+                    Algunos los tienen todos. Otros empiezan con uno y no pueden parar.
                   </p>
                 </div>
               </div>
 
               <a href="https://duendesuy.10web.cloud/categoria-producto/talismanes/" className="seccion-cta">
-                <span>Explorar talismanes</span>
+                <span>Ver los talismanes</span>
                 <span className="cta-arrow">→</span>
               </a>
             </div>
@@ -1207,7 +1268,33 @@ function Canalizaciones({ usuario }) {
           ) : (
             <div className="seccion-cinematica seccion-libros">
               <div className="seccion-simbolo">
-                <span className="simbolo-glow">📜</span>
+                <div className="anim-libro">
+                  <svg viewBox="0 0 80 80" className="libro-svg">
+                    <defs>
+                      <linearGradient id="libroGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#8B4513"/>
+                        <stop offset="50%" stopColor="#D2691E"/>
+                        <stop offset="100%" stopColor="#8B4513"/>
+                      </linearGradient>
+                    </defs>
+                    <rect x="15" y="20" width="50" height="40" rx="2" fill="url(#libroGrad)" className="libro-tapa"/>
+                    <rect x="18" y="23" width="44" height="34" fill="#FFF8DC" className="libro-paginas"/>
+                    <line x1="40" y1="23" x2="40" y2="57" stroke="#D2B48C" strokeWidth="1" className="libro-lomo"/>
+                    <g className="libro-lineas">
+                      <line x1="22" y1="30" x2="36" y2="30" stroke="#8B4513" strokeWidth="0.5" opacity="0.5"/>
+                      <line x1="22" y1="35" x2="34" y2="35" stroke="#8B4513" strokeWidth="0.5" opacity="0.5"/>
+                      <line x1="22" y1="40" x2="36" y2="40" stroke="#8B4513" strokeWidth="0.5" opacity="0.5"/>
+                      <line x1="44" y1="30" x2="58" y2="30" stroke="#8B4513" strokeWidth="0.5" opacity="0.5"/>
+                      <line x1="44" y1="35" x2="56" y2="35" stroke="#8B4513" strokeWidth="0.5" opacity="0.5"/>
+                      <line x1="44" y1="40" x2="58" y2="40" stroke="#8B4513" strokeWidth="0.5" opacity="0.5"/>
+                    </g>
+                    <g className="libro-glow">
+                      <circle cx="40" cy="40" r="3" fill="#e67e22" className="glow-center"/>
+                      <circle cx="35" cy="48" r="1.5" fill="#d4af37" className="glow-p1"/>
+                      <circle cx="45" cy="48" r="1.5" fill="#d4af37" className="glow-p2"/>
+                    </g>
+                  </svg>
+                </div>
               </div>
 
               <div className="seccion-narrativa">
@@ -1258,7 +1345,38 @@ function Canalizaciones({ usuario }) {
           ) : (
             <div className="seccion-cinematica seccion-lecturas">
               <div className="seccion-simbolo">
-                <span className="simbolo-glow">✦</span>
+                <div className="anim-cartas">
+                  <svg viewBox="0 0 80 80" className="cartas-svg">
+                    <defs>
+                      <linearGradient id="cartaGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#1a1a2e"/>
+                        <stop offset="100%" stopColor="#16213e"/>
+                      </linearGradient>
+                      <linearGradient id="cartaGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#0f3460"/>
+                        <stop offset="100%" stopColor="#16213e"/>
+                      </linearGradient>
+                    </defs>
+                    <g className="carta carta-3" transform="rotate(15, 40, 45)">
+                      <rect x="25" y="15" width="30" height="45" rx="3" fill="url(#cartaGrad1)" stroke="#3498db" strokeWidth="0.5"/>
+                      <circle cx="40" cy="37" r="8" fill="none" stroke="#3498db" strokeWidth="0.5" opacity="0.5"/>
+                    </g>
+                    <g className="carta carta-2" transform="rotate(-10, 40, 45)">
+                      <rect x="25" y="15" width="30" height="45" rx="3" fill="url(#cartaGrad2)" stroke="#9b59b6" strokeWidth="0.5"/>
+                      <polygon points="40,25 44,35 40,32 36,35" fill="#9b59b6" opacity="0.6"/>
+                    </g>
+                    <g className="carta carta-1">
+                      <rect x="25" y="15" width="30" height="45" rx="3" fill="#1a1a2e" stroke="#d4af37" strokeWidth="1"/>
+                      <circle cx="40" cy="37" r="6" fill="none" stroke="#d4af37" strokeWidth="1"/>
+                      <circle cx="40" cy="37" r="2" fill="#d4af37" className="carta-centro"/>
+                    </g>
+                    <g className="cartas-estrellas">
+                      <circle cx="30" cy="12" r="1" fill="#fff" className="estrella e1"/>
+                      <circle cx="50" cy="10" r="1.5" fill="#d4af37" className="estrella e2"/>
+                      <circle cx="60" cy="20" r="1" fill="#3498db" className="estrella e3"/>
+                    </g>
+                  </svg>
+                </div>
               </div>
 
               <div className="seccion-narrativa">
@@ -1312,33 +1430,56 @@ function Canalizaciones({ usuario }) {
           ) : (
             <div className="seccion-cinematica seccion-regalos-h">
               <div className="seccion-simbolo">
-                <span className="simbolo-glow">❤︎</span>
+                <div className="anim-regalo">
+                  <svg viewBox="0 0 80 80" className="regalo-svg">
+                    <defs>
+                      <linearGradient id="regaloGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#e91e63"/>
+                        <stop offset="100%" stopColor="#c2185b"/>
+                      </linearGradient>
+                    </defs>
+                    <rect x="20" y="35" width="40" height="30" rx="3" fill="url(#regaloGrad)" className="regalo-caja"/>
+                    <rect x="20" y="30" width="40" height="8" rx="2" fill="#ad1457" className="regalo-tapa"/>
+                    <rect x="37" y="30" width="6" height="35" fill="#d4af37" className="regalo-cinta-v"/>
+                    <rect x="20" y="32" width="40" height="4" fill="#d4af37" className="regalo-cinta-h"/>
+                    <g className="regalo-lazo">
+                      <ellipse cx="33" cy="26" rx="6" ry="8" fill="#d4af37" transform="rotate(-30, 33, 26)"/>
+                      <ellipse cx="47" cy="26" rx="6" ry="8" fill="#d4af37" transform="rotate(30, 47, 26)"/>
+                      <circle cx="40" cy="28" r="4" fill="#b8962e"/>
+                    </g>
+                    <g className="regalo-hearts">
+                      <path d="M15 20 C15 15, 20 15, 20 18 C20 15, 25 15, 25 20 C25 25, 20 28, 20 28 C20 28, 15 25, 15 20" fill="#ff6b9d" className="mini-heart h1"/>
+                      <path d="M55 15 C55 12, 58 12, 58 14 C58 12, 61 12, 61 15 C61 18, 58 20, 58 20 C58 20, 55 18, 55 15" fill="#ff6b9d" className="mini-heart h2"/>
+                      <path d="M62 35 C62 32, 65 32, 65 34 C65 32, 68 32, 68 35 C68 38, 65 40, 65 40 C65 40, 62 38, 62 35" fill="#ff6b9d" className="mini-heart h3"/>
+                    </g>
+                  </svg>
+                </div>
               </div>
 
               <div className="seccion-narrativa">
                 <div className="story-scene scene-1">
                   <p className="scene-visual">
-                    Regalar un guardián es regalar una decisión.
+                    Regalar magia es regalar una decisión.
                   </p>
                   <p>
-                    No es un objeto envuelto en papel. Es decirle a alguien:
-                    <em>"Vi esto y pensé en vos. En lo que necesitás.
-                    En lo que merecés tener cuidándote."</em>
+                    Un guardián, una lectura, un talismán, una runa. No importa qué.
+                    Es decirle a alguien: <em>"Vi esto y pensé en vos.
+                    En lo que necesitás. En lo que merecés."</em>
                   </p>
                 </div>
 
                 <div className="story-scene scene-2">
                   <p>
-                    Hay regalos que se usan y se gastan. Y hay regalos que
-                    se quedan para siempre en un estante, mirando,
-                    recordándole a esa persona que alguien la vio.
+                    Hay regalos que se usan y se olvidan. Y hay regalos que
+                    se quedan para siempre, recordándole a esa persona
+                    que alguien la vio. Que alguien pensó en ella.
                   </p>
                 </div>
 
                 <div className="story-reveal">
                   <div className="reveal-line"></div>
                   <p className="reveal-text">
-                    Todavía no regalaste ninguno.<br/>
+                    Todavía no regalaste nada.<br/>
                     <em>Pero ya sabés a quién se lo darías.</em>
                   </p>
                   <div className="reveal-line"></div>
@@ -1346,7 +1487,7 @@ function Canalizaciones({ usuario }) {
 
                 <div className="story-scene scene-final">
                   <p className="scene-direct">
-                    Cuando lo hagas, va a quedar registrado acá. Tu rastro de magia compartida.
+                    Cada regalo que hagas queda registrado acá. Tu rastro de magia compartida.
                   </p>
                 </div>
               </div>
@@ -1367,7 +1508,32 @@ function Canalizaciones({ usuario }) {
           ) : (
             <div className="seccion-cinematica seccion-regalos-r">
               <div className="seccion-simbolo">
-                <span className="simbolo-glow">✧</span>
+                <div className="anim-recibir">
+                  <svg viewBox="0 0 80 80" className="recibir-svg">
+                    <defs>
+                      <linearGradient id="recibirGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#2ecc71"/>
+                        <stop offset="100%" stopColor="#27ae60"/>
+                      </linearGradient>
+                    </defs>
+                    <g className="manos">
+                      <path d="M20 55 Q25 45, 35 50 L35 60 Q25 65, 20 55" fill="#deb887" className="mano-izq"/>
+                      <path d="M60 55 Q55 45, 45 50 L45 60 Q55 65, 60 55" fill="#deb887" className="mano-der"/>
+                    </g>
+                    <circle cx="40" cy="40" r="15" fill="url(#recibirGrad)" className="esfera-regalo"/>
+                    <circle cx="40" cy="40" r="10" fill="none" stroke="#fff" strokeWidth="0.5" opacity="0.5"/>
+                    <circle cx="40" cy="40" r="5" fill="#fff" opacity="0.3"/>
+                    <g className="recibir-sparkles">
+                      <polygon points="40,15 42,20 47,20 43,24 45,29 40,26 35,29 37,24 33,20 38,20" fill="#d4af37" className="star-main"/>
+                      <circle cx="25" cy="30" r="2" fill="#2ecc71" className="spark s1"/>
+                      <circle cx="55" cy="30" r="2" fill="#2ecc71" className="spark s2"/>
+                      <circle cx="30" cy="20" r="1.5" fill="#fff" className="spark s3"/>
+                      <circle cx="50" cy="22" r="1.5" fill="#fff" className="spark s4"/>
+                      <circle cx="20" cy="40" r="1" fill="#d4af37" className="spark s5"/>
+                      <circle cx="60" cy="38" r="1" fill="#d4af37" className="spark s6"/>
+                    </g>
+                  </svg>
+                </div>
               </div>
 
               <div className="seccion-narrativa">
@@ -1378,15 +1544,15 @@ function Canalizaciones({ usuario }) {
                   <p>
                     Requiere aceptar que alguien pensó en vos. Que dedicó tiempo
                     a elegir algo que te represente. Que se animó a decirte,
-                    sin palabras: <em>"Te veo. Te importo."</em>
+                    sin palabras: <em>"Te veo. Me importás."</em>
                   </p>
                 </div>
 
                 <div className="story-scene scene-2">
                   <p>
-                    Cuando alguien te regala un guardián o una experiencia mágica,
-                    está regalándote una pieza de su mundo interior.
-                    Algo que eligió para vos entre miles de opciones.
+                    Cuando alguien te regala algo de acá — un guardián, una lectura,
+                    un talismán — está regalándote una pieza de su mundo interior.
+                    Algo que eligió para vos.
                   </p>
                 </div>
 
@@ -1394,7 +1560,7 @@ function Canalizaciones({ usuario }) {
                   <div className="reveal-line"></div>
                   <p className="reveal-text">
                     Nadie te regaló nada todavía.<br/>
-                    <em>Pero si compartís tu perfil, eso puede cambiar.</em>
+                    <em>¿Ya compartiste tu lista de deseos?</em>
                   </p>
                   <div className="reveal-line"></div>
                 </div>
@@ -4596,6 +4762,44 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .path-name{font-family:'Cinzel',serif;font-size:0.85rem;color:#fff;letter-spacing:1px;margin-bottom:0.25rem;position:relative;z-index:1}
 .path-desc{font-size:0.75rem;color:rgba(255,255,255,0.4);position:relative;z-index:1}
 
+/* Iconos animados de categorías */
+.path-icon-anim{position:relative;width:50px;height:50px;margin-bottom:0.5rem}
+.path-icon-anim svg{width:100%;height:100%}
+.floating-icons{position:absolute;inset:0;pointer-events:none}
+.float-icon{position:absolute;font-size:0.6rem;opacity:0;animation:floatUp 3s ease-in-out infinite}
+.fi1{left:0;top:50%;animation-delay:0s}
+.fi2{right:0;top:30%;animation-delay:1s}
+.fi3{left:50%;top:0;animation-delay:2s}
+@keyframes floatUp{0%{opacity:0;transform:translateY(10px) scale(0.5)}30%{opacity:1}70%{opacity:1}100%{opacity:0;transform:translateY(-20px) scale(1)}}
+
+/* Escudo - Protección */
+.icon-escudo{filter:drop-shadow(0 0 8px rgba(74,144,217,0.5))}
+.escudo-base{animation:escudoPulse 2s ease-in-out infinite}
+.escudo-centro{animation:centroBrillo 2s ease-in-out infinite}
+.shields .float-icon{color:#4A90D9}
+@keyframes escudoPulse{0%,100%{stroke-width:2}50%{stroke-width:3}}
+@keyframes centroBrillo{0%,100%{r:3;opacity:1}50%{r:4;opacity:0.6}}
+
+/* Corazón - Amor */
+.icon-corazon{filter:drop-shadow(0 0 8px rgba(233,30,140,0.5))}
+.corazon-base{animation:corazonLatido 1.5s ease-in-out infinite}
+.hearts .float-icon{color:#E91E8C}
+@keyframes corazonLatido{0%,100%{transform:scale(1)}15%{transform:scale(1.1)}30%{transform:scale(1)}45%{transform:scale(1.05)}60%{transform:scale(1)}}
+
+/* Moneda - Abundancia */
+.icon-moneda{filter:drop-shadow(0 0 8px rgba(198,169,98,0.5))}
+.moneda-base{animation:monedaGiro 4s linear infinite}
+.coins .float-icon{color:#C6A962}
+@keyframes monedaGiro{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+
+/* Vida - Sanación */
+.icon-vida{filter:drop-shadow(0 0 8px rgba(46,204,113,0.5))}
+.vida-hoja1{animation:hojaCrecer 3s ease-in-out infinite}
+.vida-circulo{animation:circuloRespirar 3s ease-in-out infinite}
+.leaves .float-icon{color:#2ECC71}
+@keyframes hojaCrecer{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes circuloRespirar{0%,100%{r:15;opacity:1}50%{r:16;opacity:0.7}}
+
 /* ═══════════════════════════════════════════════════════════════ */
 /* SECCIONES CINEMATOGRÁFICAS (Talismanes, Libros, Lecturas, etc) */
 /* ═══════════════════════════════════════════════════════════════ */
@@ -4610,12 +4814,82 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .cta-arrow{transition:transform 0.3s}
 .seccion-cta:hover .cta-arrow{transform:translateX(5px)}
 
-/* Variantes de color por sección */
-.seccion-talismanes .simbolo-glow{color:#9b59b6;filter:drop-shadow(0 0 20px rgba(155,89,182,0.5))}
-.seccion-libros .simbolo-glow{color:#e67e22;filter:drop-shadow(0 0 20px rgba(230,126,34,0.5))}
-.seccion-lecturas .simbolo-glow{color:#3498db;filter:drop-shadow(0 0 20px rgba(52,152,219,0.5))}
-.seccion-regalos-h .simbolo-glow{color:#e91e63;filter:drop-shadow(0 0 20px rgba(233,30,99,0.5))}
-.seccion-regalos-r .simbolo-glow{color:#2ecc71;filter:drop-shadow(0 0 20px rgba(46,204,113,0.5))}
+/* ═══════════════════════════════════════════════════════════════ */
+/* ANIMACIONES SVG ESPECTACULARES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* VARITA MÁGICA - Talismanes */
+.anim-varita{width:100px;height:100px;margin:0 auto}
+.varita-svg{width:100%;height:100%;filter:drop-shadow(0 0 15px rgba(155,89,182,0.5))}
+.varita-line{animation:varitaWave 3s ease-in-out infinite}
+.varita-punta{animation:puntaGlow 2s ease-in-out infinite}
+.varita-sparkles .sparkle{animation:sparkleFloat 2s ease-in-out infinite}
+.sparkle.s1{animation-delay:0s}
+.sparkle.s2{animation-delay:0.3s}
+.sparkle.s3{animation-delay:0.6s}
+.sparkle.s4{animation-delay:0.9s}
+@keyframes varitaWave{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes puntaGlow{0%,100%{r:4;opacity:1}50%{r:6;opacity:0.7}}
+@keyframes sparkleFloat{0%,100%{opacity:1;transform:translateY(0)}50%{opacity:0.3;transform:translateY(-5px)}}
+
+/* LIBRO MÁGICO - Libros */
+.anim-libro{width:100px;height:100px;margin:0 auto}
+.libro-svg{width:100%;height:100%;filter:drop-shadow(0 0 15px rgba(230,126,34,0.4))}
+.libro-svg{animation:libroFloat 4s ease-in-out infinite}
+.libro-glow .glow-center{animation:glowPulse 2s ease-in-out infinite}
+.libro-glow .glow-p1,.libro-glow .glow-p2{animation:glowOrbit 3s ease-in-out infinite}
+.glow-p2{animation-delay:1.5s!important}
+@keyframes libroFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+@keyframes glowPulse{0%,100%{r:3;opacity:1}50%{r:5;opacity:0.6}}
+@keyframes glowOrbit{0%,100%{opacity:1}50%{opacity:0.3;transform:translateY(-3px)}}
+
+/* CARTAS TAROT - Lecturas */
+.anim-cartas{width:100px;height:100px;margin:0 auto}
+.cartas-svg{width:100%;height:100%;filter:drop-shadow(0 0 15px rgba(52,152,219,0.4))}
+.carta-1{animation:carta1Float 4s ease-in-out infinite}
+.carta-2{animation:carta2Float 4s ease-in-out infinite 0.5s}
+.carta-3{animation:carta3Float 4s ease-in-out infinite 1s}
+.carta-centro{animation:cartaCentroGlow 2s ease-in-out infinite}
+.cartas-estrellas .estrella{animation:estrellaFloat 2.5s ease-in-out infinite}
+.estrella.e1{animation-delay:0s}
+.estrella.e2{animation-delay:0.5s}
+.estrella.e3{animation-delay:1s}
+@keyframes carta1Float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes carta2Float{0%,100%{transform:rotate(-10deg) translateY(0)}50%{transform:rotate(-8deg) translateY(-4px)}}
+@keyframes carta3Float{0%,100%{transform:rotate(15deg) translateY(0)}50%{transform:rotate(17deg) translateY(-5px)}}
+@keyframes cartaCentroGlow{0%,100%{r:2;opacity:1}50%{r:3;opacity:0.5}}
+@keyframes estrellaFloat{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.3)}}
+
+/* REGALO - Regalos Hechos */
+.anim-regalo{width:100px;height:100px;margin:0 auto}
+.regalo-svg{width:100%;height:100%;filter:drop-shadow(0 0 15px rgba(233,30,99,0.4))}
+.regalo-svg{animation:regaloFloat 3s ease-in-out infinite}
+.regalo-lazo{animation:lazoWiggle 2s ease-in-out infinite}
+.regalo-hearts .mini-heart{animation:heartFloat 2s ease-in-out infinite}
+.mini-heart.h1{animation-delay:0s}
+.mini-heart.h2{animation-delay:0.4s}
+.mini-heart.h3{animation-delay:0.8s}
+@keyframes regaloFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes lazoWiggle{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes heartFloat{0%,100%{opacity:1;transform:scale(1) translateY(0)}50%{opacity:0.5;transform:scale(1.2) translateY(-8px)}}
+
+/* RECIBIR - Regalos Recibidos */
+.anim-recibir{width:100px;height:100px;margin:0 auto}
+.recibir-svg{width:100%;height:100%;filter:drop-shadow(0 0 15px rgba(46,204,113,0.4))}
+.esfera-regalo{animation:esferaPulse 3s ease-in-out infinite}
+.manos{animation:manosAcercar 3s ease-in-out infinite}
+.star-main{animation:starSpin 4s linear infinite}
+.recibir-sparkles .spark{animation:sparkFloat 2s ease-in-out infinite}
+.spark.s1{animation-delay:0s}
+.spark.s2{animation-delay:0.2s}
+.spark.s3{animation-delay:0.4s}
+.spark.s4{animation-delay:0.6s}
+.spark.s5{animation-delay:0.8s}
+.spark.s6{animation-delay:1s}
+@keyframes esferaPulse{0%,100%{r:15;opacity:1}50%{r:17;opacity:0.8}}
+@keyframes manosAcercar{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+@keyframes starSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes sparkFloat{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(1.5)}}
 
 @media(max-width:768px){
 .seccion-cinematica{padding:2rem 1.25rem}
