@@ -341,8 +341,24 @@ function duendes_qr_imprimir_page() {
     <!-- Área de impresión (oculta) -->
     <div id="print-area" class="print-area" style="display:none;"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
+    // Esperar a que QRCode esté disponible
+    function waitForQRCode(callback, maxAttempts = 50) {
+        let attempts = 0;
+        const check = () => {
+            attempts++;
+            if (typeof QRCode !== 'undefined') {
+                callback();
+            } else if (attempts < maxAttempts) {
+                setTimeout(check, 100);
+            } else {
+                console.error('QRCode library failed to load');
+            }
+        };
+        check();
+    }
+
     (async function() {
         const container = document.getElementById('tarjetas-container');
         const printArea = document.getElementById('print-area');
@@ -396,6 +412,12 @@ function duendes_qr_imprimir_page() {
 
     window.imprimirTarjeta = async function(tarjetaId) {
         try {
+            // Verificar que QRCode está cargado
+            if (typeof QRCode === 'undefined') {
+                alert('Error: La librería de QR no está cargada. Recargá la página.');
+                return;
+            }
+
             const res = await fetch(`https://duendes-vercel.vercel.app/api/admin/qr-tarjeta?id=${tarjetaId}`);
             const data = await res.json();
 
@@ -405,13 +427,6 @@ function duendes_qr_imprimir_page() {
             }
 
             const t = data.tarjeta;
-
-            // Generar QR como data URL
-            const qrDataUrl = await QRCode.toDataURL(t.urlMiMagia, {
-                width: 200,
-                margin: 0,
-                color: { dark: '#000', light: '#fff' }
-            });
 
             // Crear tarjeta imprimible
             const printArea = document.getElementById('print-area');
@@ -424,7 +439,7 @@ function duendes_qr_imprimir_page() {
                     </div>
 
                     <div class="tarjeta-qr-container">
-                        <img src="${qrDataUrl}" alt="QR Mi Magia">
+                        <div id="qr-code-container" style="display:inline-block; padding:10px; background:#fff; border-radius:8px;"></div>
                         <div class="tarjeta-codigo">${t.codigoQR}</div>
                     </div>
 
@@ -467,15 +482,25 @@ function duendes_qr_imprimir_page() {
                 </div>
             `;
 
+            // Generar QR en el contenedor
+            new QRCode(document.getElementById('qr-code-container'), {
+                text: t.urlMiMagia,
+                width: 150,
+                height: 150,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
             printArea.style.display = 'block';
 
-            // Imprimir
-            window.print();
-
-            // Ocultar después
+            // Esperar un momento para que el QR se renderice
             setTimeout(() => {
-                printArea.style.display = 'none';
-            }, 1000);
+                window.print();
+                setTimeout(() => {
+                    printArea.style.display = 'none';
+                }, 1000);
+            }, 500);
 
         } catch (error) {
             console.error(error);
