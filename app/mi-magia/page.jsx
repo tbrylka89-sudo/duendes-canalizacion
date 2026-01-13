@@ -1146,7 +1146,56 @@ function Canalizaciones({ usuario }) {
           {talismanes.length > 0 ? (
             <div className="items-grid">{talismanes.map((t,i) => <div key={i} className="item-card"><h4>{t.nombre}</h4><small>{t.fecha}</small></div>)}</div>
           ) : (
-            <div className="empty-tab"><span>✧</span><h3>Sin talismanes aún</h3><p>Los talismanes son piezas especiales con propósitos específicos.</p></div>
+            <div className="seccion-cinematica seccion-talismanes">
+              <div className="seccion-simbolo">
+                <span className="simbolo-glow">◈</span>
+              </div>
+
+              <div className="seccion-narrativa">
+                <div className="story-scene scene-1">
+                  <p className="scene-visual">
+                    Un guardián protege. Un talismán amplifica.
+                  </p>
+                  <p>
+                    Hay momentos en la vida donde necesitás algo más que compañía.
+                    Necesitás un ancla. Algo que te recuerde quién sos cuando
+                    el mundo intenta convencerte de lo contrario.
+                  </p>
+                </div>
+
+                <div className="story-scene scene-2">
+                  <p>
+                    Los talismanes no se eligen por estética. Se eligen por necesidad.
+                    El que necesita protección lo siente en el cuerpo — una urgencia
+                    que no tiene nombre pero tiene dirección.
+                  </p>
+                  <p>
+                    El que necesita claridad busca sin saber qué busca,
+                    hasta que lo encuentra.
+                  </p>
+                </div>
+
+                <div className="story-reveal">
+                  <div className="reveal-line"></div>
+                  <p className="reveal-text">
+                    Todavía no tenés ninguno.<br/>
+                    <em>Quizás todavía no lo necesitás.</em>
+                  </p>
+                  <div className="reveal-line"></div>
+                </div>
+
+                <div className="story-scene scene-final">
+                  <p className="scene-direct">
+                    Cuando llegue el momento, vas a saber.
+                  </p>
+                </div>
+              </div>
+
+              <a href="https://duendesuy.10web.cloud/categoria-producto/talismanes/" className="seccion-cta">
+                <span>Explorar talismanes</span>
+                <span className="cta-arrow">→</span>
+              </a>
+            </div>
           )}
         </div>
       )}
@@ -1156,7 +1205,48 @@ function Canalizaciones({ usuario }) {
           {libros.length > 0 ? (
             <div className="items-grid">{libros.map((l,i) => <div key={i} className="item-card"><h4>{l.nombre}</h4><small>{l.fecha}</small></div>)}</div>
           ) : (
-            <div className="empty-tab"><span>📖</span><h3>Sin libros digitales</h3><p>Próximamente tendremos guías y libros digitales sobre el mundo elemental.</p></div>
+            <div className="seccion-cinematica seccion-libros">
+              <div className="seccion-simbolo">
+                <span className="simbolo-glow">📜</span>
+              </div>
+
+              <div className="seccion-narrativa">
+                <div className="story-scene scene-1">
+                  <p className="scene-visual">
+                    Hay cosas que no se enseñan. Se transmiten.
+                  </p>
+                  <p>
+                    Durante años guardamos el conocimiento en cuadernos,
+                    servilletas, audios de WhatsApp a las 3 de la mañana.
+                    Fragmentos de algo más grande que todavía no tenía forma.
+                  </p>
+                </div>
+
+                <div className="story-scene scene-2">
+                  <p>
+                    Ahora lo estamos ordenando. Rituales que funcionan.
+                    Formas de conectar que no vas a encontrar en Google.
+                    Lo que aprendimos en años de trabajar con guardianes
+                    — y lo que ellos nos enseñaron a nosotros.
+                  </p>
+                </div>
+
+                <div className="story-reveal">
+                  <div className="reveal-line"></div>
+                  <p className="reveal-text">
+                    La biblioteca está en construcción.<br/>
+                    <em>Algunas cosas llevan tiempo.</em>
+                  </p>
+                  <div className="reveal-line"></div>
+                </div>
+
+                <div className="story-scene scene-final">
+                  <p className="scene-direct">
+                    Cuando esté lista, vas a ser de las primeras en saberlo.
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -1166,7 +1256,51 @@ function Canalizaciones({ usuario }) {
           {lecturas.length > 0 ? (
             <div className="lecturas-list">{lecturas.map((l,i) => <div key={i} className="lectura-item"><span className="lec-fecha">{l.fecha}</span><h4>{l.tipo}</h4><p>{l.resumen || l.contenido?.substring(0, 200)}...</p><button className="btn-sec">Ver completa</button></div>)}</div>
           ) : (
-            <div className="empty-tab"><span>✦</span><h3>Sin lecturas aún</h3><p>Cuando solicites una experiencia mágica, quedará guardada acá para siempre. Podrás releerla cuando quieras.</p></div>
+            <div className="seccion-cinematica seccion-lecturas">
+              <div className="seccion-simbolo">
+                <span className="simbolo-glow">✦</span>
+              </div>
+
+              <div className="seccion-narrativa">
+                <div className="story-scene scene-1">
+                  <p className="scene-visual">
+                    A veces necesitás que alguien te diga lo que ya sabés.
+                  </p>
+                  <p>
+                    No porque no lo sepas. Sino porque escucharlo de afuera
+                    lo vuelve real. Le da permiso de existir.
+                  </p>
+                </div>
+
+                <div className="story-scene scene-2">
+                  <p>
+                    Las lecturas no predicen el futuro — revelan el presente.
+                    Eso que sentís pero no nombrás. Eso que intuís pero dudás.
+                    Eso que necesitás escuchar para finalmente actuar.
+                  </p>
+                </div>
+
+                <div className="story-reveal">
+                  <div className="reveal-line"></div>
+                  <p className="reveal-text">
+                    Tu archivo está vacío.<br/>
+                    <em>Cada lectura que hagas quedará guardada acá.</em>
+                  </p>
+                  <div className="reveal-line"></div>
+                </div>
+
+                <div className="story-scene scene-final">
+                  <p className="scene-direct">
+                    Para volver a leerla cuando la necesites. Porque siempre se necesita.
+                  </p>
+                </div>
+              </div>
+
+              <a href="https://duendesuy.10web.cloud/categoria-producto/lecturas/" className="seccion-cta">
+                <span>Pedir una lectura</span>
+                <span className="cta-arrow">→</span>
+              </a>
+            </div>
           )}
         </div>
       )}
@@ -1176,7 +1310,52 @@ function Canalizaciones({ usuario }) {
           {regalosHechos.length > 0 ? (
             <div className="items-grid">{regalosHechos.map((r,i) => <div key={i} className="item-card"><h4>{r.tipo}</h4><small>Para: {r.para} • {r.fecha}</small></div>)}</div>
           ) : (
-            <div className="empty-tab"><span>❤↗</span><h3>No has regalado aún</h3><p>Cuando regales una experiencia o guardián, quedará registrado acá.</p></div>
+            <div className="seccion-cinematica seccion-regalos-h">
+              <div className="seccion-simbolo">
+                <span className="simbolo-glow">❤︎</span>
+              </div>
+
+              <div className="seccion-narrativa">
+                <div className="story-scene scene-1">
+                  <p className="scene-visual">
+                    Regalar un guardián es regalar una decisión.
+                  </p>
+                  <p>
+                    No es un objeto envuelto en papel. Es decirle a alguien:
+                    <em>"Vi esto y pensé en vos. En lo que necesitás.
+                    En lo que merecés tener cuidándote."</em>
+                  </p>
+                </div>
+
+                <div className="story-scene scene-2">
+                  <p>
+                    Hay regalos que se usan y se gastan. Y hay regalos que
+                    se quedan para siempre en un estante, mirando,
+                    recordándole a esa persona que alguien la vio.
+                  </p>
+                </div>
+
+                <div className="story-reveal">
+                  <div className="reveal-line"></div>
+                  <p className="reveal-text">
+                    Todavía no regalaste ninguno.<br/>
+                    <em>Pero ya sabés a quién se lo darías.</em>
+                  </p>
+                  <div className="reveal-line"></div>
+                </div>
+
+                <div className="story-scene scene-final">
+                  <p className="scene-direct">
+                    Cuando lo hagas, va a quedar registrado acá. Tu rastro de magia compartida.
+                  </p>
+                </div>
+              </div>
+
+              <a href="https://duendesuy.10web.cloud/tienda/" className="seccion-cta">
+                <span>Elegir un regalo</span>
+                <span className="cta-arrow">→</span>
+              </a>
+            </div>
           )}
         </div>
       )}
@@ -1186,7 +1365,47 @@ function Canalizaciones({ usuario }) {
           {regalosRecibidos.length > 0 ? (
             <div className="items-grid">{regalosRecibidos.map((r,i) => <div key={i} className="item-card"><h4>{r.tipo}</h4><small>De: {r.de} • {r.fecha}</small></div>)}</div>
           ) : (
-            <div className="empty-tab"><span>❤↙</span><h3>No has recibido regalos</h3><p>Si alguien te regala una experiencia, aparecerá acá.</p></div>
+            <div className="seccion-cinematica seccion-regalos-r">
+              <div className="seccion-simbolo">
+                <span className="simbolo-glow">✧</span>
+              </div>
+
+              <div className="seccion-narrativa">
+                <div className="story-scene scene-1">
+                  <p className="scene-visual">
+                    Recibir es más difícil que dar.
+                  </p>
+                  <p>
+                    Requiere aceptar que alguien pensó en vos. Que dedicó tiempo
+                    a elegir algo que te represente. Que se animó a decirte,
+                    sin palabras: <em>"Te veo. Te importo."</em>
+                  </p>
+                </div>
+
+                <div className="story-scene scene-2">
+                  <p>
+                    Cuando alguien te regala un guardián o una experiencia mágica,
+                    está regalándote una pieza de su mundo interior.
+                    Algo que eligió para vos entre miles de opciones.
+                  </p>
+                </div>
+
+                <div className="story-reveal">
+                  <div className="reveal-line"></div>
+                  <p className="reveal-text">
+                    Nadie te regaló nada todavía.<br/>
+                    <em>Pero si compartís tu perfil, eso puede cambiar.</em>
+                  </p>
+                  <div className="reveal-line"></div>
+                </div>
+
+                <div className="story-scene scene-final">
+                  <p className="scene-direct">
+                    A veces solo hace falta que alguien sepa qué deseás.
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -4376,6 +4595,34 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .path-sanacion .path-symbol{color:#2ECC71}
 .path-name{font-family:'Cinzel',serif;font-size:0.85rem;color:#fff;letter-spacing:1px;margin-bottom:0.25rem;position:relative;z-index:1}
 .path-desc{font-size:0.75rem;color:rgba(255,255,255,0.4);position:relative;z-index:1}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* SECCIONES CINEMATOGRÁFICAS (Talismanes, Libros, Lecturas, etc) */
+/* ═══════════════════════════════════════════════════════════════ */
+.seccion-cinematica{background:linear-gradient(180deg,#0d0d0d 0%,#1a1510 50%,#0d0d0d 100%);border-radius:20px;padding:3rem 2rem;color:#fff;position:relative;overflow:hidden;text-align:center}
+.seccion-cinematica::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none}
+.seccion-simbolo{margin-bottom:2rem}
+.simbolo-glow{font-size:3.5rem;display:inline-block;animation:simboloFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(212,175,55,0.5))}
+@keyframes simboloFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.05)}}
+.seccion-narrativa{max-width:600px;margin:0 auto 2rem;text-align:left}
+.seccion-cta{display:inline-flex;align-items:center;gap:0.75rem;background:linear-gradient(135deg,#d4af37 0%,#b8962e 100%);color:#000;padding:1rem 2rem;border-radius:30px;text-decoration:none;font-family:'Cinzel',serif;font-size:0.9rem;letter-spacing:1px;transition:all 0.3s;margin-top:1rem}
+.seccion-cta:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(212,175,55,0.4)}
+.cta-arrow{transition:transform 0.3s}
+.seccion-cta:hover .cta-arrow{transform:translateX(5px)}
+
+/* Variantes de color por sección */
+.seccion-talismanes .simbolo-glow{color:#9b59b6;filter:drop-shadow(0 0 20px rgba(155,89,182,0.5))}
+.seccion-libros .simbolo-glow{color:#e67e22;filter:drop-shadow(0 0 20px rgba(230,126,34,0.5))}
+.seccion-lecturas .simbolo-glow{color:#3498db;filter:drop-shadow(0 0 20px rgba(52,152,219,0.5))}
+.seccion-regalos-h .simbolo-glow{color:#e91e63;filter:drop-shadow(0 0 20px rgba(233,30,99,0.5))}
+.seccion-regalos-r .simbolo-glow{color:#2ecc71;filter:drop-shadow(0 0 20px rgba(46,204,113,0.5))}
+
+@media(max-width:768px){
+.seccion-cinematica{padding:2rem 1.25rem}
+.simbolo-glow{font-size:2.5rem}
+.seccion-narrativa{text-align:left}
+.seccion-cta{padding:0.85rem 1.5rem;font-size:0.85rem}
+}
 
 @media(max-width:768px){
 .elegidos-cinematic{padding:2rem 1.25rem}
