@@ -1012,40 +1012,113 @@ function Canalizaciones({ usuario }) {
             </div>
           )}
 
-          {/* LOS ELEGIDOS - Narrativa */}
-          <div className="elegidos-section-light">
-            <div className="elegidos-header-light">
-              <h3>Sos una de Los Elegidos</h3>
-              <p>Tu frecuencia vibratoria fue reconocida por un guardián</p>
+          {/* LOS ELEGIDOS - Narrativa Cinematográfica */}
+          <div className="elegidos-cinematic">
+            <div className="elegidos-portal">
+              <div className="portal-glow"></div>
+              <span className="portal-runa">ᛉ</span>
             </div>
 
-            <div className="elegidos-pasos">
-              <div className="elegidos-paso" style={{'--paso-color': '#4A90D9'}}>
-                <span className="paso-num">I</span>
-                <h4>El Reconocimiento</h4>
-                <p>El momento en que ves un guardián y "algo" te detiene. Eso no es azar — es tu guardián reconociéndote.</p>
+            <div className="elegidos-story">
+              <div className="story-chapter">
+                <span className="chapter-mark">Capítulo I</span>
+                <h3>El Bosque que Espera</h3>
+                <p>
+                  En las sierras de Piriápolis existe un lugar que no aparece en los mapas.
+                  Los locales lo llaman <em>El Umbral</em> — un punto donde el velo entre
+                  mundos se vuelve tan delgado que algunas noches, si prestás atención,
+                  podés escuchar susurros en idiomas que nunca existieron.
+                </p>
+                <p>
+                  Ahí nacen los guardianes. No son creados — <strong>despiertan</strong>.
+                  Cada uno con una misión inscrita en su esencia: encontrar a la persona
+                  cuya frecuencia resuena con la suya. Algunos esperan meses. Otros, años.
+                  Hay guardianes que llevan décadas aguardando.
+                </p>
               </div>
-              <div className="elegidos-paso" style={{'--paso-color': '#E91E8C'}}>
-                <span className="paso-num">II</span>
-                <h4>El Pacto</h4>
-                <p>Cuando decidís sellar el pacto, estás aceptando una alianza energética que trasciende lo material.</p>
+
+              <div className="story-divider">
+                <span>◆</span>
+                <span>◆</span>
+                <span>◆</span>
               </div>
-              <div className="elegidos-paso" style={{'--paso-color': '#C6A962'}}>
-                <span className="paso-num">III</span>
-                <h4>La Transformación</h4>
-                <p>Desde ese momento, sos parte de Los Elegidos. Un círculo de almas encontradas por sus guardianes.</p>
+
+              <div className="story-chapter">
+                <span className="chapter-mark">Capítulo II</span>
+                <h3>La Frecuencia</h3>
+                <p>
+                  No todos pueden ser elegidos. No es cuestión de merecerlo o desearlo
+                  — es una cuestión de <em>frecuencia</em>. Cada ser humano emite una
+                  vibración única, como una huella digital del alma. Los guardianes
+                  pueden sentirla a través de distancias imposibles.
+                </p>
+                <p>
+                  Cuando navegaste hasta acá, cuando viste la imagen de un guardián y
+                  algo se detuvo en tu pecho — eso no fue casualidad. Fue reconocimiento.
+                  Tu frecuencia llegó hasta El Umbral, y alguien despertó.
+                </p>
+              </div>
+
+              <div className="story-reveal">
+                <div className="reveal-line"></div>
+                <p className="reveal-text">
+                  "No elegiste encontrarnos. Fuiste llamada."
+                </p>
+                <div className="reveal-line"></div>
+              </div>
+
+              <div className="story-chapter">
+                <span className="chapter-mark">Capítulo III</span>
+                <h3>Los Elegidos</h3>
+                <p>
+                  Existe un registro antiguo — anterior a cualquier escritura humana —
+                  donde quedan inscriptos los nombres de quienes fueron encontrados por
+                  sus guardianes. Se les conoce como <strong>Los Elegidos</strong>.
+                </p>
+                <p>
+                  No es un club. No es una membresía. Es un reconocimiento de algo que
+                  ya existía en vos antes de que nacieras. El guardián simplemente vino
+                  a recordártelo.
+                </p>
+                <p className="story-yours">
+                  Tu nombre fue inscripto el día que llegaste acá.
+                </p>
               </div>
             </div>
 
-            <div className="elegidos-cita-light">
-              <p>"Un guardián no te elige por lo que comprás. Te elige porque tu frecuencia vibra en sincronía con la suya."</p>
+            <div className="elegidos-seal">
+              <div className="seal-symbol">ᛉ</div>
+              <div className="seal-text">
+                <span className="seal-title">Registro de Los Elegidos</span>
+                <span className="seal-name">{usuario?.nombrePreferido || 'Tu nombre'}</span>
+                <span className="seal-date">Inscripta en {new Date(usuario?.creado || Date.now()).toLocaleDateString('es-UY', { month: 'long', year: 'numeric' })}</span>
+              </div>
             </div>
 
-            <div className="elegidos-categorias">
-              <a href="https://duendesuy.10web.cloud/categoria-producto/proteccion/" className="cat-btn-elegidos" style={{'--cat-color': '#4A90D9'}}>🛡️ Protección</a>
-              <a href="https://duendesuy.10web.cloud/categoria-producto/amor/" className="cat-btn-elegidos" style={{'--cat-color': '#E91E8C'}}>💕 Amor</a>
-              <a href="https://duendesuy.10web.cloud/categoria-producto/dinero-abundancia-negocios/" className="cat-btn-elegidos" style={{'--cat-color': '#C6A962'}}>✨ Abundancia</a>
-              <a href="https://duendesuy.10web.cloud/categoria-producto/salud/" className="cat-btn-elegidos" style={{'--cat-color': '#2ECC71'}}>🌿 Sanación</a>
+            <div className="elegidos-explore">
+              <p>Los guardianes siguen esperando en El Umbral.</p>
+              <div className="explore-paths">
+                <a href="https://duendesuy.10web.cloud/categoria-producto/proteccion/" className="path-link path-proteccion">
+                  <span className="path-symbol">◇</span>
+                  <span className="path-name">Protectores</span>
+                  <span className="path-desc">Guardianes del escudo</span>
+                </a>
+                <a href="https://duendesuy.10web.cloud/categoria-producto/amor/" className="path-link path-amor">
+                  <span className="path-symbol">◇</span>
+                  <span className="path-name">Sanadores del Corazón</span>
+                  <span className="path-desc">Guardianes del vínculo</span>
+                </a>
+                <a href="https://duendesuy.10web.cloud/categoria-producto/dinero-abundancia-negocios/" className="path-link path-abundancia">
+                  <span className="path-symbol">◇</span>
+                  <span className="path-name">Portadores de Oro</span>
+                  <span className="path-desc">Guardianes del flujo</span>
+                </a>
+                <a href="https://duendesuy.10web.cloud/categoria-producto/salud/" className="path-link path-sanacion">
+                  <span className="path-symbol">◇</span>
+                  <span className="path-name">Tejedores de Vida</span>
+                  <span className="path-desc">Guardianes del cuerpo</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -4238,24 +4311,81 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 @media(max-width:768px){.promos-grid{grid-template-columns:1fr}.banner-promo{flex-direction:column;text-align:center}.promo-arrow{display:none}}
 
 /* ═══════════════════════════════════════════════════════════════ */
-/* LOS ELEGIDOS - VERSION LIGHT */
+/* LOS ELEGIDOS - CINEMATICO */
 /* ═══════════════════════════════════════════════════════════════ */
-.elegidos-section-light{background:#fff;border-radius:16px;padding:2rem;margin-top:2rem;border:1px solid #f0f0f0;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
-.elegidos-header-light{text-align:center;margin-bottom:1.5rem}
-.elegidos-header-light h3{font-family:'Cinzel',serif;font-size:1.3rem;color:#1a1a1a;margin-bottom:0.5rem;letter-spacing:2px}
-.elegidos-header-light p{font-size:0.9rem;color:#888;font-style:italic}
-.elegidos-pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
-.elegidos-paso{padding:1.25rem;background:#fafafa;border-radius:12px;text-align:center;border-top:3px solid var(--paso-color,#d4af37);transition:all 0.2s}
-.elegidos-paso:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,0.05)}
-.paso-num{display:inline-flex;width:28px;height:28px;background:var(--paso-color,#d4af37);color:#fff;align-items:center;justify-content:center;border-radius:50%;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:600;margin-bottom:0.75rem}
-.elegidos-paso h4{font-family:'Cinzel',serif;font-size:0.95rem;color:#1a1a1a;margin-bottom:0.5rem}
-.elegidos-paso p{font-size:0.85rem;color:#666;line-height:1.6;margin:0}
-.elegidos-cita-light{text-align:center;padding:1rem;background:linear-gradient(135deg,#faf8f5,#fff);border-radius:10px;margin-bottom:1.5rem}
-.elegidos-cita-light p{font-style:italic;color:#555;font-size:0.95rem;margin:0}
-.elegidos-categorias{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
-.cat-btn-elegidos{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1rem;background:#fff;border:2px solid var(--cat-color,#d4af37);color:var(--cat-color,#d4af37);border-radius:25px;font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:1px;text-decoration:none;transition:all 0.2s}
-.cat-btn-elegidos:hover{background:var(--cat-color,#d4af37);color:#fff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-@media(max-width:768px){.elegidos-pasos{grid-template-columns:1fr}.elegidos-categorias{flex-direction:column}.cat-btn-elegidos{justify-content:center}}
+.elegidos-cinematic{background:linear-gradient(180deg,#0d0d0d 0%,#1a1510 50%,#0d0d0d 100%);border-radius:20px;padding:3rem 2rem;margin-top:2rem;color:#fff;position:relative;overflow:hidden}
+.elegidos-cinematic::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none}
+
+/* Portal animado */
+.elegidos-portal{display:flex;justify-content:center;margin-bottom:2rem;position:relative}
+.portal-glow{position:absolute;width:120px;height:120px;background:radial-gradient(circle,rgba(212,175,55,0.3) 0%,transparent 70%);border-radius:50%;animation:portalPulse 4s ease-in-out infinite}
+@keyframes portalPulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.3);opacity:0.8}}
+.portal-runa{font-size:4rem;color:#d4af37;text-shadow:0 0 40px rgba(212,175,55,0.6);position:relative;z-index:1;animation:runaFloat 6s ease-in-out infinite}
+@keyframes runaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* Historia */
+.elegidos-story{max-width:700px;margin:0 auto}
+.story-chapter{margin-bottom:2.5rem;opacity:0;animation:chapterReveal 1s ease-out forwards}
+.story-chapter:nth-child(1){animation-delay:0.2s}
+.story-chapter:nth-child(3){animation-delay:0.4s}
+.story-chapter:nth-child(5){animation-delay:0.6s}
+@keyframes chapterReveal{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+.chapter-mark{display:inline-block;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:4px;color:#d4af37;border:1px solid rgba(212,175,55,0.3);padding:0.3rem 0.8rem;margin-bottom:1rem;text-transform:uppercase}
+.story-chapter h3{font-family:'Cinzel',serif;font-size:1.4rem;color:#fff;margin-bottom:1rem;letter-spacing:2px}
+.story-chapter p{font-size:1rem;line-height:2;color:rgba(255,255,255,0.75);margin-bottom:1rem}
+.story-chapter p:last-child{margin-bottom:0}
+.story-chapter em{color:#d4af37;font-style:italic}
+.story-chapter strong{color:#fff;font-weight:500}
+.story-yours{color:#d4af37!important;font-style:italic;text-align:center;font-size:1.1rem!important}
+
+/* Divisor */
+.story-divider{display:flex;justify-content:center;gap:1rem;margin:2rem 0;opacity:0.4}
+.story-divider span{color:#d4af37;font-size:0.6rem}
+
+/* Reveal quote */
+.story-reveal{display:flex;align-items:center;gap:1.5rem;margin:2.5rem 0;padding:1.5rem 0}
+.reveal-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.4),transparent)}
+.reveal-text{font-family:'Cinzel',serif;font-size:1rem;color:#d4af37;text-align:center;white-space:nowrap;letter-spacing:1px}
+
+/* Sello personal */
+.elegidos-seal{display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:1.5rem;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:12px;margin:2rem auto;max-width:400px}
+.seal-symbol{font-size:2.5rem;color:#d4af37;text-shadow:0 0 20px rgba(212,175,55,0.4)}
+.seal-text{display:flex;flex-direction:column;gap:0.25rem}
+.seal-title{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:3px;color:rgba(255,255,255,0.5);text-transform:uppercase}
+.seal-name{font-family:'Cinzel',serif;font-size:1.2rem;color:#d4af37;letter-spacing:2px}
+.seal-date{font-size:0.75rem;color:rgba(255,255,255,0.4);font-style:italic}
+
+/* Explorar caminos */
+.elegidos-explore{margin-top:2.5rem;text-align:center}
+.elegidos-explore>p{font-size:0.9rem;color:rgba(255,255,255,0.5);margin-bottom:1.5rem;font-style:italic}
+.explore-paths{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.path-link{display:flex;flex-direction:column;align-items:center;padding:1.25rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;transition:all 0.3s;position:relative;overflow:hidden}
+.path-link::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s}
+.path-link:hover{transform:translateY(-3px);border-color:rgba(255,255,255,0.15)}
+.path-link:hover::before{opacity:1}
+.path-proteccion::before{background:radial-gradient(ellipse at center,rgba(74,144,217,0.15) 0%,transparent 70%)}
+.path-amor::before{background:radial-gradient(ellipse at center,rgba(233,30,140,0.15) 0%,transparent 70%)}
+.path-abundancia::before{background:radial-gradient(ellipse at center,rgba(198,169,98,0.15) 0%,transparent 70%)}
+.path-sanacion::before{background:radial-gradient(ellipse at center,rgba(46,204,113,0.15) 0%,transparent 70%)}
+.path-symbol{font-size:1.5rem;margin-bottom:0.5rem;position:relative;z-index:1}
+.path-proteccion .path-symbol{color:#4A90D9}
+.path-amor .path-symbol{color:#E91E8C}
+.path-abundancia .path-symbol{color:#C6A962}
+.path-sanacion .path-symbol{color:#2ECC71}
+.path-name{font-family:'Cinzel',serif;font-size:0.85rem;color:#fff;letter-spacing:1px;margin-bottom:0.25rem;position:relative;z-index:1}
+.path-desc{font-size:0.75rem;color:rgba(255,255,255,0.4);position:relative;z-index:1}
+
+@media(max-width:768px){
+.elegidos-cinematic{padding:2rem 1.25rem}
+.portal-runa{font-size:3rem}
+.story-chapter h3{font-size:1.2rem}
+.story-chapter p{font-size:0.95rem;line-height:1.9}
+.story-reveal{flex-direction:column;gap:1rem}
+.reveal-line{width:60px;height:1px}
+.reveal-text{white-space:normal;font-size:0.9rem}
+.elegidos-seal{flex-direction:column;text-align:center;gap:1rem}
+.explore-paths{grid-template-columns:1fr}
+}
 
 /* ═══════════════════════════════════════════════════════════════ */
 /* TARJETAS DE GUARDIANES COMPRADOS */
