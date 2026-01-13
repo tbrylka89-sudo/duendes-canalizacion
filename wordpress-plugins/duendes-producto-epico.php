@@ -1252,10 +1252,38 @@ function duendes_render_producto_epico() {
 
             const config = tasas[pais] || tasas.DEFAULT;
             const precioLocal = Math.round(precioUSD * config.tasa);
+            const sena = Math.round(precioLocal * 0.3);
 
+            // Actualizar precio principal
             document.getElementById('precio-mostrar').textContent =
                 config.simbolo + precioLocal.toLocaleString('es-UY') + ' ' + config.moneda;
-        } catch(e) {}
+
+            // Actualizar precio secundario (solo si no es la misma moneda)
+            const precioSecundario = document.querySelector('.precio-secundario');
+            if (precioSecundario && config.moneda !== 'USD') {
+                precioSecundario.textContent = 'o $' + precioUSD + ' USD';
+            } else if (precioSecundario) {
+                precioSecundario.style.display = 'none';
+            }
+
+            // Actualizar botón de seña
+            const btnSena = document.querySelector('.btn-sena');
+            if (btnSena) {
+                btnSena.textContent = 'Reservar con seña (30% = ' + config.simbolo + sena.toLocaleString('es-UY') + ')';
+            }
+
+            // Actualizar precios en relacionados si es Uruguay
+            if (pais === 'UY') {
+                document.querySelectorAll('.relacionado-precio').forEach(el => {
+                    const usd = parseInt(el.textContent.replace(/\D/g, ''));
+                    if (usd) {
+                        el.textContent = '$' + Math.round(usd * 43).toLocaleString('es-UY') + ' UYU';
+                    }
+                });
+            }
+        } catch(e) {
+            console.log('Geolocalización no disponible');
+        }
     })();
     </script>
 
