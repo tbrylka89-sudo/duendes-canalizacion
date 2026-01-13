@@ -559,45 +559,52 @@ export function CosmosMes({ usuario }) {
 // GUÍA DE CRISTALES - Enciclopedia completa
 // ═══════════════════════════════════════════════════════════════
 
-const IMAGENES_CRISTALES = {
-  'amatista': 'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&w=200',
-  'cuarzo rosa': 'https://images.pexels.com/photos/5765988/pexels-photo-5765988.jpeg?auto=compress&w=200',
-  'citrino': 'https://images.pexels.com/photos/4040601/pexels-photo-4040601.jpeg?auto=compress&w=200',
-  'turmalina negra': 'https://images.pexels.com/photos/5273539/pexels-photo-5273539.jpeg?auto=compress&w=200',
-  'cuarzo transparente': 'https://images.pexels.com/photos/1573236/pexels-photo-1573236.jpeg?auto=compress&w=200',
-  'cuarzo claro': 'https://images.pexels.com/photos/1573236/pexels-photo-1573236.jpeg?auto=compress&w=200',
-  'selenita': 'https://images.pexels.com/photos/6186495/pexels-photo-6186495.jpeg?auto=compress&w=200',
-  'ojo de tigre': 'https://images.pexels.com/photos/6186512/pexels-photo-6186512.jpeg?auto=compress&w=200',
-  'obsidiana': 'https://images.pexels.com/photos/4040567/pexels-photo-4040567.jpeg?auto=compress&w=200',
-  'labradorita': 'https://images.pexels.com/photos/7533347/pexels-photo-7533347.jpeg?auto=compress&w=200',
-  'jade': 'https://images.pexels.com/photos/6186502/pexels-photo-6186502.jpeg?auto=compress&w=200',
-  'lapislázuli': 'https://images.pexels.com/photos/4040586/pexels-photo-4040586.jpeg?auto=compress&w=200',
-  'piedra luna': 'https://images.pexels.com/photos/5273536/pexels-photo-5273536.jpeg?auto=compress&w=200',
-  'aventurina verde': 'https://images.pexels.com/photos/4040607/pexels-photo-4040607.jpeg?auto=compress&w=200',
-  'aventurina': 'https://images.pexels.com/photos/4040607/pexels-photo-4040607.jpeg?auto=compress&w=200',
-  'hematita': 'https://images.pexels.com/photos/6186509/pexels-photo-6186509.jpeg?auto=compress&w=200',
-  'malaquita': 'https://images.pexels.com/photos/4040591/pexels-photo-4040591.jpeg?auto=compress&w=200',
-  'ágata': 'https://images.pexels.com/photos/4040583/pexels-photo-4040583.jpeg?auto=compress&w=200',
-  'cornalina': 'https://images.pexels.com/photos/5273542/pexels-photo-5273542.jpeg?auto=compress&w=200',
-  'fluorita': 'https://images.pexels.com/photos/6186498/pexels-photo-6186498.jpeg?auto=compress&w=200',
-  'sodalita': 'https://images.pexels.com/photos/4040589/pexels-photo-4040589.jpeg?auto=compress&w=200',
-  'pirita': 'https://images.pexels.com/photos/6186506/pexels-photo-6186506.jpeg?auto=compress&w=200',
-  'amazonita': 'https://images.pexels.com/photos/5273545/pexels-photo-5273545.jpeg?auto=compress&w=200',
-  'ónix': 'https://images.pexels.com/photos/4040594/pexels-photo-4040594.jpeg?auto=compress&w=200',
-  'onix': 'https://images.pexels.com/photos/4040594/pexels-photo-4040594.jpeg?auto=compress&w=200',
-  'rodocrosita': 'https://images.pexels.com/photos/5273548/pexels-photo-5273548.jpeg?auto=compress&w=200',
-  'turquesa': 'https://images.pexels.com/photos/4040598/pexels-photo-4040598.jpeg?auto=compress&w=200',
-  'granate': 'https://images.pexels.com/photos/6186515/pexels-photo-6186515.jpeg?auto=compress&w=200',
-  'jaspe': 'https://images.pexels.com/photos/4040604/pexels-photo-4040604.jpeg?auto=compress&w=200',
-  'crisocola': 'https://images.pexels.com/photos/5273551/pexels-photo-5273551.jpeg?auto=compress&w=200',
+// Colores y gradientes para cada cristal
+const COLORES_CRISTALES = {
+  'amatista': { gradient: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #6c3483 100%)', glow: '#9b59b6' },
+  'cuarzo rosa': { gradient: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%)', glow: '#f48fb1' },
+  'citrino': { gradient: 'linear-gradient(135deg, #fff9c4 0%, #f4d03f 50%, #f39c12 100%)', glow: '#f4d03f' },
+  'turmalina negra': { gradient: 'linear-gradient(135deg, #434343 0%, #1a1a1a 50%, #000000 100%)', glow: '#333' },
+  'turmalina': { gradient: 'linear-gradient(135deg, #434343 0%, #1a1a1a 50%, #000000 100%)', glow: '#333' },
+  'cuarzo transparente': { gradient: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%)', glow: '#fff' },
+  'cuarzo claro': { gradient: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%)', glow: '#fff' },
+  'selenita': { gradient: 'linear-gradient(135deg, #ffffff 0%, #fafafa 50%, #f5f5f5 100%)', glow: '#fff' },
+  'ojo de tigre': { gradient: 'linear-gradient(135deg, #d4a853 0%, #b8860b 50%, #8b6914 100%)', glow: '#d4a853' },
+  'obsidiana': { gradient: 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 50%, #0d0d0d 100%)', glow: '#333' },
+  'labradorita': { gradient: 'linear-gradient(135deg, #5dade2 0%, #3498db 30%, #2980b9 60%, #1f618d 100%)', glow: '#3498db' },
+  'jade': { gradient: 'linear-gradient(135deg, #a8e6cf 0%, #56ab91 50%, #2d6a4f 100%)', glow: '#56ab91' },
+  'lapislázuli': { gradient: 'linear-gradient(135deg, #1e3a5f 0%, #0d47a1 50%, #1565c0 100%)', glow: '#1565c0' },
+  'lapis': { gradient: 'linear-gradient(135deg, #1e3a5f 0%, #0d47a1 50%, #1565c0 100%)', glow: '#1565c0' },
+  'piedra luna': { gradient: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 30%, #c9d6ff 70%, #e2e2e2 100%)', glow: '#c9d6ff' },
+  'aventurina': { gradient: 'linear-gradient(135deg, #81c784 0%, #4caf50 50%, #2e7d32 100%)', glow: '#4caf50' },
+  'hematita': { gradient: 'linear-gradient(135deg, #616161 0%, #424242 50%, #212121 100%)', glow: '#616161' },
+  'malaquita': { gradient: 'linear-gradient(135deg, #4db6ac 0%, #009688 50%, #00695c 100%)', glow: '#009688' },
+  'ágata': { gradient: 'linear-gradient(135deg, #bcaaa4 0%, #8d6e63 50%, #5d4037 100%)', glow: '#8d6e63' },
+  'agata': { gradient: 'linear-gradient(135deg, #bcaaa4 0%, #8d6e63 50%, #5d4037 100%)', glow: '#8d6e63' },
+  'cornalina': { gradient: 'linear-gradient(135deg, #ff8a65 0%, #e64a19 50%, #bf360c 100%)', glow: '#e64a19' },
+  'fluorita': { gradient: 'linear-gradient(135deg, #ce93d8 0%, #ab47bc 30%, #4dd0e1 70%, #00acc1 100%)', glow: '#ab47bc' },
+  'sodalita': { gradient: 'linear-gradient(135deg, #5c6bc0 0%, #3949ab 50%, #1a237e 100%)', glow: '#3949ab' },
+  'pirita': { gradient: 'linear-gradient(135deg, #ffd54f 0%, #ffb300 50%, #ff8f00 100%)', glow: '#ffb300' },
+  'amazonita': { gradient: 'linear-gradient(135deg, #80deea 0%, #4dd0e1 50%, #00acc1 100%)', glow: '#4dd0e1' },
+  'ónix': { gradient: 'linear-gradient(135deg, #37474f 0%, #263238 50%, #000a12 100%)', glow: '#37474f' },
+  'onix': { gradient: 'linear-gradient(135deg, #37474f 0%, #263238 50%, #000a12 100%)', glow: '#37474f' },
+  'rodocrosita': { gradient: 'linear-gradient(135deg, #f48fb1 0%, #ec407a 50%, #c2185b 100%)', glow: '#ec407a' },
+  'rodonita': { gradient: 'linear-gradient(135deg, #f48fb1 0%, #e91e63 50%, #880e4f 100%)', glow: '#e91e63' },
+  'turquesa': { gradient: 'linear-gradient(135deg, #4dd0e1 0%, #00bcd4 50%, #0097a7 100%)', glow: '#00bcd4' },
+  'granate': { gradient: 'linear-gradient(135deg, #c62828 0%, #8e0000 50%, #5d0000 100%)', glow: '#c62828' },
+  'jaspe': { gradient: 'linear-gradient(135deg, #d84315 0%, #bf360c 50%, #870000 100%)', glow: '#d84315' },
+  'crisocola': { gradient: 'linear-gradient(135deg, #4db6ac 0%, #26a69a 50%, #00897b 100%)', glow: '#26a69a' },
+  'cuarzo ahumado': { gradient: 'linear-gradient(135deg, #8d6e63 0%, #6d4c41 50%, #4e342e 100%)', glow: '#8d6e63' },
+  'howlita': { gradient: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #e0e0e0 100%)', glow: '#f5f5f5' },
+  'kunzita': { gradient: 'linear-gradient(135deg, #f8bbd9 0%, #f48fb1 50%, #ec407a 100%)', glow: '#f48fb1' },
 };
 
-function getImagenCristal(nombre) {
+function getColorCristal(nombre) {
   const nombreLower = nombre.toLowerCase();
-  for (const [key, url] of Object.entries(IMAGENES_CRISTALES)) {
-    if (nombreLower.includes(key) || key.includes(nombreLower)) return url;
+  for (const [key, colors] of Object.entries(COLORES_CRISTALES)) {
+    if (nombreLower.includes(key) || key.includes(nombreLower)) return colors;
   }
-  return null;
+  return { gradient: 'linear-gradient(135deg, #d4af37 0%, #b8860b 50%, #8b6914 100%)', glow: '#d4af37' };
 }
 
 export function GuiaCristales({ usuario }) {
@@ -801,14 +808,18 @@ export function GuiaCristales({ usuario }) {
       ) : (
         <div style={estilos.grid}>
           {cristalesFiltrados.map(cristal => {
-            const imagenUrl = getImagenCristal(cristal.nombre);
+            const colores = getColorCristal(cristal.nombre);
             return (
             <div key={cristal.id} style={estilos.card} onClick={() => cargarDetalle(cristal.id)}>
-              {imagenUrl ? (
-                <img src={imagenUrl} alt={cristal.nombre} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #d4af37' }} />
-              ) : (
-                <div style={estilos.cardEmoji}>💎</div>
-              )}
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: colores.gradient,
+                boxShadow: `0 0 20px ${colores.glow}40, inset 0 -10px 20px rgba(0,0,0,0.3), inset 0 10px 20px rgba(255,255,255,0.2)`,
+                border: '2px solid rgba(212,175,55,0.5)',
+                flexShrink: 0
+              }} />
               <div style={estilos.cardContent}>
                 <h4 style={estilos.cardH4}>{cristal.nombre}</h4>
                 <p style={estilos.cardColor}>{cristal.color}</p>
