@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperiencias, estilosNuevos } from './nuevas-funciones';
+import TestGuardian from './test-guardian';
 
 const API_BASE = '';
 
@@ -547,6 +548,7 @@ export default function MiMagia() {
       case 'cristales': return <CristalesSec />;
       case 'guia_cristales': return <GuiaCristales usuario={usuario} />;
       case 'test_elemental': return <TestElemental usuario={usuario} onComplete={(r) => setUsuario({...usuario, elemento: r.elemento_principal})} />;
+      case 'test_guardian': return <TestGuardian usuario={usuario} onComplete={(r) => setUsuario({...usuario, testGuardian: r})} />;
       case 'cosmos': return <CosmosMes usuario={usuario} />;
       case 'circulo': return <CirculoSec usuario={usuario} setUsuario={setUsuario} token={token} pais={pais} />;
       case 'promociones': return <PromocionesMagicas usuario={usuario} ir={setSeccion} />;
@@ -618,7 +620,7 @@ export default function MiMagia() {
 
       {menuAbierto && isMobile && <div style={mobileOverlay} onClick={() => setMenuAbierto(false)} />}
       <nav className={`nav ${menuAbierto ? 'abierto' : ''}`} style={isMobile ? mobileNav : {}}>
-        {[['inicio','◇','Inicio'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
+        {[['inicio','◇','Inicio'],['test_guardian','🔮','Test del Guardián'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">El Mundo Elemental</div>
