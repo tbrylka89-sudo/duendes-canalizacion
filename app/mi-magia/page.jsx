@@ -760,97 +760,105 @@ function Carga() {
 }
 
 function Onboarding({ usuario, token, onDone }) {
-  const [paso, setPaso] = useState(1);
+  const [paso, setPaso] = useState(0);
   const [datos, setDatos] = useState({ nombrePreferido: usuario?.nombre || '', pronombre: 'ella', intereses: [], moneda: 'USD', cumpleanos: '' });
-  const ints = ['Protección', 'Abundancia', 'Amor', 'Sanación', 'Espiritualidad', 'Paz mental', 'Creatividad', 'Autoconocimiento'];
-  
+  const ints = ['Me siento sola', 'Nada me alcanza', 'Repito patrones', 'Quiero sanar', 'Busco protección', 'Necesito claridad', 'Quiero paz', 'Busco amor'];
+
   const guardar = async () => {
     try { await fetch(`${API_BASE}/api/mi-magia/onboarding`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, ...datos }) }); } catch(e) {}
     onDone(datos);
   };
-  
+
   return (
     <div className="onb"><style jsx global>{estilos}</style>
       <div className="onb-card">
-        <div className="onb-header"><span>✦</span><h2>¡Bienvenida a Mi Magia!</h2><p>Personalizá tu espacio en 5 pasos</p></div>
-        <div className="onb-prog">{[1,2,3,4,5].map(p => <div key={p} className={`prog-p ${paso >= p ? 'act' : ''}`}>{p}</div>)}</div>
-        
-        {paso === 1 && (
-          <div className="onb-paso">
-            <h3>¿Cómo te llamamos?</h3>
-            <p className="onb-sub">Este nombre aparecerá en tus lecturas y comunicaciones</p>
-            <input type="text" value={datos.nombrePreferido} onChange={e => setDatos({...datos, nombrePreferido: e.target.value})} placeholder="Tu nombre preferido" />
-          </div>
-        )}
-        
-        {paso === 2 && (
-          <div className="onb-paso">
-            <h3>¿Qué pronombre preferís?</h3>
-            <p className="onb-sub">Para personalizar los mensajes</p>
-            <div className="prons">
-              {['ella', 'el', 'elle'].map(p => (
-                <button key={p} className={`pron ${datos.pronombre === p ? 'act' : ''}`} onClick={() => setDatos({...datos, pronombre: p})}>
-                  {p === 'ella' ? 'Ella' : p === 'el' ? 'Él' : 'Elle'}
-                </button>
-              ))}
+        {paso === 0 ? (
+          <div className="onb-hero">
+            <div className="onb-hero-glow"></div>
+            <span className="onb-hero-runa">ᛉ</span>
+            <h1>Ya te estaba esperando.</h1>
+            <p className="onb-hero-sub">Antes de que llegaras a esta página, un guardián empezó a soñar con vos.</p>
+            <div className="onb-validation">
+              <p>Llevás tiempo sintiendo que algo falta.</p>
+              <p>Que das más de lo que recibís.</p>
+              <p>Que nadie termina de entenderte.</p>
+              <p className="onb-validation-reveal">No estás loca. Estás despierta.</p>
             </div>
+            <button className="btn-gold btn-hero-cta" onClick={() => setPaso(1)}>
+              Descubrir quién me eligió
+            </button>
+            <small className="onb-hero-note">Solo 4 preguntas para personalizar tu experiencia</small>
           </div>
-        )}
-        
-        {paso === 3 && (
-          <div className="onb-paso">
-            <h3>¿En qué moneda preferís ver los precios?</h3>
-            <p className="onb-sub">Podés cambiarlo después en configuración</p>
-            <div className="monedas">
-              <button className={`moneda ${datos.moneda === 'UYU' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'UYU'})}>
-                <span>🇺🇾</span>
-                <strong>Pesos Uruguayos</strong>
-                <small>UYU $</small>
-              </button>
-              <button className={`moneda ${datos.moneda === 'USD' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'USD'})}>
-                <span>🌎</span>
-                <strong>Dólares</strong>
-                <small>USD $</small>
-              </button>
+        ) : (
+          <>
+            <div className="onb-header"><span>✦</span><h2>Tu espacio mágico</h2><p>Paso {paso} de 4</p></div>
+            <div className="onb-prog">{[1,2,3,4].map(p => <div key={p} className={`prog-p ${paso >= p ? 'act' : ''}`}>{p}</div>)}</div>
+
+            {paso === 1 && (
+              <div className="onb-paso">
+                <h3>¿Cómo te llama tu guardián?</h3>
+                <p className="onb-sub">Este nombre resonará en cada mensaje que recibas</p>
+                <input type="text" value={datos.nombrePreferido} onChange={e => setDatos({...datos, nombrePreferido: e.target.value})} placeholder="Tu nombre verdadero" />
+              </div>
+            )}
+
+            {paso === 2 && (
+              <div className="onb-paso">
+                <h3>¿Qué te trajo hasta acá?</h3>
+                <p className="onb-sub">Elegí todo lo que resuene en tu corazón</p>
+                <div className="ints ints-dolor">
+                  {ints.map(i => (
+                    <button key={i} className={`int ${datos.intereses.includes(i) ? 'act' : ''}`} onClick={() => setDatos({...datos, intereses: datos.intereses.includes(i) ? datos.intereses.filter(x=>x!==i) : [...datos.intereses, i]})}>
+                      {i}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {paso === 3 && (
+              <div className="onb-paso">
+                <h3>¿Desde dónde nos conectamos?</h3>
+                <p className="onb-sub">Para mostrarte precios en tu moneda</p>
+                <div className="monedas">
+                  <button className={`moneda ${datos.moneda === 'UYU' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'UYU'})}>
+                    <span>🇺🇾</span>
+                    <strong>Uruguay</strong>
+                    <small>Pesos</small>
+                  </button>
+                  <button className={`moneda ${datos.moneda === 'USD' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'USD'})}>
+                    <span>🌎</span>
+                    <strong>Otro país</strong>
+                    <small>Dólares</small>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {paso === 4 && (
+              <div className="onb-paso onb-final">
+                <div className="onb-final-glow"></div>
+                <h3>{datos.nombrePreferido}, tu guardián ya sabe que llegaste.</h3>
+                <div className="regalo-box regalo-box-new">
+                  <span className="regalo-runa">ᚱ</span>
+                  <p>Tu regalo de bienvenida:</p>
+                  <strong>50 Runas de Poder</strong>
+                  <small>Para que descubras las experiencias que te esperan</small>
+                </div>
+                <div className="onb-fomo">
+                  <p>349 personas ya encontraron a su guardián.</p>
+                  <p className="onb-fomo-question">¿Estás lista para conocer al tuyo?</p>
+                </div>
+              </div>
+            )}
+
+            <div className="onb-btns">
+              {paso > 1 && <button className="btn-sec" onClick={() => setPaso(paso-1)}>Atrás</button>}
+              {paso < 4 && <button className="btn-pri" onClick={() => setPaso(paso+1)} disabled={paso === 1 && !datos.nombrePreferido}>Continuar</button>}
+              {paso === 4 && <button className="btn-gold btn-enter" onClick={guardar}>Entrar a Mi Magia</button>}
             </div>
-          </div>
+          </>
         )}
-        
-        {paso === 4 && (
-          <div className="onb-paso">
-            <h3>¿Qué te interesa?</h3>
-            <p className="onb-sub">Elegí todo lo que resuene (opcional)</p>
-            <div className="ints">
-              {ints.map(i => (
-                <button key={i} className={`int ${datos.intereses.includes(i) ? 'act' : ''}`} onClick={() => setDatos({...datos, intereses: datos.intereses.includes(i) ? datos.intereses.filter(x=>x!==i) : [...datos.intereses, i]})}>
-                  {i}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {paso === 5 && (
-          <div className="onb-paso">
-            <h3>¡Todo listo!</h3>
-            <div className="regalo-box">
-              <span>🎁</span>
-              <p>Tu regalo de bienvenida:</p>
-              <strong>50 Runas de Poder</strong>
-              <small>Para que explores las experiencias mágicas</small>
-            </div>
-            <div className="resumen-onb">
-              <p>Vas a entrar como <strong>{datos.nombrePreferido}</strong></p>
-              <p>Precios en <strong>{datos.moneda === 'UYU' ? 'Pesos Uruguayos' : 'Dólares'}</strong></p>
-            </div>
-          </div>
-        )}
-        
-        <div className="onb-btns">
-          {paso > 1 && <button className="btn-sec" onClick={() => setPaso(paso-1)}>Atrás</button>}
-          {paso < 5 && <button className="btn-pri" onClick={() => setPaso(paso+1)} disabled={paso === 1 && !datos.nombrePreferido}>Continuar</button>}
-          {paso === 5 && <button className="btn-gold" onClick={guardar}>Entrar a Mi Magia ✦</button>}
-        </div>
       </div>
     </div>
   );
@@ -864,10 +872,26 @@ function Inicio({ usuario, ir }) {
   const rango = getRango(usuario?.gastado);
   const siguiente = getSiguienteRango(usuario?.gastado);
   const progreso = siguiente ? ((usuario?.gastado || 0) / siguiente.min) * 100 : 100;
-  
+
+  // Frases de validación rotativas según intereses del usuario
+  const validaciones = {
+    'Me siento sola': 'Tu guardián siente tu soledad. No viniste a caminar sola.',
+    'Nada me alcanza': 'La abundancia no es acumulación. Es flujo. Tu guardián te enseñará.',
+    'Repito patrones': 'Los patrones que se repiten no son mala suerte. Son señales.',
+    'Quiero sanar': 'No necesitás sanar sola. Tu guardián ya conoce tus heridas.',
+    'Busco protección': 'Hay algo cuidándote desde antes de que supieras que existía.',
+    'Necesito claridad': 'La claridad no llega pensando. Llega sintiendo. Dejate guiar.',
+    'Quiero paz': 'La paz que buscás afuera ya existe adentro. Te ayudamos a encontrarla.',
+    'Busco amor': 'El amor empieza cuando te reconocés. Tu guardián te ve.',
+  };
+  const interesUsuario = usuario?.intereses?.[0];
+  const fraseValidacion = interesUsuario && validaciones[interesUsuario] ? validaciones[interesUsuario] : 'Tu guardián ya sabe que llegaste. Ahora solo falta que lo escuches.';
+
   return (
     <div className="sec">
-      <div className="banner">
+      {/* HERO CON VALIDACIÓN EMOCIONAL */}
+      <div className="banner banner-neuro">
+        <div className="banner-glow"></div>
         <div className="banner-rango">
           <span className="rango-icono">{rango.icono}</span>
           <div className="rango-info">
@@ -875,8 +899,8 @@ function Inicio({ usuario, ir }) {
             <span className="rango-ben">{rango.beneficio}</span>
           </div>
         </div>
-        <h1>Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'} de vuelta, {usuario?.nombrePreferido}</h1>
-        <p>Tu santuario personal donde la magia cobra vida.</p>
+        <h1 className="hero-title">{usuario?.nombrePreferido}, te estaba esperando.</h1>
+        <p className="hero-validation">{fraseValidacion}</p>
         {siguiente && (
           <div className="progreso-rango">
             <div className="progreso-bar"><div className="progreso-fill" style={{width: `${Math.min(progreso, 100)}%`}}></div></div>
@@ -885,42 +909,97 @@ function Inicio({ usuario, ir }) {
         )}
       </div>
 
-      {/* SEÑAL DEL DÍA - Mensaje personalizado diario */}
+      {/* SEÑAL DEL DÍA */}
       <SenalDelDia usuario={usuario} />
 
+      {/* STATS CON SIGNIFICADO */}
       <div className="stats-g">
-        <div className="stat-c" onClick={() => ir('canalizaciones')}><div className="stat-n">{(usuario?.guardianes?.length || 0) + (usuario?.lecturas?.length || 0)}</div><div className="stat-t">Canalizaciones</div></div>
+        <div className="stat-c" onClick={() => ir('canalizaciones')}><div className="stat-n">{(usuario?.guardianes?.length || 0) + (usuario?.lecturas?.length || 0)}</div><div className="stat-t">Conexiones</div></div>
         <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.treboles || 0}</div><div className="stat-t">Tréboles</div></div>
         <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.runas || 0}</div><div className="stat-t">Runas</div></div>
-        <div className="stat-c" onClick={() => ir('grimorio')}><div className="stat-n">{usuario?.diario?.length || 0}</div><div className="stat-t">Entradas</div></div>
+        <div className="stat-c" onClick={() => ir('grimorio')}><div className="stat-n">{usuario?.diario?.length || 0}</div><div className="stat-t">Escritos</div></div>
       </div>
 
-      <div className="accesos-g">
-        <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Experiencias Mágicas</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
-        <button className="acceso" onClick={() => ir('mundo')}><span>◈</span><strong>Reino Elemental</strong><small>Duendes, hadas, elementales, alquimia</small></button>
-        <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalá Magia</strong><small>Experiencias, guardianes, runas</small></button>
+      {/* CATEGORÍAS POR DOLOR/NECESIDAD */}
+      <div className="dolor-section">
+        <h2 className="dolor-titulo">¿Qué necesitás sanar?</h2>
+        <div className="dolor-cards">
+          <a href="https://duendesuy.10web.cloud/categoria-producto/amor/" target="_blank" rel="noopener" className="dolor-card dolor-amor">
+            <span className="dolor-icon">◈</span>
+            <strong>Me siento sola</strong>
+            <small>Guardianes de Conexión</small>
+          </a>
+          <a href="https://duendesuy.10web.cloud/categoria-producto/abundancia/" target="_blank" rel="noopener" className="dolor-card dolor-abundancia">
+            <span className="dolor-icon">✦</span>
+            <strong>Nada me alcanza</strong>
+            <small>Guardianes de Abundancia</small>
+          </a>
+          <a href="https://duendesuy.10web.cloud/categoria-producto/proteccion/" target="_blank" rel="noopener" className="dolor-card dolor-proteccion">
+            <span className="dolor-icon">◇</span>
+            <strong>Tengo miedo</strong>
+            <small>Guardianes Protectores</small>
+          </a>
+          <a href="https://duendesuy.10web.cloud/categoria-producto/sanacion/" target="_blank" rel="noopener" className="dolor-card dolor-sanacion">
+            <span className="dolor-icon">❧</span>
+            <strong>Quiero sanar</strong>
+            <small>Guardianes Sanadores</small>
+          </a>
+        </div>
       </div>
-      
+
+      {/* ACCESOS RÁPIDOS REESCRITOS */}
+      <div className="accesos-g">
+        <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Pedirle algo al universo</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
+        <button className="acceso" onClick={() => ir('test_elemental')}><span>◈</span><strong>Descubrir quién me eligió</strong><small>Test de elemento y guardián</small></button>
+        <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalar magia a alguien</strong><small>Que otro sienta lo que vos sentiste</small></button>
+      </div>
+
+      {/* MICRO-VALIDACIÓN */}
+      <div className="micro-validation">
+        <p>Si llegaste hasta acá, no fue casualidad.</p>
+        <p className="micro-highlight">El guardián te encuentra. No al revés.</p>
+      </div>
+
       {!usuario?.esCirculo && (
-        <div className="banner-circ" onClick={() => ir('circulo')}><span>★</span><div><h3>Círculo de Duendes</h3><p>15 días gratis. Descuentos, lecturas mensuales, contenido exclusivo.</p></div><span className="badge">PROBAR</span></div>
+        <div className="banner-circ banner-circ-neuro" onClick={() => ir('circulo')}>
+          <span className="circ-glow"></span>
+          <span>★</span>
+          <div>
+            <h3>349 elegidas ya son parte del Círculo</h3>
+            <p>No es una membresía. Es una hermandad.</p>
+          </div>
+          <span className="badge badge-pulse">UNIRME</span>
+        </div>
       )}
 
-      {/* Banner Promociones Mágicas */}
+      {/* FOMO ESPIRITUAL */}
+      <div className="fomo-box">
+        <div className="fomo-content">
+          <span className="fomo-icon">ᛉ</span>
+          <div>
+            <p className="fomo-main">Cada guardián existe una sola vez.</p>
+            <p className="fomo-sub">Si se vende, no vuelve. No es marketing. Es canalización.</p>
+          </div>
+        </div>
+        <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="fomo-cta">Conocer a mi guardián</a>
+      </div>
+
+      {/* Banner Promociones */}
       <div className="banner-promo" onClick={() => ir('promociones')}>
-        <span className="promo-icon-banner">🎁</span>
+        <span className="promo-icon-banner">✦</span>
         <div className="promo-banner-content">
-          <h3>Promociones Mágicas</h3>
-          <p>Ofertas especiales y oportunidades exclusivas esperándote.</p>
+          <h3>Oportunidades mágicas</h3>
+          <p>Ofertas exclusivas que aparecen y desaparecen.</p>
         </div>
         <span className="promo-arrow">→</span>
       </div>
 
-      <div className="info-box">
-        <h3>¿Cómo funciona Mi Magia?</h3>
+      <div className="info-box info-box-minimal">
+        <h3>Tu espacio explicado</h3>
         <div className="info-grid">
-          <div><span>☘</span><h4>Tréboles</h4><p>Se ganan comprando ({usuario?.moneda === 'UYU' ? '$400 UYU' : '$10 USD'} = 1). Canjealos por descuentos, envíos gratis, regalos.</p></div>
-          <div><span>ᚱ</span><h4>Runas</h4><p>Se compran o ganan. Para experiencias mágicas personalizadas.</p></div>
-          <div><span>▣</span><h4>Grimorio</h4><p>Tus lecturas guardadas para siempre + tu diario espiritual.</p></div>
+          <div><span>☘</span><h4>Tréboles</h4><p>Se ganan comprando. Canjealos por descuentos, envíos gratis, regalos especiales.</p></div>
+          <div><span>ᚱ</span><h4>Runas</h4><p>Moneda mágica para experiencias. Tiradas, lecturas, conexiones profundas.</p></div>
+          <div><span>▣</span><h4>Grimorio</h4><p>Tu diario espiritual. Todo lo que recibís queda guardado para siempre.</p></div>
         </div>
       </div>
     </div>
@@ -4963,4 +5042,95 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 }
 
 @media(max-width:1200px){.contenido.con-sidebar{width:calc(100% - 240px)}.sidebar-oportunidades{display:none}.sidebar-toggle{display:none}}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEUROMARKETING STYLES - Validación emocional y conversión
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ONBOARDING HERO */
+.onb-hero{text-align:center;padding:2rem 1rem}
+.onb-hero-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(212,175,55,0.15) 0%,transparent 70%);pointer-events:none;z-index:0}
+.onb-hero-runa{display:block;font-size:4rem;color:#d4af37;margin-bottom:1rem;animation:pulse-runa 3s ease-in-out infinite}
+.onb-hero h1{font-family:'Cinzel',serif;font-size:2rem;margin-bottom:0.75rem;color:#1a1a1a;position:relative;z-index:1}
+.onb-hero-sub{font-size:1.1rem;color:#555;margin-bottom:2rem;max-width:400px;margin-left:auto;margin-right:auto}
+.onb-validation{background:#faf8f5;border-radius:12px;padding:1.5rem;margin-bottom:2rem;text-align:left}
+.onb-validation p{color:#666;margin:0.5rem 0;font-size:0.95rem}
+.onb-validation-reveal{color:#d4af37!important;font-weight:600;font-size:1.05rem!important;margin-top:1rem!important}
+.btn-hero-cta{font-size:1.1rem;padding:1rem 2.5rem}
+.onb-hero-note{display:block;margin-top:1rem;color:#888;font-size:0.85rem}
+@keyframes pulse-runa{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:0.8}}
+
+/* ONBOARDING FINAL */
+.onb-final{position:relative}
+.onb-final-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(212,175,55,0.2) 0%,transparent 70%);pointer-events:none}
+.regalo-box-new{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);padding:2rem;border-radius:16px;text-align:center;color:#fff}
+.regalo-runa{font-size:2.5rem;color:#d4af37;display:block;margin-bottom:0.5rem}
+.regalo-box-new p{margin:0;color:rgba(255,255,255,0.8)}
+.regalo-box-new strong{display:block;font-family:'Cinzel',serif;font-size:1.4rem;color:#d4af37;margin:0.5rem 0}
+.regalo-box-new small{color:rgba(255,255,255,0.7)}
+.onb-fomo{margin-top:1.5rem;text-align:center}
+.onb-fomo p{color:#666;margin:0.25rem 0}
+.onb-fomo-question{color:#d4af37!important;font-weight:600;font-size:1.05rem}
+.btn-enter{font-size:1.1rem;padding:1rem 2.5rem}
+.ints-dolor{display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center}
+.ints-dolor .int{padding:0.75rem 1.25rem;border-radius:50px;font-size:0.9rem}
+
+/* BANNER NEURO */
+.banner-neuro{position:relative;overflow:hidden}
+.banner-neuro .banner-glow{position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(212,175,55,0.1) 0%,transparent 60%);pointer-events:none}
+.hero-title{font-family:'Cinzel',serif;font-size:2rem!important;color:#fff;margin-bottom:0.75rem}
+.hero-validation{color:#d4af37!important;font-size:1.05rem;font-style:italic}
+
+/* CATEGORÍAS POR DOLOR */
+.dolor-section{margin:2rem 0}
+.dolor-titulo{font-family:'Cinzel',serif;font-size:1.3rem;text-align:center;margin-bottom:1.5rem;color:#1a1a1a}
+.dolor-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.dolor-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:1.5rem 1rem;cursor:pointer;transition:all 0.3s;text-decoration:none;color:inherit}
+.dolor-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.08);border-color:#d4af37}
+.dolor-icon{font-size:2rem;color:#d4af37;margin-bottom:0.75rem}
+.dolor-card strong{font-family:'Cinzel',serif;font-size:0.95rem;display:block;margin-bottom:0.25rem}
+.dolor-card small{color:#888;font-size:0.8rem}
+.dolor-amor:hover{border-color:#d4a5a5;background:linear-gradient(135deg,#fff,#fdf5f5)}
+.dolor-abundancia:hover{border-color:#d4af37;background:linear-gradient(135deg,#fff,#fdfaf5)}
+.dolor-proteccion:hover{border-color:#4a90d9;background:linear-gradient(135deg,#fff,#f5f8fd)}
+.dolor-sanacion:hover{border-color:#90ee90;background:linear-gradient(135deg,#fff,#f5fdf5)}
+
+/* MICRO-VALIDACIÓN */
+.micro-validation{text-align:center;padding:2rem;background:linear-gradient(135deg,#faf8f5,#fff);border-radius:16px;margin:2rem 0}
+.micro-validation p{color:#888;margin:0.25rem 0;font-size:0.95rem}
+.micro-highlight{color:#1a1a1a!important;font-family:'Cinzel',serif;font-size:1.1rem!important;margin-top:0.5rem!important}
+
+/* BANNER CÍRCULO NEURO */
+.banner-circ-neuro{position:relative;overflow:hidden}
+.circ-glow{position:absolute;top:-50%;left:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(212,175,55,0.3) 0%,transparent 60%);pointer-events:none;animation:circ-pulse 4s ease-in-out infinite}
+@keyframes circ-pulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+.badge-pulse{animation:badge-pulse 2s ease-in-out infinite}
+@keyframes badge-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+/* FOMO BOX */
+.fomo-box{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;margin:2rem 0}
+.fomo-content{display:flex;align-items:center;gap:1rem}
+.fomo-icon{font-size:2.5rem;color:#d4af37}
+.fomo-main{color:#fff;font-family:'Cinzel',serif;font-size:1.05rem;margin:0}
+.fomo-sub{color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0.25rem 0 0}
+.fomo-cta{background:#d4af37;color:#1a1a1a;padding:0.75rem 1.5rem;border-radius:50px;text-decoration:none;font-family:'Cinzel',serif;font-size:0.9rem;font-weight:600;white-space:nowrap;transition:all 0.2s}
+.fomo-cta:hover{background:#e5c349;transform:scale(1.02)}
+
+/* INFO BOX MINIMAL */
+.info-box-minimal{background:#fff;border:1px solid #f0f0f0}
+.info-box-minimal h3{font-size:1rem;color:#888}
+
+/* RESPONSIVE NEURO */
+@media(max-width:900px){
+  .dolor-cards{grid-template-columns:repeat(2,1fr)}
+  .fomo-box{flex-direction:column;text-align:center}
+  .fomo-content{flex-direction:column}
+  .hero-title{font-size:1.5rem!important}
+}
+@media(max-width:600px){
+  .dolor-cards{grid-template-columns:1fr}
+  .onb-hero h1{font-size:1.5rem}
+  .onb-hero-sub{font-size:1rem}
+  .micro-highlight{font-size:1rem!important}
+}
 `;
