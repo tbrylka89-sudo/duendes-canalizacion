@@ -4267,7 +4267,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 /* ═══════════════════════════════════════════════════════════════ */
 /* LOS ELEGIDOS - NARRATIVA LORE */
 /* ═══════════════════════════════════════════════════════════════ */
-.elegidos-section{background:linear-gradient(180deg,#0a0a0a 0%,#1a1510 100%);border-radius:16px;padding:2.5rem;margin-top:2rem;color:#fff;position:relative;overflow:hidden}
+.elegidos-section{background:linear-gradient(180deg,#0a0a0a 0%,#1a1510 100%);border-radius:16px;padding:2.5rem;margin-top:1rem;margin-bottom:2rem;color:#fff;position:relative;overflow:hidden}
 .elegidos-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(198,169,98,0.1) 0%,transparent 70%);pointer-events:none}
 .elegidos-header{text-align:center;margin-bottom:2rem;position:relative;z-index:1}
 .elegidos-runa{display:block;font-size:3rem;color:#d4af37;margin-bottom:1rem;text-shadow:0 0 30px rgba(212,175,55,0.5);animation:runaFloat 4s ease-in-out infinite}
