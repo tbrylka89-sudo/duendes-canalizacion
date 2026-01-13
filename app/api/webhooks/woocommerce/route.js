@@ -152,9 +152,12 @@ export async function POST(request) {
       
       console.log(`Agregados ${guardianes.length} guardianes y ${trebolsGanados} tréboles a ${email}`);
 
+      // Obtener datos de canalización del formulario de checkout
+      const datosCanalizacion = orden.datos_canalizacion || {};
+
       // Generar guía de canalización y tarjeta QR para cada guardián
       for (const guardian of guardianes) {
-        await programarCanalizacion(kv, email, guardian, elegido);
+        await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion);
         await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
       }
 
@@ -265,37 +268,56 @@ function generarToken() {
   return `mm_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 12)}`;
 }
 
-async function programarCanalizacion(kv, email, guardian, elegido) {
+async function programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion = {}) {
   // Crear solicitud de canalización programada para 4 horas
   const solicitudId = `can_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
+
   const fechaEntrega = new Date();
   fechaEntrega.setHours(fechaEntrega.getHours() + 4);
-  
+
   // Verificar horario nocturno
   const horaEntrega = fechaEntrega.getHours();
   if (horaEntrega >= 22 || horaEntrega < 6) {
     fechaEntrega.setDate(fechaEntrega.getDate() + (horaEntrega >= 22 ? 1 : 0));
     fechaEntrega.setHours(6, 30, 0, 0);
   }
-  
+
+  // Determinar el nombre del destinatario
+  let nombreDestinatario = elegido.nombrePreferido || elegido.nombre;
+  if (datosCanalizacion.para_quien === 'regalo' || datosCanalizacion.para_quien === 'sorpresa') {
+    nombreDestinatario = datosCanalizacion.nombre_destinatario || nombreDestinatario;
+  }
+
   const solicitud = {
     id: solicitudId,
     tipo: 'canalizacion-guardian',
     email,
     guardian,
-    pronombre: elegido.pronombre || 'ella',
-    nombreUsuario: elegido.nombrePreferido || elegido.nombre,
+    // Datos del destinatario
+    nombreUsuario: nombreDestinatario,
+    pronombre: datosCanalizacion.pronombre || elegido.pronombre || 'ella',
+    // Datos del formulario de checkout
+    paraQuien: datosCanalizacion.para_quien || 'para_mi',
+    esNino: datosCanalizacion.es_nino || 'adulto',
+    contexto: datosCanalizacion.contexto || '',
+    fechaNacimiento: datosCanalizacion.fecha_nacimiento || '',
+    esSorpresa: datosCanalizacion.para_quien === 'sorpresa',
+    esRegalo: datosCanalizacion.para_quien === 'regalo' || datosCanalizacion.para_quien === 'sorpresa',
+    // Datos de entrega
     fechaEntrega: fechaEntrega.toISOString(),
-    estado: 'pendiente'
+    estado: 'pendiente',
+    // Para tracking
+    numeroCompra: (elegido.guardianes?.length || 0) + 1
   };
-  
+
   await kv.set(`solicitud:${solicitudId}`, solicitud);
-  
+
   // Agregar a cola
   const cola = await kv.get('cola:experiencias') || [];
   cola.push(solicitudId);
   await kv.set('cola:experiencias', cola);
+
+  console.log(`Canalización programada: ${guardian.nombre} para ${nombreDestinatario} (${datosCanalizacion.es_nino || 'adulto'})`);
 }
 
 async function programarEmailsConversion(kv, email, nombre, fechaExpira) {
