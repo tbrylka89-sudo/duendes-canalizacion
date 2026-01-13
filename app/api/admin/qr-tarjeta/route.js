@@ -80,8 +80,9 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const tarjetaId = searchParams.get('id');
+    const codigoQR = searchParams.get('codigo');
 
-    // Si piden una tarjeta específica
+    // Si piden una tarjeta específica por ID
     if (tarjetaId) {
       const tarjeta = await kv.get(`tarjeta:${tarjetaId}`);
       if (!tarjeta) {
@@ -91,6 +92,23 @@ export async function GET(request) {
         }, { status: 404, headers: corsHeaders });
       }
       return Response.json({ success: true, tarjeta }, { headers: corsHeaders });
+    }
+
+    // Si buscan por código QR
+    if (codigoQR) {
+      const pendientesIds = await kv.get('tarjetas:pendientes') || [];
+
+      for (const id of pendientesIds) {
+        const tarjeta = await kv.get(`tarjeta:${id}`);
+        if (tarjeta && tarjeta.codigoQR === codigoQR) {
+          return Response.json({ success: true, tarjeta }, { headers: corsHeaders });
+        }
+      }
+
+      return Response.json({
+        success: false,
+        error: 'Tarjeta no encontrada con ese código'
+      }, { status: 404, headers: corsHeaders });
     }
 
     // Obtener todas las pendientes

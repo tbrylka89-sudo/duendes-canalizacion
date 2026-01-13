@@ -682,32 +682,71 @@ add_shortcode('mi_magia', function() {
             const g = guardianData;
             const c = canalizacionPersonal;
 
+            // Convertir markdown básico a HTML
+            let contenidoHTML = (c.contenido || 'Tu canalización está siendo preparada.')
+                .replace(/^# (.*?)$/gm, '<h2 class="canal-h1">$1</h2>')
+                .replace(/^## (.*?)$/gm, '<h3 class="canal-h2">$1</h3>')
+                .replace(/^### (.*?)$/gm, '<h4 class="canal-h3">$1</h4>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            contenidoHTML = '<p>' + contenidoHTML + '</p>';
+
             app.innerHTML = `
+                <style>
+                    .canal-contenido-personal {
+                        text-align: left !important;
+                        font-size: 17px !important;
+                        line-height: 1.9 !important;
+                        font-family: 'Cormorant Garamond', Georgia, serif !important;
+                    }
+                    .canal-contenido-personal p {
+                        margin-bottom: 20px !important;
+                    }
+                    .canal-contenido-personal .canal-h1,
+                    .canal-contenido-personal .canal-h2 {
+                        font-family: 'Cinzel', serif !important;
+                        color: #C6A962 !important;
+                        margin-top: 40px !important;
+                        margin-bottom: 20px !important;
+                        padding-bottom: 10px !important;
+                        border-bottom: 1px solid rgba(198,169,98,0.3) !important;
+                    }
+                    .canal-contenido-personal .canal-h1 { font-size: 26px !important; }
+                    .canal-contenido-personal .canal-h2 { font-size: 22px !important; }
+                    .canal-contenido-personal .canal-h3 {
+                        font-family: 'Cinzel', serif !important;
+                        color: #C6A962 !important;
+                        font-size: 18px !important;
+                        margin-top: 25px !important;
+                        margin-bottom: 15px !important;
+                    }
+                    .canal-contenido-personal strong {
+                        color: #C6A962 !important;
+                    }
+                </style>
                 <div class="mi-magia-container">
                     <div class="estado-guardian">
                         <div class="guardian-header">
                             <div style="background:linear-gradient(135deg,#C6A962,#8B7355);color:#000;padding:8px 20px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:20px;display:inline-block;">
                                 ✨ CANALIZACIÓN EXCLUSIVA PARA VOS ✨
                             </div>
-                            <img src="${g.imagenPrincipal || ''}" alt="${g.nombre}" class="guardian-imagen">
-                            <h1 class="guardian-nombre">${g.nombre}</h1>
+                            <img src="${g.imagenPrincipal || c.guardian?.imagen || ''}" alt="${g.nombre}" class="guardian-imagen">
+                            <h1 class="guardian-nombre">${c.guardian?.nombre || g.nombre}</h1>
                             <p class="guardian-subtitulo">Tu guardián personal</p>
                         </div>
 
-                        <div class="seccion-magia mensaje-directo" style="border:2px solid #C6A962;">
-                            <h3 class="seccion-titulo">
-                                <span class="seccion-titulo-icono">🔮</span>
-                                Tu Canalización Personal
-                            </h3>
-                            <div class="seccion-contenido" style="white-space:pre-line;text-align:left;font-size:16px;line-height:1.9;">
-                                ${c.contenido || 'Tu canalización está siendo preparada. Volvé a intentar en unas horas.'}
+                        <div class="seccion-magia" style="border:2px solid #C6A962;padding:40px;">
+                            <div class="canal-contenido-personal">
+                                ${contenidoHTML}
                             </div>
-                            <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:20px;">
-                                Generada el ${c.fecha ? new Date(c.fecha).toLocaleDateString('es-UY', {day:'numeric',month:'long',year:'numeric'}) : 'fecha no disponible'}
+                            <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:30px;text-align:center;border-top:1px solid rgba(198,169,98,0.2);padding-top:20px;">
+                                Canalización generada el ${c.fecha ? new Date(c.fecha).toLocaleDateString('es-UY', {day:'numeric',month:'long',year:'numeric'}) : 'fecha no disponible'}
                             </p>
                         </div>
 
-                        <button onclick="verInfoGeneral()" class="btn-buscar" style="margin-top:20px;background:transparent;border:2px solid #C6A962;color:#C6A962;">
+                        <button onclick="verInfoGeneral()" class="btn-buscar" style="margin-top:20px;background:transparent;border:2px solid #C6A962;color:#C6A962 !important;">
                             Ver también la info general de ${g.nombre}
                         </button>
                     </div>
@@ -737,16 +776,46 @@ add_shortcode('mi_magia', function() {
 
                 const productId = parseInt(match[1], 10);
 
-                const res = await fetch(`${API_URL}/${productId}`);
-                const data = await res.json();
+                // Primero intentar buscar el producto en WooCommerce
+                try {
+                    const res = await fetch(`${API_URL}/${productId}`);
+                    const data = await res.json();
 
-                if (data.success && data.nombre) {
-                    guardianData = data;
-                    // Ir al paso de verificación de email
-                    estado = 'verificar-email';
-                } else {
-                    throw new Error('No encontrado');
+                    if (data.success && data.nombre) {
+                        guardianData = data;
+                        estado = 'verificar-email';
+                        render();
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Producto no encontrado en WooCommerce, buscando en tarjetas QR...');
                 }
+
+                // Si no se encontró en WooCommerce, buscar la tarjeta QR directamente
+                const tarjetaRes = await fetch(`https://duendes-vercel.vercel.app/api/admin/qr-tarjeta?codigo=${encodeURIComponent(codigo)}`);
+                const tarjetaData = await tarjetaRes.json();
+
+                if (tarjetaData.success && tarjetaData.tarjeta) {
+                    // Crear guardianData desde la tarjeta
+                    const t = tarjetaData.tarjeta;
+                    guardianData = {
+                        id: t.guardian?.id || productId,
+                        nombre: t.guardian?.nombre || 'Tu Guardián',
+                        imagenPrincipal: t.guardian?.imagen || '',
+                        categoria: t.guardian?.categoria || 'protección',
+                        tipo: 'Guardián',
+                        elemento: 'Tierra',
+                        proposito: t.guardian?.categoria || 'Protección',
+                        encabezado: {
+                            subtitulo: 'Guardián del Bosque Ancestral'
+                        }
+                    };
+                    estado = 'verificar-email';
+                    render();
+                    return;
+                }
+
+                throw new Error('No encontrado');
             } catch (e) {
                 console.error(e);
                 estado = 'error';
