@@ -472,15 +472,15 @@ const CUIDADOS = [
 ];
 
 const CRISTALES = [
-  { nombre: "Amatista", color: "#9b59b6", emoji: "💜", gradient: "linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #6c3483 100%)", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol directo." },
-  { nombre: "Cuarzo Rosa", color: "#f8bbd9", emoji: "💗", gradient: "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%)", props: "Amor incondicional, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
-  { nombre: "Citrino", color: "#f4d03f", emoji: "✨", gradient: "linear-gradient(135deg, #fff9c4 0%, #f4d03f 50%, #f39c12 100%)", props: "Abundancia, alegría, manifestación", cuidado: "Auto-limpiante. Carga al sol." },
-  { nombre: "Turmalina Negra", color: "#2c3e50", emoji: "🖤", gradient: "linear-gradient(135deg, #34495e 0%, #2c3e50 50%, #1a252f 100%)", props: "Protección máxima, escudo energético", cuidado: "Enterrar en sal o tierra." },
-  { nombre: "Labradorita", color: "#3498db", emoji: "🔮", gradient: "linear-gradient(135deg, #5dade2 0%, #3498db 30%, #2980b9 60%, #1f618d 100%)", props: "Magia, transformación, intuición", cuidado: "Bajo las estrellas." },
-  { nombre: "Cuarzo Transparente", color: "#ecf0f1", emoji: "💎", gradient: "linear-gradient(135deg, #ffffff 0%, #ecf0f1 50%, #bdc3c7 100%)", props: "Amplificador universal, claridad", cuidado: "Acepta todo. Limpiar seguido." },
-  { nombre: "Selenita", color: "#f5f5f5", emoji: "🌙", gradient: "linear-gradient(135deg, #ffffff 0%, #fafafa 50%, #e8e8e8 100%)", props: "Limpieza energética, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
-  { nombre: "Ojo de Tigre", color: "#b8860b", emoji: "🐯", gradient: "linear-gradient(135deg, #d4a853 0%, #b8860b 50%, #8b6914 100%)", props: "Coraje, prosperidad, protección", cuidado: "Sol de mañana." },
-  { nombre: "Obsidiana", color: "#1a1a1a", emoji: "⚫", gradient: "linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 50%, #0d0d0d 100%)", props: "Verdad, protección psíquica, raíces", cuidado: "Agua corriente. Luna nueva." }
+  { nombre: "Amatista", color: "#9b59b6", imagen: "https://images.unsplash.com/photo-1576085898323-218337e3e43c?w=400&q=80", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol directo." },
+  { nombre: "Cuarzo Rosa", color: "#f8bbd9", imagen: "https://images.unsplash.com/photo-1603145733190-d4b6bfc6d7e4?w=400&q=80", props: "Amor incondicional, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
+  { nombre: "Citrino", color: "#f4d03f", imagen: "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=400&q=80", props: "Abundancia, alegría, manifestación", cuidado: "Auto-limpiante. Carga al sol." },
+  { nombre: "Turmalina Negra", color: "#2c3e50", imagen: "https://images.unsplash.com/photo-1612197879988-de3f8fba6551?w=400&q=80", props: "Protección máxima, escudo energético", cuidado: "Enterrar en sal o tierra." },
+  { nombre: "Labradorita", color: "#3498db", imagen: "https://images.unsplash.com/photo-1551410224-699683e15636?w=400&q=80", props: "Magia, transformación, intuición", cuidado: "Bajo las estrellas." },
+  { nombre: "Cuarzo Transparente", color: "#ecf0f1", imagen: "https://images.unsplash.com/photo-1505751171710-1f6d0ace5a85?w=400&q=80", props: "Amplificador universal, claridad", cuidado: "Acepta todo. Limpiar seguido." },
+  { nombre: "Selenita", color: "#f5f5f5", imagen: "https://images.unsplash.com/photo-1560707303-4e980ce876ad?w=400&q=80", props: "Limpieza energética, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
+  { nombre: "Ojo de Tigre", color: "#b8860b", imagen: "https://images.unsplash.com/photo-1608543318498-36eb02e3739e?w=400&q=80", props: "Coraje, prosperidad, protección", cuidado: "Sol de mañana." },
+  { nombre: "Obsidiana", color: "#1a1a1a", imagen: "https://images.unsplash.com/photo-1583937443566-6d672ab3aa48?w=400&q=80", props: "Verdad, protección psíquica, raíces", cuidado: "Agua corriente. Luna nueva." }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -2210,28 +2210,36 @@ function CristalesSec() {
       <div className="cristales-grid">
         {CRISTALES.map((c,i) => (
           <div key={i} className="cristal-card">
-            <div
-              className="cristal-img-placeholder"
-              style={{
-                background: c.gradient,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              <span style={{fontSize: '4rem', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'}}>{c.emoji}</span>
-              <span style={{
-                fontFamily: 'Cinzel, serif',
-                fontSize: '1.1rem',
-                color: c.color === '#1a1a1a' || c.color === '#2c3e50' ? '#fff' : '#1a1a1a',
-                textShadow: c.color === '#1a1a1a' || c.color === '#2c3e50' ? 'none' : '0 1px 2px rgba(255,255,255,0.5)',
-                fontWeight: 500
-              }}>{c.nombre}</span>
+            <div className="cristal-img-container" style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px 12px 0 0' }}>
+              <img
+                src={c.imagen}
+                alt={c.nombre}
+                style={{
+                  width: '100%',
+                  height: '180px',
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                padding: '2rem 1rem 0.8rem',
+                textAlign: 'center'
+              }}>
+                <span style={{
+                  fontFamily: 'Cinzel, serif',
+                  fontSize: '1.1rem',
+                  color: '#fff',
+                  fontWeight: 500,
+                  textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                }}>{c.nombre}</span>
+              </div>
             </div>
             <div className="cristal-body">
-              <h4>{c.nombre}</h4>
               <p className="cristal-props">{c.props}</p>
               <small className="cristal-cuidado">🌿 {c.cuidado}</small>
             </div>
