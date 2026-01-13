@@ -109,9 +109,39 @@ LA VERDAD SOBRE LOS GUARDIANES:
 TONO OBLIGATORIO:
 ═══════════════════════════════════════════════════════════════════════════════
 
-CORRECTO (emotivo, íntimo, de destino):
-"Desde el Plano de las Esencias, [nombre] te observaba. No sabías su nombre,
-pero él ya conocía el tuyo. Esperó siglos por este momento..."
+═══════════════════════════════════════════════════════════════════════════════
+APERTURA DE HISTORIA - OBLIGATORIO GANCHO FUERTE
+═══════════════════════════════════════════════════════════════════════════════
+
+PROHIBIDO ABSOLUTAMENTE empezar con:
+- "Mucho antes de que los velos entre mundos..."
+- "En los confines del reino..."
+- "Cuando las brumas del tiempo..."
+- "En tiempos inmemoriales..."
+- "Hace eones, en el Plano de las Esencias..."
+- Cualquier intro genérica de fantasía
+
+OBLIGATORIO empezar con GANCHO que atrape:
+- Una acción concreta: "Thornwick saltó del acantilado sin mirar atrás"
+- Un momento de crisis: "El fuego consumía todo. Solo ella quedaba en pie"
+- Un misterio: "Nadie sabe por qué Elderwood abandonó el Consejo aquella noche"
+- Algo visceral: "La primera vez que vio sangre de dragón, tenía 200 años"
+- Una declaración fuerte: "Moonstone juró nunca más amar. Y lo cumplió durante tres siglos"
+
+EJEMPLOS CORRECTOS:
+"El día que Thornwick decidió abandonar el Bosque de las Sombras, llovía fuego del cielo.
+No era una metáfora. Los dragones del norte habían declarado la guerra..."
+
+"Nadie en el Plano de las Esencias quería hablar de lo que pasó en la Grieta.
+Menos aún de por qué Moonstone fue la única que volvió..."
+
+"La primera vez que Elderwood vio un humano, le escupió.
+No por odio, sino por curiosidad. Quería saber si ardían..."
+
+EJEMPLOS INCORRECTOS (NUNCA USAR):
+"Mucho antes de que los velos entre mundos se hicieran densos, Moonstone caminaba..."
+"En los albores del tiempo, cuando las esencias flotaban libremente..."
+"Hace miles de años, en un reino muy lejano..."
 
 INCORRECTO (agresivo, vendedor):
 "Te lo voy a decir sin vueltas: si [nombre] apareció en tu vida..."

@@ -361,6 +361,61 @@ add_shortcode('mi_magia', function() {
             padding: 20px;
         }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FORZAR COLORES - Evitar conflictos con WooCommerce/Theme
+    ═══════════════════════════════════════════════════════════════ */
+
+    #mi-magia-app,
+    #mi-magia-app * {
+        color: #fff !important;
+    }
+
+    #mi-magia-app {
+        background: linear-gradient(180deg, #0a0a0a 0%, #1a1510 100%) !important;
+    }
+
+    .titulo-magia,
+    .guardian-nombre,
+    .seccion-titulo,
+    .texto-cargando,
+    .don-nombre,
+    .ritual-numero,
+    .ritual-paso-contenido h4,
+    .guardian-badge {
+        color: #C6A962 !important;
+    }
+
+    .subtitulo-magia,
+    .guardian-subtitulo,
+    .info-escaneo,
+    .error-titulo {
+        color: rgba(255,255,255,0.6) !important;
+    }
+
+    .seccion-contenido,
+    .ritual-paso-contenido p,
+    .don-desc {
+        color: rgba(255,255,255,0.8) !important;
+    }
+
+    .input-codigo {
+        color: #C6A962 !important;
+        background: rgba(0,0,0,0.4) !important;
+        border-color: rgba(198,169,98,0.3) !important;
+    }
+
+    .btn-buscar {
+        color: #000 !important;
+        background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%) !important;
+    }
+
+    /* Ocultar elementos del tema que interfieren */
+    #mi-magia-app .site-header,
+    #mi-magia-app header:not(.guardian-header),
+    #mi-magia-app .main-navigation {
+        display: none !important;
+    }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
