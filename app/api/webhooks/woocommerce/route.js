@@ -151,14 +151,15 @@ export async function POST(request) {
       elegido.treboles = (elegido.treboles || 0) + trebolsGanados;
       
       console.log(`Agregados ${guardianes.length} guardianes y ${trebolsGanados} tréboles a ${email}`);
-      
-      // Generar guía de canalización para cada guardián
+
+      // Generar guía de canalización y tarjeta QR para cada guardián
       for (const guardian of guardianes) {
         await programarCanalizacion(kv, email, guardian, elegido);
+        await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
       }
-      
-      // Enviar email de compra confirmada
-      await enviarEmailCompraGuardian(resend, email, nombre, guardianes, trebolsGanados);
+
+      // Enviar email de compra confirmada (ahora incluye QR)
+      await enviarEmailCompraGuardian(resend, email, nombre, guardianes, trebolsGanados, ordenId);
     }
     
     // ═══════════════════════════════════════════════════════════
@@ -304,11 +305,11 @@ async function programarEmailsConversion(kv, email, nombre, fechaExpira) {
     { dia: 14, asunto: 'Mañana termina tu acceso al Círculo' },
     { dia: 15, asunto: 'Tu prueba del Círculo terminó. El Santuario te espera.' }
   ];
-  
+
   for (const emailConfig of emails) {
     const fechaEnvio = new Date(fechaExpira);
     fechaEnvio.setDate(fechaEnvio.getDate() - (15 - emailConfig.dia));
-    
+
     const emailProgramado = {
       email,
       nombre,
@@ -317,9 +318,53 @@ async function programarEmailsConversion(kv, email, nombre, fechaExpira) {
       dia: emailConfig.dia,
       fechaEnvio: fechaEnvio.toISOString()
     };
-    
+
     await kv.set(`email-programado:${email}:dia${emailConfig.dia}`, emailProgramado);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GENERAR TARJETA QR PARA IMPRIMIR
+// ═══════════════════════════════════════════════════════════════
+
+async function generarTarjetaQR(kv, ordenId, email, nombreCliente, guardian) {
+  const fecha = new Date();
+  const codigoQR = `DU${fecha.getFullYear().toString().slice(-2)}${(fecha.getMonth()+1).toString().padStart(2,'0')}-${guardian.id.toString().padStart(5,'0')}`;
+
+  // URL que contendrá el QR (incluye email para autocompletar)
+  const urlMiMagia = `https://duendesuy.10web.cloud/mi-magia?codigo=${codigoQR}&email=${encodeURIComponent(email)}`;
+
+  // Guardar tarjeta en KV
+  const tarjeta = {
+    id: `tarjeta_${ordenId}_${guardian.id}`,
+    ordenId,
+    email,
+    nombreCliente,
+    guardian: {
+      id: guardian.id,
+      nombre: guardian.nombre,
+      categoria: guardian.categoria,
+      imagen: guardian.imagen
+    },
+    codigoQR,
+    urlMiMagia,
+    fechaCompra: fecha.toISOString(),
+    impresa: false
+  };
+
+  await kv.set(`tarjeta:${tarjeta.id}`, tarjeta);
+
+  // Agregar a lista de tarjetas pendientes
+  const pendientes = await kv.get('tarjetas:pendientes') || [];
+  pendientes.unshift(tarjeta.id);
+  await kv.set('tarjetas:pendientes', pendientes);
+
+  // Guardar también asociada al guardián para fácil acceso
+  await kv.set(`qr:guardian:${guardian.id}:orden:${ordenId}`, tarjeta);
+
+  console.log(`Tarjeta QR generada para ${guardian.nombre} - Orden #${ordenId}`);
+
+  return tarjeta;
 }
 
 // ═══════════════════════════════════════════════════════════════
