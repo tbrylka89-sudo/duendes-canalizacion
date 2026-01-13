@@ -103,134 +103,135 @@ function duendes_qr_imprimir_page() {
         }
 
         /* ═══════════════════════════════════════════════════════════════
-           TARJETA IMPRIMIBLE - Diseño para caja
+           TARJETA IMPRIMIBLE - Diseño CLARO para impresión
+           Colores por categoría del guardián
         ═══════════════════════════════════════════════════════════════ */
 
         .tarjeta-imprimible {
             width: 90mm;
-            min-height: 130mm;
-            background: linear-gradient(180deg, #0a0a0a 0%, #1a1510 100%);
-            color: #fff;
-            padding: 8mm;
+            height: 130mm;
+            background: #fff;
+            color: #333;
+            padding: 6mm;
             box-sizing: border-box;
             font-family: 'Cormorant Garamond', Georgia, serif;
             position: relative;
             overflow: hidden;
+            border: 2px solid var(--cat-color, #C6A962);
+            border-radius: 4mm;
         }
 
-        .tarjeta-imprimible::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at center top, rgba(198,169,98,0.1) 0%, transparent 60%);
-            pointer-events: none;
-        }
+        /* Colores por categoría */
+        .tarjeta-imprimible.cat-proteccion { --cat-color: #4A6FA5; --cat-light: #E8F0FE; }
+        .tarjeta-imprimible.cat-abundancia { --cat-color: #2E7D32; --cat-light: #E8F5E9; }
+        .tarjeta-imprimible.cat-amor { --cat-color: #C2185B; --cat-light: #FCE4EC; }
+        .tarjeta-imprimible.cat-salud,
+        .tarjeta-imprimible.cat-sanacion { --cat-color: #00897B; --cat-light: #E0F2F1; }
+        .tarjeta-imprimible.cat-sabiduria { --cat-color: #7B1FA2; --cat-light: #F3E5F5; }
 
         .tarjeta-header {
             text-align: center;
-            margin-bottom: 5mm;
-            position: relative;
-            z-index: 1;
+            padding: 3mm;
+            background: var(--cat-light, #faf8f5);
+            border-radius: 2mm;
+            margin-bottom: 4mm;
         }
 
         .tarjeta-logo {
-            font-size: 8pt;
-            letter-spacing: 3px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 3mm;
+            font-size: 7pt;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 2mm;
+            text-transform: uppercase;
         }
 
         .tarjeta-guardian-nombre {
             font-family: 'Cinzel', serif;
-            font-size: 18pt;
-            color: #C6A962;
+            font-size: 14pt;
+            color: var(--cat-color, #C6A962);
             margin: 0;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            line-height: 1.2;
         }
 
         .tarjeta-subtitulo {
-            font-size: 9pt;
-            color: rgba(255,255,255,0.6);
+            font-size: 8pt;
+            color: #666;
             font-style: italic;
-            margin-top: 2mm;
+            margin-top: 1mm;
         }
 
         .tarjeta-qr-container {
             text-align: center;
-            margin: 5mm 0;
-            position: relative;
-            z-index: 1;
+            margin: 3mm 0;
+            padding: 3mm;
+            background: var(--cat-light, #faf8f5);
+            border-radius: 2mm;
         }
 
-        .tarjeta-qr-container img {
-            width: 35mm;
-            height: 35mm;
-            padding: 3mm;
-            background: #fff;
-            border-radius: 3mm;
+        .tarjeta-qr-container #qr-code-container {
+            padding: 2mm !important;
+            background: #fff !important;
+            border: 1px solid #eee;
+            border-radius: 2mm;
         }
 
         .tarjeta-codigo {
-            font-family: monospace;
-            font-size: 8pt;
-            color: #C6A962;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            color: var(--cat-color, #C6A962);
             letter-spacing: 1px;
             margin-top: 2mm;
+            font-weight: bold;
         }
 
         .tarjeta-mensaje {
             text-align: center;
-            padding: 4mm;
-            background: rgba(198,169,98,0.1);
-            border: 1px solid rgba(198,169,98,0.3);
-            border-radius: 3mm;
-            margin: 4mm 0;
-            position: relative;
-            z-index: 1;
+            padding: 3mm;
+            border: 1px solid var(--cat-color, #C6A962);
+            border-radius: 2mm;
+            margin: 3mm 0;
+            background: var(--cat-light, #faf8f5);
         }
 
         .tarjeta-mensaje-titulo {
             font-family: 'Cinzel', serif;
-            font-size: 9pt;
-            color: #C6A962;
-            margin-bottom: 2mm;
+            font-size: 8pt;
+            color: var(--cat-color, #C6A962);
+            margin-bottom: 1mm;
         }
 
         .tarjeta-mensaje-texto {
-            font-size: 8pt;
-            line-height: 1.5;
-            color: rgba(255,255,255,0.8);
+            font-size: 7pt;
+            line-height: 1.4;
+            color: #555;
         }
 
         .tarjeta-instrucciones {
-            position: relative;
-            z-index: 1;
+            margin-top: 2mm;
         }
 
         .tarjeta-instrucciones-titulo {
             font-family: 'Cinzel', serif;
-            font-size: 8pt;
-            color: #C6A962;
+            font-size: 7pt;
+            color: var(--cat-color, #C6A962);
             text-align: center;
-            margin-bottom: 3mm;
+            margin-bottom: 2mm;
         }
 
         .tarjeta-paso {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 2mm;
-            margin-bottom: 2mm;
+            margin-bottom: 1mm;
         }
 
         .tarjeta-paso-num {
             width: 4mm;
             height: 4mm;
-            background: #C6A962;
+            background: var(--cat-color, #C6A962);
             border-radius: 50%;
-            color: #000;
+            color: #fff;
             font-size: 6pt;
             font-weight: bold;
             display: flex;
@@ -241,31 +242,34 @@ function duendes_qr_imprimir_page() {
 
         .tarjeta-paso-texto {
             font-size: 7pt;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.4;
+            color: #555;
+            line-height: 1.3;
         }
 
         .tarjeta-footer {
             text-align: center;
-            margin-top: 4mm;
-            padding-top: 3mm;
-            border-top: 1px solid rgba(198,169,98,0.2);
-            position: relative;
-            z-index: 1;
+            margin-top: 3mm;
+            padding-top: 2mm;
+            border-top: 1px solid #ddd;
         }
 
         .tarjeta-footer-texto {
             font-size: 6pt;
-            color: rgba(255,255,255,0.4);
+            color: #888;
             font-style: italic;
         }
 
-        .tarjeta-decoracion {
+        .tarjeta-categoria-badge {
             position: absolute;
-            bottom: 5mm;
-            right: 5mm;
-            font-size: 24pt;
-            opacity: 0.1;
+            top: 3mm;
+            right: 3mm;
+            background: var(--cat-color, #C6A962);
+            color: #fff;
+            font-size: 6pt;
+            padding: 1mm 2mm;
+            border-radius: 2mm;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Print styles */
@@ -282,9 +286,10 @@ function duendes_qr_imprimir_page() {
                 top: 0;
             }
             .tarjeta-imprimible {
-                page-break-after: always;
                 margin: 0;
                 box-shadow: none;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
 
@@ -427,27 +432,40 @@ function duendes_qr_imprimir_page() {
             }
 
             const t = data.tarjeta;
+            const categoria = (t.guardian?.categoria || 'proteccion').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            // Mapeo de categorías a nombres bonitos
+            const categoriasNombres = {
+                'proteccion': 'Protección',
+                'abundancia': 'Abundancia',
+                'amor': 'Amor',
+                'salud': 'Salud',
+                'sanacion': 'Sanación',
+                'sabiduria': 'Sabiduría'
+            };
 
             // Crear tarjeta imprimible
             const printArea = document.getElementById('print-area');
             printArea.innerHTML = `
-                <div class="tarjeta-imprimible">
+                <div class="tarjeta-imprimible cat-${categoria}">
+                    <div class="tarjeta-categoria-badge">${categoriasNombres[categoria] || categoria}</div>
+
                     <div class="tarjeta-header">
-                        <div class="tarjeta-logo">DUENDES DEL URUGUAY</div>
+                        <div class="tarjeta-logo">Duendes del Uruguay</div>
                         <h2 class="tarjeta-guardian-nombre">${t.guardian?.nombre || 'Tu Guardián'}</h2>
                         <p class="tarjeta-subtitulo">Ha elegido acompañarte</p>
                     </div>
 
                     <div class="tarjeta-qr-container">
-                        <div id="qr-code-container" style="display:inline-block; padding:10px; background:#fff; border-radius:8px;"></div>
+                        <div id="qr-code-container"></div>
                         <div class="tarjeta-codigo">${t.codigoQR}</div>
                     </div>
 
                     <div class="tarjeta-mensaje">
-                        <div class="tarjeta-mensaje-titulo">✨ Tu Portal Personal</div>
+                        <div class="tarjeta-mensaje-titulo">Tu Portal Personal</div>
                         <div class="tarjeta-mensaje-texto">
                             Escaneá este código para acceder a tu<br>
-                            <strong style="color:#C6A962;">canalización personalizada exclusiva</strong><br>
+                            <strong>canalización personalizada exclusiva</strong><br>
                             y toda la magia de tu guardián.
                         </div>
                     </div>
@@ -457,7 +475,7 @@ function duendes_qr_imprimir_page() {
 
                         <div class="tarjeta-paso">
                             <div class="tarjeta-paso-num">1</div>
-                            <div class="tarjeta-paso-texto">Escaneá el código QR con tu celular</div>
+                            <div class="tarjeta-paso-texto">Escaneá el QR con tu celular</div>
                         </div>
 
                         <div class="tarjeta-paso">
@@ -467,18 +485,16 @@ function duendes_qr_imprimir_page() {
 
                         <div class="tarjeta-paso">
                             <div class="tarjeta-paso-num">3</div>
-                            <div class="tarjeta-paso-texto">Descubrí tu canalización única y personal</div>
+                            <div class="tarjeta-paso-texto">Descubrí tu canalización única</div>
                         </div>
                     </div>
 
                     <div class="tarjeta-footer">
                         <div class="tarjeta-footer-texto">
-                            Los guardianes eligen tanto como son elegidos.<br>
+                            Los guardianes eligen tanto como son elegidos<br>
                             duendesdeluruguay.com
                         </div>
                     </div>
-
-                    <div class="tarjeta-decoracion">🍀</div>
                 </div>
             `;
 
