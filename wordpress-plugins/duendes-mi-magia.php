@@ -424,6 +424,8 @@ add_shortcode('mi_magia', function() {
     <script>
     (function() {
         const API_URL = 'https://duendes-vercel.vercel.app/api/producto';
+        const API_USUARIO = 'https://duendes-vercel.vercel.app/api/mi-magia/usuario';
+        const API_LECTURAS = 'https://duendes-vercel.vercel.app/api/mi-magia/lecturas';
         const app = document.getElementById('mi-magia-app');
 
         // Obtener codigo de URL si existe
@@ -433,12 +435,21 @@ add_shortcode('mi_magia', function() {
         // Estado inicial
         let estado = 'codigo';
         let guardianData = null;
+        let canalizacionPersonal = null;
+        let usuarioData = null;
+        let codigoActual = '';
 
         function render() {
             if (estado === 'codigo') {
                 renderEstadoCodigo();
             } else if (estado === 'cargando') {
                 renderEstadoCargando();
+            } else if (estado === 'verificar-email') {
+                renderVerificarEmail();
+            } else if (estado === 'cargando-personal') {
+                renderCargandoPersonal();
+            } else if (estado === 'canalizado') {
+                renderCanalizacionPersonal();
             } else if (estado === 'guardian') {
                 renderEstadoGuardian();
             } else if (estado === 'error') {
@@ -615,6 +626,95 @@ add_shortcode('mi_magia', function() {
             `;
         }
 
+        function renderVerificarEmail() {
+            const g = guardianData;
+            app.innerHTML = `
+                <div class="mi-magia-container">
+                    <div class="estado-codigo">
+                        <img src="${g.imagenPrincipal || ''}" alt="${g.nombre}" class="guardian-imagen" style="width:120px;height:120px;margin-bottom:20px;">
+                        <h1 class="titulo-magia">${g.nombre}</h1>
+                        <p class="subtitulo-magia">${g.encabezado?.subtitulo || 'Guardián del Bosque Ancestral'}</p>
+
+                        <div style="background:rgba(198,169,98,0.1);border:1px solid rgba(198,169,98,0.3);border-radius:16px;padding:30px;margin:30px 0;max-width:500px;">
+                            <h3 style="color:#C6A962;margin-bottom:15px;font-family:'Cinzel',serif;">¿Sos el/la dueño/a de ${g.nombre}?</h3>
+                            <p style="color:rgba(255,255,255,0.7);margin-bottom:20px;font-size:14px;">
+                                Ingresá el email con el que realizaste la compra para acceder a tu <strong style="color:#C6A962;">canalización personalizada exclusiva</strong>.
+                            </p>
+
+                            <input type="email"
+                                   id="input-email"
+                                   class="input-codigo"
+                                   placeholder="tu@email.com"
+                                   style="width:100%;margin-bottom:15px;">
+
+                            <button class="btn-buscar" onclick="verificarEmail()" style="width:100%;margin-bottom:10px;">
+                                Ver mi canalización
+                            </button>
+
+                            <button onclick="verInfoGeneral()" style="background:transparent;border:1px solid rgba(198,169,98,0.3);color:rgba(255,255,255,0.6);padding:12px;border-radius:8px;cursor:pointer;width:100%;font-size:13px;">
+                                Solo quiero ver la info general
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('input-email')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') verificarEmail();
+            });
+        }
+
+        function renderCargandoPersonal() {
+            app.innerHTML = `
+                <div class="mi-magia-container">
+                    <div class="estado-cargando">
+                        <div class="spinner-magia"></div>
+                        <div class="texto-cargando">Buscando tu canalización personal...</div>
+                        <p style="color:rgba(255,255,255,0.5);margin-top:15px;font-size:14px;">
+                            Esto puede tomar unos segundos
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCanalizacionPersonal() {
+            const g = guardianData;
+            const c = canalizacionPersonal;
+
+            app.innerHTML = `
+                <div class="mi-magia-container">
+                    <div class="estado-guardian">
+                        <div class="guardian-header">
+                            <div style="background:linear-gradient(135deg,#C6A962,#8B7355);color:#000;padding:8px 20px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:20px;display:inline-block;">
+                                ✨ CANALIZACIÓN EXCLUSIVA PARA VOS ✨
+                            </div>
+                            <img src="${g.imagenPrincipal || ''}" alt="${g.nombre}" class="guardian-imagen">
+                            <h1 class="guardian-nombre">${g.nombre}</h1>
+                            <p class="guardian-subtitulo">Tu guardián personal</p>
+                        </div>
+
+                        <div class="seccion-magia mensaje-directo" style="border:2px solid #C6A962;">
+                            <h3 class="seccion-titulo">
+                                <span class="seccion-titulo-icono">🔮</span>
+                                Tu Canalización Personal
+                            </h3>
+                            <div class="seccion-contenido" style="white-space:pre-line;text-align:left;font-size:16px;line-height:1.9;">
+                                ${c.contenido || 'Tu canalización está siendo preparada. Volvé a intentar en unas horas.'}
+                            </div>
+                            <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:20px;">
+                                Generada el ${c.fecha ? new Date(c.fecha).toLocaleDateString('es-UY', {day:'numeric',month:'long',year:'numeric'}) : 'fecha no disponible'}
+                            </p>
+                        </div>
+
+                        <button onclick="verInfoGeneral()" class="btn-buscar" style="margin-top:20px;background:transparent;border:2px solid #C6A962;color:#C6A962;">
+                            Ver también la info general de ${g.nombre}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
         window.buscarGuardian = async function() {
             const input = document.getElementById('input-codigo');
             const codigo = input?.value?.trim();
@@ -624,6 +724,7 @@ add_shortcode('mi_magia', function() {
                 return;
             }
 
+            codigoActual = codigo;
             estado = 'cargando';
             render();
 
@@ -641,7 +742,8 @@ add_shortcode('mi_magia', function() {
 
                 if (data.success && data.nombre) {
                     guardianData = data;
-                    estado = 'guardian';
+                    // Ir al paso de verificación de email
+                    estado = 'verificar-email';
                 } else {
                     throw new Error('No encontrado');
                 }
@@ -653,9 +755,62 @@ add_shortcode('mi_magia', function() {
             render();
         };
 
+        window.verificarEmail = async function() {
+            const input = document.getElementById('input-email');
+            const email = input?.value?.trim().toLowerCase();
+
+            if (!email || !email.includes('@')) {
+                alert('Ingresá un email válido');
+                return;
+            }
+
+            estado = 'cargando-personal';
+            render();
+
+            try {
+                // Buscar lecturas del usuario por email
+                const res = await fetch(`https://duendes-vercel.vercel.app/api/mi-magia/lecturas-por-email?email=${encodeURIComponent(email)}`);
+                const data = await res.json();
+
+                if (data.success && data.lecturas && data.lecturas.length > 0) {
+                    // Buscar canalización de este guardián
+                    const canalizacion = data.lecturas.find(l =>
+                        l.tipo === 'canalizacion-guardian' &&
+                        (l.guardian?.nombre === guardianData.nombre || l.nombre === guardianData.nombre)
+                    );
+
+                    if (canalizacion) {
+                        canalizacionPersonal = canalizacion;
+                        estado = 'canalizado';
+                    } else {
+                        // No hay canalización para este guardián específico
+                        alert('No encontramos una canalización personalizada para este guardián. Puede que aún esté siendo preparada (toma unas horas después de la compra).');
+                        estado = 'guardian';
+                    }
+                } else {
+                    // Email no encontrado o sin lecturas
+                    alert('No encontramos compras con ese email. Si recién compraste, tu canalización estará lista en unas horas.');
+                    estado = 'guardian';
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error al buscar. Mostrando info general.');
+                estado = 'guardian';
+            }
+
+            render();
+        };
+
+        window.verInfoGeneral = function() {
+            estado = 'guardian';
+            render();
+        };
+
         window.volverInicio = function() {
             estado = 'codigo';
             guardianData = null;
+            canalizacionPersonal = null;
+            usuarioData = null;
             render();
         };
 
