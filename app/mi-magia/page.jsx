@@ -1027,62 +1027,56 @@ function Canalizaciones({ usuario }) {
             <div className="elegidos-story">
               <div className="story-scene scene-1">
                 <p className="scene-visual">
-                  Primero es la mirada.
+                  Hay cosas que no se buscan.
                 </p>
                 <p>
-                  Scrolleás sin pensar, como siempre. Uno más, otro más, siguiente.
-                  Y de pronto — sin saber por qué — dejás de scrollear.
-                </p>
-                <p className="scene-pause">
-                  Volvés para atrás.
+                  Aparecen. Como esa persona que conocés en el momento exacto.
+                  Como ese libro que cae de un estante y te cambia la vida.
+                  Como un guardián que te mira desde una pantalla y algo
+                  en vos dice <em>ahí está</em>.
                 </p>
               </div>
 
               <div className="story-scene scene-2">
                 <p className="scene-visual">
-                  Hay uno que te mira.
+                  No sabemos cómo funciona.
                 </p>
                 <p>
-                  No es el más lindo. No es el más caro. No tiene nada especial
-                  que puedas explicar. Pero algo en tu pecho se aprieta un poco.
-                  Como cuando escuchás una canción que no recordás pero conocés.
+                  Solo sabemos que pasa. Que hay personas que ven veinte,
+                  treinta guardianes, y siguen de largo. Y hay otras que ven
+                  uno solo y ya no pueden irse. Vuelven. Sueñan con él.
+                  Le inventan nombre antes de saber el verdadero.
                 </p>
               </div>
 
               <div className="story-reveal">
                 <div className="reveal-line"></div>
                 <p className="reveal-text">
-                  Ese momento tiene un nombre.<br/>
-                  <em>El Reconocimiento.</em>
+                  A esas personas las llamamos<br/>
+                  <em>Los Elegidos</em>
                 </p>
                 <div className="reveal-line"></div>
               </div>
 
               <div className="story-scene scene-3">
                 <p>
-                  No lo inventamos nosotros. Lo descubrimos cuando empezaron
-                  a llegar mensajes de gente que no se conocía entre sí,
-                  describiendo lo mismo:
+                  No es un título. Es un reconocimiento. De algo que ya existía
+                  antes de que supieras que existía. Un hilo invisible que
+                  conecta al guardián con su humano — o al humano con su guardián,
+                  según cómo lo mires.
                 </p>
-                <p className="scene-quote">
-                  "Supe que era él."
-                </p>
-                <p className="scene-quote">
-                  "Me encontró."
-                </p>
-                <p className="scene-quote">
-                  "No sé explicarlo."
+                <p>
+                  Cada uno de ellos nace dos veces: cuando lo creamos con las manos,
+                  y cuando alguien lo reconoce como suyo.
                 </p>
               </div>
 
               <div className="story-scene scene-final">
                 <p className="scene-revelation">
-                  Nosotros solo hacemos el cuerpo.<br/>
-                  Ellos eligen a quién habitar.
+                  Si estás leyendo esto, el hilo ya se tensó.
                 </p>
                 <p className="scene-direct">
-                  Y si llegaste hasta acá — leyendo esto, sintiendo algo —
-                  ya hay uno esperándote.
+                  Ahora solo falta que tires.
                 </p>
               </div>
             </div>
