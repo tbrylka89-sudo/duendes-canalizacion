@@ -268,7 +268,13 @@ function calcularNivel(totalCompras) {
 }
 
 function generarToken() {
-  return `mm_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 12)}`;
+  // Token corto y amigable: 12 caracteres alfanuméricos
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let token = '';
+  for (let i = 0; i < 12; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
 }
 
 async function programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion = {}, ordenId) {

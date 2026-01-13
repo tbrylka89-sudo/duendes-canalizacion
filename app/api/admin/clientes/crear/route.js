@@ -10,7 +10,8 @@ export async function POST(request) {
     const existe = await kv.get(`user:${email}`);
     if (existe) return Response.json({ success: false, error: 'Ya existe', cliente: existe });
     
-    const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let token = ''; for (let i = 0; i < 12; i++) token += chars.charAt(Math.floor(Math.random() * chars.length));
     const cliente = { email, nombre: nombre||'', token, runas: 50, treboles: 0, guardianes: [], lecturas: [], creado: new Date().toISOString() };
     await kv.set(`user:${email}`, cliente);
     

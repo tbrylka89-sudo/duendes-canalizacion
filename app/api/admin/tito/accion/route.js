@@ -39,7 +39,8 @@ export async function POST(request) {
       case 'dar_acceso': {
         const existe = await kv.get(`user:${datos.email}`);
         if (existe) { resultado = `Ya tiene cuenta. Link: https://duendes-vercel.vercel.app/mi-magia?token=${existe.token}`; break; }
-        const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+        let token = ''; for (let i = 0; i < 12; i++) token += chars.charAt(Math.floor(Math.random() * chars.length));
         await kv.set(`user:${datos.email}`, { email: datos.email, nombre: datos.nombre||'', token, runas: 50, treboles: 0, guardianes: [], lecturas: [], creado: new Date().toISOString() });
         await enviarEmail(datos.email, '✨ Tu acceso a Mi Magia', `<h1 style="color:#d4af37;">¡Bienvenida!</h1><p><a href="https://duendes-vercel.vercel.app/mi-magia?token=${token}" style="background:#d4af37;color:#1a1a1a;padding:15px 30px;border-radius:50px;text-decoration:none;display:inline-block;">Entrar a Mi Magia</a></p><p>🎁 50 Runas de regalo</p>`);
         resultado = `✅ Cuenta creada. Link: https://duendes-vercel.vercel.app/mi-magia?token=${token}`;
