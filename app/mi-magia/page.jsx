@@ -915,6 +915,50 @@ function Inicio({ usuario, ir }) {
         <span className="promo-arrow">→</span>
       </div>
 
+      <div className="info-box">
+        <h3>¿Cómo funciona Mi Magia?</h3>
+        <div className="info-grid">
+          <div><span>☘</span><h4>Tréboles</h4><p>Se ganan comprando ({usuario?.moneda === 'UYU' ? '$400 UYU' : '$10 USD'} = 1). Canjealos por descuentos, envíos gratis, regalos.</p></div>
+          <div><span>ᚱ</span><h4>Runas</h4><p>Se compran o ganan. Para experiencias mágicas personalizadas.</p></div>
+          <div><span>▣</span><h4>Grimorio</h4><p>Tus lecturas guardadas para siempre + tu diario espiritual.</p></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MIS CANALIZACIONES (antes Santuario)
+// ═══════════════════════════════════════════════════════════════
+
+function Canalizaciones({ usuario }) {
+  const [tab, setTab] = useState('guardianes');
+  const [canalizacionAbierta, setCanalizacionAbierta] = useState(null);
+
+  const guardianes = usuario?.guardianes || [];
+  const talismanes = usuario?.talismanes || [];
+  const libros = usuario?.libros || [];
+  const lecturas = usuario?.lecturas || [];
+  const regalosHechos = usuario?.regalosHechos || [];
+  const regalosRecibidos = usuario?.regalosRecibidos || [];
+
+  // Buscar canalización para un guardián
+  const getCanalizacion = (guardian) => {
+    return lecturas.find(l => l.guardianId === guardian.id || l.ordenId === guardian.ordenId);
+  };
+
+  // Estado de canalización
+  const getEstadoCana = (cana) => {
+    if (!cana) return { texto: 'Pendiente', color: '#888', icono: '⏳' };
+    if (cana.estado === 'enviada') return { texto: 'Lista', color: '#2ecc71', icono: '✓' };
+    if (cana.estado === 'aprobada') return { texto: 'En camino', color: '#d4af37', icono: '✦' };
+    return { texto: 'Procesando', color: '#3498db', icono: '◈' };
+  };
+
+  return (
+    <div className="sec">
+      <div className="sec-head"><h1>Mis Canalizaciones</h1><p>Todo lo que ha llegado a tu vida desde el mundo elemental.</p></div>
+
       {/* LOS ELEGIDOS - Narrativa */}
       <div className="elegidos-section">
         <div className="elegidos-header">
@@ -968,60 +1012,16 @@ function Inicio({ usuario, ir }) {
           </div>
 
           <p className="elegidos-cierre">
-            Este portal es tu espacio sagrado. Acá encontrarás todo lo que tu guardián quiere compartir contigo:
-            su canalización, sus mensajes, rituales especiales, y conexiones con otros Elegidos.
+            Acá encontrarás todo lo que tus guardianes quieren compartir contigo:
+            sus canalizaciones, mensajes personales, rituales especiales.
           </p>
         </div>
 
         <div className="elegidos-badge">
           <span className="badge-icono">◈</span>
-          <span className="badge-texto">Miembro desde {new Date(usuario?.creado || Date.now()).toLocaleDateString('es-UY', { month: 'long', year: 'numeric' })}</span>
+          <span className="badge-texto">{guardianes.length} guardian{guardianes.length !== 1 ? 'es' : ''} te eligieron</span>
         </div>
       </div>
-
-      <div className="info-box">
-        <h3>¿Cómo funciona Mi Magia?</h3>
-        <div className="info-grid">
-          <div><span>☘</span><h4>Tréboles</h4><p>Se ganan comprando ({usuario?.moneda === 'UYU' ? '$400 UYU' : '$10 USD'} = 1). Canjealos por descuentos, envíos gratis, regalos.</p></div>
-          <div><span>ᚱ</span><h4>Runas</h4><p>Se compran o ganan. Para experiencias mágicas personalizadas.</p></div>
-          <div><span>▣</span><h4>Grimorio</h4><p>Tus lecturas guardadas para siempre + tu diario espiritual.</p></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-// MIS CANALIZACIONES (antes Santuario)
-// ═══════════════════════════════════════════════════════════════
-
-function Canalizaciones({ usuario }) {
-  const [tab, setTab] = useState('guardianes');
-  const [canalizacionAbierta, setCanalizacionAbierta] = useState(null);
-
-  const guardianes = usuario?.guardianes || [];
-  const talismanes = usuario?.talismanes || [];
-  const libros = usuario?.libros || [];
-  const lecturas = usuario?.lecturas || [];
-  const regalosHechos = usuario?.regalosHechos || [];
-  const regalosRecibidos = usuario?.regalosRecibidos || [];
-
-  // Buscar canalización para un guardián
-  const getCanalizacion = (guardian) => {
-    return lecturas.find(l => l.guardianId === guardian.id || l.ordenId === guardian.ordenId);
-  };
-
-  // Estado de canalización
-  const getEstadoCana = (cana) => {
-    if (!cana) return { texto: 'Pendiente', color: '#888', icono: '⏳' };
-    if (cana.estado === 'enviada') return { texto: 'Lista', color: '#2ecc71', icono: '✓' };
-    if (cana.estado === 'aprobada') return { texto: 'En camino', color: '#d4af37', icono: '✦' };
-    return { texto: 'Procesando', color: '#3498db', icono: '◈' };
-  };
-
-  return (
-    <div className="sec">
-      <div className="sec-head"><h1>Mis Canalizaciones</h1><p>Todo lo que ha llegado a tu vida desde el mundo elemental.</p></div>
 
       <div className="tabs-h">
         {[['guardianes','◆','Guardianes'],['talismanes','✧','Talismanes'],['libros','📖','Libros'],['lecturas','✦','Lecturas'],['regalosH','❤↗','Regalos Hechos'],['regalosR','❤↙','Regalos Recibidos']].map(([k,i,t]) =>
