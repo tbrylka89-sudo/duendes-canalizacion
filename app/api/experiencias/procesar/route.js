@@ -365,7 +365,13 @@ RECORDÁ: Mínimo 2000 palabras. Esta canalización es un documento completo y v
 async function enviarEmailLecturaLista(resend, solicitud, contenido) {
   const pronombre = solicitud.pronombre || 'ella';
   const saludo = pronombre === 'ella' ? 'Querida' : pronombre === 'él' ? 'Querido' : 'Queride';
-  
+
+  // Obtener token del usuario
+  const elegido = await kv.get(`elegido:${solicitud.email}`);
+  const linkMiMagia = elegido?.token
+    ? `https://duendes-vercel.vercel.app/mi-magia?token=${elegido.token}`
+    : 'https://duendes-vercel.vercel.app/mi-magia';
+
   try {
     await resend.emails.send({
       from: 'Duendes del Uruguay <magia@duendesdeluruguay.com>',
@@ -389,13 +395,13 @@ async function enviarEmailLecturaLista(resend, solicitud, contenido) {
             <h1>✨ ${solicitud.nombre}</h1>
             <p>${saludo} ${solicitud.nombreUsuario},</p>
             <p>Tu lectura ha sido canalizada y está lista para vos.</p>
-            
+
             <div class="contenido">${contenido}</div>
-            
+
             <p style="text-align: center;">
-              <a href="https://duendes-vercel.vercel.app/mi-magia" class="btn">Ver en Mi Magia</a>
+              <a href="${linkMiMagia}" class="btn">Ver en Mi Magia</a>
             </p>
-            
+
             <div class="footer">
               <p>Con amor mágico,<br>Duendes del Uruguay</p>
               <p>Este mensaje fue canalizado especialmente para vos.</p>

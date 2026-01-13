@@ -27,15 +27,29 @@ export async function GET(request) {
     }
     
     // Buscar token en KV
-    const tokenData = await kv.get(`token:${token}`);
-    
+    let tokenData = await kv.get(`token:${token}`);
+
+    // Si no existe en token:${token}, buscar en elegidos (tokens antiguos)
     if (!tokenData || !tokenData.email) {
-      return Response.json({ 
-        success: false, 
-        error: 'Token inválido o expirado' 
+      const keys = await kv.keys('elegido:*');
+      for (const key of keys) {
+        const elegido = await kv.get(key);
+        if (elegido?.token === token) {
+          tokenData = { email: elegido.email, nombre: elegido.nombre };
+          // Crear la key token:${token} para futuras búsquedas
+          await kv.set(`token:${token}`, tokenData, { ex: 365 * 24 * 60 * 60 });
+          break;
+        }
+      }
+    }
+
+    if (!tokenData || !tokenData.email) {
+      return Response.json({
+        success: false,
+        error: 'Token inválido o expirado'
       }, { status: 401, headers: CORS_HEADERS });
     }
-    
+
     const email = tokenData.email.toLowerCase();
     
     // Cargar datos del elegido

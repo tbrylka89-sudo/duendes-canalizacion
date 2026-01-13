@@ -89,9 +89,18 @@ export async function POST(request) {
     }
     
     // ═══════════════════════════════════════════════════════════
+    // GENERAR TOKEN DE ACCESO SI NO EXISTE (necesario para emails)
+    // ═══════════════════════════════════════════════════════════
+
+    if (!elegido.token) {
+      elegido.token = generarToken();
+      await kv.set(`token:${elegido.token}`, { email, nombre }, { ex: 365 * 24 * 60 * 60 });
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // PROCESAR RUNAS DE PODER
     // ═══════════════════════════════════════════════════════════
-    
+
     if (runasCompradas.length > 0) {
       const totalRunas = runasCompradas.reduce((sum, r) => sum + r.cantidad, 0);
       elegido.runas = (elegido.runas || 0) + totalRunas;
@@ -99,7 +108,7 @@ export async function POST(request) {
       console.log(`Agregadas ${totalRunas} Runas de Poder a ${email}`);
       
       // Enviar email confirmando runas
-      await enviarEmailRunas(resend, email, nombre, totalRunas, elegido.runas);
+      await enviarEmailRunas(resend, email, nombre, totalRunas, elegido.runas, elegido.token);
     }
     
     // ═══════════════════════════════════════════════════════════
@@ -133,7 +142,7 @@ export async function POST(request) {
         console.log(`Membresía ${membresia.sku} activada para ${email} hasta ${nuevaExpiracion}`);
         
         // Enviar email de bienvenida al Círculo
-        await enviarEmailCirculo(resend, email, nombre, membresia.sku, nuevaExpiracion);
+        await enviarEmailCirculo(resend, email, nombre, membresia.sku, nuevaExpiracion, elegido.token);
       }
     }
     
@@ -159,12 +168,6 @@ export async function POST(request) {
       for (const guardian of guardianes) {
         await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion, ordenId);
         await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
-      }
-
-      // Generar token de acceso antes del email si no existe
-      if (!elegido.token) {
-        elegido.token = generarToken();
-        await kv.set(`token:${elegido.token}`, { email, nombre }, { ex: 365 * 24 * 60 * 60 });
       }
 
       // Enviar email de compra confirmada (ahora incluye QR y link con token)
@@ -209,12 +212,6 @@ export async function POST(request) {
     elegido.ultimaCompra = new Date().toISOString();
     elegido.ordenes = [...(elegido.ordenes || []), ordenId];
     elegido.nivel = calcularNivel(elegido.totalCompras);
-    
-    // Generar token de acceso si no existe
-    if (!elegido.token) {
-      elegido.token = generarToken();
-      await kv.set(`token:${elegido.token}`, { email, nombre }, { ex: 365 * 24 * 60 * 60 });
-    }
     
     // Guardar elegido actualizado
     await kv.set(`elegido:${email}`, elegido);
@@ -472,7 +469,11 @@ async function generarTarjetaQR(kv, ordenId, email, nombreCliente, guardian) {
 // EMAILS
 // ═══════════════════════════════════════════════════════════════
 
-async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRunas) {
+async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRunas, token) {
+  const linkMiMagia = token
+    ? `https://duendes-vercel.vercel.app/mi-magia?token=${token}`
+    : 'https://duendes-vercel.vercel.app/mi-magia';
+
   try {
     await resend.emails.send({
       from: 'Duendes del Uruguay <magia@duendesdeluruguay.com>',
@@ -486,7 +487,7 @@ async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRuna
             <p>Se agregaron <strong style="color: #d4af37;">${runasAgregadas} Runas de Poder</strong> a tu cuenta.</p>
             <p>Ahora tenés un total de <strong style="color: #d4af37;">${totalRunas} Runas</strong> para usar en experiencias mágicas.</p>
             <p style="text-align: center; margin-top: 30px;">
-              <a href="https://duendes-vercel.vercel.app/mi-magia" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Ir a Mi Magia</a>
+              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Ir a Mi Magia</a>
             </p>
           </div>
         </div>
@@ -497,9 +498,12 @@ async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRuna
   }
 }
 
-async function enviarEmailCirculo(resend, email, nombre, plan, expira) {
+async function enviarEmailCirculo(resend, email, nombre, plan, expira, token) {
   const fechaExpira = new Date(expira).toLocaleDateString('es-UY');
-  
+  const linkMiMagia = token
+    ? `https://duendes-vercel.vercel.app/mi-magia?token=${token}`
+    : 'https://duendes-vercel.vercel.app/mi-magia';
+
   try {
     await resend.emails.send({
       from: 'Duendes del Uruguay <magia@duendesdeluruguay.com>',
@@ -519,7 +523,7 @@ async function enviarEmailCirculo(resend, email, nombre, plan, expira) {
               <li>Tiradas de runas gratis cada mes</li>
             </ul>
             <p style="text-align: center; margin-top: 30px;">
-              <a href="https://duendes-vercel.vercel.app/mi-magia" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Entrar al Círculo</a>
+              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Entrar al Círculo</a>
             </p>
           </div>
         </div>
