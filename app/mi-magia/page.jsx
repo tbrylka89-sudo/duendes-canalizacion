@@ -914,6 +914,17 @@ function Inicio({ usuario, ir }) {
       {/* SEÑAL DEL DÍA */}
       <SenalDelDia usuario={usuario} />
 
+      {/* ══════ TEST DEL GUARDIÁN - EMBEBIDO EN INICIO ══════ */}
+      <div className="test-guardian-inicio-wrapper">
+        <TestGuardian
+          usuario={usuario}
+          onComplete={(resultado) => {
+            // Recargar usuario con nuevo testGuardian
+            window.location.reload();
+          }}
+        />
+      </div>
+
       {/* STATS CON SIGNIFICADO */}
       <div className="stats-g">
         <div className="stat-c" onClick={() => ir('canalizaciones')}><div className="stat-n">{(usuario?.guardianes?.length || 0) + (usuario?.lecturas?.length || 0)}</div><div className="stat-t">Conexiones</div></div>
@@ -5082,6 +5093,10 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .banner-neuro .banner-glow{position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(212,175,55,0.1) 0%,transparent 60%);pointer-events:none}
 .hero-title{font-family:'Cinzel',serif;font-size:2rem!important;color:#fff;margin-bottom:0.75rem}
 .hero-validation{color:#d4af37!important;font-size:1.05rem;font-style:italic}
+
+/* TEST GUARDIAN EN INICIO */
+.test-guardian-inicio-wrapper{margin:2rem 0;background:linear-gradient(135deg,#faf8f5,#fff);border-radius:20px;padding:0;overflow:hidden;border:1px solid rgba(212,175,55,0.2)}
+.test-guardian-inicio-wrapper .test-guardian-container{background:transparent!important;box-shadow:none!important;border:none!important}
 
 /* CATEGORÍAS POR DOLOR */
 .dolor-section{margin:2rem 0}
