@@ -157,7 +157,7 @@ export async function POST(request) {
 
       // Generar guía de canalización y tarjeta QR para cada guardián
       for (const guardian of guardianes) {
-        await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion);
+        await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion, ordenId);
         await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
       }
 
@@ -268,56 +268,35 @@ function generarToken() {
   return `mm_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 12)}`;
 }
 
-async function programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion = {}) {
-  // Crear solicitud de canalización programada para 4 horas
-  const solicitudId = `can_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+async function programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion = {}, ordenId) {
+  // Llamar a la API de canalizaciones para generar inmediatamente
+  // La canalización quedará pendiente de aprobación en el panel admin
 
-  const fechaEntrega = new Date();
-  fechaEntrega.setHours(fechaEntrega.getHours() + 4);
+  try {
+    const nombreCliente = elegido.nombrePreferido || elegido.nombre;
 
-  // Verificar horario nocturno
-  const horaEntrega = fechaEntrega.getHours();
-  if (horaEntrega >= 22 || horaEntrega < 6) {
-    fechaEntrega.setDate(fechaEntrega.getDate() + (horaEntrega >= 22 ? 1 : 0));
-    fechaEntrega.setHours(6, 30, 0, 0);
+    const response = await fetch('https://duendes-vercel.vercel.app/api/admin/canalizaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ordenId,
+        email,
+        nombreCliente,
+        guardian,
+        datosCheckout: datosCanalizacion
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log(`Canalización generada para ${guardian.nombre} - pendiente de aprobación`);
+    } else {
+      console.error('Error generando canalización:', result.error);
+    }
+  } catch (error) {
+    console.error('Error llamando API de canalizaciones:', error);
   }
-
-  // Determinar el nombre del destinatario
-  let nombreDestinatario = elegido.nombrePreferido || elegido.nombre;
-  if (datosCanalizacion.para_quien === 'regalo' || datosCanalizacion.para_quien === 'sorpresa') {
-    nombreDestinatario = datosCanalizacion.nombre_destinatario || nombreDestinatario;
-  }
-
-  const solicitud = {
-    id: solicitudId,
-    tipo: 'canalizacion-guardian',
-    email,
-    guardian,
-    // Datos del destinatario
-    nombreUsuario: nombreDestinatario,
-    pronombre: datosCanalizacion.pronombre || elegido.pronombre || 'ella',
-    // Datos del formulario de checkout
-    paraQuien: datosCanalizacion.para_quien || 'para_mi',
-    esNino: datosCanalizacion.es_nino || 'adulto',
-    contexto: datosCanalizacion.contexto || '',
-    fechaNacimiento: datosCanalizacion.fecha_nacimiento || '',
-    esSorpresa: datosCanalizacion.para_quien === 'sorpresa',
-    esRegalo: datosCanalizacion.para_quien === 'regalo' || datosCanalizacion.para_quien === 'sorpresa',
-    // Datos de entrega
-    fechaEntrega: fechaEntrega.toISOString(),
-    estado: 'pendiente',
-    // Para tracking
-    numeroCompra: (elegido.guardianes?.length || 0) + 1
-  };
-
-  await kv.set(`solicitud:${solicitudId}`, solicitud);
-
-  // Agregar a cola
-  const cola = await kv.get('cola:experiencias') || [];
-  cola.push(solicitudId);
-  await kv.set('cola:experiencias', cola);
-
-  console.log(`Canalización programada: ${guardian.nombre} para ${nombreDestinatario} (${datosCanalizacion.es_nino || 'adulto'})`);
 }
 
 async function programarEmailsConversion(kv, email, nombre, fechaExpira) {
