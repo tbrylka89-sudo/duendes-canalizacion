@@ -281,6 +281,9 @@ async function programarCanalizacion(kv, email, guardian, elegido, datosCanaliza
   try {
     const nombreCliente = elegido.nombrePreferido || elegido.nombre;
 
+    // Auto-traducir campos de texto si están en otro idioma
+    const datosTraducidos = await traducirDatosCanalizacion(datosCanalizacion);
+
     const response = await fetch('https://duendes-vercel.vercel.app/api/admin/canalizaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -289,7 +292,7 @@ async function programarCanalizacion(kv, email, guardian, elegido, datosCanaliza
         email,
         nombreCliente,
         guardian,
-        datosCheckout: datosCanalizacion
+        datosCheckout: datosTraducidos
       })
     });
 
@@ -302,6 +305,97 @@ async function programarCanalizacion(kv, email, guardian, elegido, datosCanaliza
     }
   } catch (error) {
     console.error('Error llamando API de canalizaciones:', error);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTO-TRADUCCIÓN DE CAMPOS
+// ═══════════════════════════════════════════════════════════════
+
+async function traducirDatosCanalizacion(datos) {
+  if (!datos || Object.keys(datos).length === 0) return datos;
+
+  const camposATraducir = ['porque_eligio', 'que_espera', 'contexto'];
+  const textosParaAnalizar = [];
+
+  // Recolectar textos no vacíos
+  for (const campo of camposATraducir) {
+    if (datos[campo] && datos[campo].trim().length > 10) {
+      textosParaAnalizar.push({ campo, texto: datos[campo] });
+    }
+  }
+
+  if (textosParaAnalizar.length === 0) return datos;
+
+  // Combinar textos para un solo análisis
+  const textoCombinado = textosParaAnalizar.map(t => t.texto).join('\n---\n');
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      messages: [{
+        role: 'user',
+        content: `Analiza el siguiente texto y responde en JSON:
+
+1. ¿Está escrito principalmente en español? (true/false)
+2. Si NO está en español, ¿en qué idioma está?
+3. Si NO está en español, tradúcelo al español manteniendo la emoción y el sentido
+
+Texto a analizar:
+${textoCombinado}
+
+Responde SOLO con JSON válido en este formato exacto:
+{
+  "esEspanol": true/false,
+  "idiomaOriginal": "nombre del idioma" o null si es español,
+  "textoTraducido": "texto traducido" o null si ya es español
+}`
+      }]
+    });
+
+    const respuestaTexto = response.content[0].text;
+
+    // Extraer JSON de la respuesta
+    const jsonMatch = respuestaTexto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return datos;
+
+    const analisis = JSON.parse(jsonMatch[0]);
+
+    // Si está en español, devolver datos originales
+    if (analisis.esEspanol) return datos;
+
+    // Si no está en español, agregar traducciones
+    const datosConTraduccion = { ...datos };
+
+    // Si hay traducción, procesar
+    if (analisis.textoTraducido && analisis.idiomaOriginal) {
+      const traducciones = analisis.textoTraducido.split('\n---\n');
+
+      for (let i = 0; i < textosParaAnalizar.length; i++) {
+        const { campo, texto } = textosParaAnalizar[i];
+        const traduccion = traducciones[i] || analisis.textoTraducido;
+
+        // Guardar original y agregar traducción con nota
+        datosConTraduccion[`${campo}_original`] = texto;
+        datosConTraduccion[`${campo}_idioma`] = analisis.idiomaOriginal;
+        datosConTraduccion[campo] = traduccion;
+      }
+
+      // Agregar nota de traducción
+      datosConTraduccion._traducido_desde = analisis.idiomaOriginal;
+      datosConTraduccion._nota_traduccion = `📝 Traducción automática desde ${analisis.idiomaOriginal}. Los textos originales se conservan.`;
+
+      console.log(`Texto traducido desde ${analisis.idiomaOriginal}`);
+    }
+
+    return datosConTraduccion;
+
+  } catch (error) {
+    console.error('Error en traducción automática:', error);
+    return datos; // En caso de error, devolver datos originales
   }
 }
 

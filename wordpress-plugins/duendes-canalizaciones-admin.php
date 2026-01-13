@@ -500,11 +500,19 @@ function duendes_canalizaciones_page() {
                     'pequeno': 'Pequeño/a'
                 };
 
+                // Badge de traducción si aplica
+                const traduccionBadge = canal.datosCheckout?._traducido_desde
+                    ? `<span style="background: #9b59b6; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; margin-left: 10px;">🌐 Traducido desde ${canal.datosCheckout._traducido_desde}</span>`
+                    : '';
+
                 const checkoutInfo = canal.datosCheckout ? `
                     <div class="canal-checkout-info">
-                        <strong>${paraQuienLabels[canal.datosCheckout.paraQuien] || 'Para sí misma'}</strong>
-                        ${canal.datosCheckout.esNino !== 'adulto' ? ` • ${edadLabels[canal.datosCheckout.esNino] || ''}` : ''}
-                        ${canal.datosCheckout.contexto ? ` • "${canal.datosCheckout.contexto.substring(0, 50)}..."` : ''}
+                        <strong>${paraQuienLabels[canal.datosCheckout.para_quien] || paraQuienLabels[canal.datosCheckout.paraQuien] || 'Para sí misma'}</strong>
+                        ${traduccionBadge}
+                        ${canal.datosCheckout.edad && canal.datosCheckout.edad !== 'adulto' ? ` • ${edadLabels[canal.datosCheckout.edad] || ''}` : ''}
+                        ${canal.datosCheckout.porque_eligio ? `<br><span style="color:#666;">🌙 Por qué eligió: "${canal.datosCheckout.porque_eligio.substring(0, 80)}..."</span>` : ''}
+                        ${canal.datosCheckout.que_espera ? `<br><span style="color:#666;">💫 Espera: "${canal.datosCheckout.que_espera.substring(0, 80)}..."</span>` : ''}
+                        ${canal.datosCheckout.contexto ? `<br><span style="color:#666;">✍️ Contexto: "${canal.datosCheckout.contexto.substring(0, 80)}..."</span>` : ''}
                     </div>
                 ` : '';
 

@@ -915,6 +915,70 @@ function Inicio({ usuario, ir }) {
         <span className="promo-arrow">→</span>
       </div>
 
+      {/* LOS ELEGIDOS - Narrativa */}
+      <div className="elegidos-section">
+        <div className="elegidos-header">
+          <span className="elegidos-runa">ᛉ</span>
+          <h3>Sos una de Los Elegidos</h3>
+          <p className="elegidos-sub">Tu frecuencia vibratoria fue reconocida por un guardián</p>
+        </div>
+
+        <div className="elegidos-narrativa">
+          <p className="elegidos-intro">
+            No llegaste acá por casualidad. Los guardianes que habitan en nuestro taller de Piriápolis
+            esperan pacientemente a quienes están listos para recibirlos. Cuando alguien cruza su campo
+            energético — ya sea visitando nuestra web, viendo una foto, o escuchando el nombre de un guardián —
+            algo se activa.
+          </p>
+
+          <div className="elegidos-cita">
+            <span className="cita-marca">"</span>
+            <p>
+              Un guardián no te elige por lo que comprás o lo que pagás.<br/>
+              Te elige porque tu frecuencia vibra en sincronía con la suya.<br/>
+              Es un reconocimiento ancestral. Un reencuentro.
+            </p>
+          </div>
+
+          <div className="elegidos-lore">
+            <div className="lore-item">
+              <span className="lore-num">I</span>
+              <div className="lore-text">
+                <h4>El Reconocimiento</h4>
+                <p>El momento en que ves un guardián y "algo" te detiene. Una sensación inexplicable.
+                   Eso no es azar — es tu guardián reconociéndote.</p>
+              </div>
+            </div>
+            <div className="lore-item">
+              <span className="lore-num">II</span>
+              <div className="lore-text">
+                <h4>El Pacto</h4>
+                <p>Cuando decidís sellar el pacto, no estás comprando un objeto. Estás
+                   aceptando una alianza energética que trasciende lo material.</p>
+              </div>
+            </div>
+            <div className="lore-item">
+              <span className="lore-num">III</span>
+              <div className="lore-text">
+                <h4>La Transformación</h4>
+                <p>Desde ese momento, sos parte de Los Elegidos. Un círculo de almas que
+                   fueron encontradas por sus guardianes en esta vida.</p>
+              </div>
+            </div>
+          </div>
+
+          <p className="elegidos-cierre">
+            Este portal es tu espacio sagrado. Acá encontrarás todo lo que tu guardián quiere compartir contigo:
+            su canalización, sus mensajes, rituales especiales, y conexiones con otros Elegidos.
+          </p>
+        </div>
+
+        <div className="elegidos-badge">
+          <span className="badge-icono">◈</span>
+          <span className="badge-texto">Miembro desde {new Date(usuario?.creado || Date.now()).toLocaleDateString('es-UY', { month: 'long', year: 'numeric' })}</span>
+        </div>
+      </div>
+
       <div className="info-box">
         <h3>¿Cómo funciona Mi Magia?</h3>
         <div className="info-grid">
@@ -4199,6 +4263,32 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .promo-info-box p{color:#666;font-size:0.9rem;margin:0}
 
 @media(max-width:768px){.promos-grid{grid-template-columns:1fr}.banner-promo{flex-direction:column;text-align:center}.promo-arrow{display:none}}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* LOS ELEGIDOS - NARRATIVA LORE */
+/* ═══════════════════════════════════════════════════════════════ */
+.elegidos-section{background:linear-gradient(180deg,#0a0a0a 0%,#1a1510 100%);border-radius:16px;padding:2.5rem;margin-top:2rem;color:#fff;position:relative;overflow:hidden}
+.elegidos-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(198,169,98,0.1) 0%,transparent 70%);pointer-events:none}
+.elegidos-header{text-align:center;margin-bottom:2rem;position:relative;z-index:1}
+.elegidos-runa{display:block;font-size:3rem;color:#d4af37;margin-bottom:1rem;text-shadow:0 0 30px rgba(212,175,55,0.5);animation:runaFloat 4s ease-in-out infinite}
+@keyframes runaFloat{0%,100%{transform:translateY(0);text-shadow:0 0 30px rgba(212,175,55,0.5)}50%{transform:translateY(-8px);text-shadow:0 0 40px rgba(212,175,55,0.7)}}
+.elegidos-header h3{font-family:'Cinzel',serif;font-size:1.5rem;color:#d4af37;margin-bottom:0.5rem;letter-spacing:3px}
+.elegidos-sub{font-size:0.9rem;color:rgba(255,255,255,0.6);font-style:italic}
+.elegidos-narrativa{position:relative;z-index:1}
+.elegidos-intro{color:rgba(255,255,255,0.8);line-height:1.9;margin-bottom:2rem;font-size:1.05rem}
+.elegidos-cita{background:rgba(212,175,55,0.1);border-left:3px solid #d4af37;padding:1.5rem 2rem;margin:2rem 0;position:relative}
+.cita-marca{position:absolute;top:-10px;left:1rem;font-size:4rem;color:#d4af37;opacity:0.3;font-family:'Cinzel',serif;line-height:1}
+.elegidos-cita p{color:#fff;font-style:italic;line-height:1.8;font-size:1.1rem;margin:0}
+.elegidos-lore{display:grid;gap:1.5rem;margin:2rem 0}
+.lore-item{display:flex;gap:1rem;align-items:flex-start;padding:1rem;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(212,175,55,0.2)}
+.lore-num{width:36px;height:36px;background:linear-gradient(135deg,#d4af37,#b8860b);color:#0a0a0a;display:flex;align-items:center;justify-content:center;border-radius:50%;font-family:'Cinzel',serif;font-size:0.9rem;font-weight:600;flex-shrink:0}
+.lore-text h4{font-family:'Cinzel',serif;color:#d4af37;font-size:1rem;margin-bottom:0.5rem;letter-spacing:1px}
+.lore-text p{color:rgba(255,255,255,0.7);font-size:0.95rem;line-height:1.7;margin:0}
+.elegidos-cierre{color:rgba(255,255,255,0.6);font-style:italic;line-height:1.8;margin-top:2rem;text-align:center;border-top:1px solid rgba(212,175,55,0.2);padding-top:1.5rem}
+.elegidos-badge{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:1.5rem;padding:0.75rem;background:rgba(212,175,55,0.15);border-radius:30px}
+.badge-icono{color:#d4af37;font-size:1.2rem}
+.badge-texto{font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:2px;color:rgba(255,255,255,0.8)}
+@media(max-width:768px){.elegidos-section{padding:1.5rem}.elegidos-runa{font-size:2.5rem}.elegidos-header h3{font-size:1.2rem}.elegidos-cita{padding:1rem 1.5rem}.cita-marca{font-size:3rem}.elegidos-cita p{font-size:1rem}.lore-item{flex-direction:column;text-align:center}.lore-num{margin:0 auto}}
 
 /* ═══════════════════════════════════════════════════════════════ */
 /* TARJETAS DE GUARDIANES COMPRADOS */

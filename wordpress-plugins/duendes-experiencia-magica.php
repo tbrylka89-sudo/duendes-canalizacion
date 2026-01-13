@@ -801,7 +801,9 @@ function duendes_render_producto() {
     <?php duendes_styles_base($color); ?>
     <style>
     body { background: #0a0a0a; color: #fff; }
-    .prod-hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; overflow: hidden; }
+    .prod-hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; overflow: hidden; background: <?php echo $cat_config['gradiente']; ?>; }
+    .prod-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, <?php echo $cat_config['color_orbe']; ?> 0%, transparent 60%); pointer-events: none; }
+    .prod-hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 20%, <?php echo $cat_config['color_orbe2']; ?> 0%, transparent 40%); pointer-events: none; }
     .prod-hero-content { position: relative; z-index: 1; padding: 40px; }
     .prod-badge { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 5px; padding: 15px 40px; border: 1px solid <?php echo $color; ?>66; color: <?php echo $color; ?>; margin-bottom: 50px; display: inline-flex; align-items: center; gap: 15px; }
     .prod-nombre { font-family: 'Cinzel', serif; font-size: clamp(60px, 15vw, 140px); font-weight: 400; color: #fff; letter-spacing: 6px; margin-bottom: 25px; text-shadow: 0 0 100px <?php echo $color; ?>33; }
@@ -871,6 +873,61 @@ function duendes_render_producto() {
     .prod-ritual-content ol { text-align: left; max-width: 500px; margin: 40px auto; counter-reset: ritual; list-style: none; }
     .prod-ritual-content li { margin-bottom: 25px; padding-left: 55px; position: relative; counter-increment: ritual; }
     .prod-ritual-content li::before { content: counter(ritual); position: absolute; left: 0; top: 0; width: 32px; height: 32px; background: <?php echo $color; ?>; color: #fff; font-family: 'Cinzel', serif; font-size: 14px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+    /* MENSAJE DEL GUARDIAN */
+    .prod-mensaje { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); padding: 100px 50px; position: relative; overflow: hidden; }
+    .prod-mensaje::before { content: '"'; position: absolute; top: 30px; left: 50%; transform: translateX(-50%); font-size: 200px; color: <?php echo $color; ?>; opacity: 0.1; font-family: 'Cinzel', serif; line-height: 1; }
+    .prod-mensaje-inner { max-width: 800px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+    .prod-mensaje-texto { font-size: 24px; line-height: 1.9; font-style: italic; color: rgba(255,255,255,0.9); margin-bottom: 30px; }
+    .prod-mensaje-firma { color: <?php echo $color; ?>; font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: 3px; }
+
+    /* CUIDADOS - TABS INTERACTIVOS */
+    .prod-cuidados { background: #faf9f7; padding: 100px 50px; }
+    .prod-cuidados-inner { max-width: 1000px; margin: 0 auto; }
+    .prod-cuidados-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; }
+    .prod-cuidado-tab { padding: 12px 28px; background: transparent; border: 1px solid #ddd; border-radius: 30px; font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; color: #666; }
+    .prod-cuidado-tab:hover { border-color: <?php echo $color; ?>; color: <?php echo $color; ?>; }
+    .prod-cuidado-tab.active { background: <?php echo $color; ?>; border-color: <?php echo $color; ?>; color: #000; }
+    .prod-cuidado-content { display: none; animation: fadeIn 0.5s ease; }
+    .prod-cuidado-content.active { display: block; }
+    .prod-cuidado-card { background: #fff; border-radius: 20px; padding: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+    .prod-cuidado-card h4 { font-family: 'Cinzel', serif; font-size: 22px; color: <?php echo $color; ?>; margin-bottom: 20px; }
+    .prod-cuidado-card p { font-size: 17px; line-height: 1.9; color: #555; }
+    .prod-cuidado-tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+    .prod-cuidado-tip { background: #faf9f7; padding: 20px; border-radius: 12px; text-align: center; }
+    .prod-cuidado-tip-icon { font-size: 28px; margin-bottom: 10px; }
+    .prod-cuidado-tip-text { font-size: 14px; color: #666; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* TESTIMONIOS */
+    .prod-testimonios { background: #0a0a0a; padding: 100px 50px; }
+    .prod-testimonios-inner { max-width: 900px; margin: 0 auto; }
+    .prod-testimonios-slider { position: relative; overflow: hidden; min-height: 200px; }
+    .prod-testimonio { display: none; text-align: center; padding: 0 40px; animation: fadeIn 0.5s ease; }
+    .prod-testimonio.active { display: block; }
+    .prod-testimonio-texto { font-size: 20px; line-height: 1.9; font-style: italic; color: rgba(255,255,255,0.85); margin-bottom: 30px; }
+    .prod-testimonio-autor { color: <?php echo $color; ?>; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 2px; }
+    .prod-testimonio-lugar { color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 5px; }
+    .prod-testimonios-dots { display: flex; justify-content: center; gap: 10px; margin-top: 40px; }
+    .prod-testimonios-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s; }
+    .prod-testimonios-dot.active { background: <?php echo $color; ?>; transform: scale(1.2); }
+
+    /* ANIMACIONES DE SCROLL */
+    .prod-mensaje, .prod-cuidados, .prod-testimonios, .prod-faq { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .prod-mensaje.visible, .prod-cuidados.visible, .prod-testimonios.visible, .prod-faq.visible { opacity: 1; transform: translateY(0); }
+
+    /* FAQ ACORDEON */
+    .prod-faq { background: #faf9f7; padding: 100px 50px; }
+    .prod-faq-inner { max-width: 800px; margin: 0 auto; }
+    .prod-faq-item { background: #fff; border-radius: 12px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .prod-faq-pregunta { width: 100%; padding: 25px 30px; background: none; border: none; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #1a1a1a; text-align: left; transition: all 0.3s; }
+    .prod-faq-pregunta:hover { color: <?php echo $color; ?>; }
+    .prod-faq-icon { font-size: 24px; color: <?php echo $color; ?>; transition: transform 0.3s; }
+    .prod-faq-item.open .prod-faq-icon { transform: rotate(45deg); }
+    .prod-faq-respuesta { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.4s ease; }
+    .prod-faq-item.open .prod-faq-respuesta { max-height: 300px; }
+    .prod-faq-respuesta-inner { padding: 0 30px 25px; font-size: 16px; line-height: 1.8; color: #666; }
+
     .prod-cta { background: #0a0a0a; padding: 150px 50px; text-align: center; position: relative; overflow: hidden; }
     .prod-cta-content { position: relative; z-index: 1; }
     .prod-cta-ornament { margin-bottom: 40px; }
@@ -879,8 +936,463 @@ function duendes_render_producto() {
     .prod-cta-btn { display: inline-block; padding: 24px 80px; background: <?php echo $color; ?>; color: #0a0a0a; border: none; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 4px; cursor: pointer; transition: all 0.4s; text-decoration: none; }
     .prod-cta-btn:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 20px 50px <?php echo $color; ?>44; }
     .prod-cta-note { margin-top: 30px; font-size: 15px; color: rgba(255,255,255,0.4); font-style: italic; }
-    @media (max-width: 1024px) { .prod-grid { grid-template-columns: 1fr; gap: 50px; } .prod-gallery { position: relative; top: 0; } .prod-specs-grid { grid-template-columns: 1fr; gap: 40px; } .prod-strengths-grid { grid-template-columns: 1fr; gap: 30px; } }
-    @media (max-width: 768px) { .prod-cream, .prod-dark, .prod-white, .prod-strengths, .prod-ritual, .prod-cta { padding: 80px 25px; } .prod-ritual-card { padding: 50px 30px; } .prod-details-name { font-size: 30px; } .prod-price { font-size: 26px; } .prod-spec-box { padding: 35px 25px; } .prod-dimensions { flex-direction: column; gap: 15px; } }
+
+    @media (max-width: 1024px) {
+        .prod-grid { grid-template-columns: 1fr; gap: 50px; }
+        .prod-gallery { position: relative; top: 0; }
+        .prod-specs-grid { grid-template-columns: 1fr; gap: 40px; }
+        .prod-strengths-grid { grid-template-columns: 1fr; gap: 30px; }
+    }
+
+    @media (max-width: 768px) {
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* HERO MOVIL CON ANIMACIONES AVANZADAS                           */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-hero {
+            min-height: 100svh;
+            padding: 30px 20px 60px;
+        }
+
+        .prod-hero-content {
+            padding: 20px;
+        }
+
+        /* Badge animado con color de categoria */
+        .prod-badge {
+            font-size: 8px;
+            letter-spacing: 3px;
+            padding: 12px 25px;
+            margin-bottom: 35px;
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 currentColor;
+            }
+            50% {
+                box-shadow: 0 0 20px -5px currentColor;
+            }
+        }
+
+        /* Nombre con animacion de entrada y glow */
+        .prod-nombre {
+            font-size: clamp(42px, 12vw, 70px);
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+            animation: nombreEntrada 1.2s ease-out, nombreGlow 4s ease-in-out infinite 1.2s;
+        }
+
+        @keyframes nombreEntrada {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes nombreGlow {
+            0%, 100% {
+                text-shadow: 0 0 30px currentColor;
+            }
+            50% {
+                text-shadow: 0 0 50px currentColor, 0 0 80px currentColor;
+            }
+        }
+
+        /* Tipo con animacion escalonada */
+        .prod-tipo {
+            font-size: 11px;
+            letter-spacing: 3px;
+            animation: tipoEntrada 1s ease-out 0.5s both;
+        }
+
+        @keyframes tipoEntrada {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 0.5;
+                transform: translateY(0);
+            }
+        }
+
+        /* Ornamento con animacion de dibujo */
+        .prod-hero-ornament {
+            margin-top: 40px;
+            animation: ornamentDraw 2s ease-out 0.8s both;
+        }
+
+        @keyframes ornamentDraw {
+            0% {
+                opacity: 0;
+                transform: scaleX(0);
+            }
+            100% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+
+        /* Animaciones de fondo mas sutiles en movil */
+        .prod-hero .anim-monedas .moneda,
+        .prod-hero .anim-corazones .corazon,
+        .prod-hero .anim-hojas .hoja {
+            animation-duration: 6s;
+            opacity: 0.4;
+        }
+
+        .prod-hero .anim-escudo .escudo-central {
+            width: 120px;
+            height: 150px;
+        }
+
+        .prod-hero .anim-constelaciones .constelacion {
+            max-width: 280px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* SECCIONES CON FONDO CREMITA Y VIDA                             */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-cream {
+            padding: 60px 20px;
+            background: linear-gradient(180deg,
+                #FAF8F5 0%,
+                #FDF9F3 40%,
+                #F8F3EB 70%,
+                #FAF8F5 100%
+            );
+            position: relative;
+        }
+
+        .prod-cream::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 30%, rgba(198,169,98,0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .prod-dark, .prod-white, .prod-strengths, .prod-ritual, .prod-cta {
+            padding: 70px 20px;
+        }
+
+        .prod-ritual-card {
+            padding: 40px 25px;
+        }
+
+        .prod-details-name {
+            font-size: 28px;
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        @keyframes slideInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .prod-price {
+            font-size: 24px;
+        }
+
+        .prod-spec-box {
+            padding: 30px 20px;
+        }
+
+        .prod-dimensions {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* GALERIA MOVIL CON EFECTO SWIPE                                  */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-gallery {
+            margin-bottom: 30px;
+        }
+
+        .prod-main-img {
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            animation: imgZoom 0.8s ease-out;
+        }
+
+        @keyframes imgZoom {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .prod-thumbs {
+            gap: 8px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .prod-thumb {
+            width: 60px;
+            height: 75px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* BOTON SELLAR PACTO CON ANIMACION                               */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-btn {
+            padding: 20px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prod-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            animation: btnShine 3s ease-in-out infinite;
+        }
+
+        @keyframes btnShine {
+            0%, 100% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* TRUST BADGES EN MOVIL                                          */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-trust {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prod-trust-item {
+            justify-content: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* HISTORIA CON ANIMACION DE SCROLL                               */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-dark .prod-section-inner {
+            padding: 0 10px;
+        }
+
+        .prod-section-title {
+            font-size: clamp(24px, 6vw, 32px);
+            margin-bottom: 35px;
+        }
+
+        .prod-historia {
+            font-size: 17px;
+            line-height: 1.9;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* FORTALEZAS GRID MEJORADO                                       */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-strengths {
+            background: linear-gradient(180deg, #F8F6F2 0%, #FAF8F5 100%);
+        }
+
+        .prod-strengths-grid {
+            gap: 20px;
+        }
+
+        .prod-strength {
+            padding: 35px 20px;
+            border-radius: 12px;
+        }
+
+        .prod-strength-title {
+            font-size: 16px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* QUE INCLUYE - ITEMS MEJORADOS                                  */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-incluye-item {
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
+        .prod-incluye-item-title {
+            font-size: 14px;
+        }
+
+        .prod-incluye-item-desc {
+            font-size: 13px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* MENSAJES Y SECCIONES INTERACTIVAS                              */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-mensaje {
+            padding: 70px 20px;
+        }
+
+        .prod-mensaje-texto {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .prod-cuidados-tabs {
+            gap: 8px;
+        }
+
+        .prod-cuidado-tab {
+            padding: 10px 18px;
+            font-size: 11px;
+        }
+
+        .prod-cuidado-card {
+            padding: 30px 20px;
+        }
+
+        .prod-cuidado-card h4 {
+            font-size: 18px;
+        }
+
+        .prod-cuidado-card p {
+            font-size: 15px;
+        }
+
+        .prod-cuidado-tips {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .prod-cuidado-tip {
+            padding: 15px 10px;
+        }
+
+        .prod-cuidado-tip-icon {
+            font-size: 22px;
+        }
+
+        .prod-cuidado-tip-text {
+            font-size: 11px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* FAQ MOVIL                                                       */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-faq {
+            padding: 70px 20px;
+        }
+
+        .prod-faq-pregunta {
+            padding: 20px;
+            font-size: 16px;
+        }
+
+        .prod-faq-respuesta-inner {
+            padding: 0 20px 20px;
+            font-size: 15px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* CTA FINAL MOVIL                                                 */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-cta-name {
+            font-size: clamp(28px, 8vw, 40px);
+        }
+
+        .prod-cta-price {
+            font-size: 28px;
+        }
+
+        .prod-cta-btn {
+            padding: 20px 50px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* TESTIMONIOS MOVIL                                               */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .prod-testimonios {
+            padding: 70px 20px;
+        }
+
+        .prod-testimonio {
+            padding: 0 10px;
+        }
+
+        .prod-testimonio-texto {
+            font-size: 17px;
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════ */
+    /* EXTRA PEQUENO                                                   */
+    /* ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 380px) {
+        .prod-nombre {
+            font-size: 36px;
+        }
+
+        .prod-badge {
+            font-size: 7px;
+            padding: 10px 20px;
+        }
+
+        .prod-details-name {
+            font-size: 24px;
+        }
+
+        .prod-price {
+            font-size: 22px;
+        }
+
+        .prod-cuidado-tips {
+            grid-template-columns: 1fr;
+        }
+    }
     </style>
 </head>
 <body>
@@ -960,10 +1472,18 @@ function duendes_render_producto() {
             <div class="prod-spec-header"><?php echo duendes_icon('package'); ?><h3>QUE INCLUYE TU PACTO</h3></div>
             <div class="prod-spec-content">
                 <div class="prod-incluye-item"><?php echo duendes_icon('wand', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title"><?php echo esc_html($tipo_config['nombre']); ?> <?php echo esc_html($nombre); ?></div><div class="prod-incluye-item-desc">Pieza unica canalizada en Piriapolis</div></div></div>
-                <div class="prod-incluye-item"><?php echo duendes_icon('certificate', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Certificado de Autenticidad</div><div class="prod-incluye-item-desc">Con codigo QR unico verificable</div></div></div>
-                <div class="prod-incluye-item"><?php echo duendes_icon('scroll', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Guia del Ritual de Bienvenida</div><div class="prod-incluye-item-desc">Como recibir<?php echo $lo_la; ?> en tu hogar</div></div></div>
+
+                <div class="prod-incluye-item"><?php echo duendes_icon('scroll', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Canalizacion Personalizada</div><div class="prod-incluye-item-desc">Estudio completo de tu guardian: su historia, origen, mensaje personal para vos y guia de cuidados</div></div></div>
+
+                <div class="prod-incluye-item"><?php echo duendes_icon('portal', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Acceso a "Mi Magia"</div><div class="prod-incluye-item-desc">Portal exclusivo donde veras la canalizacion completa, el mensaje que <?php echo esc_html($nombre); ?> tiene para vos, y experiencias magicas</div></div></div>
+
+                <div class="prod-incluye-item prod-incluye-highlight"><?php echo duendes_icon('star', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Seras una Elegida</div><div class="prod-incluye-item-desc">Entras al circulo de personas cuya frecuencia vibratoria fue reconocida por un guardian. No es casualidad que estes aca.</div></div></div>
+
+                <div class="prod-incluye-item"><?php echo duendes_icon('moon', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">15 dias de El Circulo gratis</div><div class="prod-incluye-item-desc">Acceso a lecturas del alma, contenido exclusivo semanal, tiradas de runas y mas</div></div></div>
+
+                <div class="prod-incluye-item"><?php echo duendes_icon('certificate', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Certificado de Autenticidad</div><div class="prod-incluye-item-desc">Con codigo QR unico que verifica que tu guardian es autentico y te da acceso a todo</div></div></div>
+
                 <?php if ($piedras && is_array($piedras) && count($piedras) > 0): ?><div class="prod-incluye-item"><?php echo duendes_icon('crystal', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Cristales Energeticos</div><div class="prod-incluye-item-desc"><?php echo esc_html(implode(', ', $piedras)); ?></div></div></div><?php endif; ?>
-                <div class="prod-incluye-item"><?php echo duendes_icon('portal', 24); ?><div class="prod-incluye-item-text"><div class="prod-incluye-item-title">Acceso al Portal del Guardian</div><div class="prod-incluye-item-desc">Comunidad exclusiva de elegidas</div></div></div>
             </div>
         </div>
     </div>
@@ -1004,6 +1524,176 @@ function duendes_render_producto() {
     </div>
 </section>
 
+<!-- MENSAJE DEL GUARDIAN -->
+<section class="prod-mensaje">
+    <div class="prod-mensaje-inner">
+        <p class="prod-section-label" style="color: <?php echo $color; ?>;"><?php echo duendes_ornament('star-small', $color); ?> SU MENSAJE PARA VOS <?php echo duendes_ornament('star-small', $color); ?></p>
+        <p class="prod-mensaje-texto">
+            <?php
+            $mensajes_default = [
+                'proteccion' => 'No vine a protegerte de todo. Vine a recordarte que ya tenés la fuerza. Solo necesitabas a alguien que te lo susurre cada día.',
+                'amor' => 'El amor que buscás afuera siempre estuvo adentro. Yo solo vine a hacerte compañía mientras lo recordás.',
+                'dinero-abundancia-negocios' => 'La abundancia no es tener más. Es saber que ya tenés suficiente. Dejame mostrarte todo lo que ya sos.',
+                'salud' => 'Tu cuerpo sabe sanarse. Tu alma sabe equilibrarse. Yo estoy acá para recordártelo cuando lo olvides.',
+                'sabiduria-guia-claridad' => 'Las respuestas que buscás ya las sabés. Solo necesitabas silencio para escucharlas. Yo te ayudo a hacer silencio.',
+            ];
+            $mensaje_cat = '';
+            foreach ($mensajes_default as $key => $msg) {
+                if (strpos($categoria_slug, $key) !== false || strpos($key, $categoria_slug) !== false) {
+                    $mensaje_cat = $msg;
+                    break;
+                }
+            }
+            echo esc_html($mensaje_cat ?: 'Te esperé mucho tiempo. Ahora que me encontraste, vamos a caminar juntos.');
+            ?>
+        </p>
+        <p class="prod-mensaje-firma">— <?php echo esc_html($nombre); ?></p>
+    </div>
+</section>
+
+<!-- CUIDADOS INTERACTIVOS -->
+<section class="prod-cuidados">
+    <div class="prod-cuidados-inner">
+        <p class="prod-section-label" style="color: <?php echo $color; ?>;"><?php echo duendes_ornament('star-small', $color); ?> CUIDADOS <?php echo duendes_ornament('star-small', $color); ?></p>
+        <h2 class="prod-section-title" style="color: #1a1a1a;">Como Cuidar a <?php echo esc_html($nombre); ?></h2>
+
+        <div class="prod-cuidados-tabs">
+            <button class="prod-cuidado-tab active" onclick="showCuidado('ubicacion')">UBICACION</button>
+            <button class="prod-cuidado-tab" onclick="showCuidado('limpieza')">LIMPIEZA</button>
+            <button class="prod-cuidado-tab" onclick="showCuidado('energia')">ENERGIA</button>
+            <button class="prod-cuidado-tab" onclick="showCuidado('fechas')">FECHAS ESPECIALES</button>
+        </div>
+
+        <div id="cuidado-ubicacion" class="prod-cuidado-content active">
+            <div class="prod-cuidado-card">
+                <h4>Donde Ubicar<?php echo $lo_la; ?></h4>
+                <p>Los guardianes prefieren lugares donde puedan observar. Un estante alto, una repisa cerca de la entrada, o junto a una ventana son ideales. Evita lugares muy transitados o cerca de aparatos electronicos que emiten mucha radiacion.</p>
+                <div class="prod-cuidado-tips">
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🪟</div><div class="prod-cuidado-tip-text">Cerca de luz natural</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🌿</div><div class="prod-cuidado-tip-text">Junto a plantas</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🚫</div><div class="prod-cuidado-tip-text">Lejos de TV/WiFi</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cuidado-limpieza" class="prod-cuidado-content">
+            <div class="prod-cuidado-card">
+                <h4>Limpieza Fisica</h4>
+                <p>Una vez al mes, pasa un paño suave y seco. Si hay polvo acumulado, usa un pincel de cerdas suaves. Nunca uses agua ni productos quimicos. Los guardianes son delicados y su material absorbe las energias.</p>
+                <div class="prod-cuidado-tips">
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🪶</div><div class="prod-cuidado-tip-text">Pincel suave</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">💨</div><div class="prod-cuidado-tip-text">Aire comprimido</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🧴</div><div class="prod-cuidado-tip-text">Sin quimicos</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cuidado-energia" class="prod-cuidado-content">
+            <div class="prod-cuidado-card">
+                <h4>Limpieza Energetica</h4>
+                <p>Cada luna llena, pasa humo de sahumerio o palo santo alrededor de <?php echo esc_html($nombre); ?>. Tambien podes dejarlo una noche bajo la luz de la luna. Si sentis que su energia esta densa, colocale un cuarzo cristal cerca por 24 horas.</p>
+                <div class="prod-cuidado-tips">
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🌙</div><div class="prod-cuidado-tip-text">Luz de luna</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🪔</div><div class="prod-cuidado-tip-text">Sahumerio</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">💎</div><div class="prod-cuidado-tip-text">Cuarzo cristal</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cuidado-fechas" class="prod-cuidado-content">
+            <div class="prod-cuidado-card">
+                <h4>Fechas Especiales</h4>
+                <p>Los guardianes se activan especialmente en los equinoccios y solsticios. En esas fechas, dedica unos minutos a conectar con <?php echo esc_html($nombre); ?>. Tambien el aniversario de su llegada a tu hogar es un momento poderoso para renovar el pacto.</p>
+                <div class="prod-cuidado-tips">
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🌸</div><div class="prod-cuidado-tip-text">21 Mar - Equinoccio</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">☀️</div><div class="prod-cuidado-tip-text">21 Jun - Solsticio</div></div>
+                    <div class="prod-cuidado-tip"><div class="prod-cuidado-tip-icon">🎂</div><div class="prod-cuidado-tip-text">Aniversario</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="prod-testimonios">
+    <div class="prod-testimonios-inner">
+        <p class="prod-section-label" style="color: <?php echo $color; ?>;"><?php echo duendes_ornament('star-small', $color); ?> LO QUE DICEN LAS ELEGIDAS <?php echo duendes_ornament('star-small', $color); ?></p>
+        <h2 class="prod-section-title">Experiencias Reales</h2>
+
+        <div class="prod-testimonios-slider">
+            <div class="prod-testimonio active">
+                <p class="prod-testimonio-texto">"Desde que llego mi guardian, la energia de mi casa cambio completamente. No es algo que pueda explicar, simplemente se siente diferente. Mas calma, mas armonia."</p>
+                <p class="prod-testimonio-autor">MARIA ELENA</p>
+                <p class="prod-testimonio-lugar">Montevideo, Uruguay</p>
+            </div>
+            <div class="prod-testimonio">
+                <p class="prod-testimonio-texto">"Lo compre esceptica, lo admito. Pero hay algo en la forma que me mira desde su estante... suena loco, pero siento que me cuida. Ya no duermo con miedo."</p>
+                <p class="prod-testimonio-autor">CAROLINA</p>
+                <p class="prod-testimonio-lugar">Buenos Aires, Argentina</p>
+            </div>
+            <div class="prod-testimonio">
+                <p class="prod-testimonio-texto">"Se lo regale a mi mama que estaba pasando un momento dificil. Me dijo que siente que tiene un companero silencioso. Ya no se siente sola."</p>
+                <p class="prod-testimonio-autor">LUCIA</p>
+                <p class="prod-testimonio-lugar">Maldonado, Uruguay</p>
+            </div>
+        </div>
+
+        <div class="prod-testimonios-dots">
+            <span class="prod-testimonios-dot active" onclick="showTestimonio(1)"></span>
+            <span class="prod-testimonios-dot" onclick="showTestimonio(2)"></span>
+            <span class="prod-testimonios-dot" onclick="showTestimonio(3)"></span>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ ACORDEON -->
+<section class="prod-faq">
+    <div class="prod-faq-inner">
+        <p class="prod-section-label" style="color: <?php echo $color; ?>;"><?php echo duendes_ornament('star-small', $color); ?> PREGUNTAS FRECUENTES <?php echo duendes_ornament('star-small', $color); ?></p>
+        <h2 class="prod-section-title" style="color: #1a1a1a;">Todo lo que Necesitas Saber</h2>
+
+        <div class="prod-faq-item">
+            <button class="prod-faq-pregunta" onclick="toggleFaq(this)">
+                <span>¿Como se que este guardian es para mi?</span>
+                <span class="prod-faq-icon">+</span>
+            </button>
+            <div class="prod-faq-respuesta">
+                <div class="prod-faq-respuesta-inner">Si sentis un llamado, una conexion inexplicable, es porque el guardian ya te eligio. Los guardianes no llegan por casualidad a tu pantalla. Si estas aca, leyendo esto, es porque hay un mensaje para vos.</div>
+            </div>
+        </div>
+
+        <div class="prod-faq-item">
+            <button class="prod-faq-pregunta" onclick="toggleFaq(this)">
+                <span>¿Cuanto tarda en llegar?</span>
+                <span class="prod-faq-icon">+</span>
+            </button>
+            <div class="prod-faq-respuesta">
+                <div class="prod-faq-respuesta-inner">En Montevideo y area metropolitana: 2-3 dias habiles. Interior de Uruguay: 4-5 dias. Argentina y resto del mundo: 7-15 dias dependiendo de la aduana. Cada guardian viaja protegido y con su certificado.</div>
+            </div>
+        </div>
+
+        <div class="prod-faq-item">
+            <button class="prod-faq-pregunta" onclick="toggleFaq(this)">
+                <span>¿Puedo regalarlo a alguien especial?</span>
+                <span class="prod-faq-icon">+</span>
+            </button>
+            <div class="prod-faq-respuesta">
+                <div class="prod-faq-respuesta-inner">Si. Los guardianes hacen regalos extraordinarios. Incluimos una carta manuscrita con el mensaje que quieras y la canalizacion personalizada para quien lo reciba. Solo indicanos el nombre de la persona al momento de la compra.</div>
+            </div>
+        </div>
+
+        <div class="prod-faq-item">
+            <button class="prod-faq-pregunta" onclick="toggleFaq(this)">
+                <span>¿Como se comunica el guardian conmigo?</span>
+                <span class="prod-faq-icon">+</span>
+            </button>
+            <div class="prod-faq-respuesta">
+                <div class="prod-faq-respuesta-inner">Los guardianes no hablan con palabras. Se comunican a traves de sensaciones, intuiciones y pequenas sincronicidades. Con el tiempo, vas a notar que "sabes" cosas sin saber como. Ese es tu guardian guiandote.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="prod-cta">
     <?php echo duendes_animacion($cat_config['animacion'], $color); ?>
     <div class="prod-cta-content">
@@ -1024,6 +1714,82 @@ function changeImg(src, thumb) {
     document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active'));
     thumb.classList.add('active');
 }
+
+// Tabs de Cuidados
+function showCuidado(tabId) {
+    // Ocultar todos los contenidos
+    document.querySelectorAll('.prod-cuidado-content').forEach(c => {
+        c.classList.remove('active');
+    });
+    // Desactivar todos los tabs
+    document.querySelectorAll('.prod-cuidado-tab').forEach(t => {
+        t.classList.remove('active');
+    });
+    // Mostrar contenido seleccionado
+    document.getElementById('cuidado-' + tabId).classList.add('active');
+    // Activar tab seleccionado
+    event.target.classList.add('active');
+}
+
+// Carousel de Testimonios
+let currentTestimonio = 1;
+function showTestimonio(num) {
+    const total = document.querySelectorAll('.prod-testimonio').length;
+    currentTestimonio = num;
+    if (currentTestimonio > total) currentTestimonio = 1;
+    if (currentTestimonio < 1) currentTestimonio = total;
+
+    document.querySelectorAll('.prod-testimonio').forEach((t, i) => {
+        t.classList.remove('active');
+        if (i + 1 === currentTestimonio) t.classList.add('active');
+    });
+
+    document.querySelectorAll('.prod-testimonios-dot').forEach((d, i) => {
+        d.classList.remove('active');
+        if (i + 1 === currentTestimonio) d.classList.add('active');
+    });
+}
+
+// Auto-rotate testimonios cada 5 segundos
+setInterval(() => {
+    showTestimonio(currentTestimonio + 1);
+}, 5000);
+
+// FAQ Acordeon
+function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+
+    // Cerrar todos los demas
+    document.querySelectorAll('.prod-faq-item').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.prod-faq-icon').textContent = '+';
+    });
+
+    // Toggle el seleccionado
+    if (!isOpen) {
+        item.classList.add('open');
+        btn.querySelector('.prod-faq-icon').textContent = '−';
+    }
+}
+
+// Animacion de entrada para secciones
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.prod-mensaje, .prod-cuidados, .prod-testimonios, .prod-faq').forEach(section => {
+    sectionObserver.observe(section);
+});
 </script>
 <?php wp_footer(); ?>
 </body>

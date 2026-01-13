@@ -599,7 +599,7 @@ function duendes_render_tienda_tarot() {
         /* Responsive */
         @media (max-width: 768px) {
             .tienda-hero {
-                padding: 60px 20px;
+                padding: 50px 20px;
             }
             .tienda-hero h1 {
                 letter-spacing: 3px;
@@ -611,19 +611,175 @@ function duendes_render_tienda_tarot() {
                 padding: 10px 16px;
                 font-size: 11px;
             }
+
+            /* ═══ FONDO CREMITA CON VIDA EN MÓVIL ═══ */
             .productos-container {
-                padding: 40px 15px 60px;
+                padding: 40px 12px 60px;
+                background: linear-gradient(180deg,
+                    #FAF8F5 0%,
+                    #FDF9F3 30%,
+                    #F8F3EB 60%,
+                    #FAF8F5 100%
+                );
+                position: relative;
             }
+
+            /* Textura sutil de vida */
+            .productos-container::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse at 30% 20%, rgba(198,169,98,0.08) 0%, transparent 50%),
+                            radial-gradient(ellipse at 70% 80%, rgba(198,169,98,0.05) 0%, transparent 40%);
+                pointer-events: none;
+            }
+
             .productos-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
+                gap: 12px;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ═══ EFECTO TAROT NEON POR CATEGORÍA ═══ */
+            .tarot-card {
+                aspect-ratio: 2/2.8;
+            }
+
+            .tarot-inner {
+                border-radius: 14px;
+                box-shadow:
+                    0 8px 25px rgba(0,0,0,0.2),
+                    0 0 0 1px rgba(198,169,98,0.2);
+            }
+
+            /* Glow neon activo en móvil (sin necesidad de hover) */
+            .tarot-card[data-cat] .tarot-inner {
+                box-shadow:
+                    0 8px 25px rgba(0,0,0,0.25),
+                    0 0 20px -5px var(--card-glow, rgba(198,169,98,0.3)),
+                    inset 0 1px 0 rgba(255,255,255,0.05);
+            }
+
+            /* Esquinas neon más visibles */
+            .tarot-corner {
+                width: 18px;
+                height: 18px;
+                opacity: 0.7;
+                box-shadow: 0 0 8px var(--card-glow, rgba(198,169,98,0.4));
+            }
+
+            /* Marco con resplandor de categoría */
+            .tarot-card[data-cat] .tarot-frame {
+                border-color: var(--card-color, rgba(198,169,98,0.3));
+                opacity: 0.6;
+            }
+
+            /* Badge con glow */
+            .tarot-badge {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+                top: 15px;
+                right: 15px;
+                box-shadow: 0 0 15px var(--card-glow, rgba(198,169,98,0.5));
+            }
+
+            /* Imagen más compacta */
+            .tarot-image {
+                inset: 14px;
+                bottom: 90px;
+                border-radius: 8px;
+            }
+
+            /* Info más compacta */
+            .tarot-info {
+                padding: 12px;
+            }
+
+            .tarot-tipo {
+                font-size: 8px;
+                letter-spacing: 2px;
+                margin-bottom: 4px;
+            }
+
+            .tarot-name {
+                font-size: 12px;
+                min-height: 32px;
+                margin-bottom: 6px;
+            }
+
+            .tarot-price {
+                font-size: 13px;
+            }
+
+            /* ═══ EFECTO NEON AL TOCAR (para touch) ═══ */
+            .tarot-card:active .tarot-inner {
+                transform: scale(0.98);
+                box-shadow:
+                    0 4px 15px rgba(0,0,0,0.3),
+                    0 0 30px var(--card-glow, rgba(198,169,98,0.5)),
+                    inset 0 0 20px var(--card-glow, rgba(198,169,98,0.1));
+            }
+
+            .tarot-card:active .tarot-corner {
+                opacity: 1;
+                box-shadow: 0 0 15px var(--card-glow, rgba(198,169,98,0.6));
+            }
+
+            /* Colores neon más intensos en móvil */
+            .tarot-card[data-cat="proteccion"] {
+                --card-glow: rgba(59, 130, 246, 0.5);
+            }
+            .tarot-card[data-cat="amor"] {
+                --card-glow: rgba(236, 72, 153, 0.5);
+            }
+            .tarot-card[data-cat="abundancia"] {
+                --card-glow: rgba(245, 158, 11, 0.5);
+            }
+            .tarot-card[data-cat="salud"] {
+                --card-glow: rgba(34, 197, 94, 0.5);
+            }
+            .tarot-card[data-cat="sabiduria"] {
+                --card-glow: rgba(139, 92, 246, 0.5);
+            }
+
+            /* Animación sutil de respiración en las cartas */
+            @keyframes cardBreath {
+                0%, 100% {
+                    box-shadow:
+                        0 8px 25px rgba(0,0,0,0.25),
+                        0 0 20px -5px var(--card-glow, rgba(198,169,98,0.3));
+                }
+                50% {
+                    box-shadow:
+                        0 10px 30px rgba(0,0,0,0.25),
+                        0 0 25px -3px var(--card-glow, rgba(198,169,98,0.4));
+                }
+            }
+
+            .tarot-card[data-cat] .tarot-inner {
+                animation: cardBreath 4s ease-in-out infinite;
+                animation-delay: calc(var(--card-index, 0) * 0.3s);
+            }
+
+            /* Hero más compacto */
+            .tienda-hero p {
+                font-size: 15px;
+                margin-bottom: 25px;
+            }
+        }
+
+        /* Extra pequeño */
+        @media (max-width: 380px) {
+            .productos-grid {
+                gap: 10px;
             }
             .tarot-name {
-                font-size: 13px;
-                min-height: 35px;
+                font-size: 11px;
             }
             .tarot-price {
-                font-size: 14px;
+                font-size: 12px;
             }
         }
 
@@ -724,7 +880,9 @@ function duendes_render_tienda_tarot() {
     <!-- Productos - fondo crema -->
     <section class="productos-container">
         <div class="productos-grid">
-            <?php while ($products->have_posts()): $products->the_post();
+            <?php
+            $card_index = 0;
+            while ($products->have_posts()): $products->the_post();
                 global $product;
                 $img_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                 $cats = wp_get_post_terms(get_the_ID(), 'product_cat');
@@ -756,7 +914,7 @@ function duendes_render_tienda_tarot() {
                 $tipo = get_post_meta(get_the_ID(), '_guardian_tipo', true) ?: get_post_meta(get_the_ID(), '_duendes_tipo', true) ?: 'Guardián';
                 $nombre = get_the_title();
             ?>
-            <article class="tarot-card" data-product-id="<?php echo get_the_ID(); ?>" data-cat="<?php echo esc_attr($cat_key); ?>">
+            <article class="tarot-card" data-product-id="<?php echo get_the_ID(); ?>" data-cat="<?php echo esc_attr($cat_key); ?>" style="--card-index: <?php echo $card_index; ?>">
                 <a href="<?php the_permalink(); ?>" class="tarot-inner">
                     <div class="tarot-frame"></div>
                     <div class="tarot-corner tl"></div>
@@ -784,7 +942,9 @@ function duendes_render_tienda_tarot() {
                     <div class="tarot-glow"></div>
                 </a>
             </article>
-            <?php endwhile; wp_reset_postdata(); ?>
+            <?php
+                $card_index++;
+            endwhile; wp_reset_postdata(); ?>
         </div>
     </section>
 
