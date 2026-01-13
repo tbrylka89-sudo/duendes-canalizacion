@@ -549,6 +549,7 @@ export default function MiMagia() {
       case 'test_elemental': return <TestElemental usuario={usuario} onComplete={(r) => setUsuario({...usuario, elemento: r.elemento_principal})} />;
       case 'cosmos': return <CosmosMes usuario={usuario} />;
       case 'circulo': return <CirculoSec usuario={usuario} setUsuario={setUsuario} token={token} pais={pais} />;
+      case 'promociones': return <PromocionesMagicas usuario={usuario} ir={setSeccion} />;
       case 'grimorio': return <GrimorioSec usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'foro': return <ForoSec usuario={usuario} setUsuario={setUsuario} />;
       case 'utilidades': return <UtilidadesSec usuario={usuario} />;
@@ -625,7 +626,7 @@ export default function MiMagia() {
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">Tu Espacio</div>
-        {[['circulo','★','Círculo'],['cosmos','☽','Cosmos del Mes'],['grimorio','▣','Grimorio'],['foro','💬','Foro Mágico']].map(([k,i,t]) =>
+        {[['circulo','★','Círculo'],['promociones','🎁','Promociones Mágicas'],['cosmos','☽','Cosmos del Mes'],['grimorio','▣','Grimorio'],['foro','💬','Foro Mágico']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">Recursos</div>
@@ -903,7 +904,17 @@ function Inicio({ usuario, ir }) {
       {!usuario?.esCirculo && (
         <div className="banner-circ" onClick={() => ir('circulo')}><span>★</span><div><h3>Círculo de Duendes</h3><p>15 días gratis. Descuentos, lecturas mensuales, contenido exclusivo.</p></div><span className="badge">PROBAR</span></div>
       )}
-      
+
+      {/* Banner Promociones Mágicas */}
+      <div className="banner-promo" onClick={() => ir('promociones')}>
+        <span className="promo-icon-banner">🎁</span>
+        <div className="promo-banner-content">
+          <h3>Promociones Mágicas</h3>
+          <p>Ofertas especiales y oportunidades exclusivas esperándote.</p>
+        </div>
+        <span className="promo-arrow">→</span>
+      </div>
+
       <div className="info-box">
         <h3>¿Cómo funciona Mi Magia?</h3>
         <div className="info-grid">
@@ -922,28 +933,76 @@ function Inicio({ usuario, ir }) {
 
 function Canalizaciones({ usuario }) {
   const [tab, setTab] = useState('guardianes');
-  
+  const [canalizacionAbierta, setCanalizacionAbierta] = useState(null);
+
   const guardianes = usuario?.guardianes || [];
   const talismanes = usuario?.talismanes || [];
   const libros = usuario?.libros || [];
   const lecturas = usuario?.lecturas || [];
   const regalosHechos = usuario?.regalosHechos || [];
   const regalosRecibidos = usuario?.regalosRecibidos || [];
-  
+
+  // Buscar canalización para un guardián
+  const getCanalizacion = (guardian) => {
+    return lecturas.find(l => l.guardianId === guardian.id || l.ordenId === guardian.ordenId);
+  };
+
+  // Estado de canalización
+  const getEstadoCana = (cana) => {
+    if (!cana) return { texto: 'Pendiente', color: '#888', icono: '⏳' };
+    if (cana.estado === 'enviada') return { texto: 'Lista', color: '#2ecc71', icono: '✓' };
+    if (cana.estado === 'aprobada') return { texto: 'En camino', color: '#d4af37', icono: '✦' };
+    return { texto: 'Procesando', color: '#3498db', icono: '◈' };
+  };
+
   return (
     <div className="sec">
       <div className="sec-head"><h1>Mis Canalizaciones</h1><p>Todo lo que ha llegado a tu vida desde el mundo elemental.</p></div>
-      
+
       <div className="tabs-h">
-        {[['guardianes','◆','Guardianes'],['talismanes','✧','Talismanes'],['libros','📖','Libros'],['lecturas','✦','Lecturas'],['regalosH','❤↗','Regalos Hechos'],['regalosR','❤↙','Regalos Recibidos']].map(([k,i,t]) => 
+        {[['guardianes','◆','Guardianes'],['talismanes','✧','Talismanes'],['libros','📖','Libros'],['lecturas','✦','Lecturas'],['regalosH','❤↗','Regalos Hechos'],['regalosR','❤↙','Regalos Recibidos']].map(([k,i,t]) =>
           <button key={k} className={`tab ${tab===k?'act':''}`} onClick={() => setTab(k)}>{i} {t}</button>
         )}
       </div>
-      
+
       {tab === 'guardianes' && (
         <div className="cana-content">
           {guardianes.length > 0 ? (
-            <div className="items-grid">{guardianes.map((g,i) => <div key={i} className="item-card"><div className="item-img">{g.imagen ? <img src={g.imagen} alt={g.nombre} /> : <span>◆</span>}</div><h4>{g.nombre}</h4><small>{g.tipo} • {g.fecha}</small></div>)}</div>
+            <div className="guardianes-lista-completa">
+              {guardianes.map((g, i) => {
+                const cana = getCanalizacion(g);
+                const estado = getEstadoCana(cana);
+                return (
+                  <div key={i} className="guardian-card-full">
+                    <div className="guardian-foto">
+                      {g.imagen ? <img src={g.imagen} alt={g.nombre} /> : <span className="guardian-placeholder">◆</span>}
+                    </div>
+                    <div className="guardian-info">
+                      <h3>{g.nombre}</h3>
+                      <div className="guardian-meta">
+                        <span className="guardian-tipo">{g.tipo || 'Guardián'}</span>
+                        {g.categoria && <span className="guardian-cat">{g.categoria}</span>}
+                      </div>
+                      <p className="guardian-fecha">Adoptado: {g.fecha || 'Recientemente'}</p>
+                      {g.paraQuien && <p className="guardian-para">Para: {g.paraQuien}</p>}
+                    </div>
+                    <div className="guardian-cana">
+                      <div className="cana-estado" style={{color: estado.color}}>
+                        <span>{estado.icono}</span>
+                        <span>Canalización: {estado.texto}</span>
+                      </div>
+                      {cana && cana.estado === 'enviada' ? (
+                        <button className="btn-ver-cana" onClick={() => setCanalizacionAbierta(cana)}>
+                          Ver Canalización
+                        </button>
+                      ) : (
+                        <p className="cana-info-text">Tu canalización personalizada está siendo preparada con amor (4-24hs)</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <div className="empty-tab">
               <span>◆</span>
@@ -952,6 +1011,28 @@ function Canalizaciones({ usuario }) {
               <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-gold">Explorar Guardianes ↗</a>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Modal de Canalización */}
+      {canalizacionAbierta && (
+        <div className="modal-cana-overlay" onClick={() => setCanalizacionAbierta(null)}>
+          <div className="modal-cana" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setCanalizacionAbierta(null)}>×</button>
+            <div className="modal-cana-header">
+              <span>✦</span>
+              <h2>Canalización de {canalizacionAbierta.guardianNombre || 'tu Guardián'}</h2>
+              {canalizacionAbierta.paraQuien && <p>Para: {canalizacionAbierta.paraQuien}</p>}
+            </div>
+            <div className="modal-cana-content">
+              {canalizacionAbierta.contenido?.split('\n').map((parrafo, i) => (
+                parrafo.trim() && <p key={i}>{limpiarTexto(parrafo)}</p>
+              ))}
+            </div>
+            <div className="modal-cana-footer">
+              <small>Esta canalización fue creada especialmente para ti ✦</small>
+            </div>
+          </div>
         </div>
       )}
       
@@ -1004,6 +1085,121 @@ function Canalizaciones({ usuario }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROMOCIONES MÁGICAS
+// ═══════════════════════════════════════════════════════════════
+
+function PromocionesMagicas({ usuario, ir }) {
+  const [promociones, setPromociones] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    cargarPromociones();
+  }, []);
+
+  const cargarPromociones = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/mi-magia/promociones`);
+      const data = await res.json();
+      if (data.success) {
+        setPromociones(data.promociones || []);
+      }
+    } catch(e) {
+      console.error('Error cargando promociones:', e);
+    }
+    setCargando(false);
+  };
+
+  // Promociones predefinidas si no hay en la API
+  const promosPredefinidas = [
+    {
+      id: 'circulo-prueba',
+      titulo: 'Círculo de Duendes',
+      subtitulo: '15 días GRATIS',
+      descripcion: 'Tu santuario secreto con beneficios exclusivos: contenido semanal, descuentos permanentes, comunidad privada y lecturas mensuales.',
+      beneficios: ['Contenido semanal exclusivo', 'Descuentos permanentes del 15%', 'Lecturas mensuales personalizadas', 'Comunidad privada'],
+      icono: '★',
+      color: '#d4af37',
+      activa: !usuario?.esCirculo,
+      accion: () => ir('circulo'),
+      textoBoton: 'Probar gratis 15 días'
+    },
+    {
+      id: 'runas-especial',
+      titulo: 'Pack de Runas Resplandor',
+      subtitulo: '100 runas = mejor valor',
+      descripcion: 'El pack más popular. 100 runas para múltiples experiencias mágicas: tiradas, oráculos, lecturas del alma y más.',
+      beneficios: ['100 runas de poder', 'El mejor precio por runa', 'Para 5-20 experiencias', 'No vencen nunca'],
+      icono: 'ᚱ',
+      color: '#7B1FA2',
+      activa: true,
+      url: 'https://duendesuy.10web.cloud/producto/runas-resplandor/',
+      textoBoton: 'Obtener $32 USD'
+    }
+  ];
+
+  const promosActivas = promociones.length > 0 ? promociones : promosPredefinidas.filter(p => p.activa);
+
+  return (
+    <div className="sec">
+      <div className="sec-head">
+        <h1>Promociones Mágicas</h1>
+        <p>Ofertas especiales y oportunidades exclusivas para ti.</p>
+      </div>
+
+      {cargando ? (
+        <div style={{textAlign:'center', padding:'3rem'}}>
+          <div style={{fontSize:'2rem', animation:'pulse 1.5s infinite'}}>✦</div>
+          <p>Cargando promociones...</p>
+        </div>
+      ) : promosActivas.length > 0 ? (
+        <div className="promos-grid">
+          {promosActivas.map(promo => (
+            <div key={promo.id} className="promo-card" style={{'--promo-color': promo.color || '#d4af37'}}>
+              <div className="promo-header">
+                <span className="promo-icono">{promo.icono}</span>
+                <div className="promo-badge-card">{promo.subtitulo}</div>
+              </div>
+              <h3>{promo.titulo}</h3>
+              <p className="promo-desc">{promo.descripcion}</p>
+
+              {promo.beneficios && (
+                <ul className="promo-beneficios-list">
+                  {promo.beneficios.map((b, i) => (
+                    <li key={i}>✓ {b}</li>
+                  ))}
+                </ul>
+              )}
+
+              {promo.url ? (
+                <a href={promo.url} target="_blank" rel="noopener" className="btn-promo">
+                  {promo.textoBoton || 'Obtener'}
+                </a>
+              ) : promo.accion ? (
+                <button onClick={promo.accion} className="btn-promo">
+                  {promo.textoBoton || 'Ver más'}
+                </button>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-promos">
+          <span>🎁</span>
+          <h3>Sin promociones activas ahora</h3>
+          <p>Volvé pronto para ver las nuevas ofertas mágicas que preparamos para vos.</p>
+        </div>
+      )}
+
+      {/* Info adicional */}
+      <div className="promo-info-box">
+        <h4>¿Cómo funcionan las promociones?</h4>
+        <p>Las promociones mágicas son ofertas especiales y temporales que preparamos para vos. Pueden incluir descuentos, beneficios exclusivos, o acceso a servicios especiales. ¡Revisá esta sección seguido!</p>
+      </div>
     </div>
   );
 }
@@ -3967,6 +4163,85 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .btn-tito:hover{background:#2a2a2a}
 
 .contenido.con-sidebar{width:calc(100% - 240px - 280px);padding-right:1rem}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* BANNER PROMOCIONES EN INICIO */
+/* ═══════════════════════════════════════════════════════════════ */
+.banner-promo{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,#f5e6d3,#fff5eb);border:2px solid #d4af37;border-radius:12px;padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;margin-top:1rem}
+.banner-promo:hover{background:linear-gradient(135deg,#ffe4c4,#fff5eb);transform:translateY(-2px);box-shadow:0 4px 15px rgba(212,175,55,0.2)}
+.promo-icon-banner{font-size:2rem}
+.promo-banner-content{flex:1}
+.promo-banner-content h3{font-family:'Cinzel',serif;color:#1a1a1a;margin:0 0 0.25rem;font-size:1rem}
+.promo-banner-content p{color:#666;margin:0;font-size:0.85rem}
+.promo-arrow{font-size:1.5rem;color:#d4af37}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* SECCIÓN PROMOCIONES MÁGICAS */
+/* ═══════════════════════════════════════════════════════════════ */
+.promos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;margin-bottom:2rem}
+.promo-card{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:1.5rem;transition:all 0.2s;position:relative;overflow:hidden}
+.promo-card:hover{border-color:var(--promo-color,#d4af37);box-shadow:0 8px 25px rgba(0,0,0,0.08)}
+.promo-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--promo-color,#d4af37)}
+.promo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.promo-icono{font-size:2rem;color:var(--promo-color,#d4af37)}
+.promo-badge-card{background:var(--promo-color,#d4af37);color:#fff;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:600}
+.promo-card h3{font-family:'Cinzel',serif;color:#1a1a1a;margin:0 0 0.75rem;font-size:1.2rem}
+.promo-desc{color:#666;font-size:0.9rem;line-height:1.5;margin:0 0 1rem}
+.promo-beneficios-list{list-style:none;padding:0;margin:0 0 1.5rem}
+.promo-beneficios-list li{padding:0.4rem 0;color:#555;font-size:0.85rem}
+.promo-beneficios-list li::before{content:'';display:none}
+.empty-promos{text-align:center;padding:3rem;background:#fafafa;border-radius:12px}
+.empty-promos span{font-size:3rem;display:block;margin-bottom:1rem}
+.empty-promos h3{font-family:'Cinzel',serif;color:#1a1a1a;margin:0 0 0.5rem}
+.empty-promos p{color:#666}
+.promo-info-box{background:linear-gradient(135deg,#f8f8f8,#fff);border:1px solid #e0e0e0;border-radius:12px;padding:1.5rem;margin-top:1.5rem}
+.promo-info-box h4{font-family:'Cinzel',serif;color:#d4af37;margin:0 0 0.5rem;font-size:1rem}
+.promo-info-box p{color:#666;font-size:0.9rem;margin:0}
+
+@media(max-width:768px){.promos-grid{grid-template-columns:1fr}.banner-promo{flex-direction:column;text-align:center}.promo-arrow{display:none}}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* TARJETAS DE GUARDIANES COMPRADOS */
+/* ═══════════════════════════════════════════════════════════════ */
+.guardianes-lista-completa{display:flex;flex-direction:column;gap:1.25rem}
+.guardian-card-full{display:flex;gap:1.25rem;background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:1.25rem;transition:all 0.2s}
+.guardian-card-full:hover{border-color:#d4af37;box-shadow:0 4px 15px rgba(0,0,0,0.05)}
+.guardian-foto{width:120px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0;background:#fafafa;display:flex;align-items:center;justify-content:center}
+.guardian-foto img{width:100%;height:100%;object-fit:cover}
+.guardian-placeholder{font-size:3rem;color:#d4af37}
+.guardian-info{flex:1;min-width:0}
+.guardian-info h3{font-family:'Cinzel',serif;color:#1a1a1a;margin:0 0 0.5rem;font-size:1.15rem}
+.guardian-meta{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem}
+.guardian-tipo{background:#f5f5f5;padding:3px 10px;border-radius:20px;font-size:0.75rem;color:#666}
+.guardian-cat{background:#d4af3722;padding:3px 10px;border-radius:20px;font-size:0.75rem;color:#b8962e}
+.guardian-fecha{color:#888;font-size:0.85rem;margin:0 0 0.25rem}
+.guardian-para{color:#555;font-size:0.9rem;margin:0;font-style:italic}
+.guardian-cana{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-width:180px}
+.cana-estado{display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;margin-bottom:0.75rem}
+.btn-ver-cana{padding:10px 16px;background:linear-gradient(135deg,#d4af37,#b8962e);border:none;border-radius:8px;color:#1a1a1a;font-family:'Cinzel',serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.btn-ver-cana:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(212,175,55,0.3)}
+.cana-info-text{font-size:0.8rem;color:#888;text-align:right;margin:0;max-width:180px}
+
+/* Modal Canalización */
+.modal-cana-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem}
+.modal-cana{background:#fff;border-radius:16px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:1rem;right:1rem;width:36px;height:36px;border-radius:50%;border:none;background:#f0f0f0;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;z-index:1}
+.modal-close:hover{background:#d4af37;color:#fff}
+.modal-cana-header{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);padding:2rem;text-align:center;border-radius:16px 16px 0 0}
+.modal-cana-header span{font-size:2rem;color:#d4af37;display:block;margin-bottom:0.5rem}
+.modal-cana-header h2{font-family:'Cinzel',serif;color:#d4af37;margin:0 0 0.5rem;font-size:1.4rem}
+.modal-cana-header p{color:rgba(255,255,255,0.8);margin:0}
+.modal-cana-content{padding:2rem;line-height:1.8}
+.modal-cana-content p{margin:0 0 1rem;color:#444}
+.modal-cana-footer{padding:1rem 2rem 1.5rem;text-align:center;border-top:1px solid #f0f0f0}
+.modal-cana-footer small{color:#888}
+
+@media(max-width:768px){
+  .guardian-card-full{flex-direction:column}
+  .guardian-foto{width:100%;height:180px}
+  .guardian-cana{align-items:stretch;min-width:100%;margin-top:1rem}
+  .cana-info-text{text-align:center;max-width:none}
+}
 
 @media(max-width:1200px){.contenido.con-sidebar{width:calc(100% - 240px)}.sidebar-oportunidades{display:none}.sidebar-toggle{display:none}}
 `;

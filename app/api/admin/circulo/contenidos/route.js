@@ -113,3 +113,54 @@ export async function PATCH(request) {
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+// DELETE - Eliminar contenido del Círculo
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const dia = parseInt(searchParams.get('dia'));
+    const mes = parseInt(searchParams.get('mes'));
+    const año = parseInt(searchParams.get('año'));
+
+    if (!dia || !mes || !año) {
+      return Response.json({
+        success: false,
+        error: 'Día, mes y año requeridos'
+      }, { status: 400 });
+    }
+
+    const key = `circulo:contenido:${año}:${mes}:${dia}`;
+    const contenido = await kv.get(key);
+
+    if (!contenido) {
+      return Response.json({
+        success: false,
+        error: 'Contenido no encontrado'
+      }, { status: 404 });
+    }
+
+    // Eliminar el contenido
+    await kv.del(key);
+
+    // Actualizar el índice del mes si existe
+    const indiceKey = `circulo:indice:${año}:${mes}`;
+    const indice = await kv.get(indiceKey);
+    if (indice && indice.dias) {
+      indice.dias = indice.dias.filter(d => d.dia !== dia);
+      indice.totalDias = indice.dias.length;
+      await kv.set(indiceKey, indice);
+    }
+
+    return Response.json({
+      success: true,
+      message: `Contenido del día ${dia}/${mes}/${año} eliminado`
+    });
+
+  } catch (error) {
+    console.error('Error eliminando contenido:', error);
+    return Response.json({
+      success: false,
+      error: error.message
+    }, { status: 500 });
+  }
+}

@@ -101,6 +101,28 @@ export default function CirculoPage() {
     }
   };
 
+  // Eliminar contenido
+  const eliminarContenido = async (contenido) => {
+    if (!confirm(`¿Eliminar el contenido del día ${contenido.dia}?`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/circulo/contenidos?dia=${contenido.dia}&mes=${contenido.mes}&año=${contenido.año}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setContenidos(prev => prev.filter(c => c.dia !== contenido.dia));
+        setContenidoAbierto(null);
+        mostrarMensaje('Contenido eliminado');
+      } else {
+        mostrarMensaje(data.error || 'Error al eliminar', 'error');
+      }
+    } catch (e) {
+      mostrarMensaje(e.message, 'error');
+    }
+  };
+
   // Publicar contenido
   const publicar = async (contenido) => {
     try {
@@ -370,23 +392,30 @@ export default function CirculoPage() {
             </div>
 
             {/* Footer con acciones */}
-            <div style={{ padding: '16px 24px', borderTop: '1px solid #2a2a3a', display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-              <button onClick={() => { generarDia(contenidoAbierto.dia); setContenidoAbierto(null); }}
-                style={{ padding: '10px 20px', background: '#1a1a25', border: '1px solid #2a2a3a', borderRadius: 8, color: 'white', cursor: 'pointer' }}>
-                🔄 Regenerar
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #2a2a3a', display: 'flex', gap: 12, justifyContent: 'space-between' }}>
+              <button onClick={() => eliminarContenido(contenidoAbierto)}
+                style={{ padding: '10px 20px', background: '#ef444422', border: '1px solid #ef4444', borderRadius: 8, color: '#ef4444', cursor: 'pointer' }}>
+                🗑️ Eliminar
               </button>
 
-              {contenidoAbierto.estado !== 'publicado' && (
-                <button onClick={() => { publicar(contenidoAbierto); setContenidoAbierto(null); }}
-                  style={{ padding: '10px 20px', background: '#22c55e', border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer', fontWeight: 600 }}>
-                  🚀 Publicar
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button onClick={() => { generarDia(contenidoAbierto.dia); setContenidoAbierto(null); }}
+                  style={{ padding: '10px 20px', background: '#1a1a25', border: '1px solid #2a2a3a', borderRadius: 8, color: 'white', cursor: 'pointer' }}>
+                  🔄 Regenerar
                 </button>
-              )}
 
-              <button onClick={() => setContenidoAbierto(null)}
-                style={{ padding: '10px 20px', background: '#2a2a3a', border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer' }}>
-                Cerrar
-              </button>
+                {contenidoAbierto.estado !== 'publicado' && (
+                  <button onClick={() => { publicar(contenidoAbierto); setContenidoAbierto(null); }}
+                    style={{ padding: '10px 20px', background: '#22c55e', border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer', fontWeight: 600 }}>
+                    🚀 Publicar
+                  </button>
+                )}
+
+                <button onClick={() => setContenidoAbierto(null)}
+                  style={{ padding: '10px 20px', background: '#2a2a3a', border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer' }}>
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>

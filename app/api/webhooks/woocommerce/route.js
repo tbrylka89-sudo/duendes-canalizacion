@@ -161,8 +161,14 @@ export async function POST(request) {
         await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
       }
 
-      // Enviar email de compra confirmada (ahora incluye QR)
-      await enviarEmailCompraGuardian(resend, email, nombre, guardianes, trebolsGanados, ordenId);
+      // Generar token de acceso antes del email si no existe
+      if (!elegido.token) {
+        elegido.token = generarToken();
+        await kv.set(`token:${elegido.token}`, { email, nombre }, { ex: 365 * 24 * 60 * 60 });
+      }
+
+      // Enviar email de compra confirmada (ahora incluye QR y link con token)
+      await enviarEmailCompraGuardian(resend, email, nombre, guardianes, trebolsGanados, ordenId, elegido.token);
     }
     
     // ═══════════════════════════════════════════════════════════
@@ -430,9 +436,12 @@ async function enviarEmailCirculo(resend, email, nombre, plan, expira) {
   }
 }
 
-async function enviarEmailCompraGuardian(resend, email, nombre, guardianes, treboles) {
+async function enviarEmailCompraGuardian(resend, email, nombre, guardianes, treboles, ordenId, token) {
   const nombresGuardianes = guardianes.map(g => g.nombre).join(', ');
-  
+  const linkMiMagia = token
+    ? `https://duendes-vercel.vercel.app/mi-magia?token=${token}`
+    : 'https://duendes-vercel.vercel.app/mi-magia';
+
   try {
     await resend.emails.send({
       from: 'Duendes del Uruguay <magia@duendesdeluruguay.com>',
@@ -444,12 +453,14 @@ async function enviarEmailCompraGuardian(resend, email, nombre, guardianes, treb
             <h1 style="color: #d4af37; text-align: center;">👑 ¡Gracias por tu compra!</h1>
             <p>Querida ${nombre},</p>
             <p>Tu guardián <strong style="color: #d4af37;">${nombresGuardianes}</strong> ya sabe que viene contigo.</p>
-            <p>En las próximas <strong>4 horas</strong> recibirás la canalización personalizada de tu guardián: su historia, su mensaje para vos, y cómo cuidarlo.</p>
+            <p>En las próximas <strong>4-24 horas</strong> recibirás la canalización personalizada de tu guardián: su historia, su mensaje para vos, y cómo cuidarlo.</p>
             ${treboles > 0 ? `<p>Además, ganaste <strong style="color: #d4af37;">🍀 ${treboles} tréboles</strong> que podés canjear por premios.</p>` : ''}
-            <p style="text-align: center; margin-top: 30px;">
-              <a href="https://duendes-vercel.vercel.app/mi-magia" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Ir a Mi Magia</a>
-            </p>
-            <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 30px;">Con amor mágico,<br>Gabriel y Thibisay</p>
+            <div style="background: rgba(212,175,55,0.1); border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center;">
+              <p style="margin: 0 0 15px; color: #d4af37; font-weight: bold;">🌟 Tu espacio mágico personal está listo</p>
+              <p style="margin: 0 0 15px; font-size: 14px;">En "Mi Magia" podrás ver tu guardián, su canalización cuando esté lista, y acceder a experiencias exclusivas.</p>
+              <a href="${linkMiMagia}" style="display: inline-block; background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Ir a Mi Magia ✦</a>
+            </div>
+            <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 30px; text-align: center;">Con amor mágico,<br>Gabriel y Thibisay</p>
           </div>
         </div>
       `
