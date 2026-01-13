@@ -472,15 +472,15 @@ const CUIDADOS = [
 ];
 
 const CRISTALES = [
-  { nombre: "Amatista", color: "#9b59b6", imagen: "https://images.unsplash.com/photo-1576085898323-218337e3e43c?w=400&q=80", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol directo." },
-  { nombre: "Cuarzo Rosa", color: "#f8bbd9", imagen: "https://images.unsplash.com/photo-1603145733190-d4b6bfc6d7e4?w=400&q=80", props: "Amor incondicional, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
-  { nombre: "Citrino", color: "#f4d03f", imagen: "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=400&q=80", props: "Abundancia, alegría, manifestación", cuidado: "Auto-limpiante. Carga al sol." },
-  { nombre: "Turmalina Negra", color: "#2c3e50", imagen: "https://images.unsplash.com/photo-1612197879988-de3f8fba6551?w=400&q=80", props: "Protección máxima, escudo energético", cuidado: "Enterrar en sal o tierra." },
-  { nombre: "Labradorita", color: "#3498db", imagen: "https://images.unsplash.com/photo-1551410224-699683e15636?w=400&q=80", props: "Magia, transformación, intuición", cuidado: "Bajo las estrellas." },
-  { nombre: "Cuarzo Transparente", color: "#ecf0f1", imagen: "https://images.unsplash.com/photo-1505751171710-1f6d0ace5a85?w=400&q=80", props: "Amplificador universal, claridad", cuidado: "Acepta todo. Limpiar seguido." },
-  { nombre: "Selenita", color: "#f5f5f5", imagen: "https://images.unsplash.com/photo-1560707303-4e980ce876ad?w=400&q=80", props: "Limpieza energética, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
-  { nombre: "Ojo de Tigre", color: "#b8860b", imagen: "https://images.unsplash.com/photo-1608543318498-36eb02e3739e?w=400&q=80", props: "Coraje, prosperidad, protección", cuidado: "Sol de mañana." },
-  { nombre: "Obsidiana", color: "#1a1a1a", imagen: "https://images.unsplash.com/photo-1583937443566-6d672ab3aa48?w=400&q=80", props: "Verdad, protección psíquica, raíces", cuidado: "Agua corriente. Luna nueva." }
+  { nombre: "Amatista", color: "#9b59b6", imagen: "https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&w=400", props: "Intuición, paz, protección espiritual", cuidado: "Agua y luna. Evitar sol directo." },
+  { nombre: "Cuarzo Rosa", color: "#f8bbd9", imagen: "https://images.pexels.com/photos/5765988/pexels-photo-5765988.jpeg?auto=compress&w=400", props: "Amor incondicional, sanación emocional", cuidado: "Solo luna. Muy sensible al sol." },
+  { nombre: "Citrino", color: "#f4d03f", imagen: "https://images.pexels.com/photos/10475789/pexels-photo-10475789.jpeg?auto=compress&w=400", props: "Abundancia, alegría, manifestación", cuidado: "Auto-limpiante. Carga al sol." },
+  { nombre: "Turmalina Negra", color: "#2c3e50", imagen: "https://images.pexels.com/photos/5273539/pexels-photo-5273539.jpeg?auto=compress&w=400", props: "Protección máxima, escudo energético", cuidado: "Enterrar en sal o tierra." },
+  { nombre: "Labradorita", color: "#3498db", imagen: "https://images.pexels.com/photos/7533347/pexels-photo-7533347.jpeg?auto=compress&w=400", props: "Magia, transformación, intuición", cuidado: "Bajo las estrellas." },
+  { nombre: "Cuarzo Transparente", color: "#ecf0f1", imagen: "https://images.pexels.com/photos/1573236/pexels-photo-1573236.jpeg?auto=compress&w=400", props: "Amplificador universal, claridad", cuidado: "Acepta todo. Limpiar seguido." },
+  { nombre: "Selenita", color: "#f5f5f5", imagen: "https://images.pexels.com/photos/6186495/pexels-photo-6186495.jpeg?auto=compress&w=400", props: "Limpieza energética, conexión angélica", cuidado: "NUNCA mojar. Solo luna o sonido." },
+  { nombre: "Ojo de Tigre", color: "#b8860b", imagen: "https://images.pexels.com/photos/6186512/pexels-photo-6186512.jpeg?auto=compress&w=400", props: "Coraje, prosperidad, protección", cuidado: "Sol de mañana." },
+  { nombre: "Obsidiana", color: "#1a1a1a", imagen: "https://images.pexels.com/photos/4040567/pexels-photo-4040567.jpeg?auto=compress&w=400", props: "Verdad, protección psíquica, raíces", cuidado: "Agua corriente. Luna nueva." }
 ];
 
 // ═══════════════════════════════════════════════════════════════
