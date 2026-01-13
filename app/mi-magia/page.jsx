@@ -1014,6 +1014,11 @@ function Canalizaciones({ usuario }) {
 
           {/* LOS ELEGIDOS - Narrativa Cinematográfica */}
           <div className="elegidos-cinematic">
+            <div className="elegidos-titulo">
+              <span className="titulo-pre">Ahora formás parte de</span>
+              <h2>Los Elegidos</h2>
+            </div>
+
             <div className="elegidos-portal">
               <div className="portal-glow"></div>
               <span className="portal-runa">ᛉ</span>
@@ -4315,6 +4320,11 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 /* ═══════════════════════════════════════════════════════════════ */
 .elegidos-cinematic{background:linear-gradient(180deg,#0d0d0d 0%,#1a1510 50%,#0d0d0d 100%);border-radius:20px;padding:3rem 2rem;margin-top:2rem;color:#fff;position:relative;overflow:hidden}
 .elegidos-cinematic::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none}
+
+/* Titulo principal */
+.elegidos-titulo{text-align:center;margin-bottom:1.5rem;position:relative;z-index:1}
+.titulo-pre{display:block;font-size:0.85rem;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-bottom:0.5rem}
+.elegidos-titulo h2{font-family:'Cinzel',serif;font-size:2.2rem;color:#d4af37;letter-spacing:6px;text-transform:uppercase;margin:0;text-shadow:0 0 40px rgba(212,175,55,0.3)}
 
 /* Portal animado */
 .elegidos-portal{display:flex;justify-content:center;margin-bottom:2rem;position:relative}
