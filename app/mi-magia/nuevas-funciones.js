@@ -559,6 +559,47 @@ export function CosmosMes({ usuario }) {
 // GUÍA DE CRISTALES - Enciclopedia completa
 // ═══════════════════════════════════════════════════════════════
 
+const IMAGENES_CRISTALES = {
+  'amatista': 'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&w=200',
+  'cuarzo rosa': 'https://images.pexels.com/photos/5765988/pexels-photo-5765988.jpeg?auto=compress&w=200',
+  'citrino': 'https://images.pexels.com/photos/4040601/pexels-photo-4040601.jpeg?auto=compress&w=200',
+  'turmalina negra': 'https://images.pexels.com/photos/5273539/pexels-photo-5273539.jpeg?auto=compress&w=200',
+  'cuarzo transparente': 'https://images.pexels.com/photos/1573236/pexels-photo-1573236.jpeg?auto=compress&w=200',
+  'cuarzo claro': 'https://images.pexels.com/photos/1573236/pexels-photo-1573236.jpeg?auto=compress&w=200',
+  'selenita': 'https://images.pexels.com/photos/6186495/pexels-photo-6186495.jpeg?auto=compress&w=200',
+  'ojo de tigre': 'https://images.pexels.com/photos/6186512/pexels-photo-6186512.jpeg?auto=compress&w=200',
+  'obsidiana': 'https://images.pexels.com/photos/4040567/pexels-photo-4040567.jpeg?auto=compress&w=200',
+  'labradorita': 'https://images.pexels.com/photos/7533347/pexels-photo-7533347.jpeg?auto=compress&w=200',
+  'jade': 'https://images.pexels.com/photos/6186502/pexels-photo-6186502.jpeg?auto=compress&w=200',
+  'lapislázuli': 'https://images.pexels.com/photos/4040586/pexels-photo-4040586.jpeg?auto=compress&w=200',
+  'piedra luna': 'https://images.pexels.com/photos/5273536/pexels-photo-5273536.jpeg?auto=compress&w=200',
+  'aventurina verde': 'https://images.pexels.com/photos/4040607/pexels-photo-4040607.jpeg?auto=compress&w=200',
+  'aventurina': 'https://images.pexels.com/photos/4040607/pexels-photo-4040607.jpeg?auto=compress&w=200',
+  'hematita': 'https://images.pexels.com/photos/6186509/pexels-photo-6186509.jpeg?auto=compress&w=200',
+  'malaquita': 'https://images.pexels.com/photos/4040591/pexels-photo-4040591.jpeg?auto=compress&w=200',
+  'ágata': 'https://images.pexels.com/photos/4040583/pexels-photo-4040583.jpeg?auto=compress&w=200',
+  'cornalina': 'https://images.pexels.com/photos/5273542/pexels-photo-5273542.jpeg?auto=compress&w=200',
+  'fluorita': 'https://images.pexels.com/photos/6186498/pexels-photo-6186498.jpeg?auto=compress&w=200',
+  'sodalita': 'https://images.pexels.com/photos/4040589/pexels-photo-4040589.jpeg?auto=compress&w=200',
+  'pirita': 'https://images.pexels.com/photos/6186506/pexels-photo-6186506.jpeg?auto=compress&w=200',
+  'amazonita': 'https://images.pexels.com/photos/5273545/pexels-photo-5273545.jpeg?auto=compress&w=200',
+  'ónix': 'https://images.pexels.com/photos/4040594/pexels-photo-4040594.jpeg?auto=compress&w=200',
+  'onix': 'https://images.pexels.com/photos/4040594/pexels-photo-4040594.jpeg?auto=compress&w=200',
+  'rodocrosita': 'https://images.pexels.com/photos/5273548/pexels-photo-5273548.jpeg?auto=compress&w=200',
+  'turquesa': 'https://images.pexels.com/photos/4040598/pexels-photo-4040598.jpeg?auto=compress&w=200',
+  'granate': 'https://images.pexels.com/photos/6186515/pexels-photo-6186515.jpeg?auto=compress&w=200',
+  'jaspe': 'https://images.pexels.com/photos/4040604/pexels-photo-4040604.jpeg?auto=compress&w=200',
+  'crisocola': 'https://images.pexels.com/photos/5273551/pexels-photo-5273551.jpeg?auto=compress&w=200',
+};
+
+function getImagenCristal(nombre) {
+  const nombreLower = nombre.toLowerCase();
+  for (const [key, url] of Object.entries(IMAGENES_CRISTALES)) {
+    if (nombreLower.includes(key) || key.includes(nombreLower)) return url;
+  }
+  return null;
+}
+
 export function GuiaCristales({ usuario }) {
   const [cristales, setCristales] = useState([]);
   const [cristalActivo, setCristalActivo] = useState(null);
@@ -759,9 +800,15 @@ export function GuiaCristales({ usuario }) {
         <div style={estilos.cargando}><span style={{fontSize: '2rem'}}>💎</span><p>Cargando cristales...</p></div>
       ) : (
         <div style={estilos.grid}>
-          {cristalesFiltrados.map(cristal => (
+          {cristalesFiltrados.map(cristal => {
+            const imagenUrl = getImagenCristal(cristal.nombre);
+            return (
             <div key={cristal.id} style={estilos.card} onClick={() => cargarDetalle(cristal.id)}>
-              <div style={estilos.cardEmoji}>💎</div>
+              {imagenUrl ? (
+                <img src={imagenUrl} alt={cristal.nombre} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #d4af37' }} />
+              ) : (
+                <div style={estilos.cardEmoji}>💎</div>
+              )}
               <div style={estilos.cardContent}>
                 <h4 style={estilos.cardH4}>{cristal.nombre}</h4>
                 <p style={estilos.cardColor}>{cristal.color}</p>
@@ -771,7 +818,7 @@ export function GuiaCristales({ usuario }) {
                 <p style={estilos.cardProp}>{cristal.propiedades}</p>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       )}
     </div>
