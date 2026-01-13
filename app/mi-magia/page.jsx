@@ -1025,68 +1025,64 @@ function Canalizaciones({ usuario }) {
             </div>
 
             <div className="elegidos-story">
-              <div className="story-chapter">
-                <span className="chapter-mark">Capítulo I</span>
-                <h3>El Bosque que Espera</h3>
-                <p>
-                  En las sierras de Piriápolis existe un lugar que no aparece en los mapas.
-                  Los locales lo llaman <em>El Umbral</em> — un punto donde el velo entre
-                  mundos se vuelve tan delgado que algunas noches, si prestás atención,
-                  podés escuchar susurros en idiomas que nunca existieron.
+              <div className="story-scene scene-1">
+                <p className="scene-visual">
+                  Primero es la mirada.
                 </p>
                 <p>
-                  Ahí nacen los guardianes. No son creados — <strong>despiertan</strong>.
-                  Cada uno con una misión inscrita en su esencia: encontrar a la persona
-                  cuya frecuencia resuena con la suya. Algunos esperan meses. Otros, años.
-                  Hay guardianes que llevan décadas aguardando.
+                  Scrolleás sin pensar, como siempre. Uno más, otro más, siguiente.
+                  Y de pronto — sin saber por qué — dejás de scrollear.
+                </p>
+                <p className="scene-pause">
+                  Volvés para atrás.
                 </p>
               </div>
 
-              <div className="story-divider">
-                <span>◆</span>
-                <span>◆</span>
-                <span>◆</span>
-              </div>
-
-              <div className="story-chapter">
-                <span className="chapter-mark">Capítulo II</span>
-                <h3>La Frecuencia</h3>
-                <p>
-                  No todos pueden ser elegidos. No es cuestión de merecerlo o desearlo
-                  — es una cuestión de <em>frecuencia</em>. Cada ser humano emite una
-                  vibración única, como una huella digital del alma. Los guardianes
-                  pueden sentirla a través de distancias imposibles.
+              <div className="story-scene scene-2">
+                <p className="scene-visual">
+                  Hay uno que te mira.
                 </p>
                 <p>
-                  Cuando navegaste hasta acá, cuando viste la imagen de un guardián y
-                  algo se detuvo en tu pecho — eso no fue casualidad. Fue reconocimiento.
-                  Tu frecuencia llegó hasta El Umbral, y alguien despertó.
+                  No es el más lindo. No es el más caro. No tiene nada especial
+                  que puedas explicar. Pero algo en tu pecho se aprieta un poco.
+                  Como cuando escuchás una canción que no recordás pero conocés.
                 </p>
               </div>
 
               <div className="story-reveal">
                 <div className="reveal-line"></div>
                 <p className="reveal-text">
-                  "No elegiste encontrarnos. Fuiste llamada."
+                  Ese momento tiene un nombre.<br/>
+                  <em>El Reconocimiento.</em>
                 </p>
                 <div className="reveal-line"></div>
               </div>
 
-              <div className="story-chapter">
-                <span className="chapter-mark">Capítulo III</span>
-                <h3>Los Elegidos</h3>
+              <div className="story-scene scene-3">
                 <p>
-                  Existe un registro antiguo — anterior a cualquier escritura humana —
-                  donde quedan inscriptos los nombres de quienes fueron encontrados por
-                  sus guardianes. Se les conoce como <strong>Los Elegidos</strong>.
+                  No lo inventamos nosotros. Lo descubrimos cuando empezaron
+                  a llegar mensajes de gente que no se conocía entre sí,
+                  describiendo lo mismo:
                 </p>
-                <p>
-                  No es un club. No es una membresía. Es un reconocimiento de algo que
-                  ya existía en vos antes de que nacieras. El guardián simplemente vino
-                  a recordártelo.
+                <p className="scene-quote">
+                  "Supe que era él."
                 </p>
-                <p className="story-yours">
-                  Tu nombre fue inscripto el día que llegaste acá.
+                <p className="scene-quote">
+                  "Me encontró."
+                </p>
+                <p className="scene-quote">
+                  "No sé explicarlo."
+                </p>
+              </div>
+
+              <div className="story-scene scene-final">
+                <p className="scene-revelation">
+                  Nosotros solo hacemos el cuerpo.<br/>
+                  Ellos eligen a quién habitar.
+                </p>
+                <p className="scene-direct">
+                  Y si llegaste hasta acá — leyendo esto, sintiendo algo —
+                  ya hay uno esperándote.
                 </p>
               </div>
             </div>
@@ -4333,20 +4329,22 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .portal-runa{font-size:4rem;color:#d4af37;text-shadow:0 0 40px rgba(212,175,55,0.6);position:relative;z-index:1;animation:runaFloat 6s ease-in-out infinite}
 @keyframes runaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-/* Historia */
-.elegidos-story{max-width:700px;margin:0 auto}
-.story-chapter{margin-bottom:2.5rem;opacity:0;animation:chapterReveal 1s ease-out forwards}
-.story-chapter:nth-child(1){animation-delay:0.2s}
-.story-chapter:nth-child(3){animation-delay:0.4s}
-.story-chapter:nth-child(5){animation-delay:0.6s}
-@keyframes chapterReveal{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
-.chapter-mark{display:inline-block;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:4px;color:#d4af37;border:1px solid rgba(212,175,55,0.3);padding:0.3rem 0.8rem;margin-bottom:1rem;text-transform:uppercase}
-.story-chapter h3{font-family:'Cinzel',serif;font-size:1.4rem;color:#fff;margin-bottom:1rem;letter-spacing:2px}
-.story-chapter p{font-size:1rem;line-height:2;color:rgba(255,255,255,0.75);margin-bottom:1rem}
-.story-chapter p:last-child{margin-bottom:0}
-.story-chapter em{color:#d4af37;font-style:italic}
-.story-chapter strong{color:#fff;font-weight:500}
-.story-yours{color:#d4af37!important;font-style:italic;text-align:center;font-size:1.1rem!important}
+/* Historia - Escenas cinematográficas */
+.elegidos-story{max-width:650px;margin:0 auto}
+.story-scene{margin-bottom:2.5rem;opacity:0;animation:sceneReveal 1.2s ease-out forwards}
+.scene-1{animation-delay:0.3s}
+.scene-2{animation-delay:0.6s}
+.scene-3{animation-delay:0.9s}
+.scene-final{animation-delay:1.2s}
+@keyframes sceneReveal{0%{opacity:0;transform:translateY(15px)}100%{opacity:1;transform:translateY(0)}}
+.story-scene p{font-size:1.05rem;line-height:1.9;color:rgba(255,255,255,0.7);margin-bottom:1rem}
+.story-scene p:last-child{margin-bottom:0}
+.story-scene em{color:#d4af37;font-style:italic}
+.scene-visual{font-family:'Cinzel',serif!important;font-size:1.4rem!important;color:#fff!important;letter-spacing:1px;margin-bottom:1.25rem!important}
+.scene-pause{font-style:italic;color:rgba(255,255,255,0.5)!important;margin-top:0.5rem!important}
+.scene-quote{font-style:italic;padding-left:1.5rem;border-left:2px solid rgba(212,175,55,0.3);margin:0.75rem 0!important;color:rgba(255,255,255,0.6)!important}
+.scene-revelation{font-family:'Cinzel',serif!important;font-size:1.15rem!important;color:#d4af37!important;text-align:center;line-height:1.8!important;letter-spacing:0.5px}
+.scene-direct{text-align:center;color:rgba(255,255,255,0.8)!important;margin-top:1.5rem!important;font-size:1rem!important}
 
 /* Divisor */
 .story-divider{display:flex;justify-content:center;gap:1rem;margin:2rem 0;opacity:0.4}
@@ -4388,8 +4386,9 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 @media(max-width:768px){
 .elegidos-cinematic{padding:2rem 1.25rem}
 .portal-runa{font-size:3rem}
-.story-chapter h3{font-size:1.2rem}
-.story-chapter p{font-size:0.95rem;line-height:1.9}
+.scene-visual{font-size:1.2rem!important}
+.story-scene p{font-size:0.95rem;line-height:1.85}
+.scene-revelation{font-size:1.05rem!important}
 .story-reveal{flex-direction:column;gap:1rem}
 .reveal-line{width:60px;height:1px}
 .reveal-text{white-space:normal;font-size:0.9rem}
