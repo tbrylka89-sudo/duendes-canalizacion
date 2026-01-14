@@ -7,31 +7,63 @@ export const maxDuration = 60;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// Headers CORS para permitir llamadas desde WordPress
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 // ═══════════════════════════════════════════════════════════════
 // API CANALIZAR PRODUCTO - Generación de historias con IA
 // ═══════════════════════════════════════════════════════════════
+
+// Manejar preflight CORS
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
 
 export async function POST(request) {
     try {
         const data = await request.json();
         const { action } = data;
 
+        let response;
         switch (action) {
             case 'generate':
-                return await generateStory(data);
+                response = await generateStory(data);
+                break;
             case 'improve':
-                return await improveStory(data);
+                response = await improveStory(data);
+                break;
             case 'regenerate':
-                return await regenerateStory(data);
+                response = await regenerateStory(data);
+                break;
             case 'feedback':
-                return await saveFeedback(data);
+                response = await saveFeedback(data);
+                break;
             default:
-                return NextResponse.json({ success: false, error: 'Acción no válida' });
+                response = NextResponse.json({ success: false, error: 'Acción no válida' });
         }
+
+        // Agregar headers CORS a la respuesta
+        const headers = new Headers(response.headers);
+        Object.entries(corsHeaders).forEach(([key, value]) => {
+            headers.set(key, value);
+        });
+
+        return new NextResponse(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers
+        });
 
     } catch (error) {
         console.error('Error en canalizar-producto:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return NextResponse.json(
+            { success: false, error: error.message },
+            { status: 500, headers: corsHeaders }
+        );
     }
 }
 
