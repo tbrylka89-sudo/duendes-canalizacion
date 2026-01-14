@@ -1,18 +1,12 @@
 <?php
 /**
- * Plugin Name: Duendes Test Guardian v3.5
- * Description: Test del Guardián - Embudo emocional con IA y memoria
- * Version: 3.5
+ * Plugin Name: Duendes Test Guardian v3.6
+ * Description: Test del Guardián - Diseño cinematográfico premium
+ * Version: 3.6
  * Author: Duendes del Uruguay
  */
 
-// Evitar acceso directo
 if (!defined('ABSPATH')) exit;
-
-// ═══════════════════════════════════════════════════════════════════════════════════════
-// TEST DEL GUARDIAN v3.5 - REWORK TOTAL
-// Flujo reordenado + UI premium con grilla + Tarjeta digital
-// ═══════════════════════════════════════════════════════════════════════════════════════
 
 add_action('wp_footer', 'duendes_test_guardian_v3');
 
@@ -24,23 +18,19 @@ function duendes_test_guardian_v3() {
 
     <style id="tg-v3-styles">
     /* ═══════════════════════════════════════════════════════════════════════════
-       VARIABLES Y RESET
+       VARIABLES - PALETA CINEMATOGRÁFICA
        ═══════════════════════════════════════════════════════════════════════════ */
     :root {
         --tg-bg: #05060A;
+        --tg-bg-glass: rgba(10, 12, 18, 0.85);
         --tg-text: #F5F7FF;
-        --tg-text-soft: rgba(245, 247, 255, 0.7);
+        --tg-text-soft: rgba(245, 247, 255, 0.75);
         --tg-text-muted: rgba(245, 247, 255, 0.5);
         --tg-neon: #3B82F6;
-        --tg-neon-glow: rgba(59, 130, 246, 0.4);
-        --tg-neon-soft: rgba(59, 130, 246, 0.15);
+        --tg-neon-glow: rgba(59, 130, 246, 0.35);
+        --tg-neon-soft: rgba(59, 130, 246, 0.12);
         --tg-gold: #D4AF37;
-        --tg-gold-soft: rgba(212, 175, 55, 0.6);
-        --tg-glass: rgba(255, 255, 255, 0.03);
-        --tg-border: rgba(59, 130, 246, 0.4);
-        --tg-card-padding: 32px;
-        --tg-card-padding-mobile: 22px;
-        --tg-border-width: 2px;
+        --tg-gold-soft: rgba(212, 175, 55, 0.7);
     }
 
     #tg-app {
@@ -76,31 +66,31 @@ function duendes_test_guardian_v3() {
     .tg-orb {
         position: absolute;
         border-radius: 50%;
-        filter: blur(120px);
-        animation: tgOrbFloat 25s ease-in-out infinite;
+        filter: blur(140px);
+        animation: tgOrbFloat 30s ease-in-out infinite;
     }
 
     .tg-orb-1 {
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-        top: -200px;
-        left: -200px;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+        top: -250px;
+        left: -250px;
     }
 
     .tg-orb-2 {
         width: 500px;
         height: 500px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
         bottom: -150px;
         right: -150px;
-        animation-delay: -8s;
+        animation-delay: -10s;
     }
 
     @keyframes tgOrbFloat {
         0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(30px, -40px) scale(1.1); }
-        66% { transform: translate(-20px, 30px) scale(0.9); }
+        33% { transform: translate(40px, -50px) scale(1.1); }
+        66% { transform: translate(-30px, 40px) scale(0.95); }
     }
 
     .tg-particles {
@@ -115,823 +105,768 @@ function duendes_test_guardian_v3() {
         background: var(--tg-neon);
         border-radius: 50%;
         opacity: 0;
-        animation: tgParticleRise 18s linear infinite;
+        animation: tgParticle 8s ease-in-out infinite;
     }
 
-    @keyframes tgParticleRise {
-        0% { opacity: 0; transform: translateY(100vh) scale(0); }
-        10% { opacity: 0.6; }
-        90% { opacity: 0.3; }
-        100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+    @keyframes tgParticle {
+        0%, 100% { opacity: 0; transform: translateY(0); }
+        50% { opacity: 0.6; transform: translateY(-30px); }
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
-       CONTENIDO PRINCIPAL
+       CONTAINER Y LAYOUT
        ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-content {
+    .tg-container {
         position: relative;
         z-index: 10;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 60px 24px;
     }
 
     .tg-screen {
         display: none;
-        width: 100%;
-        max-width: 650px;
-        text-align: center;
+        min-height: 100vh;
     }
 
     .tg-screen.active {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
-    }
-
-    .tg-screen.wide {
-        max-width: 1150px;
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
        TIPOGRAFÍA
        ═══════════════════════════════════════════════════════════════════════════ */
     .tg-title {
-        font-family: 'Cinzel', serif !important;
-        color: var(--tg-gold) !important;
-        font-size: clamp(1.6rem, 4.5vw, 2.3rem) !important;
-        font-weight: 600 !important;
-        letter-spacing: 2px !important;
-        text-transform: uppercase !important;
-        margin-bottom: 15px !important;
-        text-shadow: 0 0 40px var(--tg-gold-soft) !important;
-        background: none !important;
-        line-height: 1.3 !important;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(28px, 5vw, 42px);
+        font-weight: 600;
+        color: var(--tg-text);
+        text-align: center;
+        line-height: 1.3;
+        margin-bottom: 16px;
     }
 
     .tg-subtitle {
-        color: var(--tg-text-soft) !important;
-        font-size: 1.15rem !important;
-        font-style: italic;
-        margin-bottom: 35px;
-        line-height: 1.6;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       INDICADOR DE PROGRESO
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-progress {
-        position: fixed;
-        top: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 10px;
-        z-index: 100;
-    }
-
-    .tg-rune {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: rgba(59, 130, 246, 0.2);
-        border: 1px solid var(--tg-border);
-        transition: all 0.5s ease;
-    }
-
-    .tg-rune.active {
-        background: var(--tg-neon);
-        box-shadow: 0 0 15px var(--tg-neon-glow);
-    }
-
-    .tg-rune.completed {
-        background: var(--tg-gold);
-        border-color: var(--tg-gold);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       FORMULARIO DATOS PERSONALES (PANTALLA 1)
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-personal-form {
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
-    .tg-form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    .tg-form-grid .full-width {
-        grid-column: 1 / -1;
-    }
-
-    .tg-field {
-        text-align: left;
-        margin-bottom: 0;
-    }
-
-    .tg-field label {
-        display: block;
-        color: var(--tg-text);
-        font-family: 'Cinzel', serif;
-        font-size: 0.75rem;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    .tg-field .optional-tag {
-        color: var(--tg-text-muted);
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 0.7rem;
-        font-style: italic;
-        text-transform: none;
-        letter-spacing: 0;
-        margin-left: 6px;
-    }
-
-    .tg-field input,
-    .tg-field select {
-        width: 100%;
-        background: var(--tg-glass);
-        border: var(--tg-border-width) solid var(--tg-border);
-        border-radius: 12px;
-        color: var(--tg-text);
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 1.05rem;
-        padding: 14px 18px;
-        outline: none;
-        transition: all 0.3s ease;
-    }
-
-    .tg-field input:focus,
-    .tg-field select:focus {
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 20px var(--tg-neon-glow);
-    }
-
-    .tg-field input::placeholder {
-        color: rgba(245, 247, 255, 0.3);
-    }
-
-    .tg-field select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233B82F6' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 15px center;
-        padding-right: 40px;
-    }
-
-    .tg-field select option {
-        background: #0a0a0f;
-        color: var(--tg-text);
-    }
-
-    .tg-form-disclaimer {
+        font-size: clamp(18px, 3vw, 22px);
         color: var(--tg-text-soft);
-        font-size: 0.9rem;
-        font-style: italic;
-        margin-top: 30px;
-        padding: 18px;
-        background: var(--tg-glass);
-        border-radius: 12px;
-        border: 1px solid var(--tg-neon-soft);
-        line-height: 1.6;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       PREGUNTAS
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-question {
         text-align: center;
-        margin-bottom: 45px;
-    }
-
-    .tg-question-num {
-        color: var(--tg-neon);
-        font-family: 'Cinzel', serif;
-        font-size: 0.75rem;
-        letter-spacing: 4px;
-        margin-bottom: 20px;
-        opacity: 0.7;
-    }
-
-    .tg-question-text {
-        color: var(--tg-text);
-        font-family: 'Cormorant Garamond', serif;
-        font-size: clamp(1.3rem, 4vw, 1.8rem);
-        font-style: italic;
-        font-weight: 500;
-        line-height: 1.5;
-        max-width: 580px;
-        margin: 0 auto;
-    }
-
-    .tg-letter {
-        display: inline-block;
-        opacity: 0;
-        animation: tgLetterIn 0.3s ease forwards;
-    }
-
-    @keyframes tgLetterIn {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       MYSTIC BUBBLE BUTTONS
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-options {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-        width: 100%;
-        max-width: 480px;
-        margin: 0 auto;
-    }
-
-    #tg-app .tg-bubble,
-    #tg-app button.tg-bubble {
-        background: #000000 !important;
-        color: var(--tg-text) !important;
-        border: var(--tg-border-width) solid var(--tg-neon) !important;
-        border-radius: 50px !important;
-        padding: 16px 32px !important;
-        font-family: 'Cormorant Garamond', serif !important;
-        font-size: 1.05rem !important;
-        font-weight: 500 !important;
-        letter-spacing: 0.3px !important;
-        cursor: pointer !important;
-        width: 100% !important;
-        max-width: 420px !important;
-        text-align: center !important;
-        opacity: 0;
-        transform: translateY(18px);
-        transition: all 0.25s ease !important;
-        box-shadow:
-            0 0 15px var(--tg-neon-glow),
-            0 0 30px rgba(59, 130, 246, 0.15),
-            inset 0 0 20px rgba(59, 130, 246, 0.05) !important;
-        outline: none !important;
-    }
-
-    #tg-app .tg-bubble.visible {
-        animation: tgBubbleAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes tgBubbleAppear {
-        0% { opacity: 0; transform: translateY(18px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-
-    #tg-app .tg-bubble:hover {
-        background: rgba(59, 130, 246, 0.1) !important;
-        transform: scale(1.02) !important;
-        box-shadow:
-            0 0 25px var(--tg-neon-glow),
-            0 0 50px rgba(59, 130, 246, 0.2) !important;
-    }
-
-    #tg-app .tg-bubble:active {
-        transform: scale(0.98) !important;
-    }
-
-    #tg-app .tg-bubble.selected {
-        background: var(--tg-neon) !important;
-        color: #000 !important;
-        animation: tgBubblePop 0.4s ease forwards;
-    }
-
-    @keyframes tgBubblePop {
-        0% { transform: scale(1); }
-        30% { transform: scale(1.08); }
-        100% { transform: scale(0); opacity: 0; }
-    }
-
-    /* Botón de acción principal */
-    #tg-app .tg-btn-primary {
-        background: linear-gradient(135deg, var(--tg-neon), #2563EB) !important;
-        color: #fff !important;
-        border: none !important;
-        padding: 18px 50px !important;
-        border-radius: 50px !important;
-        font-family: 'Cinzel', serif !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 2px !important;
-        text-transform: uppercase !important;
-        cursor: pointer !important;
-        margin-top: 30px !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 0 30px var(--tg-neon-glow) !important;
-        outline: none !important;
-    }
-
-    #tg-app .tg-btn-primary:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 0 50px var(--tg-neon-glow) !important;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       TEXTO LIBRE
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-freetext {
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
-    .tg-freetext textarea {
-        width: 100%;
-        min-height: 120px;
-        background: var(--tg-glass);
-        border: var(--tg-border-width) solid var(--tg-border);
-        border-radius: 16px;
-        color: var(--tg-text);
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 1.15rem;
-        font-style: italic;
-        padding: 20px;
-        resize: none;
-        outline: none;
-        transition: all 0.3s ease;
         line-height: 1.6;
-    }
-
-    .tg-freetext textarea:focus {
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 20px var(--tg-neon-glow);
-    }
-
-    .tg-freetext textarea::placeholder {
-        color: rgba(245, 247, 255, 0.35);
+        max-width: 50ch;
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
-       PANTALLA CONTACTO (WhatsApp + Email)
+       BOTONES BURBUJA
        ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-contact-form {
-        width: 100%;
-        max-width: 450px;
-        margin: 0 auto;
-    }
-
-    .tg-whatsapp-field {
-        display: flex;
-        gap: 10px;
-    }
-
-    .tg-whatsapp-field .prefix {
-        width: 90px;
-        flex-shrink: 0;
-    }
-
-    .tg-whatsapp-field .number {
-        flex: 1;
-    }
-
-    .tg-checkbox-field {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        text-align: left;
-        margin-top: 25px;
-        padding: 15px;
-        background: var(--tg-glass);
-        border-radius: 12px;
-        cursor: pointer;
-    }
-
-    .tg-checkbox-field input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        margin-top: 2px;
-        accent-color: var(--tg-neon);
-        cursor: pointer;
-    }
-
-    .tg-checkbox-field label {
-        color: var(--tg-text-soft);
-        font-size: 0.95rem;
-        line-height: 1.5;
-        cursor: pointer;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       LOADER
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-loader {
-        display: flex;
-        flex-direction: column;
+    .tg-bubble {
+        display: inline-flex;
         align-items: center;
-        gap: 25px;
-    }
-
-    .tg-loader-spinner {
-        width: 60px;
-        height: 60px;
-        border: 2px solid var(--tg-border);
-        border-top-color: var(--tg-neon);
-        border-radius: 50%;
-        animation: tgSpin 1s linear infinite;
-    }
-
-    @keyframes tgSpin {
-        to { transform: rotate(360deg); }
-    }
-
-    .tg-loader-text {
+        justify-content: center;
+        padding: 16px 36px;
+        background: rgba(10, 10, 14, 0.9);
+        border: 2px solid var(--tg-neon);
+        border-radius: 50px;
         color: var(--tg-text);
-        font-size: 1.2rem;
-        font-style: italic;
+        font-family: 'Cinzel', serif;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 20px var(--tg-neon-glow), inset 0 0 20px rgba(59, 130, 246, 0.05);
+        text-transform: uppercase;
+    }
+
+    .tg-bubble:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 35px var(--tg-neon-glow), 0 8px 25px rgba(0,0,0,0.4), inset 0 0 25px rgba(59, 130, 246, 0.1);
+    }
+
+    .tg-bubble-small {
+        padding: 12px 24px;
+        font-size: 13px;
+    }
+
+    .tg-bubble-gold {
+        border-color: var(--tg-gold);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .tg-bubble-gold:hover {
+        box-shadow: 0 0 35px rgba(212, 175, 55, 0.4), 0 8px 25px rgba(0,0,0,0.4);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       PANTALLAS DE FLUJO (música, intro, personal, preguntas, contacto)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .tg-music-container {
+        text-align: center;
+    }
+
+    .tg-music-icon {
+        font-size: 60px;
+        margin-bottom: 30px;
         animation: tgPulse 2s ease-in-out infinite;
     }
 
     @keyframes tgPulse {
-        0%, 100% { opacity: 0.6; }
-        50% { opacity: 1; }
+        0%, 100% { opacity: 0.7; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.05); }
     }
 
-    /* ═══════════════════════════════════════════════════════════════════════════
-       PANTALLA FINAL - LAYOUT PREMIUM CON GRILLA
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-result-container {
-        width: 100%;
-        max-width: 1150px;
-        margin: 0 auto;
-        padding: 20px;
+    .tg-music-activator {
+        cursor: pointer;
+        transition: transform 0.3s;
     }
 
-    /* Header */
-    .tg-result-header {
-        text-align: center;
-        margin-bottom: 50px;
+    .tg-music-activator:hover {
+        transform: scale(1.02);
     }
 
-    .tg-result-title {
-        font-family: 'Cinzel', serif;
-        color: var(--tg-gold);
-        font-size: clamp(1.8rem, 5vw, 2.5rem);
-        font-weight: 600;
-        margin-bottom: 12px;
-        text-shadow: 0 0 40px var(--tg-gold-soft);
-        line-height: 1.3;
+    .tg-skip-music {
+        background: none;
+        border: none;
+        color: var(--tg-text-muted);
+        font-size: 14px;
+        margin-top: 30px;
+        cursor: pointer;
+        text-decoration: underline;
+        transition: color 0.3s;
     }
 
-    .tg-result-subtitle {
+    .tg-skip-music:hover {
         color: var(--tg-text-soft);
-        font-size: 1.15rem;
-        font-style: italic;
     }
 
-    /* Grilla principal */
-    .tg-result-grid {
+    /* Progress bar */
+    .tg-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--tg-neon), var(--tg-gold));
+        z-index: 100;
+        transition: width 0.5s ease;
+        box-shadow: 0 0 10px var(--tg-neon-glow);
+    }
+
+    /* Formularios */
+    .tg-form-grid {
         display: grid;
-        grid-template-columns: 55% 45%;
-        gap: 36px;
-        margin-bottom: 50px;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        width: 100%;
+        max-width: 600px;
+        margin: 40px auto;
     }
 
-    /* Cards base */
-    .tg-card {
-        background: var(--tg-glass);
-        border: var(--tg-border-width) solid var(--tg-border);
-        border-radius: 20px;
-        padding: var(--tg-card-padding);
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.08);
-    }
-
-    .tg-card-title {
-        font-family: 'Cinzel', serif;
-        color: var(--tg-text);
-        font-size: 0.85rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 20px;
-        opacity: 0.8;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .tg-card-title::before {
-        content: '✦';
-        color: var(--tg-neon);
-        font-size: 0.9rem;
-    }
-
-    /* Columna izquierda */
-    .tg-result-left {
+    .tg-field {
         display: flex;
         flex-direction: column;
-        gap: 28px;
+        gap: 8px;
     }
 
-    /* Revelación */
-    .tg-revelation p {
-        color: var(--tg-text);
-        font-size: 1.1rem;
-        line-height: 1.8;
-        margin-bottom: 18px;
+    .tg-field.full-width {
+        grid-column: 1 / -1;
     }
 
-    .tg-revelation p:last-child {
-        margin-bottom: 0;
-    }
-
-    .tg-revelation .highlight {
-        color: var(--tg-neon);
+    .tg-field label {
+        font-size: 14px;
+        color: var(--tg-text-soft);
         font-weight: 500;
     }
 
-    /* Por qué estos guardianes */
+    .tg-field input, .tg-field select {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: var(--tg-text);
+        font-family: inherit;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    .tg-field input:focus, .tg-field select:focus {
+        outline: none;
+        border-color: var(--tg-neon);
+        box-shadow: 0 0 15px var(--tg-neon-soft);
+    }
+
+    .tg-field input::placeholder {
+        color: var(--tg-text-muted);
+    }
+
+    /* Preguntas */
+    .tg-question-container {
+        text-align: center;
+        width: 100%;
+        max-width: 700px;
+    }
+
+    .tg-question-text {
+        font-size: clamp(22px, 4vw, 30px);
+        color: var(--tg-text);
+        line-height: 1.5;
+        margin-bottom: 40px;
+    }
+
+    .tg-options {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 30px;
+    }
+
+    .tg-option {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 16px;
+        padding: 18px 24px;
+        color: var(--tg-text);
+        font-size: 17px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: left;
+    }
+
+    .tg-option:hover {
+        border-color: var(--tg-neon);
+        background: rgba(59, 130, 246, 0.08);
+        transform: translateX(5px);
+    }
+
+    .tg-option.selected {
+        border-color: var(--tg-neon);
+        background: rgba(59, 130, 246, 0.12);
+        box-shadow: 0 0 20px var(--tg-neon-soft);
+    }
+
+    .tg-freetext {
+        width: 100%;
+        min-height: 120px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 16px;
+        padding: 20px;
+        color: var(--tg-text);
+        font-family: inherit;
+        font-size: 17px;
+        line-height: 1.6;
+        resize: none;
+    }
+
+    .tg-freetext:focus {
+        outline: none;
+        border-color: var(--tg-neon);
+        box-shadow: 0 0 20px var(--tg-neon-soft);
+    }
+
+    /* Loading */
+    .tg-loader-container {
+        text-align: center;
+    }
+
+    .tg-loader-orb {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--tg-neon) 0%, transparent 70%);
+        margin: 0 auto 40px;
+        animation: tgLoaderPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes tgLoaderPulse {
+        0%, 100% { transform: scale(0.9); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .tg-loader-text {
+        font-size: 20px;
+        color: var(--tg-text-soft);
+        font-style: italic;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RESULTADO - DISEÑO CINEMATOGRÁFICO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    #screen-result.active {
+        display: block;
+        padding-top: 40px;
+    }
+
+    .tg-result-container {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* FILA 1: Header cinematográfico */
+    .tg-result-header {
+        text-align: center;
+        margin-bottom: 70px;
+        padding: 40px 0;
+    }
+
+    .tg-result-header h1 {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(32px, 6vw, 52px);
+        font-weight: 600;
+        color: var(--tg-text);
+        margin-bottom: 16px;
+        letter-spacing: 1px;
+    }
+
+    .tg-result-header h1 span {
+        color: var(--tg-gold);
+    }
+
+    .tg-result-header p {
+        font-size: 20px;
+        color: var(--tg-text-muted);
+        font-style: italic;
+    }
+
+    /* FILA 2: Grid 7/5 columnas */
+    .tg-result-grid {
+        display: grid;
+        grid-template-columns: 7fr 5fr;
+        gap: 50px;
+        margin-bottom: 80px;
+    }
+
+    /* Columna izquierda */
+    .tg-col-left {
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+    }
+
+    /* Bloque revelación - glass con borde suave */
+    .tg-revelation-block {
+        background: var(--tg-bg-glass);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 24px;
+        padding: 40px;
+        backdrop-filter: blur(10px);
+    }
+
+    .tg-revelation-title {
+        font-family: 'Cinzel', serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--tg-neon);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+    }
+
+    .tg-revelation-text {
+        font-size: 20px;
+        color: var(--tg-text);
+        line-height: 1.7;
+        max-width: 52ch;
+    }
+
+    .tg-mirror-lines {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tg-mirror-line {
+        font-size: 17px;
+        color: var(--tg-text-soft);
+        font-style: italic;
+        margin-bottom: 8px;
+    }
+
+    /* Bloque "Por qué" - SIN caja, lista editorial */
+    .tg-why-block {
+        padding: 0 10px;
+    }
+
+    .tg-why-title {
+        font-family: 'Cinzel', serif;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--tg-text);
+        margin-bottom: 28px;
+    }
+
     .tg-why-list {
         list-style: none;
-        padding: 0;
     }
 
-    .tg-why-list li {
-        color: var(--tg-text-soft);
-        font-size: 1.05rem;
-        line-height: 1.6;
-        padding: 14px 0 14px 35px;
-        position: relative;
-        border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    .tg-why-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
 
-    .tg-why-list li:last-child {
+    .tg-why-item:last-child {
         border-bottom: none;
+        margin-bottom: 0;
         padding-bottom: 0;
     }
 
-    .tg-why-list li::before {
-        content: '◇';
-        position: absolute;
-        left: 0;
-        top: 14px;
-        color: var(--tg-neon);
-        font-size: 1rem;
+    .tg-why-icon {
+        flex-shrink: 0;
+        width: 8px;
+        height: 8px;
+        background: var(--tg-neon);
+        border-radius: 50%;
+        margin-top: 10px;
+        box-shadow: 0 0 10px var(--tg-neon-glow);
+    }
+
+    .tg-why-text {
+        font-size: 17px;
+        color: var(--tg-text-soft);
+        line-height: 1.6;
     }
 
     /* Columna derecha */
-    .tg-result-right {
+    .tg-col-right {
         display: flex;
         flex-direction: column;
-        gap: 28px;
+        gap: 30px;
     }
 
-    /* Guardian principal */
-    .tg-guardian-main {
+    /* Bloque guardián - EL protagonista con borde fuerte */
+    .tg-guardian-block {
+        background: var(--tg-bg-glass);
+        border: 2px solid var(--tg-neon);
+        border-radius: 28px;
+        padding: 36px;
         text-align: center;
-        padding: var(--tg-card-padding);
-        background: linear-gradient(180deg, var(--tg-glass) 0%, rgba(59, 130, 246, 0.05) 100%);
-        border: var(--tg-border-width) solid var(--tg-border);
-        border-radius: 24px;
+        box-shadow: 0 0 40px var(--tg-neon-soft), inset 0 0 60px rgba(59, 130, 246, 0.03);
     }
 
-    .tg-guardian-img {
-        width: 200px;
-        height: 200px;
+    .tg-guardian-label {
+        font-size: 12px;
+        color: var(--tg-gold);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+    }
+
+    .tg-guardian-photo {
+        width: 160px;
+        height: 160px;
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid var(--tg-neon);
-        box-shadow:
-            0 0 40px var(--tg-neon-glow),
-            0 0 80px rgba(59, 130, 246, 0.2);
-        margin-bottom: 22px;
-        transition: all 0.3s ease;
-    }
-
-    .tg-guardian-main:hover .tg-guardian-img {
-        box-shadow:
-            0 0 50px var(--tg-neon-glow),
-            0 0 100px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 0 30px var(--tg-neon-glow);
+        margin-bottom: 20px;
     }
 
     .tg-guardian-name {
         font-family: 'Cinzel', serif;
-        color: var(--tg-text);
-        font-size: 1.4rem;
+        font-size: 24px;
         font-weight: 600;
-        margin-bottom: 10px;
+        color: var(--tg-text);
+        margin-bottom: 8px;
     }
 
     .tg-guardian-price {
+        font-size: 18px;
         color: var(--tg-gold);
-        font-family: 'Cinzel', serif;
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 12px;
+        margin-bottom: 24px;
     }
 
-    .tg-guardian-scarcity {
-        color: var(--tg-text-muted);
-        font-size: 0.9rem;
-        font-style: italic;
-        margin-bottom: 22px;
-        line-height: 1.5;
-    }
-
-    .tg-cta-primary {
-        display: inline-block;
-        background: linear-gradient(135deg, var(--tg-neon), #2563EB) !important;
-        color: #fff !important;
-        border: none !important;
-        padding: 16px 32px !important;
-        border-radius: 50px !important;
-        font-family: 'Cinzel', serif !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 1px !important;
-        text-transform: uppercase !important;
-        text-decoration: none !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 0 30px var(--tg-neon-glow) !important;
-        cursor: pointer !important;
-    }
-
-    .tg-cta-primary:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 0 50px var(--tg-neon-glow) !important;
-    }
-
-    .tg-cta-secondary {
+    .tg-guardian-cta {
         display: block;
-        color: var(--tg-text-muted) !important;
-        font-size: 0.85rem !important;
-        text-decoration: underline !important;
-        margin-top: 15px !important;
-        transition: color 0.2s !important;
+        width: 100%;
+        padding: 18px 24px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+        border: 2px solid var(--tg-neon);
+        border-radius: 50px;
+        color: var(--tg-text);
+        font-family: 'Cinzel', serif;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.4s;
+        box-shadow: 0 0 25px var(--tg-neon-glow);
     }
 
-    .tg-cta-secondary:hover {
-        color: var(--tg-text) !important;
+    .tg-guardian-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 40px var(--tg-neon-glow), 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    /* Ritual */
-    .tg-ritual {
-        border-color: var(--tg-neon);
+    .tg-guardian-micro {
+        font-size: 13px;
+        color: var(--tg-text-muted);
+        margin-top: 16px;
+        font-style: italic;
+    }
+
+    /* Bloque ritual - minimal */
+    .tg-ritual-block {
+        padding: 24px;
+        border-left: 2px solid rgba(212, 175, 55, 0.4);
+    }
+
+    .tg-ritual-label {
+        font-size: 12px;
+        color: var(--tg-gold-soft);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 14px;
     }
 
     .tg-ritual-text {
-        color: var(--tg-text);
-        font-size: 1.1rem;
-        line-height: 1.8;
+        font-size: 17px;
+        color: var(--tg-text-soft);
+        line-height: 1.7;
         font-style: italic;
     }
 
-    /* Separador */
-    .tg-separator {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--tg-neon), transparent);
-        box-shadow: 0 0 20px var(--tg-neon-glow);
-        margin: 20px 0 50px;
-        opacity: 0.5;
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FILA 3: También te recomendamos - CARRUSEL MODERNO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .tg-also-section {
+        margin-bottom: 80px;
     }
 
-    /* También te recomendamos */
-    .tg-also-section {
-        margin-bottom: 50px;
+    .tg-also-header {
+        text-align: center;
+        margin-bottom: 40px;
     }
 
     .tg-also-title {
         font-family: 'Cinzel', serif;
+        font-size: 20px;
+        font-weight: 500;
         color: var(--tg-text);
-        font-size: 1rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        text-align: center;
-        margin-bottom: 35px;
-        opacity: 0.7;
+        position: relative;
+        display: inline-block;
     }
 
-    .tg-also-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
+    .tg-also-title::before,
+    .tg-also-title::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3));
+    }
+
+    .tg-also-title::before {
+        right: calc(100% + 20px);
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3));
+    }
+
+    .tg-also-title::after {
+        left: calc(100% + 20px);
+        background: linear-gradient(-90deg, transparent, rgba(59, 130, 246, 0.3));
+    }
+
+    .tg-also-scroll {
+        display: flex;
         gap: 24px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding: 20px 10px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
-    .tg-also-item {
+    .tg-also-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Cards livianas - SIN borde pesado */
+    .tg-also-card {
+        flex: 0 0 220px;
+        scroll-snap-align: start;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 20px;
+        padding: 20px;
         text-align: center;
         text-decoration: none;
-        padding: 20px;
-        background: var(--tg-glass);
-        border: var(--tg-border-width) solid rgba(59, 130, 246, 0.2);
-        border-radius: 16px;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
     }
 
-    .tg-also-item:hover {
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 30px var(--tg-neon-glow);
-        transform: translateY(-5px);
+    .tg-also-card:hover {
+        transform: translateY(-8px);
+        background: rgba(59, 130, 246, 0.06);
+        border-color: rgba(59, 130, 246, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--tg-neon-soft);
     }
 
-    .tg-also-img {
+    .tg-also-photo {
         width: 100px;
         height: 100px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid var(--tg-border);
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
+        margin-bottom: 16px;
+        border: 2px solid transparent;
+        transition: all 0.4s;
     }
 
-    .tg-also-item:hover .tg-also-img {
+    .tg-also-card:hover .tg-also-photo {
         border-color: var(--tg-neon);
+        box-shadow: 0 0 20px var(--tg-neon-glow);
     }
 
     .tg-also-name {
         font-family: 'Cinzel', serif;
-        color: var(--tg-text);
-        font-size: 0.95rem;
+        font-size: 15px;
         font-weight: 500;
+        color: var(--tg-text);
         margin-bottom: 8px;
+        line-height: 1.3;
     }
 
     .tg-also-price {
-        color: var(--tg-gold-soft);
-        font-size: 0.9rem;
-        margin-bottom: 12px;
+        font-size: 14px;
+        color: var(--tg-gold);
+        margin-bottom: 14px;
     }
 
-    .tg-also-cta {
+    .tg-also-btn {
         display: inline-block;
-        color: var(--tg-neon) !important;
-        font-size: 0.8rem;
+        padding: 8px 20px;
+        background: transparent;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 20px;
+        color: var(--tg-text-soft);
+        font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        font-family: 'Cinzel', serif;
+        transition: all 0.3s;
     }
 
-    /* Frase sellada */
-    .tg-sealed {
+    .tg-also-card:hover .tg-also-btn {
+        border-color: var(--tg-neon);
+        color: var(--tg-text);
+        box-shadow: 0 0 15px var(--tg-neon-soft);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FILA 4: Altar final - Cierre elegante
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .tg-altar {
         text-align: center;
-        padding: 35px;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent);
-        border: var(--tg-border-width) solid var(--tg-border);
-        border-radius: 20px;
-        margin-bottom: 40px;
+        padding: 60px 20px;
+        border-top: 1px solid rgba(212, 175, 55, 0.15);
     }
 
     .tg-sealed-phrase {
         font-family: 'Cinzel', serif;
-        color: var(--tg-gold);
-        font-size: 1.4rem;
+        font-size: clamp(22px, 4vw, 30px);
         font-weight: 500;
+        color: var(--tg-gold);
         line-height: 1.5;
-        margin-bottom: 25px;
+        margin-bottom: 40px;
+        text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
     }
 
-    .tg-sealed-actions {
+    .tg-altar-actions {
         display: flex;
         justify-content: center;
-        gap: 15px;
+        gap: 20px;
         flex-wrap: wrap;
     }
 
-    .tg-btn-outline {
-        background: transparent !important;
-        border: var(--tg-border-width) solid var(--tg-gold-soft) !important;
-        color: var(--tg-gold) !important;
-        padding: 12px 28px !important;
-        border-radius: 50px !important;
-        font-family: 'Cinzel', serif !important;
-        font-size: 0.75rem !important;
-        letter-spacing: 1px !important;
-        text-transform: uppercase !important;
-        cursor: pointer !important;
-        transition: all 0.3s !important;
+    /* ═══════════════════════════════════════════════════════════════════════════
+       NEWSLETTER - Sección elegante
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .tg-newsletter {
+        margin: 60px 0;
+        padding: 50px 30px;
+        text-align: center;
+        background: linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, transparent 100%);
+        border-radius: 24px;
     }
 
-    .tg-btn-outline:hover {
-        background: rgba(212, 175, 55, 0.1) !important;
-        box-shadow: 0 0 25px var(--tg-gold-soft) !important;
+    .tg-newsletter-title {
+        font-family: 'Cinzel', serif;
+        font-size: 20px;
+        color: var(--tg-text);
+        margin-bottom: 12px;
+    }
+
+    .tg-newsletter-sub {
+        font-size: 16px;
+        color: var(--tg-text-muted);
+        margin-bottom: 30px;
+    }
+
+    .tg-newsletter-form {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .tg-newsletter-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 14px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 50px;
+        color: var(--tg-text);
+        font-size: 16px;
+        font-family: inherit;
+    }
+
+    .tg-newsletter-input:focus {
+        outline: none;
+        border-color: var(--tg-neon);
+        box-shadow: 0 0 20px var(--tg-neon-soft);
+    }
+
+    .tg-newsletter-input::placeholder {
+        color: var(--tg-text-muted);
+    }
+
+    .tg-newsletter-status {
+        margin-top: 20px;
+        font-size: 15px;
+        min-height: 24px;
+    }
+
+    .tg-newsletter-status.loading {
+        color: var(--tg-neon);
+    }
+
+    .tg-newsletter-status.success {
+        color: var(--tg-gold);
+    }
+
+    .tg-newsletter-status.error {
+        color: #ef4444;
     }
 
     /* Restart */
-    .tg-restart {
+    .tg-restart-link {
         display: block;
-        text-align: center;
+        margin-top: 50px;
         color: var(--tg-text-muted);
-        font-size: 0.9rem;
-        background: none;
-        border: none;
-        cursor: pointer;
+        font-size: 14px;
         text-decoration: underline;
-        margin: 30px auto 0;
-        transition: color 0.2s;
+        cursor: pointer;
+        transition: color 0.3s;
     }
 
-    .tg-restart:hover {
-        color: var(--tg-text);
+    .tg-restart-link:hover {
+        color: var(--tg-text-soft);
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
@@ -940,423 +875,304 @@ function duendes_test_guardian_v3() {
     @media (max-width: 900px) {
         .tg-result-grid {
             grid-template-columns: 1fr;
-            gap: 28px;
+            gap: 40px;
         }
 
-        .tg-result-left,
-        .tg-result-right {
-            order: unset;
-        }
-
-        .tg-result-right {
+        .tg-col-right {
             order: -1;
         }
 
-        .tg-also-grid {
-            grid-template-columns: repeat(2, 1fr);
+        .tg-result-header {
+            margin-bottom: 50px;
         }
     }
 
     @media (max-width: 600px) {
-        :root {
-            --tg-card-padding: var(--tg-card-padding-mobile);
+        .tg-container {
+            padding: 40px 16px;
         }
 
         .tg-form-grid {
             grid-template-columns: 1fr;
         }
 
-        .tg-result-title {
-            font-size: 1.5rem;
+        .tg-revelation-block {
+            padding: 28px 22px;
         }
 
-        .tg-guardian-img {
-            width: 160px;
-            height: 160px;
+        .tg-guardian-block {
+            padding: 28px 22px;
         }
 
-        .tg-also-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .tg-also-card {
+            flex: 0 0 180px;
         }
 
-        .tg-also-img {
+        .tg-also-photo {
             width: 80px;
             height: 80px;
         }
 
-        .tg-whatsapp-field {
+        .tg-altar-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tg-newsletter-form {
             flex-direction: column;
         }
 
-        .tg-whatsapp-field .prefix {
-            width: 100%;
+        .tg-newsletter-input {
+            min-width: 100%;
         }
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       PANTALLA MÚSICA
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-music-activator {
-        width: 150px;
-        height: 150px;
-        margin: 40px auto;
-        position: relative;
-        cursor: pointer;
-    }
-
-    .tg-music-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    .tg-music-icon svg {
-        width: 50px;
-        height: 50px;
-        stroke: var(--tg-neon);
-        fill: none;
-        stroke-width: 1.5;
-        filter: drop-shadow(0 0 15px var(--tg-neon-glow));
-    }
-
-    .tg-music-ring {
-        position: absolute;
-        border: 1px solid var(--tg-border);
-        border-radius: 50%;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        animation: tgRingExpand 3s ease-out infinite;
-    }
-
-    .tg-music-ring:nth-child(1) { width: 80px; height: 80px; }
-    .tg-music-ring:nth-child(2) { width: 110px; height: 110px; animation-delay: 1s; }
-    .tg-music-ring:nth-child(3) { width: 140px; height: 140px; animation-delay: 2s; }
-
-    @keyframes tgRingExpand {
-        0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); }
-        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
-    }
-
-    .tg-skip-music {
-        background: transparent !important;
-        border: 1px solid var(--tg-border) !important;
-        color: var(--tg-text-soft) !important;
-        padding: 12px 30px !important;
-        border-radius: 50px !important;
-        font-family: 'Cinzel', serif !important;
-        font-size: 0.8rem !important;
-        letter-spacing: 1px !important;
-        cursor: pointer !important;
-        margin-top: 40px !important;
-        transition: all 0.3s !important;
-    }
-
-    .tg-skip-music:hover {
-        border-color: var(--tg-neon) !important;
-        color: var(--tg-text) !important;
     }
     </style>
 
-    <!-- HTML STRUCTURE -->
     <div id="tg-app">
         <div class="tg-bg">
             <div class="tg-orb tg-orb-1"></div>
             <div class="tg-orb tg-orb-2"></div>
-            <div class="tg-particles" id="tg-particles"></div>
+            <div class="tg-particles">
+                <div class="tg-particle" style="left:10%;top:20%;animation-delay:0s"></div>
+                <div class="tg-particle" style="left:85%;top:15%;animation-delay:1s"></div>
+                <div class="tg-particle" style="left:20%;top:80%;animation-delay:2s"></div>
+                <div class="tg-particle" style="left:70%;top:70%;animation-delay:3s"></div>
+                <div class="tg-particle" style="left:40%;top:40%;animation-delay:4s"></div>
+            </div>
         </div>
 
-        <div class="tg-content">
-            <div class="tg-progress" id="tg-progress"></div>
+        <div class="tg-progress" id="tg-progress"></div>
 
-            <!-- Screen: Music -->
+        <div class="tg-container">
+            <!-- PANTALLA: Música -->
             <div class="tg-screen active" id="screen-music">
-                <p class="tg-subtitle">Experiencia inmersiva</p>
-                <div class="tg-music-activator" onclick="TG.startWithMusic()">
-                    <div class="tg-music-ring"></div>
-                    <div class="tg-music-ring"></div>
-                    <div class="tg-music-ring"></div>
-                    <div class="tg-music-icon">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>
+                <div class="tg-music-container">
+                    <div class="tg-music-icon">🎧</div>
+                    <h1 class="tg-title">Antes de comenzar...</h1>
+                    <p class="tg-subtitle">Te recomendamos usar auriculares para una experiencia más profunda.</p>
+                    <div class="tg-music-activator" onclick="TG.startWithMusic()" style="margin-top:40px;">
+                        <button class="tg-bubble">Activar audio y comenzar</button>
                     </div>
+                    <button class="tg-skip-music" onclick="TG.startWithoutMusic()">Continuar en silencio</button>
                 </div>
-                <p style="color: var(--tg-text-soft); font-size: 0.9rem;">Tocá para activar el sonido</p>
-                <button class="tg-skip-music" onclick="TG.startWithoutMusic()">Continuar en silencio</button>
             </div>
 
-            <!-- Screen: Intro -->
+            <!-- PANTALLA: Intro -->
             <div class="tg-screen" id="screen-intro">
-                <h1 class="tg-title">El Test del Guardián</h1>
-                <p class="tg-subtitle">El guardián te elige a vos.<br>Descubrí cuál está esperándote.</p>
-                <button class="tg-bubble visible" onclick="TG.goToPersonal()" style="opacity:1;transform:none;">Comenzar</button>
+                <h1 class="tg-title">El portal se está abriendo...</h1>
+                <p class="tg-subtitle" style="margin-bottom:50px;">Algo te estaba esperando. Y no llegaste por casualidad.</p>
+                <button class="tg-bubble" onclick="TG.begin()">Comenzar</button>
             </div>
 
-            <!-- Screen: Personal Data (PANTALLA 1 - PRIMERO) -->
+            <!-- PANTALLA: Datos personales -->
             <div class="tg-screen" id="screen-personal">
-                <h2 class="tg-title" style="font-size:1.5rem !important;">Primero, contanos de vos</h2>
-                <p class="tg-subtitle">Esto no es un formulario. Es la llave del portal.</p>
-
-                <div class="tg-personal-form">
-                    <div class="tg-form-grid">
-                        <div class="tg-field full-width">
-                            <label>Nombre</label>
-                            <input type="text" id="p-name" placeholder="Tu nombre completo...">
-                        </div>
-                        <div class="tg-field">
-                            <label>Edad</label>
-                            <input type="number" id="p-age" placeholder="Ej: 35" min="18" max="99">
-                        </div>
-                        <div class="tg-field">
-                            <label>Sexo <span class="optional-tag">(opcional)</span></label>
-                            <select id="p-sex">
-                                <option value="">Seleccionar...</option>
-                                <option value="F">Mujer</option>
-                                <option value="M">Hombre</option>
-                                <option value="O">Otro</option>
-                                <option value="N">Prefiero no decir</option>
-                            </select>
-                        </div>
-                        <div class="tg-field">
-                            <label>Nacionalidad</label>
-                            <select id="p-nationality">
-                                <option value="">Seleccionar...</option>
-                                <option value="AR">Argentina</option>
-                                <option value="UY">Uruguay</option>
-                                <option value="CL">Chile</option>
-                                <option value="MX">México</option>
-                                <option value="CO">Colombia</option>
-                                <option value="PE">Perú</option>
-                                <option value="ES">España</option>
-                                <option value="US">Estados Unidos</option>
-                                <option value="OT">Otra</option>
-                            </select>
-                        </div>
-                        <div class="tg-field">
-                            <label>País de residencia</label>
-                            <select id="p-country" onchange="TG.updatePhonePrefix()">
-                                <option value="">Seleccionar...</option>
-                                <option value="AR">Argentina</option>
-                                <option value="UY">Uruguay</option>
-                                <option value="CL">Chile</option>
-                                <option value="MX">México</option>
-                                <option value="CO">Colombia</option>
-                                <option value="PE">Perú</option>
-                                <option value="ES">España</option>
-                                <option value="US">Estados Unidos</option>
-                                <option value="OT">Otro</option>
-                            </select>
-                        </div>
-                        <div class="tg-field">
-                            <label>Ciudad <span class="optional-tag">(opcional)</span></label>
-                            <input type="text" id="p-city" placeholder="Tu ciudad...">
-                        </div>
-                        <div class="tg-field full-width">
-                            <label>Fecha de nacimiento</label>
-                            <input type="date" id="p-birth">
-                        </div>
+                <h1 class="tg-title">Primero, contanos de vos</h1>
+                <p class="tg-subtitle">Para que tu guardián pueda encontrarte.</p>
+                <div class="tg-form-grid">
+                    <div class="tg-field full-width">
+                        <label>Nombre *</label>
+                        <input type="text" id="p-name" placeholder="Tu nombre o cómo querés que te llame...">
                     </div>
+                    <div class="tg-field">
+                        <label>Edad</label>
+                        <input type="number" id="p-age" placeholder="Años" min="18" max="99">
+                    </div>
+                    <div class="tg-field">
+                        <label>Género (opcional)</label>
+                        <select id="p-sex">
+                            <option value="">Prefiero no decir</option>
+                            <option value="F">Femenino</option>
+                            <option value="M">Masculino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+                    <div class="tg-field">
+                        <label>País *</label>
+                        <select id="p-country">
+                            <option value="">Seleccionar...</option>
+                            <option value="AR">Argentina</option>
+                            <option value="UY">Uruguay</option>
+                            <option value="CL">Chile</option>
+                            <option value="MX">México</option>
+                            <option value="CO">Colombia</option>
+                            <option value="PE">Perú</option>
+                            <option value="ES">España</option>
+                            <option value="US">Estados Unidos</option>
+                            <option value="OT">Otro</option>
+                        </select>
+                    </div>
+                    <div class="tg-field">
+                        <label>Ciudad (opcional)</label>
+                        <input type="text" id="p-city" placeholder="Tu ciudad...">
+                    </div>
+                    <div class="tg-field full-width">
+                        <label>Fecha de nacimiento (opcional)</label>
+                        <input type="date" id="p-birth">
+                    </div>
+                </div>
+                <button class="tg-bubble" onclick="TG.submitPersonal()">Continuar</button>
+            </div>
 
-                    <button class="tg-btn-primary" onclick="TG.submitPersonal()">Siguiente</button>
+            <!-- PANTALLA: Preguntas -->
+            <div class="tg-screen" id="screen-question">
+                <div class="tg-question-container">
+                    <p class="tg-question-text" id="q-text"></p>
+                    <div class="tg-options" id="q-options"></div>
+                    <textarea class="tg-freetext" id="q-freetext" placeholder="Escribí lo que sientas..." style="display:none;"></textarea>
+                    <button class="tg-bubble" id="q-continue" style="display:none;" onclick="TG.submitFreetext()">Continuar</button>
                 </div>
             </div>
 
-            <!-- Screen: Questions -->
-            <div class="tg-screen" id="screen-questions">
-                <div class="tg-question">
-                    <div class="tg-question-num" id="q-num"></div>
-                    <div class="tg-question-text" id="q-text"></div>
-                </div>
-                <div class="tg-options" id="q-options"></div>
-                <div class="tg-freetext" id="q-freetext" style="display:none;">
-                    <textarea id="q-textarea" placeholder=""></textarea>
-                    <button class="tg-btn-primary" onclick="TG.submitFreetext()" style="margin-top:25px;">Continuar</button>
-                </div>
-            </div>
-
-            <!-- Screen: Contact (WhatsApp + Email) -->
+            <!-- PANTALLA: Contacto -->
             <div class="tg-screen" id="screen-contact">
-                <h2 class="tg-title" style="font-size:1.4rem !important;">Último paso</h2>
-                <p class="tg-subtitle">¿Dónde te enviamos tu tarjeta?</p>
-
-                <div class="tg-contact-form">
-                    <div class="tg-field" style="margin-bottom:20px;">
-                        <label>Email</label>
+                <h1 class="tg-title">Un último paso...</h1>
+                <p class="tg-subtitle">Para enviarte tu revelación y mantenerte en el círculo.</p>
+                <div class="tg-form-grid">
+                    <div class="tg-field full-width">
+                        <label>Email *</label>
                         <input type="email" id="c-email" placeholder="tu@email.com">
                     </div>
-
                     <div class="tg-field">
-                        <label>WhatsApp <span class="optional-tag">(opcional)</span></label>
-                        <div class="tg-whatsapp-field">
-                            <input type="text" id="c-prefix" class="prefix" placeholder="+54" value="+54">
-                            <input type="tel" id="c-phone" class="number" placeholder="9 11 1234-5678">
-                        </div>
+                        <label>Prefijo</label>
+                        <input type="text" id="c-prefix" value="+598" readonly style="max-width:100px;">
                     </div>
-
-                    <div class="tg-checkbox-field" onclick="document.getElementById('c-newsletter').click()">
-                        <input type="checkbox" id="c-newsletter">
-                        <label for="c-newsletter">También quiero recibir señales (newsletter con rituales y novedades)</label>
+                    <div class="tg-field" style="flex:1;">
+                        <label>WhatsApp (opcional)</label>
+                        <input type="tel" id="c-whatsapp" placeholder="Tu número...">
                     </div>
-
-                    <p class="tg-form-disclaimer">
-                        Te va a llegar al email tu tarjeta del guardián + tu frase sellada.
-                    </p>
-
-                    <button class="tg-btn-primary" onclick="TG.submitContact()">Revelar mi Guardián</button>
                 </div>
+                <button class="tg-bubble" onclick="TG.submitContact()">Revelar mi guardián</button>
             </div>
 
-            <!-- Screen: Loading -->
+            <!-- PANTALLA: Loading -->
             <div class="tg-screen" id="screen-loading">
-                <div class="tg-loader">
-                    <div class="tg-loader-spinner"></div>
-                    <p class="tg-loader-text" id="loader-text">Leyendo tu señal...</p>
-                    <p style="color: var(--tg-neon); font-size: 0.95rem;">Tu guardián está siendo revelado</p>
+                <div class="tg-loader-container">
+                    <div class="tg-loader-orb"></div>
+                    <p class="tg-loader-text" id="loader-text">Conectando con el portal...</p>
                 </div>
             </div>
 
-            <!-- Screen: Result -->
-            <div class="tg-screen wide" id="screen-result">
-                <div class="tg-result-container" id="result-content">
-                    <!-- Populated by JS -->
-                </div>
+            <!-- PANTALLA: Resultado -->
+            <div class="tg-screen" id="screen-result">
+                <div class="tg-result-container" id="result-content"></div>
             </div>
         </div>
     </div>
 
-    <audio id="tg-audio" loop src="https://duendesuy.10web.cloud/wp-content/uploads/2026/01/ES_Words-of-an-Angel-Kikoru.mp3"></audio>
-
     <script>
     var TG = {
-        ajaxUrl: '<?php echo $ajax_url; ?>',
-        vercelApi: 'https://duendes-vercel.vercel.app/api',
         audio: null,
         currentQ: 0,
         personal: {},
         contact: {},
         answers: {},
+        ajaxUrl: '<?php echo $ajax_url; ?>',
+        vercelApi: 'https://duendes-vercel.vercel.app/api',
         visitorId: null,
-        totalSteps: 10, // 1 personal + 7 questions + 1 contact + 1 result
+
+        questions: [
+            {
+                id: 'q1_for_whom',
+                text: '¿Para quién estás buscando hoy?',
+                type: 'single',
+                options: [
+                    { id: 'mi', label: 'Para mí' },
+                    { id: 'regalo', label: 'Es un regalo' },
+                    { id: 'ambos', label: 'Todavía no sé bien' }
+                ]
+            },
+            {
+                id: 'q2_pain',
+                text: '¿Qué es lo que más te pesa últimamente?',
+                type: 'single',
+                options: [
+                    { id: 'agotamiento', label: 'Estoy agotada de ser la fuerte', pain: 'agotamiento' },
+                    { id: 'proteccion', label: 'Siento que necesito protección', pain: 'proteccion' },
+                    { id: 'soledad', label: 'Me siento sola aunque esté acompañada', pain: 'soledad' },
+                    { id: 'patrones', label: 'Repito los mismos patrones', pain: 'patrones' },
+                    { id: 'amor', label: 'Quiero amor pero me cuesta confiar', pain: 'amor' }
+                ]
+            },
+            {
+                id: 'q3_body',
+                text: '¿Dónde lo sentís en el cuerpo?',
+                type: 'single',
+                options: [
+                    { id: 'pecho', label: 'En el pecho, como opresión', body: 'pecho' },
+                    { id: 'garganta', label: 'En la garganta, como un nudo', body: 'garganta' },
+                    { id: 'cansancio', label: 'Un cansancio que no se va', body: 'cansancio' },
+                    { id: 'cabeza', label: 'En la cabeza, ansiedad', body: 'cabeza' },
+                    { id: 'intuicion', label: 'En la panza, mi intuición está cargada', body: 'intuicion' }
+                ]
+            },
+            {
+                id: 'q4_soul',
+                text: '¿Qué te está pidiendo tu alma últimamente?',
+                type: 'freetext',
+                placeholder: 'No hay respuesta incorrecta. Escribí lo primero que te venga...'
+            },
+            {
+                id: 'q5_universe',
+                text: 'Si el universo pudiera decirte algo esta noche, ¿qué te gustaría escuchar?',
+                type: 'freetext',
+                placeholder: 'Escribí desde el corazón...'
+            },
+            {
+                id: 'q6_magic_style',
+                text: '¿Cómo te gustaría que fuera la magia que recibas?',
+                type: 'single',
+                options: [
+                    { id: 'rapida', label: 'Directa y rápida', style: 'rapida' },
+                    { id: 'profunda', label: 'Profunda y transformadora', style: 'profunda' },
+                    { id: 'suave', label: 'Suave y amorosa', style: 'suave' },
+                    { id: 'protectora', label: 'Firme y protectora', style: 'protectora' },
+                    { id: 'senal', label: 'Como una señal para volver a mí', style: 'señal' }
+                ]
+            },
+            {
+                id: 'q7_ready',
+                text: '¿Estás lista para conocer al guardián que te eligió?',
+                type: 'single',
+                options: [
+                    { id: 'si', label: 'Sí, estoy lista' },
+                    { id: 'nerviosa', label: 'Un poco nerviosa, pero sí' },
+                    { id: 'curiosa', label: 'Tengo curiosidad' }
+                ]
+            }
+        ],
+
+        loaderPhrases: [
+            'Conectando con el portal...',
+            'Leyendo tu energía...',
+            'Los guardianes están escuchando...',
+            'Buscando el que resuena con vos...',
+            'Preparando tu revelación...'
+        ],
 
         phonePrefixes: {
             'AR': '+54', 'UY': '+598', 'CL': '+56', 'MX': '+52',
             'CO': '+57', 'PE': '+51', 'ES': '+34', 'US': '+1', 'OT': '+1'
         },
 
-        questions: [
-            {
-                id: 'q1_for_whom',
-                type: 'options',
-                text: '¿Este guardián es para vos o para alguien especial?',
-                options: [
-                    {id: 'self', text: 'Es para mí'},
-                    {id: 'gift', text: 'Es un regalo'}
-                ]
-            },
-            {
-                id: 'q2_pain',
-                type: 'options',
-                text: '¿Qué sentís que más estás sosteniendo sola últimamente?',
-                options: [
-                    {id: 'exhausted', text: 'Estoy agotada de ser la fuerte', pain: 'agotamiento'},
-                    {id: 'protection', text: 'Necesito protección (me estoy cargando de todo)', pain: 'proteccion'},
-                    {id: 'lonely', text: 'Me siento sola aunque esté con gente', pain: 'soledad'},
-                    {id: 'patterns', text: 'Repito patrones y no sé cómo cortarlos', pain: 'patrones'},
-                    {id: 'love', text: 'Quiero amor, pero me cuesta confiar', pain: 'amor'}
-                ]
-            },
-            {
-                id: 'q3_body',
-                type: 'options',
-                text: '¿Dónde lo sentís primero en el cuerpo?',
-                options: [
-                    {id: 'chest', text: 'Pecho apretado', body: 'pecho'},
-                    {id: 'throat', text: 'Nudo en la garganta', body: 'garganta'},
-                    {id: 'fatigue', text: 'Cansancio que no se va', body: 'cansancio'},
-                    {id: 'anxiety', text: 'Ansiedad en la cabeza', body: 'cabeza'},
-                    {id: 'gut', text: 'Panza/intuición cargada', body: 'intuicion'}
-                ]
-            },
-            {
-                id: 'q4_soul',
-                type: 'freetext',
-                text: '¿Qué te está pidiendo tu alma hace rato?',
-                placeholder: 'Mi alma me pide…'
-            },
-            {
-                id: 'q5_universe',
-                type: 'freetext',
-                text: 'Si el universo hoy te diera una sola respuesta… ¿qué te gustaría escuchar?',
-                placeholder: 'Me gustaría que me diga…'
-            },
-            {
-                id: 'q6_magic_style',
-                type: 'options',
-                text: '¿Cómo te gusta recibir la magia?',
-                options: [
-                    {id: 'fast', text: 'Directa y rápida (necesito alivio ya)', style: 'rapida'},
-                    {id: 'deep', text: 'Profunda y transformadora', style: 'profunda'},
-                    {id: 'soft', text: 'Suave y amorosa', style: 'suave'},
-                    {id: 'firm', text: 'Firme y protectora', style: 'protectora'},
-                    {id: 'signal', text: 'Como señal para volver a mí', style: 'señal'}
-                ]
-            }
-        ],
-
-        loaderPhrases: [
-            'Leyendo tu señal...',
-            'Conectando con los portales...',
-            'Tu energía está siendo escuchada...',
-            'Buscando a quien te espera...'
-        ],
-
         init: function() {
-            this.createParticles();
-            this.createProgress();
-            this.loadVisitorId();
+            this.visitorId = this.getVisitorId();
+            this.updateProgress(0);
+            document.getElementById('p-country').addEventListener('change', this.updatePhonePrefix.bind(this));
         },
 
-        createParticles: function() {
-            var container = document.getElementById('tg-particles');
-            if (!container) return;
-            for (var i = 0; i < 15; i++) {
-                var p = document.createElement('div');
-                p.className = 'tg-particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 18 + 's';
-                container.appendChild(p);
+        getVisitorId: function() {
+            var id = localStorage.getItem('duendes_visitor_id');
+            if (!id) {
+                id = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('duendes_visitor_id', id);
             }
+            return id;
         },
 
-        createProgress: function() {
-            var container = document.getElementById('tg-progress');
-            if (!container) return;
-            for (var i = 0; i < this.totalSteps; i++) {
-                var rune = document.createElement('div');
-                rune.className = 'tg-rune';
-                rune.dataset.index = i;
-                container.appendChild(rune);
-            }
-        },
-
-        updateProgress: function(index) {
-            var runes = document.querySelectorAll('.tg-rune');
-            runes.forEach(function(r, i) {
-                r.classList.remove('active', 'completed');
-                if (i < index) r.classList.add('completed');
-                if (i === index) r.classList.add('active');
-            });
-        },
-
-        loadVisitorId: function() {
-            var stored = localStorage.getItem('duendes_visitor_id');
-            if (stored) {
-                this.visitorId = stored;
-            } else {
-                this.visitorId = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('duendes_visitor_id', this.visitorId);
-            }
+        updateProgress: function(step) {
+            var total = 11;
+            var pct = Math.min((step / total) * 100, 100);
+            document.getElementById('tg-progress').style.width = pct + '%';
         },
 
         show: function(screenId) {
@@ -1368,21 +1184,22 @@ function duendes_test_guardian_v3() {
         },
 
         startWithMusic: function() {
-            this.audio = document.getElementById('tg-audio');
-            if (this.audio) {
-                this.audio.volume = 0.3;
-                this.audio.play().catch(function() {});
-            }
+            this.audio = new Audio('https://duendes-vercel.vercel.app/audio/ambient-mystical.mp3');
+            this.audio.loop = true;
+            this.audio.volume = 0.3;
+            this.audio.play().catch(function() {});
             this.show('screen-intro');
+            this.updateProgress(1);
         },
 
         startWithoutMusic: function() {
             this.show('screen-intro');
+            this.updateProgress(1);
         },
 
-        goToPersonal: function() {
-            this.updateProgress(0);
+        begin: function() {
             this.show('screen-personal');
+            this.updateProgress(2);
         },
 
         updatePhonePrefix: function() {
@@ -1393,369 +1210,313 @@ function duendes_test_guardian_v3() {
 
         submitPersonal: function() {
             var name = document.getElementById('p-name').value.trim();
-            var age = document.getElementById('p-age').value;
-            var nationality = document.getElementById('p-nationality').value;
             var country = document.getElementById('p-country').value;
-            var birth = document.getElementById('p-birth').value;
 
-            if (!name) { alert('Por favor ingresá tu nombre'); return; }
-            if (!age) { alert('Por favor ingresá tu edad'); return; }
-            if (!nationality) { alert('Por favor seleccioná tu nacionalidad'); return; }
-            if (!country) { alert('Por favor seleccioná tu país de residencia'); return; }
-            if (!birth) { alert('Por favor ingresá tu fecha de nacimiento'); return; }
+            if (!name) {
+                alert('Por favor, ingresá tu nombre');
+                return;
+            }
+            if (!country) {
+                alert('Por favor, seleccioná tu país');
+                return;
+            }
 
             this.personal = {
                 name: name,
-                age: age,
+                age: document.getElementById('p-age').value,
                 sex: document.getElementById('p-sex').value,
-                nationality: nationality,
                 country: country,
-                city: document.getElementById('p-city').value.trim(),
-                birth: birth
+                city: document.getElementById('p-city').value,
+                birth: document.getElementById('p-birth').value
             };
 
+            this.updatePhonePrefix();
             this.currentQ = 0;
-            this.answers = {};
-            this.updateProgress(1);
-            this.show('screen-questions');
             this.showQuestion();
-        },
-
-        animateText: function(text, container, callback) {
-            container.innerHTML = '';
-            var words = text.split(' ');
-            var delay = 0;
-
-            words.forEach(function(word, wi) {
-                var wordSpan = document.createElement('span');
-                wordSpan.style.display = 'inline-block';
-                wordSpan.style.marginRight = '0.25em';
-
-                word.split('').forEach(function(char) {
-                    var charSpan = document.createElement('span');
-                    charSpan.className = 'tg-letter';
-                    charSpan.textContent = char;
-                    charSpan.style.animationDelay = delay + 's';
-                    wordSpan.appendChild(charSpan);
-                    delay += 0.02;
-                });
-
-                container.appendChild(wordSpan);
-            });
-
-            if (callback) setTimeout(callback, delay * 1000 + 300);
         },
 
         showQuestion: function() {
             var q = this.questions[this.currentQ];
-            var numEl = document.getElementById('q-num');
-            var textEl = document.getElementById('q-text');
-            var optionsEl = document.getElementById('q-options');
-            var freetextEl = document.getElementById('q-freetext');
+            document.getElementById('q-text').textContent = q.text;
 
-            numEl.textContent = (this.currentQ + 1) + ' / ' + this.questions.length;
-            this.updateProgress(this.currentQ + 1);
+            var optContainer = document.getElementById('q-options');
+            var freetext = document.getElementById('q-freetext');
+            var continueBtn = document.getElementById('q-continue');
 
-            optionsEl.innerHTML = '';
-            optionsEl.style.display = 'none';
-            freetextEl.style.display = 'none';
+            optContainer.innerHTML = '';
+            freetext.style.display = 'none';
+            freetext.value = '';
+            continueBtn.style.display = 'none';
 
-            var self = this;
-            this.animateText(q.text, textEl, function() {
-                if (q.type === 'options') {
-                    optionsEl.style.display = 'flex';
-                    q.options.forEach(function(opt, i) {
-                        var btn = document.createElement('button');
-                        btn.className = 'tg-bubble';
-                        btn.textContent = opt.text;
-                        btn.onclick = function() { self.selectOption(opt, btn); };
-                        optionsEl.appendChild(btn);
+            if (q.type === 'single') {
+                var self = this;
+                q.options.forEach(function(opt) {
+                    var div = document.createElement('div');
+                    div.className = 'tg-option';
+                    div.textContent = opt.label;
+                    div.onclick = function() {
+                        self.selectOption(q.id, opt);
+                    };
+                    optContainer.appendChild(div);
+                });
+            } else if (q.type === 'freetext') {
+                freetext.style.display = 'block';
+                freetext.placeholder = q.placeholder || 'Escribí lo que sientas...';
+                continueBtn.style.display = 'inline-flex';
+            }
 
-                        setTimeout(function() {
-                            btn.classList.add('visible');
-                        }, i * 100);
-                    });
-                } else {
-                    freetextEl.style.display = 'block';
-                    var textarea = document.getElementById('q-textarea');
-                    textarea.value = '';
-                    textarea.placeholder = q.placeholder || '';
-                    setTimeout(function() { textarea.focus(); }, 300);
-                }
-            });
+            this.show('screen-question');
+            this.updateProgress(3 + this.currentQ);
         },
 
-        selectOption: function(opt, btn) {
-            var q = this.questions[this.currentQ];
-            this.answers[q.id] = opt;
+        selectOption: function(qId, opt) {
+            this.answers[qId] = opt;
 
-            btn.classList.add('selected');
-            document.querySelectorAll('.tg-bubble').forEach(function(b) {
-                if (b !== btn) b.style.opacity = '0';
+            document.querySelectorAll('.tg-option').forEach(function(el) {
+                el.classList.remove('selected');
             });
+            event.target.classList.add('selected');
 
             var self = this;
             setTimeout(function() {
                 self.nextQuestion();
-            }, 450);
+            }, 400);
         },
 
         submitFreetext: function() {
             var q = this.questions[this.currentQ];
-            var text = document.getElementById('q-textarea').value.trim();
+            var text = document.getElementById('q-freetext').value.trim();
 
             if (!text) {
-                alert('Por favor escribí algo antes de continuar');
+                alert('Por favor, escribí algo antes de continuar');
                 return;
             }
 
-            this.answers[q.id] = {text: text};
+            this.answers[q.id] = { text: text };
             this.nextQuestion();
         },
 
         nextQuestion: function() {
             this.currentQ++;
-
             if (this.currentQ < this.questions.length) {
                 this.showQuestion();
             } else {
-                this.updateProgress(8);
-                this.show('screen-contact');
+                this.showContactScreen();
             }
+        },
+
+        showContactScreen: function() {
+            this.show('screen-contact');
+            this.updateProgress(10);
         },
 
         submitContact: function() {
             var email = document.getElementById('c-email').value.trim();
 
-            if (!email) {
-                alert('Por favor ingresá tu email');
+            if (!email || !email.includes('@')) {
+                alert('Por favor, ingresá un email válido');
                 return;
             }
 
             this.contact = {
                 email: email,
-                phone: document.getElementById('c-prefix').value + document.getElementById('c-phone').value.replace(/\s/g, ''),
-                newsletter: document.getElementById('c-newsletter').checked
+                whatsapp: document.getElementById('c-prefix').value + document.getElementById('c-whatsapp').value.trim()
             };
 
-            this.updateProgress(9);
-            this.show('screen-loading');
-            this.animateLoader();
-            this.processResult();
+            this.processResults();
         },
 
-        animateLoader: function() {
-            var self = this;
-            var textEl = document.getElementById('loader-text');
-            var index = 0;
+        processResults: function() {
+            this.show('screen-loading');
 
-            var interval = setInterval(function() {
-                index = (index + 1) % self.loaderPhrases.length;
-                textEl.textContent = self.loaderPhrases[index];
+            var self = this;
+            var phraseIndex = 0;
+            var loaderText = document.getElementById('loader-text');
+
+            var phraseInterval = setInterval(function() {
+                phraseIndex = (phraseIndex + 1) % self.loaderPhrases.length;
+                loaderText.textContent = self.loaderPhrases[phraseIndex];
             }, 2000);
 
-            setTimeout(function() {
-                clearInterval(interval);
-            }, 10000);
-        },
-
-        processResult: function() {
-            var self = this;
-
             var testData = {
-                visitor_id: this.visitorId,
                 personal: this.personal,
                 contact: this.contact,
-                answers: this.answers,
-                timestamp: new Date().toISOString()
+                answers: this.answers
             };
 
             localStorage.setItem('duendes_test_data', JSON.stringify(testData));
 
             Promise.all([
-                this.callInterpretation(testData),
-                this.loadProducts()
+                fetch(this.vercelApi + '/guardian/interpret', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identity: { name: this.personal.name, country: this.personal.country },
+                        answers: this.answers
+                    })
+                }).then(function(r) { return r.json(); }),
+
+                this.fetchProducts()
             ]).then(function(results) {
+                clearInterval(phraseInterval);
                 var interpretation = results[0];
                 var products = results[1];
-
-                self.renderResult(interpretation, products);
                 self.saveProfile(testData, interpretation);
-
+                self.renderResult(interpretation, products);
             }).catch(function(err) {
+                clearInterval(phraseInterval);
                 console.error('Error:', err);
                 self.renderFallbackResult();
             });
         },
 
-        callInterpretation: function(data) {
-            return fetch(this.vercelApi + '/guardian/interpret', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    identity: {
-                        name: data.personal.name,
-                        birth: data.personal.birth,
-                        country: data.personal.country
-                    },
-                    answers: data.answers
-                })
-            })
-            .then(function(r) { return r.json(); })
-            .catch(function() {
-                return {
-                    summary_emotional: 'Tu energía habla de alguien que ha sostenido demasiado. Pero hay una parte de vos que todavía cree... y esa parte te trajo hasta acá.',
-                    mirror_lines: ['Leí tu señal con respeto.', 'Sentí algo claro: estás lista para soltar lo que ya no es tuyo.'],
-                    intent: 'proteccion',
-                    ritual_text: 'Esta noche, apoyá la mano en tu pecho y decí: "Hoy me elijo. Hoy vuelvo a mí."',
-                    sealed_phrase: 'Tu energía no está rota. Está despertando.',
-                    why_reasons: ['Porque tu energía pidió protección sin palabras', 'Porque sentí el cansancio de quien ha dado demasiado', 'Porque el guardián que te eligió sabe sostenerte']
-                };
-            });
-        },
-
-        loadProducts: function() {
-            var self = this;
-            var intent = 'proteccion';
-
-            if (this.answers.q2_pain) {
-                var pain = this.answers.q2_pain.pain;
-                if (pain === 'amor' || pain === 'soledad') intent = 'amor';
-                else if (pain === 'agotamiento' || pain === 'patrones') intent = 'sanacion';
-            }
+        fetchProducts: function() {
+            var intent = this.answers.q2_pain?.pain || 'proteccion';
+            var categoryMap = {
+                'proteccion': 'proteccion',
+                'amor': 'amor',
+                'agotamiento': 'sanacion',
+                'soledad': 'amor',
+                'patrones': 'proteccion'
+            };
+            var cat = categoryMap[intent] || 'proteccion';
 
             var formData = new FormData();
             formData.append('action', 'duendes_get_productos');
-            formData.append('categoria', intent);
-            formData.append('limite', 5);
+            formData.append('categoria', cat);
+            formData.append('limite', '5');
 
             return fetch(this.ajaxUrl, {
                 method: 'POST',
                 body: formData
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success && data.data.length > 0) {
-                    return data.data;
-                }
-                var fd2 = new FormData();
-                fd2.append('action', 'duendes_get_productos');
-                fd2.append('limite', 5);
-                return fetch(self.ajaxUrl, {method: 'POST', body: fd2})
-                    .then(function(r) { return r.json(); })
-                    .then(function(d) { return d.success ? d.data : []; });
-            });
+            }).then(function(r) { return r.json(); });
         },
 
         renderResult: function(interpretation, products) {
-            var name = this.personal.name.split(' ')[0];
-            var container = document.getElementById('result-content');
-
-            var mainProduct = products[0] || null;
-            var alsoProducts = products.slice(1, 5);
-
-            var mainName = mainProduct ? mainProduct.nombre.split(' ')[0] : 'Tu Guardián';
+            var name = this.personal.name || 'Viajera';
+            var firstName = name.split(' ')[0];
+            var mainProduct = products && products.length > 0 ? products[0] : null;
+            var alsoProducts = products && products.length > 1 ? products.slice(1) : [];
 
             var html = '';
 
-            // Header
+            // FILA 1: Header cinematográfico
             html += '<div class="tg-result-header">';
-            html += '<h1 class="tg-result-title">' + name + ', tu guardián te encontró.</h1>';
-            html += '<p class="tg-result-subtitle">No llegaste por casualidad.</p>';
+            html += '<h1><span>' + firstName + '</span>, tu guardián te encontró.</h1>';
+            html += '<p>No llegaste por casualidad.</p>';
             html += '</div>';
 
-            // Grid principal
+            // FILA 2: Grid 7/5
             html += '<div class="tg-result-grid">';
 
-            // Columna izquierda
-            html += '<div class="tg-result-left">';
+            // Columna izquierda (7 col)
+            html += '<div class="tg-col-left">';
 
-            // Card Revelación
-            html += '<div class="tg-card tg-revelation">';
-            html += '<h3 class="tg-card-title">Tu revelación</h3>';
-            if (interpretation.mirror_lines) {
+            // Bloque revelación
+            html += '<div class="tg-revelation-block">';
+            html += '<div class="tg-revelation-title">Tu Revelación</div>';
+            html += '<p class="tg-revelation-text">' + (interpretation.summary_emotional || 'Tu energía habla de alguien que busca. Y el hecho de estar acá dice mucho.') + '</p>';
+
+            if (interpretation.mirror_lines && interpretation.mirror_lines.length > 0) {
+                html += '<div class="tg-mirror-lines">';
                 interpretation.mirror_lines.forEach(function(line) {
-                    html += '<p>' + line + '</p>';
+                    html += '<p class="tg-mirror-line">' + line + '</p>';
                 });
+                html += '</div>';
             }
-            html += '<p>' + (interpretation.summary_emotional || '') + '</p>';
             html += '</div>';
 
-            // Card Por qué estos guardianes
+            // Bloque "Por qué" - lista editorial
             if (interpretation.why_reasons && interpretation.why_reasons.length > 0) {
-                html += '<div class="tg-card">';
-                html += '<h3 class="tg-card-title">Por qué estos guardianes</h3>';
+                html += '<div class="tg-why-block">';
+                html += '<h3 class="tg-why-title">Por qué estos guardianes son para vos</h3>';
                 html += '<ul class="tg-why-list">';
                 interpretation.why_reasons.forEach(function(reason) {
-                    html += '<li>' + reason + '</li>';
+                    html += '<li class="tg-why-item">';
+                    html += '<span class="tg-why-icon"></span>';
+                    html += '<span class="tg-why-text">' + reason + '</span>';
+                    html += '</li>';
                 });
                 html += '</ul>';
                 html += '</div>';
             }
 
-            html += '</div>'; // fin columna izquierda
+            html += '</div>'; // fin col izquierda
 
-            // Columna derecha
-            html += '<div class="tg-result-right">';
+            // Columna derecha (5 col)
+            html += '<div class="tg-col-right">';
 
-            // Guardian principal
+            // Bloque guardián principal
             if (mainProduct) {
-                html += '<div class="tg-guardian-main">';
-                html += '<img class="tg-guardian-img" src="' + mainProduct.imagen + '" alt="' + mainProduct.nombre + '" onerror="this.style.display=\'none\'">';
+                html += '<div class="tg-guardian-block">';
+                html += '<div class="tg-guardian-label">Tu guardián recomendado</div>';
+                if (mainProduct.imagen) {
+                    html += '<img class="tg-guardian-photo" src="' + mainProduct.imagen + '" alt="' + mainProduct.nombre + '" onerror="this.style.display=\'none\'">';
+                }
                 html += '<div class="tg-guardian-name">' + mainProduct.nombre + '</div>';
                 html += '<div class="tg-guardian-price">' + mainProduct.precio + '</div>';
-                html += '<div class="tg-guardian-scarcity">Pieza única. Si se adopta, no vuelve.</div>';
-                html += '<a href="' + mainProduct.url + '" class="tg-cta-primary">Sellar mi pacto con ' + mainName + '</a>';
-                html += '<a href="' + mainProduct.url + '" class="tg-cta-secondary">Ver detalles</a>';
+                html += '<a href="' + mainProduct.url + '" class="tg-guardian-cta">Sellar mi pacto</a>';
+                html += '<p class="tg-guardian-micro">Pieza única. Si se adopta, no vuelve.</p>';
                 html += '</div>';
             }
 
-            // Ritual
+            // Bloque ritual
             if (interpretation.ritual_text) {
-                html += '<div class="tg-card tg-ritual">';
-                html += '<h3 class="tg-card-title">Tu ritual de conexión</h3>';
+                html += '<div class="tg-ritual-block">';
+                html += '<div class="tg-ritual-label">Tu ritual de conexión</div>';
                 html += '<p class="tg-ritual-text">' + interpretation.ritual_text + '</p>';
                 html += '</div>';
             }
 
-            html += '</div>'; // fin columna derecha
+            html += '</div>'; // fin col derecha
             html += '</div>'; // fin grid
 
-            // Separador
-            html += '<div class="tg-separator"></div>';
-
-            // También te recomendamos
+            // FILA 3: También te recomendamos (carrusel)
             if (alsoProducts.length > 0) {
                 html += '<div class="tg-also-section">';
+                html += '<div class="tg-also-header">';
                 html += '<h3 class="tg-also-title">También te recomendamos</h3>';
-                html += '<div class="tg-also-grid">';
+                html += '</div>';
+                html += '<div class="tg-also-scroll">';
                 alsoProducts.forEach(function(prod) {
-                    html += '<a href="' + prod.url + '" class="tg-also-item">';
-                    html += '<img class="tg-also-img" src="' + prod.imagen + '" alt="' + prod.nombre + '" onerror="this.style.display=\'none\'">';
+                    html += '<a href="' + prod.url + '" class="tg-also-card">';
+                    if (prod.imagen) {
+                        html += '<img class="tg-also-photo" src="' + prod.imagen + '" alt="' + prod.nombre + '" onerror="this.parentElement.style.display=\'none\'">';
+                    }
                     html += '<div class="tg-also-name">' + prod.nombre + '</div>';
                     html += '<div class="tg-also-price">' + prod.precio + '</div>';
-                    html += '<span class="tg-also-cta">Ver →</span>';
+                    html += '<span class="tg-also-btn">Ver</span>';
                     html += '</a>';
                 });
                 html += '</div>';
                 html += '</div>';
             }
 
-            // Frase sellada
+            // Newsletter
+            html += '<div class="tg-newsletter">';
+            html += '<h3 class="tg-newsletter-title">Recibí señales del universo</h3>';
+            html += '<p class="tg-newsletter-sub">No son newsletters. Son mensajes cuando el universo tenga algo que decirte.</p>';
+            html += '<div class="tg-newsletter-form">';
+            html += '<input type="email" class="tg-newsletter-input" id="nl-email" placeholder="Tu email..." value="' + (this.contact.email || '') + '">';
+            html += '<button class="tg-bubble tg-bubble-small" onclick="TG.submitNewsletter()">Recibir señales</button>';
+            html += '</div>';
+            html += '<div class="tg-newsletter-status" id="nl-status"></div>';
+            html += '</div>';
+
+            // FILA 4: Altar final
+            html += '<div class="tg-altar">';
             if (interpretation.sealed_phrase) {
-                html += '<div class="tg-sealed">';
                 html += '<p class="tg-sealed-phrase">"' + interpretation.sealed_phrase + '"</p>';
-                html += '<div class="tg-sealed-actions">';
-                html += '<button class="tg-btn-outline" onclick="TG.downloadCard()">Descargar mi tarjeta</button>';
-                html += '<button class="tg-btn-outline" onclick="TG.copyPhrase()">Copiar frase</button>';
-                html += '</div>';
-                html += '</div>';
             }
+            html += '<div class="tg-altar-actions">';
+            html += '<button class="tg-bubble tg-bubble-small tg-bubble-gold" onclick="TG.downloadCard()">Descargar mi tarjeta</button>';
+            html += '<button class="tg-bubble tg-bubble-small" onclick="TG.copyPhrase()">Copiar frase</button>';
+            html += '</div>';
+            html += '<span class="tg-restart-link" onclick="TG.restart()">Hacer el test de nuevo</span>';
+            html += '</div>';
 
-            html += '<button class="tg-restart" onclick="TG.restart()">Hacer el test de nuevo</button>';
-
-            container.innerHTML = html;
-            this.updateProgress(10);
+            document.getElementById('result-content').innerHTML = html;
+            this.updateProgress(11);
             this.show('screen-result');
         },
 
@@ -1772,7 +1533,7 @@ function duendes_test_guardian_v3() {
         saveProfile: function(testData, interpretation) {
             fetch(this.vercelApi + '/guardian/profile', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     visitor_id: this.visitorId,
                     identity: {
@@ -1788,11 +1549,55 @@ function duendes_test_guardian_v3() {
             }).catch(function(e) { console.log('Profile save error:', e); });
         },
 
+        submitNewsletter: function() {
+            var email = document.getElementById('nl-email').value.trim();
+            var status = document.getElementById('nl-status');
+
+            if (!email || !email.includes('@')) {
+                status.className = 'tg-newsletter-status error';
+                status.textContent = 'Ingresá un email válido.';
+                return;
+            }
+
+            status.className = 'tg-newsletter-status loading';
+            status.textContent = 'Sellando señal...';
+
+            var self = this;
+            fetch(this.vercelApi + '/newsletter/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    name: this.personal.name || '',
+                    country: this.personal.country || '',
+                    source: 'test_guardian'
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    status.className = 'tg-newsletter-status success';
+                    status.textContent = data.already_subscribed
+                        ? 'Ya estás en el círculo. Las señales llegarán.'
+                        : 'Señal recibida. Te va a llegar un mensaje.';
+                    self.trackEvent('tg_newsletter_success');
+                } else {
+                    throw new Error(data.error);
+                }
+            })
+            .catch(function(err) {
+                status.className = 'tg-newsletter-status error';
+                status.textContent = 'El portal falló. Probá de nuevo.';
+                self.trackEvent('tg_newsletter_error');
+            });
+
+            this.trackEvent('tg_newsletter_submitted');
+        },
+
         downloadCard: function() {
             var data = JSON.parse(localStorage.getItem('duendes_test_data') || '{}');
             var name = data.personal?.name || 'Visitante';
-            alert('Tu tarjeta está siendo generada. Te llegará al email: ' + (data.contact?.email || ''));
-            // TODO: Implementar generación real de PNG/PDF
+            alert('Tu tarjeta está siendo generada, ' + name + '. Te llegará al email.');
         },
 
         copyPhrase: function() {
@@ -1800,6 +1605,12 @@ function duendes_test_guardian_v3() {
             if (phrase && navigator.clipboard) {
                 navigator.clipboard.writeText(phrase.textContent.replace(/"/g, ''));
                 alert('Frase copiada. Guardala en un lugar especial.');
+            }
+        },
+
+        trackEvent: function(event, data) {
+            if (typeof gtag === 'function') {
+                gtag('event', event, data || {});
             }
         },
 
@@ -1813,6 +1624,7 @@ function duendes_test_guardian_v3() {
             this.contact = {};
             this.answers = {};
             this.show('screen-music');
+            this.updateProgress(0);
         }
     };
 
@@ -1822,4 +1634,3 @@ function duendes_test_guardian_v3() {
 }
 
 add_shortcode('duendes_test_guardian', function(){ return ''; });
-// FIN TEST DEL GUARDIAN v3.5
