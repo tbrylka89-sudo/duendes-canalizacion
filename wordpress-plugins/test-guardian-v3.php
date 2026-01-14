@@ -12,6 +12,25 @@ function duendes_test_guardian_render() {
 <!-- DUENDES TEST GUARDIAN v8 - AZUL NEON PREMIUM -->
 <div id="tg-portal" class="tg-portal">
 <style>
+/* === FIX CRÍTICO: Forzar visibilidad del contenedor padre === */
+/* Esto anula el CSS de neuromarketing que oculta .elementor-shortcode:empty */
+.elementor-shortcode:has(#tg-portal),
+.elementor-widget-shortcode:has(#tg-portal),
+.elementor-widget:has(#tg-portal) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-height: auto !important;
+}
+/* El propio portal siempre visible */
+#tg-portal {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 /* === RESET Y BASE === */
 #tg-portal, #tg-portal * {
     margin: 0;
@@ -1220,6 +1239,21 @@ function duendes_test_guardian_render() {
 
     // Exponer globalmente
     window.TG = TG;
+})();
+
+// FALLBACK: Forzar visibilidad del contenedor padre (para navegadores sin :has())
+(function() {
+    var portal = document.getElementById('tg-portal');
+    if (portal) {
+        var parent = portal.closest('.elementor-shortcode');
+        if (parent) {
+            parent.style.cssText = 'display:block!important;visibility:visible!important;opacity:1!important;height:auto!important;overflow:visible!important;';
+        }
+        var widget = portal.closest('.elementor-widget');
+        if (widget) {
+            widget.style.cssText = 'display:block!important;visibility:visible!important;opacity:1!important;';
+        }
+    }
 })();
 </script>
 <!-- /DUENDES TEST GUARDIAN v8 -->
