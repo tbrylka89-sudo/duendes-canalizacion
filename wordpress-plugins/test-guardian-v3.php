@@ -1,1636 +1,1231 @@
 <?php
-/**
- * Plugin Name: Duendes Test Guardian v3.6
- * Description: Test del Guardián - Diseño cinematográfico premium
- * Version: 3.6
- * Author: Duendes del Uruguay
- */
-
+/*
+Plugin Name: Test Guardian v8 - Premium Cinematografico
+Description: Test del Guardian con estetica azul neon + flujo correcto
+Version: 8.0
+*/
 if (!defined('ABSPATH')) exit;
 
-add_action('wp_footer', 'duendes_test_guardian_v3');
+function duendes_test_guardian_render() {
+    ob_start();
+?>
+<!-- DUENDES TEST GUARDIAN v8 - AZUL NEON PREMIUM -->
+<div id="tg-portal" class="tg-portal">
+<style>
+/* === RESET Y BASE === */
+#tg-portal, #tg-portal * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
 
-function duendes_test_guardian_v3() {
-    if (strpos($_SERVER['REQUEST_URI'], 'descubri') === false) return;
-    $ajax_url = admin_url('admin-ajax.php');
-    ?>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+#tg-portal {
+    min-height: 100vh;
+    background: #050508;
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+}
 
-    <style id="tg-v3-styles">
-    /* ═══════════════════════════════════════════════════════════════════════════
-       VARIABLES - PALETA CINEMATOGRÁFICA
-       ═══════════════════════════════════════════════════════════════════════════ */
-    :root {
-        --tg-bg: #05060A;
-        --tg-bg-glass: rgba(10, 12, 18, 0.85);
-        --tg-text: #F5F7FF;
-        --tg-text-soft: rgba(245, 247, 255, 0.75);
-        --tg-text-muted: rgba(245, 247, 255, 0.5);
-        --tg-neon: #3B82F6;
-        --tg-neon-glow: rgba(59, 130, 246, 0.35);
-        --tg-neon-soft: rgba(59, 130, 246, 0.12);
-        --tg-gold: #D4AF37;
-        --tg-gold-soft: rgba(212, 175, 55, 0.7);
-    }
+/* Particulas sutiles de fondo */
+#tg-portal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(0, 168, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(0, 168, 255, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+}
 
-    #tg-app {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: var(--tg-bg);
-        z-index: 2147483647;
-        font-family: 'Cormorant Garamond', Georgia, serif;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
+/* === CONTENEDOR PRINCIPAL === */
+.tg-wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
 
-    #tg-app * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+/* === PANTALLAS === */
+.tg-screen {
+    display: none;
+    animation: tgFadeIn 0.6s ease-out;
+}
 
-    /* ═══════════════════════════════════════════════════════════════════════════
-       FONDO CINEMATOGRÁFICO
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-bg {
-        position: fixed;
-        inset: 0;
-        overflow: hidden;
-        pointer-events: none;
-        z-index: 1;
-    }
+.tg-screen.tg-active {
+    display: block;
+}
 
-    .tg-orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(140px);
-        animation: tgOrbFloat 30s ease-in-out infinite;
-    }
+@keyframes tgFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    .tg-orb-1 {
-        width: 700px;
-        height: 700px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
-        top: -250px;
-        left: -250px;
-    }
+/* === TIPOGRAFIA === */
+.tg-icon {
+    font-size: 72px;
+    display: block;
+    text-align: center;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 20px rgba(0, 168, 255, 0.3));
+}
 
-    .tg-orb-2 {
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
-        bottom: -150px;
-        right: -150px;
-        animation-delay: -10s;
-    }
+.tg-title {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 400;
+    line-height: 1.3;
+    text-shadow: 0 0 30px rgba(0, 168, 255, 0.2);
+}
 
-    @keyframes tgOrbFloat {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(40px, -50px) scale(1.1); }
-        66% { transform: translate(-30px, 40px) scale(0.95); }
-    }
+.tg-subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
 
-    .tg-particles {
-        position: absolute;
-        inset: 0;
-    }
+.tg-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 40px;
+}
 
-    .tg-particle {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background: var(--tg-neon);
-        border-radius: 50%;
-        opacity: 0;
-        animation: tgParticle 8s ease-in-out infinite;
-    }
+/* === BOTONES PRINCIPALES (AZUL NEON) === */
+.tg-btn-main {
+    display: inline-block;
+    padding: 20px 50px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    border: 2px solid #00a8ff;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.2), inset 0 0 20px rgba(0, 168, 255, 0.05);
+}
 
-    @keyframes tgParticle {
-        0%, 100% { opacity: 0; transform: translateY(0); }
-        50% { opacity: 0.6; transform: translateY(-30px); }
-    }
+.tg-btn-main:hover {
+    background: rgba(0, 168, 255, 0.1);
+    box-shadow: 0 0 40px rgba(0, 168, 255, 0.4), inset 0 0 30px rgba(0, 168, 255, 0.1);
+    transform: translateY(-2px);
+}
 
-    /* ═══════════════════════════════════════════════════════════════════════════
-       CONTAINER Y LAYOUT
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-container {
-        position: relative;
-        z-index: 10;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 60px 24px;
-    }
+/* === BARRA DE PROGRESO === */
+.tg-progress {
+    margin-bottom: 50px;
+}
 
-    .tg-screen {
-        display: none;
-        min-height: 100vh;
-    }
+.tg-progress-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-align: center;
+    margin-bottom: 15px;
+}
 
-    .tg-screen.active {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+.tg-progress-bar {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
 
-    /* ═══════════════════════════════════════════════════════════════════════════
-       TIPOGRAFÍA
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-title {
-        font-family: 'Cinzel', serif;
-        font-size: clamp(28px, 5vw, 42px);
-        font-weight: 600;
-        color: var(--tg-text);
-        text-align: center;
-        line-height: 1.3;
-        margin-bottom: 16px;
-    }
+.tg-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00a8ff, #00d4ff);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+}
 
-    .tg-subtitle {
-        font-size: clamp(18px, 3vw, 22px);
-        color: var(--tg-text-soft);
-        text-align: center;
-        line-height: 1.6;
-        max-width: 50ch;
-    }
+/* === PREGUNTA === */
+.tg-question {
+    font-size: 28px;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
 
-    /* ═══════════════════════════════════════════════════════════════════════════
-       BOTONES BURBUJA
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-bubble {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px 36px;
-        background: rgba(10, 10, 14, 0.9);
-        border: 2px solid var(--tg-neon);
-        border-radius: 50px;
-        color: var(--tg-text);
-        font-family: 'Cinzel', serif;
-        font-size: 15px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 0 20px var(--tg-neon-glow), inset 0 0 20px rgba(59, 130, 246, 0.05);
-        text-transform: uppercase;
-    }
+.tg-question-sub {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 50px;
+}
 
-    .tg-bubble:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0 35px var(--tg-neon-glow), 0 8px 25px rgba(0,0,0,0.4), inset 0 0 25px rgba(59, 130, 246, 0.1);
-    }
+/* === OPCIONES (BURBUJAS MISTICAS) === */
+.tg-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
 
-    .tg-bubble-small {
-        padding: 12px 24px;
-        font-size: 13px;
-    }
+.tg-option {
+    display: block;
+    width: 100%;
+    padding: 24px 30px;
+    background: rgba(0, 168, 255, 0.03);
+    border: 1px solid rgba(0, 168, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.4s ease;
+    animation: tgBubbleUp 0.5s ease-out backwards;
+}
 
-    .tg-bubble-gold {
-        border-color: var(--tg-gold);
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-    }
+.tg-option:nth-child(1) { animation-delay: 0.1s; }
+.tg-option:nth-child(2) { animation-delay: 0.2s; }
+.tg-option:nth-child(3) { animation-delay: 0.3s; }
+.tg-option:nth-child(4) { animation-delay: 0.4s; }
+.tg-option:nth-child(5) { animation-delay: 0.5s; }
 
-    .tg-bubble-gold:hover {
-        box-shadow: 0 0 35px rgba(212, 175, 55, 0.4), 0 8px 25px rgba(0,0,0,0.4);
-    }
+@keyframes tgBubbleUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    /* ═══════════════════════════════════════════════════════════════════════════
-       PANTALLAS DE FLUJO (música, intro, personal, preguntas, contacto)
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-music-container {
-        text-align: center;
-    }
+.tg-option:hover {
+    background: rgba(0, 168, 255, 0.08);
+    border-color: rgba(0, 168, 255, 0.4);
+    transform: translateX(10px);
+    box-shadow: 0 0 30px rgba(0, 168, 255, 0.15);
+}
 
-    .tg-music-icon {
-        font-size: 60px;
-        margin-bottom: 30px;
-        animation: tgPulse 2s ease-in-out infinite;
-    }
+.tg-option-label {
+    display: block;
+    font-size: 18px;
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
 
-    @keyframes tgPulse {
-        0%, 100% { opacity: 0.7; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.05); }
-    }
+.tg-option-desc {
+    display: block;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
 
-    .tg-music-activator {
-        cursor: pointer;
-        transition: transform 0.3s;
-    }
+/* === TEXTAREA === */
+.tg-textarea {
+    width: 100%;
+    min-height: 160px;
+    padding: 25px;
+    background: rgba(0, 168, 255, 0.03);
+    border: 1px solid rgba(0, 168, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 17px;
+    font-family: Georgia, serif;
+    line-height: 1.7;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
 
-    .tg-music-activator:hover {
-        transform: scale(1.02);
-    }
+.tg-textarea:focus {
+    outline: none;
+    border-color: rgba(0, 168, 255, 0.5);
+    box-shadow: 0 0 30px rgba(0, 168, 255, 0.1);
+}
 
-    .tg-skip-music {
-        background: none;
-        border: none;
-        color: var(--tg-text-muted);
-        font-size: 14px;
-        margin-top: 30px;
-        cursor: pointer;
-        text-decoration: underline;
-        transition: color 0.3s;
-    }
+.tg-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+}
 
-    .tg-skip-music:hover {
-        color: var(--tg-text-soft);
-    }
+.tg-textarea-hint {
+    margin-top: 15px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+    font-style: italic;
+    text-align: center;
+}
 
-    /* Progress bar */
-    .tg-progress {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--tg-neon), var(--tg-gold));
-        z-index: 100;
-        transition: width 0.5s ease;
-        box-shadow: 0 0 10px var(--tg-neon-glow);
-    }
+/* === BOTON CONTINUAR === */
+.tg-btn-next {
+    display: inline-block;
+    margin-top: 35px;
+    padding: 16px 45px;
+    background: transparent;
+    color: #00a8ff;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 1px solid rgba(0, 168, 255, 0.4);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
-    /* Formularios */
+.tg-btn-next:hover {
+    background: rgba(0, 168, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.2);
+}
+
+/* === INPUTS DE FORMULARIO === */
+.tg-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+@media (max-width: 600px) {
     .tg-form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        width: 100%;
-        max-width: 600px;
-        margin: 40px auto;
+        grid-template-columns: 1fr;
     }
+}
 
-    .tg-field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+.tg-field {
+    text-align: left;
+}
 
-    .tg-field.full-width {
-        grid-column: 1 / -1;
-    }
+.tg-field.tg-full {
+    grid-column: 1 / -1;
+}
 
-    .tg-field label {
-        font-size: 14px;
-        color: var(--tg-text-soft);
-        font-weight: 500;
-    }
+.tg-label {
+    display: block;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
 
-    .tg-field input, .tg-field select {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(59, 130, 246, 0.25);
-        border-radius: 12px;
-        padding: 14px 18px;
-        color: var(--tg-text);
-        font-family: inherit;
-        font-size: 16px;
-        transition: all 0.3s;
-    }
+.tg-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(0, 168, 255, 0.03);
+    border: 1px solid rgba(0, 168, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: Georgia, serif;
+    transition: all 0.3s ease;
+}
 
-    .tg-field input:focus, .tg-field select:focus {
-        outline: none;
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 15px var(--tg-neon-soft);
-    }
+.tg-input:focus {
+    outline: none;
+    border-color: rgba(0, 168, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.1);
+}
 
-    .tg-field input::placeholder {
-        color: var(--tg-text-muted);
-    }
+.tg-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
 
-    /* Preguntas */
-    .tg-question-container {
-        text-align: center;
-        width: 100%;
-        max-width: 700px;
-    }
+.tg-select {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(0, 168, 255, 0.03);
+    border: 1px solid rgba(0, 168, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300a8ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
 
-    .tg-question-text {
-        font-size: clamp(22px, 4vw, 30px);
-        color: var(--tg-text);
-        line-height: 1.5;
-        margin-bottom: 40px;
-    }
+.tg-select option {
+    background: #0a0a0f;
+    color: #ffffff;
+}
 
-    .tg-options {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        margin-bottom: 30px;
-    }
+/* === LOADING === */
+.tg-loading {
+    text-align: center;
+    padding: 100px 20px;
+}
 
-    .tg-option {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 16px;
-        padding: 18px 24px;
-        color: var(--tg-text);
-        font-size: 17px;
-        cursor: pointer;
-        transition: all 0.3s;
-        text-align: left;
-    }
+.tg-loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(0, 168, 255, 0.1);
+    border-top-color: #00a8ff;
+    border-radius: 50%;
+    margin: 0 auto 30px;
+    animation: tgSpin 1s linear infinite;
+}
 
-    .tg-option:hover {
-        border-color: var(--tg-neon);
-        background: rgba(59, 130, 246, 0.08);
-        transform: translateX(5px);
-    }
+@keyframes tgSpin {
+    to { transform: rotate(360deg); }
+}
 
-    .tg-option.selected {
-        border-color: var(--tg-neon);
-        background: rgba(59, 130, 246, 0.12);
-        box-shadow: 0 0 20px var(--tg-neon-soft);
-    }
+/* === RESULTADO FINAL - GRILLA PREMIUM === */
+.tg-result-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
 
-    .tg-freetext {
-        width: 100%;
-        min-height: 120px;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 16px;
-        padding: 20px;
-        color: var(--tg-text);
-        font-family: inherit;
-        font-size: 17px;
-        line-height: 1.6;
-        resize: none;
-    }
+.tg-result-name {
+    font-size: 14px;
+    color: #00a8ff;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    margin-bottom: 15px;
+}
 
-    .tg-freetext:focus {
-        outline: none;
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 20px var(--tg-neon-soft);
-    }
+.tg-result-title {
+    font-size: 38px;
+    color: #ffffff;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
 
-    /* Loading */
-    .tg-loader-container {
-        text-align: center;
-    }
+.tg-result-subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
 
-    .tg-loader-orb {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: radial-gradient(circle, var(--tg-neon) 0%, transparent 70%);
-        margin: 0 auto 40px;
-        animation: tgLoaderPulse 2s ease-in-out infinite;
-    }
+/* Grilla 2 columnas */
+.tg-result-grid {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    gap: 40px;
+    margin-bottom: 60px;
+}
 
-    @keyframes tgLoaderPulse {
-        0%, 100% { transform: scale(0.9); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 1; }
-    }
-
-    .tg-loader-text {
-        font-size: 20px;
-        color: var(--tg-text-soft);
-        font-style: italic;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       RESULTADO - DISEÑO CINEMATOGRÁFICO
-       ═══════════════════════════════════════════════════════════════════════════ */
-    #screen-result.active {
-        display: block;
-        padding-top: 40px;
-    }
-
-    .tg-result-container {
-        max-width: 1140px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
-    /* FILA 1: Header cinematográfico */
-    .tg-result-header {
-        text-align: center;
-        margin-bottom: 70px;
-        padding: 40px 0;
-    }
-
-    .tg-result-header h1 {
-        font-family: 'Cinzel', serif;
-        font-size: clamp(32px, 6vw, 52px);
-        font-weight: 600;
-        color: var(--tg-text);
-        margin-bottom: 16px;
-        letter-spacing: 1px;
-    }
-
-    .tg-result-header h1 span {
-        color: var(--tg-gold);
-    }
-
-    .tg-result-header p {
-        font-size: 20px;
-        color: var(--tg-text-muted);
-        font-style: italic;
-    }
-
-    /* FILA 2: Grid 7/5 columnas */
+@media (max-width: 768px) {
     .tg-result-grid {
-        display: grid;
-        grid-template-columns: 7fr 5fr;
-        gap: 50px;
-        margin-bottom: 80px;
+        grid-template-columns: 1fr;
     }
+}
 
-    /* Columna izquierda */
-    .tg-col-left {
-        display: flex;
-        flex-direction: column;
-        gap: 50px;
+/* Card Revelacion (izquierda) */
+.tg-revelation-card {
+    background: rgba(0, 168, 255, 0.02);
+    border: 1px solid rgba(0, 168, 255, 0.12);
+    border-radius: 16px;
+    padding: 40px;
+}
+
+.tg-revelation-title {
+    font-size: 12px;
+    color: #00a8ff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+
+.tg-revelation-text {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.9;
+    font-style: italic;
+    margin-bottom: 30px;
+}
+
+.tg-why-title {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(0, 168, 255, 0.1);
+}
+
+.tg-why-list {
+    list-style: none;
+}
+
+.tg-why-list li {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.tg-why-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    background: #00a8ff;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+}
+
+/* Card Guardian Principal (derecha) */
+.tg-guardian-card {
+    text-align: center;
+}
+
+.tg-guardian-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    margin: 0 auto 25px;
+    border: 3px solid rgba(0, 168, 255, 0.3);
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 168, 255, 0.2);
+}
+
+.tg-guardian-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tg-guardian-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+}
+
+.tg-guardian-name {
+    font-size: 26px;
+    color: #ffffff;
+    margin-bottom: 25px;
+}
+
+.tg-guardian-cta {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    border: 2px solid #00a8ff;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.15);
+}
+
+.tg-guardian-cta:hover {
+    background: rgba(0, 168, 255, 0.1);
+    box-shadow: 0 0 40px rgba(0, 168, 255, 0.3);
+}
+
+.tg-ritual-box {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 168, 255, 0.03);
+    border-left: 2px solid #00a8ff;
+    text-align: left;
+}
+
+.tg-ritual-label {
+    font-size: 10px;
+    color: #00a8ff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.tg-ritual-text {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+/* Separador elegante */
+.tg-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 168, 255, 0.2), transparent);
+    margin: 50px 0;
+}
+
+/* Tambien te recomendamos - Cards livianas */
+.tg-also-section {
+    margin-bottom: 60px;
+}
+
+.tg-also-title {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.tg-also-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .tg-also-grid {
+        grid-template-columns: 1fr;
     }
-
-    /* Bloque revelación - glass con borde suave */
-    .tg-revelation-block {
-        background: var(--tg-bg-glass);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 24px;
-        padding: 40px;
-        backdrop-filter: blur(10px);
-    }
-
-    .tg-revelation-title {
-        font-family: 'Cinzel', serif;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--tg-neon);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 20px;
-    }
-
-    .tg-revelation-text {
-        font-size: 20px;
-        color: var(--tg-text);
-        line-height: 1.7;
-        max-width: 52ch;
-    }
-
-    .tg-mirror-lines {
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .tg-mirror-line {
-        font-size: 17px;
-        color: var(--tg-text-soft);
-        font-style: italic;
-        margin-bottom: 8px;
-    }
-
-    /* Bloque "Por qué" - SIN caja, lista editorial */
-    .tg-why-block {
-        padding: 0 10px;
-    }
-
-    .tg-why-title {
-        font-family: 'Cinzel', serif;
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--tg-text);
-        margin-bottom: 28px;
-    }
-
-    .tg-why-list {
-        list-style: none;
-    }
-
-    .tg-why-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .tg-why-item:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .tg-why-icon {
-        flex-shrink: 0;
-        width: 8px;
-        height: 8px;
-        background: var(--tg-neon);
-        border-radius: 50%;
-        margin-top: 10px;
-        box-shadow: 0 0 10px var(--tg-neon-glow);
-    }
-
-    .tg-why-text {
-        font-size: 17px;
-        color: var(--tg-text-soft);
-        line-height: 1.6;
-    }
-
-    /* Columna derecha */
-    .tg-col-right {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-    }
-
-    /* Bloque guardián - EL protagonista con borde fuerte */
-    .tg-guardian-block {
-        background: var(--tg-bg-glass);
-        border: 2px solid var(--tg-neon);
-        border-radius: 28px;
-        padding: 36px;
-        text-align: center;
-        box-shadow: 0 0 40px var(--tg-neon-soft), inset 0 0 60px rgba(59, 130, 246, 0.03);
-    }
-
-    .tg-guardian-label {
-        font-size: 12px;
-        color: var(--tg-gold);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 20px;
-    }
-
-    .tg-guardian-photo {
-        width: 160px;
-        height: 160px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--tg-neon);
-        box-shadow: 0 0 30px var(--tg-neon-glow);
-        margin-bottom: 20px;
-    }
-
-    .tg-guardian-name {
-        font-family: 'Cinzel', serif;
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--tg-text);
-        margin-bottom: 8px;
-    }
-
-    .tg-guardian-price {
-        font-size: 18px;
-        color: var(--tg-gold);
-        margin-bottom: 24px;
-    }
-
-    .tg-guardian-cta {
-        display: block;
-        width: 100%;
-        padding: 18px 24px;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
-        border: 2px solid var(--tg-neon);
-        border-radius: 50px;
-        color: var(--tg-text);
-        font-family: 'Cinzel', serif;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        text-decoration: none;
-        transition: all 0.4s;
-        box-shadow: 0 0 25px var(--tg-neon-glow);
-    }
-
-    .tg-guardian-cta:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0 40px var(--tg-neon-glow), 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .tg-guardian-micro {
-        font-size: 13px;
-        color: var(--tg-text-muted);
-        margin-top: 16px;
-        font-style: italic;
-    }
-
-    /* Bloque ritual - minimal */
-    .tg-ritual-block {
-        padding: 24px;
-        border-left: 2px solid rgba(212, 175, 55, 0.4);
-    }
-
-    .tg-ritual-label {
-        font-size: 12px;
-        color: var(--tg-gold-soft);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 14px;
-    }
-
-    .tg-ritual-text {
-        font-size: 17px;
-        color: var(--tg-text-soft);
-        line-height: 1.7;
-        font-style: italic;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       FILA 3: También te recomendamos - CARRUSEL MODERNO
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-also-section {
-        margin-bottom: 80px;
-    }
-
-    .tg-also-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .tg-also-title {
-        font-family: 'Cinzel', serif;
-        font-size: 20px;
-        font-weight: 500;
-        color: var(--tg-text);
-        position: relative;
-        display: inline-block;
-    }
-
-    .tg-also-title::before,
-    .tg-also-title::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        width: 60px;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3));
-    }
-
-    .tg-also-title::before {
-        right: calc(100% + 20px);
-        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3));
-    }
-
-    .tg-also-title::after {
-        left: calc(100% + 20px);
-        background: linear-gradient(-90deg, transparent, rgba(59, 130, 246, 0.3));
-    }
-
-    .tg-also-scroll {
-        display: flex;
-        gap: 24px;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding: 20px 10px;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    .tg-also-scroll::-webkit-scrollbar {
-        display: none;
-    }
-
-    /* Cards livianas - SIN borde pesado */
-    .tg-also-card {
-        flex: 0 0 220px;
-        scroll-snap-align: start;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 20px;
-        padding: 20px;
-        text-align: center;
-        text-decoration: none;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid transparent;
-    }
-
-    .tg-also-card:hover {
-        transform: translateY(-8px);
-        background: rgba(59, 130, 246, 0.06);
-        border-color: rgba(59, 130, 246, 0.3);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--tg-neon-soft);
-    }
-
-    .tg-also-photo {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-bottom: 16px;
-        border: 2px solid transparent;
-        transition: all 0.4s;
-    }
-
-    .tg-also-card:hover .tg-also-photo {
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 20px var(--tg-neon-glow);
-    }
-
-    .tg-also-name {
-        font-family: 'Cinzel', serif;
-        font-size: 15px;
-        font-weight: 500;
-        color: var(--tg-text);
-        margin-bottom: 8px;
-        line-height: 1.3;
-    }
-
-    .tg-also-price {
-        font-size: 14px;
-        color: var(--tg-gold);
-        margin-bottom: 14px;
-    }
-
-    .tg-also-btn {
-        display: inline-block;
-        padding: 8px 20px;
-        background: transparent;
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        border-radius: 20px;
-        color: var(--tg-text-soft);
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.3s;
-    }
-
-    .tg-also-card:hover .tg-also-btn {
-        border-color: var(--tg-neon);
-        color: var(--tg-text);
-        box-shadow: 0 0 15px var(--tg-neon-soft);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       FILA 4: Altar final - Cierre elegante
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-altar {
-        text-align: center;
-        padding: 60px 20px;
-        border-top: 1px solid rgba(212, 175, 55, 0.15);
-    }
-
-    .tg-sealed-phrase {
-        font-family: 'Cinzel', serif;
-        font-size: clamp(22px, 4vw, 30px);
-        font-weight: 500;
-        color: var(--tg-gold);
-        line-height: 1.5;
-        margin-bottom: 40px;
-        text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
-    }
-
-    .tg-altar-actions {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       NEWSLETTER - Sección elegante
-       ═══════════════════════════════════════════════════════════════════════════ */
-    .tg-newsletter {
-        margin: 60px 0;
-        padding: 50px 30px;
-        text-align: center;
-        background: linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, transparent 100%);
-        border-radius: 24px;
-    }
-
-    .tg-newsletter-title {
-        font-family: 'Cinzel', serif;
-        font-size: 20px;
-        color: var(--tg-text);
-        margin-bottom: 12px;
-    }
-
-    .tg-newsletter-sub {
-        font-size: 16px;
-        color: var(--tg-text-muted);
-        margin-bottom: 30px;
-    }
-
-    .tg-newsletter-form {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
-    .tg-newsletter-input {
-        flex: 1;
-        min-width: 250px;
-        padding: 14px 20px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(59, 130, 246, 0.25);
-        border-radius: 50px;
-        color: var(--tg-text);
-        font-size: 16px;
-        font-family: inherit;
-    }
-
-    .tg-newsletter-input:focus {
-        outline: none;
-        border-color: var(--tg-neon);
-        box-shadow: 0 0 20px var(--tg-neon-soft);
-    }
-
-    .tg-newsletter-input::placeholder {
-        color: var(--tg-text-muted);
-    }
-
-    .tg-newsletter-status {
-        margin-top: 20px;
-        font-size: 15px;
-        min-height: 24px;
-    }
-
-    .tg-newsletter-status.loading {
-        color: var(--tg-neon);
-    }
-
-    .tg-newsletter-status.success {
-        color: var(--tg-gold);
-    }
-
-    .tg-newsletter-status.error {
-        color: #ef4444;
-    }
-
-    /* Restart */
-    .tg-restart-link {
-        display: block;
-        margin-top: 50px;
-        color: var(--tg-text-muted);
-        font-size: 14px;
-        text-decoration: underline;
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-
-    .tg-restart-link:hover {
-        color: var(--tg-text-soft);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════════════════════════════ */
-    @media (max-width: 900px) {
-        .tg-result-grid {
-            grid-template-columns: 1fr;
-            gap: 40px;
-        }
-
-        .tg-col-right {
-            order: -1;
-        }
-
-        .tg-result-header {
-            margin-bottom: 50px;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .tg-container {
-            padding: 40px 16px;
-        }
-
-        .tg-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .tg-revelation-block {
-            padding: 28px 22px;
-        }
-
-        .tg-guardian-block {
-            padding: 28px 22px;
-        }
-
-        .tg-also-card {
-            flex: 0 0 180px;
-        }
-
-        .tg-also-photo {
-            width: 80px;
-            height: 80px;
-        }
-
-        .tg-altar-actions {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .tg-newsletter-form {
-            flex-direction: column;
-        }
-
-        .tg-newsletter-input {
-            min-width: 100%;
-        }
-    }
-    </style>
-
-    <div id="tg-app">
-        <div class="tg-bg">
-            <div class="tg-orb tg-orb-1"></div>
-            <div class="tg-orb tg-orb-2"></div>
-            <div class="tg-particles">
-                <div class="tg-particle" style="left:10%;top:20%;animation-delay:0s"></div>
-                <div class="tg-particle" style="left:85%;top:15%;animation-delay:1s"></div>
-                <div class="tg-particle" style="left:20%;top:80%;animation-delay:2s"></div>
-                <div class="tg-particle" style="left:70%;top:70%;animation-delay:3s"></div>
-                <div class="tg-particle" style="left:40%;top:40%;animation-delay:4s"></div>
-            </div>
-        </div>
-
-        <div class="tg-progress" id="tg-progress"></div>
-
-        <div class="tg-container">
-            <!-- PANTALLA: Música -->
-            <div class="tg-screen active" id="screen-music">
-                <div class="tg-music-container">
-                    <div class="tg-music-icon">🎧</div>
-                    <h1 class="tg-title">Antes de comenzar...</h1>
-                    <p class="tg-subtitle">Te recomendamos usar auriculares para una experiencia más profunda.</p>
-                    <div class="tg-music-activator" onclick="TG.startWithMusic()" style="margin-top:40px;">
-                        <button class="tg-bubble">Activar audio y comenzar</button>
-                    </div>
-                    <button class="tg-skip-music" onclick="TG.startWithoutMusic()">Continuar en silencio</button>
-                </div>
-            </div>
-
-            <!-- PANTALLA: Intro -->
-            <div class="tg-screen" id="screen-intro">
-                <h1 class="tg-title">El portal se está abriendo...</h1>
-                <p class="tg-subtitle" style="margin-bottom:50px;">Algo te estaba esperando. Y no llegaste por casualidad.</p>
-                <button class="tg-bubble" onclick="TG.begin()">Comenzar</button>
-            </div>
-
-            <!-- PANTALLA: Datos personales -->
-            <div class="tg-screen" id="screen-personal">
-                <h1 class="tg-title">Primero, contanos de vos</h1>
-                <p class="tg-subtitle">Para que tu guardián pueda encontrarte.</p>
-                <div class="tg-form-grid">
-                    <div class="tg-field full-width">
-                        <label>Nombre *</label>
-                        <input type="text" id="p-name" placeholder="Tu nombre o cómo querés que te llame...">
-                    </div>
-                    <div class="tg-field">
-                        <label>Edad</label>
-                        <input type="number" id="p-age" placeholder="Años" min="18" max="99">
-                    </div>
-                    <div class="tg-field">
-                        <label>Género (opcional)</label>
-                        <select id="p-sex">
-                            <option value="">Prefiero no decir</option>
-                            <option value="F">Femenino</option>
-                            <option value="M">Masculino</option>
-                            <option value="O">Otro</option>
-                        </select>
-                    </div>
-                    <div class="tg-field">
-                        <label>País *</label>
-                        <select id="p-country">
-                            <option value="">Seleccionar...</option>
-                            <option value="AR">Argentina</option>
-                            <option value="UY">Uruguay</option>
-                            <option value="CL">Chile</option>
-                            <option value="MX">México</option>
-                            <option value="CO">Colombia</option>
-                            <option value="PE">Perú</option>
-                            <option value="ES">España</option>
-                            <option value="US">Estados Unidos</option>
-                            <option value="OT">Otro</option>
-                        </select>
-                    </div>
-                    <div class="tg-field">
-                        <label>Ciudad (opcional)</label>
-                        <input type="text" id="p-city" placeholder="Tu ciudad...">
-                    </div>
-                    <div class="tg-field full-width">
-                        <label>Fecha de nacimiento (opcional)</label>
-                        <input type="date" id="p-birth">
-                    </div>
-                </div>
-                <button class="tg-bubble" onclick="TG.submitPersonal()">Continuar</button>
-            </div>
-
-            <!-- PANTALLA: Preguntas -->
-            <div class="tg-screen" id="screen-question">
-                <div class="tg-question-container">
-                    <p class="tg-question-text" id="q-text"></p>
-                    <div class="tg-options" id="q-options"></div>
-                    <textarea class="tg-freetext" id="q-freetext" placeholder="Escribí lo que sientas..." style="display:none;"></textarea>
-                    <button class="tg-bubble" id="q-continue" style="display:none;" onclick="TG.submitFreetext()">Continuar</button>
-                </div>
-            </div>
-
-            <!-- PANTALLA: Contacto -->
-            <div class="tg-screen" id="screen-contact">
-                <h1 class="tg-title">Un último paso...</h1>
-                <p class="tg-subtitle">Para enviarte tu revelación y mantenerte en el círculo.</p>
-                <div class="tg-form-grid">
-                    <div class="tg-field full-width">
-                        <label>Email *</label>
-                        <input type="email" id="c-email" placeholder="tu@email.com">
-                    </div>
-                    <div class="tg-field">
-                        <label>Prefijo</label>
-                        <input type="text" id="c-prefix" value="+598" readonly style="max-width:100px;">
-                    </div>
-                    <div class="tg-field" style="flex:1;">
-                        <label>WhatsApp (opcional)</label>
-                        <input type="tel" id="c-whatsapp" placeholder="Tu número...">
-                    </div>
-                </div>
-                <button class="tg-bubble" onclick="TG.submitContact()">Revelar mi guardián</button>
-            </div>
-
-            <!-- PANTALLA: Loading -->
-            <div class="tg-screen" id="screen-loading">
-                <div class="tg-loader-container">
-                    <div class="tg-loader-orb"></div>
-                    <p class="tg-loader-text" id="loader-text">Conectando con el portal...</p>
-                </div>
-            </div>
-
-            <!-- PANTALLA: Resultado -->
-            <div class="tg-screen" id="screen-result">
-                <div class="tg-result-container" id="result-content"></div>
-            </div>
+}
+
+.tg-also-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.tg-also-card:hover {
+    background: rgba(0, 168, 255, 0.05);
+    border-color: rgba(0, 168, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.tg-also-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    overflow: hidden;
+    border: 2px solid rgba(0, 168, 255, 0.15);
+}
+
+.tg-also-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tg-also-name {
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.tg-also-cat {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Altar Final - Frase + Botones */
+.tg-altar {
+    text-align: center;
+    padding: 50px 30px;
+    background: linear-gradient(180deg, rgba(0, 168, 255, 0.02) 0%, transparent 100%);
+    border-radius: 20px;
+}
+
+.tg-phrase {
+    font-size: 24px;
+    color: #00a8ff;
+    font-style: italic;
+    margin-bottom: 35px;
+    line-height: 1.6;
+}
+
+.tg-altar-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.tg-altar-btn {
+    padding: 14px 30px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tg-altar-btn:hover {
+    color: #ffffff;
+    border-color: #00a8ff;
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.2);
+}
+
+/* Newsletter */
+.tg-newsletter {
+    margin-top: 50px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(0, 168, 255, 0.1);
+    text-align: center;
+}
+
+.tg-newsletter-title {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+
+.tg-newsletter-form {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.tg-newsletter-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 14px 20px;
+    background: rgba(0, 168, 255, 0.03);
+    border: 1px solid rgba(0, 168, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.tg-newsletter-btn {
+    padding: 14px 30px;
+    background: transparent;
+    color: #00a8ff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 1px solid #00a8ff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tg-newsletter-btn:hover {
+    background: rgba(0, 168, 255, 0.1);
+}
+
+.tg-newsletter-status {
+    margin-top: 15px;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.tg-newsletter-status.loading { color: rgba(255, 255, 255, 0.5); }
+.tg-newsletter-status.success { color: #00ff88; }
+.tg-newsletter-status.error { color: #ff6b6b; }
+
+/* Retry link */
+.tg-retry {
+    display: inline-block;
+    margin-top: 40px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+.tg-retry:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Centro texto */
+.tg-center { text-align: center; }
+</style>
+
+<div class="tg-wrap">
+    <!-- PANTALLA 0: INTRO -->
+    <div id="tg-intro" class="tg-screen tg-active">
+        <span class="tg-icon">&#127769;</span>
+        <h1 class="tg-title">El portal se esta abriendo...</h1>
+        <p class="tg-subtitle">Algo te estaba esperando.<br>Y no llegaste aca por casualidad.</p>
+        <p class="tg-subtitle">Este test no es un juego. Es un espejo.<br>Te voy a hacer preguntas que quizas nadie te hizo antes.</p>
+        <p class="tg-hint">Tomate tu tiempo. Respira. Y responde con el corazon.</p>
+        <div class="tg-center">
+            <button class="tg-btn-main" onclick="TG.start()">ESTOY LISTA</button>
         </div>
     </div>
 
-    <script>
+    <!-- PANTALLA 1: IDENTIDAD -->
+    <div id="tg-identity" class="tg-screen">
+        <span class="tg-icon">&#128273;</span>
+        <h2 class="tg-title">Primero, contanos de vos</h2>
+        <p class="tg-hint">Esto no es un formulario. Es la llave del portal.</p>
+
+        <div class="tg-form-grid">
+            <div class="tg-field">
+                <label class="tg-label">Tu nombre *</label>
+                <input type="text" class="tg-input" id="tg-nombre" placeholder="Como te llamas?">
+            </div>
+            <div class="tg-field">
+                <label class="tg-label">Fecha de nacimiento *</label>
+                <input type="date" class="tg-input" id="tg-nacimiento">
+            </div>
+            <div class="tg-field">
+                <label class="tg-label">Sexo</label>
+                <select class="tg-select" id="tg-sexo">
+                    <option value="">Prefiero no decir</option>
+                    <option value="mujer">Mujer</option>
+                    <option value="hombre">Hombre</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="tg-field">
+                <label class="tg-label">Nacionalidad *</label>
+                <input type="text" class="tg-input" id="tg-nacionalidad" placeholder="Uruguaya, Argentina...">
+            </div>
+            <div class="tg-field">
+                <label class="tg-label">Pais de residencia *</label>
+                <select class="tg-select" id="tg-pais">
+                    <option value="">Selecciona...</option>
+                    <option value="UY">Uruguay</option>
+                    <option value="AR">Argentina</option>
+                    <option value="ES">Espana</option>
+                    <option value="MX">Mexico</option>
+                    <option value="CO">Colombia</option>
+                    <option value="CL">Chile</option>
+                    <option value="US">Estados Unidos</option>
+                    <option value="BR">Brasil</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="tg-field">
+                <label class="tg-label">Ciudad</label>
+                <input type="text" class="tg-input" id="tg-ciudad" placeholder="Tu ciudad (opcional)">
+            </div>
+        </div>
+
+        <div class="tg-center">
+            <button class="tg-btn-main" onclick="TG.saveIdentity()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: PREGUNTAS -->
+    <div id="tg-questions" class="tg-screen"></div>
+
+    <!-- PANTALLA 3: CONTACTO -->
+    <div id="tg-contact" class="tg-screen">
+        <span class="tg-icon">&#128140;</span>
+        <h2 class="tg-title">Tu guardian quiere encontrarte</h2>
+        <p class="tg-hint">Te va a llegar por email tu tarjeta del guardian + tu frase sellada.</p>
+
+        <div class="tg-form-grid">
+            <div class="tg-field tg-full">
+                <label class="tg-label">Tu email *</label>
+                <input type="email" class="tg-input" id="tg-email" placeholder="tu@email.com">
+            </div>
+            <div class="tg-field" style="width:120px;">
+                <label class="tg-label">Prefijo</label>
+                <select class="tg-select" id="tg-prefijo">
+                    <option value="+598">+598</option>
+                    <option value="+54">+54</option>
+                    <option value="+34">+34</option>
+                    <option value="+52">+52</option>
+                    <option value="+57">+57</option>
+                    <option value="+56">+56</option>
+                    <option value="+1">+1</option>
+                    <option value="+55">+55</option>
+                </select>
+            </div>
+            <div class="tg-field" style="flex:1;">
+                <label class="tg-label">WhatsApp *</label>
+                <input type="tel" class="tg-input" id="tg-whatsapp" placeholder="Tu numero sin prefijo">
+            </div>
+        </div>
+
+        <div class="tg-center">
+            <button class="tg-btn-main" onclick="TG.saveContact()">REVELAR MI GUARDIAN</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 4: LOADING -->
+    <div id="tg-loading" class="tg-screen">
+        <div class="tg-loading">
+            <div class="tg-loading-spinner"></div>
+            <h2 class="tg-title">Tu guardian esta despertando...</h2>
+            <p class="tg-subtitle">Estamos leyendo tu energia</p>
+        </div>
+    </div>
+
+    <!-- PANTALLA 5: RESULTADO -->
+    <div id="tg-result" class="tg-screen"></div>
+</div>
+</div>
+
+<script>
+(function(){
     var TG = {
-        audio: null,
-        currentQ: 0,
-        personal: {},
-        contact: {},
-        answers: {},
-        ajaxUrl: '<?php echo $ajax_url; ?>',
-        vercelApi: 'https://duendes-vercel.vercel.app/api',
-        visitorId: null,
-
+        data: { identity: {}, answers: {}, contact: {} },
+        step: 0,
         questions: [
-            {
-                id: 'q1_for_whom',
-                text: '¿Para quién estás buscando hoy?',
-                type: 'single',
-                options: [
-                    { id: 'mi', label: 'Para mí' },
-                    { id: 'regalo', label: 'Es un regalo' },
-                    { id: 'ambos', label: 'Todavía no sé bien' }
-                ]
-            },
-            {
-                id: 'q2_pain',
-                text: '¿Qué es lo que más te pesa últimamente?',
-                type: 'single',
-                options: [
-                    { id: 'agotamiento', label: 'Estoy agotada de ser la fuerte', pain: 'agotamiento' },
-                    { id: 'proteccion', label: 'Siento que necesito protección', pain: 'proteccion' },
-                    { id: 'soledad', label: 'Me siento sola aunque esté acompañada', pain: 'soledad' },
-                    { id: 'patrones', label: 'Repito los mismos patrones', pain: 'patrones' },
-                    { id: 'amor', label: 'Quiero amor pero me cuesta confiar', pain: 'amor' }
-                ]
-            },
-            {
-                id: 'q3_body',
-                text: '¿Dónde lo sentís en el cuerpo?',
-                type: 'single',
-                options: [
-                    { id: 'pecho', label: 'En el pecho, como opresión', body: 'pecho' },
-                    { id: 'garganta', label: 'En la garganta, como un nudo', body: 'garganta' },
-                    { id: 'cansancio', label: 'Un cansancio que no se va', body: 'cansancio' },
-                    { id: 'cabeza', label: 'En la cabeza, ansiedad', body: 'cabeza' },
-                    { id: 'intuicion', label: 'En la panza, mi intuición está cargada', body: 'intuicion' }
-                ]
-            },
-            {
-                id: 'q4_soul',
-                text: '¿Qué te está pidiendo tu alma últimamente?',
-                type: 'freetext',
-                placeholder: 'No hay respuesta incorrecta. Escribí lo primero que te venga...'
-            },
-            {
-                id: 'q5_universe',
-                text: 'Si el universo pudiera decirte algo esta noche, ¿qué te gustaría escuchar?',
-                type: 'freetext',
-                placeholder: 'Escribí desde el corazón...'
-            },
-            {
-                id: 'q6_magic_style',
-                text: '¿Cómo te gustaría que fuera la magia que recibas?',
-                type: 'single',
-                options: [
-                    { id: 'rapida', label: 'Directa y rápida', style: 'rapida' },
-                    { id: 'profunda', label: 'Profunda y transformadora', style: 'profunda' },
-                    { id: 'suave', label: 'Suave y amorosa', style: 'suave' },
-                    { id: 'protectora', label: 'Firme y protectora', style: 'protectora' },
-                    { id: 'senal', label: 'Como una señal para volver a mí', style: 'señal' }
-                ]
-            },
-            {
-                id: 'q7_ready',
-                text: '¿Estás lista para conocer al guardián que te eligió?',
-                type: 'single',
-                options: [
-                    { id: 'si', label: 'Sí, estoy lista' },
-                    { id: 'nerviosa', label: 'Un poco nerviosa, pero sí' },
-                    { id: 'curiosa', label: 'Tengo curiosidad' }
-                ]
+            {type:"select", id:"momento", title:"Que momento estas atravesando?", subtitle:"No hay respuestas correctas, solo honestas", options:[
+                {id:"buscando", label:"Estoy buscando algo", desc:"Paz, claridad, un cambio..."},
+                {id:"sanando", label:"Estoy sanando algo", desc:"Heridas, perdidas, ciclos que cierran"},
+                {id:"transicion", label:"Estoy en transicion", desc:"Cambios grandes, incertidumbre"},
+                {id:"proteccion", label:"Necesito proteccion", desc:"Me siento vulnerable, expuesta"}
+            ]},
+            {type:"select", id:"cuerpo", title:"Donde lo sentis en el cuerpo?", subtitle:"El cuerpo siempre sabe antes que la mente", options:[
+                {id:"pecho", label:"En el pecho", desc:"Apretado, pesado, como si cargara algo"},
+                {id:"garganta", label:"En la garganta", desc:"Cosas que no puedo decir, que trago"},
+                {id:"estomago", label:"En el estomago", desc:"Ansiedad, nervios, nudo constante"},
+                {id:"espalda", label:"En la espalda", desc:"Cargas, responsabilidades, tension"},
+                {id:"todo", label:"En todo el cuerpo", desc:"Un cansancio profundo que no se va"}
+            ]},
+            {type:"text", id:"dolor", title:"Que es lo que MAS te duele HOY?", subtitle:"Aca podes ser completamente honesta. Nadie te va a juzgar.", placeholder:"Escribi lo que sientas... esto es sagrado.", hint:"Solo vos y tu guardian lo van a saber."},
+            {type:"text", id:"deseo", title:"Si pudieras pedirle UNA cosa al universo...", subtitle:"Que le pedirias?", placeholder:"Sin filtros. Sin verguenza. Que necesitas de verdad?", hint:"Esto queda entre vos y el universo."},
+            {type:"select", id:"patron", title:"Hay algo que sentis que se repite en tu vida?", subtitle:"Patrones que no logras romper, ciclos que vuelven", options:[
+                {id:"relaciones", label:"En mis relaciones", desc:"Siempre termino en el mismo lugar"},
+                {id:"dinero", label:"Con el dinero", desc:"Nunca alcanza o se va rapido"},
+                {id:"autoestima", label:"Conmigo misma", desc:"No me valoro como deberia"},
+                {id:"familia", label:"Con mi familia", desc:"Conflictos que se repiten"},
+                {id:"ninguno", label:"No identifico ninguno claro", desc:"O prefiero no pensarlo ahora"}
+            ]},
+            {type:"text", id:"alma", title:"Cerra los ojos un segundo...", subtitle:"Que recuerdo de tu infancia te viene a la mente AHORA?", placeholder:"Puede ser feliz, triste, confuso...", hint:"No lo pienses. Escribi lo primero que llegue."},
+            {type:"select", id:"estilo", title:"Como preferis que te llegue la magia?", subtitle:"Tu guardian se va a comunicar con vos de esta forma", options:[
+                {id:"suave", label:"Suave y amorosa", desc:"Con paciencia, ternura, sin presion"},
+                {id:"directa", label:"Directa y clara", desc:"Sin vueltas, al punto, honesta"},
+                {id:"mistica", label:"Mistica y profunda", desc:"Senales, simbolos, suenos"},
+                {id:"practica", label:"Practica y concreta", desc:"Rituales simples, pasos claros"}
+            ]}
+        ]
+    };
+
+    var PREFIJOS = {UY:"+598",AR:"+54",ES:"+34",MX:"+52",CO:"+57",CL:"+56",US:"+1",BR:"+55"};
+    var IMG_DEFAULT = "https://duendesdeluruguay.com/wp-content/uploads/2024/guardian-default.jpg";
+    var SHOP_URL = "https://duendesdeluruguay.com/shop/";
+    var API_URL = "https://duendes-vercel.vercel.app/api";
+
+    function show(id) {
+        document.querySelectorAll('.tg-screen').forEach(function(s){ s.classList.remove('tg-active'); });
+        document.getElementById(id).classList.add('tg-active');
+        document.getElementById('tg-portal').scrollIntoView({behavior:'smooth'});
+    }
+
+    TG.start = function() {
+        show('tg-identity');
+    };
+
+    TG.saveIdentity = function() {
+        var nombre = document.getElementById('tg-nombre').value.trim();
+        var nacimiento = document.getElementById('tg-nacimiento').value;
+        var nacionalidad = document.getElementById('tg-nacionalidad').value.trim();
+        var pais = document.getElementById('tg-pais').value;
+
+        if (!nombre || !nacimiento || !nacionalidad || !pais) {
+            alert('Por favor completa los campos obligatorios');
+            return;
+        }
+
+        TG.data.identity = {
+            nombre: nombre,
+            nacimiento: nacimiento,
+            sexo: document.getElementById('tg-sexo').value,
+            nacionalidad: nacionalidad,
+            pais: pais,
+            ciudad: document.getElementById('tg-ciudad').value.trim()
+        };
+
+        // Setear prefijo segun pais
+        var prefijo = PREFIJOS[pais] || "+598";
+        document.getElementById('tg-prefijo').value = prefijo;
+
+        TG.step = 0;
+        show('tg-questions');
+        renderQuestion();
+    };
+
+    function renderQuestion() {
+        var q = TG.questions[TG.step];
+        var progress = ((TG.step + 1) / TG.questions.length) * 100;
+        var html = '';
+
+        html += '<div class="tg-progress">';
+        html += '<div class="tg-progress-label">Pregunta ' + (TG.step + 1) + ' de ' + TG.questions.length + '</div>';
+        html += '<div class="tg-progress-bar"><div class="tg-progress-fill" style="width:' + progress + '%"></div></div>';
+        html += '</div>';
+
+        html += '<h2 class="tg-question">' + q.title + '</h2>';
+        html += '<p class="tg-question-sub">' + q.subtitle + '</p>';
+
+        if (q.type === 'select') {
+            html += '<div class="tg-options">';
+            for (var i = 0; i < q.options.length; i++) {
+                var opt = q.options[i];
+                html += '<button class="tg-option" onclick="TG.answer(\'' + q.id + '\',\'' + opt.id + '\')">';
+                html += '<span class="tg-option-label">' + opt.label + '</span>';
+                html += '<span class="tg-option-desc">' + opt.desc + '</span>';
+                html += '</button>';
             }
-        ],
+            html += '</div>';
+        } else {
+            html += '<textarea class="tg-textarea" id="tg-textarea" placeholder="' + q.placeholder + '"></textarea>';
+            html += '<p class="tg-textarea-hint">' + q.hint + '</p>';
+            html += '<div class="tg-center"><button class="tg-btn-next" onclick="TG.answerText(\'' + q.id + '\')">Continuar</button></div>';
+        }
 
-        loaderPhrases: [
-            'Conectando con el portal...',
-            'Leyendo tu energía...',
-            'Los guardianes están escuchando...',
-            'Buscando el que resuena con vos...',
-            'Preparando tu revelación...'
-        ],
+        document.getElementById('tg-questions').innerHTML = html;
 
-        phonePrefixes: {
-            'AR': '+54', 'UY': '+598', 'CL': '+56', 'MX': '+52',
-            'CO': '+57', 'PE': '+51', 'ES': '+34', 'US': '+1', 'OT': '+1'
-        },
-
-        init: function() {
-            this.visitorId = this.getVisitorId();
-            this.updateProgress(0);
-            document.getElementById('p-country').addEventListener('change', this.updatePhonePrefix.bind(this));
-        },
-
-        getVisitorId: function() {
-            var id = localStorage.getItem('duendes_visitor_id');
-            if (!id) {
-                id = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('duendes_visitor_id', id);
-            }
-            return id;
-        },
-
-        updateProgress: function(step) {
-            var total = 11;
-            var pct = Math.min((step / total) * 100, 100);
-            document.getElementById('tg-progress').style.width = pct + '%';
-        },
-
-        show: function(screenId) {
-            document.querySelectorAll('.tg-screen').forEach(function(s) {
-                s.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo(0, 0);
-        },
-
-        startWithMusic: function() {
-            this.audio = new Audio('https://duendes-vercel.vercel.app/audio/ambient-mystical.mp3');
-            this.audio.loop = true;
-            this.audio.volume = 0.3;
-            this.audio.play().catch(function() {});
-            this.show('screen-intro');
-            this.updateProgress(1);
-        },
-
-        startWithoutMusic: function() {
-            this.show('screen-intro');
-            this.updateProgress(1);
-        },
-
-        begin: function() {
-            this.show('screen-personal');
-            this.updateProgress(2);
-        },
-
-        updatePhonePrefix: function() {
-            var country = document.getElementById('p-country').value;
-            var prefix = this.phonePrefixes[country] || '+1';
-            document.getElementById('c-prefix').value = prefix;
-        },
-
-        submitPersonal: function() {
-            var name = document.getElementById('p-name').value.trim();
-            var country = document.getElementById('p-country').value;
-
-            if (!name) {
-                alert('Por favor, ingresá tu nombre');
-                return;
-            }
-            if (!country) {
-                alert('Por favor, seleccioná tu país');
-                return;
-            }
-
-            this.personal = {
-                name: name,
-                age: document.getElementById('p-age').value,
-                sex: document.getElementById('p-sex').value,
-                country: country,
-                city: document.getElementById('p-city').value,
-                birth: document.getElementById('p-birth').value
-            };
-
-            this.updatePhonePrefix();
-            this.currentQ = 0;
-            this.showQuestion();
-        },
-
-        showQuestion: function() {
-            var q = this.questions[this.currentQ];
-            document.getElementById('q-text').textContent = q.text;
-
-            var optContainer = document.getElementById('q-options');
-            var freetext = document.getElementById('q-freetext');
-            var continueBtn = document.getElementById('q-continue');
-
-            optContainer.innerHTML = '';
-            freetext.style.display = 'none';
-            freetext.value = '';
-            continueBtn.style.display = 'none';
-
-            if (q.type === 'single') {
-                var self = this;
-                q.options.forEach(function(opt) {
-                    var div = document.createElement('div');
-                    div.className = 'tg-option';
-                    div.textContent = opt.label;
-                    div.onclick = function() {
-                        self.selectOption(q.id, opt);
-                    };
-                    optContainer.appendChild(div);
-                });
-            } else if (q.type === 'freetext') {
-                freetext.style.display = 'block';
-                freetext.placeholder = q.placeholder || 'Escribí lo que sientas...';
-                continueBtn.style.display = 'inline-flex';
-            }
-
-            this.show('screen-question');
-            this.updateProgress(3 + this.currentQ);
-        },
-
-        selectOption: function(qId, opt) {
-            this.answers[qId] = opt;
-
-            document.querySelectorAll('.tg-option').forEach(function(el) {
-                el.classList.remove('selected');
-            });
-            event.target.classList.add('selected');
-
-            var self = this;
+        if (q.type === 'text') {
             setTimeout(function() {
-                self.nextQuestion();
-            }, 400);
-        },
+                var ta = document.getElementById('tg-textarea');
+                if (ta) ta.focus();
+            }, 300);
+        }
+    }
 
-        submitFreetext: function() {
-            var q = this.questions[this.currentQ];
-            var text = document.getElementById('q-freetext').value.trim();
+    TG.answer = function(qid, aid) {
+        TG.data.answers[qid] = aid;
+        nextQuestion();
+    };
 
-            if (!text) {
-                alert('Por favor, escribí algo antes de continuar');
-                return;
-            }
+    TG.answerText = function(qid) {
+        var ta = document.getElementById('tg-textarea');
+        TG.data.answers[qid] = ta ? ta.value : '';
+        nextQuestion();
+    };
 
-            this.answers[q.id] = { text: text };
-            this.nextQuestion();
-        },
+    function nextQuestion() {
+        if (TG.step < TG.questions.length - 1) {
+            TG.step++;
+            renderQuestion();
+            document.getElementById('tg-portal').scrollIntoView({behavior:'smooth'});
+        } else {
+            show('tg-contact');
+        }
+    }
 
-        nextQuestion: function() {
-            this.currentQ++;
-            if (this.currentQ < this.questions.length) {
-                this.showQuestion();
-            } else {
-                this.showContactScreen();
-            }
-        },
+    TG.saveContact = function() {
+        var email = document.getElementById('tg-email').value.trim();
+        var whatsapp = document.getElementById('tg-whatsapp').value.trim();
 
-        showContactScreen: function() {
-            this.show('screen-contact');
-            this.updateProgress(10);
-        },
+        if (!email || !whatsapp) {
+            alert('Por favor completa email y WhatsApp');
+            return;
+        }
 
-        submitContact: function() {
-            var email = document.getElementById('c-email').value.trim();
+        TG.data.contact = {
+            email: email,
+            prefijo: document.getElementById('tg-prefijo').value,
+            whatsapp: whatsapp
+        };
 
-            if (!email || !email.includes('@')) {
-                alert('Por favor, ingresá un email válido');
-                return;
-            }
+        show('tg-loading');
+        setTimeout(processResult, 2500);
+    };
 
-            this.contact = {
-                email: email,
-                whatsapp: document.getElementById('c-prefix').value + document.getElementById('c-whatsapp').value.trim()
-            };
+    function processResult() {
+        var ans = TG.data.answers;
+        var nombre = TG.data.identity.nombre || 'Alma';
 
-            this.processResults();
-        },
+        var guardianName = 'El Guardian de la Proteccion';
+        var message = 'Tu energia habla de alguien que ha cargado mucho sobre sus hombros. Alguien que da mas de lo que recibe. Y eso, aunque a veces duele, es tu forma de amar.';
+        var ritual = 'Esta noche, antes de dormir, pone una mano en tu corazon y deci en voz alta: Merezco ser cuidada. Merezco recibir.';
+        var whyReasons = ['Tu energia pide proteccion', 'Cargas mas de lo que deberias', 'Necesitas un guardian que cuide de vos'];
 
-        processResults: function() {
-            this.show('screen-loading');
+        if (ans.momento === 'sanando' || ans.patron === 'relaciones' || ans.patron === 'autoestima') {
+            guardianName = 'El Guardian de la Sanacion';
+            message = 'Hay heridas antiguas que todavia pesan en tu energia. No porque no hayas intentado sanarlas, sino porque nadie te enseno como. Tu guardian viene a mostrarte el camino.';
+            ritual = 'Pone ambas manos en tu pecho. Respira profundo tres veces. Decile a tu nina interior: Ya no estas sola. Yo estoy aca.';
+            whyReasons = ['Tu alma esta sanando heridas viejas', 'Los patrones vienen de lejos', 'Es momento de cerrar ciclos'];
+        } else if (ans.momento === 'buscando' || ans.patron === 'dinero') {
+            guardianName = 'El Guardian de la Abundancia';
+            message = 'Algo en vos sabe que merece mas. Pero hay una parte que todavia no se lo cree. Tu guardian viene a recordarte que la abundancia es tu derecho de nacimiento.';
+            ritual = 'Cada manana al despertar, antes de abrir los ojos, deci: Hoy estoy abierta a recibir todo lo bueno que el universo tiene para mi.';
+            whyReasons = ['Tu energia esta lista para recibir', 'Los bloqueos son creencias, no realidades', 'La abundancia te esta buscando'];
+        }
 
-            var self = this;
-            var phraseIndex = 0;
-            var loaderText = document.getElementById('loader-text');
+        var phrases = [
+            'Lo que te eligio, no se equivoca.',
+            'No buscas un objeto. Buscas un companero del alma.',
+            'Ya no tenes que caminar sola.',
+            'El universo conspiro para que llegues aca.'
+        ];
+        var phrase = phrases[Math.floor(Math.random() * phrases.length)];
 
-            var phraseInterval = setInterval(function() {
-                phraseIndex = (phraseIndex + 1) % self.loaderPhrases.length;
-                loaderText.textContent = self.loaderPhrases[phraseIndex];
-            }, 2000);
+        // Render resultado
+        var html = '';
 
-            var testData = {
-                personal: this.personal,
-                contact: this.contact,
-                answers: this.answers
-            };
+        // Header
+        html += '<div class="tg-result-header">';
+        html += '<div class="tg-result-name">' + nombre + '</div>';
+        html += '<h1 class="tg-result-title">Tu guardian te encontro.</h1>';
+        html += '<p class="tg-result-subtitle">No llegaste por casualidad.</p>';
+        html += '</div>';
 
-            localStorage.setItem('duendes_test_data', JSON.stringify(testData));
+        // Grilla 2 columnas
+        html += '<div class="tg-result-grid">';
 
-            Promise.all([
-                fetch(this.vercelApi + '/guardian/interpret', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        identity: { name: this.personal.name, country: this.personal.country },
-                        answers: this.answers
-                    })
-                }).then(function(r) { return r.json(); }),
+        // Izquierda - Revelacion
+        html += '<div class="tg-revelation-card">';
+        html += '<div class="tg-revelation-title">Tu revelacion</div>';
+        html += '<p class="tg-revelation-text">"' + message + '"</p>';
+        html += '<div class="tg-why-title">Por que este guardian</div>';
+        html += '<ul class="tg-why-list">';
+        for (var i = 0; i < whyReasons.length; i++) {
+            html += '<li>' + whyReasons[i] + '</li>';
+        }
+        html += '</ul>';
+        html += '</div>';
 
-                this.fetchProducts()
-            ]).then(function(results) {
-                clearInterval(phraseInterval);
-                var interpretation = results[0];
-                var products = results[1];
-                self.saveProfile(testData, interpretation);
-                self.renderResult(interpretation, products);
-            }).catch(function(err) {
-                clearInterval(phraseInterval);
-                console.error('Error:', err);
-                self.renderFallbackResult();
-            });
-        },
+        // Derecha - Guardian
+        html += '<div class="tg-guardian-card">';
+        html += '<div class="tg-guardian-photo"><img src="' + IMG_DEFAULT + '" alt="Guardian"></div>';
+        html += '<div class="tg-guardian-label">Tu guardian es</div>';
+        html += '<h2 class="tg-guardian-name">' + guardianName + '</h2>';
+        html += '<a href="' + SHOP_URL + '" class="tg-guardian-cta">CONOCER A MI GUARDIAN</a>';
+        html += '<div class="tg-ritual-box">';
+        html += '<div class="tg-ritual-label">Tu primer ritual</div>';
+        html += '<p class="tg-ritual-text">' + ritual + '</p>';
+        html += '</div>';
+        html += '</div>';
 
-        fetchProducts: function() {
-            var intent = this.answers.q2_pain?.pain || 'proteccion';
-            var categoryMap = {
-                'proteccion': 'proteccion',
-                'amor': 'amor',
-                'agotamiento': 'sanacion',
-                'soledad': 'amor',
-                'patrones': 'proteccion'
-            };
-            var cat = categoryMap[intent] || 'proteccion';
+        html += '</div>'; // fin grilla
 
-            var formData = new FormData();
-            formData.append('action', 'duendes_get_productos');
-            formData.append('categoria', cat);
-            formData.append('limite', '5');
+        // Separador
+        html += '<div class="tg-separator"></div>';
 
-            return fetch(this.ajaxUrl, {
+        // Tambien te recomendamos
+        html += '<div class="tg-also-section">';
+        html += '<div class="tg-also-title">Tambien resuenan con vos</div>';
+        html += '<div class="tg-also-grid">';
+        html += '<a href="' + SHOP_URL + '" class="tg-also-card">';
+        html += '<div class="tg-also-photo"><img src="' + IMG_DEFAULT + '" alt=""></div>';
+        html += '<div class="tg-also-name">Guardian del Amor</div>';
+        html += '<div class="tg-also-cat">Amor</div>';
+        html += '</a>';
+        html += '<a href="' + SHOP_URL + '" class="tg-also-card">';
+        html += '<div class="tg-also-photo"><img src="' + IMG_DEFAULT + '" alt=""></div>';
+        html += '<div class="tg-also-name">Guardian de la Calma</div>';
+        html += '<div class="tg-also-cat">Sanacion</div>';
+        html += '</a>';
+        html += '<a href="' + SHOP_URL + '" class="tg-also-card">';
+        html += '<div class="tg-also-photo"><img src="' + IMG_DEFAULT + '" alt=""></div>';
+        html += '<div class="tg-also-name">Guardian del Camino</div>';
+        html += '<div class="tg-also-cat">Proteccion</div>';
+        html += '</a>';
+        html += '</div>';
+        html += '</div>';
+
+        // Altar final
+        html += '<div class="tg-altar">';
+        html += '<p class="tg-phrase">"' + phrase + '"</p>';
+        html += '<div class="tg-altar-buttons">';
+        html += '<button class="tg-altar-btn" onclick="TG.download()">DESCARGAR MI TARJETA</button>';
+        html += '<button class="tg-altar-btn" onclick="TG.copyPhrase(\'' + phrase.replace(/'/g, "\\'") + '\')">COPIAR FRASE</button>';
+        html += '</div>';
+
+        // Newsletter
+        html += '<div class="tg-newsletter">';
+        html += '<div class="tg-newsletter-title">Recibir senales del portal</div>';
+        html += '<div class="tg-newsletter-form">';
+        html += '<input type="email" class="tg-newsletter-input" id="tg-nl-email" placeholder="tu@email.com" value="' + (TG.data.contact.email || '') + '">';
+        html += '<button class="tg-newsletter-btn" onclick="TG.subscribe()">SELLAR SENAL</button>';
+        html += '</div>';
+        html += '<div id="tg-nl-status" class="tg-newsletter-status"></div>';
+        html += '</div>';
+
+        html += '<span class="tg-retry" onclick="TG.retry()">Hacer el test de nuevo</span>';
+        html += '</div>';
+
+        document.getElementById('tg-result').innerHTML = html;
+        show('tg-result');
+
+        // Guardar datos en backend
+        saveToBackend();
+    }
+
+    function saveToBackend() {
+        // Intenta guardar en Vercel KV
+        try {
+            fetch(API_URL + '/test-guardian/save', {
                 method: 'POST',
-                body: formData
-            }).then(function(r) { return r.json(); });
-        },
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(TG.data)
+            }).catch(function(){});
+        } catch(e) {}
+    }
 
-        renderResult: function(interpretation, products) {
-            var name = this.personal.name || 'Viajera';
-            var firstName = name.split(' ')[0];
-            var mainProduct = products && products.length > 0 ? products[0] : null;
-            var alsoProducts = products && products.length > 1 ? products.slice(1) : [];
+    TG.download = function() {
+        alert('Funcion de descarga en desarrollo. Tu tarjeta llegara a tu email.');
+    };
 
-            var html = '';
-
-            // FILA 1: Header cinematográfico
-            html += '<div class="tg-result-header">';
-            html += '<h1><span>' + firstName + '</span>, tu guardián te encontró.</h1>';
-            html += '<p>No llegaste por casualidad.</p>';
-            html += '</div>';
-
-            // FILA 2: Grid 7/5
-            html += '<div class="tg-result-grid">';
-
-            // Columna izquierda (7 col)
-            html += '<div class="tg-col-left">';
-
-            // Bloque revelación
-            html += '<div class="tg-revelation-block">';
-            html += '<div class="tg-revelation-title">Tu Revelación</div>';
-            html += '<p class="tg-revelation-text">' + (interpretation.summary_emotional || 'Tu energía habla de alguien que busca. Y el hecho de estar acá dice mucho.') + '</p>';
-
-            if (interpretation.mirror_lines && interpretation.mirror_lines.length > 0) {
-                html += '<div class="tg-mirror-lines">';
-                interpretation.mirror_lines.forEach(function(line) {
-                    html += '<p class="tg-mirror-line">' + line + '</p>';
-                });
-                html += '</div>';
-            }
-            html += '</div>';
-
-            // Bloque "Por qué" - lista editorial
-            if (interpretation.why_reasons && interpretation.why_reasons.length > 0) {
-                html += '<div class="tg-why-block">';
-                html += '<h3 class="tg-why-title">Por qué estos guardianes son para vos</h3>';
-                html += '<ul class="tg-why-list">';
-                interpretation.why_reasons.forEach(function(reason) {
-                    html += '<li class="tg-why-item">';
-                    html += '<span class="tg-why-icon"></span>';
-                    html += '<span class="tg-why-text">' + reason + '</span>';
-                    html += '</li>';
-                });
-                html += '</ul>';
-                html += '</div>';
-            }
-
-            html += '</div>'; // fin col izquierda
-
-            // Columna derecha (5 col)
-            html += '<div class="tg-col-right">';
-
-            // Bloque guardián principal
-            if (mainProduct) {
-                html += '<div class="tg-guardian-block">';
-                html += '<div class="tg-guardian-label">Tu guardián recomendado</div>';
-                if (mainProduct.imagen) {
-                    html += '<img class="tg-guardian-photo" src="' + mainProduct.imagen + '" alt="' + mainProduct.nombre + '" onerror="this.style.display=\'none\'">';
-                }
-                html += '<div class="tg-guardian-name">' + mainProduct.nombre + '</div>';
-                html += '<div class="tg-guardian-price">' + mainProduct.precio + '</div>';
-                html += '<a href="' + mainProduct.url + '" class="tg-guardian-cta">Sellar mi pacto</a>';
-                html += '<p class="tg-guardian-micro">Pieza única. Si se adopta, no vuelve.</p>';
-                html += '</div>';
-            }
-
-            // Bloque ritual
-            if (interpretation.ritual_text) {
-                html += '<div class="tg-ritual-block">';
-                html += '<div class="tg-ritual-label">Tu ritual de conexión</div>';
-                html += '<p class="tg-ritual-text">' + interpretation.ritual_text + '</p>';
-                html += '</div>';
-            }
-
-            html += '</div>'; // fin col derecha
-            html += '</div>'; // fin grid
-
-            // FILA 3: También te recomendamos (carrusel)
-            if (alsoProducts.length > 0) {
-                html += '<div class="tg-also-section">';
-                html += '<div class="tg-also-header">';
-                html += '<h3 class="tg-also-title">También te recomendamos</h3>';
-                html += '</div>';
-                html += '<div class="tg-also-scroll">';
-                alsoProducts.forEach(function(prod) {
-                    html += '<a href="' + prod.url + '" class="tg-also-card">';
-                    if (prod.imagen) {
-                        html += '<img class="tg-also-photo" src="' + prod.imagen + '" alt="' + prod.nombre + '" onerror="this.parentElement.style.display=\'none\'">';
-                    }
-                    html += '<div class="tg-also-name">' + prod.nombre + '</div>';
-                    html += '<div class="tg-also-price">' + prod.precio + '</div>';
-                    html += '<span class="tg-also-btn">Ver</span>';
-                    html += '</a>';
-                });
-                html += '</div>';
-                html += '</div>';
-            }
-
-            // Newsletter
-            html += '<div class="tg-newsletter">';
-            html += '<h3 class="tg-newsletter-title">Recibí señales del universo</h3>';
-            html += '<p class="tg-newsletter-sub">No son newsletters. Son mensajes cuando el universo tenga algo que decirte.</p>';
-            html += '<div class="tg-newsletter-form">';
-            html += '<input type="email" class="tg-newsletter-input" id="nl-email" placeholder="Tu email..." value="' + (this.contact.email || '') + '">';
-            html += '<button class="tg-bubble tg-bubble-small" onclick="TG.submitNewsletter()">Recibir señales</button>';
-            html += '</div>';
-            html += '<div class="tg-newsletter-status" id="nl-status"></div>';
-            html += '</div>';
-
-            // FILA 4: Altar final
-            html += '<div class="tg-altar">';
-            if (interpretation.sealed_phrase) {
-                html += '<p class="tg-sealed-phrase">"' + interpretation.sealed_phrase + '"</p>';
-            }
-            html += '<div class="tg-altar-actions">';
-            html += '<button class="tg-bubble tg-bubble-small tg-bubble-gold" onclick="TG.downloadCard()">Descargar mi tarjeta</button>';
-            html += '<button class="tg-bubble tg-bubble-small" onclick="TG.copyPhrase()">Copiar frase</button>';
-            html += '</div>';
-            html += '<span class="tg-restart-link" onclick="TG.restart()">Hacer el test de nuevo</span>';
-            html += '</div>';
-
-            document.getElementById('result-content').innerHTML = html;
-            this.updateProgress(11);
-            this.show('screen-result');
-        },
-
-        renderFallbackResult: function() {
-            this.renderResult({
-                summary_emotional: 'Tu energía habla de alguien que busca. Y el hecho de estar acá dice mucho.',
-                mirror_lines: ['Leí tu señal.', 'Algo en vos sabe que es momento de cambiar.'],
-                ritual_text: 'Esta noche, apoyá la mano en tu pecho y respirá profundo tres veces.',
-                sealed_phrase: 'Lo que te eligió no se equivoca.',
-                why_reasons: ['Porque tu energía lo llamó', 'Porque llegaste hasta acá', 'Porque estás lista']
-            }, []);
-        },
-
-        saveProfile: function(testData, interpretation) {
-            fetch(this.vercelApi + '/guardian/profile', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    visitor_id: this.visitorId,
-                    identity: {
-                        name: testData.personal.name,
-                        birth: testData.personal.birth,
-                        country: testData.personal.country,
-                        email: testData.contact.email
-                    },
-                    answers: testData.answers,
-                    interpretation: interpretation,
-                    timestamp: new Date().toISOString()
-                })
-            }).catch(function(e) { console.log('Profile save error:', e); });
-        },
-
-        submitNewsletter: function() {
-            var email = document.getElementById('nl-email').value.trim();
-            var status = document.getElementById('nl-status');
-
-            if (!email || !email.includes('@')) {
-                status.className = 'tg-newsletter-status error';
-                status.textContent = 'Ingresá un email válido.';
-                return;
-            }
-
-            status.className = 'tg-newsletter-status loading';
-            status.textContent = 'Sellando señal...';
-
-            var self = this;
-            fetch(this.vercelApi + '/newsletter/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: email,
-                    name: this.personal.name || '',
-                    country: this.personal.country || '',
-                    source: 'test_guardian'
-                })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    status.className = 'tg-newsletter-status success';
-                    status.textContent = data.already_subscribed
-                        ? 'Ya estás en el círculo. Las señales llegarán.'
-                        : 'Señal recibida. Te va a llegar un mensaje.';
-                    self.trackEvent('tg_newsletter_success');
-                } else {
-                    throw new Error(data.error);
-                }
-            })
-            .catch(function(err) {
-                status.className = 'tg-newsletter-status error';
-                status.textContent = 'El portal falló. Probá de nuevo.';
-                self.trackEvent('tg_newsletter_error');
-            });
-
-            this.trackEvent('tg_newsletter_submitted');
-        },
-
-        downloadCard: function() {
-            var data = JSON.parse(localStorage.getItem('duendes_test_data') || '{}');
-            var name = data.personal?.name || 'Visitante';
-            alert('Tu tarjeta está siendo generada, ' + name + '. Te llegará al email.');
-        },
-
-        copyPhrase: function() {
-            var phrase = document.querySelector('.tg-sealed-phrase');
-            if (phrase && navigator.clipboard) {
-                navigator.clipboard.writeText(phrase.textContent.replace(/"/g, ''));
-                alert('Frase copiada. Guardala en un lugar especial.');
-            }
-        },
-
-        trackEvent: function(event, data) {
-            if (typeof gtag === 'function') {
-                gtag('event', event, data || {});
-            }
-        },
-
-        restart: function() {
-            if (this.audio) {
-                this.audio.pause();
-                this.audio.currentTime = 0;
-            }
-            this.currentQ = 0;
-            this.personal = {};
-            this.contact = {};
-            this.answers = {};
-            this.show('screen-music');
-            this.updateProgress(0);
+    TG.copyPhrase = function(phrase) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(phrase);
+            alert('Frase copiada al portapapeles');
         }
     };
 
-    TG.init();
-    </script>
-    <?php
+    TG.subscribe = function() {
+        var email = document.getElementById('tg-nl-email').value.trim();
+        var status = document.getElementById('tg-nl-status');
+
+        if (!email) {
+            status.className = 'tg-newsletter-status error';
+            status.textContent = 'Ingresa tu email';
+            return;
+        }
+
+        status.className = 'tg-newsletter-status loading';
+        status.textContent = 'Sellando senal...';
+
+        fetch(API_URL + '/newsletter/subscribe', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email, source: 'test-guardian'})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                status.className = 'tg-newsletter-status success';
+                status.textContent = 'Senal recibida. Bienvenida al portal.';
+            } else {
+                status.className = 'tg-newsletter-status error';
+                status.textContent = data.error || 'El portal fallo. Intenta de nuevo.';
+            }
+        })
+        .catch(function() {
+            status.className = 'tg-newsletter-status error';
+            status.textContent = 'El portal fallo. Intenta de nuevo.';
+        });
+    };
+
+    TG.retry = function() {
+        TG.data = { identity: {}, answers: {}, contact: {} };
+        TG.step = 0;
+        show('tg-intro');
+    };
+
+    // Exponer globalmente
+    window.TG = TG;
+})();
+</script>
+<!-- /DUENDES TEST GUARDIAN v8 -->
+<?php
+    return ob_get_clean();
 }
 
-add_shortcode('duendes_test_guardian', function(){ return ''; });
+add_shortcode('duendes_test_guardian_v3', 'duendes_test_guardian_render');
+add_shortcode('test_del_guardian', 'duendes_test_guardian_render');
