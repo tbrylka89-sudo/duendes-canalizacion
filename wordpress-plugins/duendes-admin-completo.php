@@ -1,99 +1,31 @@
 <?php
 /**
  * Plugin Name: Duendes - Admin Completo
- * Description: Sistema administrativo completo para Duendes del Uruguay
- * Version: 1.0
+ * Description: Sistema administrativo con Tito AI Chat
+ * Version: 2.0
  * Author: Duendes del Uruguay
  */
 
 if (!defined('ABSPATH')) exit;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CONSTANTES Y CONFIGURACIÓN
-// ═══════════════════════════════════════════════════════════════════════════
-
-define('DUENDES_ADMIN_VERSION', '1.0.0');
+define('DUENDES_ADMIN_VERSION', '2.0.0');
 define('DUENDES_API_URL', 'https://duendes-vercel.vercel.app/api');
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MENÚ PRINCIPAL EN WP-ADMIN
+// MENÚ PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
 add_action('admin_menu', function() {
-    // Menú principal: Tito
-    add_menu_page(
-        'Panel Tito',
-        '🧙 Tito Admin',
-        'manage_options',
-        'duendes-tito',
-        'duendes_tito_dashboard',
-        'dashicons-star-filled',
-        3
-    );
-
-    // Submenú: Dashboard
-    add_submenu_page(
-        'duendes-tito',
-        'Dashboard',
-        '📊 Dashboard',
-        'manage_options',
-        'duendes-tito',
-        'duendes_tito_dashboard'
-    );
-
-    // Submenú: Canalizaciones
-    add_submenu_page(
-        'duendes-tito',
-        'Canalizaciones',
-        '🔮 Canalizaciones',
-        'manage_options',
-        'duendes-canalizaciones',
-        'duendes_canalizaciones_page'
-    );
-
-    // Submenú: Usuarios
-    add_submenu_page(
-        'duendes-tito',
-        'Usuarios',
-        '👥 Usuarios',
-        'manage_options',
-        'duendes-usuarios',
-        'duendes_usuarios_page'
-    );
-
-    // Submenú: El Círculo
-    add_submenu_page(
-        'duendes-tito',
-        'El Círculo',
-        '🌙 El Círculo',
-        'manage_options',
-        'duendes-circulo',
-        'duendes_circulo_page'
-    );
-
-    // Submenú: Banners & Promos
-    add_submenu_page(
-        'duendes-tito',
-        'Banners & Promos',
-        '🎨 Banners',
-        'manage_options',
-        'duendes-banners',
-        'duendes_banners_page'
-    );
-
-    // Submenú: Configuración
-    add_submenu_page(
-        'duendes-tito',
-        'Configuración',
-        '⚙️ Config',
-        'manage_options',
-        'duendes-config',
-        'duendes_config_page'
-    );
+    add_menu_page('Tito Admin', '🧙 Tito Admin', 'manage_options', 'duendes-tito', 'duendes_tito_chat_page', 'dashicons-star-filled', 3);
+    add_submenu_page('duendes-tito', 'Chat con Tito', '💬 Chat', 'manage_options', 'duendes-tito', 'duendes_tito_chat_page');
+    add_submenu_page('duendes-tito', 'Canalizaciones', '🔮 Canalizaciones', 'manage_options', 'duendes-canalizaciones', 'duendes_canalizaciones_page');
+    add_submenu_page('duendes-tito', 'Usuarios', '👥 Usuarios', 'manage_options', 'duendes-usuarios', 'duendes_usuarios_page');
+    add_submenu_page('duendes-tito', 'El Círculo', '🌙 El Círculo', 'manage_options', 'duendes-circulo', 'duendes_circulo_page');
+    add_submenu_page('duendes-tito', 'Banners', '🎨 Banners', 'manage_options', 'duendes-banners', 'duendes_banners_page');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ESTILOS GLOBALES ADMIN
+// ESTILOS GLOBALES - TEMA NEON
 // ═══════════════════════════════════════════════════════════════════════════
 
 add_action('admin_head', function() {
@@ -101,59 +33,82 @@ add_action('admin_head', function() {
     if (strpos($screen->id, 'duendes') === false) return;
     ?>
     <style>
-    .duendes-admin-wrap {
-        max-width: 1400px;
-        margin: 20px auto;
+    /* Reset WordPress admin styles for our pages */
+    .duendes-wrap {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        background: #0a0a0f;
+        min-height: 100vh;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
+    /* Header Neon */
     .duendes-header {
-        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
-        padding: 30px;
-        border-radius: 16px;
-        margin-bottom: 30px;
-        color: #fff;
+        background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+        padding: 24px 30px;
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .duendes-header h1 {
-        margin: 0 0 10px 0;
-        font-size: 28px;
+        margin: 0;
+        font-size: 24px;
         font-weight: 700;
+        background: linear-gradient(90deg, #00ffff, #00ff88);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
     }
 
     .duendes-header p {
-        margin: 0;
-        opacity: 0.8;
-        font-size: 16px;
+        margin: 4px 0 0 0;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 14px;
     }
 
-    .duendes-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
+    /* Neon Colors */
+    .neon-cyan { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+    .neon-green { color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+    .neon-magenta { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
+    .neon-orange { color: #ff8800; text-shadow: 0 0 10px #ff8800; }
+    .neon-purple { color: #aa00ff; text-shadow: 0 0 10px #aa00ff; }
+
+    .bg-neon-cyan { background: linear-gradient(135deg, #001a1a 0%, #003333 100%); border: 1px solid rgba(0, 255, 255, 0.3); }
+    .bg-neon-green { background: linear-gradient(135deg, #001a0f 0%, #003322 100%); border: 1px solid rgba(0, 255, 136, 0.3); }
+    .bg-neon-magenta { background: linear-gradient(135deg, #1a001a 0%, #330033 100%); border: 1px solid rgba(255, 0, 255, 0.3); }
+    .bg-neon-orange { background: linear-gradient(135deg, #1a0f00 0%, #332200 100%); border: 1px solid rgba(255, 136, 0, 0.3); }
+    .bg-neon-purple { background: linear-gradient(135deg, #0f001a 0%, #220033 100%); border: 1px solid rgba(170, 0, 255, 0.3); }
+
+    /* Main Content */
+    .duendes-content {
+        padding: 30px;
+        background: #0a0a0f;
     }
 
+    /* Cards */
     .duendes-card {
-        background: #fff;
-        border-radius: 12px;
+        background: linear-gradient(135deg, #12121a 0%, #1a1a28 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
         padding: 24px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        border: 1px solid #e5e7eb;
+        margin-bottom: 24px;
     }
 
     .duendes-card-header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 16px;
+        margin-bottom: 20px;
         padding-bottom: 16px;
-        border-bottom: 2px solid #f3f4f6;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .duendes-card-icon {
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -164,84 +119,115 @@ add_action('admin_head', function() {
     .duendes-card-title {
         font-size: 18px;
         font-weight: 600;
-        color: #1f2937;
+        color: #fff;
         margin: 0;
     }
 
+    /* Grid */
+    .duendes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+    }
+
+    @media (max-width: 782px) {
+        .duendes-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Stats */
     .duendes-stat {
         text-align: center;
-        padding: 20px;
+        padding: 24px;
     }
 
     .duendes-stat-value {
-        font-size: 36px;
-        font-weight: 700;
-        color: #4f46e5;
+        font-size: 42px;
+        font-weight: 800;
+        background: linear-gradient(90deg, #00ffff, #00ff88);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .duendes-stat-label {
         font-size: 14px;
-        color: #6b7280;
-        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 8px;
     }
 
+    /* Buttons */
     .duendes-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
-        padding: 12px 24px;
-        border-radius: 8px;
+        padding: 14px 28px;
+        border-radius: 10px;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         border: none;
-        transition: all 0.2s;
+        transition: all 0.3s;
+        text-decoration: none;
     }
 
     .duendes-btn-primary {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        color: #fff;
+        background: linear-gradient(135deg, #00ffff 0%, #00ff88 100%);
+        color: #000;
     }
 
     .duendes-btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
+        color: #000;
     }
 
     .duendes-btn-secondary {
-        background: #f3f4f6;
-        color: #374151;
-        border: 1px solid #d1d5db;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .duendes-btn-success {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    .duendes-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
         color: #fff;
     }
 
+    .duendes-btn-magenta {
+        background: linear-gradient(135deg, #ff00ff 0%, #ff00aa 100%);
+        color: #fff;
+    }
+
+    .duendes-btn-orange {
+        background: linear-gradient(135deg, #ff8800 0%, #ffaa00 100%);
+        color: #000;
+    }
+
+    /* Forms */
     .duendes-form-group {
         margin-bottom: 20px;
     }
 
     .duendes-label {
         display: block;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 6px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 8px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
     }
 
     .duendes-input,
     .duendes-select,
     .duendes-textarea {
         width: 100%;
-        padding: 12px 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
+        padding: 14px 18px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
         font-size: 15px;
-        transition: all 0.2s;
+        color: #fff;
+        transition: all 0.3s;
         box-sizing: border-box;
     }
 
@@ -249,8 +235,8 @@ add_action('admin_head', function() {
     .duendes-select:focus,
     .duendes-textarea:focus {
         outline: none;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        border-color: #00ffff;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
     }
 
     .duendes-textarea {
@@ -258,6 +244,12 @@ add_action('admin_head', function() {
         resize: vertical;
     }
 
+    .duendes-select option {
+        background: #1a1a28;
+        color: #fff;
+    }
+
+    /* Tables */
     .duendes-table {
         width: 100%;
         border-collapse: collapse;
@@ -265,85 +257,68 @@ add_action('admin_head', function() {
 
     .duendes-table th,
     .duendes-table td {
-        padding: 12px 16px;
+        padding: 14px 18px;
         text-align: left;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
     }
 
     .duendes-table th {
-        background: #f9fafb;
+        background: rgba(0, 0, 0, 0.3);
         font-weight: 600;
-        color: #374151;
-        font-size: 13px;
+        font-size: 12px;
         text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.6);
     }
 
     .duendes-table tr:hover {
-        background: #f9fafb;
+        background: rgba(0, 255, 255, 0.05);
     }
 
+    /* Badges */
     .duendes-badge {
         display: inline-block;
-        padding: 4px 12px;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
     }
 
-    .duendes-badge-success { background: #d1fae5; color: #065f46; }
-    .duendes-badge-warning { background: #fef3c7; color: #92400e; }
-    .duendes-badge-info { background: #dbeafe; color: #1e40af; }
-    .duendes-badge-purple { background: #ede9fe; color: #5b21b6; }
+    .duendes-badge-cyan { background: rgba(0, 255, 255, 0.2); color: #00ffff; }
+    .duendes-badge-green { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+    .duendes-badge-magenta { background: rgba(255, 0, 255, 0.2); color: #ff00ff; }
+    .duendes-badge-orange { background: rgba(255, 136, 0, 0.2); color: #ff8800; }
 
-    .duendes-alert {
-        padding: 16px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .duendes-alert-info {
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-        color: #1e40af;
-    }
-
-    .duendes-alert-success {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        color: #166534;
-    }
-
+    /* Tabs */
     .duendes-tabs {
         display: flex;
         gap: 4px;
         margin-bottom: 24px;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-wrap: wrap;
     }
 
     .duendes-tab {
-        padding: 12px 24px;
+        padding: 14px 24px;
         background: none;
         border: none;
         font-size: 14px;
         font-weight: 600;
-        color: #6b7280;
+        color: rgba(255, 255, 255, 0.5);
         cursor: pointer;
         border-bottom: 3px solid transparent;
-        margin-bottom: -2px;
-        transition: all 0.2s;
+        margin-bottom: -1px;
+        transition: all 0.3s;
     }
 
     .duendes-tab:hover {
-        color: #4f46e5;
+        color: #00ffff;
     }
 
     .duendes-tab.active {
-        color: #4f46e5;
-        border-bottom-color: #4f46e5;
+        color: #00ffff;
+        border-bottom-color: #00ffff;
     }
 
     .duendes-tab-content {
@@ -354,1154 +329,1003 @@ add_action('admin_head', function() {
         display: block;
     }
 
-    .duendes-loading {
-        display: none;
-        align-items: center;
-        gap: 12px;
-        padding: 20px;
-        background: #fef3c7;
-        border-radius: 8px;
-        margin: 20px 0;
-    }
+    /* ═══════════════════════════════════════════════════════════════════════
+       CHAT INTERFACE - TITO
+       ═══════════════════════════════════════════════════════════════════════ */
 
-    .duendes-loading.visible {
+    .tito-chat-container {
         display: flex;
+        flex-direction: column;
+        height: calc(100vh - 200px);
+        min-height: 500px;
+        background: linear-gradient(135deg, #0a0a0f 0%, #12121a 100%);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        overflow: hidden;
     }
 
-    .duendes-spinner {
-        width: 24px;
-        height: 24px;
-        border: 3px solid #fcd34d;
-        border-top-color: #f59e0b;
+    .tito-chat-header {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #001a1a 0%, #002828 100%);
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .tito-avatar {
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        background: linear-gradient(135deg, #00ffff, #00ff88);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
     }
 
-    @keyframes spin {
-        to { transform: rotate(360deg); }
+    .tito-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #00ff88;
     }
 
-    .duendes-tito-suggestion {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 1px solid #f59e0b;
+    .tito-status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #00ff88;
+        box-shadow: 0 0 10px #00ff88;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .tito-chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .tito-message {
+        max-width: 80%;
+        padding: 16px 20px;
+        border-radius: 16px;
+        line-height: 1.6;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tito-message-tito {
+        align-self: flex-start;
+        background: linear-gradient(135deg, #1a2a2a 0%, #1a3333 100%);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        color: #fff;
+    }
+
+    .tito-message-user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #00ffff 0%, #00ff88 100%);
+        color: #000;
+    }
+
+    .tito-message-actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .tito-action-btn {
+        padding: 8px 16px;
+        background: rgba(0, 255, 255, 0.1);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 8px;
+        color: #00ffff;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tito-action-btn:hover {
+        background: rgba(0, 255, 255, 0.2);
+    }
+
+    .tito-chat-input-container {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+        border-top: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .tito-chat-input-wrapper {
+        display: flex;
+        gap: 12px;
+    }
+
+    .tito-chat-input {
+        flex: 1;
+        padding: 16px 20px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid rgba(0, 255, 255, 0.2);
         border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-    }
-
-    .duendes-tito-suggestion h4 {
-        margin: 0 0 8px 0;
-        color: #92400e;
         font-size: 15px;
+        color: #fff;
+        resize: none;
+        min-height: 50px;
+        max-height: 150px;
     }
 
-    .duendes-tito-suggestion p {
-        margin: 0;
-        color: #78350f;
+    .tito-chat-input:focus {
+        outline: none;
+        border-color: #00ffff;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    .tito-chat-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .tito-send-btn {
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #00ffff 0%, #00ff88 100%);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .tito-send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    }
+
+    .tito-quick-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tito-quick-btn {
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tito-quick-btn:hover {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.3);
+        color: #00ffff;
+    }
+
+    /* Loading */
+    .tito-typing {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #1a2a2a 0%, #1a3333 100%);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 16px;
+        max-width: 200px;
+    }
+
+    .tito-typing-dots {
+        display: flex;
+        gap: 4px;
+    }
+
+    .tito-typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #00ffff;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+
+    .tito-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .tito-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+        30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* Result Cards */
+    .tito-result-card {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 12px;
+    }
+
+    .tito-result-card h4 {
+        margin: 0 0 8px 0;
+        color: #00ffff;
         font-size: 14px;
     }
 
-    .duendes-result-preview {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 20px;
-        margin-top: 20px;
-        max-height: 400px;
-        overflow-y: auto;
+    .tito-result-card pre {
+        margin: 0;
+        white-space: pre-wrap;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        line-height: 1.6;
     }
 
-    .duendes-result-preview h4 {
-        margin: 0 0 12px 0;
-        color: #374151;
-    }
-
+    /* User Avatar */
     .duendes-user-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        background: linear-gradient(135deg, #ff00ff, #ff00aa);
         color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 600;
-        font-size: 16px;
+        font-size: 14px;
     }
 
-    .duendes-quick-actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 20px;
+    /* Responsive */
+    @media (max-width: 782px) {
+        .tito-chat-container {
+            height: calc(100vh - 150px);
+            border-radius: 0;
+        }
+        .tito-message {
+            max-width: 90%;
+        }
+        .duendes-content {
+            padding: 16px;
+        }
     }
     </style>
     <?php
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. DASHBOARD TITO
+// 1. TITO CHAT - PÁGINA PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
-function duendes_tito_dashboard() {
-    // Obtener estadísticas
-    $total_products = wp_count_posts('product')->publish;
-    $total_users = count_users();
-    $total_orders = wc_orders_count('completed') + wc_orders_count('processing');
-    $mi_magia_users = duendes_count_mi_magia_users();
-
-    // Obtener sugerencias de Tito
-    $tito_suggestions = duendes_get_tito_suggestions();
+function duendes_tito_chat_page() {
     ?>
-    <div class="wrap duendes-admin-wrap">
+    <div class="wrap duendes-wrap">
         <div class="duendes-header">
-            <h1>🧙 Panel de Tito</h1>
-            <p>Tu asistente mágico para administrar Duendes del Uruguay</p>
-        </div>
-
-        <!-- Estadísticas rápidas -->
-        <div class="duendes-grid">
-            <div class="duendes-card">
-                <div class="duendes-stat">
-                    <div class="duendes-stat-value"><?php echo $total_products; ?></div>
-                    <div class="duendes-stat-label">Productos / Guardianes</div>
-                </div>
+            <div>
+                <h1>🧙 Tito Admin</h1>
+                <p>Tu asistente mágico sin límites</p>
             </div>
-            <div class="duendes-card">
-                <div class="duendes-stat">
-                    <div class="duendes-stat-value"><?php echo $total_users['total_users']; ?></div>
-                    <div class="duendes-stat-label">Usuarios Totales</div>
-                </div>
-            </div>
-            <div class="duendes-card">
-                <div class="duendes-stat">
-                    <div class="duendes-stat-value"><?php echo $mi_magia_users; ?></div>
-                    <div class="duendes-stat-label">Usuarios Mi Magia</div>
-                </div>
-            </div>
-            <div class="duendes-card">
-                <div class="duendes-stat">
-                    <div class="duendes-stat-value"><?php echo $total_orders; ?></div>
-                    <div class="duendes-stat-label">Pedidos</div>
-                </div>
+            <div style="display: flex; gap: 12px;">
+                <a href="<?php echo admin_url('admin.php?page=duendes-canalizaciones'); ?>" class="duendes-btn duendes-btn-secondary">🔮 Canalizaciones</a>
+                <a href="<?php echo admin_url('admin.php?page=duendes-circulo'); ?>" class="duendes-btn duendes-btn-secondary">🌙 El Círculo</a>
             </div>
         </div>
 
-        <div class="duendes-grid" style="grid-template-columns: 2fr 1fr;">
-            <!-- Sugerencias de Tito -->
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #fef3c7;">💡</div>
-                    <h3 class="duendes-card-title">Sugerencias de Tito</h3>
-                </div>
-                <div id="tito-suggestions">
-                    <?php if (!empty($tito_suggestions)): ?>
-                        <?php foreach ($tito_suggestions as $suggestion): ?>
-                        <div class="duendes-tito-suggestion">
-                            <h4><?php echo esc_html($suggestion['titulo']); ?></h4>
-                            <p><?php echo esc_html($suggestion['mensaje']); ?></p>
+        <div class="duendes-content">
+            <div class="tito-chat-container">
+                <div class="tito-chat-header">
+                    <div class="tito-avatar">🧙</div>
+                    <div>
+                        <strong style="color: #fff; font-size: 16px;">Tito</strong>
+                        <div class="tito-status">
+                            <span class="tito-status-dot"></span>
+                            Listo para ayudarte
                         </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="duendes-tito-suggestion">
-                            <h4>🌟 Todo marcha bien</h4>
-                            <p>No tengo sugerencias por ahora. ¡Seguí así!</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <button class="duendes-btn duendes-btn-secondary" onclick="DuendesAdmin.refreshTitoSuggestions()">
-                    🔄 Actualizar sugerencias
-                </button>
-            </div>
-
-            <!-- Acciones rápidas -->
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #dbeafe;">⚡</div>
-                    <h3 class="duendes-card-title">Acciones Rápidas</h3>
-                </div>
-                <div class="duendes-quick-actions" style="flex-direction: column;">
-                    <a href="<?php echo admin_url('duendes-canalizaciones'); ?>" class="duendes-btn duendes-btn-primary" style="justify-content: center;">
-                        🔮 Nueva Canalización
-                    </a>
-                    <a href="<?php echo admin_url('post-new.php?post_type=product'); ?>" class="duendes-btn duendes-btn-success" style="justify-content: center;">
-                        ✨ Nuevo Producto
-                    </a>
-                    <a href="<?php echo admin_url('admin.php?page=duendes-usuarios'); ?>" class="duendes-btn duendes-btn-secondary" style="justify-content: center;">
-                        👥 Ver Usuarios
-                    </a>
-                    <a href="<?php echo admin_url('admin.php?page=duendes-circulo'); ?>" class="duendes-btn duendes-btn-secondary" style="justify-content: center;">
-                        🌙 El Círculo
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Crear producto rápido con Tito -->
-        <div class="duendes-card">
-            <div class="duendes-card-header">
-                <div class="duendes-card-icon" style="background: #ede9fe;">🪄</div>
-                <h3 class="duendes-card-title">Crear Producto Rápido con Tito</h3>
-            </div>
-            <p style="color: #6b7280; margin-bottom: 20px;">Subí las fotos y Tito + Claude generan todo automáticamente.</p>
-
-            <form id="quick-product-form" enctype="multipart/form-data">
-                <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Fotos del Producto</label>
-                        <input type="file" name="product_photos" id="product_photos" class="duendes-input" multiple accept="image/*">
-                    </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Tipo de Ser (opcional)</label>
-                        <select name="tipo_ser" class="duendes-select">
-                            <option value="">Claude decide...</option>
-                            <option value="duende">Duende</option>
-                            <option value="guardian">Guardián</option>
-                            <option value="bruja">Bruja</option>
-                            <option value="duende_abundancia">Duende de la Abundancia</option>
-                            <option value="protector">Protector</option>
-                        </select>
                     </div>
                 </div>
-                <div class="duendes-form-group">
-                    <label class="duendes-label">Notas adicionales (opcional)</label>
-                    <textarea name="notas" class="duendes-textarea" placeholder="Ej: tiene un cristal de citrino, mide 20cm, se ve joven..."></textarea>
+
+                <div class="tito-chat-messages" id="tito-messages">
+                    <div class="tito-message tito-message-tito">
+                        <strong>¡Hola! 🌟</strong><br><br>
+                        Soy Tito, tu asistente mágico. Puedo hacer <strong>absolutamente todo</strong> por vos:<br><br>
+                        • Crear productos completos desde fotos<br>
+                        • Generar canalizaciones personalizadas<br>
+                        • Crear contenido para El Círculo<br>
+                        • Gestionar usuarios y runas<br>
+                        • Generar imágenes con IA<br>
+                        • Crear cupones, descuentos, promociones<br>
+                        • Analizar ventas y sugerirte mejoras<br>
+                        • Lo que me pidas... sin límites<br><br>
+                        <strong>¿Qué necesitás?</strong>
+
+                        <div class="tito-message-actions">
+                            <button class="tito-action-btn" onclick="TitoChat.quickAction('crear producto')">✨ Crear producto</button>
+                            <button class="tito-action-btn" onclick="TitoChat.quickAction('generar canalizacion')">🔮 Canalización</button>
+                            <button class="tito-action-btn" onclick="TitoChat.quickAction('ver estadisticas')">📊 Estadísticas</button>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="duendes-btn duendes-btn-primary">
-                    🪄 Crear Producto con IA
-                </button>
-            </form>
 
-            <div id="quick-product-loading" class="duendes-loading">
-                <div class="duendes-spinner"></div>
-                <span>Tito está trabajando con Claude...</span>
+                <div class="tito-chat-input-container">
+                    <div class="tito-chat-input-wrapper">
+                        <textarea class="tito-chat-input" id="tito-input" placeholder="Escribí lo que necesitás... (Ej: 'creame un producto con estas fotos', 'generá el contenido de febrero')" rows="1"></textarea>
+                        <button class="tito-send-btn" onclick="TitoChat.send()">Enviar</button>
+                    </div>
+                    <div class="tito-quick-actions">
+                        <button class="tito-quick-btn" onclick="TitoChat.quickAction('crear cupon 20%')">🎟️ Crear cupón</button>
+                        <button class="tito-quick-btn" onclick="TitoChat.quickAction('regalar 100 runas a')">💎 Regalar runas</button>
+                        <button class="tito-quick-btn" onclick="TitoChat.quickAction('generar semana del circulo')">📅 Generar semana</button>
+                        <button class="tito-quick-btn" onclick="TitoChat.quickAction('ver usuarios mi magia')">👥 Usuarios</button>
+                        <button class="tito-quick-btn" onclick="TitoChat.quickAction('crear banner promocional')">🎨 Crear banner</button>
+                        <button class="tito-quick-btn" onclick="TitoChat.quickAction('analizar ventas del mes')">📈 Ventas</button>
+                    </div>
+                </div>
             </div>
-
-            <div id="quick-product-result" class="duendes-result-preview" style="display: none;"></div>
         </div>
     </div>
 
     <script>
-    var DuendesAdmin = {
-        refreshTitoSuggestions: function() {
-            // Implementar refresh de sugerencias
-            alert('Actualizando sugerencias...');
+    var TitoChat = {
+        messagesContainer: null,
+        input: null,
+
+        init: function() {
+            this.messagesContainer = document.getElementById('tito-messages');
+            this.input = document.getElementById('tito-input');
+
+            // Auto-resize textarea
+            this.input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+            });
+
+            // Enter to send
+            this.input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    TitoChat.send();
+                }
+            });
+        },
+
+        send: function() {
+            var message = this.input.value.trim();
+            if (!message) return;
+
+            // Add user message
+            this.addMessage(message, 'user');
+            this.input.value = '';
+            this.input.style.height = 'auto';
+
+            // Show typing indicator
+            this.showTyping();
+
+            // Send to API
+            fetch('<?php echo DUENDES_API_URL; ?>/admin/tito-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    context: 'admin_full_access'
+                })
+            })
+            .then(r => r.json())
+            .then(result => {
+                this.hideTyping();
+                if (result.success) {
+                    this.addMessage(result.response, 'tito', result.actions);
+                } else {
+                    this.addMessage('Hubo un error: ' + (result.error || 'Error desconocido'), 'tito');
+                }
+            })
+            .catch(err => {
+                this.hideTyping();
+                this.addMessage('Error de conexión. Reintentá en unos segundos.', 'tito');
+            });
+        },
+
+        quickAction: function(action) {
+            this.input.value = action;
+            this.input.focus();
+        },
+
+        addMessage: function(content, type, actions) {
+            var div = document.createElement('div');
+            div.className = 'tito-message tito-message-' + type;
+            div.innerHTML = content.replace(/\n/g, '<br>');
+
+            if (actions && actions.length > 0) {
+                var actionsDiv = document.createElement('div');
+                actionsDiv.className = 'tito-message-actions';
+                actions.forEach(function(action) {
+                    var btn = document.createElement('button');
+                    btn.className = 'tito-action-btn';
+                    btn.textContent = action.label;
+                    btn.onclick = function() { TitoChat.executeAction(action); };
+                    actionsDiv.appendChild(btn);
+                });
+                div.appendChild(actionsDiv);
+            }
+
+            this.messagesContainer.appendChild(div);
+            this.scrollToBottom();
+        },
+
+        showTyping: function() {
+            var typing = document.createElement('div');
+            typing.className = 'tito-typing';
+            typing.id = 'tito-typing';
+            typing.innerHTML = '<div class="tito-typing-dots"><span class="tito-typing-dot"></span><span class="tito-typing-dot"></span><span class="tito-typing-dot"></span></div><span style="color: rgba(255,255,255,0.6);">Tito está pensando...</span>';
+            this.messagesContainer.appendChild(typing);
+            this.scrollToBottom();
+        },
+
+        hideTyping: function() {
+            var typing = document.getElementById('tito-typing');
+            if (typing) typing.remove();
+        },
+
+        scrollToBottom: function() {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        },
+
+        executeAction: function(action) {
+            if (action.type === 'link') {
+                window.location.href = action.url;
+            } else if (action.type === 'command') {
+                this.input.value = action.command;
+                this.send();
+            }
         }
     };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        TitoChat.init();
+    });
     </script>
     <?php
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. CANALIZACIONES MANUALES
+// 2. CANALIZACIONES
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_canalizaciones_page() {
-    // Obtener productos (guardianes) para el selector
-    $products = wc_get_products([
-        'status' => 'publish',
-        'limit' => -1,
-        'orderby' => 'title',
-        'order' => 'ASC'
-    ]);
-
-    // Obtener canalizaciones anteriores
-    $canalizaciones = get_option('duendes_canalizaciones_historial', []);
+    $products = wc_get_products(['status' => 'publish', 'limit' => -1, 'orderby' => 'title', 'order' => 'ASC']);
     ?>
-    <div class="wrap duendes-admin-wrap">
-        <div class="duendes-header">
-            <h1>🔮 Canalizaciones</h1>
-            <p>Genera canalizaciones personalizadas para tus clientes</p>
+    <div class="wrap duendes-wrap">
+        <div class="duendes-header bg-neon-magenta" style="background: linear-gradient(135deg, #1a001a 0%, #330022 100%); border-bottom: 1px solid rgba(255, 0, 255, 0.3);">
+            <div>
+                <h1 style="background: linear-gradient(90deg, #ff00ff, #ff66ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🔮 Canalizaciones</h1>
+                <p>Genera canalizaciones personalizadas</p>
+            </div>
         </div>
 
-        <div class="duendes-tabs">
-            <button class="duendes-tab active" onclick="DuendesCanalizaciones.showTab('nueva')">✨ Nueva Canalización</button>
-            <button class="duendes-tab" onclick="DuendesCanalizaciones.showTab('historial')">📜 Historial</button>
-        </div>
-
-        <!-- Tab: Nueva Canalización -->
-        <div id="tab-nueva" class="duendes-tab-content active">
-            <div class="duendes-grid" style="grid-template-columns: 2fr 1fr;">
+        <div class="duendes-content">
+            <div class="duendes-grid" style="grid-template-columns: 1.5fr 1fr;">
                 <div class="duendes-card">
                     <div class="duendes-card-header">
-                        <div class="duendes-card-icon" style="background: #ede9fe;">🔮</div>
-                        <h3 class="duendes-card-title">Datos de la Canalización</h3>
+                        <div class="duendes-card-icon" style="background: rgba(255, 0, 255, 0.2);">🔮</div>
+                        <h3 class="duendes-card-title">Nueva Canalización</h3>
                     </div>
 
                     <form id="canalizacion-form">
-                        <div class="duendes-grid">
+                        <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
                             <div class="duendes-form-group">
                                 <label class="duendes-label">Guardián / Duende</label>
-                                <select name="producto_id" id="producto_id" class="duendes-select" required>
-                                    <option value="">Seleccionar guardián...</option>
-                                    <?php foreach ($products as $product): ?>
-                                    <option value="<?php echo $product->get_id(); ?>">
-                                        <?php echo esc_html($product->get_name()); ?>
-                                    </option>
+                                <select name="producto_id" class="duendes-select" required>
+                                    <option value="">Seleccionar...</option>
+                                    <?php foreach ($products as $p): ?>
+                                    <option value="<?php echo $p->get_id(); ?>"><?php echo esc_html($p->get_name()); ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="duendes-form-group">
                                 <label class="duendes-label">Nombre del Cliente</label>
-                                <input type="text" name="cliente_nombre" class="duendes-input" placeholder="María García" required>
+                                <input type="text" name="cliente_nombre" class="duendes-input" required>
                             </div>
                         </div>
 
-                        <div class="duendes-grid">
+                        <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
                             <div class="duendes-form-group">
-                                <label class="duendes-label">Email del Cliente</label>
-                                <input type="email" name="cliente_email" class="duendes-input" placeholder="maria@email.com">
+                                <label class="duendes-label">Email</label>
+                                <input type="email" name="cliente_email" class="duendes-input">
                             </div>
                             <div class="duendes-form-group">
                                 <label class="duendes-label">País</label>
-                                <input type="text" name="cliente_pais" class="duendes-input" placeholder="Argentina">
+                                <input type="text" name="cliente_pais" class="duendes-input">
                             </div>
                         </div>
 
                         <div class="duendes-form-group">
-                            <label class="duendes-label">¿Qué momento está atravesando?</label>
-                            <textarea name="momento_vida" class="duendes-textarea" placeholder="Describe brevemente la situación del cliente..."></textarea>
+                            <label class="duendes-label">Momento que atraviesa</label>
+                            <textarea name="momento_vida" class="duendes-textarea" placeholder="Describe la situación..."></textarea>
                         </div>
 
                         <div class="duendes-form-group">
-                            <label class="duendes-label">¿Qué busca o necesita?</label>
+                            <label class="duendes-label">Qué busca / necesita</label>
                             <textarea name="necesidad" class="duendes-textarea" placeholder="Protección, claridad, abundancia..."></textarea>
                         </div>
 
                         <div class="duendes-form-group">
                             <label class="duendes-label">Foto del Cliente (opcional)</label>
-                            <input type="file" name="cliente_foto" class="duendes-input" accept="image/*">
-                            <small style="color: #6b7280;">Para lectura de aura y personalización profunda</small>
+                            <input type="file" name="foto" class="duendes-input" accept="image/*">
                         </div>
 
-                        <div class="duendes-form-group">
-                            <label class="duendes-label">Notas adicionales</label>
-                            <textarea name="notas" class="duendes-textarea" placeholder="Cualquier información extra..."></textarea>
-                        </div>
-
-                        <div style="display: flex; gap: 12px;">
-                            <button type="submit" class="duendes-btn duendes-btn-primary">
-                                🔮 Generar Canalización
-                            </button>
-                            <button type="button" class="duendes-btn duendes-btn-secondary" onclick="DuendesCanalizaciones.limpiarFormulario()">
-                                🗑️ Limpiar
-                            </button>
-                        </div>
+                        <button type="submit" class="duendes-btn duendes-btn-magenta">
+                            🔮 Generar Canalización
+                        </button>
                     </form>
-
-                    <div id="canalizacion-loading" class="duendes-loading">
-                        <div class="duendes-spinner"></div>
-                        <span>Claude está canalizando el mensaje del guardián...</span>
-                    </div>
                 </div>
 
-                <!-- Preview / Resultado -->
                 <div class="duendes-card">
                     <div class="duendes-card-header">
-                        <div class="duendes-card-icon" style="background: #d1fae5;">👁️</div>
+                        <div class="duendes-card-icon" style="background: rgba(0, 255, 136, 0.2);">👁️</div>
                         <h3 class="duendes-card-title">Vista Previa</h3>
                     </div>
-                    <div id="canalizacion-preview">
-                        <p style="color: #9ca3af; text-align: center; padding: 40px 20px;">
-                            La canalización aparecerá aquí...
-                        </p>
+                    <div id="canalizacion-preview" style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
+                        La canalización aparecerá aquí...
                     </div>
-                    <div id="canalizacion-actions" style="display: none; margin-top: 20px;">
-                        <button class="duendes-btn duendes-btn-success" onclick="DuendesCanalizaciones.enviarEmail()">
-                            📧 Enviar por Email
-                        </button>
-                        <button class="duendes-btn duendes-btn-secondary" onclick="DuendesCanalizaciones.copiar()">
-                            📋 Copiar
-                        </button>
-                        <button class="duendes-btn duendes-btn-secondary" onclick="DuendesCanalizaciones.guardar()">
-                            💾 Guardar
-                        </button>
+                    <div id="canalizacion-actions" style="display: none; margin-top: 20px; gap: 12px;">
+                        <button class="duendes-btn duendes-btn-primary" onclick="copiarCanalizacion()">📋 Copiar</button>
+                        <button class="duendes-btn duendes-btn-secondary" onclick="enviarEmail()">📧 Enviar Email</button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Tab: Historial -->
-        <div id="tab-historial" class="duendes-tab-content">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #dbeafe;">📜</div>
-                    <h3 class="duendes-card-title">Historial de Canalizaciones</h3>
-                </div>
-
-                <?php if (empty($canalizaciones)): ?>
-                <p style="color: #9ca3af; text-align: center; padding: 40px;">
-                    No hay canalizaciones guardadas aún.
-                </p>
-                <?php else: ?>
-                <table class="duendes-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Guardián</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach (array_reverse($canalizaciones) as $c): ?>
-                        <tr>
-                            <td><?php echo esc_html($c['fecha']); ?></td>
-                            <td><?php echo esc_html($c['cliente']); ?></td>
-                            <td><?php echo esc_html($c['guardian']); ?></td>
-                            <td><span class="duendes-badge duendes-badge-success">Enviada</span></td>
-                            <td>
-                                <button class="duendes-btn duendes-btn-secondary" style="padding: 6px 12px;">Ver</button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php endif; ?>
             </div>
         </div>
     </div>
 
     <script>
-    var DuendesCanalizaciones = {
-        showTab: function(tab) {
-            document.querySelectorAll('.duendes-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.duendes-tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-        },
-
-        limpiarFormulario: function() {
-            document.getElementById('canalizacion-form').reset();
-            document.getElementById('canalizacion-preview').innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 40px 20px;">La canalización aparecerá aquí...</p>';
-            document.getElementById('canalizacion-actions').style.display = 'none';
-        },
-
-        enviarEmail: function() {
-            alert('Enviando por email...');
-        },
-
-        copiar: function() {
-            var content = document.getElementById('canalizacion-preview').innerText;
-            navigator.clipboard.writeText(content);
-            alert('Copiado al portapapeles!');
-        },
-
-        guardar: function() {
-            alert('Guardando...');
-        }
-    };
-
-    // Manejar envío del formulario
     document.getElementById('canalizacion-form').addEventListener('submit', function(e) {
         e.preventDefault();
-
-        var loading = document.getElementById('canalizacion-loading');
         var preview = document.getElementById('canalizacion-preview');
         var actions = document.getElementById('canalizacion-actions');
-
-        loading.classList.add('visible');
-
         var formData = new FormData(this);
-        var data = {
-            action: 'generate_canalizacion',
-            producto_id: formData.get('producto_id'),
-            cliente_nombre: formData.get('cliente_nombre'),
-            cliente_email: formData.get('cliente_email'),
-            cliente_pais: formData.get('cliente_pais'),
-            momento_vida: formData.get('momento_vida'),
-            necesidad: formData.get('necesidad'),
-            notas: formData.get('notas')
-        };
+
+        preview.innerHTML = '<div style="color: #ff00ff;">🔮 Generando canalización...</div>';
 
         fetch('<?php echo DUENDES_API_URL; ?>/admin/canalizacion-manual', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(r => r.json())
-        .then(result => {
-            loading.classList.remove('visible');
-
-            if (result.success) {
-                preview.innerHTML = '<div style="white-space: pre-wrap; line-height: 1.8;">' + result.canalizacion + '</div>';
-                actions.style.display = 'flex';
-            } else {
-                preview.innerHTML = '<p style="color: #dc2626;">Error: ' + (result.error || 'Error desconocido') + '</p>';
-            }
-        })
-        .catch(err => {
-            loading.classList.remove('visible');
-            preview.innerHTML = '<p style="color: #dc2626;">Error de conexión: ' + err.message + '</p>';
-        });
-    });
-    </script>
-    <?php
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 3. GESTIÓN DE USUARIOS
-// ═══════════════════════════════════════════════════════════════════════════
-
-function duendes_usuarios_page() {
-    // Obtener usuarios
-    $all_users = get_users(['number' => 100, 'orderby' => 'registered', 'order' => 'DESC']);
-    $mi_magia_users = get_users(['meta_key' => 'mi_magia_active', 'meta_value' => '1']);
-    $circulo_users = get_users(['meta_key' => 'circulo_member', 'meta_value' => '1']);
-    ?>
-    <div class="wrap duendes-admin-wrap">
-        <div class="duendes-header">
-            <h1>👥 Gestión de Usuarios</h1>
-            <p>Administra los usuarios de la web, Mi Magia y El Círculo</p>
-        </div>
-
-        <div class="duendes-tabs">
-            <button class="duendes-tab active" onclick="DuendesUsuarios.showTab('todos')">👥 Todos (<?php echo count($all_users); ?>)</button>
-            <button class="duendes-tab" onclick="DuendesUsuarios.showTab('mimagia')">✨ Mi Magia (<?php echo count($mi_magia_users); ?>)</button>
-            <button class="duendes-tab" onclick="DuendesUsuarios.showTab('circulo')">🌙 El Círculo (<?php echo count($circulo_users); ?>)</button>
-            <button class="duendes-tab" onclick="DuendesUsuarios.showTab('crear')">➕ Crear Usuario</button>
-        </div>
-
-        <!-- Tab: Todos los usuarios -->
-        <div id="tab-todos" class="duendes-tab-content active">
-            <div class="duendes-card">
-                <table class="duendes-table">
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Email</th>
-                            <th>Registro</th>
-                            <th>Mi Magia</th>
-                            <th>El Círculo</th>
-                            <th>Runas</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($all_users as $user):
-                            $mi_magia = get_user_meta($user->ID, 'mi_magia_active', true);
-                            $circulo = get_user_meta($user->ID, 'circulo_member', true);
-                            $runas = get_user_meta($user->ID, 'runas_poder', true) ?: 0;
-                            $initials = strtoupper(substr($user->display_name, 0, 2));
-                        ?>
-                        <tr>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div class="duendes-user-avatar"><?php echo $initials; ?></div>
-                                    <div>
-                                        <strong><?php echo esc_html($user->display_name); ?></strong>
-                                        <br><small style="color: #6b7280;">@<?php echo esc_html($user->user_login); ?></small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><?php echo esc_html($user->user_email); ?></td>
-                            <td><?php echo date('d/m/Y', strtotime($user->user_registered)); ?></td>
-                            <td>
-                                <?php if ($mi_magia): ?>
-                                    <span class="duendes-badge duendes-badge-purple">Activo</span>
-                                <?php else: ?>
-                                    <span class="duendes-badge" style="background: #f3f4f6; color: #6b7280;">-</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if ($circulo): ?>
-                                    <span class="duendes-badge duendes-badge-info">Miembro</span>
-                                <?php else: ?>
-                                    <span class="duendes-badge" style="background: #f3f4f6; color: #6b7280;">-</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><strong><?php echo $runas; ?></strong> 💎</td>
-                            <td>
-                                <button class="duendes-btn duendes-btn-secondary" style="padding: 6px 12px;" onclick="DuendesUsuarios.editar(<?php echo $user->ID; ?>)">
-                                    ✏️
-                                </button>
-                                <button class="duendes-btn duendes-btn-secondary" style="padding: 6px 12px;" onclick="DuendesUsuarios.darMiMagia(<?php echo $user->ID; ?>)">
-                                    ✨
-                                </button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Tab: Mi Magia -->
-        <div id="tab-mimagia" class="duendes-tab-content">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #ede9fe;">✨</div>
-                    <h3 class="duendes-card-title">Usuarios de Mi Magia</h3>
-                </div>
-                <?php if (empty($mi_magia_users)): ?>
-                <p style="color: #9ca3af; text-align: center; padding: 40px;">
-                    No hay usuarios con Mi Magia activo aún.
-                </p>
-                <?php else: ?>
-                <table class="duendes-table">
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Email</th>
-                            <th>Runas</th>
-                            <th>Compras</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($mi_magia_users as $user):
-                            $runas = get_user_meta($user->ID, 'runas_poder', true) ?: 0;
-                        ?>
-                        <tr>
-                            <td><?php echo esc_html($user->display_name); ?></td>
-                            <td><?php echo esc_html($user->user_email); ?></td>
-                            <td><strong><?php echo $runas; ?></strong> 💎</td>
-                            <td>-</td>
-                            <td>
-                                <button class="duendes-btn duendes-btn-secondary" style="padding: 6px 12px;">Ver perfil</button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- Tab: El Círculo -->
-        <div id="tab-circulo" class="duendes-tab-content">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #dbeafe;">🌙</div>
-                    <h3 class="duendes-card-title">Miembros de El Círculo</h3>
-                </div>
-                <?php if (empty($circulo_users)): ?>
-                <p style="color: #9ca3af; text-align: center; padding: 40px;">
-                    No hay miembros de El Círculo aún.
-                </p>
-                <?php else: ?>
-                <table class="duendes-table">
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Email</th>
-                            <th>Desde</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($circulo_users as $user): ?>
-                        <tr>
-                            <td><?php echo esc_html($user->display_name); ?></td>
-                            <td><?php echo esc_html($user->user_email); ?></td>
-                            <td><?php echo date('d/m/Y', strtotime($user->user_registered)); ?></td>
-                            <td><span class="duendes-badge duendes-badge-success">Activo</span></td>
-                            <td>
-                                <button class="duendes-btn duendes-btn-secondary" style="padding: 6px 12px;">Ver</button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- Tab: Crear Usuario -->
-        <div id="tab-crear" class="duendes-tab-content">
-            <div class="duendes-card" style="max-width: 600px;">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #d1fae5;">➕</div>
-                    <h3 class="duendes-card-title">Crear Usuario con Mi Magia</h3>
-                </div>
-
-                <form id="crear-usuario-form">
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Nombre completo</label>
-                        <input type="text" name="nombre" class="duendes-input" required>
-                    </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Email</label>
-                        <input type="email" name="email" class="duendes-input" required>
-                    </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Runas de regalo</label>
-                        <input type="number" name="runas" class="duendes-input" value="50">
-                    </div>
-                    <div class="duendes-form-group">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" name="mi_magia" value="1" checked>
-                            Activar Mi Magia
-                        </label>
-                    </div>
-                    <div class="duendes-form-group">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" name="enviar_email" value="1" checked>
-                            Enviar email de bienvenida
-                        </label>
-                    </div>
-                    <button type="submit" class="duendes-btn duendes-btn-success">
-                        ✨ Crear Usuario
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    var DuendesUsuarios = {
-        showTab: function(tab) {
-            document.querySelectorAll('.duendes-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.duendes-tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-        },
-
-        editar: function(userId) {
-            window.location.href = 'user-edit.php?user_id=' + userId;
-        },
-
-        darMiMagia: function(userId) {
-            if (confirm('¿Activar Mi Magia para este usuario?')) {
-                // AJAX call to activate
-                alert('Mi Magia activado!');
-            }
-        }
-    };
-
-    document.getElementById('crear-usuario-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        var formData = new FormData(this);
-
-        fetch(ajaxurl, {
-            method: 'POST',
-            body: new URLSearchParams({
-                action: 'duendes_crear_usuario',
-                nombre: formData.get('nombre'),
-                email: formData.get('email'),
-                runas: formData.get('runas'),
-                mi_magia: formData.get('mi_magia') ? 1 : 0,
-                enviar_email: formData.get('enviar_email') ? 1 : 0,
-                nonce: '<?php echo wp_create_nonce('duendes_crear_usuario'); ?>'
+            body: JSON.stringify({
+                producto_id: formData.get('producto_id'),
+                cliente_nombre: formData.get('cliente_nombre'),
+                cliente_email: formData.get('cliente_email'),
+                cliente_pais: formData.get('cliente_pais'),
+                momento_vida: formData.get('momento_vida'),
+                necesidad: formData.get('necesidad')
             })
         })
         .then(r => r.json())
         .then(result => {
             if (result.success) {
-                alert('Usuario creado exitosamente!');
-                location.reload();
+                preview.innerHTML = '<div style="white-space: pre-wrap; line-height: 1.8; color: #fff;">' + result.canalizacion + '</div>';
+                actions.style.display = 'flex';
             } else {
-                alert('Error: ' + result.data);
+                preview.innerHTML = '<div style="color: #ff4444;">Error: ' + result.error + '</div>';
             }
+        })
+        .catch(err => {
+            preview.innerHTML = '<div style="color: #ff4444;">Error de conexión</div>';
         });
     });
+
+    function copiarCanalizacion() {
+        var text = document.getElementById('canalizacion-preview').innerText;
+        navigator.clipboard.writeText(text);
+        alert('Copiado!');
+    }
     </script>
     <?php
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. EL CÍRCULO - GENERADOR DE CONTENIDO
+// 3. USUARIOS
 // ═══════════════════════════════════════════════════════════════════════════
 
-function duendes_circulo_page() {
-    $meses = [
-        1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-        5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-        9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
-    ];
+function duendes_usuarios_page() {
+    $all_users = get_users(['number' => 100, 'orderby' => 'registered', 'order' => 'DESC']);
     ?>
-    <div class="wrap duendes-admin-wrap">
-        <div class="duendes-header">
-            <h1>🌙 El Círculo - Generador de Contenido</h1>
-            <p>Genera el contenido mensual completo con Claude + OpenAI</p>
+    <div class="wrap duendes-wrap">
+        <div class="duendes-header" style="background: linear-gradient(135deg, #001a0f 0%, #003322 100%); border-bottom: 1px solid rgba(0, 255, 136, 0.3);">
+            <div>
+                <h1 style="background: linear-gradient(90deg, #00ff88, #00ffaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">👥 Usuarios</h1>
+                <p>Gestión completa de usuarios</p>
+            </div>
+            <button class="duendes-btn duendes-btn-primary" onclick="mostrarCrearUsuario()">➕ Crear Usuario</button>
         </div>
 
-        <div class="duendes-tabs">
-            <button class="duendes-tab active" onclick="DuendesCirculo.showTab('generar')">🪄 Generar Mes</button>
-            <button class="duendes-tab" onclick="DuendesCirculo.showTab('calendario')">📅 Calendario</button>
-            <button class="duendes-tab" onclick="DuendesCirculo.showTab('plantillas')">📝 Plantillas</button>
-            <button class="duendes-tab" onclick="DuendesCirculo.showTab('historial')">📜 Historial</button>
-        </div>
+        <div class="duendes-content">
+            <div class="duendes-tabs">
+                <button class="duendes-tab active" onclick="showUserTab('todos')">👥 Todos</button>
+                <button class="duendes-tab" onclick="showUserTab('mimagia')">✨ Mi Magia</button>
+                <button class="duendes-tab" onclick="showUserTab('circulo')">🌙 El Círculo</button>
+            </div>
 
-        <!-- Tab: Generar Mes -->
-        <div id="tab-generar" class="duendes-tab-content active">
-            <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
+            <div id="tab-todos" class="duendes-tab-content active">
                 <div class="duendes-card">
-                    <div class="duendes-card-header">
-                        <div class="duendes-card-icon" style="background: #dbeafe;">🗓️</div>
-                        <h3 class="duendes-card-title">Configurar Generación</h3>
-                    </div>
-
-                    <form id="circulo-form">
-                        <div class="duendes-grid">
-                            <div class="duendes-form-group">
-                                <label class="duendes-label">Mes</label>
-                                <select name="mes" class="duendes-select">
-                                    <?php foreach ($meses as $num => $nombre): ?>
-                                    <option value="<?php echo $num; ?>" <?php selected($num, date('n')); ?>>
-                                        <?php echo $nombre; ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="duendes-form-group">
-                                <label class="duendes-label">Año</label>
-                                <select name="ano" class="duendes-select">
-                                    <option value="2025">2025</option>
-                                    <option value="2026" selected>2026</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="duendes-form-group">
-                            <label class="duendes-label">Tipo de contenido a generar</label>
-                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                    <input type="checkbox" name="tipos[]" value="meditacion" checked> 🧘 Meditaciones diarias
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                    <input type="checkbox" name="tipos[]" value="ritual" checked> 🕯️ Rituales semanales
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                    <input type="checkbox" name="tipos[]" value="lectura" checked> 🔮 Lecturas de energía
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                    <input type="checkbox" name="tipos[]" value="guardian" checked> 🧙 Mensaje del guardián del mes
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                    <input type="checkbox" name="tipos[]" value="cristal" checked> 💎 Cristal del mes
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="duendes-form-group">
-                            <label class="duendes-label">Tema especial del mes (opcional)</label>
-                            <input type="text" name="tema" class="duendes-input" placeholder="Ej: Luna de cosecha, Equinoccio...">
-                        </div>
-
-                        <div class="duendes-form-group">
-                            <label class="duendes-label">Generar imágenes con OpenAI</label>
-                            <select name="imagenes" class="duendes-select">
-                                <option value="todas">Sí, todas las imágenes</option>
-                                <option value="principales">Solo imágenes principales</option>
-                                <option value="ninguna">No generar imágenes</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="duendes-btn duendes-btn-primary">
-                            🌙 Generar Mes Completo
-                        </button>
-                    </form>
-
-                    <div id="circulo-loading" class="duendes-loading">
-                        <div class="duendes-spinner"></div>
-                        <span id="circulo-loading-text">Generando contenido del mes...</span>
-                    </div>
+                    <table class="duendes-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Registro</th>
+                                <th>Mi Magia</th>
+                                <th>Runas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($all_users as $user):
+                                $mi_magia = get_user_meta($user->ID, 'mi_magia_active', true);
+                                $runas = get_user_meta($user->ID, 'runas_poder', true) ?: 0;
+                            ?>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="duendes-user-avatar"><?php echo strtoupper(substr($user->display_name, 0, 2)); ?></div>
+                                        <div>
+                                            <strong><?php echo esc_html($user->display_name); ?></strong><br>
+                                            <small style="color: rgba(255,255,255,0.5);">@<?php echo esc_html($user->user_login); ?></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><?php echo esc_html($user->user_email); ?></td>
+                                <td><?php echo date('d/m/Y', strtotime($user->user_registered)); ?></td>
+                                <td>
+                                    <?php if ($mi_magia): ?>
+                                        <span class="duendes-badge duendes-badge-magenta">Activo</span>
+                                    <?php else: ?>
+                                        <span class="duendes-badge" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);">-</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><span class="neon-cyan"><?php echo $runas; ?></span> 💎</td>
+                                <td>
+                                    <button class="duendes-btn duendes-btn-secondary" style="padding: 8px 12px;" onclick="regalarRunas(<?php echo $user->ID; ?>)">💎</button>
+                                    <button class="duendes-btn duendes-btn-secondary" style="padding: 8px 12px;" onclick="toggleMiMagia(<?php echo $user->ID; ?>)">✨</button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
+            <div id="tab-mimagia" class="duendes-tab-content">
                 <div class="duendes-card">
-                    <div class="duendes-card-header">
-                        <div class="duendes-card-icon" style="background: #fef3c7;">👁️</div>
-                        <h3 class="duendes-card-title">Vista Previa</h3>
-                    </div>
-                    <div id="circulo-preview" style="max-height: 500px; overflow-y: auto;">
-                        <p style="color: #9ca3af; text-align: center; padding: 40px;">
-                            El contenido generado aparecerá aquí...
-                        </p>
-                    </div>
+                    <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">Usuarios con Mi Magia activo</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Tab: Calendario -->
-        <div id="tab-calendario" class="duendes-tab-content">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #d1fae5;">📅</div>
-                    <h3 class="duendes-card-title">Calendario de Contenido</h3>
+            <div id="tab-circulo" class="duendes-tab-content">
+                <div class="duendes-card">
+                    <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">Miembros de El Círculo</p>
                 </div>
-                <p style="color: #6b7280; text-align: center; padding: 60px;">
-                    Calendario visual próximamente...
-                </p>
-            </div>
-        </div>
-
-        <!-- Tab: Plantillas -->
-        <div id="tab-plantillas" class="duendes-tab-content">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #ede9fe;">📝</div>
-                    <h3 class="duendes-card-title">Plantillas de Publicación</h3>
-                </div>
-                <div class="duendes-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div style="border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;" onclick="DuendesCirculo.selectTemplate('instagram')">
-                        <div style="font-size: 40px; margin-bottom: 10px;">📱</div>
-                        <strong>Instagram</strong>
-                        <p style="color: #6b7280; font-size: 13px;">Formato cuadrado, textos cortos</p>
-                    </div>
-                    <div style="border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;" onclick="DuendesCirculo.selectTemplate('email')">
-                        <div style="font-size: 40px; margin-bottom: 10px;">📧</div>
-                        <strong>Email</strong>
-                        <p style="color: #6b7280; font-size: 13px;">Newsletter, textos largos</p>
-                    </div>
-                    <div style="border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;" onclick="DuendesCirculo.selectTemplate('web')">
-                        <div style="font-size: 40px; margin-bottom: 10px;">🌐</div>
-                        <strong>Web</strong>
-                        <p style="color: #6b7280; font-size: 13px;">Página completa</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab: Historial -->
-        <div id="tab-historial" class="duendes-tab-content">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #fee2e2;">📜</div>
-                    <h3 class="duendes-card-title">Historial de Generaciones</h3>
-                </div>
-                <p style="color: #9ca3af; text-align: center; padding: 40px;">
-                    No hay generaciones anteriores.
-                </p>
             </div>
         </div>
     </div>
 
     <script>
-    var DuendesCirculo = {
-        showTab: function(tab) {
-            document.querySelectorAll('.duendes-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.duendes-tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-        },
+    function showUserTab(tab) {
+        document.querySelectorAll('.duendes-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.duendes-tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
 
-        selectTemplate: function(template) {
-            alert('Plantilla ' + template + ' seleccionada');
+    function regalarRunas(userId) {
+        var cantidad = prompt('¿Cuántas runas querés regalar?', '50');
+        if (cantidad) {
+            alert('Regalando ' + cantidad + ' runas al usuario ' + userId);
+            // Implementar AJAX
         }
-    };
+    }
 
-    document.getElementById('circulo-form').addEventListener('submit', function(e) {
+    function toggleMiMagia(userId) {
+        if (confirm('¿Activar/desactivar Mi Magia para este usuario?')) {
+            alert('Cambiando estado de Mi Magia...');
+            // Implementar AJAX
+        }
+    }
+
+    function mostrarCrearUsuario() {
+        alert('Formulario de crear usuario - próximamente');
+    }
+    </script>
+    <?php
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. EL CÍRCULO
+// ═══════════════════════════════════════════════════════════════════════════
+
+function duendes_circulo_page() {
+    ?>
+    <div class="wrap duendes-wrap">
+        <div class="duendes-header" style="background: linear-gradient(135deg, #0f001a 0%, #220044 100%); border-bottom: 1px solid rgba(170, 0, 255, 0.3);">
+            <div>
+                <h1 style="background: linear-gradient(90deg, #aa00ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🌙 El Círculo</h1>
+                <p>Generador de contenido mágico</p>
+            </div>
+        </div>
+
+        <div class="duendes-content">
+            <div class="duendes-tabs">
+                <button class="duendes-tab active" onclick="showCirculoTab('generar')">🪄 Generar</button>
+                <button class="duendes-tab" onclick="showCirculoTab('calendario')">📅 Calendario</button>
+                <button class="duendes-tab" onclick="showCirculoTab('miembros')">👥 Miembros</button>
+                <button class="duendes-tab" onclick="showCirculoTab('promos')">🎁 Promos</button>
+            </div>
+
+            <!-- Tab: Generar -->
+            <div id="tab-generar" class="duendes-tab-content active">
+                <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="duendes-card">
+                        <div class="duendes-card-header">
+                            <div class="duendes-card-icon" style="background: rgba(170, 0, 255, 0.2);">🪄</div>
+                            <h3 class="duendes-card-title">Generar Contenido</h3>
+                        </div>
+
+                        <form id="circulo-generar-form">
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">Período a generar</label>
+                                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; border: 2px solid transparent;" class="periodo-option">
+                                        <input type="radio" name="periodo" value="dia" style="accent-color: #aa00ff;"> Día
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; border: 2px solid transparent;" class="periodo-option">
+                                        <input type="radio" name="periodo" value="semana" checked style="accent-color: #aa00ff;"> Semana
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; border: 2px solid transparent;" class="periodo-option">
+                                        <input type="radio" name="periodo" value="quincena" style="accent-color: #aa00ff;"> Quincena
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; border: 2px solid transparent;" class="periodo-option">
+                                        <input type="radio" name="periodo" value="mes" style="accent-color: #aa00ff;"> Mes
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="duendes-form-group">
+                                    <label class="duendes-label">Mes</label>
+                                    <select name="mes" class="duendes-select">
+                                        <option value="1">Enero</option>
+                                        <option value="2">Febrero</option>
+                                        <option value="3">Marzo</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Mayo</option>
+                                        <option value="6">Junio</option>
+                                        <option value="7">Julio</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
+                                    </select>
+                                </div>
+                                <div class="duendes-form-group">
+                                    <label class="duendes-label">Año</label>
+                                    <select name="ano" class="duendes-select">
+                                        <option value="2025">2025</option>
+                                        <option value="2026" selected>2026</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">Tipo de contenido</label>
+                                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer;">
+                                        <input type="checkbox" name="tipos[]" value="meditacion" checked style="accent-color: #aa00ff;"> 🧘 Meditaciones
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer;">
+                                        <input type="checkbox" name="tipos[]" value="ritual" checked style="accent-color: #aa00ff;"> 🕯️ Rituales
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer;">
+                                        <input type="checkbox" name="tipos[]" value="lectura" checked style="accent-color: #aa00ff;"> 🔮 Lecturas de energía
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer;">
+                                        <input type="checkbox" name="tipos[]" value="guardian" checked style="accent-color: #aa00ff;"> 🧙 Mensaje del guardián
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer;">
+                                        <input type="checkbox" name="tipos[]" value="cristal" checked style="accent-color: #aa00ff;"> 💎 Cristal del período
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">Generar imágenes (OpenAI)</label>
+                                <select name="imagenes" class="duendes-select">
+                                    <option value="todas">Todas las imágenes</option>
+                                    <option value="principales">Solo principales</option>
+                                    <option value="ninguna">Sin imágenes</option>
+                                </select>
+                            </div>
+
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">Tema especial (opcional)</label>
+                                <input type="text" name="tema" class="duendes-input" placeholder="Ej: Luna de cosecha, Equinoccio...">
+                            </div>
+
+                            <button type="submit" class="duendes-btn" style="background: linear-gradient(135deg, #aa00ff, #ff00ff); color: #fff; width: 100%;">
+                                🪄 Generar Contenido
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="duendes-card">
+                        <div class="duendes-card-header">
+                            <div class="duendes-card-icon" style="background: rgba(0, 255, 255, 0.2);">👁️</div>
+                            <h3 class="duendes-card-title">Vista Previa</h3>
+                        </div>
+                        <div id="circulo-preview" style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px; max-height: 500px; overflow-y: auto;">
+                            El contenido generado aparecerá aquí...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Calendario -->
+            <div id="tab-calendario" class="duendes-tab-content">
+                <div class="duendes-card">
+                    <div class="duendes-card-header">
+                        <div class="duendes-card-icon" style="background: rgba(255, 136, 0, 0.2);">📅</div>
+                        <h3 class="duendes-card-title">Calendario de Contenido</h3>
+                    </div>
+                    <div id="calendario-container" style="min-height: 400px;">
+                        <!-- Calendario aquí -->
+                        <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 60px;">Cargando calendario...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Miembros -->
+            <div id="tab-miembros" class="duendes-tab-content">
+                <div class="duendes-card">
+                    <div class="duendes-card-header">
+                        <div class="duendes-card-icon" style="background: rgba(0, 255, 136, 0.2);">👥</div>
+                        <h3 class="duendes-card-title">Gestión de Miembros</h3>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="duendes-btn duendes-btn-primary" onclick="habilitarRegistros()">✅ Habilitar Registros</button>
+                        <button class="duendes-btn duendes-btn-secondary" onclick="regalarTiempoGratis()">🎁 Regalar Tiempo Gratis</button>
+                        <button class="duendes-btn duendes-btn-secondary" onclick="regalarRunasMasivo()">💎 Regalar Runas</button>
+                        <button class="duendes-btn duendes-btn-secondary" onclick="crearCupon()">🎟️ Crear Cupón</button>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.5);">Lista de miembros del Círculo...</p>
+                </div>
+            </div>
+
+            <!-- Tab: Promos -->
+            <div id="tab-promos" class="duendes-tab-content">
+                <div class="duendes-card">
+                    <div class="duendes-card-header">
+                        <div class="duendes-card-icon" style="background: rgba(255, 0, 255, 0.2);">🎁</div>
+                        <h3 class="duendes-card-title">Promociones y Competencias</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,136,0,0.3); border-radius: 12px; padding: 20px; cursor: pointer;" onclick="crearPromo('descuento')">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🏷️</div>
+                            <strong style="color: #ff8800;">Crear Descuento</strong>
+                            <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 8px;">Porcentaje o monto fijo</p>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,255,0.3); border-radius: 12px; padding: 20px; cursor: pointer;" onclick="crearPromo('cupon')">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🎟️</div>
+                            <strong style="color: #00ffff;">Crear Cupón</strong>
+                            <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 8px;">Código promocional</p>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,136,0.3); border-radius: 12px; padding: 20px; cursor: pointer;" onclick="crearPromo('competencia')">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🏆</div>
+                            <strong style="color: #00ff88;">Crear Competencia</strong>
+                            <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 8px;">Retos y premios</p>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,0,255,0.3); border-radius: 12px; padding: 20px; cursor: pointer;" onclick="crearPromo('regalo')">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🎁</div>
+                            <strong style="color: #ff00ff;">Regalo Masivo</strong>
+                            <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 8px;">Runas, lecturas, tiempo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showCirculoTab(tab) {
+        document.querySelectorAll('.duendes-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.duendes-tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    function habilitarRegistros() { alert('Habilitando registros...'); }
+    function regalarTiempoGratis() { alert('Configurar tiempo gratis...'); }
+    function regalarRunasMasivo() { alert('Regalar runas masivamente...'); }
+    function crearCupon() { alert('Crear cupón...'); }
+    function crearPromo(tipo) { alert('Crear ' + tipo + '...'); }
+
+    document.getElementById('circulo-generar-form').addEventListener('submit', function(e) {
         e.preventDefault();
-
-        var loading = document.getElementById('circulo-loading');
-        var loadingText = document.getElementById('circulo-loading-text');
         var preview = document.getElementById('circulo-preview');
+        preview.innerHTML = '<div style="color: #aa00ff;">🪄 Generando contenido mágico...</div>';
 
-        loading.classList.add('visible');
-
-        var messages = [
-            'Generando contenido del mes...',
-            'Claude está creando meditaciones...',
-            'Diseñando rituales semanales...',
-            'Conectando con las energías del mes...',
-            'Generando imágenes con OpenAI...',
-            'Casi listo, puliendo detalles...'
-        ];
-
-        var msgIndex = 0;
-        var msgInterval = setInterval(function() {
-            msgIndex = (msgIndex + 1) % messages.length;
-            loadingText.textContent = messages[msgIndex];
-        }, 5000);
-
-        // Simular generación (conectar con API real)
         setTimeout(function() {
-            clearInterval(msgInterval);
-            loading.classList.remove('visible');
-            preview.innerHTML = '<div class="duendes-alert duendes-alert-success"><strong>✨ Contenido generado!</strong><br>El mes completo ha sido generado. Revisá cada sección en el calendario.</div>';
-        }, 3000);
+            preview.innerHTML = '<div style="color: #00ff88;">✅ Contenido generado!</div><br><div style="text-align: left; color: #fff;">Aquí aparecería el contenido generado por Claude...</div>';
+        }, 2000);
     });
     </script>
     <?php
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. BANNERS Y PROMOCIONES
+// 5. BANNERS
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_banners_page() {
     ?>
-    <div class="wrap duendes-admin-wrap">
-        <div class="duendes-header">
-            <h1>🎨 Banners & Promociones</h1>
-            <p>Crea banners promocionales para Mi Magia</p>
+    <div class="wrap duendes-wrap">
+        <div class="duendes-header" style="background: linear-gradient(135deg, #1a0f00 0%, #332200 100%); border-bottom: 1px solid rgba(255, 136, 0, 0.3);">
+            <div>
+                <h1 style="background: linear-gradient(90deg, #ff8800, #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎨 Banners & Promos</h1>
+                <p>Crea banners promocionales</p>
+            </div>
         </div>
 
-        <div class="duendes-grid" style="grid-template-columns: 1fr 1fr;">
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #fce7f3;">🖼️</div>
-                    <h3 class="duendes-card-title">Crear Banner</h3>
+        <div class="duendes-content">
+            <div class="duendes-grid">
+                <div class="duendes-card">
+                    <div class="duendes-card-header">
+                        <div class="duendes-card-icon" style="background: rgba(255, 136, 0, 0.2);">🖼️</div>
+                        <h3 class="duendes-card-title">Crear Banner</h3>
+                    </div>
+
+                    <form id="banner-form">
+                        <div class="duendes-form-group">
+                            <label class="duendes-label">Título</label>
+                            <input type="text" name="titulo" class="duendes-input" placeholder="¡50% OFF!">
+                        </div>
+                        <div class="duendes-form-group">
+                            <label class="duendes-label">Subtítulo</label>
+                            <input type="text" name="subtitulo" class="duendes-input" placeholder="Solo por tiempo limitado">
+                        </div>
+                        <div class="duendes-form-group">
+                            <label class="duendes-label">Imagen</label>
+                            <input type="file" name="imagen" class="duendes-input" accept="image/*">
+                        </div>
+                        <div class="duendes-form-group">
+                            <label class="duendes-label">Ubicación</label>
+                            <select name="ubicacion" class="duendes-select">
+                                <option value="mi_magia">Mi Magia - Home</option>
+                                <option value="tienda">Tienda</option>
+                                <option value="checkout">Checkout</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="duendes-btn duendes-btn-orange">🎨 Crear Banner</button>
+                    </form>
                 </div>
 
-                <form id="banner-form">
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Título del Banner</label>
-                        <input type="text" name="titulo" class="duendes-input" placeholder="Ej: ¡50% OFF en guardianes!">
+                <div class="duendes-card">
+                    <div class="duendes-card-header">
+                        <div class="duendes-card-icon" style="background: rgba(0, 255, 255, 0.2);">📋</div>
+                        <h3 class="duendes-card-title">Banners Activos</h3>
                     </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Subtítulo</label>
-                        <input type="text" name="subtitulo" class="duendes-input" placeholder="Solo por tiempo limitado">
-                    </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Imagen de fondo</label>
-                        <input type="file" name="imagen" class="duendes-input" accept="image/*">
-                    </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Link destino</label>
-                        <input type="url" name="link" class="duendes-input" placeholder="https://...">
-                    </div>
-                    <div class="duendes-form-group">
-                        <label class="duendes-label">Ubicación</label>
-                        <select name="ubicacion" class="duendes-select">
-                            <option value="mi_magia_home">Mi Magia - Home</option>
-                            <option value="mi_magia_sidebar">Mi Magia - Sidebar</option>
-                            <option value="tienda">Tienda</option>
-                            <option value="checkout">Checkout</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="duendes-btn duendes-btn-primary">
-                        🎨 Crear Banner
-                    </button>
-                </form>
-            </div>
-
-            <div class="duendes-card">
-                <div class="duendes-card-header">
-                    <div class="duendes-card-icon" style="background: #dbeafe;">📋</div>
-                    <h3 class="duendes-card-title">Banners Activos</h3>
+                    <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">No hay banners activos</p>
                 </div>
-                <p style="color: #9ca3af; text-align: center; padding: 40px;">
-                    No hay banners activos.
-                </p>
             </div>
         </div>
     </div>
     <?php
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 6. CONFIGURACIÓN
-// ═══════════════════════════════════════════════════════════════════════════
-
-function duendes_config_page() {
-    ?>
-    <div class="wrap duendes-admin-wrap">
-        <div class="duendes-header">
-            <h1>⚙️ Configuración</h1>
-            <p>Ajustes generales del sistema Duendes</p>
-        </div>
-
-        <div class="duendes-card" style="max-width: 800px;">
-            <div class="duendes-card-header">
-                <div class="duendes-card-icon" style="background: #f3f4f6;">🔧</div>
-                <h3 class="duendes-card-title">Configuración General</h3>
-            </div>
-
-            <form id="config-form">
-                <div class="duendes-form-group">
-                    <label class="duendes-label">Runas de bienvenida (registro gratis)</label>
-                    <input type="number" name="runas_bienvenida" class="duendes-input" value="50">
-                </div>
-
-                <div class="duendes-form-group">
-                    <label class="duendes-label">API URL Vercel</label>
-                    <input type="url" name="api_url" class="duendes-input" value="<?php echo DUENDES_API_URL; ?>">
-                </div>
-
-                <div class="duendes-form-group">
-                    <label class="duendes-label">Email para reportes de Tito</label>
-                    <input type="email" name="email_reportes" class="duendes-input" value="<?php echo get_option('admin_email'); ?>">
-                </div>
-
-                <button type="submit" class="duendes-btn duendes-btn-primary">
-                    💾 Guardar Configuración
-                </button>
-            </form>
-        </div>
-    </div>
-    <?php
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FUNCIONES AUXILIARES
-// ═══════════════════════════════════════════════════════════════════════════
-
-function duendes_count_mi_magia_users() {
-    global $wpdb;
-    return (int) $wpdb->get_var(
-        "SELECT COUNT(*) FROM {$wpdb->usermeta} WHERE meta_key = 'mi_magia_active' AND meta_value = '1'"
-    );
-}
-
-function duendes_get_tito_suggestions() {
-    // Por ahora retorna sugerencias estáticas
-    // Conectar con la API de Tito para sugerencias dinámicas
-    return [
-        [
-            'titulo' => '📦 Productos sin historia',
-            'mensaje' => 'Hay 3 productos que aún no tienen historia generada. ¿Querés que los canalice?'
-        ],
-        [
-            'titulo' => '🎯 Oportunidad de venta',
-            'mensaje' => 'Los guardianes de protección están siendo muy buscados esta semana.'
-        ]
-    ];
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// AJAX HANDLERS
-// ═══════════════════════════════════════════════════════════════════════════
-
-// Crear usuario con Mi Magia
-add_action('wp_ajax_duendes_crear_usuario', function() {
-    check_ajax_referer('duendes_crear_usuario', 'nonce');
-
-    $nombre = sanitize_text_field($_POST['nombre']);
-    $email = sanitize_email($_POST['email']);
-    $runas = intval($_POST['runas']);
-    $mi_magia = intval($_POST['mi_magia']);
-    $enviar_email = intval($_POST['enviar_email']);
-
-    // Verificar que el email no existe
-    if (email_exists($email)) {
-        wp_send_json_error('El email ya está registrado');
-    }
-
-    // Crear usuario
-    $username = sanitize_user(strtolower(str_replace(' ', '', $nombre)));
-    $password = wp_generate_password(12);
-
-    $user_id = wp_create_user($username, $password, $email);
-
-    if (is_wp_error($user_id)) {
-        wp_send_json_error($user_id->get_error_message());
-    }
-
-    // Actualizar nombre
-    wp_update_user([
-        'ID' => $user_id,
-        'display_name' => $nombre,
-        'first_name' => explode(' ', $nombre)[0]
-    ]);
-
-    // Dar runas y Mi Magia
-    update_user_meta($user_id, 'runas_poder', $runas);
-    if ($mi_magia) {
-        update_user_meta($user_id, 'mi_magia_active', '1');
-    }
-
-    // Enviar email de bienvenida
-    if ($enviar_email) {
-        wp_mail(
-            $email,
-            '✨ Bienvenida a Mi Magia - Duendes del Uruguay',
-            "¡Hola {$nombre}!\n\nTu cuenta de Mi Magia ha sido creada.\n\nUsuario: {$username}\nContraseña: {$password}\n\nTenés {$runas} runas de poder para comenzar.\n\n🔮 Duendes del Uruguay"
-        );
-    }
-
-    wp_send_json_success(['user_id' => $user_id]);
-});
