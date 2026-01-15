@@ -66,7 +66,7 @@ const CONTENT_TYPES = {
 export async function POST(request) {
     try {
         const data = await request.json();
-        const { periodo, fecha_inicio, tema_especial, notas } = data;
+        const { periodo, fecha_inicio, tema_especial, notas, instrucciones_claude, extras = [] } = data;
 
         if (!periodo || !CONTENT_TYPES[periodo]) {
             return NextResponse.json(
@@ -77,6 +77,33 @@ export async function POST(request) {
 
         const contentType = CONTENT_TYPES[periodo];
         const fechaInicio = fecha_inicio || new Date().toISOString().split('T')[0];
+
+        // Construir secciones extras basadas en checkboxes
+        let extrasSection = '';
+        if (extras.includes('test_interactivo')) {
+            extrasSection += `
+### TEST INTERACTIVO PARA LA COMUNIDAD
+Creá un test de 5 preguntas que los miembros puedan hacer EN VIVO mientras leen.
+Cada pregunta debe tener 3-4 opciones.
+Al final, según las respuestas, dar una interpretación personalizada.
+Formato: Pregunta -> Opciones -> Significado de cada elección.
+`;
+        }
+        if (extras.includes('quiz_energia')) {
+            extrasSection += `
+### QUIZ DE ENERGÍA PERSONAL
+Creá un quiz rápido (3 preguntas) para que cada persona descubra su energía del momento.
+Las preguntas deben ser sobre sensaciones, colores o elementos que les atraen HOY.
+Dar un resultado con mensaje del guardián según la combinación de respuestas.
+`;
+        }
+        if (extras.includes('incluir_video')) {
+            extrasSection += `
+### ESPACIO PARA VIDEO
+Dejá un espacio marcado como [VIDEO: descripción del contenido sugerido]
+donde se insertará un video personalizado. Sugerí qué debería contener el video.
+`;
+        }
 
         const prompt = `Sos el creador de contenido espiritual de Duendes del Uruguay para El Círculo (membresía premium).
 
@@ -91,13 +118,19 @@ TIPO DE CONTENIDO: ${contentType.name}
 FECHA INICIO: ${fechaInicio}
 ${tema_especial ? `TEMA ESPECIAL: ${tema_especial}` : ''}
 ${notas ? `NOTAS ADICIONALES: ${notas}` : ''}
+${instrucciones_claude ? `
+INSTRUCCIONES ESPECIALES DE LA CREADORA:
+${instrucciones_claude}
+` : ''}
 
 ESTRUCTURA REQUERIDA:
 ${contentType.structure}
+${extrasSection}
 
 Generá el contenido completo ahora, usando formato Markdown para estructurarlo bien.
 Cada sección debe ser sustancial y valiosa, no relleno.
-Los mensajes de los guardianes deben sentirse canalizados, no escritos por IA.`;
+Los mensajes de los guardianes deben sentirse canalizados, no escritos por IA.
+${instrucciones_claude ? 'IMPORTANTE: Seguí las instrucciones especiales de la creadora con prioridad.' : ''}`;
 
         const response = await anthropic.messages.create({
             model: 'claude-sonnet-4-20250514',
@@ -113,6 +146,7 @@ Los mensajes de los guardianes deben sentirse canalizados, no escritos por IA.`;
             periodo,
             tipo: contentType.name,
             fecha_inicio: fechaInicio,
+            extras_incluidos: extras,
             fecha_generacion: new Date().toISOString()
         }, { headers: corsHeaders });
 

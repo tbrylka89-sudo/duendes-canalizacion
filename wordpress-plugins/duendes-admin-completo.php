@@ -1655,6 +1655,33 @@ function duendes_circulo_page() {
                                 <input type="text" name="tema" class="duendes-input" placeholder="Ej: Luna de cosecha, Equinoccio...">
                             </div>
 
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">Extras opcionales</label>
+                                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #333; cursor: pointer;">
+                                        <input type="checkbox" name="extras[]" value="test_interactivo" style="accent-color: #aa00ff;"> 📝 Test interactivo para la comunidad
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #333; cursor: pointer;">
+                                        <input type="checkbox" name="extras[]" value="quiz_energia" style="accent-color: #aa00ff;"> 🔮 Quiz de energía personal
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; color: #333; cursor: pointer;">
+                                        <input type="checkbox" name="extras[]" value="incluir_video" style="accent-color: #aa00ff;"> 🎬 Espacio para video personalizado
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">📤 Subir video (opcional)</label>
+                                <input type="file" name="video" class="duendes-input" accept="video/mp4,video/webm,video/mov" style="padding: 10px;">
+                                <small style="color: #888; display: block; margin-top: 6px;">Formatos: MP4, WebM, MOV. Max 100MB</small>
+                            </div>
+
+                            <div class="duendes-form-group">
+                                <label class="duendes-label">✏️ Instrucciones para Claude (opcional)</label>
+                                <textarea name="instrucciones_claude" class="duendes-input" rows="3" placeholder="Ej: Enfocate en la energía del solsticio, mencioná el cristal cuarzo rosa, el tono debe ser más directo y menos poético..."></textarea>
+                                <small style="color: #888; display: block; margin-top: 6px;">Dale indicaciones específicas a Claude para este contenido</small>
+                            </div>
+
                             <button type="submit" class="duendes-btn" style="background: linear-gradient(135deg, #8800cc, #aa00ff); color: #fff; width: 100%;">
                                 🪄 Generar Contenido
                             </button>
@@ -1789,54 +1816,321 @@ function duendes_circulo_page() {
         }
     }
 
+    // Plantillas de competencias pre-hechas
+    var plantillasCompetencias = [
+        {
+            id: 'foto_altar',
+            nombre: '📸 Mejor Foto de Altar',
+            descripcion: 'Los participantes comparten fotos de sus altares con duendes',
+            duracion: '7 días',
+            premio: 'Canalización gratis',
+            mecanica: 'Subir foto del altar, votos de la comunidad'
+        },
+        {
+            id: 'historia_duende',
+            nombre: '📖 Mi Historia con mi Duende',
+            descripcion: 'Contar cómo conocieron a su duende y qué cambió',
+            duracion: '5 días',
+            premio: '100 Runas + Lectura especial',
+            mecanica: 'Escribir historia de máx. 300 palabras'
+        },
+        {
+            id: 'ritual_creativo',
+            nombre: '🕯️ Ritual Creativo',
+            descripcion: 'Crear un ritual personal con su duende guardián',
+            duracion: '10 días',
+            premio: 'Producto gratis + Recanalización',
+            mecanica: 'Describir ritual + foto opcional'
+        },
+        {
+            id: 'reto_7_dias',
+            nombre: '✨ Reto 7 Días de Magia',
+            descripcion: 'Completar una actividad diaria durante 7 días',
+            duracion: '7 días',
+            premio: '50 Runas por día completado',
+            mecanica: 'Marcar actividad completada cada día'
+        },
+        {
+            id: 'dibujo_guardian',
+            nombre: '🎨 Dibujá a tu Guardián',
+            descripcion: 'Ilustraciones artísticas de los guardianes',
+            duracion: '14 días',
+            premio: 'Duende físico + 200 Runas',
+            mecanica: 'Subir ilustración, votos de la comunidad'
+        },
+        {
+            id: 'meditacion_compartida',
+            nombre: '🧘 Meditación Compartida',
+            descripcion: 'Participar en meditaciones grupales en vivo',
+            duracion: '3 días',
+            premio: 'Acceso El Círculo 1 mes gratis',
+            mecanica: 'Asistir a sesión en vivo + reflexión'
+        },
+        {
+            id: 'referidos_magicos',
+            nombre: '💫 Referidos Mágicos',
+            descripcion: 'Traer amigos a la comunidad',
+            duracion: '30 días',
+            premio: '20% comisión en Runas + premios extra',
+            mecanica: 'Código personal de referido'
+        }
+    ];
+
     function crearPromo(tipo) {
         var modal = document.createElement('div');
-        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:99999;';
+        modal.id = 'promo-modal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:99999;overflow-y:auto;padding:20px;';
 
-        var content = '<div style="background:#1a1a28;padding:30px;border-radius:16px;max-width:500px;width:90%;border:1px solid rgba(0,255,255,0.3);">';
-        content += '<h3 style="color:#00ffff;margin-bottom:20px;">Crear ' + tipo + '</h3>';
+        var content = '<div style="background:#FFFCF8;padding:30px;border-radius:16px;max-width:600px;width:100%;border:2px solid #e8ddd0;max-height:90vh;overflow-y:auto;">';
+        content += '<h3 style="color:#333;margin-bottom:20px;font-size:20px;">✨ Crear ' + tipo.charAt(0).toUpperCase() + tipo.slice(1) + '</h3>';
 
         if (tipo === 'descuento' || tipo === 'cupon') {
-            content += '<input type="text" id="promo-nombre" placeholder="Nombre del cupón" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;">';
-            content += '<input type="number" id="promo-valor" placeholder="Descuento (%)" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Nombre del cupón</label>';
+            content += '<input type="text" id="promo-nombre" placeholder="Ej: DUENDE20" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div>';
+            content += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">';
+            content += '<div><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Valor</label>';
+            content += '<input type="number" id="promo-valor" placeholder="20" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div>';
+            content += '<div><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Tipo</label>';
+            content += '<select id="promo-tipo-desc" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="percent">Porcentaje (%)</option><option value="fixed">Monto fijo (USD)</option></select></div></div>';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Fecha expiración (opcional)</label>';
+            content += '<input type="date" id="promo-expira" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div>';
+
         } else if (tipo === 'competencia') {
-            content += '<input type="text" id="promo-nombre" placeholder="Nombre de la competencia" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;">';
-            content += '<input type="text" id="promo-premio" placeholder="Premio" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;">';
-            content += '<input type="text" id="promo-duracion" placeholder="Duración (ej: 7 días)" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;">';
+            content += '<div style="margin-bottom:20px;"><label style="display:block;margin-bottom:10px;color:#666;font-size:14px;font-weight:600;">🎯 Elegí una plantilla o creá una personalizada:</label>';
+            content += '<div style="display:grid;gap:10px;max-height:250px;overflow-y:auto;padding-right:8px;">';
+
+            plantillasCompetencias.forEach(function(p) {
+                content += '<div onclick="seleccionarPlantilla(\'' + p.id + '\')" id="plantilla-' + p.id + '" style="background:#fff;border:2px solid #e8ddd0;border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;">';
+                content += '<div style="font-weight:600;color:#333;margin-bottom:4px;">' + p.nombre + '</div>';
+                content += '<div style="font-size:12px;color:#888;">' + p.descripcion + '</div>';
+                content += '<div style="display:flex;gap:12px;margin-top:8px;font-size:11px;">';
+                content += '<span style="color:#00a8a8;">⏱️ ' + p.duracion + '</span>';
+                content += '<span style="color:#d000d0;">🎁 ' + p.premio + '</span>';
+                content += '</div></div>';
+            });
+
+            content += '<div onclick="seleccionarPlantilla(\'custom\')" id="plantilla-custom" style="background:#f5f0e8;border:2px dashed #ccc;border-radius:10px;padding:14px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-weight:600;color:#666;">➕ Crear personalizada</div>';
+            content += '</div></div></div>';
+
+            content += '<div id="competencia-form-fields" style="display:none;">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Nombre de la competencia</label>';
+            content += '<input type="text" id="promo-nombre" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div>';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Premio</label>';
+            content += '<input type="text" id="promo-premio" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div>';
+            content += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">';
+            content += '<div><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Duración</label>';
+            content += '<input type="text" id="promo-duracion" placeholder="7 días" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div>';
+            content += '<div><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Fecha inicio</label>';
+            content += '<input type="date" id="promo-fecha-inicio" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div></div>';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Mecánica</label>';
+            content += '<textarea id="promo-mecanica" rows="2" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;resize:vertical;"></textarea></div>';
+            content += '</div>';
+
         } else if (tipo === 'regalo') {
-            content += '<select id="promo-tipo-regalo" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;"><option value="runas">Runas</option><option value="acceso">Acceso gratis</option><option value="lectura">Lectura gratis</option></select>';
-            content += '<input type="text" id="promo-destinatarios" placeholder="Destinatarios (todos, circulo, nuevos)" style="width:100%;padding:12px;margin-bottom:12px;background:#0a0a0f;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;box-sizing:border-box;">';
+            content += '<div style="margin-bottom:20px;"><label style="display:block;margin-bottom:10px;color:#666;font-size:14px;font-weight:600;">🎁 Tipo de regalo:</label>';
+            content += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+
+            content += '<div onclick="seleccionarTipoRegalo(\'runas\')" id="regalo-runas" class="regalo-option" style="background:#e6fffe;border:2px solid #00b8a9;border-radius:10px;padding:16px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-size:28px;margin-bottom:6px;">💎</div><div style="font-weight:600;color:#008080;">Runas</div></div>';
+
+            content += '<div onclick="seleccionarTipoRegalo(\'tiempo\')" id="regalo-tiempo" class="regalo-option" style="background:#fff;border:2px solid #e8ddd0;border-radius:10px;padding:16px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-size:28px;margin-bottom:6px;">⏰</div><div style="font-weight:600;color:#666;">Tiempo Gratis</div></div>';
+
+            content += '<div onclick="seleccionarTipoRegalo(\'lectura\')" id="regalo-lectura" class="regalo-option" style="background:#fff;border:2px solid #e8ddd0;border-radius:10px;padding:16px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-size:28px;margin-bottom:6px;">🔮</div><div style="font-weight:600;color:#666;">Lectura Gratis</div></div>';
+
+            content += '<div onclick="seleccionarTipoRegalo(\'descuento\')" id="regalo-descuento" class="regalo-option" style="background:#fff;border:2px solid #e8ddd0;border-radius:10px;padding:16px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-size:28px;margin-bottom:6px;">🏷️</div><div style="font-weight:600;color:#666;">Descuento</div></div>';
+
+            content += '<div onclick="seleccionarTipoRegalo(\'producto\')" id="regalo-producto" class="regalo-option" style="background:#fff;border:2px solid #e8ddd0;border-radius:10px;padding:16px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-size:28px;margin-bottom:6px;">🧙</div><div style="font-weight:600;color:#666;">Producto Gratis</div></div>';
+
+            content += '<div onclick="seleccionarTipoRegalo(\'circulo\')" id="regalo-circulo" class="regalo-option" style="background:#fff;border:2px solid #e8ddd0;border-radius:10px;padding:16px;cursor:pointer;text-align:center;">';
+            content += '<div style="font-size:28px;margin-bottom:6px;">🌙</div><div style="font-weight:600;color:#666;">Acceso Círculo</div></div>';
+
+            content += '</div></div>';
+
+            content += '<input type="hidden" id="promo-tipo-regalo" value="runas">';
+
+            content += '<div id="regalo-runas-fields">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Cantidad de Runas</label>';
+            content += '<select id="promo-cantidad-runas" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="25">25 Runas</option><option value="50" selected>50 Runas</option><option value="100">100 Runas</option><option value="200">200 Runas</option><option value="500">500 Runas</option><option value="custom">Cantidad personalizada</option></select></div>';
+            content += '<div id="runas-custom" style="display:none;margin-bottom:15px;"><input type="number" id="promo-runas-custom" placeholder="Cantidad exacta" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;"></div></div>';
+
+            content += '<div id="regalo-tiempo-fields" style="display:none;">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Días de acceso gratis</label>';
+            content += '<select id="promo-dias" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="3">3 días</option><option value="7" selected>7 días</option><option value="14">14 días</option><option value="30">1 mes</option><option value="60">2 meses</option></select></div></div>';
+
+            content += '<div id="regalo-lectura-fields" style="display:none;">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Tipo de lectura</label>';
+            content += '<select id="promo-tipo-lectura" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="energia">Lectura de Energía</option><option value="tarot">Tirada de Tarot (3 cartas)</option><option value="runas">Lectura de Runas</option><option value="guardian">Mensaje del Guardián</option></select></div></div>';
+
+            content += '<div id="regalo-descuento-fields" style="display:none;">';
+            content += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">';
+            content += '<div><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Porcentaje</label>';
+            content += '<select id="promo-porcentaje" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option><option value="25">25%</option><option value="30">30%</option><option value="50">50%</option></select></div>';
+            content += '<div><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Válido en</label>';
+            content += '<select id="promo-valido-en" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="todo">Toda la tienda</option><option value="duendes">Solo duendes</option><option value="circulo">Solo El Círculo</option></select></div></div></div>';
+
+            content += '<div id="regalo-producto-fields" style="display:none;">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Producto a regalar</label>';
+            content += '<select id="promo-producto" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="mini_guardian">Mini Guardián Digital</option><option value="meditacion">Meditación Premium</option><option value="ritual">Kit de Ritual</option></select></div></div>';
+
+            content += '<div id="regalo-circulo-fields" style="display:none;">';
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Duración de membresía</label>';
+            content += '<select id="promo-circulo-duracion" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="7">7 días de prueba</option><option value="30" selected>1 mes</option><option value="90">3 meses</option></select></div></div>';
+
+            content += '<hr style="border:none;border-top:1px solid #e8ddd0;margin:20px 0;">';
+
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Destinatarios</label>';
+            content += '<select id="promo-destinatarios" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;">';
+            content += '<option value="todos">Todos los usuarios</option><option value="circulo">Miembros del Círculo</option><option value="mi_magia">Usuarios Mi Magia</option><option value="nuevos">Usuarios nuevos (último mes)</option><option value="inactivos">Usuarios inactivos (+3 meses)</option><option value="cumpleaneros">Cumpleañeros del mes</option></select></div>';
+
+            content += '<div style="margin-bottom:15px;"><label style="display:block;margin-bottom:6px;color:#666;font-size:13px;">Mensaje personalizado (opcional)</label>';
+            content += '<textarea id="promo-mensaje" rows="2" placeholder="Este mensaje aparecerá en el email del regalo..." style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;color:#333;box-sizing:border-box;resize:vertical;"></textarea></div>';
         }
 
         content += '<div style="display:flex;gap:12px;margin-top:20px;">';
-        content += '<button onclick="ejecutarPromo(\'' + tipo + '\')" style="flex:1;padding:12px;background:linear-gradient(135deg,#00ffff,#00ff88);border:none;border-radius:8px;color:#000;font-weight:600;cursor:pointer;">Crear</button>';
-        content += '<button onclick="this.parentElement.parentElement.parentElement.remove()" style="flex:1;padding:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;cursor:pointer;">Cancelar</button>';
+        content += '<button onclick="ejecutarPromo(\'' + tipo + '\')" style="flex:1;padding:14px;background:linear-gradient(135deg,#00b8a9,#00d4aa);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:15px;">✨ Crear</button>';
+        content += '<button onclick="document.getElementById(\'promo-modal\').remove()" style="flex:1;padding:14px;background:#f5f0e8;border:1px solid #ddd;border-radius:8px;color:#666;cursor:pointer;font-size:15px;">Cancelar</button>';
         content += '</div></div>';
 
         modal.innerHTML = content;
         document.body.appendChild(modal);
+
+        // Event listener para cantidad runas custom
+        var selectRunas = document.getElementById('promo-cantidad-runas');
+        if (selectRunas) {
+            selectRunas.addEventListener('change', function() {
+                document.getElementById('runas-custom').style.display = this.value === 'custom' ? 'block' : 'none';
+            });
+        }
+    }
+
+    var plantillaSeleccionada = null;
+
+    function seleccionarPlantilla(id) {
+        // Reset all
+        document.querySelectorAll('[id^="plantilla-"]').forEach(function(el) {
+            el.style.borderColor = '#e8ddd0';
+            el.style.background = el.id === 'plantilla-custom' ? '#f5f0e8' : '#fff';
+        });
+
+        var el = document.getElementById('plantilla-' + id);
+        if (el) {
+            el.style.borderColor = '#00b8a9';
+            el.style.background = '#e6fffe';
+        }
+
+        var formFields = document.getElementById('competencia-form-fields');
+
+        if (id === 'custom') {
+            plantillaSeleccionada = null;
+            formFields.style.display = 'block';
+            document.getElementById('promo-nombre').value = '';
+            document.getElementById('promo-premio').value = '';
+            document.getElementById('promo-duracion').value = '';
+            document.getElementById('promo-mecanica').value = '';
+        } else {
+            var plantilla = plantillasCompetencias.find(function(p) { return p.id === id; });
+            if (plantilla) {
+                plantillaSeleccionada = plantilla;
+                formFields.style.display = 'block';
+                document.getElementById('promo-nombre').value = plantilla.nombre.replace(/^[^\s]+\s/, '');
+                document.getElementById('promo-premio').value = plantilla.premio;
+                document.getElementById('promo-duracion').value = plantilla.duracion;
+                document.getElementById('promo-mecanica').value = plantilla.mecanica;
+            }
+        }
+    }
+
+    function seleccionarTipoRegalo(tipo) {
+        // Reset all
+        document.querySelectorAll('.regalo-option').forEach(function(el) {
+            el.style.borderColor = '#e8ddd0';
+            el.style.background = '#fff';
+        });
+
+        var el = document.getElementById('regalo-' + tipo);
+        if (el) {
+            el.style.borderColor = '#00b8a9';
+            el.style.background = '#e6fffe';
+        }
+
+        document.getElementById('promo-tipo-regalo').value = tipo;
+
+        // Hide all fields
+        ['runas', 'tiempo', 'lectura', 'descuento', 'producto', 'circulo'].forEach(function(t) {
+            var fields = document.getElementById('regalo-' + t + '-fields');
+            if (fields) fields.style.display = 'none';
+        });
+
+        // Show selected
+        var selectedFields = document.getElementById('regalo-' + tipo + '-fields');
+        if (selectedFields) selectedFields.style.display = 'block';
     }
 
     function ejecutarPromo(tipo) {
         var datos = {};
+
         if (tipo === 'descuento' || tipo === 'cupon') {
             datos = {
                 nombre: document.getElementById('promo-nombre').value,
                 descuento: document.getElementById('promo-valor').value,
-                tipo_descuento: 'porcentaje'
+                tipo_descuento: document.getElementById('promo-tipo-desc').value,
+                expira: document.getElementById('promo-expira').value
             };
         } else if (tipo === 'competencia') {
             datos = {
                 nombre: document.getElementById('promo-nombre').value,
                 premio: document.getElementById('promo-premio').value,
-                duracion: document.getElementById('promo-duracion').value
+                duracion: document.getElementById('promo-duracion').value,
+                fecha_inicio: document.getElementById('promo-fecha-inicio').value,
+                mecanica: document.getElementById('promo-mecanica').value,
+                plantilla_id: plantillaSeleccionada ? plantillaSeleccionada.id : null
             };
         } else if (tipo === 'regalo') {
+            var tipoRegalo = document.getElementById('promo-tipo-regalo').value;
             datos = {
-                tipo_regalo: document.getElementById('promo-tipo-regalo').value,
-                destinatarios: document.getElementById('promo-destinatarios').value
+                tipo_regalo: tipoRegalo,
+                destinatarios: document.getElementById('promo-destinatarios').value,
+                mensaje: document.getElementById('promo-mensaje').value
             };
+
+            // Agregar datos específicos según tipo de regalo
+            if (tipoRegalo === 'runas') {
+                var cantidadRunas = document.getElementById('promo-cantidad-runas').value;
+                datos.cantidad = cantidadRunas === 'custom'
+                    ? document.getElementById('promo-runas-custom').value
+                    : cantidadRunas;
+            } else if (tipoRegalo === 'tiempo') {
+                datos.dias = document.getElementById('promo-dias').value;
+            } else if (tipoRegalo === 'lectura') {
+                datos.tipo_lectura = document.getElementById('promo-tipo-lectura').value;
+            } else if (tipoRegalo === 'descuento') {
+                datos.porcentaje = document.getElementById('promo-porcentaje').value;
+                datos.valido_en = document.getElementById('promo-valido-en').value;
+            } else if (tipoRegalo === 'producto') {
+                datos.producto = document.getElementById('promo-producto').value;
+            } else if (tipoRegalo === 'circulo') {
+                datos.duracion_circulo = document.getElementById('promo-circulo-duracion').value;
+            }
         }
+
+        // Mostrar loading
+        var btn = event.target;
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ Creando...';
+        btn.disabled = true;
 
         fetch('<?php echo DUENDES_API_URL; ?>/admin/promociones', {
             method: 'POST',
@@ -1845,12 +2139,32 @@ function duendes_circulo_page() {
         })
         .then(r => r.json())
         .then(result => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
             if (result.success) {
-                alert('✅ ' + tipo + ' creado exitosamente!');
-                document.querySelector('[style*="position:fixed"]').remove();
+                var mensaje = '✅ ' + tipo.charAt(0).toUpperCase() + tipo.slice(1) + ' creado exitosamente!';
+
+                if (result.cupon) {
+                    mensaje += '\n\nCódigo: ' + result.cupon.codigo;
+                }
+                if (result.competencia) {
+                    mensaje += '\n\n' + result.competencia.contenido.substring(0, 200) + '...';
+                }
+                if (result.regalo) {
+                    mensaje += '\n\n' + result.regalo.contenido.substring(0, 200) + '...';
+                }
+
+                alert(mensaje);
+                document.getElementById('promo-modal').remove();
             } else {
                 alert('Error: ' + result.error);
             }
+        })
+        .catch(err => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            alert('Error de conexión');
         });
     }
 
@@ -1862,6 +2176,8 @@ function duendes_circulo_page() {
         var mes = formData.get('mes');
         var ano = formData.get('ano');
         var tema = formData.get('tema');
+        var instrucciones = formData.get('instrucciones_claude');
+        var extras = formData.getAll('extras[]');
 
         preview.innerHTML = '<div style="color: #aa00ff;">🪄 Generando contenido mágico para ' + periodo + '...</div><div style="margin-top: 10px; color: #888; font-size: 13px;">Esto puede tomar hasta 30 segundos</div>';
 
@@ -1872,6 +2188,8 @@ function duendes_circulo_page() {
                 periodo: periodo,
                 fecha_inicio: ano + '-' + mes.padStart(2, '0') + '-01',
                 tema_especial: tema,
+                instrucciones_claude: instrucciones,
+                extras: extras,
                 notas: ''
             })
         })

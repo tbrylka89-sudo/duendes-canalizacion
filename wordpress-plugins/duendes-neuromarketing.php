@@ -223,47 +223,193 @@ function duendes_neuro_css() {
     }
     .neuro-validacion .gold { color: #d4af37; font-weight: 500; }
 
-    /* CONTADOR FLOTANTE - PRUEBA SOCIAL */
+    /* BURBUJA FLOTANTE - PRUEBA SOCIAL ESTÉTICA */
     .neuro-social-proof {
         position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: linear-gradient(135deg, #1a1a1a, #222);
+        bottom: 30px;
+        left: 30px;
+        background: radial-gradient(ellipse at 30% 20%, rgba(30, 30, 40, 0.98) 0%, rgba(15, 15, 20, 0.95) 100%);
         color: #fff;
-        padding: 15px 20px;
-        border-radius: 12px;
-        font-family: 'Cormorant Garamond', Georgia, serif;
-        font-size: 0.9rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        border: 1px solid rgba(212,175,55,0.15);
+        padding: 18px 24px;
+        border-radius: 60px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.85rem;
+        box-shadow:
+            0 8px 32px rgba(0,0,0,0.4),
+            0 0 0 1px rgba(212,175,55,0.2),
+            inset 0 1px 0 rgba(255,255,255,0.05);
         z-index: 9999;
-        transform: translateX(-120%);
+        transform: translateY(120px) scale(0.8);
         opacity: 0;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        max-width: 280px;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-width: 320px;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .neuro-social-proof::before {
+        content: '✦';
+        font-size: 1.2rem;
+        color: #d4af37;
+        animation: brilloBurbuja 2s ease-in-out infinite;
+    }
+    @keyframes brilloBurbuja {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
     }
     .neuro-social-proof.visible {
-        transform: translateX(0);
+        transform: translateY(0) scale(1);
         opacity: 1;
     }
-    .neuro-social-proof .nombre { color: #d4af37; font-weight: 500; }
-    .neuro-social-proof .accion { color: rgba(255,255,255,0.7); }
-    .neuro-social-proof .tiempo { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
-    .neuro-social-proof-close {
-        position: absolute;
-        top: 5px;
-        right: 8px;
-        background: none;
-        border: none;
-        color: rgba(255,255,255,0.3);
-        cursor: pointer;
-        font-size: 1rem;
+    .neuro-social-proof.saliendo {
+        transform: translateY(-20px) scale(0.9);
+        opacity: 0;
     }
+    .neuro-social-proof-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .neuro-social-proof .nombre {
+        color: #d4af37;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .neuro-social-proof .accion {
+        color: rgba(255,255,255,0.85);
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 0.9rem;
+        font-style: italic;
+    }
+    .neuro-social-proof .tiempo {
+        color: rgba(255,255,255,0.4);
+        font-size: 0.7rem;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        margin-top: 2px;
+    }
+
+    /* SECCIÓN MI MAGIA - PORTAL MÁGICO */
+    .mi-magia-section {
+        background: linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #0a0a0a 100%);
+        padding: 80px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    .mi-magia-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 400px 300px at 30% 40%, rgba(147, 112, 219, 0.1) 0%, transparent 70%),
+            radial-gradient(ellipse 300px 200px at 70% 60%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .mi-magia-inner {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+    .mi-magia-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(147, 112, 219, 0.15);
+        border: 1px solid rgba(147, 112, 219, 0.3);
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #9370db;
+        margin-bottom: 25px;
+    }
+    .mi-magia-title {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(28px, 5vw, 42px);
+        color: #fff;
+        margin: 0 0 15px;
+        font-weight: 500;
+    }
+    .mi-magia-title span {
+        background: linear-gradient(135deg, #9370db, #d4af37);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .mi-magia-subtitle {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.7);
+        margin: 0 0 35px;
+        line-height: 1.7;
+        font-style: italic;
+    }
+    .mi-magia-features {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+    .mi-magia-feature {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(147, 112, 219, 0.2);
+        padding: 10px 18px;
+        border-radius: 30px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.85);
+    }
+    .mi-magia-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 35px;
+        background: linear-gradient(135deg, #9370db 0%, #7b5dbd 100%);
+        border-radius: 50px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        box-shadow: 0 10px 30px rgba(147, 112, 219, 0.3);
+    }
+    .mi-magia-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(147, 112, 219, 0.4);
+    }
+    .mi-magia-note {
+        margin-top: 20px;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.5);
+    }
+    .mi-magia-note span { color: #9370db; }
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
         .neuro-banner-top { font-size: 0.8rem; gap: 15px; padding: 8px 15px; }
-        .neuro-social-proof { left: 10px; right: 10px; max-width: none; bottom: 10px; }
+        .neuro-social-proof {
+            left: 15px;
+            right: 15px;
+            max-width: none;
+            bottom: 15px;
+            border-radius: 40px;
+            padding: 14px 20px;
+        }
+        .mi-magia-section { padding: 60px 15px; }
+        .mi-magia-features { gap: 10px; }
+        .mi-magia-feature { padding: 8px 14px; font-size: 0.75rem; }
     }
     @media (max-width: 480px) {
         .neuro-banner-top .hide-mobile { display: none; }
@@ -291,6 +437,7 @@ function duendes_neuro_js() {
             if (esHome) {
                 agregarBannerTop();
                 agregarValidacion();
+                agregarSeccionMiMagia();
                 mostrarSocialProof();
             }
         }
@@ -339,11 +486,11 @@ function duendes_neuro_js() {
             var banner = document.createElement('div');
             banner.className = 'neuro-banner-top';
             banner.innerHTML = '\
-                <span><span class="gold">✦</span> Si llegaste hasta acá, <span class="gold">no fue casualidad</span></span>\
+                <span><span class="gold">✦</span> Algo te trajo hasta acá. <span class="gold">No lo ignores.</span></span>\
                 <span class="sep hide-mobile">•</span>\
-                <span class="hide-mobile"><span class="gold">12,847</span> guardianes adoptados</span>\
+                <span class="hide-mobile"><span class="gold">Miles</span> ya encontraron su guardián</span>\
                 <span class="sep">•</span>\
-                <span>Envíos a <span class="gold">45+ países</span></span>\
+                <span>Envíos a <span class="gold">todo el mundo</span></span>\
             ';
 
             header.parentNode.insertBefore(banner, header);
@@ -369,7 +516,7 @@ function duendes_neuro_js() {
 
             var validacion = document.createElement('div');
             validacion.className = 'neuro-validacion';
-            validacion.innerHTML = '<p>No elegís al guardián. <span class="gold">El guardián te elige a vos</span>.</p>';
+            validacion.innerHTML = '<p>Vos no elegís al guardián. <span class="gold">Él ya te eligió a vos.</span></p>';
 
             // Insertar después del test
             if (testSection.nextSibling) {
@@ -381,44 +528,102 @@ function duendes_neuro_js() {
             if (document.querySelector('.neuro-social-proof')) return;
             if (sessionStorage.getItem('neuroSocialVisto')) return;
 
-            var nombres = ['María de Buenos Aires', 'Josefina de Montevideo', 'Patricia de Costa Rica', 'Carolina de Santiago', 'Lucía de Lima', 'Valentina de Bogotá'];
-            var acciones = ['adoptó su guardián', 'encontró a su protector', 'adoptó su 2do guardián'];
-            var tiempos = ['hace 3 minutos', 'hace 12 minutos', 'hace 27 minutos'];
+            var datos = [
+                { nombre: 'María', pais: 'Argentina', accion: 'conectó con su guardián' },
+                { nombre: 'Josefina', pais: 'Uruguay', accion: 'encontró su protector' },
+                { nombre: 'Patricia', pais: 'Costa Rica', accion: 'adoptó su guardián' },
+                { nombre: 'Carolina', pais: 'Chile', accion: 'recibió su canalización' },
+                { nombre: 'Lucía', pais: 'Perú', accion: 'descubrió su guardián' },
+                { nombre: 'Valentina', pais: 'Colombia', accion: 'conectó con su guardián' },
+                { nombre: 'Ana', pais: 'México', accion: 'adoptó su 2do guardián' },
+                { nombre: 'Camila', pais: 'España', accion: 'encontró su protector' }
+            ];
+            var tiempos = ['hace 2 min', 'hace 5 min', 'hace 11 min', 'hace 18 min'];
 
-            var nombre = nombres[Math.floor(Math.random() * nombres.length)];
-            var accion = acciones[Math.floor(Math.random() * acciones.length)];
+            var dato = datos[Math.floor(Math.random() * datos.length)];
             var tiempo = tiempos[Math.floor(Math.random() * tiempos.length)];
 
             var popup = document.createElement('div');
             popup.className = 'neuro-social-proof';
             popup.innerHTML = '\
-                <button class="neuro-social-proof-close">×</button>\
-                <span class="nombre">' + nombre + '</span>\
-                <span class="accion"> ' + accion + '</span>\
-                <div class="tiempo">' + tiempo + '</div>\
+                <div class="neuro-social-proof-content">\
+                    <div><span class="nombre">' + dato.nombre + '</span> de ' + dato.pais + '</div>\
+                    <span class="accion">' + dato.accion + '</span>\
+                    <div class="tiempo">' + tiempo + '</div>\
+                </div>\
             ';
 
             document.body.appendChild(popup);
 
-            popup.querySelector('.neuro-social-proof-close').onclick = function() {
-                popup.classList.remove('visible');
-                setTimeout(function() { popup.remove(); }, 500);
+            // Click para cerrar
+            popup.onclick = function() {
+                popup.classList.add('saliendo');
+                setTimeout(function() { popup.remove(); }, 600);
             };
 
-            // Mostrar después de 8 segundos
+            // Mostrar después de 6 segundos
             setTimeout(function() {
                 popup.classList.add('visible');
-            }, 8000);
+            }, 6000);
 
-            // Ocultar después de 20 segundos
+            // Ocultar suavemente después de 5 segundos de visible
             setTimeout(function() {
-                if (popup.parentNode) {
-                    popup.classList.remove('visible');
-                    setTimeout(function() { popup.remove(); }, 500);
+                if (popup.parentNode && popup.classList.contains('visible')) {
+                    popup.classList.add('saliendo');
+                    setTimeout(function() { if (popup.parentNode) popup.remove(); }, 600);
                 }
-            }, 20000);
+            }, 11000);
 
             sessionStorage.setItem('neuroSocialVisto', '1');
+        }
+
+        function agregarSeccionMiMagia() {
+            if (document.querySelector('.mi-magia-section')) return;
+
+            var miMagia = document.createElement('section');
+            miMagia.className = 'mi-magia-section';
+            miMagia.innerHTML = '\
+                <div class="mi-magia-inner">\
+                    <div class="mi-magia-badge">🔮 Portal Exclusivo</div>\
+                    <h2 class="mi-magia-title">¿Ya tenés tu guardián?<br><span>Entrá a Mi Magia</span></h2>\
+                    <p class="mi-magia-subtitle">Tu canalización personal te espera. Mensajes que solo vos podés leer.<br>Rituales diseñados para tu energía. Todo en un solo lugar.</p>\
+                    <div class="mi-magia-features">\
+                        <div class="mi-magia-feature">📜 Tu canalización única</div>\
+                        <div class="mi-magia-feature">🌙 Rituales de conexión</div>\
+                        <div class="mi-magia-feature">✨ Mensajes de tu guardián</div>\
+                    </div>\
+                    <a href="/mi-magia/" class="mi-magia-cta">Entrar a Mi Magia →</a>\
+                    <p class="mi-magia-note">Ingresá con el <span>código de tu tarjeta</span> o escaneá el QR</p>\
+                </div>\
+            ';
+
+            // Buscar múltiples opciones de donde insertar
+            var targets = [
+                document.querySelector('.circulo-banner'),
+                document.querySelector('[class*="circulo"]'),
+                document.querySelector('.elementor-location-footer'),
+                document.querySelector('footer'),
+                document.querySelector('.site-footer'),
+                document.querySelector('#colophon')
+            ];
+
+            var insertTarget = null;
+            for (var i = 0; i < targets.length; i++) {
+                if (targets[i]) {
+                    insertTarget = targets[i];
+                    break;
+                }
+            }
+
+            if (insertTarget) {
+                insertTarget.parentNode.insertBefore(miMagia, insertTarget);
+            } else {
+                // Último recurso: antes del último elemento del body
+                var lastElement = document.body.lastElementChild;
+                if (lastElement) {
+                    document.body.insertBefore(miMagia, lastElement);
+                }
+            }
         }
 
         // Ejecutar
@@ -459,13 +664,14 @@ function duendes_intro_cinematica() {
         <div style="text-align: center; padding: 40px; max-width: 600px;">
             <p style="
                 color: #d4af37;
-                font-family: 'Cormorant Garamond', Georgia, serif;
+                font-family: 'Cinzel', serif;
                 font-size: clamp(1.3rem, 4vw, 2.2rem);
-                font-style: italic;
+                font-weight: 400;
                 margin: 0;
                 opacity: 0;
                 animation: introFadeIn 1s ease 0.3s forwards;
-            ">El universo no te trajo aca por casualidad.</p>
+                letter-spacing: 1px;
+            ">Sentiste el llamado.</p>
             <p style="
                 color: rgba(255,255,255,0.8);
                 font-family: 'Cormorant Garamond', Georgia, serif;
@@ -473,7 +679,8 @@ function duendes_intro_cinematica() {
                 margin-top: 25px;
                 opacity: 0;
                 animation: introFadeIn 1s ease 1.2s forwards;
-            ">Algo te estaba esperando...</p>
+                font-style: italic;
+            ">Y tu guardián ya lo sabe.</p>
         </div>
     </div>
     <style>
@@ -515,9 +722,9 @@ function duendes_intro_cinematica() {
 
 function duendes_hero_emocional_shortcode($atts) {
     $atts = shortcode_atts(array(
-        'titulo' => 'No buscas un objeto. Buscas un companero del alma.',
-        'subtitulo' => 'Un ser que entienda sin palabras, que proteja sin pedir nada, que este ahi cuando nadie mas esta.',
-        'cta_texto' => 'Encontrar mi Guardian',
+        'titulo' => 'Hay un vacío que las cosas no llenan.',
+        'subtitulo' => 'Lo sentís aunque no sepas nombrarlo. Esa sensación de que falta algo. De que necesitás algo que te entienda sin explicaciones.',
+        'cta_texto' => 'Encontrar mi Guardián',
         'cta_url' => '/tienda/'
     ), $atts);
 
@@ -637,33 +844,33 @@ function duendes_categorias_dolor_shortcode() {
     $categorias = array(
         array(
             'icono' => '🛡️',
-            'titulo' => 'Te sentis desprotegida',
-            'dolor' => 'Algo o alguien te esta drenando. La energia pesada te persigue.',
-            'solucion' => 'Guardianes de Proteccion',
+            'titulo' => 'Algo te está drenando',
+            'dolor' => 'Esa energía pesada que no te deja en paz. Personas, lugares, pensamientos que te agotan.',
+            'solucion' => 'Guardianes de Protección',
             'url' => '/categoria-producto/proteccion/',
             'color' => '#4a90a4'
         ),
         array(
             'icono' => '💰',
-            'titulo' => 'El dinero no fluye',
-            'dolor' => 'Trabajas tanto y nunca alcanza. Sentis bloqueos invisibles.',
+            'titulo' => 'El dinero se escapa',
+            'dolor' => 'Das todo y nunca alcanza. Hay algo bloqueando lo que merecés recibir.',
             'solucion' => 'Guardianes de Abundancia',
             'url' => '/categoria-producto/abundancia/',
             'color' => '#d4af37'
         ),
         array(
             'icono' => '💔',
-            'titulo' => 'El amor te esquiva',
-            'dolor' => 'Relaciones que lastiman o soledad que pesa. Mereces mas.',
+            'titulo' => 'El amor duele o falta',
+            'dolor' => 'Relaciones que lastiman. O esa soledad que pesa más de noche.',
             'solucion' => 'Guardianes del Amor',
             'url' => '/categoria-producto/amor/',
             'color' => '#e75480'
         ),
         array(
             'icono' => '🌿',
-            'titulo' => 'Tu cuerpo o alma duelen',
-            'dolor' => 'Cansancio cronico, ansiedad, heridas que no cierran.',
-            'solucion' => 'Guardianes de Sanacion',
+            'titulo' => 'Necesitás sanar',
+            'dolor' => 'Heridas que no cierran. Cansancio del cuerpo y del alma que no se va.',
+            'solucion' => 'Guardianes de Sanación',
             'url' => '/categoria-producto/sanacion/',
             'color' => '#56ab91'
         )
@@ -672,8 +879,8 @@ function duendes_categorias_dolor_shortcode() {
     ob_start();
     ?>
     <section class="duendes-categorias-dolor">
-        <h2 class="categorias-titulo">¿Que te trajo hasta aca?</h2>
-        <p class="categorias-subtitulo">Tu guardian ya sabe. Ahora te toca elegir.</p>
+        <h2 class="categorias-titulo">¿Qué te está pesando ahora?</h2>
+        <p class="categorias-subtitulo">No tenés que nombrarlo. Solo elegí.</p>
         <div class="categorias-grid">
             <?php foreach ($categorias as $cat): ?>
             <a href="<?php echo esc_url($cat['url']); ?>" class="categoria-card" style="--accent: <?php echo $cat['color']; ?>">
@@ -784,8 +991,8 @@ function duendes_cofre_tesoros_shortcode() {
     <section class="duendes-cofre">
         <div class="cofre-header">
             <span class="cofre-icono">📦✨</span>
-            <h2>Tu Cofre de Tesoros</h2>
-            <p>Todo lo que recibis al adoptar un guardian</p>
+            <h2>Lo que recibís no es solo un guardián</h2>
+            <p>Es una experiencia completa que cambia todo</p>
         </div>
         <div class="cofre-contenido">
             <div class="tesoro">
@@ -825,7 +1032,7 @@ function duendes_cofre_tesoros_shortcode() {
             </div>
         </div>
         <div class="cofre-footer">
-            <p>No compras una pieza. <strong>Entras al mundo.</strong></p>
+            <p>No es una compra. <strong>Es el comienzo de algo.</strong></p>
         </div>
     </section>
     <style>

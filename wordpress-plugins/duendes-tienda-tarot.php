@@ -17,8 +17,8 @@ add_action('template_redirect', function() {
 
 function duendes_render_tienda_tarot() {
     $categoria_actual = null;
-    $titulo = 'Guardianes Disponibles';
-    $subtitulo = 'Piezas únicas canalizadas en Piriápolis';
+    $titulo = 'Encontrá al que ya te eligió';
+    $subtitulo = 'Cada uno nació para alguien. Uno de ellos, para vos.';
 
     if (is_product_category()) {
         $categoria_actual = get_queried_object();
@@ -45,13 +45,13 @@ function duendes_render_tienda_tarot() {
 
     $products = new WP_Query($args);
 
-    // Categorias principales
+    // Categorias principales - con textos neuroventa
     $categorias = [
-        ['slug' => 'proteccion', 'nombre' => 'Protección', 'color' => '#3b82f6', 'icono' => '🛡️'],
-        ['slug' => 'amor', 'nombre' => 'Amor', 'color' => '#ec4899', 'icono' => '💜'],
-        ['slug' => 'dinero-abundancia-negocios', 'nombre' => 'Abundancia', 'color' => '#f59e0b', 'icono' => '✨'],
-        ['slug' => 'salud', 'nombre' => 'Sanación', 'color' => '#22c55e', 'icono' => '🌿'],
-        ['slug' => 'sabiduria-guia-claridad', 'nombre' => 'Sabiduría', 'color' => '#8b5cf6', 'icono' => '🔮'],
+        ['slug' => 'proteccion', 'nombre' => 'Protección', 'desc' => 'Algo te drena', 'color' => '#3b82f6', 'icono' => '🛡️'],
+        ['slug' => 'amor', 'nombre' => 'Amor', 'desc' => 'El corazón pide', 'color' => '#ec4899', 'icono' => '💜'],
+        ['slug' => 'dinero-abundancia-negocios', 'nombre' => 'Abundancia', 'desc' => 'No alcanza', 'color' => '#f59e0b', 'icono' => '✨'],
+        ['slug' => 'salud', 'nombre' => 'Sanación', 'desc' => 'Necesitás sanar', 'color' => '#22c55e', 'icono' => '🌿'],
+        ['slug' => 'sabiduria-guia-claridad', 'nombre' => 'Sabiduría', 'desc' => 'Buscás respuestas', 'color' => '#8b5cf6', 'icono' => '🔮'],
     ];
 
     // Obtener header del tema
@@ -870,7 +870,7 @@ function duendes_render_tienda_tarot() {
                     </div>
 
                     <span class="cat-name"><?php echo $cat['nombre']; ?></span>
-                    <span class="cat-count"><?php echo $count; ?> guardianes</span>
+                    <span class="cat-count"><?php echo isset($cat['desc']) ? $cat['desc'] : $count . ' guardianes'; ?></span>
                 </a>
             </div>
             <?php endforeach; ?>
@@ -950,7 +950,7 @@ function duendes_render_tienda_tarot() {
 
     <!-- Footer section -->
     <section class="tienda-footer-section">
-        <p>Duendes del Uruguay · Canalizados en Piriápolis · Piezas únicas e irrepetibles</p>
+        <p>Duendes del Uruguay · Nacidos en Piriápolis · Destinados a encontrarte</p>
     </section>
 
     <!-- Notificacion carrito -->

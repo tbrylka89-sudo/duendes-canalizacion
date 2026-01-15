@@ -340,6 +340,278 @@ add_shortcode('mi_magia', function() {
         margin-bottom: 30px;
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       CONTENIDO BORROSO PARA NO COMPRADORES
+    ═══════════════════════════════════════════════════════════════ */
+    .contenido-bloqueado {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contenido-borroso {
+        filter: blur(8px);
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .overlay-desbloquear {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 50%, rgba(0,0,0,0.95) 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .desbloquear-icono {
+        font-size: 50px;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .desbloquear-titulo {
+        font-family: 'Cinzel', serif;
+        font-size: 24px;
+        color: #C6A962;
+        margin-bottom: 15px;
+    }
+
+    .desbloquear-texto {
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 25px;
+        max-width: 400px;
+        line-height: 1.6;
+    }
+
+    .btn-comprar {
+        padding: 16px 40px;
+        background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%);
+        border: none;
+        border-radius: 30px;
+        color: #000;
+        font-family: 'Cinzel', serif;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        margin-bottom: 15px;
+    }
+
+    .btn-comprar:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(198,169,98,0.4);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FORMULARIO DE RECANALIZACIÓN
+    ═══════════════════════════════════════════════════════════════ */
+    .recanalizacion-card {
+        background: linear-gradient(135deg, rgba(198,169,98,0.1) 0%, rgba(198,169,98,0.05) 100%);
+        border: 2px solid rgba(198,169,98,0.3);
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 30px;
+    }
+
+    .recan-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .recan-icono {
+        font-size: 36px;
+    }
+
+    .recan-titulo {
+        font-family: 'Cinzel', serif;
+        font-size: 22px;
+        color: #C6A962;
+    }
+
+    .recan-subtitulo {
+        color: rgba(255,255,255,0.6);
+        font-size: 14px;
+    }
+
+    .recan-descripcion {
+        color: rgba(255,255,255,0.7);
+        line-height: 1.7;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(198,169,98,0.2);
+    }
+
+    .recan-tipos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .recan-tipo {
+        background: rgba(0,0,0,0.3);
+        border: 2px solid rgba(198,169,98,0.2);
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .recan-tipo:hover, .recan-tipo.selected {
+        border-color: #C6A962;
+        background: rgba(198,169,98,0.15);
+    }
+
+    .recan-tipo-icono {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .recan-tipo-titulo {
+        font-family: 'Cinzel', serif;
+        color: #C6A962;
+        font-size: 15px;
+        margin-bottom: 5px;
+    }
+
+    .recan-tipo-precio {
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .recan-tipo-desc {
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
+        margin-top: 8px;
+    }
+
+    .recan-form-group {
+        margin-bottom: 20px;
+    }
+
+    .recan-label {
+        display: block;
+        color: #C6A962;
+        font-size: 14px;
+        margin-bottom: 8px;
+        font-family: 'Cinzel', serif;
+    }
+
+    .recan-input, .recan-textarea {
+        width: 100%;
+        padding: 14px 18px;
+        background: rgba(0,0,0,0.4);
+        border: 1px solid rgba(198,169,98,0.3);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 15px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+
+    .recan-input:focus, .recan-textarea:focus {
+        outline: none;
+        border-color: #C6A962;
+    }
+
+    .recan-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .recan-file-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px;
+        background: rgba(0,0,0,0.3);
+        border: 2px dashed rgba(198,169,98,0.3);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .recan-file-label:hover {
+        border-color: #C6A962;
+        background: rgba(198,169,98,0.1);
+    }
+
+    .recan-file-input {
+        display: none;
+    }
+
+    .btn-enviar-recan {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-family: 'Cinzel', serif;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+
+    .btn-enviar-recan:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(198,169,98,0.3);
+    }
+
+    .btn-enviar-recan:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .recan-success {
+        text-align: center;
+        padding: 40px;
+    }
+
+    .recan-success-icono {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+
+    .recan-success-titulo {
+        font-family: 'Cinzel', serif;
+        font-size: 24px;
+        color: #C6A962;
+        margin-bottom: 15px;
+    }
+
+    .recan-success-texto {
+        color: rgba(255,255,255,0.7);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+        .recan-tipos {
+            grid-template-columns: 1fr;
+        }
+    }
+
     /* Responsive */
     @media (max-width: 600px) {
         .input-codigo-container {
@@ -880,6 +1152,279 @@ add_shortcode('mi_magia', function() {
             guardianData = null;
             canalizacionPersonal = null;
             usuarioData = null;
+            render();
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // RECANALIZACIÓN - Formulario para clientes
+        // ═══════════════════════════════════════════════════════════════
+
+        let tipoRecanSeleccionado = 'nuestro';
+        let recanEnviada = false;
+
+        window.mostrarFormRecanalización = function() {
+            estado = 'recanalizacion';
+            render();
+        };
+
+        function renderRecanalizacion() {
+            if (recanEnviada) {
+                return renderRecanExito();
+            }
+
+            const g = guardianData;
+            app.innerHTML = `
+                <div class="mi-magia-container">
+                    <div class="estado-guardian">
+                        <div style="text-align:center;margin-bottom:30px;">
+                            <button onclick="verInfoGeneral()" style="background:transparent;border:1px solid rgba(198,169,98,0.3);color:rgba(255,255,255,0.6);padding:10px 20px;border-radius:20px;cursor:pointer;font-size:13px;">
+                                ← Volver a ${g?.nombre || 'tu guardián'}
+                            </button>
+                        </div>
+
+                        <div class="recanalizacion-card">
+                            <div class="recan-header">
+                                <span class="recan-icono">✨</span>
+                                <div>
+                                    <h3 class="recan-titulo">Solicitar Recanalización</h3>
+                                    <p class="recan-subtitulo">Recibí un nuevo mensaje actualizado de tu guardián</p>
+                                </div>
+                            </div>
+
+                            <p class="recan-descripcion">
+                                La recanalización es una nueva conexión con tu guardián que refleja tu momento actual.
+                                Ideal si han pasado meses desde tu primera canalización o estás atravesando una etapa diferente.
+                            </p>
+
+                            <p style="color:#C6A962;margin-bottom:15px;font-family:'Cinzel',serif;font-size:14px;">¿De qué tipo es tu guardián?</p>
+
+                            <div class="recan-tipos">
+                                <div class="recan-tipo ${tipoRecanSeleccionado === 'nuestro' ? 'selected' : ''}" onclick="selectTipoRecan('nuestro')">
+                                    <div class="recan-tipo-icono">🏠</div>
+                                    <div class="recan-tipo-titulo">Duende de Duendes</div>
+                                    <div class="recan-tipo-precio">GRATIS</div>
+                                    <div class="recan-tipo-desc">Lo compraste en Duendes del Uruguay</div>
+                                </div>
+
+                                <div class="recan-tipo ${tipoRecanSeleccionado === 'ajeno' ? 'selected' : ''}" onclick="selectTipoRecan('ajeno')">
+                                    <div class="recan-tipo-icono">🌍</div>
+                                    <div class="recan-tipo-titulo">Duende Externo</div>
+                                    <div class="recan-tipo-precio">$7 USD</div>
+                                    <div class="recan-tipo-desc">Es de otro lugar o fue un regalo</div>
+                                </div>
+                            </div>
+
+                            <form id="form-recanalizacion" onsubmit="enviarRecanalizacion(event)">
+                                <div class="recan-form-group">
+                                    <label class="recan-label">Nombre del guardián</label>
+                                    <input type="text" class="recan-input" id="recan-nombre-duende" value="${g?.nombre || ''}" required>
+                                </div>
+
+                                <div class="recan-form-group">
+                                    <label class="recan-label">Tu email de compra</label>
+                                    <input type="email" class="recan-input" id="recan-email" placeholder="tu@email.com" required>
+                                </div>
+
+                                <div class="recan-form-group">
+                                    <label class="recan-label">Foto del guardián (opcional)</label>
+                                    <label class="recan-file-label" id="label-foto">
+                                        <span>📷</span>
+                                        <span id="foto-texto">Seleccionar imagen</span>
+                                        <input type="file" class="recan-file-input" id="recan-foto" accept="image/*" onchange="updateFotoLabel(this)">
+                                    </label>
+                                </div>
+
+                                <div class="recan-form-group">
+                                    <label class="recan-label">¿Qué momento estás atravesando?</label>
+                                    <textarea class="recan-textarea" id="recan-momento" placeholder="Contanos brevemente qué está pasando en tu vida, qué sentís, qué necesitás..." required></textarea>
+                                </div>
+
+                                <div class="recan-form-group">
+                                    <label class="recan-label">¿Qué te gustaría preguntarle a tu guardián?</label>
+                                    <textarea class="recan-textarea" id="recan-pregunta" placeholder="Una pregunta específica o tema que querés que aborde..." style="min-height:80px;"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn-enviar-recan" id="btn-enviar-recan">
+                                    ${tipoRecanSeleccionado === 'nuestro' ? '✨ Solicitar Recanalización Gratuita' : '✨ Solicitar Recanalización ($7 USD)'}
+                                </button>
+
+                                ${tipoRecanSeleccionado === 'nuestro' ? `
+                                    <p style="color:rgba(255,255,255,0.5);font-size:12px;text-align:center;margin-top:15px;">
+                                        Tu solicitud será revisada para verificar la compra
+                                    </p>
+                                ` : ''}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRecanExito() {
+            app.innerHTML = `
+                <div class="mi-magia-container">
+                    <div class="estado-guardian">
+                        <div class="recanalizacion-card">
+                            <div class="recan-success">
+                                <div class="recan-success-icono">✨</div>
+                                <h3 class="recan-success-titulo">¡Solicitud Enviada!</h3>
+                                <p class="recan-success-texto">
+                                    ${tipoRecanSeleccionado === 'nuestro'
+                                        ? 'Revisaremos tu solicitud y te contactaremos pronto. Si todo está en orden, recibirás tu nueva canalización en tu email en 24-48 horas.'
+                                        : 'Te enviaremos un link de pago por email. Una vez confirmado el pago, recibirás tu nueva canalización en 24-48 horas.'
+                                    }
+                                </p>
+                                <button onclick="volverInicio()" class="btn-buscar" style="margin-top:25px;">
+                                    Volver al inicio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.selectTipoRecan = function(tipo) {
+            tipoRecanSeleccionado = tipo;
+            renderRecanalizacion();
+        };
+
+        window.updateFotoLabel = function(input) {
+            const texto = document.getElementById('foto-texto');
+            if (input.files && input.files[0]) {
+                texto.textContent = input.files[0].name;
+            } else {
+                texto.textContent = 'Seleccionar imagen';
+            }
+        };
+
+        window.enviarRecanalizacion = async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btn-enviar-recan');
+            const originalText = btn.textContent;
+            btn.textContent = '⏳ Enviando...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('action', 'duendes_solicitar_recanalizacion');
+            formData.append('nonce', '<?php echo wp_create_nonce("duendes_public"); ?>');
+            formData.append('tipo', tipoRecanSeleccionado);
+            formData.append('nombre_duende', document.getElementById('recan-nombre-duende').value);
+            formData.append('email', document.getElementById('recan-email').value);
+            formData.append('momento_actual', document.getElementById('recan-momento').value);
+            formData.append('pregunta', document.getElementById('recan-pregunta').value || '');
+
+            const fotoInput = document.getElementById('recan-foto');
+            if (fotoInput.files && fotoInput.files[0]) {
+                formData.append('foto', fotoInput.files[0]);
+            }
+
+            try {
+                const res = await fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    recanEnviada = true;
+                    renderRecanExito();
+                } else {
+                    alert('Error: ' + (data.data?.message || 'Intenta de nuevo'));
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                alert('Error de conexión. Intenta de nuevo.');
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // CONTENIDO BORROSO - Vista previa para no compradores
+        // ═══════════════════════════════════════════════════════════════
+
+        function renderVistaPrevia() {
+            const g = guardianData;
+            const urlCompra = g?.permalink || '/tienda/';
+
+            app.innerHTML = `
+                <div class="mi-magia-container">
+                    <div class="estado-guardian">
+                        <div class="guardian-header">
+                            <img src="${g?.imagenPrincipal || ''}" alt="${g?.nombre || 'Guardián'}" class="guardian-imagen">
+                            <h1 class="guardian-nombre">${g?.nombre || 'Tu Guardián'}</h1>
+                            <p class="guardian-subtitulo">${g?.encabezado?.subtitulo || 'Guardián del Bosque Ancestral'}</p>
+                        </div>
+
+                        <!-- Contenido borroso -->
+                        <div class="contenido-bloqueado">
+                            <div class="contenido-borroso">
+                                <div class="seccion-magia mensaje-directo">
+                                    <h3 class="seccion-titulo">💬 Mensaje Personal</h3>
+                                    <div class="seccion-contenido">"Este es un mensaje que solo el verdadero guardián de ${g?.nombre || 'este duende'} puede leer. Contiene guía específica para tu camino actual..."</div>
+                                </div>
+
+                                <div class="seccion-magia">
+                                    <h3 class="seccion-titulo">📜 Historia del Guardián</h3>
+                                    <div class="seccion-contenido">La historia ancestral de este guardián abarca siglos de sabiduría acumulada. Su origen se remonta a tiempos donde la magia fluía libremente entre los mundos...</div>
+                                </div>
+
+                                <div class="seccion-magia">
+                                    <h3 class="seccion-titulo">🎁 Dones Especiales</h3>
+                                    <div class="seccion-contenido">
+                                        <div class="don-item" style="margin-bottom:10px;"><span class="don-icono">🌟</span> Don de la protección ancestral</div>
+                                        <div class="don-item" style="margin-bottom:10px;"><span class="don-icono">💫</span> Don del equilibrio emocional</div>
+                                        <div class="don-item"><span class="don-icono">⭐</span> Don de la claridad mental</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="overlay-desbloquear">
+                                <div class="desbloquear-icono">🔒</div>
+                                <h3 class="desbloquear-titulo">Contenido Exclusivo</h3>
+                                <p class="desbloquear-texto">
+                                    Esta canalización es exclusiva para quien adoptó a ${g?.nombre || 'este guardián'}.
+                                    Si ya lo tenés, verificá tu email para acceder.
+                                </p>
+                                <a href="${urlCompra}" class="btn-comprar">Adoptar a ${g?.nombre || 'este Guardián'}</a>
+                                <button onclick="estado='verificar-email';render();" style="background:transparent;border:1px solid rgba(198,169,98,0.5);color:#C6A962;padding:12px 25px;border-radius:20px;cursor:pointer;font-size:14px;">
+                                    Ya lo tengo, verificar email
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Botón de recanalización -->
+                        <div class="recanalizacion-card" style="margin-top:40px;text-align:center;">
+                            <h3 style="font-family:'Cinzel',serif;color:#C6A962;margin-bottom:10px;">¿Ya tenés un duende?</h3>
+                            <p style="color:rgba(255,255,255,0.6);margin-bottom:20px;">
+                                Solicitá una recanalización actualizada para conectar con tu guardián en tu momento actual.
+                            </p>
+                            <button onclick="mostrarFormRecanalización()" class="btn-buscar" style="padding:14px 30px;">
+                                ✨ Solicitar Recanalización
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Actualizar el render principal
+        const originalRender = render;
+        render = function() {
+            if (estado === 'recanalizacion') {
+                renderRecanalizacion();
+            } else if (estado === 'vista-previa') {
+                renderVistaPrevia();
+            } else {
+                originalRender();
+            }
+        };
+
+        window.verVistaPrevia = function() {
+            estado = 'vista-previa';
             render();
         };
 

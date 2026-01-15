@@ -955,5 +955,81 @@ function duendes_render_producto_digital_template() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 10. AGREGAR MI MAGIA AL MENÚ DE NAVEGACIÓN
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Agregar Mi Magia al menú principal
+add_filter('wp_nav_menu_items', function($items, $args) {
+    // Solo agregar en menús principales
+    $menus_principales = ['primary', 'main', 'main-menu', 'primary-menu', 'header-menu', 'menu-1'];
+
+    $menu_location = $args->theme_location ?? '';
+    $menu_slug = '';
+    if (isset($args->menu) && is_object($args->menu)) {
+        $menu_slug = $args->menu->slug ?? '';
+    } elseif (isset($args->menu)) {
+        $menu_slug = $args->menu;
+    }
+
+    $es_menu_principal = in_array($menu_location, $menus_principales) ||
+                         in_array($menu_slug, $menus_principales) ||
+                         strpos($menu_location, 'primary') !== false ||
+                         strpos($menu_location, 'main') !== false ||
+                         strpos($menu_location, 'header') !== false;
+
+    // Si no identificamos el menú, agregarlo igual si parece menú de navegación principal
+    if (!$es_menu_principal && strpos($items, 'tienda') !== false) {
+        $es_menu_principal = true;
+    }
+
+    if ($es_menu_principal) {
+        // Verificar que no esté ya agregado
+        if (strpos($items, 'mi-magia') === false) {
+            $mi_magia_item = '<li class="menu-item menu-item-mi-magia">';
+            $mi_magia_item .= '<a href="/mi-magia/" class="menu-link-mi-magia" style="display:flex;align-items:center;gap:6px;">';
+            $mi_magia_item .= '<span style="font-size:1.1em;">✨</span> Mi Magia';
+            $mi_magia_item .= '</a></li>';
+
+            // Agregar antes del último item (usualmente Mi Cuenta o Carrito)
+            $last_li = strrpos($items, '<li');
+            if ($last_li !== false) {
+                $items = substr_replace($items, $mi_magia_item, $last_li, 0);
+            } else {
+                $items .= $mi_magia_item;
+            }
+        }
+    }
+
+    return $items;
+}, 15, 2);
+
+// Estilos para el item Mi Magia en el menú
+add_action('wp_head', function() {
+    ?>
+    <style id="duendes-mi-magia-menu">
+    /* Mi Magia en el menú - sutil pero visible */
+    .menu-item-mi-magia a,
+    .menu-link-mi-magia {
+        position: relative;
+    }
+    .menu-item-mi-magia a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #9370db, #d4af37);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+    .menu-item-mi-magia a:hover::after {
+        width: 80%;
+    }
+    </style>
+    <?php
+}, 20);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // FIN DEL PLUGIN
 // ═══════════════════════════════════════════════════════════════════════════

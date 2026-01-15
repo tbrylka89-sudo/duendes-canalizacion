@@ -275,51 +275,51 @@ function duendes_circulo_banner_html() {
                 <div class="cb-orbe cb-orbe-3"></div>
 
                 <div class="circulo-banner-inner">
-                    <div class="cb-badge">✨ Comunidad Exclusiva ✨</div>
+                    <div class="cb-badge">✨ Para quienes quieren más ✨</div>
 
                     <h2 class="cb-title">
-                        Únete al
-                        <span>Círculo de Duendes</span>
+                        Esto no termina acá.
+                        <span>El Círculo</span>
                     </h2>
 
                     <p class="cb-subtitle">
-                        Donde la magia cobra vida cada semana.<br>
-                        Contenido exclusivo, rituales guiados y conexión con otros elegidos.
+                        Si sentís que necesitás más que un guardián.<br>
+                        Rituales cada semana. Guía constante. Comunidad que entiende.
                     </p>
 
                     <div class="cb-benefits">
                         <div class="cb-benefit">
                             <span class="cb-benefit-icon">🌙</span>
-                            <span>Rituales semanales</span>
+                            <span>Rituales cada semana</span>
                         </div>
                         <div class="cb-benefit">
                             <span class="cb-benefit-icon">📜</span>
-                            <span>Contenido exclusivo</span>
+                            <span>Tiradas personales</span>
                         </div>
                         <div class="cb-benefit">
                             <span class="cb-benefit-icon">🍀</span>
-                            <span>25 runas/mes gratis</span>
+                            <span>25 runas gratis/mes</span>
                         </div>
                         <div class="cb-benefit">
                             <span class="cb-benefit-icon">🎁</span>
-                            <span>10% en toda la tienda</span>
+                            <span>Descuentos exclusivos</span>
                         </div>
                     </div>
 
                     <div class="cb-cta-wrap">
                         <a href="/circulo/" class="cb-cta">
-                            🔮 Quiero Unirme al Círculo
+                            🔮 Quiero entrar al Círculo
                         </a>
                         <p class="cb-guarantee">
-                            <span><?php echo $total_members; ?> elegidos</span> ya son parte • Cancelá cuando quieras
+                            <span><?php echo $total_members; ?> personas</span> ya encontraron su lugar • Sin compromiso
                         </p>
                     </div>
 
                     <div class="cb-urgency">
                         <p class="cb-urgency-text">
-                            🌟 <strong>Solo para quienes sienten el llamado.</strong>
-                            El Círculo no es para todos — es para quienes buscan
-                            algo más profundo que lo material.
+                            🌟 <strong>No es para cualquiera.</strong>
+                            Es para quienes saben que hay algo más allá de lo visible.
+                            Para las que buscan respuestas que otros no dan.
                         </p>
                     </div>
                 </div>
