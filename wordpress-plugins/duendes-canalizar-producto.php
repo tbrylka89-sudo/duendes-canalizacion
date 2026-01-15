@@ -9,6 +9,46 @@
 if (!defined('ABSPATH')) exit;
 
 // ═══════════════════════════════════════════════════════════════
+// CONFIGURAR RANKMATH PARA PRODUCTOS
+// ═══════════════════════════════════════════════════════════════
+
+// Habilitar RankMath en productos de WooCommerce
+add_filter('rank_math/sitemap/post_types', function($post_types) {
+    $post_types[] = 'product';
+    return array_unique($post_types);
+});
+
+// Forzar que RankMath muestre su metabox en productos
+add_filter('rank_math/metabox/priority', function($priority) {
+    return 'high';
+});
+
+// Habilitar SEO para productos si RankMath está activo
+add_action('init', function() {
+    // Verificar si RankMath está activo
+    if (!class_exists('RankMath')) return;
+
+    // Obtener opciones actuales de RankMath
+    $titles = get_option('rank-math-options-titles', []);
+
+    // Habilitar para productos si no está configurado
+    if (!isset($titles['pt_product_add_meta_box']) || $titles['pt_product_add_meta_box'] !== 'on') {
+        $titles['pt_product_add_meta_box'] = 'on';
+        $titles['pt_product_bulk_editing'] = 'on';
+        $titles['pt_product_link_suggestions'] = 'on';
+        update_option('rank-math-options-titles', $titles);
+    }
+}, 5);
+
+// Asegurar que el metabox de RankMath aparezca en productos
+add_filter('rank_math/metabox/post_types', function($post_types) {
+    if (!in_array('product', $post_types)) {
+        $post_types[] = 'product';
+    }
+    return $post_types;
+});
+
+// ═══════════════════════════════════════════════════════════════
 // ESTILOS Y SCRIPTS ADMIN
 // ═══════════════════════════════════════════════════════════════
 
@@ -776,15 +816,21 @@ function duendes_canalizar_get_scripts() {
             },
 
             applyResult: function(result) {
+                console.log('Aplicando resultado:', result);
+
                 // Título del producto
                 if (result.titulo) {
                     var titleField = document.getElementById('title');
-                    if (titleField) titleField.value = result.titulo;
+                    if (titleField) {
+                        titleField.value = result.titulo;
+                        // Disparar evento para que WP detecte el cambio
+                        titleField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                 }
 
                 // Descripción larga (WooCommerce usa el editor de contenido)
-                if (result.descripcion && typeof wp !== 'undefined' && wp.editor) {
-                    var editor = tinyMCE.get('content');
+                if (result.descripcion) {
+                    var editor = typeof tinyMCE !== 'undefined' ? tinyMCE.get('content') : null;
                     if (editor) {
                         editor.setContent(result.descripcion);
                     } else {
@@ -793,9 +839,9 @@ function duendes_canalizar_get_scripts() {
                     }
                 }
 
-                // Descripción corta
-                if (result.descripcion_corta && typeof wp !== 'undefined') {
-                    var excerptEditor = tinyMCE.get('excerpt');
+                // Descripción corta de WooCommerce
+                if (result.descripcion_corta) {
+                    var excerptEditor = typeof tinyMCE !== 'undefined' ? tinyMCE.get('excerpt') : null;
                     if (excerptEditor) {
                         excerptEditor.setContent(result.descripcion_corta);
                     } else {
@@ -804,17 +850,64 @@ function duendes_canalizar_get_scripts() {
                     }
                 }
 
-                // RankMath SEO
+                // Tags de producto (WooCommerce)
+                if (result.tags) {
+                    var tagsField = document.getElementById('new-tag-product_tag');
+                    if (tagsField) {
+                        tagsField.value = result.tags;
+                        console.log('Tags aplicados al campo:', result.tags);
+                        // Intentar hacer click en el botón Add para agregar los tags
+                        var addBtn = document.querySelector('.tagadd');
+                        if (addBtn) {
+                            setTimeout(function() { addBtn.click(); }, 100);
+                        }
+                    } else {
+                        console.log('Campo de tags no encontrado. Tags generados:', result.tags);
+                    }
+                }
+
+                // RankMath SEO - buscar en múltiples lugares
                 if (result.seo_title) {
-                    var seoTitle = document.querySelector('input[name=\"rank_math_title\"]') ||
-                                   document.getElementById('rank_math_title');
-                    if (seoTitle) seoTitle.value = result.seo_title;
+                    var seoTitleSelectors = [
+                        'input[name=\"rank_math_title\"]',
+                        '#rank_math_title',
+                        '.rank-math-title input',
+                        'input[id*=\"rank-math\"][id*=\"title\"]',
+                        '#rank-math-editor input[type=\"text\"]'
+                    ];
+                    var seoTitleField = null;
+                    for (var i = 0; i < seoTitleSelectors.length; i++) {
+                        seoTitleField = document.querySelector(seoTitleSelectors[i]);
+                        if (seoTitleField) break;
+                    }
+                    if (seoTitleField) {
+                        seoTitleField.value = result.seo_title;
+                        seoTitleField.dispatchEvent(new Event('input', { bubbles: true }));
+                        console.log('SEO Title aplicado:', result.seo_title);
+                    } else {
+                        console.log('Campo SEO Title no encontrado. Valor:', result.seo_title);
+                    }
                 }
 
                 if (result.seo_description) {
-                    var seoDesc = document.querySelector('textarea[name=\"rank_math_description\"]') ||
-                                  document.getElementById('rank_math_description');
-                    if (seoDesc) seoDesc.value = result.seo_description;
+                    var seoDescSelectors = [
+                        'textarea[name=\"rank_math_description\"]',
+                        '#rank_math_description',
+                        '.rank-math-description textarea',
+                        'textarea[id*=\"rank-math\"][id*=\"description\"]'
+                    ];
+                    var seoDescField = null;
+                    for (var i = 0; i < seoDescSelectors.length; i++) {
+                        seoDescField = document.querySelector(seoDescSelectors[i]);
+                        if (seoDescField) break;
+                    }
+                    if (seoDescField) {
+                        seoDescField.value = result.seo_description;
+                        seoDescField.dispatchEvent(new Event('input', { bubbles: true }));
+                        console.log('SEO Description aplicado:', result.seo_description);
+                    } else {
+                        console.log('Campo SEO Description no encontrado. Valor:', result.seo_description);
+                    }
                 }
 
                 // Actualizar nombre en el campo si se generó
@@ -824,6 +917,15 @@ function duendes_canalizar_get_scripts() {
                         nombreField.value = result.nombre_generado;
                     }
                 }
+
+                // Mostrar resumen de lo que se aplicó
+                console.log('=== RESUMEN DE GENERACIÓN ===');
+                console.log('Título:', result.titulo || 'N/A');
+                console.log('SEO Title:', result.seo_title || 'N/A');
+                console.log('SEO Desc:', result.seo_description || 'N/A');
+                console.log('Tags:', result.tags || 'N/A');
+                console.log('Tipo de ser:', result.tipo_ser || 'N/A');
+                console.log('============================');
             },
 
             getDescripcionActual: function() {
