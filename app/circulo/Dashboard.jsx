@@ -222,8 +222,78 @@ export default function CirculoDashboard({ usuario }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function SeccionInicio({ guardianSemana, portalActual, usuario }) {
+  const [consejo, setConsejo] = useState(null);
+  const [cargandoConsejo, setCargandoConsejo] = useState(true);
+
+  useEffect(() => {
+    cargarConsejoDelDia();
+  }, [usuario]);
+
+  async function cargarConsejoDelDia() {
+    setCargandoConsejo(true);
+    try {
+      const nombre = usuario?.nombre || usuario?.nombrePreferido || 'viajero';
+      const res = await fetch(`/api/circulo/consejo-del-dia?nombre=${encodeURIComponent(nombre)}`);
+      const data = await res.json();
+      if (data.success) {
+        setConsejo(data);
+      }
+    } catch (error) {
+      console.error('Error cargando consejo:', error);
+    } finally {
+      setCargandoConsejo(false);
+    }
+  }
+
+  async function regenerarConsejo() {
+    setCargandoConsejo(true);
+    try {
+      const nombre = usuario?.nombre || usuario?.nombrePreferido || 'viajero';
+      const res = await fetch(`/api/circulo/consejo-del-dia?nombre=${encodeURIComponent(nombre)}&t=${Date.now()}`);
+      const data = await res.json();
+      if (data.success) {
+        setConsejo(data);
+      }
+    } catch (error) {
+      console.error('Error regenerando consejo:', error);
+    } finally {
+      setCargandoConsejo(false);
+    }
+  }
+
   return (
     <div className="seccion-inicio">
+      {/* Consejo del Día - Mensaje único cada visita */}
+      {consejo && (
+        <div className="consejo-del-dia-card">
+          <div className="consejo-header">
+            <div className="consejo-guardian-mini">
+              <img src={consejo.guardian?.imagen} alt={consejo.guardian?.nombre} />
+            </div>
+            <div className="consejo-titulo-wrap">
+              <span className="consejo-etiqueta">Mensaje para vos</span>
+              <h3 className="consejo-titulo">{consejo.consejo?.titulo}</h3>
+            </div>
+            <button className="btn-regenerar" onClick={regenerarConsejo} disabled={cargandoConsejo}>
+              {cargandoConsejo ? '...' : '↻'}
+            </button>
+          </div>
+          <div className="consejo-contenido">
+            {cargandoConsejo ? (
+              <p className="cargando-consejo">Generando mensaje...</p>
+            ) : (
+              <>
+                <p className="consejo-mensaje">{consejo.consejo?.mensaje}</p>
+                <p className="consejo-reflexion">"{consejo.consejo?.reflexion}"</p>
+              </>
+            )}
+          </div>
+          <div className="consejo-footer">
+            <span>Semana {consejo.semana} • {consejo.diasRestantes} días más con {consejo.guardian?.nombre}</span>
+          </div>
+        </div>
+      )}
+
       {/* Bienvenida */}
       <div className="bienvenida">
         <h2>Bienvenido al Círculo, {usuario?.nombre || 'viajero'}</h2>
@@ -231,20 +301,20 @@ function SeccionInicio({ guardianSemana, portalActual, usuario }) {
       </div>
 
       {/* Guardián de la semana */}
-      {guardianSemana && (
+      {(guardianSemana || consejo?.guardian) && (
         <div className="guardian-semana-card">
           <div className="guardian-semana-header">
             <span className="etiqueta">Guardián de la Semana</span>
           </div>
           <div className="guardian-semana-content">
             <div className="guardian-imagen-wrap">
-              <img src={guardianSemana.imagen} alt={guardianSemana.nombre} />
+              <img src={consejo?.guardian?.imagen || guardianSemana?.imagen} alt={consejo?.guardian?.nombre || guardianSemana?.nombre} />
             </div>
             <div className="guardian-info">
-              <span className="guardian-categoria">{guardianSemana.tipo_ser_nombre} de {guardianSemana.categoria}</span>
-              <h3 className="guardian-nombre">{guardianSemana.nombre}</h3>
-              <p className="guardian-arquetipo">{guardianSemana.arquetipo}</p>
-              <a href={guardianSemana.url_tienda} target="_blank" className="ver-en-tienda">
+              <span className="guardian-categoria">{consejo?.guardian?.tipo_ser_nombre || guardianSemana?.tipo_ser_nombre} de {consejo?.guardian?.categoria || guardianSemana?.categoria}</span>
+              <h3 className="guardian-nombre">{consejo?.guardian?.nombre || guardianSemana?.nombre}</h3>
+              <p className="guardian-arquetipo">{consejo?.guardian?.arquetipo || guardianSemana?.arquetipo}</p>
+              <a href={consejo?.guardian?.url_tienda || guardianSemana?.url_tienda} target="_blank" className="ver-en-tienda">
                 Ver en la tienda →
               </a>
             </div>
@@ -449,6 +519,147 @@ function SeccionInicio({ guardianSemana, portalActual, usuario }) {
         @media (max-width: 500px) {
           .accesos-grid {
             grid-template-columns: 1fr;
+          }
+        }
+
+        /* Consejo del Día */
+        .consejo-del-dia-card {
+          background: linear-gradient(135deg, rgba(139, 90, 43, 0.15), rgba(212, 175, 55, 0.1));
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          border-radius: 25px;
+          padding: 0;
+          margin-bottom: 40px;
+          overflow: hidden;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .consejo-header {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 20px 25px;
+          background: rgba(212, 175, 55, 0.1);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .consejo-guardian-mini {
+          flex-shrink: 0;
+        }
+
+        .consejo-guardian-mini img {
+          width: 55px;
+          height: 55px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(212, 175, 55, 0.5);
+        }
+
+        .consejo-titulo-wrap {
+          flex: 1;
+        }
+
+        .consejo-etiqueta {
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: rgba(212, 175, 55, 0.8);
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        .consejo-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          color: #ffffff;
+          margin: 0;
+          font-weight: 500;
+        }
+
+        .btn-regenerar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(212, 175, 55, 0.2);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          color: #d4af37;
+          font-size: 18px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .btn-regenerar:hover:not(:disabled) {
+          background: rgba(212, 175, 55, 0.3);
+          transform: rotate(180deg);
+        }
+
+        .btn-regenerar:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .consejo-contenido {
+          padding: 25px 30px;
+        }
+
+        .consejo-mensaje {
+          font-size: 18px;
+          line-height: 1.7;
+          color: rgba(255, 255, 255, 0.9);
+          margin-bottom: 20px;
+        }
+
+        .consejo-reflexion {
+          font-size: 16px;
+          font-style: italic;
+          color: #d4af37;
+          padding-left: 20px;
+          border-left: 2px solid rgba(212, 175, 55, 0.4);
+          margin: 0;
+        }
+
+        .consejo-footer {
+          padding: 15px 30px;
+          background: rgba(0, 0, 0, 0.2);
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .cargando-consejo {
+          text-align: center;
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
+          padding: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+          .consejo-header {
+            padding: 15px 20px;
+          }
+
+          .consejo-guardian-mini img {
+            width: 45px;
+            height: 45px;
+          }
+
+          .consejo-titulo {
+            font-size: 14px;
+          }
+
+          .consejo-contenido {
+            padding: 20px;
+          }
+
+          .consejo-mensaje {
+            font-size: 16px;
+          }
+
+          .consejo-reflexion {
+            font-size: 14px;
           }
         }
       `}</style>
