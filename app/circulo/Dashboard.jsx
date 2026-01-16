@@ -6,12 +6,64 @@ import { useState, useEffect } from 'react';
 // Vista principal después del portal de entrada
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// Configuración de portales/temporadas
+const PORTALES = {
+  yule: {
+    nombre: 'Portal de Yule',
+    meses: [5, 6, 7], // junio-agosto
+    colores: { primario: '#4a90d9', secundario: '#1a3a5c', acento: '#c0d8f0' },
+    icono: '❄️',
+    descripcion: 'Introspección y renacimiento'
+  },
+  ostara: {
+    nombre: 'Portal de Ostara',
+    meses: [8, 9, 10], // septiembre-noviembre
+    colores: { primario: '#4a9d4a', secundario: '#1a3c1a', acento: '#90ee90' },
+    icono: '🌱',
+    descripcion: 'Nuevos comienzos'
+  },
+  litha: {
+    nombre: 'Portal de Litha',
+    meses: [11, 0, 1], // diciembre-febrero
+    colores: { primario: '#d4af37', secundario: '#5c4a1a', acento: '#ffd700' },
+    icono: '☀️',
+    descripcion: 'Abundancia plena'
+  },
+  mabon: {
+    nombre: 'Portal de Mabon',
+    meses: [2, 3, 4], // marzo-mayo
+    colores: { primario: '#d2691e', secundario: '#4a2a0a', acento: '#deb887' },
+    icono: '🍂',
+    descripcion: 'Gratitud y cosecha'
+  }
+};
+
+// Colores según elemento del duende
+const COLORES_ELEMENTO = {
+  fuego: { primario: '#ff6b35', secundario: '#8b2500', glow: 'rgba(255, 107, 53, 0.4)' },
+  agua: { primario: '#4a90d9', secundario: '#1a3a5c', glow: 'rgba(74, 144, 217, 0.4)' },
+  tierra: { primario: '#8b7355', secundario: '#3d2914', glow: 'rgba(139, 115, 85, 0.4)' },
+  aire: { primario: '#b8a9c9', secundario: '#4a3a5c', glow: 'rgba(184, 169, 201, 0.4)' },
+  espiritu: { primario: '#d4af37', secundario: '#5c4a1a', glow: 'rgba(212, 175, 55, 0.4)' }
+};
+
+function obtenerPortalActual() {
+  const mes = new Date().getMonth();
+  for (const [id, portal] of Object.entries(PORTALES)) {
+    if (portal.meses.includes(mes)) {
+      return { id, ...portal };
+    }
+  }
+  return { id: 'litha', ...PORTALES.litha };
+}
+
 export default function CirculoDashboard({ usuario }) {
   const [seccion, setSeccion] = useState('inicio');
   const [contenidoSemana, setContenidoSemana] = useState(null);
   const [guardianSemana, setGuardianSemana] = useState(null);
-  const [portalActual, setPortalActual] = useState(null);
+  const [portalActual, setPortalActual] = useState(obtenerPortalActual());
   const [cargando, setCargando] = useState(true);
+  const [coloresDuende, setColoresDuende] = useState(COLORES_ELEMENTO.espiritu);
 
   useEffect(() => {
     cargarDatos();
@@ -24,11 +76,10 @@ export default function CirculoDashboard({ usuario }) {
       const dataDuende = await resDuende.json();
       if (dataDuende.success) {
         setGuardianSemana(dataDuende.guardian);
-        setPortalActual(dataDuende.portal_actual);
+        // Actualizar colores según elemento del duende
+        const elemento = dataDuende.guardian?.elemento?.toLowerCase() || 'espiritu';
+        setColoresDuende(COLORES_ELEMENTO[elemento] || COLORES_ELEMENTO.espiritu);
       }
-
-      // Aquí cargaríamos el contenido de la semana desde KV
-      // Por ahora dejamos placeholder
 
     } catch (error) {
       console.error('Error cargando datos:', error);
@@ -37,8 +88,34 @@ export default function CirculoDashboard({ usuario }) {
     }
   }
 
+  // Semana del año para animaciones
+  const semanaAno = Math.ceil((new Date() - new Date(new Date().getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000));
+
   return (
-    <div className="circulo-dashboard">
+    <div
+      className="circulo-dashboard"
+      style={{
+        '--portal-primario': portalActual.colores.primario,
+        '--portal-secundario': portalActual.colores.secundario,
+        '--portal-acento': portalActual.colores.acento,
+        '--duende-primario': coloresDuende.primario,
+        '--duende-secundario': coloresDuende.secundario,
+        '--duende-glow': coloresDuende.glow
+      }}
+    >
+      {/* Banner de Temporada */}
+      <div className={`banner-temporada banner-${portalActual.id}`}>
+        <div className="banner-particulas"></div>
+        <div className="banner-contenido">
+          <span className="banner-icono">{portalActual.icono}</span>
+          <div className="banner-texto">
+            <span className="banner-nombre">{portalActual.nombre}</span>
+            <span className="banner-desc">{portalActual.descripcion}</span>
+          </div>
+        </div>
+        <div className={`banner-animacion animacion-semana-${semanaAno % 4}`}></div>
+      </div>
+
       {/* Header con navegación */}
       <header className="circulo-header">
         <div className="header-left">
@@ -96,9 +173,156 @@ export default function CirculoDashboard({ usuario }) {
       <style jsx>{`
         .circulo-dashboard {
           min-height: 100vh;
-          background: linear-gradient(180deg, #0a0a0a 0%, #0d0810 50%, #0a0a0a 100%);
+          background: linear-gradient(180deg, var(--portal-secundario, #0a0a0a) 0%, #0d0810 50%, #0a0a0a 100%);
           color: #ffffff;
           font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+
+        /* Banner de Temporada */
+        .banner-temporada {
+          position: relative;
+          height: 80px;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .banner-yule {
+          background: linear-gradient(135deg, #1a3a5c 0%, #0a1520 50%, #1a3a5c 100%);
+        }
+        .banner-ostara {
+          background: linear-gradient(135deg, #1a3c1a 0%, #0a1510 50%, #1a3c1a 100%);
+        }
+        .banner-litha {
+          background: linear-gradient(135deg, #5c4a1a 0%, #201508 50%, #5c4a1a 100%);
+        }
+        .banner-mabon {
+          background: linear-gradient(135deg, #4a2a0a 0%, #1a0a00 50%, #4a2a0a 100%);
+        }
+
+        .banner-particulas {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(circle, var(--portal-acento) 1px, transparent 1px);
+          background-size: 30px 30px;
+          opacity: 0.3;
+          animation: particulasFloat 20s linear infinite;
+        }
+
+        @keyframes particulasFloat {
+          0% { background-position: 0 0; }
+          100% { background-position: 30px 30px; }
+        }
+
+        .banner-contenido {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .banner-icono {
+          font-size: 32px;
+          animation: iconoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes iconoPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.15); }
+        }
+
+        .banner-texto {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .banner-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 600;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: var(--portal-acento);
+        }
+
+        .banner-desc {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+          font-style: italic;
+        }
+
+        .banner-animacion {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        /* Animaciones semanales rotativas */
+        .animacion-semana-0 .banner-animacion::before,
+        .banner-temporada:has(.animacion-semana-0)::before {
+          content: '';
+          position: absolute;
+          width: 200%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+          animation: shimmer 3s infinite;
+        }
+
+        .animacion-semana-1 .banner-animacion::before,
+        .banner-temporada:has(.animacion-semana-1)::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 50%, var(--portal-acento) 0%, transparent 30%);
+          opacity: 0.2;
+          animation: orbMove 8s ease-in-out infinite;
+        }
+
+        .animacion-semana-2 .banner-animacion::before,
+        .banner-temporada:has(.animacion-semana-2)::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(45deg, transparent 40%, var(--portal-acento) 50%, transparent 60%);
+          opacity: 0.1;
+          animation: diagonalMove 5s linear infinite;
+        }
+
+        .animacion-semana-3 .banner-animacion::before,
+        .banner-temporada:has(.animacion-semana-3)::before {
+          content: '';
+          position: absolute;
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          background: var(--portal-acento);
+          opacity: 0.1;
+          filter: blur(30px);
+          animation: floatAround 10s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+
+        @keyframes orbMove {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(100%); }
+        }
+
+        @keyframes diagonalMove {
+          0% { transform: translateX(-100%) translateY(-100%); }
+          100% { transform: translateX(100%) translateY(100%); }
+        }
+
+        @keyframes floatAround {
+          0%, 100% { top: 20%; left: 10%; }
+          25% { top: 60%; left: 80%; }
+          50% { top: 10%; left: 90%; }
+          75% { top: 70%; left: 20%; }
         }
 
         /* Header */
@@ -614,31 +838,31 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
         }
 
         .consejo-contenido {
-          padding: 25px 30px;
+          padding: 25px 30px !important;
         }
 
         .consejo-mensaje {
-          font-size: 18px;
-          line-height: 1.7;
-          color: rgba(255, 255, 255, 0.9);
-          margin-bottom: 20px;
+          font-size: 18px !important;
+          line-height: 1.7 !important;
+          color: #ffffff !important;
+          margin-bottom: 20px !important;
         }
 
         .consejo-reflexion {
-          font-size: 16px;
-          font-style: italic;
-          color: #d4af37;
-          padding-left: 20px;
-          border-left: 2px solid rgba(212, 175, 55, 0.4);
-          margin: 0;
+          font-size: 16px !important;
+          font-style: italic !important;
+          color: #d4af37 !important;
+          padding-left: 20px !important;
+          border-left: 2px solid rgba(212, 175, 55, 0.4) !important;
+          margin: 0 !important;
         }
 
         .consejo-footer {
-          padding: 15px 30px;
-          background: rgba(0, 0, 0, 0.2);
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.4);
+          padding: 15px 30px !important;
+          background: rgba(0, 0, 0, 0.2) !important;
+          border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+          font-size: 12px !important;
+          color: rgba(255, 255, 255, 0.6) !important;
         }
 
         .cargando-consejo {
