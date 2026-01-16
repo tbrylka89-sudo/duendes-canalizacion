@@ -12,9 +12,11 @@ export async function GET(request) {
   try {
     const url = new URL(request.url);
     const nombreUsuario = url.searchParams.get('nombre') || 'viajero';
+    const emailUsuario = url.searchParams.get('email') || '';
 
     // Obtener la semana actual del año
     const ahora = new Date();
+    const hoy = ahora.toISOString().split('T')[0];
     const semanaDelAno = obtenerSemanaDelAno(ahora);
     const claveGuardianSemanal = `circulo:guardian-semana:${ahora.getFullYear()}-W${semanaDelAno}`;
 
@@ -36,8 +38,28 @@ export async function GET(request) {
       await kv.set(claveGuardianSemanal, guardianSemana, { ex: 604800 });
     }
 
-    // Generar mensaje ÚNICO para esta visita (no se cachea)
-    const mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario);
+    // Contar visitas del día para esta persona
+    let visitasHoy = 1;
+    if (emailUsuario) {
+      const claveVisitas = `circulo:visitas-dia:${emailUsuario}:${hoy}`;
+      const visitasData = await kv.get(claveVisitas) || { contador: 0 };
+      visitasHoy = visitasData.contador + 1;
+      // Guardar nueva visita (expira a medianoche, máximo 24h)
+      await kv.set(claveVisitas, { contador: visitasHoy }, { ex: 86400 });
+    }
+
+    // Generar mensaje según número de visitas del día
+    let mensaje;
+    if (visitasHoy === 1) {
+      // Primera visita: mensaje normal
+      mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario, 'primera');
+    } else if (visitasHoy === 2) {
+      // Segunda visita: bienvenida de vuelta
+      mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario, 'regreso');
+    } else {
+      // Tercera visita o más: chiste del duende
+      mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario, 'chiste');
+    }
 
     // Calcular cuántos días quedan de esta semana
     const diasRestantes = 7 - ahora.getDay();
@@ -46,6 +68,7 @@ export async function GET(request) {
       success: true,
       semana: semanaDelAno,
       diasRestantes: diasRestantes,
+      visitaDelDia: visitasHoy,
       guardian: {
         id: guardianSemana.id,
         nombre: guardianSemana.nombre,
@@ -115,16 +138,30 @@ async function seleccionarGuardianSemana(semana, ano) {
 // GENERAR CONSEJO ÚNICO POR VISITA
 // ═══════════════════════════════════════════════════════════════════════════════
 
-async function generarConsejoUnico(guardian, nombreUsuario) {
+async function generarConsejoUnico(guardian, nombreUsuario, tipoVisita = 'primera') {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
-  if (!apiKey) {
-    // Fallback si no hay API key
-    return {
+  // Fallbacks según tipo de visita
+  const fallbacks = {
+    primera: {
       titulo: `Consejo del día de ${guardian.nombre}`,
       mensaje: `${nombreUsuario}, hoy te acompaño en tu camino. Recordá que cada momento es una oportunidad para conectar con la magia.`,
       reflexion: `¿Qué pequeño paso podés dar hoy hacia lo que más deseás?`
-    };
+    },
+    regreso: {
+      titulo: `¡Qué lindo verte de nuevo!`,
+      mensaje: `${nombreUsuario}, volviste. Eso me pone feliz. Significa que algo de lo que compartimos antes resonó en vos.`,
+      reflexion: `¿Qué te trajo de vuelta hoy?`
+    },
+    chiste: {
+      titulo: `${guardian.nombre} quiere hacerte reír`,
+      mensaje: `${nombreUsuario}, ¿sabés qué le dijo un duende a otro cuando se perdieron en el bosque? "¡Tranquilo, que la magia siempre encuentra el camino!" Bueno, yo tampoco sé contar chistes... pero al menos te saqué una sonrisa.`,
+      reflexion: `¿Cuándo fue la última vez que te reíste de verdad?`
+    }
+  };
+
+  if (!apiKey) {
+    return fallbacks[tipoVisita] || fallbacks.primera;
   }
 
   const portal = obtenerPortalActual();
@@ -134,6 +171,42 @@ async function generarConsejoUnico(guardian, nombreUsuario) {
 
   // Generar un factor de variación para que cada mensaje sea diferente
   const variacion = Date.now().toString().slice(-4);
+
+  // Prompts diferentes según tipo de visita
+  const prompts = {
+    primera: `Es ${dia} a la ${momento}. ${nombreUsuario} acaba de entrar al Círculo.
+Estamos en ${portal.nombre} (${portal.energia}).
+
+Generá un consejo del día ÚNICO con este formato:
+
+TITULO: Consejo del día de ${guardian.nombre}
+MENSAJE: [2-3 oraciones directas a ${nombreUsuario}, algo profundo pero práctico para este momento específico]
+REFLEXION: [Una pregunta poderosa para que reflexione hoy]
+
+Que sea diferente a cualquier otro consejo. Que ${nombreUsuario} sienta que es solo para él/ella en este momento exacto.`,
+
+    regreso: `Es ${dia} a la ${momento}. ${nombreUsuario} VOLVIÓ al Círculo hoy por segunda vez.
+Estamos en ${portal.nombre} (${portal.energia}).
+
+Generá un mensaje de BIENVENIDA DE REGRESO con este formato:
+
+TITULO: ¡${nombreUsuario} volvió!
+MENSAJE: [2-3 oraciones expresando genuina alegría de que volvió, algo cálido y cercano. Hacele sentir que notaste que regresó. Puede incluir algo como "me alegra", "qué lindo", etc.]
+REFLEXION: [Una pregunta suave sobre qué lo/la trajo de vuelta o qué está buscando]
+
+Que se sienta especial por haber vuelto.`,
+
+    chiste: `Es ${dia} a la ${momento}. ${nombreUsuario} entró al Círculo por TERCERA VEZ hoy. Le gusta venir seguido.
+Estamos en ${portal.nombre} (${portal.energia}).
+
+Generá un CHISTE o algo gracioso con este formato:
+
+TITULO: ${guardian.nombre} tiene algo que contarte...
+MENSAJE: [Un chiste, comentario gracioso o anécdota divertida relacionada con duendes, magia, naturaleza o tu personalidad. Puede ser un juego de palabras, algo absurdo, o una observación cómica sobre la vida. Tiene que ser simpático y hacer sonreír.]
+REFLEXION: [Una pregunta liviana sobre la risa, la alegría o algo no muy profundo]
+
+Que ${nombreUsuario} se ría o al menos sonría. No tiene que ser un chiste perfecto, solo algo que aliviane el momento.`
+  };
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -162,16 +235,7 @@ REGLAS CRÍTICAS:
 - Hablás en primera persona - SOS ${guardian.nombre}`,
         messages: [{
           role: 'user',
-          content: `Es ${dia} a la ${momento}. ${nombreUsuario} acaba de entrar al Círculo.
-Estamos en ${portal.nombre} (${portal.energia}).
-
-Generá un consejo del día ÚNICO con este formato:
-
-TITULO: Consejo del día de ${guardian.nombre}
-MENSAJE: [2-3 oraciones directas a ${nombreUsuario}, algo profundo pero práctico para este momento específico]
-REFLEXION: [Una pregunta poderosa para que reflexione hoy]
-
-Que sea diferente a cualquier otro consejo. Que ${nombreUsuario} sienta que es solo para él/ella en este momento exacto.`
+          content: prompts[tipoVisita] || prompts.primera
         }]
       })
     });
@@ -189,18 +253,14 @@ Que sea diferente a cualquier otro consejo. Que ${nombreUsuario} sienta que es s
     const reflexionMatch = texto.match(/REFLEXION:\s*(.+?)$/s);
 
     return {
-      titulo: tituloMatch?.[1]?.trim() || `Consejo del día de ${guardian.nombre}`,
-      mensaje: mensajeMatch?.[1]?.trim() || `${nombreUsuario}, hoy es un día para confiar en vos mismo.`,
-      reflexion: reflexionMatch?.[1]?.trim() || `¿Qué te está pidiendo tu corazón hoy?`
+      titulo: tituloMatch?.[1]?.trim() || fallbacks[tipoVisita]?.titulo || `Mensaje de ${guardian.nombre}`,
+      mensaje: mensajeMatch?.[1]?.trim() || fallbacks[tipoVisita]?.mensaje || `${nombreUsuario}, gracias por estar acá.`,
+      reflexion: reflexionMatch?.[1]?.trim() || fallbacks[tipoVisita]?.reflexion || `¿Qué te trajo hoy?`
     };
 
   } catch (error) {
     console.error('Error generando consejo:', error);
-    return {
-      titulo: `Consejo del día de ${guardian.nombre}`,
-      mensaje: `${nombreUsuario}, el universo no comete errores. Que estés acá ahora tiene un propósito. Prestá atención a las señales que aparezcan hoy.`,
-      reflexion: `¿Qué mensaje necesitabas escuchar y todavía no te animaste a aceptar?`
-    };
+    return fallbacks[tipoVisita] || fallbacks.primera;
   }
 }
 

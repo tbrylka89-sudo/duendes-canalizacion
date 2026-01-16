@@ -233,7 +233,12 @@ function SeccionInicio({ guardianSemana, portalActual, usuario }) {
     setCargandoConsejo(true);
     try {
       const nombre = usuario?.nombre || usuario?.nombrePreferido || 'viajero';
-      const res = await fetch(`/api/circulo/consejo-del-dia?nombre=${encodeURIComponent(nombre)}`);
+      const email = usuario?.email || '';
+      const params = new URLSearchParams({
+        nombre,
+        ...(email && { email })
+      });
+      const res = await fetch(`/api/circulo/consejo-del-dia?${params}`);
       const data = await res.json();
       if (data.success) {
         setConsejo(data);
@@ -249,7 +254,13 @@ function SeccionInicio({ guardianSemana, portalActual, usuario }) {
     setCargandoConsejo(true);
     try {
       const nombre = usuario?.nombre || usuario?.nombrePreferido || 'viajero';
-      const res = await fetch(`/api/circulo/consejo-del-dia?nombre=${encodeURIComponent(nombre)}&t=${Date.now()}`);
+      const email = usuario?.email || '';
+      const params = new URLSearchParams({
+        nombre,
+        ...(email && { email }),
+        t: Date.now().toString()
+      });
+      const res = await fetch(`/api/circulo/consejo-del-dia?${params}`);
       const data = await res.json();
       if (data.success) {
         setConsejo(data);
