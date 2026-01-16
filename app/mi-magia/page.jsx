@@ -2343,22 +2343,39 @@ function CristalesSec() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CÍRCULO (con contenido interno desarrollado - conectado a APIs)
+// CÍRCULO DE DUENDES - Dashboard con tema oscuro y neón
 // ═══════════════════════════════════════════════════════════════
 
-function CirculoSec({ usuario, setUsuario, token, pais }) {
-  const [tab, setTab] = useState('inicio');
-  const [verMembresias, setVerMembresias] = useState(false);
-  const [activandoPrueba, setActivandoPrueba] = useState(false);
-  const [lunaData, setLunaData] = useState(null);
-  const [contenidos, setContenidos] = useState([]);
-  const [cargandoLuna, setCargandoLuna] = useState(false);
-  const [cargandoContenido, setCargandoContenido] = useState(false);
-  const [contenidoModal, setContenidoModal] = useState(null);
-  const esUY = pais === 'UY';
+// Colores neón para el Círculo
+const COLORES_NEON = {
+  magenta: '#ff006e',
+  celeste: '#00d4ff',
+  verdeMosgo: '#00ff88',
+  dorado: '#ffd700',
+  violeta: '#bf00ff'
+};
 
-  // Estado para onboarding
-  const [onboardingCompletado, setOnboardingCompletado] = useState(null); // null = cargando
+// Portales estacionales
+const PORTALES_CIRCULO = {
+  yule: { nombre: 'Yule', meses: [5, 6, 7], color: COLORES_NEON.celeste, icono: '❄️' },
+  ostara: { nombre: 'Ostara', meses: [8, 9, 10], color: COLORES_NEON.verdeMosgo, icono: '🌱' },
+  litha: { nombre: 'Litha', meses: [11, 0, 1], color: COLORES_NEON.dorado, icono: '☀️' },
+  mabon: { nombre: 'Mabon', meses: [2, 3, 4], color: COLORES_NEON.magenta, icono: '🍂' }
+};
+
+// Colores por elemento del duende
+const COLORES_ELEMENTO = {
+  fuego: COLORES_NEON.magenta,
+  agua: COLORES_NEON.celeste,
+  tierra: COLORES_NEON.verdeMosgo,
+  aire: COLORES_NEON.dorado,
+  espiritu: COLORES_NEON.violeta
+};
+
+function CirculoSec({ usuario, setUsuario, token, pais }) {
+  const [consejo, setConsejo] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [onboardingCompletado, setOnboardingCompletado] = useState(null);
   const [pasoOnboarding, setPasoOnboarding] = useState(1);
   const [guardandoOnboarding, setGuardandoOnboarding] = useState(false);
   const [datosOnboarding, setDatosOnboarding] = useState({
@@ -2374,29 +2391,49 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
     tipoContenido: [],
     objetivoPrincipal: ''
   });
+  const esUY = pais === 'UY';
 
-  // Verificar si completó onboarding
+  // Obtener portal actual
+  const mesActual = new Date().getMonth();
+  const portalActual = Object.entries(PORTALES_CIRCULO).find(([_, p]) => p.meses.includes(mesActual))?.[1] || PORTALES_CIRCULO.litha;
+
+  // Verificar onboarding al montar
   useEffect(() => {
     if (usuario?.esCirculo && usuario?.email) {
       verificarOnboarding();
+      cargarConsejo();
     }
   }, [usuario?.esCirculo, usuario?.email]);
 
   const verificarOnboarding = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/circulo/perfil?email=${encodeURIComponent(usuario.email)}`);
+      const res = await fetch(`/api/circulo/perfil?email=${encodeURIComponent(usuario.email)}`);
       const data = await res.json();
       setOnboardingCompletado(data.existe && data.perfil?.onboardingCompletado);
     } catch(e) {
-      console.error('Error verificando onboarding:', e);
-      setOnboardingCompletado(true); // En caso de error, mostrar contenido
+      setOnboardingCompletado(true);
     }
+  };
+
+  const cargarConsejo = async () => {
+    setCargando(true);
+    try {
+      const nombre = usuario?.nombrePreferido || usuario?.nombre || 'viajero';
+      const res = await fetch(`/api/circulo/consejo-del-dia?nombre=${encodeURIComponent(nombre)}&email=${encodeURIComponent(usuario.email || '')}`);
+      const data = await res.json();
+      if (data.success) {
+        setConsejo(data);
+      }
+    } catch(e) {
+      console.error('Error cargando consejo:', e);
+    }
+    setCargando(false);
   };
 
   const guardarOnboarding = async () => {
     setGuardandoOnboarding(true);
     try {
-      const res = await fetch(`${API_BASE}/api/circulo/perfil`, {
+      const res = await fetch('/api/circulo/perfil', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2411,7 +2448,7 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
           setUsuario({ ...usuario, nombrePreferido: datosOnboarding.nombrePreferido });
         }
       }
-    } catch(e) { console.error('Error guardando onboarding:', e); }
+    } catch(e) {}
     setGuardandoOnboarding(false);
   };
 
@@ -2423,489 +2460,302 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
     });
   };
 
-  useEffect(() => {
-    if (usuario?.esCirculo && onboardingCompletado) {
-      cargarLuna();
-      cargarContenido();
-    }
-  }, [usuario?.esCirculo, onboardingCompletado]);
+  // Color del duende actual
+  const colorDuende = consejo?.guardian?.elemento ? COLORES_ELEMENTO[consejo.guardian.elemento.toLowerCase()] || COLORES_NEON.dorado : portalActual.color;
 
-  const cargarLuna = async () => {
-    setCargandoLuna(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/circulo/luna?email=${usuario.email}`);
-      const data = await res.json();
-      if (data.success) setLunaData(data.luna);
-    } catch(e) { console.error('Error cargando luna:', e); }
-    setCargandoLuna(false);
-  };
+  // ═══════════════════════════════════════════════════════════════
+  // SI ES MIEMBRO DEL CÍRCULO
+  // ═══════════════════════════════════════════════════════════════
 
-  const cargarContenido = async () => {
-    setCargandoContenido(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/circulo/contenido?email=${usuario.email}`);
-      const data = await res.json();
-      if (data.success) setContenidos(data.contenidos || []);
-    } catch(e) { console.error('Error cargando contenido:', e); }
-    setCargandoContenido(false);
-  };
-
-  const activarPrueba = async () => {
-    setActivandoPrueba(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/mi-magia/circulo/prueba`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: usuario.email }) });
-      const data = await res.json();
-      if (data.success) {
-        setUsuario({ ...usuario, esCirculo: true, circuloPrueba: true, circuloExpira: data.beneficios?.expira, runas: (usuario.runas || 0) + 50 });
-      }
-    } catch(e) {}
-    setActivandoPrueba(false);
-  };
-
-  // SI ES MIEMBRO DEL CÍRCULO - VERIFICAR ONBOARDING PRIMERO
   if (usuario?.esCirculo) {
-    // Cargando estado de onboarding
+    // Cargando onboarding
     if (onboardingCompletado === null) {
       return (
-        <div className="sec circulo-interno" style={{textAlign:'center',padding:'3rem'}}>
-          <span style={{fontSize:'3rem',display:'block',marginBottom:'1rem'}}>★</span>
+        <div className="circulo-dark-loading">
+          <span className="circulo-star">★</span>
           <p>Preparando tu espacio en el Círculo...</p>
+          <style jsx>{`
+            .circulo-dark-loading { background: #0a0a0a; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; color: #fff; font-family: 'Cinzel', serif; }
+            .circulo-star { font-size: 3rem; color: ${portalActual.color}; animation: pulse 2s infinite; }
+            @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+          `}</style>
         </div>
       );
     }
 
-    // MOSTRAR ONBOARDING SI NO LO COMPLETÓ
+    // ONBOARDING (si no completado)
     if (!onboardingCompletado) {
       return (
-        <div className="sec circulo-interno">
-          <div className="circulo-header-int">
-            <span>★</span>
+        <div className="circulo-dark-onboarding">
+          <div className="onb-header">
+            <span style={{color: portalActual.color}}>★</span>
             <h1>Bienvenid{datosOnboarding.pronombres === 'el' ? 'o' : 'a'} al Círculo</h1>
-            <p>Antes de entrar, queremos conocerte mejor</p>
+            <p>Queremos conocerte para personalizar tu experiencia</p>
           </div>
-
-          {/* Indicador de pasos */}
-          <div style={{display:'flex',justifyContent:'center',gap:'12px',marginBottom:'2rem'}}>
+          <div className="onb-pasos">
             {[1,2,3,4].map(n => (
-              <div key={n} style={{
-                width:'36px',height:'36px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
-                fontSize:'14px',fontWeight:'600',transition:'all 0.3s',
-                background: pasoOnboarding >= n ? (pasoOnboarding === n ? '#1a1a1a' : '#e0e0e0') : '#f5f5f5',
-                color: pasoOnboarding >= n ? (pasoOnboarding === n ? '#d4af37' : '#666') : '#ccc'
-              }}>{n}</div>
+              <div key={n} className={`onb-paso ${pasoOnboarding >= n ? 'activo' : ''} ${pasoOnboarding === n ? 'actual' : ''}`} style={pasoOnboarding === n ? {borderColor: portalActual.color, color: portalActual.color} : {}}>{n}</div>
             ))}
           </div>
 
-          {/* PASO 1: Datos personales */}
           {pasoOnboarding === 1 && (
-            <div style={{maxWidth:'500px',margin:'0 auto'}}>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Cómo te gustaría que te llamemos?</label>
-                <input type="text" value={datosOnboarding.nombrePreferido} onChange={e => handleOnboardingChange('nombrePreferido', e.target.value)} placeholder="Tu nombre o apodo" style={{width:'100%',padding:'12px',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem'}} />
-              </div>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Con qué pronombres te sentís cómodo/a?</label>
-                <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-                  {[['ella','Ella'],['el','Él'],['elle','Elle'],['no-decir','Prefiero no decir']].map(([v,t]) => (
-                    <button key={v} onClick={() => handleOnboardingChange('pronombres', v)} style={{padding:'10px 18px',borderRadius:'20px',border:'1px solid',borderColor: datosOnboarding.pronombres === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.pronombres === v ? '#1a1a1a' : '#fff',color: datosOnboarding.pronombres === v ? '#fff' : '#333',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>Fecha de nacimiento</label>
-                <input type="date" value={datosOnboarding.fechaNacimiento} onChange={e => handleOnboardingChange('fechaNacimiento', e.target.value)} style={{width:'100%',padding:'12px',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem'}} />
-                <small style={{color:'#888',marginTop:'4px',display:'block'}}>Para calcular tu signo y número de vida</small>
-              </div>
-              <button onClick={() => setPasoOnboarding(2)} disabled={!datosOnboarding.nombrePreferido} style={{width:'100%',padding:'14px',background: datosOnboarding.nombrePreferido ? '#1a1a1a' : '#ccc',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',cursor: datosOnboarding.nombrePreferido ? 'pointer' : 'not-allowed',fontFamily:'Cinzel,serif'}}>Siguiente</button>
+            <div className="onb-content">
+              <div className="onb-campo"><label>¿Cómo te gustaría que te llamemos?</label><input type="text" value={datosOnboarding.nombrePreferido} onChange={e => handleOnboardingChange('nombrePreferido', e.target.value)} placeholder="Tu nombre" /></div>
+              <div className="onb-campo"><label>Pronombres</label><div className="onb-opciones">{[['ella','Ella'],['el','Él'],['elle','Elle'],['no-decir','Prefiero no decir']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('pronombres', v)} className={datosOnboarding.pronombres === v ? 'sel' : ''} style={datosOnboarding.pronombres === v ? {background: portalActual.color, borderColor: portalActual.color} : {}}>{t}</button>))}</div></div>
+              <div className="onb-campo"><label>Fecha de nacimiento</label><input type="date" value={datosOnboarding.fechaNacimiento} onChange={e => handleOnboardingChange('fechaNacimiento', e.target.value)} /><small>Para calcular tu signo y número de vida</small></div>
+              <button className="onb-btn" onClick={() => setPasoOnboarding(2)} disabled={!datosOnboarding.nombrePreferido} style={{background: datosOnboarding.nombrePreferido ? portalActual.color : '#333'}}>Siguiente</button>
             </div>
           )}
 
-          {/* PASO 2: Historia con Duendes */}
           {pasoOnboarding === 2 && (
-            <div style={{maxWidth:'500px',margin:'0 auto'}}>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Cómo llegaste a Duendes del Uruguay?</label>
-                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                  {[['instagram','Por Instagram'],['recomendacion','Me lo recomendó alguien'],['busqueda','Buscando cristales o guardianes'],['feria','En una feria o evento'],['otro','De otra forma']].map(([v,t]) => (
-                    <button key={v} onClick={() => handleOnboardingChange('comoLlegaste', v)} style={{padding:'12px 16px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.comoLlegaste === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.comoLlegaste === v ? '#f5f5f5' : '#fff',textAlign:'left',cursor:'pointer',fontSize:'0.95rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Cuántos guardianes tenés?</label>
-                <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-                  {[['0','Ninguno aún'],['1-3','1 a 3'],['4-10','4 a 10'],['mas-10','Más de 10']].map(([v,t]) => (
-                    <button key={v} onClick={() => handleOnboardingChange('guardiansAdoptados', v)} style={{padding:'10px 18px',borderRadius:'20px',border:'1px solid',borderColor: datosOnboarding.guardiansAdoptados === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.guardiansAdoptados === v ? '#1a1a1a' : '#fff',color: datosOnboarding.guardiansAdoptados === v ? '#fff' : '#333',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{display:'flex',gap:'12px'}}>
-                <button onClick={() => setPasoOnboarding(1)} style={{flex:1,padding:'14px',background:'#fff',color:'#333',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',cursor:'pointer'}}>Anterior</button>
-                <button onClick={() => setPasoOnboarding(3)} style={{flex:2,padding:'14px',background:'#1a1a1a',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',cursor:'pointer',fontFamily:'Cinzel,serif'}}>Siguiente</button>
-              </div>
+            <div className="onb-content">
+              <div className="onb-campo"><label>¿Cómo llegaste a Duendes del Uruguay?</label><div className="onb-opciones-v">{[['instagram','Por Instagram'],['recomendacion','Me lo recomendó alguien'],['busqueda','Buscando cristales/guardianes'],['feria','En una feria'],['otro','Otra forma']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('comoLlegaste', v)} className={datosOnboarding.comoLlegaste === v ? 'sel' : ''}>{t}</button>))}</div></div>
+              <div className="onb-campo"><label>¿Cuántos guardianes tenés?</label><div className="onb-opciones">{[['0','Ninguno'],['1-3','1 a 3'],['4-10','4 a 10'],['mas-10','Más de 10']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('guardiansAdoptados', v)} className={datosOnboarding.guardiansAdoptados === v ? 'sel' : ''} style={datosOnboarding.guardiansAdoptados === v ? {background: portalActual.color, borderColor: portalActual.color} : {}}>{t}</button>))}</div></div>
+              <div className="onb-nav"><button className="onb-btn-sec" onClick={() => setPasoOnboarding(1)}>Anterior</button><button className="onb-btn" onClick={() => setPasoOnboarding(3)} style={{background: portalActual.color}}>Siguiente</button></div>
             </div>
           )}
 
-          {/* PASO 3: Intereses */}
           {pasoOnboarding === 3 && (
-            <div style={{maxWidth:'500px',margin:'0 auto'}}>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Qué áreas te interesan más? (podés elegir varias)</label>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
-                  {[['abundancia','Abundancia'],['proteccion','Protección'],['amor','Amor'],['sanacion','Sanación'],['intuicion','Intuición'],['naturaleza','Naturaleza']].map(([v,t]) => (
-                    <button key={v} onClick={() => toggleOnboardingArray('areasInteres', v)} style={{padding:'12px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.areasInteres.includes(v) ? '#d4af37' : '#e0e0e0',background: datosOnboarding.areasInteres.includes(v) ? '#fffbf0' : '#fff',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Con qué frecuencia hacés práctica espiritual?</label>
-                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                  {[['nunca','Recién empiezo'],['ocasional','De vez en cuando'],['regular','Semanalmente'],['diario','Todos los días']].map(([v,t]) => (
-                    <button key={v} onClick={() => handleOnboardingChange('practicaEspiritual', v)} style={{padding:'12px 16px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.practicaEspiritual === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.practicaEspiritual === v ? '#f5f5f5' : '#fff',textAlign:'left',cursor:'pointer',fontSize:'0.95rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{display:'flex',gap:'12px'}}>
-                <button onClick={() => setPasoOnboarding(2)} style={{flex:1,padding:'14px',background:'#fff',color:'#333',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',cursor:'pointer'}}>Anterior</button>
-                <button onClick={() => setPasoOnboarding(4)} style={{flex:2,padding:'14px',background:'#1a1a1a',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',cursor:'pointer',fontFamily:'Cinzel,serif'}}>Siguiente</button>
-              </div>
+            <div className="onb-content">
+              <div className="onb-campo"><label>¿Qué áreas te interesan? (varias)</label><div className="onb-grid">{[['abundancia','Abundancia'],['proteccion','Protección'],['amor','Amor'],['sanacion','Sanación'],['intuicion','Intuición'],['naturaleza','Naturaleza']].map(([v,t]) => (<button key={v} onClick={() => toggleOnboardingArray('areasInteres', v)} className={datosOnboarding.areasInteres.includes(v) ? 'sel' : ''} style={datosOnboarding.areasInteres.includes(v) ? {borderColor: portalActual.color, color: portalActual.color} : {}}>{t}</button>))}</div></div>
+              <div className="onb-campo"><label>Frecuencia de práctica espiritual</label><div className="onb-opciones-v">{[['nunca','Recién empiezo'],['ocasional','De vez en cuando'],['regular','Semanalmente'],['diario','Todos los días']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('practicaEspiritual', v)} className={datosOnboarding.practicaEspiritual === v ? 'sel' : ''}>{t}</button>))}</div></div>
+              <div className="onb-nav"><button className="onb-btn-sec" onClick={() => setPasoOnboarding(2)}>Anterior</button><button className="onb-btn" onClick={() => setPasoOnboarding(4)} style={{background: portalActual.color}}>Siguiente</button></div>
             </div>
           )}
 
-          {/* PASO 4: Experiencia y objetivo */}
           {pasoOnboarding === 4 && (
-            <div style={{maxWidth:'500px',margin:'0 auto'}}>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Hiciste cursos espirituales antes?</label>
-                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                  {[['no','No, primera vez'],['gratis','Solo gratuitos'],['pagos','Cursos pagos'],['presencial','Talleres presenciales'],['varios','Varios de todo tipo']].map(([v,t]) => (
-                    <button key={v} onClick={() => handleOnboardingChange('cursosAnteriores', v)} style={{padding:'12px 16px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.cursosAnteriores === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.cursosAnteriores === v ? '#f5f5f5' : '#fff',textAlign:'left',cursor:'pointer',fontSize:'0.95rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Qué tipo de contenido te gusta más?</label>
-                <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-                  {[['lecturas','Lecturas'],['audios','Audios'],['videos','Videos'],['rituales','Rituales'],['lives','Lives']].map(([v,t]) => (
-                    <button key={v} onClick={() => toggleOnboardingArray('tipoContenido', v)} style={{padding:'10px 16px',borderRadius:'20px',border:'1px solid',borderColor: datosOnboarding.tipoContenido.includes(v) ? '#d4af37' : '#e0e0e0',background: datosOnboarding.tipoContenido.includes(v) ? '#fffbf0' : '#fff',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{marginBottom:'1.5rem'}}>
-                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Qué buscás al unirte al Círculo?</label>
-                <textarea value={datosOnboarding.objetivoPrincipal} onChange={e => handleOnboardingChange('objetivoPrincipal', e.target.value)} placeholder="Contanos qué esperás encontrar..." rows={3} style={{width:'100%',padding:'12px',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',resize:'vertical'}} />
-              </div>
-              <div style={{display:'flex',gap:'12px'}}>
-                <button onClick={() => setPasoOnboarding(3)} style={{flex:1,padding:'14px',background:'#fff',color:'#333',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',cursor:'pointer'}}>Anterior</button>
-                <button onClick={guardarOnboarding} disabled={guardandoOnboarding} style={{flex:2,padding:'14px',background: guardandoOnboarding ? '#888' : '#d4af37',color:'#1a1a1a',border:'none',borderRadius:'8px',fontSize:'1rem',cursor: guardandoOnboarding ? 'not-allowed' : 'pointer',fontFamily:'Cinzel,serif',fontWeight:'600'}}>{guardandoOnboarding ? 'Guardando...' : 'Entrar al Círculo'}</button>
-              </div>
+            <div className="onb-content">
+              <div className="onb-campo"><label>¿Hiciste cursos espirituales antes?</label><div className="onb-opciones-v">{[['no','No, primera vez'],['gratis','Solo gratuitos'],['pagos','Cursos pagos'],['presencial','Presenciales'],['varios','Varios tipos']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('cursosAnteriores', v)} className={datosOnboarding.cursosAnteriores === v ? 'sel' : ''}>{t}</button>))}</div></div>
+              <div className="onb-campo"><label>Tipo de contenido preferido (varias)</label><div className="onb-opciones">{[['lecturas','Lecturas'],['audios','Audios'],['videos','Videos'],['rituales','Rituales'],['lives','Lives']].map(([v,t]) => (<button key={v} onClick={() => toggleOnboardingArray('tipoContenido', v)} className={datosOnboarding.tipoContenido.includes(v) ? 'sel' : ''} style={datosOnboarding.tipoContenido.includes(v) ? {borderColor: portalActual.color, color: portalActual.color} : {}}>{t}</button>))}</div></div>
+              <div className="onb-campo"><label>¿Qué buscás en el Círculo?</label><textarea value={datosOnboarding.objetivoPrincipal} onChange={e => handleOnboardingChange('objetivoPrincipal', e.target.value)} placeholder="Contanos..." rows={3} /></div>
+              <div className="onb-nav"><button className="onb-btn-sec" onClick={() => setPasoOnboarding(3)}>Anterior</button><button className="onb-btn onb-btn-final" onClick={guardarOnboarding} disabled={guardandoOnboarding} style={{background: portalActual.color}}>{guardandoOnboarding ? 'Guardando...' : 'Entrar al Círculo'}</button></div>
             </div>
           )}
+
+          <style jsx>{`
+            .circulo-dark-onboarding { background: #0a0a0a; border-radius: 16px; padding: 2rem; color: #fff; font-family: 'Cormorant Garamond', serif; }
+            .onb-header { text-align: center; margin-bottom: 2rem; }
+            .onb-header span { font-size: 2.5rem; }
+            .onb-header h1 { font-family: 'Tangerine', cursive; font-size: 2.5rem; margin: 0.5rem 0; color: #fff; }
+            .onb-header p { color: rgba(255,255,255,0.6); font-size: 1rem; }
+            .onb-pasos { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+            .onb-paso { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #333; color: #666; font-weight: 600; transition: all 0.3s; }
+            .onb-paso.activo { border-color: #666; color: #fff; }
+            .onb-paso.actual { border-width: 2px; }
+            .onb-content { max-width: 450px; margin: 0 auto; }
+            .onb-campo { margin-bottom: 1.5rem; }
+            .onb-campo label { display: block; color: #fff; margin-bottom: 0.5rem; font-size: 1rem; }
+            .onb-campo input, .onb-campo textarea { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 1rem; font-family: inherit; box-sizing: border-box; }
+            .onb-campo input:focus, .onb-campo textarea:focus { outline: none; border-color: ${portalActual.color}; }
+            .onb-campo small { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-top: 4px; display: block; }
+            .onb-opciones { display: flex; flex-wrap: wrap; gap: 8px; }
+            .onb-opciones button { padding: 10px 18px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
+            .onb-opciones button:hover { border-color: #666; }
+            .onb-opciones button.sel { color: #0a0a0a; font-weight: 600; }
+            .onb-opciones-v { display: flex; flex-direction: column; gap: 8px; }
+            .onb-opciones-v button { padding: 12px 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: rgba(255,255,255,0.7); cursor: pointer; text-align: left; font-size: 0.95rem; transition: all 0.3s; }
+            .onb-opciones-v button:hover { border-color: #666; }
+            .onb-opciones-v button.sel { background: #222; border-color: ${portalActual.color}; color: ${portalActual.color}; }
+            .onb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            .onb-grid button { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
+            .onb-grid button:hover { border-color: #666; }
+            .onb-grid button.sel { background: rgba(255,255,255,0.05); }
+            .onb-nav { display: flex; gap: 12px; margin-top: 1.5rem; }
+            .onb-btn { flex: 2; padding: 14px; border: none; border-radius: 8px; color: #0a0a0a; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: 'Cinzel', serif; transition: all 0.3s; }
+            .onb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+            .onb-btn-sec { flex: 1; padding: 14px; border: 1px solid #333; border-radius: 8px; background: transparent; color: #fff; font-size: 1rem; cursor: pointer; }
+            .onb-btn-final { box-shadow: 0 0 20px ${portalActual.color}40; }
+          `}</style>
         </div>
       );
     }
 
-    // CONTENIDO NORMAL DEL CÍRCULO (onboarding completado)
+    // DASHBOARD PRINCIPAL (onboarding completado)
     return (
-      <div className="sec circulo-interno">
-        <div className="circulo-header-int">
-          <span>★</span>
-          <h1>Círculo de Duendes</h1>
-          <p>{usuario.circuloPrueba ? `Prueba gratuita` : `Miembro activo`}{usuario.circuloExpira ? ` hasta ${new Date(usuario.circuloExpira).toLocaleDateString('es-UY')}` : ''}</p>
+      <div className="circulo-dark-dashboard">
+        {/* Banner del portal actual */}
+        <div className="circulo-banner" style={{'--portal-color': portalActual.color, '--duende-color': colorDuende}}>
+          <div className="banner-bg"></div>
+          <div className="banner-content">
+            <span className="portal-icon">{portalActual.icono}</span>
+            <h1>Círculo de Duendes</h1>
+            <p>Portal de {portalActual.nombre}</p>
+          </div>
         </div>
 
-        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'8px',marginBottom:'1.5rem'}}>
-          {[['inicio','◇','Inicio'],['contenido','✦','Contenido'],['guia','☽','Guía Lunar'],['comunidad','❧','Comunidad']].map(([k,i,t]) =>
-            <button key={k} onClick={() => setTab(k)} style={{
-              display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',
-              padding:'12px 8px',background: tab===k ? '#1a1a1a' : '#fff',
-              color: tab===k ? '#fff' : '#1a1a1a',
-              border:'1px solid',borderColor: tab===k ? '#1a1a1a' : '#e0e0e0',
-              borderRadius:'10px',fontSize:'0.9rem',cursor:'pointer',fontFamily:'Cinzel,serif'
-            }}>
-              <span style={{color: tab===k ? '#d4af37' : '#d4af37'}}>{i}</span>{t}
-            </button>
-          )}
+        {/* Duende de la semana */}
+        {cargando ? (
+          <div className="duende-loading"><span>✦</span> Conectando con tu guardián...</div>
+        ) : consejo?.guardian ? (
+          <div className="duende-card" style={{'--duende-color': colorDuende}}>
+            <div className="duende-imagen">
+              <img src={consejo.guardian.imagen} alt={consejo.guardian.nombre} />
+              <div className="duende-aura"></div>
+            </div>
+            <div className="duende-info">
+              <span className="duende-tipo">{consejo.guardian.tipo_ser_nombre} - {consejo.guardian.arquetipo || 'Guardián'}</span>
+              <h2>{consejo.guardian.nombre}</h2>
+              <p className="duende-elemento">{consejo.guardian.elemento}</p>
+            </div>
+
+            {/* Mensaje del duende */}
+            <div className="consejo-box">
+              {consejo.tipoMensaje === 'primera' && <span className="consejo-badge">✦ Consejo del día</span>}
+              {consejo.tipoMensaje === 'comentario' && <span className="consejo-badge comentario">💬 Te cuento algo más...</span>}
+              {consejo.tipoMensaje === 'gracioso' && <span className="consejo-badge gracioso">😄 Entre nos...</span>}
+              <p className="consejo-texto">{consejo.consejo?.mensaje || consejo.consejo}</p>
+            </div>
+
+            {/* Días restantes */}
+            <div className="semana-info">
+              <span>📅 {consejo.diasRestantes} días más con {consejo.guardian.nombre}</span>
+              {consejo.visitaDelDia > 1 && <span className="visita-num">Visita #{consejo.visitaDelDia} de hoy</span>}
+            </div>
+          </div>
+        ) : (
+          <div className="duende-error">No pudimos conectar con tu guardián. Intentá de nuevo.</div>
+        )}
+
+        {/* Accesos rápidos */}
+        <div className="circulo-accesos">
+          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.celeste}}><span>☽</span> Guía Lunar</button>
+          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.verdeMosgo}}><span>✦</span> Contenido</button>
+          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.magenta}}><span>❧</span> Comunidad</button>
+          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.dorado}}><span>📖</span> Rituales</button>
         </div>
 
-        {tab === 'inicio' && (
-          <div className="circulo-inicio">
-            <div className="beneficios-activos">
-              <h2>Tus Beneficios Activos</h2>
-              <div className="benef-grid-int">
-                <div className="benef-item-int"><span>◈</span><strong>5-10% OFF</strong><p>Según tu plan</p></div>
-                <div className="benef-item-int"><span>✦</span><strong>Acceso anticipado</strong><p>24-72hs antes</p></div>
-                <div className="benef-item-int"><span>ᚱ</span><strong>Tiradas gratis/mes</strong><p>1 a 5 según plan</p></div>
-              </div>
-            </div>
+        <style jsx>{`
+          .circulo-dark-dashboard { background: #0a0a0a; border-radius: 16px; overflow: hidden; color: #fff; font-family: 'Cormorant Garamond', serif; }
+          .circulo-banner { position: relative; padding: 2.5rem 1.5rem; text-align: center; overflow: hidden; }
+          .banner-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
+          .banner-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, var(--portal-color) 0%, transparent 70%); opacity: 0.15; }
+          .banner-content { position: relative; z-index: 1; }
+          .portal-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; filter: drop-shadow(0 0 10px var(--portal-color)); }
+          .banner-content h1 { font-family: 'Tangerine', cursive; font-size: 3rem; margin: 0; color: #fff; text-shadow: 0 0 30px var(--portal-color); }
+          .banner-content p { color: var(--portal-color); font-size: 1.1rem; margin-top: 0.5rem; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase; }
 
-            {lunaData && (
-              <div className="luna-preview">
-                <div className="luna-mini">
-                  <span className="luna-emoji">{lunaData.faseActual?.emoji}</span>
-                  <div>
-                    <strong>{lunaData.faseActual?.nombre}</strong>
-                    <p>{lunaData.faseActual?.energia}</p>
-                  </div>
-                </div>
-                <button className="btn-sec" onClick={() => setTab('guia')}>Ver guía lunar completa →</button>
-              </div>
-            )}
+          .duende-loading { text-align: center; padding: 3rem; color: rgba(255,255,255,0.6); }
+          .duende-loading span { color: ${portalActual.color}; }
+          .duende-error { text-align: center; padding: 2rem; color: rgba(255,255,255,0.5); }
 
-            <div className="circulo-bienvenida">
-              <h2>Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'} al santuario secreto</h2>
-              <p>Este es tu espacio exclusivo. Acá encontrarás contenido que no está disponible en ningún otro lugar: guías lunares, DIY mágicos, meditaciones, y una comunidad de personas que, como vos, sienten el llamado de la magia.</p>
-              <p>Explorá las secciones arriba. Cada semana agregamos contenido nuevo.</p>
-            </div>
-          </div>
-        )}
+          .duende-card { padding: 1.5rem; text-align: center; }
+          .duende-imagen { position: relative; width: 180px; height: 180px; margin: 0 auto 1.5rem; }
+          .duende-imagen img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--duende-color); }
+          .duende-aura { position: absolute; inset: -10px; border-radius: 50%; background: radial-gradient(circle, var(--duende-color) 0%, transparent 70%); opacity: 0.3; animation: aura-pulse 3s ease-in-out infinite; z-index: -1; }
+          @keyframes aura-pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.5; } }
 
-        {tab === 'contenido' && (
-          <div className="circulo-contenido">
-            <h2>Contenido Exclusivo</h2>
-            <p className="contenido-intro">Cada mes nuevo contenido. Acá abajo lo más reciente:</p>
-            {cargandoContenido ? (
-              <div className="cargando-mini">Cargando contenido...</div>
-            ) : (
-              <div className="contenido-lista">
-                {contenidos.length > 0 ? contenidos.map((c, i) => (
-                  <div key={c.id || i} style={{background:'#fff',border:'1px solid #f0f0f0',borderRadius:'12px',padding:'15px',display:'flex',gap:'12px',alignItems:'flex-start'}}>
-                    <span style={{fontSize:'2rem',flexShrink:0}}>{c.tipo === 'ritual' ? '🕯️' : c.tipo === 'meditacion' ? '🎧' : c.tipo === 'guia' ? '📖' : '✦'}</span>
-                    <div style={{flex:1,minWidth:0}}>
-                      <h4 style={{fontFamily:'Cinzel,serif',marginBottom:'5px',fontSize:'1rem'}}>{c.titulo}</h4>
-                      <p style={{fontSize:'0.9rem',color:'#666',marginBottom:'8px',lineHeight:'1.4'}}>{c.extracto}</p>
-                      <small style={{display:'block',fontSize:'0.75rem',color:'#888',marginBottom:'10px'}}>Por {c.autor} • {c.vistas} vistas</small>
-                      <button className="btn-sec" onClick={() => setContenidoModal(c)} style={{fontSize:'0.85rem',padding:'8px 16px'}}>Ver {c.tipo}</button>
-                    </div>
-                  </div>
-                )) : (
-                  <p className="sin-contenido">Cargando contenido exclusivo...</p>
-                )}
-              </div>
-            )}
+          .duende-info { margin-bottom: 1.5rem; }
+          .duende-tipo { font-size: 0.85rem; color: var(--duende-color); text-transform: uppercase; letter-spacing: 2px; font-family: 'Cinzel', serif; }
+          .duende-info h2 { font-family: 'Tangerine', cursive; font-size: 2.5rem; margin: 0.3rem 0; color: #fff; }
+          .duende-elemento { color: rgba(255,255,255,0.5); font-size: 0.9rem; }
 
-            {/* Modal de Contenido */}
-            {contenidoModal && (
-              <div className="contenido-modal-overlay" onClick={() => setContenidoModal(null)}>
-                <div className="contenido-modal" onClick={e => e.stopPropagation()}>
-                  <button className="modal-cerrar" onClick={() => setContenidoModal(null)}>×</button>
-                  <div className="modal-header">
-                    <span>{contenidoModal.tipo === 'ritual' ? '🕯️' : contenidoModal.tipo === 'meditacion' ? '🎧' : contenidoModal.tipo === 'guia' ? '📖' : '✦'}</span>
-                    <div>
-                      <h2>{contenidoModal.titulo}</h2>
-                      <p className="modal-meta">Por {contenidoModal.autor} • {contenidoModal.vistas} vistas</p>
-                    </div>
-                  </div>
-                  <div className="modal-contenido">
-                    {contenidoModal.contenido ? (
-                      contenidoModal.contenido.split('\n').map((p, i) => {
-                        if (p.startsWith('## ')) return <h2 key={i}>{p.replace('## ', '')}</h2>;
-                        if (p.startsWith('### ')) return <h3 key={i}>{p.replace('### ', '')}</h3>;
-                        if (p.startsWith('**') && p.endsWith('**')) return <h4 key={i}>{p.replace(/\*\*/g, '')}</h4>;
-                        if (p.startsWith('- ')) return <li key={i}>{p.replace('- ', '')}</li>;
-                        if (p.startsWith('✦')) return <p key={i} className="mensaje-cierre">{p}</p>;
-                        if (p.trim() === '') return <br key={i} />;
-                        return <p key={i}>{p.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>;
-                      })
-                    ) : (
-                      <p>{contenidoModal.extracto}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="temas-explorar">
-              <h3>Temas que exploramos:</h3>
-              <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
-            </div>
-          </div>
-        )}
+          .consejo-box { background: #111; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border-left: 3px solid var(--duende-color); text-align: left; }
+          .consejo-badge { display: inline-block; font-size: 0.8rem; color: var(--duende-color); margin-bottom: 0.8rem; font-family: 'Cinzel', serif; letter-spacing: 1px; }
+          .consejo-badge.comentario { color: ${COLORES_NEON.celeste}; }
+          .consejo-badge.gracioso { color: ${COLORES_NEON.dorado}; }
+          .consejo-texto { font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.9); margin: 0; }
 
-        {tab === 'guia' && (
-          <div className="circulo-guia">
-            <h2>Guía Lunar</h2>
-            {cargandoLuna ? (
-              <div className="cargando-mini">Consultando las estrellas...</div>
-            ) : lunaData ? (
-              <>
-                <div className="luna-hero">
-                  <div className="luna-fase-grande">
-                    <span className="luna-emoji-lg">{lunaData.faseActual?.emoji}</span>
-                    <div>
-                      <h3>{lunaData.faseActual?.nombre}</h3>
-                      <p className="luna-energia">{lunaData.faseActual?.energia}</p>
-                      <small>{lunaData.iluminacion}% iluminada</small>
-                    </div>
-                  </div>
-                  {lunaData.signoLunar && (
-                    <div className="signo-lunar">
-                      <span>{lunaData.signoLunar.emoji}</span>
-                      <div>
-                        <strong>Luna en {lunaData.signoLunar.signo}</strong>
-                        <p>{lunaData.signoLunar.energia}</p>
-                        <small>Elemento: {lunaData.signoLunar.elemento}</small>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          .semana-info { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #111; border-radius: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+          .visita-num { color: var(--duende-color); }
 
-                <div className="mensaje-guardian-luna">
-                  <h3>✦ Mensaje de tu Guardián</h3>
-                  <p className="mensaje-texto">{limpiarTexto(lunaData.mensajeGuardian)}</p>
-                </div>
-
-                <div className="afirmacion-dia">
-                  <h3>Afirmación del día</h3>
-                  <p className="afirmacion">"{limpiarTexto(lunaData.afirmacionDia)}"</p>
-                </div>
-
-                {lunaData.proximasFases && (
-                  <div className="proximas-fases">
-                    <h3>Próximas fases</h3>
-                    <div className="fases-grid">
-                      {lunaData.proximasFases.map((f, i) => (
-                        <div key={i} className="fase-item">
-                          <span>{f.emoji}</span>
-                          <strong>{f.fase}</strong>
-                          <small>en {f.diasRestantes} días</small>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {lunaData.ritualesRecomendados && (
-                  <div className="rituales-fase">
-                    <h3>Rituales para esta fase</h3>
-                    <ul>
-                      {lunaData.ritualesRecomendados.map((r, i) => <li key={i}>{r}</li>)}
-                    </ul>
-                  </div>
-                )}
-
-                {lunaData.cristalesLuna && (
-                  <div className="cristales-fase">
-                    <h3>Cristales recomendados</h3>
-                    <div className="cristales-tags">
-                      {lunaData.cristalesLuna.map((c, i) => <span key={i}>{c}</span>)}
-                    </div>
-                  </div>
-                )}
-
-                {lunaData.energiaMes && (
-                  <div className="energia-mes">
-                    <h3>Energía del mes: {lunaData.energiaMes.nombre}</h3>
-                    <div className="energia-info" style={{borderColor: lunaData.energiaMes.color}}>
-                      <strong>Tema: {lunaData.energiaMes.tema}</strong>
-                      <p>Cristal del mes: {lunaData.energiaMes.cristal}</p>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="luna-error">No pudimos cargar los datos lunares. Intentá de nuevo.</div>
-            )}
-          </div>
-        )}
-
-        {tab === 'comunidad' && (
-          <ForoSec usuario={usuario} setUsuario={setUsuario} />
-        )}
+          .circulo-accesos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 1.5rem; }
+          .acceso-btn { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #111; border: 1px solid #222; border-radius: 10px; color: #fff; font-family: 'Cinzel', serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
+          .acceso-btn:hover { border-color: var(--btn-color); box-shadow: 0 0 15px var(--btn-color)30; }
+          .acceso-btn span { font-size: 1.3rem; color: var(--btn-color); }
+        `}</style>
       </div>
     );
   }
 
-  // SI NO ES MIEMBRO - LANDING CON BLUR PREVIEW
+  // ═══════════════════════════════════════════════════════════════
+  // SI NO ES MIEMBRO - MODAL CON PREVIEW BLURREADO
+  // ═══════════════════════════════════════════════════════════════
+
   return (
-    <div className="sec circulo-landing">
-      <div className="circulo-hero"><span>★</span><h1>Círculo de Duendes</h1><p>El santuario secreto para quienes sienten el llamado</p></div>
-
-      {/* Vista previa con blur */}
-      <div className="circulo-preview-blur">
-        <div className="preview-content">
-          <div className="preview-item">
-            <span>🕯️</span>
-            <h4>Ritual de Luna Llena para Manifestación</h4>
-            <p>Descubrí cómo aprovechar la energía de la luna llena...</p>
-          </div>
-          <div className="preview-item">
-            <span>🧙</span>
-            <h4>Los Duendes Protectores del Hogar</h4>
-            <p>Conoce a los guardianes elementales que cuidan tu espacio...</p>
-          </div>
-          <div className="preview-item">
-            <span>🎧</span>
-            <h4>Meditación: Conexión con tu Guardián</h4>
-            <p>Una meditación profunda para establecer un vínculo...</p>
+    <div className="circulo-promo-container">
+      {/* Preview blurreado de fondo */}
+      <div className="circulo-preview-bg">
+        <div className="preview-fake-content">
+          <div className="fake-duende"></div>
+          <div className="fake-text"></div>
+          <div className="fake-text short"></div>
+          <div className="fake-cards">
+            <div className="fake-card"></div>
+            <div className="fake-card"></div>
           </div>
         </div>
-        <div className="preview-overlay">
-          <span className="lock-icon">🔒</span>
-          <h3>Contenido exclusivo del Círculo</h3>
-          <p>Accedé a rituales, guías, meditaciones y más</p>
+      </div>
+
+      {/* Modal de suscripción */}
+      <div className="circulo-modal">
+        <span className="modal-star">★</span>
+        <h1>Círculo de Duendes</h1>
+        <p className="modal-subtitle">El santuario secreto para quienes sienten el llamado</p>
+
+        <div className="beneficios-lista">
+          <div className="beneficio"><span style={{color: COLORES_NEON.magenta}}>✦</span> Duende guardián semanal con mensajes únicos</div>
+          <div className="beneficio"><span style={{color: COLORES_NEON.celeste}}>☽</span> Guía lunar completa cada mes</div>
+          <div className="beneficio"><span style={{color: COLORES_NEON.verdeMosgo}}>🕯️</span> Rituales y prácticas exclusivas</div>
+          <div className="beneficio"><span style={{color: COLORES_NEON.dorado}}>❧</span> Comunidad privada de buscadores</div>
+          <div className="beneficio"><span style={{color: COLORES_NEON.violeta}}>◈</span> 5-10% OFF en guardianes</div>
+        </div>
+
+        <h3>Elegí tu membresía</h3>
+        <p className="pago-unico">Pago único - Sin renovación automática</p>
+
+        <div className="membresias-grid">
+          <a href="https://duendesuy.10web.cloud/producto/circulo-semestral/" target="_blank" rel="noopener" className="membresia-card">
+            <h4>Semestral</h4>
+            <div className="precio">{esUY ? '$3.600' : '$90'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
+            <span className="duracion">6 meses de magia</span>
+          </a>
+          <a href="https://duendesuy.10web.cloud/producto/circulo-anual/" target="_blank" rel="noopener" className="membresia-card destacada">
+            <span className="badge-mejor">Mejor valor</span>
+            <h4>Anual</h4>
+            <div className="precio">{esUY ? '$5.900' : '$150'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
+            <span className="duracion">12 meses de magia</span>
+            <span className="ahorro">Ahorrás 25%</span>
+          </a>
         </div>
       </div>
 
-      {/* Caja de acción principal */}
-      <div className="circulo-cta-box">
-        {!usuario?.circuloPruebaUsada ? (
-          <>
-            <div className="cta-header">
-              <span className="cta-gift">🎁</span>
-              <h2>15 días gratis para vos</h2>
-            </div>
-            <div className="cta-benefits">
-              <div className="cta-benefit"><span>✓</span> Acceso a todo el contenido exclusivo</div>
-              <div className="cta-benefit"><span>✓</span> 10 Runas + 2 tréboles por mes</div>
-              <div className="cta-benefit"><span>✓</span> 1 Tirada de Runas gratis/mes</div>
-              <div className="cta-benefit"><span>✓</span> 5% en guardianes nuevos</div>
-              <div className="cta-benefit"><span>✓</span> Sin compromiso, cancelás cuando quieras</div>
-            </div>
-            <button className="btn-gold btn-lg cta-button" onClick={activarPrueba} disabled={activandoPrueba}>
-              {activandoPrueba ? '✨ Activando tu acceso...' : '✦ Comenzar prueba gratuita'}
-            </button>
-            <p className="cta-small">Sin tarjeta de crédito. Sin letra chica.</p>
-          </>
-        ) : (
-          <>
-            <div className="cta-header">
-              <span className="cta-gift">★</span>
-              <h2>Elegí tu membresía</h2>
-            </div>
-            <p className="cta-subtitle">Ya probaste el Círculo. ¡Es hora de quedarte!</p>
-            <div className="membresias-cta-grid">
-              {MEMBRESIAS.map(m => (
-                <div key={m.nombre} className={`membresia-cta-card ${m.nombre === 'Anual' ? 'destacada' : ''}`}>
-                  {m.nombre === 'Anual' && <span className="badge-popular">Más elegida</span>}
-                  <h4>{m.nombre}</h4>
-                  <div className="membresia-precio-cta">
-                    {esUY ? `$${m.precioUY.toLocaleString()}` : `$${m.precio}`}
-                    <small>{esUY ? 'UYU' : 'USD'}</small>
-                  </div>
-                  {m.ahorro && <span className="membresia-ahorro-cta">{m.ahorro}</span>}
-                  <p className="membresia-dias">{m.dias} días</p>
-                  <a href={m.url} target="_blank" rel="noopener" className="btn-membresia">
-                    Elegir →
-                  </a>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+      <style jsx>{`
+        .circulo-promo-container { position: relative; min-height: 500px; border-radius: 16px; overflow: hidden; background: #0a0a0a; }
+        .circulo-preview-bg { position: absolute; inset: 0; filter: blur(8px); opacity: 0.3; padding: 2rem; }
+        .preview-fake-content { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .fake-duende { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #333, #222); }
+        .fake-text { width: 80%; height: 20px; background: #222; border-radius: 4px; }
+        .fake-text.short { width: 50%; }
+        .fake-cards { display: flex; gap: 1rem; width: 100%; margin-top: 1rem; }
+        .fake-card { flex: 1; height: 100px; background: #1a1a1a; border-radius: 8px; }
 
-      <h2 className="sec-titulo">¿Qué incluye el Círculo?</h2>
-      <div className="beneficios-grid">
-        {CIRCULO_CONTENIDO.beneficios.map((b,i) => (
-          <div key={i} className="beneficio-card"><span>{b.icono}</span><h4>{b.titulo}</h4><p>{b.desc}</p></div>
-        ))}
-      </div>
+        .circulo-modal { position: relative; z-index: 1; text-align: center; padding: 2.5rem 1.5rem; color: #fff; font-family: 'Cormorant Garamond', serif; }
+        .modal-star { font-size: 3rem; color: ${COLORES_NEON.dorado}; display: block; margin-bottom: 0.5rem; text-shadow: 0 0 30px ${COLORES_NEON.dorado}; }
+        .circulo-modal h1 { font-family: 'Tangerine', cursive; font-size: 3rem; margin: 0 0 0.5rem; color: #fff; }
+        .modal-subtitle { color: rgba(255,255,255,0.6); font-size: 1.1rem; margin-bottom: 2rem; }
 
-      <h2 className="sec-titulo">Temas que exploramos</h2>
-      <div className="temas-tags">{CIRCULO_CONTENIDO.temas.map((t,i) => <span key={i}>{t}</span>)}</div>
+        .beneficios-lista { text-align: left; max-width: 320px; margin: 0 auto 2rem; }
+        .beneficio { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 1rem; color: rgba(255,255,255,0.85); border-bottom: 1px solid #1a1a1a; }
+        .beneficio span { font-size: 1.2rem; }
+
+        .circulo-modal h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0 0 0.3rem; color: #fff; letter-spacing: 1px; }
+        .pago-unico { font-size: 0.85rem; color: ${COLORES_NEON.verdeMosgo}; margin-bottom: 1.5rem; }
+
+        .membresias-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px; margin: 0 auto; }
+        .membresia-card { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem; background: #111; border: 1px solid #222; border-radius: 12px; text-decoration: none; color: #fff; transition: all 0.3s; position: relative; }
+        .membresia-card:hover { border-color: ${COLORES_NEON.dorado}; box-shadow: 0 0 20px ${COLORES_NEON.dorado}30; }
+        .membresia-card.destacada { border-color: ${COLORES_NEON.dorado}; background: linear-gradient(135deg, #1a1a0a 0%, #111 100%); }
+        .badge-mejor { position: absolute; top: -10px; background: ${COLORES_NEON.dorado}; color: #0a0a0a; font-size: 0.7rem; padding: 4px 12px; border-radius: 20px; font-family: 'Cinzel', serif; font-weight: 600; }
+        .membresia-card h4 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0 0 0.5rem; }
+        .precio { font-size: 1.8rem; font-weight: 700; color: #fff; }
+        .precio small { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-left: 4px; }
+        .duracion { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; }
+        .ahorro { font-size: 0.8rem; color: ${COLORES_NEON.verdeMosgo}; margin-top: 0.5rem; font-weight: 600; }
+      `}</style>
     </div>
   );
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // GRIMORIO (con explicación completa)

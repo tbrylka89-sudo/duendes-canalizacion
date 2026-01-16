@@ -38,27 +38,79 @@ export async function GET(request) {
       await kv.set(claveGuardianSemanal, guardianSemana, { ex: 604800 });
     }
 
-    // Contar visitas del día para esta persona
+    // Contar visitas del día para esta persona (solo si pasaron 2+ horas desde última)
     let visitasHoy = 1;
+    let mensajeRepetido = false;
+    const dosHorasMs = 2 * 60 * 60 * 1000; // 2 horas en milisegundos
+
     if (emailUsuario) {
       const claveVisitas = `circulo:visitas-dia:${emailUsuario}:${hoy}`;
-      const visitasData = await kv.get(claveVisitas) || { contador: 0 };
-      visitasHoy = visitasData.contador + 1;
-      // Guardar nueva visita (expira a medianoche, máximo 24h)
-      await kv.set(claveVisitas, { contador: visitasHoy }, { ex: 86400 });
+      const visitasData = await kv.get(claveVisitas) || { contador: 0, ultimaVisita: 0 };
+
+      const tiempoDesdeUltima = Date.now() - (visitasData.ultimaVisita || 0);
+
+      if (tiempoDesdeUltima >= dosHorasMs) {
+        // Han pasado 2+ horas, cuenta como nueva visita
+        visitasHoy = visitasData.contador + 1;
+        await kv.set(claveVisitas, {
+          contador: visitasHoy,
+          ultimaVisita: Date.now()
+        }, { ex: 86400 });
+      } else {
+        // No han pasado 2 horas, mantener mismo contador
+        visitasHoy = visitasData.contador || 1;
+        mensajeRepetido = true;
+      }
     }
 
     // Generar mensaje según número de visitas del día
     let mensaje;
+    let tipoMensaje = 'primera';
+
+    // Si es mensaje repetido (menos de 2h), devolver el último mensaje guardado
+    if (mensajeRepetido && emailUsuario) {
+      const ultimoMensaje = await kv.get(`circulo:ultimo-mensaje:${emailUsuario}:${hoy}`);
+      if (ultimoMensaje) {
+        return Response.json({
+          success: true,
+          semana: semanaDelAno,
+          diasRestantes: 7 - ahora.getDay(),
+          visitaDelDia: visitasHoy,
+          guardian: {
+            id: guardianSemana.id,
+            nombre: guardianSemana.nombre,
+            imagen: guardianSemana.imagen,
+            categoria: guardianSemana.categoria,
+            tipo_ser: guardianSemana.tipo_ser,
+            tipo_ser_nombre: guardianSemana.tipo_ser_nombre,
+            arquetipo: guardianSemana.arquetipo,
+            elemento: guardianSemana.elemento,
+            url_tienda: guardianSemana.url_tienda
+          },
+          consejo: ultimoMensaje,
+          portal: obtenerPortalActual(),
+          mensajeRepetido: true
+        });
+      }
+    }
+
     if (visitasHoy === 1) {
-      // Primera visita: mensaje normal
+      // Primera visita: mensaje normal (consejo del día)
+      tipoMensaje = 'primera';
       mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario, 'primera');
     } else if (visitasHoy === 2) {
-      // Segunda visita: bienvenida de vuelta
+      // Segunda visita: comentario extra del duende
+      tipoMensaje = 'comentario';
       mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario, 'regreso');
     } else {
-      // Tercera visita o más: chiste del duende
+      // Tercera visita o más: mensaje gracioso/simpático
+      tipoMensaje = 'gracioso';
       mensaje = await generarConsejoUnico(guardianSemana, nombreUsuario, 'chiste');
+    }
+
+    // Guardar último mensaje para no regenerar si vuelve antes de 2h
+    if (emailUsuario) {
+      await kv.set(`circulo:ultimo-mensaje:${emailUsuario}:${hoy}`, mensaje, { ex: 86400 });
     }
 
     // Calcular cuántos días quedan de esta semana
@@ -69,6 +121,7 @@ export async function GET(request) {
       semana: semanaDelAno,
       diasRestantes: diasRestantes,
       visitaDelDia: visitasHoy,
+      tipoMensaje: tipoMensaje,
       guardian: {
         id: guardianSemana.id,
         nombre: guardianSemana.nombre,
