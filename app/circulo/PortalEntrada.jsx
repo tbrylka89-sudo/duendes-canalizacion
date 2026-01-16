@@ -196,7 +196,8 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
           position: fixed;
           inset: 0;
           z-index: 9999;
-          overflow: hidden;
+          overflow-y: auto;
+          overflow-x: hidden;
           background: #050508;
         }
 
