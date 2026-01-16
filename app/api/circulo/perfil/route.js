@@ -101,28 +101,25 @@ export async function POST(request) {
 
 function calcularPerfilCliente(perfil) {
   let score = {
-    poderAdquisitivo: 0,  // 0-100
-    engagement: 0,         // 0-100
-    madurezEspiritual: 0,  // 0-100
-    potencialCompra: 0     // 0-100
+    poderAdquisitivo: 0,
+    engagement: 0,
+    madurezEspiritual: 0,
+    potencialCompra: 0
   };
 
   // PODER ADQUISITIVO
-  // Basado en guardianes adoptados
   const guardianes = perfil.guardiansAdoptados;
   if (guardianes === '0') score.poderAdquisitivo += 10;
   else if (guardianes === '1-3') score.poderAdquisitivo += 30;
   else if (guardianes === '4-10') score.poderAdquisitivo += 60;
   else if (guardianes === 'mas-10') score.poderAdquisitivo += 90;
 
-  // Basado en colección de cristales
   const cristales = perfil.coleccionCristales;
   if (cristales === 'no') score.poderAdquisitivo += 0;
   else if (cristales === 'algunos') score.poderAdquisitivo += 15;
   else if (cristales === 'coleccion') score.poderAdquisitivo += 35;
   else if (cristales === 'apasionado') score.poderAdquisitivo += 50;
 
-  // Basado en cursos anteriores
   const cursos = perfil.cursosAnteriores;
   if (cursos === 'no') score.poderAdquisitivo += 0;
   else if (cursos === 'gratis') score.poderAdquisitivo += 10;
@@ -130,21 +127,18 @@ function calcularPerfilCliente(perfil) {
   else if (cursos === 'presencial') score.poderAdquisitivo += 45;
   else if (cursos === 'varios') score.poderAdquisitivo += 55;
 
-  // Normalizar a 100
   score.poderAdquisitivo = Math.min(100, score.poderAdquisitivo);
 
-  // ENGAGEMENT (qué tan activo será)
+  // ENGAGEMENT
   const practica = perfil.practicaEspiritual;
   if (practica === 'nunca') score.engagement += 20;
   else if (practica === 'ocasional') score.engagement += 40;
   else if (practica === 'regular') score.engagement += 70;
   else if (practica === 'diario') score.engagement += 95;
 
-  // Áreas de interés (más = más engagement)
   const areasCount = (perfil.areasInteres || []).length;
   score.engagement += areasCount * 8;
 
-  // Tipo de contenido (más = más engagement)
   const tipoCount = (perfil.tipoContenido || []).length;
   score.engagement += tipoCount * 10;
 
@@ -162,7 +156,7 @@ function calcularPerfilCliente(perfil) {
 
   score.madurezEspiritual = Math.min(100, score.madurezEspiritual);
 
-  // POTENCIAL DE COMPRA (combinación)
+  // POTENCIAL DE COMPRA
   score.potencialCompra = Math.round(
     (score.poderAdquisitivo * 0.5) +
     (score.engagement * 0.3) +
@@ -185,20 +179,17 @@ function calcularPerfilCliente(perfil) {
 function generarRecomendaciones(perfil, scores) {
   const recs = [];
 
-  // Basado en áreas de interés
   const areas = perfil.areasInteres || [];
   if (areas.includes('abundancia')) recs.push('guardianes-abundancia');
   if (areas.includes('proteccion')) recs.push('guardianes-proteccion');
   if (areas.includes('amor')) recs.push('rituales-amor');
   if (areas.includes('sanacion')) recs.push('cristales-sanacion');
 
-  // Basado en poder adquisitivo
   if (scores.poderAdquisitivo >= 60) {
     recs.push('colecciones-exclusivas');
     recs.push('canalizaciones-premium');
   }
 
-  // Basado en práctica
   if (perfil.practicaEspiritual === 'diario') {
     recs.push('rituales-avanzados');
   } else if (perfil.practicaEspiritual === 'nunca') {
@@ -211,7 +202,6 @@ function generarRecomendaciones(perfil, scores) {
 function calcularDatosDerivados(perfil) {
   const datos = {};
 
-  // Signo zodiacal
   if (perfil.fechaNacimiento) {
     datos.signoZodiacal = calcularSigno(perfil.fechaNacimiento);
     datos.numeroVida = calcularNumeroVida(perfil.fechaNacimiento);
@@ -249,7 +239,7 @@ function calcularSigno(fecha) {
     }
   }
 
-  return 'Capricornio'; // Default
+  return 'Capricornio';
 }
 
 function calcularNumeroVida(fecha) {

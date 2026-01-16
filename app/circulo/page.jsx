@@ -2,14 +2,15 @@
 import { useState, useEffect } from 'react';
 import PortalEntrada from './PortalEntrada';
 import CirculoDashboard from './Dashboard';
+import Onboarding from './Onboarding';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PÁGINA PRINCIPAL DEL CÍRCULO DE DUENDES
-// Flujo: Verificar acceso → Portal de entrada → Dashboard
+// Flujo: Verificar acceso → Onboarding (primera vez) → Portal de entrada → Dashboard
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function CirculoPage() {
-  const [estado, setEstado] = useState('verificando'); // verificando, no_acceso, portal, dashboard
+  const [estado, setEstado] = useState('verificando'); // verificando, no_acceso, onboarding, portal, dashboard
   const [usuario, setUsuario] = useState(null);
   const [error, setError] = useState(null);
 
@@ -41,16 +42,23 @@ export default function CirculoPage() {
         setUsuario(data.usuario);
         localStorage.setItem('circulo_token', token);
 
-        // Verificar si ya vio el portal hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        const ultimaVisita = localStorage.getItem('circulo_ultima_visita');
+        // Verificar si ya completó el onboarding
+        const perfilRes = await fetch(`/api/circulo/perfil?email=${encodeURIComponent(data.usuario.email)}`);
+        const perfilData = await perfilRes.json();
 
-        if (ultimaVisita === hoy) {
-          // Ya vio el portal hoy, ir directo al dashboard
-          setEstado('dashboard');
+        if (!perfilData.existe || !perfilData.perfil?.onboardingCompletado) {
+          // Primera vez - mostrar onboarding
+          setEstado('onboarding');
         } else {
-          // Mostrar portal de entrada
-          setEstado('portal');
+          // Ya hizo onboarding - verificar si vio el portal hoy
+          const hoy = new Date().toISOString().split('T')[0];
+          const ultimaVisita = localStorage.getItem('circulo_ultima_visita');
+
+          if (ultimaVisita === hoy) {
+            setEstado('dashboard');
+          } else {
+            setEstado('portal');
+          }
         }
       } else {
         setEstado('no_acceso');
@@ -61,6 +69,16 @@ export default function CirculoPage() {
       setEstado('no_acceso');
       setError('Error de conexión');
     }
+  }
+
+  function handleOnboardingComplete(datos) {
+    // Actualizar usuario con datos del onboarding
+    setUsuario(prev => ({
+      ...prev,
+      nombre: datos.nombrePreferido || prev?.nombre,
+      nombrePreferido: datos.nombrePreferido
+    }));
+    setEstado('portal');
   }
 
   function handleEntrarAlCirculo() {
@@ -253,12 +271,23 @@ export default function CirculoPage() {
     );
   }
 
+  // Estado: Onboarding (primera vez)
+  if (estado === 'onboarding') {
+    return (
+      <Onboarding
+        email={usuario?.email}
+        nombreInicial={usuario?.nombre}
+        onComplete={handleOnboardingComplete}
+      />
+    );
+  }
+
   // Estado: Portal de entrada
   if (estado === 'portal') {
     return (
       <PortalEntrada
         onEntrar={handleEntrarAlCirculo}
-        usuarioNombre={usuario?.nombre}
+        usuarioNombre={usuario?.nombrePreferido || usuario?.nombre}
       />
     );
   }
