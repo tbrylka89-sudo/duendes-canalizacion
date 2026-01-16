@@ -2357,12 +2357,78 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
   const [contenidoModal, setContenidoModal] = useState(null);
   const esUY = pais === 'UY';
 
+  // Estado para onboarding
+  const [onboardingCompletado, setOnboardingCompletado] = useState(null); // null = cargando
+  const [pasoOnboarding, setPasoOnboarding] = useState(1);
+  const [guardandoOnboarding, setGuardandoOnboarding] = useState(false);
+  const [datosOnboarding, setDatosOnboarding] = useState({
+    nombrePreferido: usuario?.nombre || '',
+    pronombres: '',
+    fechaNacimiento: '',
+    comoLlegaste: '',
+    guardiansAdoptados: '',
+    areasInteres: [],
+    practicaEspiritual: '',
+    coleccionCristales: '',
+    cursosAnteriores: '',
+    tipoContenido: [],
+    objetivoPrincipal: ''
+  });
+
+  // Verificar si completó onboarding
   useEffect(() => {
-    if (usuario?.esCirculo) {
+    if (usuario?.esCirculo && usuario?.email) {
+      verificarOnboarding();
+    }
+  }, [usuario?.esCirculo, usuario?.email]);
+
+  const verificarOnboarding = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/circulo/perfil?email=${encodeURIComponent(usuario.email)}`);
+      const data = await res.json();
+      setOnboardingCompletado(data.existe && data.perfil?.onboardingCompletado);
+    } catch(e) {
+      console.error('Error verificando onboarding:', e);
+      setOnboardingCompletado(true); // En caso de error, mostrar contenido
+    }
+  };
+
+  const guardarOnboarding = async () => {
+    setGuardandoOnboarding(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/circulo/perfil`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: usuario.email,
+          perfil: { ...datosOnboarding, onboardingCompletado: true, fechaOnboarding: new Date().toISOString() }
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOnboardingCompletado(true);
+        if (datosOnboarding.nombrePreferido) {
+          setUsuario({ ...usuario, nombrePreferido: datosOnboarding.nombrePreferido });
+        }
+      }
+    } catch(e) { console.error('Error guardando onboarding:', e); }
+    setGuardandoOnboarding(false);
+  };
+
+  const handleOnboardingChange = (campo, valor) => setDatosOnboarding(prev => ({ ...prev, [campo]: valor }));
+  const toggleOnboardingArray = (campo, item) => {
+    setDatosOnboarding(prev => {
+      const arr = prev[campo] || [];
+      return { ...prev, [campo]: arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item] };
+    });
+  };
+
+  useEffect(() => {
+    if (usuario?.esCirculo && onboardingCompletado) {
       cargarLuna();
       cargarContenido();
     }
-  }, [usuario?.esCirculo]);
+  }, [usuario?.esCirculo, onboardingCompletado]);
 
   const cargarLuna = async () => {
     setCargandoLuna(true);
@@ -2396,8 +2462,150 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
     setActivandoPrueba(false);
   };
 
-  // SI ES MIEMBRO DEL CÍRCULO - MUNDO INTERNO
+  // SI ES MIEMBRO DEL CÍRCULO - VERIFICAR ONBOARDING PRIMERO
   if (usuario?.esCirculo) {
+    // Cargando estado de onboarding
+    if (onboardingCompletado === null) {
+      return (
+        <div className="sec circulo-interno" style={{textAlign:'center',padding:'3rem'}}>
+          <span style={{fontSize:'3rem',display:'block',marginBottom:'1rem'}}>★</span>
+          <p>Preparando tu espacio en el Círculo...</p>
+        </div>
+      );
+    }
+
+    // MOSTRAR ONBOARDING SI NO LO COMPLETÓ
+    if (!onboardingCompletado) {
+      return (
+        <div className="sec circulo-interno">
+          <div className="circulo-header-int">
+            <span>★</span>
+            <h1>Bienvenid{datosOnboarding.pronombres === 'el' ? 'o' : 'a'} al Círculo</h1>
+            <p>Antes de entrar, queremos conocerte mejor</p>
+          </div>
+
+          {/* Indicador de pasos */}
+          <div style={{display:'flex',justifyContent:'center',gap:'12px',marginBottom:'2rem'}}>
+            {[1,2,3,4].map(n => (
+              <div key={n} style={{
+                width:'36px',height:'36px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
+                fontSize:'14px',fontWeight:'600',transition:'all 0.3s',
+                background: pasoOnboarding >= n ? (pasoOnboarding === n ? '#1a1a1a' : '#e0e0e0') : '#f5f5f5',
+                color: pasoOnboarding >= n ? (pasoOnboarding === n ? '#d4af37' : '#666') : '#ccc'
+              }}>{n}</div>
+            ))}
+          </div>
+
+          {/* PASO 1: Datos personales */}
+          {pasoOnboarding === 1 && (
+            <div style={{maxWidth:'500px',margin:'0 auto'}}>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Cómo te gustaría que te llamemos?</label>
+                <input type="text" value={datosOnboarding.nombrePreferido} onChange={e => handleOnboardingChange('nombrePreferido', e.target.value)} placeholder="Tu nombre o apodo" style={{width:'100%',padding:'12px',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem'}} />
+              </div>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Con qué pronombres te sentís cómodo/a?</label>
+                <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
+                  {[['ella','Ella'],['el','Él'],['elle','Elle'],['no-decir','Prefiero no decir']].map(([v,t]) => (
+                    <button key={v} onClick={() => handleOnboardingChange('pronombres', v)} style={{padding:'10px 18px',borderRadius:'20px',border:'1px solid',borderColor: datosOnboarding.pronombres === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.pronombres === v ? '#1a1a1a' : '#fff',color: datosOnboarding.pronombres === v ? '#fff' : '#333',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>Fecha de nacimiento</label>
+                <input type="date" value={datosOnboarding.fechaNacimiento} onChange={e => handleOnboardingChange('fechaNacimiento', e.target.value)} style={{width:'100%',padding:'12px',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem'}} />
+                <small style={{color:'#888',marginTop:'4px',display:'block'}}>Para calcular tu signo y número de vida</small>
+              </div>
+              <button onClick={() => setPasoOnboarding(2)} disabled={!datosOnboarding.nombrePreferido} style={{width:'100%',padding:'14px',background: datosOnboarding.nombrePreferido ? '#1a1a1a' : '#ccc',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',cursor: datosOnboarding.nombrePreferido ? 'pointer' : 'not-allowed',fontFamily:'Cinzel,serif'}}>Siguiente</button>
+            </div>
+          )}
+
+          {/* PASO 2: Historia con Duendes */}
+          {pasoOnboarding === 2 && (
+            <div style={{maxWidth:'500px',margin:'0 auto'}}>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Cómo llegaste a Duendes del Uruguay?</label>
+                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {[['instagram','Por Instagram'],['recomendacion','Me lo recomendó alguien'],['busqueda','Buscando cristales o guardianes'],['feria','En una feria o evento'],['otro','De otra forma']].map(([v,t]) => (
+                    <button key={v} onClick={() => handleOnboardingChange('comoLlegaste', v)} style={{padding:'12px 16px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.comoLlegaste === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.comoLlegaste === v ? '#f5f5f5' : '#fff',textAlign:'left',cursor:'pointer',fontSize:'0.95rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Cuántos guardianes tenés?</label>
+                <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
+                  {[['0','Ninguno aún'],['1-3','1 a 3'],['4-10','4 a 10'],['mas-10','Más de 10']].map(([v,t]) => (
+                    <button key={v} onClick={() => handleOnboardingChange('guardiansAdoptados', v)} style={{padding:'10px 18px',borderRadius:'20px',border:'1px solid',borderColor: datosOnboarding.guardiansAdoptados === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.guardiansAdoptados === v ? '#1a1a1a' : '#fff',color: datosOnboarding.guardiansAdoptados === v ? '#fff' : '#333',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:'flex',gap:'12px'}}>
+                <button onClick={() => setPasoOnboarding(1)} style={{flex:1,padding:'14px',background:'#fff',color:'#333',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',cursor:'pointer'}}>Anterior</button>
+                <button onClick={() => setPasoOnboarding(3)} style={{flex:2,padding:'14px',background:'#1a1a1a',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',cursor:'pointer',fontFamily:'Cinzel,serif'}}>Siguiente</button>
+              </div>
+            </div>
+          )}
+
+          {/* PASO 3: Intereses */}
+          {pasoOnboarding === 3 && (
+            <div style={{maxWidth:'500px',margin:'0 auto'}}>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Qué áreas te interesan más? (podés elegir varias)</label>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+                  {[['abundancia','Abundancia'],['proteccion','Protección'],['amor','Amor'],['sanacion','Sanación'],['intuicion','Intuición'],['naturaleza','Naturaleza']].map(([v,t]) => (
+                    <button key={v} onClick={() => toggleOnboardingArray('areasInteres', v)} style={{padding:'12px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.areasInteres.includes(v) ? '#d4af37' : '#e0e0e0',background: datosOnboarding.areasInteres.includes(v) ? '#fffbf0' : '#fff',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Con qué frecuencia hacés práctica espiritual?</label>
+                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {[['nunca','Recién empiezo'],['ocasional','De vez en cuando'],['regular','Semanalmente'],['diario','Todos los días']].map(([v,t]) => (
+                    <button key={v} onClick={() => handleOnboardingChange('practicaEspiritual', v)} style={{padding:'12px 16px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.practicaEspiritual === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.practicaEspiritual === v ? '#f5f5f5' : '#fff',textAlign:'left',cursor:'pointer',fontSize:'0.95rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:'flex',gap:'12px'}}>
+                <button onClick={() => setPasoOnboarding(2)} style={{flex:1,padding:'14px',background:'#fff',color:'#333',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',cursor:'pointer'}}>Anterior</button>
+                <button onClick={() => setPasoOnboarding(4)} style={{flex:2,padding:'14px',background:'#1a1a1a',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',cursor:'pointer',fontFamily:'Cinzel,serif'}}>Siguiente</button>
+              </div>
+            </div>
+          )}
+
+          {/* PASO 4: Experiencia y objetivo */}
+          {pasoOnboarding === 4 && (
+            <div style={{maxWidth:'500px',margin:'0 auto'}}>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Hiciste cursos espirituales antes?</label>
+                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {[['no','No, primera vez'],['gratis','Solo gratuitos'],['pagos','Cursos pagos'],['presencial','Talleres presenciales'],['varios','Varios de todo tipo']].map(([v,t]) => (
+                    <button key={v} onClick={() => handleOnboardingChange('cursosAnteriores', v)} style={{padding:'12px 16px',borderRadius:'8px',border:'1px solid',borderColor: datosOnboarding.cursosAnteriores === v ? '#1a1a1a' : '#e0e0e0',background: datosOnboarding.cursosAnteriores === v ? '#f5f5f5' : '#fff',textAlign:'left',cursor:'pointer',fontSize:'0.95rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Qué tipo de contenido te gusta más?</label>
+                <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
+                  {[['lecturas','Lecturas'],['audios','Audios'],['videos','Videos'],['rituales','Rituales'],['lives','Lives']].map(([v,t]) => (
+                    <button key={v} onClick={() => toggleOnboardingArray('tipoContenido', v)} style={{padding:'10px 16px',borderRadius:'20px',border:'1px solid',borderColor: datosOnboarding.tipoContenido.includes(v) ? '#d4af37' : '#e0e0e0',background: datosOnboarding.tipoContenido.includes(v) ? '#fffbf0' : '#fff',cursor:'pointer',fontSize:'0.9rem'}}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{marginBottom:'1.5rem'}}>
+                <label style={{display:'block',marginBottom:'8px',fontWeight:'500'}}>¿Qué buscás al unirte al Círculo?</label>
+                <textarea value={datosOnboarding.objetivoPrincipal} onChange={e => handleOnboardingChange('objetivoPrincipal', e.target.value)} placeholder="Contanos qué esperás encontrar..." rows={3} style={{width:'100%',padding:'12px',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',resize:'vertical'}} />
+              </div>
+              <div style={{display:'flex',gap:'12px'}}>
+                <button onClick={() => setPasoOnboarding(3)} style={{flex:1,padding:'14px',background:'#fff',color:'#333',border:'1px solid #e0e0e0',borderRadius:'8px',fontSize:'1rem',cursor:'pointer'}}>Anterior</button>
+                <button onClick={guardarOnboarding} disabled={guardandoOnboarding} style={{flex:2,padding:'14px',background: guardandoOnboarding ? '#888' : '#d4af37',color:'#1a1a1a',border:'none',borderRadius:'8px',fontSize:'1rem',cursor: guardandoOnboarding ? 'not-allowed' : 'pointer',fontFamily:'Cinzel,serif',fontWeight:'600'}}>{guardandoOnboarding ? 'Guardando...' : 'Entrar al Círculo'}</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // CONTENIDO NORMAL DEL CÍRCULO (onboarding completado)
     return (
       <div className="sec circulo-interno">
         <div className="circulo-header-int">
