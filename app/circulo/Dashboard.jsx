@@ -85,6 +85,7 @@ export default function CirculoDashboard({ usuario }) {
             guardianSemana={guardianSemana}
             portalActual={portalActual}
             usuario={usuario}
+            onCambiarSeccion={setSeccion}
           />
         )}
         {seccion === 'contenido' && <SeccionContenido />}
@@ -221,7 +222,7 @@ export default function CirculoDashboard({ usuario }) {
 // SECCIÓN INICIO
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function SeccionInicio({ guardianSemana, portalActual, usuario }) {
+function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion }) {
   const [consejo, setConsejo] = useState(null);
   const [cargandoConsejo, setCargandoConsejo] = useState(true);
 
@@ -335,22 +336,22 @@ function SeccionInicio({ guardianSemana, portalActual, usuario }) {
 
       {/* Grid de accesos rápidos */}
       <div className="accesos-grid">
-        <div className="acceso-card">
+        <div className="acceso-card" onClick={() => onCambiarSeccion('contenido')}>
           <span className="acceso-icono">📜</span>
           <h4>Contenido de Hoy</h4>
           <p>La enseñanza del día te espera</p>
         </div>
-        <div className="acceso-card">
+        <div className="acceso-card" onClick={() => onCambiarSeccion('contenido')}>
           <span className="acceso-icono">🕯️</span>
           <h4>Ritual de la Semana</h4>
           <p>Práctica guiada por el guardián</p>
         </div>
-        <div className="acceso-card">
+        <div className="acceso-card" onClick={() => onCambiarSeccion('foro')}>
           <span className="acceso-icono">💬</span>
           <h4>Foro del Círculo</h4>
           <p>Conectá con la comunidad</p>
         </div>
-        <div className="acceso-card">
+        <div className="acceso-card" onClick={() => onCambiarSeccion('archivo')}>
           <span className="acceso-icono">📚</span>
           <h4>Archivo</h4>
           <p>Contenido de semanas anteriores</p>
