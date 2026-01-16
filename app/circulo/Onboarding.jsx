@@ -209,7 +209,7 @@ export default function Onboarding({ email, nombreInicial, onComplete }) {
         )}
       </div>
 
-      <style jsx>{\`
+      <style jsx>{`
         .onboarding { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 30% 20%, rgba(107, 33, 168, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%), linear-gradient(180deg, #050508 0%, #0a0a0a 100%); padding: 40px 20px; font-family: 'Cormorant Garamond', serif; }
         .contenedor { width: 100%; max-width: 600px; background: rgba(20, 20, 25, 0.95); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
         .pasos-indicador { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
@@ -243,7 +243,7 @@ export default function Onboarding({ email, nombreInicial, onComplete }) {
         .btn-siguiente:disabled, .btn-finalizar:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-siguiente:not(:disabled):hover, .btn-finalizar:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3); }
         @media (max-width: 600px) { .contenedor { padding: 30px 20px; } .paso-contenido h2 { font-size: 38px; } .pasos-indicador { gap: 15px; } .paso-dot { width: 35px; height: 35px; font-size: 14px; } }
-      \`}</style>
+      `}</style>
     </div>
   );
 }
