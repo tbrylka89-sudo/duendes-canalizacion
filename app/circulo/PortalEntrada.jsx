@@ -202,7 +202,7 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
         }
 
         .portal-canvas {
-          position: absolute;
+          position: fixed;
           inset: 0;
           z-index: 3;
           pointer-events: none;
@@ -210,7 +210,7 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
 
         /* Fondo del bosque */
         .bosque-fondo {
-          position: absolute;
+          position: fixed;
           inset: 0;
           background:
             radial-gradient(ellipse at 50% 100%, rgba(10, 30, 10, 0.8) 0%, transparent 70%),
@@ -222,7 +222,7 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
 
         /* Niebla animada */
         .niebla {
-          position: absolute;
+          position: fixed;
           width: 200%;
           height: 30%;
           bottom: 0;
@@ -253,7 +253,7 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
 
         /* Árboles */
         .arbol {
-          position: absolute;
+          position: fixed;
           bottom: 0;
           width: 300px;
           height: 100%;
