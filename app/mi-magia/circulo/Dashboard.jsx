@@ -7,6 +7,229 @@ import { useState, useEffect } from 'react';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// COMPONENTE: INDICADORES DE COMUNIDAD EN VIVO
+// Muestra actividad simulada de la comunidad (social proof)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ComunidadIndicadores() {
+  const [stats, setStats] = useState(null);
+  const [actividad, setActividad] = useState(null);
+  const [mostrarCompra, setMostrarCompra] = useState(false);
+
+  useEffect(() => {
+    cargarStats();
+    cargarActividad();
+
+    // Actualizar actividad cada 30 segundos
+    const interval = setInterval(() => {
+      cargarActividad();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Mostrar notificación de compra cada 45-90 segundos
+  useEffect(() => {
+    const mostrarNotificacion = () => {
+      setMostrarCompra(true);
+      setTimeout(() => setMostrarCompra(false), 5000);
+    };
+
+    // Primera notificación después de 10 segundos
+    const timeout = setTimeout(mostrarNotificacion, 10000);
+
+    // Siguientes notificaciones cada 45-90 segundos
+    const interval = setInterval(() => {
+      if (Math.random() > 0.3) { // 70% de probabilidad
+        cargarActividad();
+        mostrarNotificacion();
+      }
+    }, 45000 + Math.random() * 45000);
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  async function cargarStats() {
+    try {
+      const res = await fetch('/api/comunidad/bots?tipo=stats');
+      const data = await res.json();
+      if (data.success) {
+        setStats(data.stats);
+      }
+    } catch (error) {
+      console.error('Error cargando stats:', error);
+    }
+  }
+
+  async function cargarActividad() {
+    try {
+      const res = await fetch('/api/comunidad/bots?tipo=actividad');
+      const data = await res.json();
+      if (data.success) {
+        setActividad(data.actividad);
+      }
+    } catch (error) {
+      console.error('Error cargando actividad:', error);
+    }
+  }
+
+  if (!stats) return null;
+
+  return (
+    <>
+      {/* Barra superior de stats */}
+      <div className="comunidad-stats-bar">
+        <div className="stat-item">
+          <span className="stat-dot verde"></span>
+          <span>{actividad?.viendoAhora || 12} personas viendo ahora</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-icon">👥</span>
+          <span>{stats.totalMiembros} guardianas en el Círculo</span>
+        </div>
+        {actividad?.escribiendo && (
+          <div className="stat-item escribiendo">
+            <span className="stat-icon">✍️</span>
+            <span>{actividad.escribiendo} está escribiendo...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Notificación de compra (toast) */}
+      {mostrarCompra && actividad?.ultimaCompra && (
+        <div className="toast-compra">
+          <div className="toast-avatar">{actividad.ultimaCompra.pais}</div>
+          <div className="toast-info">
+            <strong>{actividad.ultimaCompra.nombre}</strong>
+            <span>adoptó a {actividad.ultimaCompra.guardian}</span>
+            <small>hace {actividad.ultimaCompra.hace}</small>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .comunidad-stats-bar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 30px;
+          padding: 10px 20px;
+          background: rgba(212, 175, 55, 0.05);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.7);
+          flex-wrap: wrap;
+        }
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .stat-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          animation: pulse-dot 2s infinite;
+        }
+
+        .stat-dot.verde {
+          background: #4ade80;
+          box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+        }
+
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+
+        .stat-icon {
+          font-size: 14px;
+        }
+
+        .escribiendo {
+          animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeInOut {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+
+        /* Toast de compra */
+        .toast-compra {
+          position: fixed;
+          bottom: 30px;
+          left: 30px;
+          background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          border-radius: 15px;
+          padding: 15px 20px;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+          animation: slideInUp 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
+        }
+
+        @keyframes slideInUp {
+          from { transform: translateY(100px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+
+        .toast-avatar {
+          font-size: 24px;
+        }
+
+        .toast-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .toast-info strong {
+          color: #fff;
+          font-size: 14px;
+        }
+
+        .toast-info span {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 13px;
+        }
+
+        .toast-info small {
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 11px;
+          margin-top: 3px;
+        }
+
+        @media (max-width: 600px) {
+          .comunidad-stats-bar {
+            gap: 15px;
+            font-size: 11px;
+          }
+
+          .toast-compra {
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // TOUR DEL CÍRCULO - Pasos
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -384,6 +607,9 @@ export default function CirculoDashboard({ usuario }) {
         '--duende-glow': coloresDuende.glow
       }}
     >
+      {/* Indicadores de comunidad en vivo */}
+      <ComunidadIndicadores />
+
       {/* Banner de Temporada */}
       <div className={`banner-temporada banner-${portalActual.id}`}>
         <div className="banner-particulas"></div>
@@ -1242,15 +1468,27 @@ function SeccionContenido() {
 // SECCIÓN FORO
 // ═══════════════════════════════════════════════════════════════════════════════
 
+const CATEGORIAS_FORO = {
+  todas: { nombre: 'Todas', icono: '✨' },
+  experiencia: { nombre: 'Experiencias', icono: '💫' },
+  pregunta: { nombre: 'Preguntas', icono: '❓' },
+  tip: { nombre: 'Tips', icono: '💡' },
+  agradecimiento: { nombre: 'Agradecimientos', icono: '💜' },
+  ritual: { nombre: 'Rituales', icono: '🕯️' },
+  sincronicidad: { nombre: 'Sincronicidades', icono: '🔮' }
+};
+
 function SeccionForo({ usuario }) {
   const [posts, setPosts] = useState([]);
-  const [categorias, setCategorias] = useState({});
+  const [postsComunidad, setPostsComunidad] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState('todas');
   const [cargando, setCargando] = useState(true);
   const [mostrarNuevoPost, setMostrarNuevoPost] = useState(false);
+  const [postExpandido, setPostExpandido] = useState(null);
 
   useEffect(() => {
     cargarPosts();
+    cargarPostsComunidad();
   }, [categoriaActiva]);
 
   async function cargarPosts() {
@@ -1262,8 +1500,7 @@ function SeccionForo({ usuario }) {
       const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
-        setPosts(data.posts);
-        setCategorias(data.categorias);
+        setPosts(data.posts || []);
       }
     } catch (error) {
       console.error('Error cargando posts:', error);
@@ -1272,10 +1509,37 @@ function SeccionForo({ usuario }) {
     }
   }
 
+  async function cargarPostsComunidad() {
+    try {
+      const res = await fetch('/api/comunidad/bots?limite=15');
+      const data = await res.json();
+      if (data.success) {
+        // Filtrar por categoría si es necesario
+        let postsFiltrados = data.posts || [];
+        if (categoriaActiva !== 'todas') {
+          postsFiltrados = postsFiltrados.filter(p => p.tipo === categoriaActiva);
+        }
+        setPostsComunidad(postsFiltrados);
+      }
+    } catch (error) {
+      console.error('Error cargando posts comunidad:', error);
+    }
+  }
+
+  // Combinar posts reales con posts de la comunidad simulada
+  const todosLosPosts = [...posts, ...postsComunidad].sort((a, b) => {
+    const fechaA = new Date(a.creado_en || a.fecha);
+    const fechaB = new Date(b.creado_en || b.fecha);
+    return fechaB - fechaA;
+  });
+
   return (
     <div className="seccion-foro">
       <div className="foro-header">
-        <h2>Foro del Círculo</h2>
+        <div className="foro-titulo-wrap">
+          <h2>Foro del Círculo</h2>
+          <span className="foro-miembros">👥 324 guardianas participando</span>
+        </div>
         <button className="btn-nuevo-post" onClick={() => setMostrarNuevoPost(true)}>
           + Nuevo Post
         </button>
@@ -1283,13 +1547,7 @@ function SeccionForo({ usuario }) {
 
       {/* Filtros de categoría */}
       <div className="foro-categorias">
-        <button
-          className={`cat-btn ${categoriaActiva === 'todas' ? 'active' : ''}`}
-          onClick={() => setCategoriaActiva('todas')}
-        >
-          Todas
-        </button>
-        {Object.entries(categorias).map(([id, cat]) => (
+        {Object.entries(CATEGORIAS_FORO).map(([id, cat]) => (
           <button
             key={id}
             className={`cat-btn ${categoriaActiva === id ? 'active' : ''}`}
@@ -1304,24 +1562,59 @@ function SeccionForo({ usuario }) {
       <div className="posts-lista">
         {cargando ? (
           <p className="cargando">Cargando...</p>
-        ) : posts.length === 0 ? (
+        ) : todosLosPosts.length === 0 ? (
           <p className="sin-posts">Aún no hay posts en esta categoría. ¡Sé el primero!</p>
         ) : (
-          posts.map(post => (
-            <div key={post.id} className="post-card">
+          todosLosPosts.map((post, idx) => (
+            <div
+              key={post.id || `post-${idx}`}
+              className={`post-card ${postExpandido === (post.id || idx) ? 'expandido' : ''}`}
+              onClick={() => setPostExpandido(postExpandido === (post.id || idx) ? null : (post.id || idx))}
+            >
               <div className="post-header">
-                <span className="post-categoria">{post.categoria_info?.icono} {post.categoria_info?.nombre}</span>
-                <span className="post-fecha">{new Date(post.creado_en).toLocaleDateString()}</span>
-              </div>
-              <h3 className="post-titulo">{post.titulo}</h3>
-              <p className="post-preview">{post.contenido.substring(0, 150)}...</p>
-              <div className="post-footer">
-                <span className="post-autor">Por {post.usuario_nombre}</span>
-                <div className="post-stats">
-                  <span>❤️ {post.total_likes}</span>
-                  <span>💬 {post.total_comentarios}</span>
+                <div className="post-autor-info">
+                  <span className="autor-avatar">{post.autor?.avatar || '👤'}</span>
+                  <div className="autor-detalles">
+                    <span className="autor-nombre">{post.autor?.nombre || post.usuario_nombre || 'Anónima'}</span>
+                    <span className="autor-nivel">{post.autor?.pais} {post.autor?.nivel === 'diamante' ? '💎' : post.autor?.nivel === 'oro' ? '🥇' : post.autor?.nivel === 'plata' ? '🥈' : '🥉'}</span>
+                  </div>
+                </div>
+                <div className="post-meta">
+                  <span className="post-categoria">{CATEGORIAS_FORO[post.tipo]?.icono || '✨'} {CATEGORIAS_FORO[post.tipo]?.nombre || 'General'}</span>
+                  <span className="post-fecha">{post.hace || new Date(post.creado_en).toLocaleDateString()}</span>
                 </div>
               </div>
+
+              <p className="post-contenido">{post.contenido || post.titulo}</p>
+
+              {post.guardian && (
+                <span className="post-guardian-tag">🧙 Sobre {post.guardian}</span>
+              )}
+
+              <div className="post-footer">
+                <div className="post-stats">
+                  <span className="stat-item">❤️ {post.likes || post.total_likes || 0}</span>
+                  <span className="stat-item">💬 {post.respuestas || post.total_comentarios || 0}</span>
+                </div>
+                <button className="btn-responder">Responder</button>
+              </div>
+
+              {/* Respuestas preview */}
+              {postExpandido === (post.id || idx) && post.respuestasPreview?.length > 0 && (
+                <div className="respuestas-preview">
+                  {post.respuestasPreview.map((resp, i) => (
+                    <div key={i} className="respuesta-item">
+                      <span className="respuesta-avatar">{resp.autor?.avatar || '👤'}</span>
+                      <div className="respuesta-contenido">
+                        <strong>{resp.autor?.nombre}</strong>
+                        <p>{resp.contenido}</p>
+                        <small>{resp.hace}</small>
+                      </div>
+                    </div>
+                  ))}
+                  <button className="btn-ver-todas">Ver todas las respuestas</button>
+                </div>
+              )}
             </div>
           ))
         )}
@@ -1335,15 +1628,20 @@ function SeccionForo({ usuario }) {
         .foro-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           margin-bottom: 30px;
         }
 
-        .foro-header h2 {
+        .foro-titulo-wrap h2 {
           font-family: 'Tangerine', cursive;
           font-size: 48px;
           color: #ffffff;
-          margin: 0;
+          margin: 0 0 5px;
+        }
+
+        .foro-miembros {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.5);
         }
 
         .btn-nuevo-post {
@@ -1423,33 +1721,75 @@ function SeccionForo({ usuario }) {
           border-color: rgba(212, 175, 55, 0.3);
         }
 
+        .post-card.expandido {
+          background: rgba(212, 175, 55, 0.05);
+          border-color: rgba(212, 175, 55, 0.4);
+        }
+
         .post-header {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 12px;
+          align-items: flex-start;
+          margin-bottom: 15px;
+        }
+
+        .post-autor-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .autor-avatar {
+          font-size: 28px;
+        }
+
+        .autor-detalles {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .autor-nombre {
+          font-size: 15px;
+          font-weight: 600;
+          color: #fff;
+        }
+
+        .autor-nivel {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .post-meta {
+          text-align: right;
         }
 
         .post-categoria {
+          display: block;
           font-size: 12px;
           color: rgba(212, 175, 55, 0.8);
+          margin-bottom: 4px;
         }
 
         .post-fecha {
-          font-size: 12px;
+          font-size: 11px;
           color: rgba(255, 255, 255, 0.4);
         }
 
-        .post-titulo {
-          font-family: 'Cinzel', serif;
-          font-size: 20px;
-          color: #ffffff;
-          margin-bottom: 10px;
+        .post-contenido {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.85);
+          line-height: 1.7;
+          margin-bottom: 15px;
         }
 
-        .post-preview {
-          font-size: 15px;
-          color: rgba(255, 255, 255, 0.6);
-          line-height: 1.6;
+        .post-guardian-tag {
+          display: inline-block;
+          background: rgba(107, 33, 168, 0.2);
+          border: 1px solid rgba(107, 33, 168, 0.4);
+          color: #b794f6;
+          font-size: 12px;
+          padding: 5px 12px;
+          border-radius: 15px;
           margin-bottom: 15px;
         }
 
@@ -1461,16 +1801,106 @@ function SeccionForo({ usuario }) {
           border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .post-autor {
-          font-size: 13px;
-          color: rgba(255, 255, 255, 0.5);
-        }
-
         .post-stats {
           display: flex;
           gap: 15px;
+        }
+
+        .stat-item {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-responder {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 12px;
+          padding: 8px 15px;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .btn-responder:hover {
+          border-color: #d4af37;
+          color: #d4af37;
+        }
+
+        /* Respuestas */
+        .respuestas-preview {
+          margin-top: 20px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .respuesta-item {
+          display: flex;
+          gap: 12px;
+          padding: 15px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
+          margin-bottom: 10px;
+        }
+
+        .respuesta-avatar {
+          font-size: 20px;
+          flex-shrink: 0;
+        }
+
+        .respuesta-contenido {
+          flex: 1;
+        }
+
+        .respuesta-contenido strong {
+          display: block;
           font-size: 13px;
-          color: rgba(255, 255, 255, 0.5);
+          color: #fff;
+          margin-bottom: 5px;
+        }
+
+        .respuesta-contenido p {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0 0 5px;
+          line-height: 1.5;
+        }
+
+        .respuesta-contenido small {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-ver-todas {
+          width: 100%;
+          background: rgba(212, 175, 55, 0.1);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          color: #d4af37;
+          font-size: 13px;
+          padding: 12px;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .btn-ver-todas:hover {
+          background: rgba(212, 175, 55, 0.2);
+        }
+
+        @media (max-width: 600px) {
+          .foro-header {
+            flex-direction: column;
+            gap: 20px;
+          }
+
+          .post-header {
+            flex-direction: column;
+            gap: 15px;
+          }
+
+          .post-meta {
+            text-align: left;
+          }
         }
       `}</style>
     </div>
