@@ -1359,6 +1359,7 @@ export default function MiMagia() {
         </>
       )}
 
+      {!chatAbierto && <TitoBurbuja usuario={usuario} onAbrir={() => setChatAbierto(true)} />}
       <Tito usuario={usuario} abierto={chatAbierto} setAbierto={setChatAbierto} />
     </div>
   );
@@ -4825,6 +4826,170 @@ function FaqSec({ onVerTour }) {
 // ═══════════════════════════════════════════════════════════════
 // TITO
 // ═══════════════════════════════════════════════════════════════
+
+// BURBUJA DE SUGERENCIAS DE TITO
+function TitoBurbuja({ usuario, onAbrir }) {
+  const [sugerencia, setSugerencia] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [cerrada, setCerrada] = useState(false);
+
+  useEffect(() => {
+    if (!usuario?.email || cerrada) return;
+
+    // Esperar 3 segundos antes de mostrar la burbuja
+    const timer = setTimeout(() => {
+      cargarSugerencia();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [usuario?.email, cerrada]);
+
+  async function cargarSugerencia() {
+    try {
+      const res = await fetch('/api/tito/sugerencias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: usuario?.email })
+      });
+      const data = await res.json();
+
+      if (data.success && data.sugerencias?.length > 0) {
+        // Mostrar la primera sugerencia de mayor prioridad
+        setSugerencia(data.sugerencias[0]);
+        setVisible(true);
+
+        // Ocultar después de 15 segundos
+        setTimeout(() => {
+          setVisible(false);
+        }, 15000);
+      }
+    } catch (err) {
+      console.error('Error cargando sugerencias:', err);
+    }
+  }
+
+  function cerrarBurbuja() {
+    setVisible(false);
+    setCerrada(true);
+  }
+
+  function handleClick() {
+    cerrarBurbuja();
+    onAbrir();
+  }
+
+  if (!visible || !sugerencia) return null;
+
+  return (
+    <div className="tito-burbuja" onClick={handleClick}>
+      <button className="burbuja-cerrar" onClick={(e) => { e.stopPropagation(); cerrarBurbuja(); }}>✕</button>
+      <div className="burbuja-contenido">
+        <span className="burbuja-avatar">
+          <img src={TITO_IMG} alt="Tito" onError={e => e.target.style.display='none'} />
+        </span>
+        <div className="burbuja-mensaje">
+          <p>{sugerencia.mensaje}</p>
+          {sugerencia.producto && (
+            <span className="burbuja-tag">{sugerencia.producto.tipo === 'experiencia' ? `${sugerencia.producto.precio} runas` : `$${sugerencia.producto.precio}`}</span>
+          )}
+        </div>
+      </div>
+      <style jsx>{`
+        .tito-burbuja {
+          position: fixed;
+          bottom: 140px;
+          right: 1.5rem;
+          max-width: 280px;
+          background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 15px;
+          padding: 12px 15px;
+          cursor: pointer;
+          z-index: 998;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          animation: burbujaEntrar 0.5s ease;
+        }
+        @keyframes burbujaEntrar {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .burbuja-cerrar {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          width: 24px;
+          height: 24px;
+          background: #333;
+          border: 1px solid #555;
+          border-radius: 50%;
+          color: #999;
+          font-size: 12px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .burbuja-cerrar:hover {
+          background: #444;
+          color: #fff;
+        }
+        .burbuja-contenido {
+          display: flex;
+          gap: 10px;
+          align-items: flex-start;
+        }
+        .burbuja-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #d4af37;
+          flex-shrink: 0;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .burbuja-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .burbuja-mensaje {
+          flex: 1;
+        }
+        .burbuja-mensaje p {
+          color: #FDF8F0;
+          font-size: 13px;
+          line-height: 1.4;
+          margin: 0;
+          font-family: 'Cormorant Garamond', serif;
+        }
+        .burbuja-tag {
+          display: inline-block;
+          margin-top: 6px;
+          background: rgba(212, 175, 55, 0.2);
+          color: #d4af37;
+          font-size: 11px;
+          padding: 3px 8px;
+          border-radius: 10px;
+        }
+        @media (max-width: 768px) {
+          .tito-burbuja {
+            bottom: 130px;
+            right: 10px;
+            max-width: 250px;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 function Tito({ usuario, abierto, setAbierto }) {
   const [msgs, setMsgs] = useState([]);
