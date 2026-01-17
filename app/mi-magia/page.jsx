@@ -35,11 +35,11 @@ const PACKS_RUNAS = [
 
 const EXPERIENCIAS = [
   { 
-    id: 'tirada-runas', 
-    nombre: 'Tirada de Runas', 
-    icono: 'ᚱ', 
-    runas: 5, 
-    treboles: 25, 
+    id: 'tirada-runas',
+    nombre: 'Tirada de Runas',
+    icono: 'ᚱ',
+    runas: 8,
+    treboles: 40, 
     tiempo: '20-30 minutos', 
     intro: `Las runas son un antiguo alfabeto nórdico que trasciende la escritura. Cada símbolo guarda energía, sabiduría y mensajes del universo. Cuando hacemos una tirada, no es azar - es sincronicidad pura.
 
@@ -49,11 +49,11 @@ Yo (Gabriel o Thibisay, dependiendo de quién esté canalizando ese día) me sie
     campos: ['pregunta', 'contexto']
   },
   { 
-    id: 'susurro-guardian', 
-    nombre: 'Susurro del Guardián', 
-    icono: '✦', 
-    runas: 10, 
-    treboles: 50, 
+    id: 'susurro-guardian',
+    nombre: 'Susurro del Guardián',
+    icono: '✦',
+    runas: 15,
+    treboles: 75, 
     tiempo: '40-60 minutos',
     intro: `¿Estás mirando los guardianes de la tienda y no sabés cuál elegir? ¿Sentís que varios te llaman pero no podés decidirte? Este servicio existe exactamente para eso.
 
@@ -64,11 +64,11 @@ Lo que hacemos es conectar con los guardianes que mencionás y dejar que ELLOS h
     esElegirGuardian: true
   },
   { 
-    id: 'oraculo-mes', 
-    nombre: 'Oráculo del Mes', 
-    icono: '☽', 
-    runas: 12, 
-    treboles: 60, 
+    id: 'oraculo-mes',
+    nombre: 'Oráculo del Mes',
+    icono: '☽',
+    runas: 18,
+    treboles: 90, 
     tiempo: '1-2 horas',
     intro: `Cada mes trae su propia energía. Las fases lunares, los tránsitos planetarios, las estaciones... todo influye en cómo fluye nuestra vida. Este oráculo te da un mapa completo del mes que viene.
 
@@ -78,11 +78,11 @@ No es una predicción rígida del futuro - es una guía de las energías disponi
     campos: ['mes', 'area_principal', 'situacion']
   },
   { 
-    id: 'gran-oraculo', 
-    nombre: 'El Gran Oráculo', 
-    icono: '★', 
-    runas: 20, 
-    treboles: 100, 
+    id: 'gran-oraculo',
+    nombre: 'El Gran Oráculo',
+    icono: '★',
+    runas: 35,
+    treboles: 175, 
     tiempo: '2-3 horas',
     intro: `Esta es nuestra lectura más completa para quienes quieren ver el panorama grande. Tres meses de tu vida mapeados en detalle: amor, trabajo, salud, espiritualidad, desarrollo personal.
 
@@ -92,11 +92,11 @@ Usamos una combinación de runas, numerología (por eso pedimos tu fecha de naci
     campos: ['fecha_nacimiento', 'hora_nacimiento', 'lugar_nacimiento', 'pregunta_principal']
   },
   { 
-    id: 'lectura-alma', 
-    nombre: 'Lectura del Alma', 
-    icono: '◈', 
-    runas: 25, 
-    treboles: 125, 
+    id: 'lectura-alma',
+    nombre: 'Lectura del Alma',
+    icono: '◈',
+    runas: 45,
+    treboles: 225, 
     tiempo: '4-6 horas',
     intro: `¿Alguna vez sentiste que hay algo más grande esperándote? ¿Que viniste a este mundo con un propósito que todavía no terminás de descifrar? Esta lectura va a las profundidades de tu ser.
 
@@ -106,11 +106,11 @@ Trabajamos con tu número de vida (calculado desde tu fecha de nacimiento), patr
     campos: ['fecha_nacimiento', 'hora_nacimiento', 'lugar_nacimiento', 'nombre_completo', 'patrones_repetitivos']
   },
   { 
-    id: 'registros-akashicos', 
-    nombre: 'Registros Akáshicos', 
-    icono: '∞', 
-    runas: 35, 
-    treboles: 175, 
+    id: 'registros-akashicos',
+    nombre: 'Registros Akáshicos',
+    icono: '∞',
+    runas: 60,
+    treboles: 300, 
     tiempo: '6-8 horas',
     intro: `Los Registros Akáshicos son la biblioteca cósmica donde está guardada toda la información de tu alma a través de todas sus encarnaciones. Acceder a ellos es como abrir el libro de tu existencia eterna.
 
@@ -120,11 +120,11 @@ Este proceso es sagrado y profundo. Requiere preparación tanto de nuestra parte
     campos: ['fecha_nacimiento', 'hora_nacimiento', 'lugar_nacimiento', 'nombre_completo', 'miedos_inexplicables', 'atracciones_epocas']
   },
   { 
-    id: 'carta-ancestral', 
-    nombre: 'Carta Ancestral', 
-    icono: '❧', 
-    runas: 15, 
-    treboles: 75, 
+    id: 'carta-ancestral',
+    nombre: 'Carta Ancestral',
+    icono: '❧',
+    runas: 22,
+    treboles: 110, 
     tiempo: '1-2 horas',
     intro: `Tus ancestros no se fueron del todo. Su sangre corre por tus venas, sus memorias están en tu ADN, y su amor te acompaña aunque no los veas. Esta carta es un puente hacia ellos.
 
@@ -134,11 +134,11 @@ Canalizamos mensajes de tu linaje - pueden ser abuelos que conociste, bisabuelos
     campos: ['nombre_ancestro', 'nacionalidades', 'patrones_familia']
   },
   { 
-    id: 'mapa-energetico', 
-    nombre: 'Mapa Energético', 
-    icono: '◎', 
-    runas: 18, 
-    treboles: 90, 
+    id: 'mapa-energetico',
+    nombre: 'Mapa Energético',
+    icono: '◎',
+    runas: 28,
+    treboles: 140, 
     tiempo: '2-3 horas',
     intro: `Tu cuerpo físico es solo la capa más densa de quien sos. Alrededor y a través de él fluye tu cuerpo energético: chakras, aura, meridianos. Cuando algo está mal energéticamente, eventualmente se manifiesta en lo físico o emocional.
 
@@ -148,11 +148,11 @@ Este mapa es un diagnóstico completo. Escaneamos tu campo, identificamos dónde
     campos: ['sintomas_fisicos', 'sintomas_emocionales', 'areas_bloqueadas']
   },
   { 
-    id: 'pregunta-especifica', 
-    nombre: 'Pregunta Específica', 
-    icono: '?', 
-    runas: 8, 
-    treboles: 40, 
+    id: 'pregunta-especifica',
+    nombre: 'Pregunta Específica',
+    icono: '?',
+    runas: 12,
+    treboles: 60, 
     tiempo: '30-45 minutos',
     intro: `A veces no necesitás un análisis extenso. Necesitás UNA respuesta. Esa pregunta que te da vueltas en la cabeza, que no te deja dormir, que necesitás resolver para poder avanzar.
 
@@ -818,6 +818,7 @@ const PASOS_TOUR = [
     id: 'tito',
     titulo: 'Tito, tu Asistente',
     icono: '🧙',
+    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2026/01/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-1_53c2ddf7-82d8-47fa-823e-7b0f3af1398e-scaled.jpg',
     mensaje: 'Si tenés dudas, Tito está ahí para ayudarte. Es un duende sabio que conoce todo sobre Duendes del Uruguay. Lo encontrás en el botón flotante.',
     tip: 'Preguntale lo que quieras'
   },
@@ -846,7 +847,11 @@ function TourMiMagia({ usuario, onFinish }) {
         </div>
 
         <div className="tour-content">
-          <span className="tour-icono">{pasoActual.icono}</span>
+          {pasoActual.imagen ? (
+            <img src={pasoActual.imagen} alt={pasoActual.titulo} className="tour-imagen" />
+          ) : (
+            <span className="tour-icono">{pasoActual.icono}</span>
+          )}
           <h1>{pasoActual.titulo}</h1>
           <p className="tour-mensaje">{pasoActual.mensaje}</p>
           <div className="tour-tip">
@@ -932,6 +937,15 @@ function TourMiMagia({ usuario, onFinish }) {
           display: block;
           margin-bottom: 1rem;
           filter: drop-shadow(0 0 20px #d4af3750);
+        }
+        .tour-imagen {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-bottom: 1rem;
+          border: 3px solid #d4af37;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
         }
 
         .tour-card h1 {

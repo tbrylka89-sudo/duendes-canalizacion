@@ -1032,7 +1032,382 @@ function LandingCirculo({ onTrialClick }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// FORMULARIO DE TRIAL
+// MODAL DE PRUEBA GRATUITA (OVERLAY)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ModalTrialPrueba({ onCerrar, onExito }) {
+  const [email, setEmail] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [intencion, setIntencion] = useState('');
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!aceptaTerminos) {
+      setError('Debes aceptar los términos para continuar');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/mi-magia/circulo/prueba', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, nombre, intencion })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        onExito({ email, nombre, ...data });
+      } else {
+        setError(data.error || 'Error al activar la prueba');
+      }
+    } catch (err) {
+      console.error('Error activando trial:', err);
+      setError('Error de conexión. Intentá de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="modal-trial-overlay">
+      <div className="modal-trial-card">
+        <button onClick={onCerrar} className="modal-cerrar">✕</button>
+
+        {/* Contador visual */}
+        <div className="countdown-visual">
+          <div className="countdown-circle">
+            <span className="countdown-number">15</span>
+            <span className="countdown-label">días</span>
+          </div>
+          <p className="countdown-texto">de acceso completo</p>
+        </div>
+
+        <h2>Tu prueba gratuita te espera</h2>
+        <p className="modal-subtitulo">Sin tarjeta de crédito · Sin compromisos</p>
+
+        <form onSubmit={handleSubmit} className="form-modal-trial">
+          <div className="campo-modal">
+            <label>Tu nombre</label>
+            <input
+              type="text"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="¿Cómo te llamás?"
+              required
+            />
+          </div>
+
+          <div className="campo-modal">
+            <label>Tu email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tucorreo@email.com"
+              required
+            />
+          </div>
+
+          <div className="campo-modal">
+            <label>¿Qué buscás en el Círculo?</label>
+            <textarea
+              value={intencion}
+              onChange={(e) => setIntencion(e.target.value)}
+              placeholder="Contanos qué te gustaría encontrar, qué te atrajo del Círculo, o qué momento estás atravesando..."
+              rows={3}
+            />
+          </div>
+
+          <div className="campo-checkbox">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={aceptaTerminos}
+                onChange={(e) => setAceptaTerminos(e.target.checked)}
+              />
+              <span className="checkmark"></span>
+              <span>Acepto los <a href="/terminos" target="_blank">términos y condiciones</a> y la <a href="/privacidad" target="_blank">política de privacidad</a></span>
+            </label>
+          </div>
+
+          {error && <div className="error-modal">{error}</div>}
+
+          <button type="submit" className="btn-comenzar" disabled={loading || !aceptaTerminos}>
+            {loading ? (
+              <span className="loading-spinner">Activando tu magia...</span>
+            ) : (
+              <>✨ Comenzar mi prueba gratuita</>
+            )}
+          </button>
+        </form>
+
+        <div className="beneficios-mini">
+          <span>✦ 100 runas de regalo</span>
+          <span>✦ 1 tirada gratis</span>
+          <span>✦ Acceso completo</span>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .modal-trial-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.85);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 20px;
+          animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .modal-trial-card {
+          background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+          border: 1px solid #d4af37;
+          border-radius: 20px;
+          padding: 2.5rem;
+          max-width: 480px;
+          width: 100%;
+          position: relative;
+          box-shadow: 0 0 60px rgba(212, 175, 55, 0.2);
+          animation: slideUp 0.4s ease;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+        @keyframes slideUp {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-cerrar {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background: none;
+          border: none;
+          color: #888;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: color 0.2s;
+        }
+        .modal-cerrar:hover { color: #d4af37; }
+
+        .countdown-visual {
+          text-align: center;
+          margin-bottom: 1.5rem;
+        }
+        .countdown-circle {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: 3px solid #d4af37;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 0.5rem;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+          animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.5); }
+        }
+        .countdown-number {
+          font-family: 'Cinzel', serif;
+          font-size: 2.5rem;
+          color: #d4af37;
+          font-weight: 700;
+          line-height: 1;
+        }
+        .countdown-label {
+          font-size: 0.8rem;
+          color: #d4af37;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+        .countdown-texto {
+          color: #FDF8F0;
+          font-size: 1rem;
+          margin: 0;
+        }
+
+        h2 {
+          font-family: 'Cinzel', serif;
+          color: #d4af37;
+          text-align: center;
+          font-size: 1.5rem;
+          margin: 0 0 0.5rem;
+        }
+        .modal-subtitulo {
+          text-align: center;
+          color: #888;
+          font-size: 0.9rem;
+          margin: 0 0 1.5rem;
+        }
+
+        .form-modal-trial {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        .campo-modal label {
+          display: block;
+          color: #FDF8F0;
+          font-size: 0.9rem;
+          margin-bottom: 0.4rem;
+        }
+        .campo-modal input,
+        .campo-modal textarea {
+          width: 100%;
+          padding: 0.8rem 1rem;
+          background: #0d0d0d;
+          border: 1px solid #333;
+          border-radius: 10px;
+          color: #FDF8F0;
+          font-size: 1rem;
+          transition: border-color 0.2s;
+        }
+        .campo-modal input:focus,
+        .campo-modal textarea:focus {
+          outline: none;
+          border-color: #d4af37;
+        }
+        .campo-modal input::placeholder,
+        .campo-modal textarea::placeholder {
+          color: #666;
+        }
+        .campo-modal textarea {
+          resize: none;
+        }
+
+        .campo-checkbox {
+          margin: 0.5rem 0;
+        }
+        .checkbox-label {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          cursor: pointer;
+          color: #999;
+          font-size: 0.85rem;
+          line-height: 1.4;
+        }
+        .checkbox-label input {
+          display: none;
+        }
+        .checkmark {
+          width: 20px;
+          height: 20px;
+          min-width: 20px;
+          border: 2px solid #555;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .checkbox-label input:checked + .checkmark {
+          background: #d4af37;
+          border-color: #d4af37;
+        }
+        .checkbox-label input:checked + .checkmark::after {
+          content: '✓';
+          color: #0d0d0d;
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .checkbox-label a {
+          color: #d4af37;
+          text-decoration: underline;
+        }
+
+        .error-modal {
+          background: rgba(220, 53, 69, 0.15);
+          border: 1px solid #dc3545;
+          color: #ff6b7a;
+          padding: 0.8rem;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          text-align: center;
+        }
+
+        .btn-comenzar {
+          width: 100%;
+          padding: 1rem;
+          background: linear-gradient(135deg, #d4af37, #b8962e);
+          color: #0d0d0d;
+          border: none;
+          border-radius: 50px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+          margin-top: 0.5rem;
+        }
+        .btn-comenzar:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+        }
+        .btn-comenzar:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .loading-spinner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .beneficios-mini {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          margin-top: 1.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid #333;
+          flex-wrap: wrap;
+        }
+        .beneficios-mini span {
+          color: #888;
+          font-size: 0.8rem;
+        }
+
+        @media (max-width: 500px) {
+          .modal-trial-card {
+            padding: 1.5rem;
+          }
+          h2 { font-size: 1.3rem; }
+          .countdown-circle {
+            width: 80px;
+            height: 80px;
+          }
+          .countdown-number { font-size: 2rem; }
+          .beneficios-mini {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// FORMULARIO DE TRIAL (VERSIÓN LEGACY - MANTENER POR COMPATIBILIDAD)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function FormularioTrial({ onVolver, onExito }) {
@@ -1047,7 +1422,7 @@ function FormularioTrial({ onVolver, onExito }) {
     setError(null);
 
     try {
-      const res = await fetch('/api/circulo/activar-trial', {
+      const res = await fetch('/api/mi-magia/circulo/prueba', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, nombre })
@@ -1056,8 +1431,7 @@ function FormularioTrial({ onVolver, onExito }) {
       const data = await res.json();
 
       if (data.success) {
-        localStorage.setItem('circulo_token', data.token);
-        onExito({ email, nombre, token: data.token });
+        onExito({ email, nombre, ...data });
       } else {
         setError(data.error || 'Error al activar la prueba');
       }
@@ -1422,18 +1796,26 @@ export default function CirculoPage() {
     );
   }
 
-  // LANDING (NO ACCESO)
-  if (estado === 'landing') {
-    return <LandingCirculo onTrialClick={() => setEstado('trial_form')} />;
-  }
-
-  // FORMULARIO TRIAL
-  if (estado === 'trial_form') {
+  // LANDING (NO ACCESO) - Con modal de trial superpuesto
+  if (estado === 'landing' || estado === 'trial_form') {
     return (
-      <FormularioTrial
-        onVolver={() => setEstado('landing')}
-        onExito={handleTrialExito}
-      />
+      <>
+        <div className={estado === 'trial_form' ? 'landing-blur' : ''}>
+          <LandingCirculo onTrialClick={() => setEstado('trial_form')} />
+        </div>
+        {estado === 'trial_form' && (
+          <ModalTrialPrueba
+            onCerrar={() => setEstado('landing')}
+            onExito={handleTrialExito}
+          />
+        )}
+        <style jsx>{`
+          .landing-blur {
+            filter: blur(5px);
+            pointer-events: none;
+          }
+        `}</style>
+      </>
     );
   }
 
