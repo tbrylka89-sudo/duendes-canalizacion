@@ -1285,20 +1285,20 @@ export default function MiMagia() {
                   <li>✓ Descuentos de 5% a 10%</li>
                   <li>✓ Acceso anticipado</li>
                 </ul>
-                <button className="btn-promo" onClick={() => {setSeccion('circulo'); setSidebarAbierto(false);}}>
-                  Probar gratis →
-                </button>
+                <a href="/mi-magia/circulo" className="btn-promo" onClick={() => setSidebarAbierto(false)}>
+                  Probá 15 días gratis →
+                </a>
               </div>
             )}
 
             {usuario?.esCirculo && (
               <div className="sidebar-card circulo-activo">
-                <span className="promo-icon">★</span>
-                <h4>Sos parte del Círculo</h4>
+                <span className="promo-icon activo">★</span>
+                <h4>✓ Sos parte del Círculo</h4>
                 <p>Membresía activa</p>
-                <button className="btn-outline" onClick={() => {setSeccion('circulo'); setSidebarAbierto(false);}}>
-                  Ver contenido exclusivo
-                </button>
+                <a href="/mi-magia/circulo" className="btn-circulo-link" onClick={() => setSidebarAbierto(false)}>
+                  Ir al Círculo →
+                </a>
               </div>
             )}
 
@@ -1586,7 +1586,7 @@ function Inicio({ usuario, ir }) {
       </div>
 
       {!usuario?.esCirculo && (
-        <div className="banner-circ banner-circ-neuro" onClick={() => ir('circulo')}>
+        <a href="/mi-magia/circulo" className="banner-circ banner-circ-neuro">
           <span className="circ-glow"></span>
           <span>★</span>
           <div>
@@ -1594,7 +1594,7 @@ function Inicio({ usuario, ir }) {
             <p>No es una membresía. Es una hermandad.</p>
           </div>
           <span className="badge badge-pulse">UNIRME</span>
-        </div>
+        </a>
       )}
 
       {/* FOMO ESPIRITUAL */}
@@ -2325,9 +2325,9 @@ function PromocionesMagicas({ usuario, ir }) {
     {
       id: 'runas-especial',
       titulo: 'Pack de Runas Resplandor',
-      subtitulo: '100 runas = mejor valor',
-      descripcion: 'El pack más popular. 100 runas para múltiples experiencias mágicas: tiradas, oráculos, lecturas del alma y más.',
-      beneficios: ['100 runas de poder', 'El mejor precio por runa', 'Para 5-20 experiencias', 'No vencen nunca'],
+      subtitulo: '350 runas = mejor valor',
+      descripcion: 'El pack más conveniente. 350 runas para múltiples experiencias mágicas: tiradas, oráculos, lecturas del alma y más.',
+      beneficios: ['350 runas de poder', 'El mejor precio por runa', 'Para 15-50 experiencias', 'No vencen nunca'],
       icono: 'ᚱ',
       color: '#7B1FA2',
       activa: true,
@@ -2958,618 +2958,132 @@ function CristalesSec() {
 // CÍRCULO DE DUENDES - Dashboard con tema oscuro y neón
 // ═══════════════════════════════════════════════════════════════
 
-// Colores neón para el Círculo
-const COLORES_NEON = {
-  magenta: '#ff006e',
-  celeste: '#00d4ff',
-  verdeMosgo: '#00ff88',
-  dorado: '#ffd700',
-  violeta: '#bf00ff'
-};
+// ═══════════════════════════════════════════════════════════════
+// CÍRCULO - Sección simplificada (redirecciona a página completa)
+// ═══════════════════════════════════════════════════════════════
 
-// Portales estacionales
-const PORTALES_CIRCULO = {
-  yule: { nombre: 'Yule', meses: [5, 6, 7], color: COLORES_NEON.celeste, icono: '❄️' },
-  ostara: { nombre: 'Ostara', meses: [8, 9, 10], color: COLORES_NEON.verdeMosgo, icono: '🌱' },
-  litha: { nombre: 'Litha', meses: [11, 0, 1], color: COLORES_NEON.dorado, icono: '☀️' },
-  mabon: { nombre: 'Mabon', meses: [2, 3, 4], color: COLORES_NEON.magenta, icono: '🍂' }
-};
-
-// Colores por elemento del duende
-const COLORES_ELEMENTO = {
-  fuego: COLORES_NEON.magenta,
-  agua: COLORES_NEON.celeste,
-  tierra: COLORES_NEON.verdeMosgo,
-  aire: COLORES_NEON.dorado,
-  espiritu: COLORES_NEON.violeta
-};
-
-function CirculoSec({ usuario, setUsuario, token, pais }) {
-  const [tab, setTab] = useState('inicio'); // inicio, luna, contenido, comunidad, rituales
-  const [consejo, setConsejo] = useState(null);
-  const [cargando, setCargando] = useState(true);
-  const [onboardingCompletado, setOnboardingCompletado] = useState(null);
-  const [pasoOnboarding, setPasoOnboarding] = useState(1);
-  const [guardandoOnboarding, setGuardandoOnboarding] = useState(false);
-  const [datosOnboarding, setDatosOnboarding] = useState({
-    nombrePreferido: usuario?.nombre || '',
-    pronombres: '',
-    fechaNacimiento: '',
-    comoLlegaste: '',
-    guardiansAdoptados: '',
-    areasInteres: [],
-    practicaEspiritual: '',
-    coleccionCristales: '',
-    cursosAnteriores: '',
-    tipoContenido: [],
-    objetivoPrincipal: ''
-  });
+function CirculoSec({ usuario, pais }) {
+  const [historial, setHistorial] = useState([]);
+  const [cargando, setCargando] = useState(false);
   const esUY = pais === 'UY';
 
-  // Obtener portal actual
-  const mesActual = new Date().getMonth();
-  const portalActual = Object.entries(PORTALES_CIRCULO).find(([_, p]) => p.meses.includes(mesActual))?.[1] || PORTALES_CIRCULO.litha;
-
-  // Verificar onboarding al montar
+  // Cargar historial de mensajes del Duende de la Semana
   useEffect(() => {
     if (usuario?.esCirculo && usuario?.email) {
-      verificarOnboarding();
-      cargarConsejo();
+      cargarHistorial();
     }
   }, [usuario?.esCirculo, usuario?.email]);
 
-  const verificarOnboarding = async () => {
-    try {
-      const res = await fetch(`/api/circulo/perfil?email=${encodeURIComponent(usuario.email)}`);
-      const data = await res.json();
-      setOnboardingCompletado(data.existe && data.perfil?.onboardingCompletado);
-    } catch(e) {
-      setOnboardingCompletado(true);
-    }
-  };
-
-  const cargarConsejo = async () => {
+  const cargarHistorial = async () => {
     setCargando(true);
     try {
-      const nombre = usuario?.nombrePreferido || usuario?.nombre || 'viajero';
-      const res = await fetch(`/api/circulo/consejo-del-dia?nombre=${encodeURIComponent(nombre)}&email=${encodeURIComponent(usuario.email || '')}`);
+      const res = await fetch(`/api/circulo/historial-mensajes?email=${encodeURIComponent(usuario.email)}`);
       const data = await res.json();
-      if (data.success) {
-        setConsejo(data);
+      if (data.success && data.mensajes) {
+        setHistorial(data.mensajes.slice(0, 10)); // Últimos 10 mensajes
       }
     } catch(e) {
-      console.error('Error cargando consejo:', e);
+      console.error('Error cargando historial:', e);
     }
     setCargando(false);
   };
-
-  const guardarOnboarding = async () => {
-    setGuardandoOnboarding(true);
-    try {
-      const res = await fetch('/api/circulo/perfil', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: usuario.email,
-          perfil: { ...datosOnboarding, onboardingCompletado: true, fechaOnboarding: new Date().toISOString() }
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setOnboardingCompletado(true);
-        if (datosOnboarding.nombrePreferido) {
-          setUsuario({ ...usuario, nombrePreferido: datosOnboarding.nombrePreferido });
-        }
-      }
-    } catch(e) {}
-    setGuardandoOnboarding(false);
-  };
-
-  const handleOnboardingChange = (campo, valor) => setDatosOnboarding(prev => ({ ...prev, [campo]: valor }));
-  const toggleOnboardingArray = (campo, item) => {
-    setDatosOnboarding(prev => {
-      const arr = prev[campo] || [];
-      return { ...prev, [campo]: arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item] };
-    });
-  };
-
-  // Color del duende actual
-  const colorDuende = consejo?.guardian?.elemento ? COLORES_ELEMENTO[consejo.guardian.elemento.toLowerCase()] || COLORES_NEON.dorado : portalActual.color;
 
   // ═══════════════════════════════════════════════════════════════
   // SI ES MIEMBRO DEL CÍRCULO
   // ═══════════════════════════════════════════════════════════════
 
   if (usuario?.esCirculo) {
-    // Cargando onboarding
-    if (onboardingCompletado === null) {
-      return (
-        <div className="circulo-dark-loading">
-          <span className="circulo-star">★</span>
-          <p>Preparando tu espacio en el Círculo...</p>
-          <style jsx>{`
-            .circulo-dark-loading { background: #0a0a0a; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; color: #fff; font-family: 'Cinzel', serif; }
-            .circulo-star { font-size: 3rem; color: ${portalActual.color}; animation: pulse 2s infinite; }
-            @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
-          `}</style>
-        </div>
-      );
-    }
-
-    // ONBOARDING (si no completado)
-    if (!onboardingCompletado) {
-      return (
-        <div className="circulo-dark-onboarding">
-          <div className="onb-header">
-            <span style={{color: portalActual.color}}>★</span>
-            <h1>{personalizarTexto('Bienvenido/a al Círculo', datosOnboarding.pronombres || datosOnboarding.genero)}</h1>
-            <p>Queremos conocerte para personalizar tu experiencia</p>
-          </div>
-          <div className="onb-pasos">
-            {[1,2,3,4].map(n => (
-              <div key={n} className={`onb-paso ${pasoOnboarding >= n ? 'activo' : ''} ${pasoOnboarding === n ? 'actual' : ''}`} style={pasoOnboarding === n ? {borderColor: portalActual.color, color: portalActual.color} : {}}>{n}</div>
-            ))}
-          </div>
-
-          {pasoOnboarding === 1 && (
-            <div className="onb-content">
-              <div className="onb-campo"><label>¿Cómo te gustaría que te llamemos?</label><input type="text" value={datosOnboarding.nombrePreferido} onChange={e => handleOnboardingChange('nombrePreferido', e.target.value)} placeholder="Tu nombre" /></div>
-              <div className="onb-campo"><label>Pronombres</label><div className="onb-opciones">{[['ella','Ella'],['el','Él'],['elle','Elle'],['no-decir','Prefiero no decir']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('pronombres', v)} className={datosOnboarding.pronombres === v ? 'sel' : ''} style={datosOnboarding.pronombres === v ? {background: portalActual.color, borderColor: portalActual.color} : {}}>{t}</button>))}</div></div>
-              <div className="onb-campo"><label>Fecha de nacimiento</label><input type="date" value={datosOnboarding.fechaNacimiento} onChange={e => handleOnboardingChange('fechaNacimiento', e.target.value)} /><small>Para calcular tu signo y número de vida</small></div>
-              <button className="onb-btn" onClick={() => setPasoOnboarding(2)} disabled={!datosOnboarding.nombrePreferido} style={{background: datosOnboarding.nombrePreferido ? portalActual.color : '#333'}}>Siguiente</button>
-            </div>
-          )}
-
-          {pasoOnboarding === 2 && (
-            <div className="onb-content">
-              <div className="onb-campo"><label>¿Cómo llegaste a Duendes del Uruguay?</label><div className="onb-opciones-v">{[['instagram','Por Instagram'],['recomendacion','Me lo recomendó alguien'],['busqueda','Buscando cristales/guardianes'],['feria','En una feria'],['otro','Otra forma']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('comoLlegaste', v)} className={datosOnboarding.comoLlegaste === v ? 'sel' : ''}>{t}</button>))}</div></div>
-              <div className="onb-campo"><label>¿Cuántos guardianes tenés?</label><div className="onb-opciones">{[['0','Ninguno'],['1-3','1 a 3'],['4-10','4 a 10'],['mas-10','Más de 10']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('guardiansAdoptados', v)} className={datosOnboarding.guardiansAdoptados === v ? 'sel' : ''} style={datosOnboarding.guardiansAdoptados === v ? {background: portalActual.color, borderColor: portalActual.color} : {}}>{t}</button>))}</div></div>
-              <div className="onb-nav"><button className="onb-btn-sec" onClick={() => setPasoOnboarding(1)}>Anterior</button><button className="onb-btn" onClick={() => setPasoOnboarding(3)} style={{background: portalActual.color}}>Siguiente</button></div>
-            </div>
-          )}
-
-          {pasoOnboarding === 3 && (
-            <div className="onb-content">
-              <div className="onb-campo"><label>¿Qué áreas te interesan? (varias)</label><div className="onb-grid">{[['abundancia','Abundancia'],['proteccion','Protección'],['amor','Amor'],['sanacion','Sanación'],['intuicion','Intuición'],['naturaleza','Naturaleza']].map(([v,t]) => (<button key={v} onClick={() => toggleOnboardingArray('areasInteres', v)} className={datosOnboarding.areasInteres.includes(v) ? 'sel' : ''} style={datosOnboarding.areasInteres.includes(v) ? {borderColor: portalActual.color, color: portalActual.color} : {}}>{t}</button>))}</div></div>
-              <div className="onb-campo"><label>Frecuencia de práctica espiritual</label><div className="onb-opciones-v">{[['nunca','Recién empiezo'],['ocasional','De vez en cuando'],['regular','Semanalmente'],['diario','Todos los días']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('practicaEspiritual', v)} className={datosOnboarding.practicaEspiritual === v ? 'sel' : ''}>{t}</button>))}</div></div>
-              <div className="onb-nav"><button className="onb-btn-sec" onClick={() => setPasoOnboarding(2)}>Anterior</button><button className="onb-btn" onClick={() => setPasoOnboarding(4)} style={{background: portalActual.color}}>Siguiente</button></div>
-            </div>
-          )}
-
-          {pasoOnboarding === 4 && (
-            <div className="onb-content">
-              <div className="onb-campo"><label>¿Hiciste cursos espirituales antes?</label><div className="onb-opciones-v">{[['no','No, primera vez'],['gratis','Solo gratuitos'],['pagos','Cursos pagos'],['presencial','Presenciales'],['varios','Varios tipos']].map(([v,t]) => (<button key={v} onClick={() => handleOnboardingChange('cursosAnteriores', v)} className={datosOnboarding.cursosAnteriores === v ? 'sel' : ''}>{t}</button>))}</div></div>
-              <div className="onb-campo"><label>Tipo de contenido preferido (varias)</label><div className="onb-opciones">{[['lecturas','Lecturas'],['audios','Audios'],['videos','Videos'],['rituales','Rituales'],['lives','Lives']].map(([v,t]) => (<button key={v} onClick={() => toggleOnboardingArray('tipoContenido', v)} className={datosOnboarding.tipoContenido.includes(v) ? 'sel' : ''} style={datosOnboarding.tipoContenido.includes(v) ? {borderColor: portalActual.color, color: portalActual.color} : {}}>{t}</button>))}</div></div>
-              <div className="onb-campo"><label>¿Qué buscás en el Círculo?</label><textarea value={datosOnboarding.objetivoPrincipal} onChange={e => handleOnboardingChange('objetivoPrincipal', e.target.value)} placeholder="Contanos..." rows={3} /></div>
-              <div className="onb-nav"><button className="onb-btn-sec" onClick={() => setPasoOnboarding(3)}>Anterior</button><button className="onb-btn onb-btn-final" onClick={guardarOnboarding} disabled={guardandoOnboarding} style={{background: portalActual.color}}>{guardandoOnboarding ? 'Guardando...' : 'Entrar al Círculo'}</button></div>
-            </div>
-          )}
-
-          <style jsx>{`
-            .circulo-dark-onboarding { background: #0a0a0a; border-radius: 16px; padding: 2rem; color: #fff; font-family: 'Cormorant Garamond', serif; }
-            .onb-header { text-align: center; margin-bottom: 2rem; }
-            .onb-header span { font-size: 2.5rem; }
-            .onb-header h1 { font-family: 'Tangerine', cursive; font-size: 2.5rem; margin: 0.5rem 0; color: #fff; }
-            .onb-header p { color: rgba(255,255,255,0.6); font-size: 1rem; }
-            .onb-pasos { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
-            .onb-paso { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #333; color: #666; font-weight: 600; transition: all 0.3s; }
-            .onb-paso.activo { border-color: #666; color: #fff; }
-            .onb-paso.actual { border-width: 2px; }
-            .onb-content { max-width: 450px; margin: 0 auto; }
-            .onb-campo { margin-bottom: 1.5rem; }
-            .onb-campo label { display: block; color: #fff; margin-bottom: 0.5rem; font-size: 1rem; }
-            .onb-campo input, .onb-campo textarea { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 1rem; font-family: inherit; box-sizing: border-box; }
-            .onb-campo input:focus, .onb-campo textarea:focus { outline: none; border-color: ${portalActual.color}; }
-            .onb-campo small { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-top: 4px; display: block; }
-            .onb-opciones { display: flex; flex-wrap: wrap; gap: 8px; }
-            .onb-opciones button { padding: 10px 18px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
-            .onb-opciones button:hover { border-color: #666; }
-            .onb-opciones button.sel { color: #0a0a0a; font-weight: 600; }
-            .onb-opciones-v { display: flex; flex-direction: column; gap: 8px; }
-            .onb-opciones-v button { padding: 12px 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: rgba(255,255,255,0.7); cursor: pointer; text-align: left; font-size: 0.95rem; transition: all 0.3s; }
-            .onb-opciones-v button:hover { border-color: #666; }
-            .onb-opciones-v button.sel { background: #222; border-color: ${portalActual.color}; color: ${portalActual.color}; }
-            .onb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-            .onb-grid button { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
-            .onb-grid button:hover { border-color: #666; }
-            .onb-grid button.sel { background: rgba(255,255,255,0.05); }
-            .onb-nav { display: flex; gap: 12px; margin-top: 1.5rem; }
-            .onb-btn { flex: 2; padding: 14px; border: none; border-radius: 8px; color: #0a0a0a; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: 'Cinzel', serif; transition: all 0.3s; }
-            .onb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-            .onb-btn-sec { flex: 1; padding: 14px; border: 1px solid #333; border-radius: 8px; background: transparent; color: #fff; font-size: 1rem; cursor: pointer; }
-            .onb-btn-final { box-shadow: 0 0 20px ${portalActual.color}40; }
-          `}</style>
-        </div>
-      );
-    }
-
-    // DASHBOARD PRINCIPAL (onboarding completado)
     return (
-      <div className="circulo-dark-dashboard">
-        {/* Banner del portal actual */}
-        <div className="circulo-banner" style={{'--portal-color': portalActual.color, '--duende-color': colorDuende}}>
-          <div className="banner-bg"></div>
-          <div className="banner-content">
-            <span className="portal-icon">{portalActual.icono}</span>
-            <h1>Círculo de Duendes</h1>
-            <p>Portal de {portalActual.nombre}</p>
-          </div>
+      <div className="sec">
+        <div className="circulo-miembro-card">
+          <span className="circulo-miembro-icon">★</span>
+          <h2>✓ Sos parte del Círculo</h2>
+          <p>Tu membresía está activa. Entrá al Círculo para ver todo tu contenido exclusivo.</p>
+          <a href="/mi-magia/circulo" className="btn-ir-circulo">
+            Ir al Círculo →
+          </a>
         </div>
 
-        {/* Duende de la semana */}
-        {cargando ? (
-          <div className="duende-loading"><span>✦</span> Conectando con tu guardián...</div>
-        ) : consejo?.guardian ? (
-          <div className="duende-card" style={{'--duende-color': colorDuende}}>
-            <div className="duende-imagen">
-              <img src={consejo.guardian.imagen} alt={consejo.guardian.nombre} />
-              <div className="duende-aura"></div>
+        {/* Historial de mensajes del Duende de la Semana */}
+        <div className="historial-mensajes">
+          <h3>📜 Mensajes recibidos del Duende de la Semana</h3>
+          {cargando ? (
+            <p className="historial-cargando">Cargando historial...</p>
+          ) : historial.length > 0 ? (
+            <div className="mensajes-lista">
+              {historial.map((msg, i) => (
+                <div key={i} className="mensaje-item">
+                  <div className="mensaje-header">
+                    <span className="mensaje-guardian">{msg.guardian || 'Guardián'}</span>
+                    <span className="mensaje-fecha">{msg.fecha || ''}</span>
+                  </div>
+                  <p className="mensaje-texto">{msg.mensaje}</p>
+                </div>
+              ))}
             </div>
-            <div className="duende-info">
-              <span className="duende-tipo">{consejo.guardian.tipo_ser_nombre} - {consejo.guardian.arquetipo || 'Guardián'}</span>
-              <h2>{consejo.guardian.nombre}</h2>
-              <p className="duende-elemento">{consejo.guardian.elemento}</p>
-            </div>
-
-            {/* Mensaje del duende */}
-            <div className="consejo-box">
-              {consejo.tipoMensaje === 'primera' && <span className="consejo-badge">✦ Consejo del día</span>}
-              {consejo.tipoMensaje === 'comentario' && <span className="consejo-badge comentario">💬 Te cuento algo más...</span>}
-              {consejo.tipoMensaje === 'gracioso' && <span className="consejo-badge gracioso">😄 Entre nos...</span>}
-              <p className="consejo-texto">{consejo.consejo?.mensaje || consejo.consejo}</p>
-            </div>
-
-            {/* Días restantes */}
-            <div className="semana-info">
-              <span>📅 {consejo.diasRestantes} días más con {consejo.guardian.nombre}</span>
-              {consejo.visitaDelDia > 1 && <span className="visita-num">Visita #{consejo.visitaDelDia} de hoy</span>}
-            </div>
-          </div>
-        ) : (
-          <div className="duende-error">No pudimos conectar con tu guardián. Intentá de nuevo.</div>
-        )}
-
-        {/* Navegación por tabs */}
-        {tab === 'inicio' ? (
-          <div className="circulo-accesos">
-            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.celeste}} onClick={() => setTab('luna')}><span>☽</span> Guía Lunar</button>
-            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.verdeMosgo}} onClick={() => setTab('contenido')}><span>✦</span> Contenido</button>
-            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.magenta}} onClick={() => setTab('comunidad')}><span>❧</span> Comunidad</button>
-            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.dorado}} onClick={() => setTab('rituales')}><span>📖</span> Rituales</button>
-          </div>
-        ) : (
-          <div className="tab-content">
-            <button className="btn-volver-inicio" onClick={() => setTab('inicio')}>← Volver al inicio</button>
-
-            {tab === 'luna' && (
-              <div className="seccion-luna">
-                <h2 style={{color: COLORES_NEON.celeste}}>☽ Guía Lunar</h2>
-                <p>Tu conexión con los ciclos de la luna</p>
-                <div className="luna-actual">
-                  <span className="luna-fase">🌙</span>
-                  <div>
-                    <h3>Luna actual</h3>
-                    <p>Pronto tendrás aquí la guía completa de las fases lunares, rituales recomendados y meditaciones para cada momento del ciclo.</p>
-                  </div>
-                </div>
-                <div className="luna-prox">
-                  <p className="proximamente">✦ Contenido en preparación</p>
-                </div>
-              </div>
-            )}
-
-            {tab === 'contenido' && (
-              <div className="seccion-contenido">
-                <h2 style={{color: COLORES_NEON.verdeMosgo}}>✦ Contenido Exclusivo</h2>
-                <p>Material especial solo para miembros del Círculo</p>
-                <div className="contenido-grid">
-                  <div className="contenido-card">
-                    <span>📚</span>
-                    <h4>Biblioteca de Rituales</h4>
-                    <p>Prácticas ancestrales</p>
-                  </div>
-                  <div className="contenido-card">
-                    <span>🔮</span>
-                    <h4>Meditaciones Guiadas</h4>
-                    <p>Con los guardianes</p>
-                  </div>
-                  <div className="contenido-card">
-                    <span>✨</span>
-                    <h4>Cursos Especiales</h4>
-                    <p>Aprendizaje profundo</p>
-                  </div>
-                  <div className="contenido-card">
-                    <span>🌿</span>
-                    <h4>Herbolaria Mágica</h4>
-                    <p>Secretos de plantas</p>
-                  </div>
-                </div>
-                <p className="proximamente">✦ Contenido en preparación</p>
-              </div>
-            )}
-
-            {tab === 'comunidad' && (
-              <div className="seccion-comunidad">
-                <h2 style={{color: COLORES_NEON.magenta}}>❧ Comunidad del Círculo</h2>
-                <p>Tu espacio para conectar, compartir y crecer junto a otros buscadores</p>
-
-                <div className="comunidad-stats">
-                  <div className="stat-item">
-                    <span className="stat-num">✦</span>
-                    <span className="stat-label">Miembros activos</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-num">☽</span>
-                    <span className="stat-label">Círculos de luna</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-num">❧</span>
-                    <span className="stat-label">Historias compartidas</span>
-                  </div>
-                </div>
-
-                <div className="foro-seccion">
-                  <div className="foro-titulo">
-                    <span className="foro-icono">📋</span>
-                    <div>
-                      <h3>Tablero de Experiencias</h3>
-                      <p>Compartí tu camino con los guardianes</p>
-                    </div>
-                  </div>
-                  <div className="foro-estado">
-                    <span className="estado-badge">En desarrollo</span>
-                    <p>Estamos creando un espacio sagrado para que puedas compartir tus experiencias, sueños y descubrimientos con otros miembros del Círculo.</p>
-                  </div>
-                </div>
-
-                <div className="comunidad-features">
-                  <div className="feature-card">
-                    <span style={{color: COLORES_NEON.magenta}}>💬</span>
-                    <h4>Historias con Guardianes</h4>
-                    <p>Contá cómo te conectaste con tu guardián y qué aprendiste</p>
-                  </div>
-                  <div className="feature-card">
-                    <span style={{color: COLORES_NEON.celeste}}>🌙</span>
-                    <h4>Círculos Lunares</h4>
-                    <p>Encuentros virtuales cada luna llena y nueva</p>
-                  </div>
-                  <div className="feature-card">
-                    <span style={{color: COLORES_NEON.verdeMosgo}}>🌿</span>
-                    <h4>Intercambio de Rituales</h4>
-                    <p>Compartí prácticas que funcionaron para vos</p>
-                  </div>
-                  <div className="feature-card">
-                    <span style={{color: COLORES_NEON.dorado}}>✨</span>
-                    <h4>Preguntas al Círculo</h4>
-                    <p>Consultá a la comunidad sobre tu camino</p>
-                  </div>
-                </div>
-
-                <div className="comunidad-cta">
-                  <p>¿Tenés algo para compartir? Escribinos a <strong>circulo@duendesuy.com</strong></p>
-                </div>
-              </div>
-            )}
-
-            {tab === 'rituales' && (
-              <div className="seccion-rituales">
-                <h2 style={{color: COLORES_NEON.dorado}}>📖 Rituales del Portal</h2>
-                <p>Prácticas sagradas para el portal de {portalActual.nombre}</p>
-                <div className="ritual-destacado">
-                  <span className="ritual-icon">{portalActual.icono}</span>
-                  <div>
-                    <h3>Ritual de {portalActual.nombre}</h3>
-                    <p>Conectá con la energía de este momento del año a través de prácticas específicas para el portal actual.</p>
-                  </div>
-                </div>
-                <div className="rituales-lista">
-                  <div className="ritual-mini">
-                    <span>🕯️</span>
-                    <span>Ritual de velas</span>
-                  </div>
-                  <div className="ritual-mini">
-                    <span>🌿</span>
-                    <span>Limpieza energética</span>
-                  </div>
-                  <div className="ritual-mini">
-                    <span>✨</span>
-                    <span>Meditación guiada</span>
-                  </div>
-                </div>
-                <p className="proximamente">✦ Rituales en preparación</p>
-              </div>
-            )}
-          </div>
-        )}
+          ) : (
+            <p className="historial-vacio">Tus mensajes del Duende de la Semana aparecerán aquí.</p>
+          )}
+        </div>
 
         <style jsx>{`
-          .circulo-dark-dashboard { background: #0a0a0a; border-radius: 16px; overflow: hidden; color: #fff; font-family: 'Cormorant Garamond', serif; }
-          .circulo-banner { position: relative; padding: 2.5rem 1.5rem; text-align: center; overflow: hidden; }
-          .banner-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
-          .banner-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, var(--portal-color) 0%, transparent 70%); opacity: 0.15; }
-          .banner-content { position: relative; z-index: 1; }
-          .portal-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; filter: drop-shadow(0 0 10px var(--portal-color)); }
-          .banner-content h1 { font-family: 'Tangerine', cursive; font-size: 3rem; margin: 0; color: #fff; text-shadow: 0 0 30px var(--portal-color); }
-          .banner-content p { color: var(--portal-color); font-size: 1.1rem; margin-top: 0.5rem; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase; }
+          .circulo-miembro-card { background: linear-gradient(135deg, #f0fff0, #e8f5e9); border: 2px solid #2a7a2a; border-radius: 16px; padding: 2rem; text-align: center; margin-bottom: 2rem; }
+          .circulo-miembro-icon { font-size: 3rem; color: #2a7a2a; display: block; margin-bottom: 1rem; }
+          .circulo-miembro-card h2 { font-family: 'Cinzel', serif; color: #2a7a2a; margin: 0 0 0.5rem; }
+          .circulo-miembro-card p { color: #555; margin-bottom: 1.5rem; }
+          .btn-ir-circulo { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #2a7a2a, #1a5a1a); color: #fff; text-decoration: none; border-radius: 8px; font-family: 'Cinzel', serif; font-weight: 600; transition: all 0.2s; }
+          .btn-ir-circulo:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(42,122,42,0.3); }
 
-          .duende-loading { text-align: center; padding: 3rem; color: rgba(255,255,255,0.6); }
-          .duende-loading span { color: ${portalActual.color}; }
-          .duende-error { text-align: center; padding: 2rem; color: rgba(255,255,255,0.5); }
-
-          .duende-card { padding: 1.5rem; text-align: center; }
-          .duende-imagen { position: relative; width: 180px; height: 180px; margin: 0 auto 1.5rem; }
-          .duende-imagen img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--duende-color); }
-          .duende-aura { position: absolute; inset: -10px; border-radius: 50%; background: radial-gradient(circle, var(--duende-color) 0%, transparent 70%); opacity: 0.3; animation: aura-pulse 3s ease-in-out infinite; z-index: -1; }
-          @keyframes aura-pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.5; } }
-
-          .duende-info { margin-bottom: 1.5rem; }
-          .duende-tipo { font-size: 0.85rem; color: var(--duende-color); text-transform: uppercase; letter-spacing: 2px; font-family: 'Cinzel', serif; }
-          .duende-info h2 { font-family: 'Tangerine', cursive; font-size: 2.5rem; margin: 0.3rem 0; color: #fff; }
-          .duende-elemento { color: rgba(255,255,255,0.5); font-size: 0.9rem; }
-
-          .consejo-box { background: #111; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border-left: 3px solid var(--duende-color); text-align: left; }
-          .consejo-badge { display: inline-block; font-size: 0.8rem; color: var(--duende-color); margin-bottom: 0.8rem; font-family: 'Cinzel', serif; letter-spacing: 1px; }
-          .consejo-badge.comentario { color: ${COLORES_NEON.celeste}; }
-          .consejo-badge.gracioso { color: ${COLORES_NEON.dorado}; }
-          .consejo-texto { font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.9); margin: 0; }
-
-          .semana-info { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #111; border-radius: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
-          .visita-num { color: var(--duende-color); }
-
-          .circulo-accesos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 1.5rem; }
-          .acceso-btn { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #111; border: 1px solid #222; border-radius: 10px; color: #fff; font-family: 'Cinzel', serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
-          .acceso-btn:hover { border-color: var(--btn-color); box-shadow: 0 0 15px var(--btn-color)30; }
-          .acceso-btn span { font-size: 1.3rem; color: var(--btn-color); }
-
-          /* Tab content sections */
-          .tab-content { padding: 1.5rem; }
-          .btn-volver-inicio { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #333; color: rgba(255,255,255,0.7); padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; margin-bottom: 1.5rem; transition: all 0.3s; }
-          .btn-volver-inicio:hover { border-color: #666; color: #fff; }
-
-          .tab-content h2 { font-family: 'Tangerine', cursive; font-size: 2.2rem; margin: 0 0 0.5rem; }
-          .tab-content > p { color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; font-size: 1rem; }
-          .proximamente { text-align: center; color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 1.5rem; padding: 1rem; background: #0a0a0a; border-radius: 8px; }
-
-          /* Luna section */
-          .luna-actual { display: flex; gap: 1rem; align-items: flex-start; background: #111; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; }
-          .luna-fase { font-size: 3rem; filter: drop-shadow(0 0 10px ${COLORES_NEON.celeste}); }
-          .luna-actual h3 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0 0 0.5rem; color: ${COLORES_NEON.celeste}; }
-          .luna-actual p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.95rem; line-height: 1.5; }
-
-          /* Contenido section */
-          .contenido-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-          .contenido-card { background: #111; padding: 1.2rem; border-radius: 10px; text-align: center; border: 1px solid #222; transition: all 0.3s; }
-          .contenido-card:hover { border-color: ${COLORES_NEON.verdeMosgo}40; }
-          .contenido-card span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
-          .contenido-card h4 { font-family: 'Cinzel', serif; font-size: 0.85rem; margin: 0 0 0.3rem; color: #fff; }
-          .contenido-card p { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin: 0; }
-
-          /* Comunidad section */
-          .comunidad-stats { display: flex; justify-content: space-around; padding: 1.2rem; background: linear-gradient(135deg, ${COLORES_NEON.magenta}10 0%, transparent 100%); border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid ${COLORES_NEON.magenta}20; }
-          .stat-item { text-align: center; }
-          .stat-num { font-size: 1.5rem; color: ${COLORES_NEON.magenta}; display: block; margin-bottom: 4px; }
-          .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
-
-          .foro-seccion { background: #111; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
-          .foro-titulo { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
-          .foro-icono { font-size: 2rem; }
-          .foro-titulo h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0 0 0.3rem; color: #fff; }
-          .foro-titulo p { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin: 0; }
-          .foro-estado { background: #0a0a0a; padding: 1rem; border-radius: 8px; }
-          .estado-badge { display: inline-block; font-size: 0.7rem; background: ${COLORES_NEON.violeta}30; color: ${COLORES_NEON.violeta}; padding: 4px 12px; border-radius: 20px; margin-bottom: 0.8rem; }
-          .foro-estado p { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin: 0; line-height: 1.5; }
-
-          .comunidad-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-          .feature-card { background: #111; padding: 1rem; border-radius: 10px; border: 1px solid #1a1a1a; transition: all 0.3s; }
-          .feature-card:hover { border-color: #333; }
-          .feature-card span { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
-          .feature-card h4 { font-family: 'Cinzel', serif; font-size: 0.8rem; margin: 0 0 0.3rem; color: #fff; }
-          .feature-card p { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin: 0; line-height: 1.4; }
-
-          .comunidad-cta { text-align: center; padding: 1rem; background: #0a0a0a; border-radius: 8px; }
-          .comunidad-cta p { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin: 0; }
-          .comunidad-cta strong { color: ${COLORES_NEON.magenta}; }
-
-          /* Rituales section */
-          .ritual-destacado { display: flex; gap: 1rem; align-items: flex-start; background: linear-gradient(135deg, #1a1a0a 0%, #111 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid ${COLORES_NEON.dorado}30; margin-bottom: 1rem; }
-          .ritual-icon { font-size: 3rem; filter: drop-shadow(0 0 10px ${COLORES_NEON.dorado}); }
-          .ritual-destacado h3 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0 0 0.5rem; color: ${COLORES_NEON.dorado}; }
-          .ritual-destacado p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.95rem; line-height: 1.5; }
-          .rituales-lista { display: flex; flex-direction: column; gap: 8px; }
-          .ritual-mini { display: flex; align-items: center; gap: 12px; background: #111; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; color: rgba(255,255,255,0.8); }
-          .ritual-mini span:first-child { font-size: 1.2rem; }
+          .historial-mensajes { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.5rem; }
+          .historial-mensajes h3 { font-family: 'Cinzel', serif; color: #1a1a1a; margin: 0 0 1rem; font-size: 1rem; }
+          .historial-cargando, .historial-vacio { color: #888; font-style: italic; text-align: center; padding: 2rem; }
+          .mensajes-lista { display: flex; flex-direction: column; gap: 1rem; }
+          .mensaje-item { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 1rem; }
+          .mensaje-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+          .mensaje-guardian { font-family: 'Cinzel', serif; color: #d4af37; font-weight: 600; }
+          .mensaje-fecha { font-size: 0.8rem; color: #999; }
+          .mensaje-texto { color: #444; line-height: 1.6; margin: 0; font-size: 0.95rem; }
         `}</style>
       </div>
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // SI NO ES MIEMBRO - MODAL CON PREVIEW BLURREADO
+  // SI NO ES MIEMBRO - MOSTRAR PROMOCIÓN
   // ═══════════════════════════════════════════════════════════════
 
   return (
-    <div className="circulo-promo-container">
-      {/* Preview blurreado de fondo */}
-      <div className="circulo-preview-bg">
-        <div className="preview-fake-content">
-          <div className="fake-duende"></div>
-          <div className="fake-text"></div>
-          <div className="fake-text short"></div>
-          <div className="fake-cards">
-            <div className="fake-card"></div>
-            <div className="fake-card"></div>
-          </div>
-        </div>
-      </div>
+    <div className="sec">
+      <div className="circulo-promo-card">
+        <span className="circulo-promo-icon">★</span>
+        <h2>Círculo de Duendes</h2>
+        <p className="circulo-promo-sub">El santuario secreto para quienes sienten el llamado</p>
 
-      {/* Modal de suscripción */}
-      <div className="circulo-modal">
-        <span className="modal-star">★</span>
-        <h1>Círculo de Duendes</h1>
-        <p className="modal-subtitle">El santuario secreto para quienes sienten el llamado</p>
-
-        <div className="beneficios-lista">
-          <div className="beneficio"><span style={{color: COLORES_NEON.magenta}}>✦</span> Duende guardián semanal con mensajes únicos</div>
-          <div className="beneficio"><span style={{color: COLORES_NEON.celeste}}>☽</span> Guía lunar completa cada mes</div>
-          <div className="beneficio"><span style={{color: COLORES_NEON.verdeMosgo}}>🕯️</span> Rituales y prácticas exclusivas</div>
-          <div className="beneficio"><span style={{color: COLORES_NEON.dorado}}>❧</span> Comunidad privada de buscadores</div>
-          <div className="beneficio"><span style={{color: COLORES_NEON.violeta}}>◈</span> 5-10% OFF en guardianes</div>
-          <div className="beneficio destacado"><span style={{color: COLORES_NEON.dorado}}>🎁</span> <strong>100 runas de regalo</strong> para usar en la tienda</div>
+        <div className="beneficios-lista-simple">
+          <div className="beneficio-item">✦ Duende guardián semanal con mensajes únicos</div>
+          <div className="beneficio-item">☽ Guía lunar completa cada mes</div>
+          <div className="beneficio-item">🕯️ Rituales y prácticas exclusivas</div>
+          <div className="beneficio-item">❧ Comunidad privada de buscadores</div>
+          <div className="beneficio-item">◈ 5-10% OFF en guardianes</div>
+          <div className="beneficio-item destacado">🎁 100 runas de regalo para usar en la tienda</div>
         </div>
 
-        <h3>Elegí tu membresía</h3>
-        <p className="pago-unico">Pago único - Sin renovación automática</p>
-
-        <div className="membresias-grid">
-          <a href="https://duendesuy.10web.cloud/producto/circulo-semestral/" target="_blank" rel="noopener" className="membresia-card">
-            <h4>Semestral</h4>
-            <div className="precio">{esUY ? '$2.000' : '$50'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
-            <span className="duracion">6 meses de magia</span>
-          </a>
-          <a href="https://duendesuy.10web.cloud/producto/circulo-anual/" target="_blank" rel="noopener" className="membresia-card destacada">
-            <span className="badge-mejor">Mejor valor</span>
-            <h4>Anual</h4>
-            <div className="precio">{esUY ? '$3.200' : '$80'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
-            <span className="duracion">12 meses de magia</span>
-            <span className="ahorro">Ahorrás 20%</span>
-          </a>
-        </div>
+        <a href="/mi-magia/circulo" className="btn-unirse-circulo">
+          Probá 15 días gratis →
+        </a>
       </div>
 
       <style jsx>{`
-        .circulo-promo-container { position: relative; min-height: 500px; border-radius: 16px; overflow: hidden; background: #0a0a0a; }
-        .circulo-preview-bg { position: absolute; inset: 0; filter: blur(8px); opacity: 0.3; padding: 2rem; }
-        .preview-fake-content { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-        .fake-duende { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #333, #222); }
-        .fake-text { width: 80%; height: 20px; background: #222; border-radius: 4px; }
-        .fake-text.short { width: 50%; }
-        .fake-cards { display: flex; gap: 1rem; width: 100%; margin-top: 1rem; }
-        .fake-card { flex: 1; height: 100px; background: #1a1a1a; border-radius: 8px; }
-
-        .circulo-modal { position: relative; z-index: 1; text-align: center; padding: 2.5rem 1.5rem; color: #fff; font-family: 'Cormorant Garamond', serif; }
-        .modal-star { font-size: 3rem; color: ${COLORES_NEON.dorado}; display: block; margin-bottom: 0.5rem; text-shadow: 0 0 30px ${COLORES_NEON.dorado}; }
-        .circulo-modal h1 { font-family: 'Tangerine', cursive; font-size: 3rem; margin: 0 0 0.5rem; color: #fff; }
-        .modal-subtitle { color: rgba(255,255,255,0.6); font-size: 1.1rem; margin-bottom: 2rem; }
-
-        .beneficios-lista { text-align: left; max-width: 320px; margin: 0 auto 2rem; }
-        .beneficio { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 1rem; color: rgba(255,255,255,0.85); border-bottom: 1px solid #1a1a1a; }
-        .beneficio span { font-size: 1.2rem; }
-        .beneficio.destacado { background: linear-gradient(90deg, ${COLORES_NEON.dorado}15 0%, transparent 100%); padding: 12px 10px; margin: 8px -10px; border-radius: 8px; border-bottom: none; }
-        .beneficio.destacado strong { color: ${COLORES_NEON.dorado}; }
-
-        .circulo-modal h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0 0 0.3rem; color: #fff; letter-spacing: 1px; }
-        .pago-unico { font-size: 0.85rem; color: ${COLORES_NEON.verdeMosgo}; margin-bottom: 1.5rem; }
-
-        .membresias-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px; margin: 0 auto; }
-        .membresia-card { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem; background: #111; border: 1px solid #222; border-radius: 12px; text-decoration: none; color: #fff; transition: all 0.3s; position: relative; }
-        .membresia-card:hover { border-color: ${COLORES_NEON.dorado}; box-shadow: 0 0 20px ${COLORES_NEON.dorado}30; }
-        .membresia-card.destacada { border-color: ${COLORES_NEON.dorado}; background: linear-gradient(135deg, #1a1a0a 0%, #111 100%); }
-        .badge-mejor { position: absolute; top: -10px; background: ${COLORES_NEON.dorado}; color: #0a0a0a; font-size: 0.7rem; padding: 4px 12px; border-radius: 20px; font-family: 'Cinzel', serif; font-weight: 600; }
-        .membresia-card h4 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0 0 0.5rem; }
-        .precio { font-size: 1.8rem; font-weight: 700; color: #fff; }
-        .precio small { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-left: 4px; }
-        .duracion { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; }
-        .ahorro { font-size: 0.8rem; color: ${COLORES_NEON.verdeMosgo}; margin-top: 0.5rem; font-weight: 600; }
+        .circulo-promo-card { background: linear-gradient(135deg, #faf8f3, #fff); border: 2px solid #d4af37; border-radius: 16px; padding: 2rem; text-align: center; }
+        .circulo-promo-icon { font-size: 3rem; color: #d4af37; display: block; margin-bottom: 1rem; }
+        .circulo-promo-card h2 { font-family: 'Tangerine', cursive; font-size: 2.5rem; color: #1a1a1a; margin: 0 0 0.5rem; }
+        .circulo-promo-sub { color: #666; margin-bottom: 1.5rem; }
+        .beneficios-lista-simple { text-align: left; max-width: 350px; margin: 0 auto 1.5rem; }
+        .beneficio-item { padding: 0.6rem 0; border-bottom: 1px dashed #e0e0e0; color: #444; font-size: 0.95rem; }
+        .beneficio-item:last-child { border-bottom: none; }
+        .beneficio-item.destacado { background: linear-gradient(90deg, rgba(212,175,55,0.1), transparent); padding: 0.8rem 0.5rem; margin: 0.5rem -0.5rem 0; border-radius: 6px; border-bottom: none; font-weight: 600; color: #b8962e; }
+        .btn-unirse-circulo { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #d4af37, #b8962e); color: #1a1a1a; text-decoration: none; border-radius: 8px; font-family: 'Cinzel', serif; font-weight: 600; transition: all 0.2s; }
+        .btn-unirse-circulo:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
       `}</style>
     </div>
   );
@@ -6104,6 +5618,10 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
 .btn-outline{padding:10px 16px;background:transparent;border:1px solid #d4af37;border-radius:6px;color:#d4af37;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
 .btn-outline:hover{background:#d4af3711}
+
+.btn-circulo-link{display:block;width:100%;padding:12px;background:linear-gradient(135deg,#2a7a2a,#1a5a1a);border:none;border-radius:8px;color:#fff;font-family:'Cinzel',serif;font-weight:600;font-size:0.9rem;text-decoration:none;text-align:center;transition:all 0.2s}
+.btn-circulo-link:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(42,122,42,0.3)}
+.promo-icon.activo{color:#2a7a2a}
 
 .oferta-mini{display:flex;align-items:center;gap:10px;margin-bottom:0.75rem}
 .oferta-mini span:first-child{font-size:1.5rem;color:#d4af37;width:35px;text-align:center}

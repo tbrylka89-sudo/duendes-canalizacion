@@ -452,7 +452,7 @@ export async function POST(request) {
         }
 
         // Obtener posts reales de usuarios para interactuar
-        const postsReales = await kv.keys('foro:post:*');
+        const postsReales = await kv.keys('foro:general:*');
         const resultados = { postsCreados: 0, interacciones: 0 };
 
         // 1. Crear posts de bots
@@ -475,7 +475,7 @@ export async function POST(request) {
             creado: new Date().toISOString()
           };
 
-          await kv.set(`foro:post:${nuevoPost.id}`, nuevoPost, { ex: 90 * 24 * 60 * 60 }); // 90 días
+          await kv.set(`foro:general:${nuevoPost.id}`, nuevoPost, { ex: 90 * 24 * 60 * 60 }); // 90 días
           resultados.postsCreados++;
         }
 
