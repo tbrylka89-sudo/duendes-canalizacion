@@ -1,6 +1,6 @@
 # PROGRESO: Sistema de Gamificación Duendes del Uruguay
 
-**Última actualización:** 2026-01-17 17:10
+**Última actualización:** 2026-01-17 17:20
 
 ---
 
@@ -144,6 +144,11 @@ WordPress mu-plugins:
   - Eventos de luna llena/nueva
   - Portales estacionales
   - Descuentos para miembros Círculo
+- [x] `app/api/gamificacion/ejecutar-lectura/route.js`
+  - Ejecutar lectura con verificación completa
+  - Descuentos combinados (membresía + nivel)
+  - Generación IA con prompts específicos por categoría
+  - Tracking de XP y progresión
 
 ---
 
@@ -168,7 +173,12 @@ APIs creadas:
   - Descuentos automáticos para miembros del Círculo
 
 **Siguiente paso - Fase 2:**
-- [ ] Crear API para ejecutar lectura: `/api/gamificacion/ejecutar-lectura`
+- [x] Crear API para ejecutar lectura: `/api/gamificacion/ejecutar-lectura`
+  - POST: ejecutar lectura con verificación de nivel, guardián, runas
+  - GET: obtener lectura completada
+  - Descuentos automáticos por membresía (5-10%) y nivel (5-15%)
+  - Integración con sistema de XP y gamificación
+  - Generación IA con prompts por categoría
 - [ ] Integrar con sistema de experiencias existente
 - [ ] Crear UI del cofre diario en Mi Magia
 
