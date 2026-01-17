@@ -3894,6 +3894,7 @@ function ForoSec({ usuario, setUsuario }) {
   const [postSeleccionado, setPostSeleccionado] = useState(null);
   const [respuesta, setRespuesta] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
     cargarPosts();
@@ -3908,7 +3909,6 @@ function ForoSec({ usuario, setUsuario }) {
         setPosts(data.posts || []);
       }
     } catch (e) {
-      // Usar posts de ejemplo si no hay API
       setPosts(getPostsEjemplo(categoria));
     }
     setCargando(false);
@@ -3937,7 +3937,6 @@ function ForoSec({ usuario, setUsuario }) {
         setMostrarNuevo(false);
       }
     } catch (e) {
-      // Agregar localmente si falla
       const nuevoPostLocal = {
         id: Date.now(),
         autor: usuario.nombrePreferido,
@@ -3947,7 +3946,8 @@ function ForoSec({ usuario, setUsuario }) {
         categoria,
         fecha: new Date().toISOString(),
         respuestas: [],
-        likes: 0
+        likes: 0,
+        etiqueta: 'nuevo'
       };
       setPosts([nuevoPostLocal, ...posts]);
       setNuevoPost('');
@@ -3986,7 +3986,6 @@ function ForoSec({ usuario, setUsuario }) {
         setRespuesta('');
       }
     } catch (e) {
-      // Agregar localmente
       const nuevaRespuesta = {
         id: Date.now(),
         autor: usuario.nombrePreferido,
@@ -4026,7 +4025,8 @@ function ForoSec({ usuario, setUsuario }) {
         { id: 1, autor: 'Mariana', contenido: '¡Me pasa todo el tiempo! Son increíbles.', fecha: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
         { id: 2, autor: 'Lucia', contenido: 'Finnegan es muy especial. Mi Bramble también me acompaña mucho.', fecha: new Date(Date.now() - 30 * 60 * 1000).toISOString() }
       ],
-      likes: 12
+      likes: 12,
+      etiqueta: 'destacado'
     },
     {
       id: 2,
@@ -4038,7 +4038,8 @@ function ForoSec({ usuario, setUsuario }) {
       categoria: cat,
       fecha: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
       respuestas: [],
-      likes: 8
+      likes: 8,
+      etiqueta: 'nuevo'
     },
     {
       id: 3,
@@ -4050,42 +4051,63 @@ function ForoSec({ usuario, setUsuario }) {
       respuestas: [
         { id: 1, autor: 'Duendes del Uruguay', contenido: '¡Bienvenida Sofía! Lo más importante es hablarle, contarle tus cosas, ponerlo en un lugar especial. La conexión crece con el tiempo. ✨', fecha: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString() }
       ],
-      likes: 24
+      likes: 24,
+      etiqueta: 'resuelto'
     }
   ];
 
+  const postsFiltrados = busqueda.trim()
+    ? posts.filter(p => p.titulo.toLowerCase().includes(busqueda.toLowerCase()) || p.contenido.toLowerCase().includes(busqueda.toLowerCase()))
+    : posts;
+
+  const getEtiquetaStyle = (etiqueta) => {
+    switch(etiqueta) {
+      case 'destacado': return { bg: 'linear-gradient(135deg, #d4af37, #b8962e)', color: '#0a0a0a' };
+      case 'resuelto': return { bg: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff' };
+      case 'nuevo': return { bg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', color: '#fff' };
+      default: return null;
+    }
+  };
+
+  // Vista de post seleccionado
   if (postSeleccionado) {
     return (
-      <div className="sec">
-        <button className="btn-back" onClick={() => setPostSeleccionado(null)}>← Volver al foro</button>
+      <div className="foro-dark">
+        <button className="foro-btn-volver" onClick={() => setPostSeleccionado(null)}>← Volver al foro</button>
 
-        <div className="foro-post-full">
-          <div className="post-header">
-            <div className="post-avatar">{postSeleccionado.autor.charAt(0)}</div>
-            <div className="post-meta">
-              <strong>{postSeleccionado.autor}</strong>
-              <span>{formatearFecha(postSeleccionado.fecha)}</span>
+        <div className="foro-post-detalle">
+          <div className="foro-post-header">
+            <div className="foro-avatar-lg">{postSeleccionado.autor.charAt(0)}</div>
+            <div className="foro-post-meta">
+              <span className="foro-autor">{postSeleccionado.autor}</span>
+              <span className="foro-fecha">{formatearFecha(postSeleccionado.fecha)}</span>
             </div>
+            {postSeleccionado.etiqueta && (
+              <span className="foro-etiqueta" style={{background: getEtiquetaStyle(postSeleccionado.etiqueta)?.bg, color: getEtiquetaStyle(postSeleccionado.etiqueta)?.color}}>
+                {postSeleccionado.etiqueta === 'destacado' && '★ '}
+                {postSeleccionado.etiqueta === 'resuelto' && '✓ '}
+                {postSeleccionado.etiqueta}
+              </span>
+            )}
           </div>
-          <h2 className="post-titulo">{postSeleccionado.titulo}</h2>
-          <p className="post-contenido">{postSeleccionado.contenido}</p>
-
-          <div className="post-acciones">
-            <span>❤️ {postSeleccionado.likes || 0} me gusta</span>
-            <span>💬 {(postSeleccionado.respuestas || []).length} respuestas</span>
+          <h2 className="foro-post-titulo">{postSeleccionado.titulo}</h2>
+          <p className="foro-post-texto">{postSeleccionado.contenido}</p>
+          <div className="foro-post-stats">
+            <span>❤️ {postSeleccionado.likes || 0}</span>
+            <span>💬 {(postSeleccionado.respuestas || []).length}</span>
           </div>
         </div>
 
         {(postSeleccionado.respuestas || []).length > 0 && (
-          <div className="foro-respuestas">
-            <h3>Respuestas</h3>
+          <div className="foro-respuestas-sec">
+            <h3>💬 Respuestas ({postSeleccionado.respuestas.length})</h3>
             {postSeleccionado.respuestas.map((r, i) => (
-              <div key={r.id || i} className="respuesta-card">
-                <div className="respuesta-avatar">{r.autor.charAt(0)}</div>
-                <div className="respuesta-content">
-                  <div className="respuesta-meta">
-                    <strong>{r.autor}</strong>
-                    <span>{formatearFecha(r.fecha)}</span>
+              <div key={r.id || i} className="foro-respuesta-card">
+                <div className="foro-avatar-sm">{r.autor.charAt(0)}</div>
+                <div className="foro-respuesta-body">
+                  <div className="foro-respuesta-header">
+                    <span className="foro-autor-sm">{r.autor}</span>
+                    <span className="foro-fecha-sm">{formatearFecha(r.fecha)}</span>
                   </div>
                   <p>{r.contenido}</p>
                 </div>
@@ -4094,7 +4116,7 @@ function ForoSec({ usuario, setUsuario }) {
           </div>
         )}
 
-        <div className="foro-responder">
+        <div className="foro-nueva-respuesta">
           <h3>Tu respuesta</h3>
           <textarea
             placeholder="Comparte tu experiencia o ayuda a tu compañera..."
@@ -4102,55 +4124,101 @@ function ForoSec({ usuario, setUsuario }) {
             onChange={e => setRespuesta(e.target.value)}
             rows={3}
           />
-          <button className="btn-gold" onClick={responderPost} disabled={!respuesta.trim() || enviando}>
+          <button className="foro-btn-gold" onClick={responderPost} disabled={!respuesta.trim() || enviando}>
             {enviando ? 'Enviando...' : 'Responder'}
           </button>
         </div>
+
+        <style jsx>{`
+          .foro-dark { background: linear-gradient(180deg, #0a0a0f 0%, #0f0f14 100%); min-height: 100vh; padding: 2rem; color: #FDF8F0; font-family: 'Cormorant Garamond', serif; }
+          .foro-btn-volver { background: transparent; border: 1px solid rgba(212,175,55,0.3); color: #d4af37; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin-bottom: 1.5rem; transition: all 0.3s; }
+          .foro-btn-volver:hover { background: rgba(212,175,55,0.1); border-color: #d4af37; }
+          .foro-post-detalle { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+          .foro-post-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+          .foro-avatar-lg { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #d4af37, #b8962e); display: flex; align-items: center; justify-content: center; color: #0a0a0a; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 600; }
+          .foro-post-meta { display: flex; flex-direction: column; flex: 1; }
+          .foro-autor { font-family: 'Cinzel', serif; color: #d4af37; font-size: 1rem; }
+          .foro-fecha { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+          .foro-etiqueta { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+          .foro-post-titulo { font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 1rem; color: #FDF8F0; }
+          .foro-post-texto { color: rgba(255,255,255,0.85); line-height: 1.8; font-size: 1.05rem; }
+          .foro-post-stats { display: flex; gap: 1.5rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+          .foro-respuestas-sec { margin-bottom: 1.5rem; }
+          .foro-respuestas-sec h3 { font-family: 'Cinzel', serif; color: #d4af37; margin-bottom: 1rem; }
+          .foro-respuesta-card { display: flex; gap: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; transition: all 0.3s; }
+          .foro-respuesta-card:hover { border-color: rgba(212,175,55,0.2); }
+          .foro-avatar-sm { width: 36px; height: 36px; border-radius: 50%; background: rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 0.9rem; flex-shrink: 0; }
+          .foro-respuesta-body { flex: 1; }
+          .foro-respuesta-header { display: flex; gap: 0.75rem; margin-bottom: 0.5rem; }
+          .foro-autor-sm { color: #d4af37; font-size: 0.9rem; }
+          .foro-fecha-sm { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+          .foro-respuesta-body p { color: rgba(255,255,255,0.8); margin: 0; font-size: 0.95rem; line-height: 1.6; }
+          .foro-nueva-respuesta { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 16px; padding: 1.5rem; }
+          .foro-nueva-respuesta h3 { font-family: 'Cinzel', serif; color: #d4af37; margin-bottom: 1rem; }
+          .foro-nueva-respuesta textarea { width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #FDF8F0; font-size: 1rem; font-family: inherit; resize: vertical; margin-bottom: 1rem; }
+          .foro-nueva-respuesta textarea:focus { outline: none; border-color: #d4af37; }
+          .foro-nueva-respuesta textarea::placeholder { color: rgba(255,255,255,0.4); }
+          .foro-btn-gold { background: linear-gradient(135deg, #d4af37, #b8962e); color: #0a0a0a; border: none; padding: 12px 30px; border-radius: 50px; font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+          .foro-btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212,175,55,0.3); }
+          .foro-btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+        `}</style>
       </div>
     );
   }
 
+  // Vista principal del foro
   return (
-    <div className="sec" style={{maxWidth:'100%',overflowX:'hidden'}}>
-      <div className="sec-head">
-        <h1>💬 Foro Mágico</h1>
-        <p>Conectá con la comunidad de guardianas y guardianes.</p>
+    <div className="foro-dark">
+      {/* Header */}
+      <div className="foro-header">
+        <div className="foro-header-content">
+          <span className="foro-icono">💬</span>
+          <div>
+            <h1>Foro Mágico</h1>
+            <p>Conectá con la comunidad de guardianas y guardianes</p>
+          </div>
+        </div>
       </div>
 
-      <div style={{display:'flex',flexWrap:'wrap',gap:'8px',marginBottom:'1rem',maxWidth:'100%'}}>
+      {/* Búsqueda */}
+      <div className="foro-busqueda">
+        <input
+          type="text"
+          placeholder="🔍 Buscar en el foro..."
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+        />
+      </div>
+
+      {/* Categorías */}
+      <div className="foro-categorias-premium">
         {CATEGORIAS_FORO.map(cat => (
           <button
             key={cat.id}
             onClick={() => setCategoria(cat.id)}
-            style={{
-              display:'flex',alignItems:'center',gap:'6px',
-              padding:'8px 12px',background: categoria === cat.id ? '#1a1a1a' : '#fff',
-              color: categoria === cat.id ? '#fff' : '#1a1a1a',
-              border:'1px solid',borderColor: categoria === cat.id ? '#1a1a1a' : '#e0e0e0',
-              borderRadius:'8px',fontSize:'0.85rem',cursor:'pointer'
-            }}
+            className={`foro-cat-btn ${categoria === cat.id ? 'activa' : ''}`}
           >
-            <span>{cat.icono}</span>
-            <span>{cat.nombre}</span>
+            <span className="cat-icono">{cat.icono}</span>
+            <span className="cat-nombre">{cat.nombre}</span>
           </button>
         ))}
       </div>
 
-      <div style={{marginBottom:'1rem'}}>
-        <button className="btn-gold" onClick={() => setMostrarNuevo(!mostrarNuevo)} style={{width:'100%',padding:'12px',fontSize:'1rem'}}>
-          {mostrarNuevo ? 'Cancelar' : '+ Nueva publicación'}
-        </button>
-      </div>
+      {/* Botón nuevo post */}
+      <button className="foro-nuevo-btn" onClick={() => setMostrarNuevo(!mostrarNuevo)}>
+        <span>{mostrarNuevo ? '✕' : '+'}</span>
+        {mostrarNuevo ? 'Cancelar' : 'Nueva publicación'}
+      </button>
 
+      {/* Formulario nuevo post */}
       {mostrarNuevo && (
-        <div className="foro-nuevo">
-          <h3>Nueva publicación en {CATEGORIAS_FORO.find(c => c.id === categoria)?.nombre}</h3>
+        <div className="foro-nuevo-form">
+          <h3>✦ Nueva publicación en {CATEGORIAS_FORO.find(c => c.id === categoria)?.nombre}</h3>
           <input
             type="text"
             placeholder="Título de tu publicación"
             value={titulo}
             onChange={e => setTitulo(e.target.value)}
-            className="foro-titulo-input"
           />
           <textarea
             placeholder="¿Qué querés compartir con la comunidad?"
@@ -4158,38 +4226,115 @@ function ForoSec({ usuario, setUsuario }) {
             onChange={e => setNuevoPost(e.target.value)}
             rows={5}
           />
-          <button className="btn-gold" onClick={publicar} disabled={!titulo.trim() || !nuevoPost.trim() || enviando}>
+          <button className="foro-btn-gold" onClick={publicar} disabled={!titulo.trim() || !nuevoPost.trim() || enviando}>
             {enviando ? 'Publicando...' : 'Publicar'}
           </button>
         </div>
       )}
 
+      {/* Lista de posts */}
       {cargando ? (
-        <div className="foro-loading">Cargando publicaciones...</div>
-      ) : posts.length === 0 ? (
-        <div className="foro-empty">
+        <div className="foro-cargando">
+          <span className="foro-spinner">✦</span>
+          <p>Cargando publicaciones...</p>
+        </div>
+      ) : postsFiltrados.length === 0 ? (
+        <div className="foro-vacio">
           <span>✦</span>
           <h3>Sé la primera en publicar</h3>
           <p>Esta categoría está esperando tu voz. ¡Compartí algo con la comunidad!</p>
         </div>
       ) : (
-        <div className="foro-posts">
-          {posts.map(post => (
-            <div key={post.id} className="foro-post-card" onClick={() => setPostSeleccionado(post)}>
-              <div className="post-avatar">{post.autor.charAt(0)}</div>
-              <div className="post-content">
-                <h4>{post.titulo}</h4>
-                <p>{post.contenido.substring(0, 150)}{post.contenido.length > 150 ? '...' : ''}</p>
-                <div className="post-footer">
-                  <span className="post-autor">{post.autor}</span>
-                  <span className="post-fecha">{formatearFecha(post.fecha)}</span>
-                  <span className="post-stats">💬 {(post.respuestas || []).length} · ❤️ {post.likes || 0}</span>
+        <div className="foro-lista">
+          {postsFiltrados.map(post => (
+            <div key={post.id} className="foro-card" onClick={() => setPostSeleccionado(post)}>
+              <div className="foro-card-left">
+                <div className="foro-avatar">{post.autor.charAt(0)}</div>
+              </div>
+              <div className="foro-card-content">
+                <div className="foro-card-top">
+                  <h4>{post.titulo}</h4>
+                  {post.etiqueta && (
+                    <span className="foro-etiqueta-mini" style={{background: getEtiquetaStyle(post.etiqueta)?.bg, color: getEtiquetaStyle(post.etiqueta)?.color}}>
+                      {post.etiqueta === 'destacado' && '★'}
+                      {post.etiqueta === 'resuelto' && '✓'}
+                      {post.etiqueta === 'nuevo' && '●'}
+                    </span>
+                  )}
+                </div>
+                <p className="foro-card-preview">{post.contenido.substring(0, 120)}{post.contenido.length > 120 ? '...' : ''}</p>
+                <div className="foro-card-footer">
+                  <span className="foro-card-autor">{post.autor}</span>
+                  <span className="foro-card-sep">·</span>
+                  <span className="foro-card-fecha">{formatearFecha(post.fecha)}</span>
+                  <span className="foro-card-sep">·</span>
+                  <span className="foro-card-stats">💬 {(post.respuestas || []).length}</span>
+                  <span className="foro-card-stats">❤️ {post.likes || 0}</span>
                 </div>
               </div>
+              <div className="foro-card-arrow">→</div>
             </div>
           ))}
         </div>
       )}
+
+      <style jsx>{`
+        .foro-dark { background: linear-gradient(180deg, #0a0a0f 0%, #0f0f14 100%); min-height: 100vh; padding: 0; color: #FDF8F0; font-family: 'Cormorant Garamond', serif; }
+        .foro-header { background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.05) 100%); border-bottom: 1px solid rgba(212,175,55,0.2); padding: 2rem; }
+        .foro-header-content { display: flex; align-items: center; gap: 1rem; max-width: 900px; margin: 0 auto; }
+        .foro-icono { font-size: 2.5rem; }
+        .foro-header h1 { font-family: 'Cinzel', serif; font-size: 1.8rem; margin: 0 0 0.25rem; color: #FDF8F0; }
+        .foro-header p { color: rgba(255,255,255,0.6); margin: 0; }
+        .foro-busqueda { padding: 1.5rem 2rem; max-width: 900px; margin: 0 auto; }
+        .foro-busqueda input { width: 100%; padding: 14px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #FDF8F0; font-size: 1rem; font-family: inherit; transition: all 0.3s; }
+        .foro-busqueda input:focus { outline: none; border-color: #d4af37; background: rgba(255,255,255,0.08); }
+        .foro-busqueda input::placeholder { color: rgba(255,255,255,0.4); }
+        .foro-categorias-premium { display: flex; gap: 0.75rem; padding: 0 2rem 1.5rem; max-width: 900px; margin: 0 auto; flex-wrap: wrap; }
+        .foro-cat-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; color: rgba(255,255,255,0.7); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
+        .foro-cat-btn:hover { border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.05); }
+        .foro-cat-btn.activa { background: linear-gradient(135deg, #d4af37, #b8962e); border-color: transparent; color: #0a0a0a; }
+        .foro-cat-btn .cat-icono { font-size: 1rem; }
+        .foro-nuevo-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: calc(100% - 4rem); max-width: 868px; margin: 0 auto 1.5rem; padding: 14px; background: linear-gradient(135deg, #d4af37, #b8962e); border: none; border-radius: 12px; color: #0a0a0a; font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .foro-nuevo-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212,175,55,0.3); }
+        .foro-nuevo-btn span { font-size: 1.2rem; }
+        .foro-nuevo-form { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; padding: 1.5rem; margin: 0 2rem 1.5rem; max-width: 868px; margin-left: auto; margin-right: auto; }
+        .foro-nuevo-form h3 { font-family: 'Cinzel', serif; color: #d4af37; margin-bottom: 1rem; }
+        .foro-nuevo-form input, .foro-nuevo-form textarea { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #FDF8F0; font-size: 1rem; font-family: inherit; margin-bottom: 1rem; box-sizing: border-box; }
+        .foro-nuevo-form textarea { resize: vertical; }
+        .foro-nuevo-form input:focus, .foro-nuevo-form textarea:focus { outline: none; border-color: #d4af37; }
+        .foro-nuevo-form input::placeholder, .foro-nuevo-form textarea::placeholder { color: rgba(255,255,255,0.4); }
+        .foro-cargando, .foro-vacio { text-align: center; padding: 4rem 2rem; color: rgba(255,255,255,0.5); }
+        .foro-spinner { display: block; font-size: 2.5rem; color: #d4af37; margin-bottom: 1rem; animation: spin 2s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .foro-vacio span { display: block; font-size: 3rem; color: #d4af37; margin-bottom: 1rem; }
+        .foro-vacio h3 { font-family: 'Cinzel', serif; color: #FDF8F0; margin-bottom: 0.5rem; }
+        .foro-lista { padding: 0 2rem 2rem; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+        .foro-card { display: flex; align-items: flex-start; gap: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease; }
+        .foro-card:hover { border-color: rgba(212,175,55,0.4); transform: translateX(5px); box-shadow: 0 8px 30px rgba(212,175,55,0.1); }
+        .foro-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #d4af37, #b8962e); display: flex; align-items: center; justify-content: center; color: #0a0a0a; font-family: 'Cinzel', serif; font-weight: 600; flex-shrink: 0; }
+        .foro-card-content { flex: 1; min-width: 0; }
+        .foro-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; }
+        .foro-card-top h4 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0; color: #FDF8F0; flex: 1; }
+        .foro-etiqueta-mini { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; }
+        .foro-card-preview { color: rgba(255,255,255,0.6); font-size: 0.95rem; margin: 0 0 0.75rem; line-height: 1.5; }
+        .foro-card-footer { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+        .foro-card-autor { color: #d4af37; }
+        .foro-card-sep { color: rgba(255,255,255,0.3); }
+        .foro-card-fecha, .foro-card-stats { color: rgba(255,255,255,0.4); }
+        .foro-card-arrow { color: #d4af37; font-size: 1.2rem; opacity: 0; transition: all 0.3s; }
+        .foro-card:hover .foro-card-arrow { opacity: 1; }
+        .foro-btn-gold { background: linear-gradient(135deg, #d4af37, #b8962e); color: #0a0a0a; border: none; padding: 12px 30px; border-radius: 50px; font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .foro-btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212,175,55,0.3); }
+        .foro-btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+        @media (max-width: 600px) {
+          .foro-header { padding: 1.5rem; }
+          .foro-busqueda, .foro-lista, .foro-nuevo-form { padding-left: 1rem; padding-right: 1rem; }
+          .foro-categorias-premium { padding-left: 1rem; padding-right: 1rem; }
+          .foro-nuevo-btn { width: calc(100% - 2rem); }
+          .foro-card { padding: 1rem; }
+          .foro-card-arrow { display: none; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -4792,7 +4937,71 @@ Mensaje actual: ${m}`;
 const estilos = `
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box!important}
-input,textarea,select{font-size:16px!important}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ANIMACIONES PROFESIONALES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Fade In al cargar */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(212,175,55,0.2)}50%{box-shadow:0 0 40px rgba(212,175,55,0.4)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* Clases de animación */
+.animate-fade-in{animation:fadeIn 0.5s ease-out forwards}
+.animate-fade-in-up{animation:fadeInUp 0.6s ease-out forwards}
+.animate-delay-1{animation-delay:0.1s;opacity:0}
+.animate-delay-2{animation-delay:0.2s;opacity:0}
+.animate-delay-3{animation-delay:0.3s;opacity:0}
+.animate-delay-4{animation-delay:0.4s;opacity:0}
+
+/* Hover premium para cards */
+.hover-lift{transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.hover-lift:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,0.15)}
+
+/* Shimmer dorado en botones */
+.btn-shimmer{position:relative;overflow:hidden}
+.btn-shimmer::after{content:'';position:absolute;top:0;left:-200%;width:200%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:none}
+.btn-shimmer:hover::after{animation:shimmer 1.5s ease-in-out}
+
+/* Efecto glow dorado */
+.glow-gold{transition:box-shadow 0.3s ease}
+.glow-gold:hover{box-shadow:0 0 30px rgba(212,175,55,0.4)}
+
+/* Transiciones suaves globales */
+.sec{animation:fadeIn 0.4s ease-out}
+.stat-c,.acceso,.exp-card-new,.cristal-card,.tipo-card,.ritual-card,.util-card{transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.stat-c:hover,.acceso:hover,.exp-card-new:hover,.cristal-card:hover,.tipo-card:hover,.ritual-card:hover,.util-card:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(212,175,55,0.15)}
+
+/* Acordeón animado */
+.faq-item{transition:all 0.3s ease}
+.faq-respuesta{animation:fadeIn 0.3s ease-out}
+
+/* Botones con efecto premium */
+.btn-gold,.btn-pri{transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
+.btn-gold::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,0.2);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.4s ease,height 0.4s ease}
+.btn-gold:hover::before{width:300px;height:300px}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,175,55,0.35)}
+
+/* Cards del banner con animación secuencial */
+.banner{animation:fadeInUp 0.5s ease-out}
+.stats-g .stat-c:nth-child(1){animation:fadeInUp 0.5s ease-out 0.1s forwards;opacity:0}
+.stats-g .stat-c:nth-child(2){animation:fadeInUp 0.5s ease-out 0.2s forwards;opacity:0}
+.stats-g .stat-c:nth-child(3){animation:fadeInUp 0.5s ease-out 0.3s forwards;opacity:0}
+.stats-g .stat-c:nth-child(4){animation:fadeInUp 0.5s ease-out 0.4s forwards;opacity:0}
+
+/* Scroll reveal para secciones */
+.accesos-g .acceso:nth-child(1){animation:fadeInUp 0.5s ease-out 0.15s forwards;opacity:0}
+.accesos-g .acceso:nth-child(2){animation:fadeInUp 0.5s ease-out 0.25s forwards;opacity:0}
+.accesos-g .acceso:nth-child(3){animation:fadeInUp 0.5s ease-out 0.35s forwards;opacity:0}
+input,textarea,select{font-size:16px!important;color:#1a1a1a!important}
+input::placeholder,textarea::placeholder{color:#888!important}
+.circulo-dark-onboarding input,.circulo-dark-onboarding textarea,.circulo-dark-dashboard input,.circulo-dark-dashboard textarea,.exp-formulario input,.exp-formulario textarea,.buscar-input,.foro-dark input,.foro-dark textarea{color:#FDF8F0!important;background:#1a1a1a!important;border-color:#333!important}
+.circulo-dark-onboarding input::placeholder,.circulo-dark-onboarding textarea::placeholder,.circulo-dark-dashboard input::placeholder,.circulo-dark-dashboard textarea::placeholder,.exp-formulario input::placeholder,.exp-formulario textarea::placeholder{color:#888!important}
+.circulo-dark-onboarding h1,.circulo-dark-onboarding h2,.circulo-dark-onboarding h3,.circulo-dark-onboarding h4,.circulo-dark-onboarding label,.circulo-dark-dashboard h1,.circulo-dark-dashboard h2,.circulo-dark-dashboard h3,.circulo-dark-dashboard h4{color:#FDF8F0!important}
+.ciclo-titulo,.faq-pregunta-texto,.faq-card h3,.faq-card h4{color:#FDF8F0!important}
 html{overflow-x:hidden!important;width:100%!important;max-width:100%!important}
 body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;font-family:'Cormorant Garamond',Georgia,serif;background:#FFFEF9;color:#1a1a1a;font-size:18px;line-height:1.6;position:relative}
 .app{min-height:100vh;overflow-x:hidden!important;width:100%!important;box-sizing:border-box}

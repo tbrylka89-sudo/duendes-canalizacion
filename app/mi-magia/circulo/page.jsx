@@ -225,12 +225,12 @@ function LandingCirculo({ onTrialClick }) {
         <div className="contenedor">
           <div className="duende-header">
             <span className="duende-icono">🍄</span>
-            <h2>El Duende de la Semana</h2>
+            <h2>El Guardián que te Enseña y Guía</h2>
           </div>
           <p className="duende-intro">
-            Imaginá tener un mentor espiritual diferente cada semana. Cada guardián trae
-            su propia energía, su propia historia de miles de años, y su propia forma
-            de ayudarte a crecer.
+            Cada semana, un guardián diferente toma el protagonismo para enseñarte
+            su sabiduría ancestral. No es un duende de regalo: es un maestro espiritual
+            que comparte contigo sus conocimientos, rituales y secretos milenarios.
           </p>
           <div className="duende-cards">
             <div className="duende-card">
