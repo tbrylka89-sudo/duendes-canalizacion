@@ -1677,6 +1677,335 @@ function FormularioTrial({ onVolver, onExito }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// BIENVENIDA DEL GUARDIÁN DE LA SEMANA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function BienvenidaGuardian({ usuario, onContinuar }) {
+  const [guardian, setGuardian] = useState(null);
+  const [mensaje, setMensaje] = useState('');
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    cargarBienvenida();
+  }, []);
+
+  async function cargarBienvenida() {
+    try {
+      const res = await fetch('/api/circulo/bienvenida-guardian', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: usuario?.email,
+          nombre: usuario?.nombrePreferido || usuario?.nombre,
+          perfil: usuario?.perfil
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setGuardian(data.guardian);
+        setMensaje(data.mensaje);
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      console.error('Error cargando bienvenida:', err);
+      setError('No pudimos conectar con el guardián');
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  if (cargando) {
+    return (
+      <div className="bienvenida-container">
+        <div className="bienvenida-loading">
+          <div className="loading-orb"></div>
+          <p>Conectando con tu guardián...</p>
+        </div>
+        <style jsx>{`
+          .bienvenida-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(107, 33, 168, 0.15) 0%, transparent 50%),
+                        linear-gradient(180deg, #050508 0%, #0a0a0a 100%);
+            font-family: 'Cormorant Garamond', serif;
+          }
+          .bienvenida-loading {
+            text-align: center;
+            color: #fff;
+          }
+          .loading-orb {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4af37, #6b21a8);
+            margin: 0 auto 20px;
+            animation: pulse 1.5s infinite;
+          }
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+          }
+          p { font-size: 18px; color: rgba(255,255,255,0.7); }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bienvenida-container">
+        <div className="bienvenida-error">
+          <p>{error}</p>
+          <button onClick={onContinuar}>Continuar de todos modos</button>
+        </div>
+        <style jsx>{`
+          .bienvenida-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #050508 0%, #0a0a0a 100%);
+            font-family: 'Cormorant Garamond', serif;
+          }
+          .bienvenida-error {
+            text-align: center;
+            color: #fff;
+          }
+          p { margin-bottom: 20px; }
+          button {
+            background: #d4af37;
+            color: #0a0a0a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bienvenida-container">
+      <div className="bienvenida-card">
+        {/* Partículas de fondo */}
+        <div className="particulas">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="particula" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }}></div>
+          ))}
+        </div>
+
+        {/* Imagen del guardián */}
+        <div className="guardian-imagen-container">
+          <div className="guardian-glow" style={{ background: guardian?.color || '#d4af37' }}></div>
+          <img
+            src={guardian?.imagen || IMAGEN_TITO}
+            alt={guardian?.nombre}
+            className="guardian-imagen"
+          />
+        </div>
+
+        {/* Info del guardián */}
+        <div className="guardian-info">
+          <span className="guardian-tag">Guardián de la Semana</span>
+          <h1>{guardian?.nombre}</h1>
+          <p className="guardian-especialidad">✦ {guardian?.especialidad}</p>
+        </div>
+
+        {/* Mensaje personalizado */}
+        <div className="mensaje-container">
+          <div className="mensaje-burbuja">
+            {mensaje.split('\n\n').map((parrafo, i) => (
+              <p key={i}>{parrafo}</p>
+            ))}
+          </div>
+        </div>
+
+        {/* Botón continuar */}
+        <button onClick={onContinuar} className="btn-continuar">
+          ✨ Entrar al Círculo
+        </button>
+      </div>
+
+      <style jsx>{`
+        .bienvenida-container {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(ellipse at 30% 20%, rgba(107, 33, 168, 0.2) 0%, transparent 50%),
+                      radial-gradient(ellipse at 70% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                      linear-gradient(180deg, #050508 0%, #0a0a0a 100%);
+          padding: 40px 20px;
+          font-family: 'Cormorant Garamond', serif;
+          overflow: hidden;
+        }
+        .bienvenida-card {
+          position: relative;
+          width: 100%;
+          max-width: 550px;
+          background: rgba(20, 20, 25, 0.9);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 25px;
+          padding: 40px 30px;
+          text-align: center;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+          animation: cardAppear 0.8s ease;
+        }
+        @keyframes cardAppear {
+          from { opacity: 0; transform: translateY(30px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .particulas {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          pointer-events: none;
+          overflow: hidden;
+          border-radius: 25px;
+        }
+        .particula {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: #d4af37;
+          border-radius: 50%;
+          opacity: 0;
+          animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+          0% { transform: translateY(100%); opacity: 0; }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        .guardian-imagen-container {
+          position: relative;
+          width: 150px;
+          height: 150px;
+          margin: 0 auto 25px;
+        }
+        .guardian-glow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 180px;
+          height: 180px;
+          border-radius: 50%;
+          opacity: 0.3;
+          filter: blur(30px);
+          animation: glowPulse 3s infinite;
+        }
+        @keyframes glowPulse {
+          0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
+          50% { opacity: 0.4; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        .guardian-imagen {
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid #d4af37;
+          position: relative;
+          z-index: 1;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .guardian-info {
+          margin-bottom: 25px;
+        }
+        .guardian-tag {
+          display: inline-block;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          padding: 6px 15px;
+          border-radius: 20px;
+          font-size: 12px;
+          color: #d4af37;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          margin-bottom: 15px;
+        }
+        h1 {
+          font-family: 'Tangerine', cursive;
+          font-size: 56px;
+          color: #d4af37;
+          margin: 0 0 10px;
+          text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        .guardian-especialidad {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 16px;
+          margin: 0;
+        }
+
+        .mensaje-container {
+          margin-bottom: 30px;
+        }
+        .mensaje-burbuja {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 25px;
+          text-align: left;
+        }
+        .mensaje-burbuja p {
+          color: #FDF8F0;
+          font-size: 16px;
+          line-height: 1.7;
+          margin: 0 0 15px;
+        }
+        .mensaje-burbuja p:last-child {
+          margin-bottom: 0;
+        }
+
+        .btn-continuar {
+          width: 100%;
+          background: linear-gradient(135deg, #d4af37, #b8972e);
+          color: #0a0a0a;
+          border: none;
+          padding: 18px 30px;
+          border-radius: 50px;
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .btn-continuar:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+        }
+
+        @media (max-width: 550px) {
+          .bienvenida-card { padding: 30px 20px; }
+          h1 { font-size: 44px; }
+          .guardian-imagen-container { width: 120px; height: 120px; }
+          .guardian-imagen { width: 120px; height: 120px; }
+          .mensaje-burbuja { padding: 20px; }
+          .mensaje-burbuja p { font-size: 15px; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1747,9 +2076,11 @@ export default function CirculoPage() {
     setUsuario(prev => ({
       ...prev,
       nombre: datos.nombrePreferido || prev?.nombre,
-      nombrePreferido: datos.nombrePreferido
+      nombrePreferido: datos.nombrePreferido,
+      perfil: datos
     }));
-    setEstado('portal');
+    // Ir a bienvenida del guardián en lugar de portal
+    setEstado('bienvenida');
   }
 
   function handleEntrarAlCirculo() {
@@ -1826,6 +2157,16 @@ export default function CirculoPage() {
         email={usuario?.email}
         nombreInicial={usuario?.nombre}
         onComplete={handleOnboardingComplete}
+      />
+    );
+  }
+
+  // BIENVENIDA DEL GUARDIÁN DE LA SEMANA
+  if (estado === 'bienvenida') {
+    return (
+      <BienvenidaGuardian
+        usuario={usuario}
+        onContinuar={() => setEstado('portal')}
       />
     );
   }
