@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperiencias, estilosNuevos } from './nuevas-funciones';
 import TestGuardian from './test-guardian';
+import { personalizarTexto, saludoPersonalizado } from '@/lib/personalizacion';
 
 const API_BASE = '';
 
@@ -1208,7 +1209,7 @@ export default function MiMagia() {
       <style jsx global>{estilos}</style>
       <header className="header" style={isMobile ? {padding: '0 12px'} : {}}>
         <div className="logo"><span>✦</span> MI MAGIA</div>
-        {!isMobile && <div className="user-info">Bienvenid{usuario?.pronombre === 'el' ? 'o' : 'a'}, {usuario?.nombrePreferido}</div>}
+        {!isMobile && <div className="user-info">{saludoPersonalizado(usuario?.nombrePreferido, usuario?.genero || usuario?.pronombre)}</div>}
         <div className="hstats" style={isMobile ? {gap: '6px'} : {}}>
           <span style={{background: '#1a1a1a', color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: isMobile ? '0.75rem' : '0.85rem'}}>☘ {usuario?.treboles || 0}</span>
           <span style={{background: '#1a1a1a', color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: isMobile ? '0.75rem' : '0.85rem'}}>ᚱ {usuario?.runas || 0}</span>
@@ -1242,7 +1243,10 @@ export default function MiMagia() {
         {[['utilidades','⚡','Utilidades'],['faq','❓','FAQ Duendes']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
-        <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="nav-volver">↗ Ir a la tienda</a>
+        <div className="nav-links-externos">
+          <a href="/mi-magia/circulo" className="nav-volver nav-circulo">★ Entrar al Círculo</a>
+          <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="nav-volver">↗ Ir a la tienda</a>
+        </div>
       </nav>
       
       <main className={`contenido ${sidebarAbierto && !isMobile ? 'con-sidebar' : ''}`}>
@@ -3098,7 +3102,7 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
         <div className="circulo-dark-onboarding">
           <div className="onb-header">
             <span style={{color: portalActual.color}}>★</span>
-            <h1>Bienvenid{datosOnboarding.pronombres === 'el' ? 'o' : 'a'} al Círculo</h1>
+            <h1>{personalizarTexto('Bienvenido/a al Círculo', datosOnboarding.pronombres || datosOnboarding.genero)}</h1>
             <p>Queremos conocerte para personalizar tu experiencia</p>
           </div>
           <div className="onb-pasos">
@@ -4768,7 +4772,7 @@ function FaqSec({ onVerTour }) {
       <div className="faq-contacto">
         <h3>¿No encontraste lo que buscabas?</h3>
         <p>Escribinos y te ayudamos.</p>
-        <a href="https://wa.me/59899123456" target="_blank" rel="noopener" className="btn-gold">
+        <a href="https://wa.me/59898690629" target="_blank" rel="noopener" className="btn-gold">
           💬 Contactar por WhatsApp
         </a>
       </div>
@@ -5201,7 +5205,10 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .nav-item.activo{background:#f5f5f5;color:#1a1a1a;border-left:3px solid #d4af37}
 .nav-i{color:#d4af37;width:20px;text-align:center}
 .nav-sep{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:1px;color:#999;padding:1.25rem 1.5rem 0.5rem;text-transform:uppercase}
-.nav-volver{margin-top:auto;padding:1rem 1.5rem;color:#d4af37;text-decoration:none;font-size:0.9rem}
+.nav-links-externos{margin-top:auto;padding:0.5rem 1rem;display:flex;flex-direction:column;gap:0.5rem}
+.nav-volver{padding:0.75rem 1rem;color:#d4af37;text-decoration:none;font-size:0.85rem;display:block;border-radius:8px;transition:all 0.2s}
+.nav-volver:hover{background:rgba(212,175,55,0.1)}
+.nav-circulo{background:linear-gradient(135deg,rgba(212,175,55,0.15),rgba(180,130,30,0.1));border:1px solid rgba(212,175,55,0.3);font-weight:600}
 .contenido{margin-left:240px;margin-top:65px;min-height:calc(100vh - 65px);width:calc(100% - 240px);overflow-x:hidden;padding-right:1rem}
 .sec{padding:2rem;max-width:1200px;margin:0 auto;box-sizing:border-box;width:100%}
 .sec-head{margin-bottom:2rem}

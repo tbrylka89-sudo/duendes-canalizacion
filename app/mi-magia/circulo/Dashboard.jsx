@@ -658,6 +658,12 @@ export default function CirculoDashboard({ usuario }) {
           </button>
         </nav>
         <div className="header-right">
+          <div className="nav-links-externos">
+            <a href="/mi-magia" className="link-externo">Mi Magia</a>
+            <a href="https://duendesuy.10web.cloud" target="_blank" rel="noopener" className="link-externo link-tienda">
+              Tienda
+            </a>
+          </div>
           <button className="btn-tour-mini" onClick={verTourDeNuevo} title="Ver tour">
             ?
           </button>
@@ -919,6 +925,42 @@ export default function CirculoDashboard({ usuario }) {
           color: rgba(255, 255, 255, 0.7);
         }
 
+        .nav-links-externos {
+          display: flex;
+          gap: 8px;
+          margin-right: 10px;
+        }
+
+        .link-externo {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.5);
+          text-decoration: none;
+          padding: 6px 12px;
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          transition: all 0.3s ease;
+        }
+
+        .link-externo:hover {
+          color: #fff;
+          border-color: rgba(212, 175, 55, 0.5);
+          background: rgba(212, 175, 55, 0.1);
+        }
+
+        .link-externo.link-tienda {
+          border-color: rgba(212, 175, 55, 0.3);
+          color: rgba(212, 175, 55, 0.8);
+        }
+
+        .link-externo.link-tienda:hover {
+          background: rgba(212, 175, 55, 0.15);
+          color: #d4af37;
+          border-color: #d4af37;
+        }
+
         .btn-tour-mini {
           width: 28px;
           height: 28px;
@@ -978,10 +1020,53 @@ export default function CirculoDashboard({ usuario }) {
 function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion }) {
   const [consejo, setConsejo] = useState(null);
   const [cargandoConsejo, setCargandoConsejo] = useState(true);
+  const [infoVisita, setInfoVisita] = useState(null);
+  const [mensajeVisible, setMensajeVisible] = useState(true);
 
   useEffect(() => {
-    cargarConsejoDelDia();
+    cargarInfoVisita();
   }, [usuario]);
+
+  // Registrar visita y determinar qué mensaje mostrar
+  async function cargarInfoVisita() {
+    try {
+      const email = usuario?.email;
+      const nombre = usuario?.nombre || usuario?.nombrePreferido || 'viajero';
+      const genero = usuario?.genero || 'el';
+
+      if (!email) {
+        // Sin email, mostrar consejo por defecto
+        cargarConsejoDelDia();
+        return;
+      }
+
+      const params = new URLSearchParams({ email, nombre, genero });
+      const res = await fetch(`/api/circulo/visitas?${params}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setInfoVisita(data);
+
+        // Solo cargar consejo completo si es primera visita
+        if (data.tipoMensaje === 'bienvenida_completa' || data.visitaNumero === 1) {
+          cargarConsejoDelDia();
+        } else {
+          setCargandoConsejo(false);
+        }
+
+        // Auto-ocultar mensaje después de cierto tiempo según tipo
+        if (data.mostrarMensaje && data.tipoMensaje !== 'bienvenida_completa') {
+          const tiempoOcultar = data.tipoMensaje === 'segunda_visita' ? 4000 : 6000;
+          setTimeout(() => setMensajeVisible(false), tiempoOcultar);
+        }
+      } else {
+        cargarConsejoDelDia();
+      }
+    } catch (error) {
+      console.error('Error cargando info visita:', error);
+      cargarConsejoDelDia();
+    }
+  }
 
   async function cargarConsejoDelDia() {
     setCargandoConsejo(true);
@@ -1026,10 +1111,33 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
     }
   }
 
+  // Personalizar texto según género
+  const personalizarGenero = (texto) => {
+    const genero = usuario?.genero;
+    if (!genero || genero === 'el') return texto.replace(/Bienvenido\/a/g, 'Bienvenido').replace(/guardiana\/guardián/g, 'guardián');
+    if (genero === 'ella') return texto.replace(/Bienvenido\/a/g, 'Bienvenida').replace(/guardiana\/guardián/g, 'guardiana');
+    if (genero === 'neutro') return texto.replace(/Bienvenido\/a/g, 'Bienvenide').replace(/guardiana\/guardián/g, 'guardiane');
+    return texto;
+  };
+
+  const nombreUsuario = usuario?.nombre || usuario?.nombrePreferido || 'viajero';
+  const esPrimeraVisita = !infoVisita || infoVisita.visitaNumero === 1 || infoVisita.tipoMensaje === 'bienvenida_completa';
+
   return (
     <div className="seccion-inicio">
-      {/* Consejo del Día - Mensaje único cada visita */}
-      {consejo && (
+      {/* Mensaje de visita (2da, 3ra visita) - toast flotante */}
+      {infoVisita?.mostrarMensaje && !esPrimeraVisita && mensajeVisible && (
+        <div className={`mensaje-visita-toast ${infoVisita.tipoMensaje} ${!mensajeVisible ? 'oculto' : ''}`}>
+          <div className="toast-contenido">
+            <span className="toast-titulo">{infoVisita.mensaje?.titulo}</span>
+            <span className="toast-texto">{infoVisita.mensaje?.texto}</span>
+          </div>
+          <button className="toast-cerrar" onClick={() => setMensajeVisible(false)}>×</button>
+        </div>
+      )}
+
+      {/* Consejo del Día - Solo en primera visita */}
+      {esPrimeraVisita && consejo && (
         <div className="consejo-del-dia-card">
           <div className="consejo-header">
             <div className="consejo-guardian-mini">
@@ -1061,8 +1169,11 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
 
       {/* Bienvenida */}
       <div className="bienvenida">
-        <h2>Bienvenido al Círculo, {usuario?.nombre || 'viajero'}</h2>
+        <h2>{personalizarGenero(`Bienvenido/a al Círculo, ${nombreUsuario}`)}</h2>
         <p>Estamos en el {portalActual?.nombre} - {portalActual?.energia}</p>
+        {infoVisita && infoVisita.visitaNumero > 1 && (
+          <span className="visita-contador">Visita #{infoVisita.visitaNumero} de hoy</span>
+        )}
       </div>
 
       {/* Guardián de la semana */}
@@ -1138,6 +1249,105 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           font-size: 18px;
           color: rgba(255, 255, 255, 0.6);
           font-style: italic;
+        }
+
+        .visita-contador {
+          display: inline-block;
+          margin-top: 10px;
+          font-size: 11px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: rgba(212, 175, 55, 0.5);
+          background: rgba(212, 175, 55, 0.05);
+          padding: 4px 12px;
+          border-radius: 12px;
+        }
+
+        /* Toast de visitas */
+        .mensaje-visita-toast {
+          position: fixed;
+          top: 100px;
+          right: 20px;
+          background: linear-gradient(135deg, #1a1a25 0%, #252535 100%);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 16px;
+          padding: 20px 45px 20px 25px;
+          max-width: 350px;
+          z-index: 1000;
+          animation: slideInRight 0.4s ease, glow 2s ease infinite;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.1); }
+          50% { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 175, 55, 0.2); }
+        }
+
+        .mensaje-visita-toast.oculto {
+          animation: slideOutRight 0.3s ease forwards;
+        }
+
+        @keyframes slideOutRight {
+          to {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+        }
+
+        .mensaje-visita-toast.segunda_visita {
+          border-color: rgba(100, 200, 255, 0.3);
+        }
+
+        .mensaje-visita-toast.tercera_visita {
+          border-color: rgba(180, 100, 255, 0.3);
+        }
+
+        .toast-contenido {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .toast-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .toast-texto {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.7);
+          line-height: 1.5;
+        }
+
+        .toast-cerrar {
+          position: absolute;
+          top: 10px;
+          right: 12px;
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 20px;
+          cursor: pointer;
+          padding: 5px;
+          line-height: 1;
+          transition: color 0.2s;
+        }
+
+        .toast-cerrar:hover {
+          color: rgba(255, 255, 255, 0.8);
         }
 
         /* Guardián de la semana */

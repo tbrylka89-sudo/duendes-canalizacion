@@ -139,6 +139,12 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 17. ACTIVIDAD RECIENTE: {"accion": "ver_actividad"}
 18. REPORTE VENTAS: {"accion": "reporte_ventas", "datos": {"periodo": "hoy|semana|mes"}}
 
+### PERFILES VISITANTES (LO QUE TITO APRENDIÓ)
+19. VER PERFILES: {"accion": "ver_perfiles_tito", "datos": {"limite": 20}}
+20. BUSCAR PERFIL: {"accion": "buscar_perfil_tito", "datos": {"query": "nombre, email o visitorId"}}
+21. VER CONVERSACIONES: {"accion": "ver_conversaciones_tito", "datos": {"visitorId": "id_del_visitante"}}
+22. PERFILES CON PROBLEMAS: {"accion": "perfiles_vulnerables"}
+
 ### CREATIVIDAD (IA)
 19. GENERAR IMAGEN: {"accion": "generar_imagen", "datos": {"prompt": "descripcion de la imagen", "estilo": "magico|duende|watercolor|realista|natural"}}
 20. GENERAR VOZ: {"accion": "generar_voz", "datos": {"texto": "texto a convertir en audio", "voz": "thibisay|thibisay-rapido|duende|bella|rachel"}}
@@ -167,6 +173,10 @@ Cuando necesites ejecutar una accion, responde SOLO con el JSON:
 - "Genera un post de Instagram sobre luna llena" -> generar_post_redes
 - "Escribe un email de bienvenida para el circulo" -> generar_email
 - "Crea un guion para un reel de 30 segundos sobre cristales" -> generar_guion_reel
+- "Mostrame los perfiles que aprendió Tito" -> ver_perfiles_tito
+- "Busca el perfil de maria" -> buscar_perfil_tito
+- "Quienes están pasando por momentos difíciles?" -> perfiles_vulnerables
+- "Ver conversaciones del visitante X" -> ver_conversaciones_tito
 
 ## REGLAS DE ORO
 
@@ -1120,6 +1130,183 @@ _Adaptá según tu estilo y los elementos visuales que tengas disponibles._`
         };
       } catch (e) {
         return { mensaje: `❌ Error generando guión: ${e.message}` };
+      }
+    }
+
+    case 'ver_perfiles_tito': {
+      const { limite = 20 } = datos || {};
+      try {
+        // Obtener IDs de perfiles activos
+        const perfilesIds = await kv.smembers('tito:perfiles:activos') || [];
+
+        if (perfilesIds.length === 0) {
+          return { mensaje: '📋 Todavía no hay perfiles guardados. Tito irá aprendiendo sobre los visitantes a medida que chatee con ellos.' };
+        }
+
+        const perfiles = [];
+        for (const visitorId of perfilesIds.slice(0, limite)) {
+          const perfil = await kv.get(`tito:visitante:${visitorId}`);
+          if (perfil) {
+            perfiles.push({ visitorId, ...perfil });
+          }
+        }
+
+        // Ordenar por última interacción
+        perfiles.sort((a, b) => new Date(b.ultimaInteraccion) - new Date(a.ultimaInteraccion));
+
+        const lista = perfiles.map(p => {
+          const info = p.infoPersonal || {};
+          const detalles = [];
+          if (info.situacionFamiliar) detalles.push(info.situacionFamiliar);
+          if (info.mascota) detalles.push(`tiene ${info.mascota}${info.nombreMascota ? ` (${info.nombreMascota})` : ''}`);
+          if (info.ocupacion) detalles.push(info.ocupacion);
+          if (info.motivoPrincipal) detalles.push(`busca ${info.motivoPrincipal}`);
+          if (info.atravesandoMomentoDificil) detalles.push('⚠️ momento difícil');
+          if (info.mostróDudaEconómica) detalles.push('💰 duda económica');
+
+          return `- **${p.nombre || 'Sin nombre'}** ${p.email ? `(${p.email})` : ''}
+  📊 ${p.interacciones || 0} chats | 🌍 ${info.pais || 'Desconocido'}
+  ${detalles.length > 0 ? `  📝 ${detalles.join(' | ')}` : ''}`;
+        }).join('\n\n');
+
+        return {
+          mensaje: `👥 **Perfiles aprendidos por Tito (${perfiles.length}/${perfilesIds.length}):**\n\n${lista}\n\n_Usá "ver conversaciones de [visitorId]" para ver el historial completo._`
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error: ${e.message}` };
+      }
+    }
+
+    case 'buscar_perfil_tito': {
+      const { query } = datos;
+      if (!query) {
+        return { mensaje: 'Necesito un nombre, email o visitorId para buscar.' };
+      }
+
+      try {
+        const perfilesIds = await kv.smembers('tito:perfiles:activos') || [];
+        const resultados = [];
+        const queryLower = query.toLowerCase();
+
+        for (const visitorId of perfilesIds) {
+          const perfil = await kv.get(`tito:visitante:${visitorId}`);
+          if (!perfil) continue;
+
+          const nombre = (perfil.nombre || '').toLowerCase();
+          const email = (perfil.email || '').toLowerCase();
+
+          if (visitorId.includes(queryLower) || nombre.includes(queryLower) || email.includes(queryLower)) {
+            resultados.push({ visitorId, ...perfil });
+          }
+        }
+
+        if (resultados.length === 0) {
+          return { mensaje: `No encontré perfiles con "${query}"` };
+        }
+
+        const detalle = resultados[0];
+        const info = detalle.infoPersonal || {};
+
+        let resumen = `👤 **Perfil de ${detalle.nombre || 'Visitante'}**\n\n`;
+        resumen += `📧 Email: ${detalle.email || 'No proporcionado'}\n`;
+        resumen += `🔑 ID: ${detalle.visitorId}\n`;
+        resumen += `📊 Interacciones: ${detalle.interacciones || 0}\n`;
+        resumen += `📅 Última: ${detalle.ultimaInteraccion ? new Date(detalle.ultimaInteraccion).toLocaleString('es-UY') : 'N/A'}\n\n`;
+
+        if (Object.keys(info).length > 0) {
+          resumen += `**📝 Lo que sabemos:**\n`;
+          if (info.pais) resumen += `- País: ${info.pais}\n`;
+          if (info.situacionFamiliar) resumen += `- Situación: ${info.situacionFamiliar}\n`;
+          if (info.tieneHijos) resumen += `- Tiene hijos\n`;
+          if (info.mascota) resumen += `- Mascota: ${info.mascota}${info.nombreMascota ? ` (${info.nombreMascota})` : ''}\n`;
+          if (info.ocupacion) resumen += `- Ocupación: ${info.ocupacion}\n`;
+          if (info.motivoPrincipal) resumen += `- Busca: ${info.motivoPrincipal}\n`;
+          if (info.interesesEspirituales?.length > 0) resumen += `- Intereses: ${info.interesesEspirituales.join(', ')}\n`;
+          if (info.compraParaRegalo) resumen += `- Compra para regalo${info.destinatarioRegalo ? ` (${info.destinatarioRegalo})` : ''}\n`;
+          if (info.atravesandoMomentoDificil) resumen += `- ⚠️ Atravesando momento difícil\n`;
+          if (info.mostróDudaEconómica) resumen += `- 💰 Mostró duda económica\n`;
+        }
+
+        if (detalle.productosVistos?.length > 0) {
+          resumen += `\n**👀 Productos vistos:**\n`;
+          detalle.productosVistos.slice(0, 5).forEach(p => {
+            resumen += `- ${p.nombre}\n`;
+          });
+        }
+
+        return { mensaje: resumen };
+      } catch (e) {
+        return { mensaje: `❌ Error: ${e.message}` };
+      }
+    }
+
+    case 'ver_conversaciones_tito': {
+      const { visitorId } = datos;
+      if (!visitorId) {
+        return { mensaje: 'Necesito el visitorId del perfil.' };
+      }
+
+      try {
+        const perfil = await kv.get(`tito:visitante:${visitorId}`);
+        if (!perfil) {
+          return { mensaje: `No encontré el perfil con ID: ${visitorId}` };
+        }
+
+        if (!perfil.conversaciones || perfil.conversaciones.length === 0) {
+          return { mensaje: `${perfil.nombre || 'Este visitante'} no tiene conversaciones guardadas.` };
+        }
+
+        let historial = `💬 **Conversaciones de ${perfil.nombre || 'Visitante'}**\n\n`;
+
+        perfil.conversaciones.slice(-10).forEach(conv => {
+          const fecha = new Date(conv.fecha).toLocaleString('es-UY');
+          historial += `📅 ${fecha}\n`;
+          historial += `👤 **Usuario:** ${conv.usuario}\n`;
+          historial += `🤖 **Tito:** ${conv.tito}\n\n---\n\n`;
+        });
+
+        return { mensaje: historial };
+      } catch (e) {
+        return { mensaje: `❌ Error: ${e.message}` };
+      }
+    }
+
+    case 'perfiles_vulnerables': {
+      try {
+        const perfilesIds = await kv.smembers('tito:perfiles:activos') || [];
+        const vulnerables = [];
+
+        for (const visitorId of perfilesIds) {
+          const perfil = await kv.get(`tito:visitante:${visitorId}`);
+          if (!perfil) continue;
+
+          const info = perfil.infoPersonal || {};
+
+          // Detectar situaciones sensibles
+          if (info.atravesandoMomentoDificil || info.problemasMencionados?.length > 0) {
+            vulnerables.push({
+              visitorId,
+              nombre: perfil.nombre || 'Sin nombre',
+              email: perfil.email,
+              razon: 'momento difícil',
+              detalles: info.problemasMencionados?.[0]?.contexto || 'No hay detalles'
+            });
+          }
+        }
+
+        if (vulnerables.length === 0) {
+          return { mensaje: '✅ No hay visitantes que hayan mencionado estar pasando por momentos difíciles.' };
+        }
+
+        const lista = vulnerables.map(v =>
+          `- **${v.nombre}** ${v.email ? `(${v.email})` : ''}\n  ⚠️ ${v.razon}\n  📝 "${v.detalles.substring(0, 100)}..."`
+        ).join('\n\n');
+
+        return {
+          mensaje: `⚠️ **Visitantes que necesitan atención especial (${vulnerables.length}):**\n\n${lista}\n\n_Estas personas mencionaron estar pasando por momentos difíciles. Considerá un seguimiento personalizado._`
+        };
+      } catch (e) {
+        return { mensaje: `❌ Error: ${e.message}` };
       }
     }
 

@@ -245,6 +245,20 @@ BIEN (visual, fácil de leer):
 Cuando hablen de: protección, abundancia, amor, sanación, duende, ver, elegir, recomendar...
 Agregá al final: [PRODUCTOS: id1, id2, id3, id4]
 
+=== SER CONFIDENTE - MUY IMPORTANTE ===
+Además de ayudar con productos, sos un AMIGO DE VERDAD.
+Interesate genuinamente por la persona:
+- Si mencionan algo personal, profundizá: "¿Y cómo te sentís con eso?"
+- Preguntá de forma natural: "¿Vivís sola/o?", "¿Tenés mascotas?", "¿Qué te gusta hacer?"
+- Si hablan de problemas, escuchá y validá antes de ofrecer soluciones
+- Recordá lo que te cuentan y usalo en conversaciones futuras
+- Preguntás que podés hacer naturalmente:
+  * "¿Qué te trajo por acá hoy?" (estado emocional)
+  * "¿Lo querés para vos o para regalar?" (relaciones)
+  * "¿Cuánto hace que te interesa el mundo espiritual?" (historia)
+  * "¿Cómo se llaman los que viven con vos?" (familia/mascotas)
+  * "¿Qué momento estás atravesando?" (situación actual)
+
 === VENDER SIN VENDER ===
 No presionás. Informás, ayudás, conectás.
 - Son piezas únicas, hechas a mano, cuando se van no vuelven
@@ -658,25 +672,121 @@ ${esAdmin ?
         const nuevaMemoria = memoriaVisitante || {
           creado: new Date().toISOString(),
           interacciones: 0,
-          productosVistos: []
+          productosVistos: [],
+          infoPersonal: {},
+          conversaciones: []
         };
-        
+
         nuevaMemoria.ultimaInteraccion = new Date().toISOString();
         nuevaMemoria.interacciones = (nuevaMemoria.interacciones || 0) + 1;
-        
+        if (!nuevaMemoria.infoPersonal) nuevaMemoria.infoPersonal = {};
+        if (!nuevaMemoria.conversaciones) nuevaMemoria.conversaciones = [];
+
+        // Guardar fragmento de conversación para el admin
+        nuevaMemoria.conversaciones.push({
+          fecha: new Date().toISOString(),
+          usuario: message.substring(0, 500),
+          tito: textoRespuesta.substring(0, 500)
+        });
+        // Mantener solo las últimas 20 interacciones
+        if (nuevaMemoria.conversaciones.length > 20) {
+          nuevaMemoria.conversaciones = nuevaMemoria.conversaciones.slice(-20);
+        }
+
         // Detectar nombre
         const nombreMatch = message.match(/(?:me llamo|soy|mi nombre es)\s+([A-Za-zÁáÉéÍíÓóÚúÑñ]+)/i);
-        if (nombreMatch) nuevaMemoria.nombre = nombreMatch[1];
-        
+        if (nombreMatch) {
+          nuevaMemoria.nombre = nombreMatch[1];
+          nuevaMemoria.infoPersonal.nombre = nombreMatch[1];
+        }
+
         // Detectar email
         const emailMatch = message.match(/[\w.-]+@[\w.-]+\.\w+/);
-        if (emailMatch) nuevaMemoria.email = emailMatch[0];
-        
+        if (emailMatch) {
+          nuevaMemoria.email = emailMatch[0];
+          nuevaMemoria.infoPersonal.email = emailMatch[0];
+        }
+
+        // === EXTRAER INFORMACIÓN PERSONAL (CONFIDENTE) ===
+
+        // Detectar si vive solo/a o acompañado/a
+        if (/vivo sol[ao]|estoy sol[ao]|separad[ao]|divorciad[ao]/i.test(message)) {
+          nuevaMemoria.infoPersonal.situacionFamiliar = 'vive solo/a';
+        } else if (/vivo con|mi pareja|mi esposo|mi esposa|mi novio|mi novia|casad[ao]/i.test(message)) {
+          nuevaMemoria.infoPersonal.situacionFamiliar = 'en pareja';
+        } else if (/mis hijos|tengo hijos|soy madre|soy padre|mis niños/i.test(message)) {
+          nuevaMemoria.infoPersonal.tieneHijos = true;
+        }
+
+        // Detectar mascotas
+        const mascotaMatch = message.match(/(?:mi|tengo|un[ao]?)\s+(perro|gato|gata|perrita|perrito|gatito|gatita|mascota)/i);
+        if (mascotaMatch) {
+          nuevaMemoria.infoPersonal.mascota = mascotaMatch[1];
+        }
+        const nombreMascotaMatch = message.match(/(?:se llama|llamado|llamada)\s+([A-Za-zÁáÉéÍíÓóÚúÑñ]+)/i);
+        if (nombreMascotaMatch && nuevaMemoria.infoPersonal.mascota) {
+          nuevaMemoria.infoPersonal.nombreMascota = nombreMascotaMatch[1];
+        }
+
+        // Detectar problemas/momento difícil
+        if (/estoy pasando|momento difícil|momento dificil|problema|crisis|ansiedad|depresión|depresion|triste|angustia|preocupad[ao]|estresad[ao]/i.test(message)) {
+          nuevaMemoria.infoPersonal.atravesandoMomentoDificil = true;
+          if (!nuevaMemoria.infoPersonal.problemasMencionados) {
+            nuevaMemoria.infoPersonal.problemasMencionados = [];
+          }
+          nuevaMemoria.infoPersonal.problemasMencionados.push({
+            fecha: new Date().toISOString(),
+            contexto: message.substring(0, 200)
+          });
+        }
+
+        // Detectar intereses espirituales
+        if (/tarot|runas|cristales|meditación|meditacion|yoga|astrología|astrologia|chakras|reiki|brujería|brujeria|magia/i.test(message)) {
+          if (!nuevaMemoria.infoPersonal.interesesEspirituales) {
+            nuevaMemoria.infoPersonal.interesesEspirituales = [];
+          }
+          const intereses = message.match(/tarot|runas|cristales|meditación|meditacion|yoga|astrología|astrologia|chakras|reiki|brujería|brujeria|magia/gi);
+          if (intereses) {
+            intereses.forEach(i => {
+              if (!nuevaMemoria.infoPersonal.interesesEspirituales.includes(i.toLowerCase())) {
+                nuevaMemoria.infoPersonal.interesesEspirituales.push(i.toLowerCase());
+              }
+            });
+          }
+        }
+
+        // Detectar trabajo/ocupación
+        const trabajoMatch = message.match(/(?:trabajo en|soy|trabajo como|me dedico a)\s+([^,.]+)/i);
+        if (trabajoMatch) {
+          nuevaMemoria.infoPersonal.ocupacion = trabajoMatch[1].trim();
+        }
+
+        // Detectar para quién es (regalo)
+        if (/para mi mamá|para mi madre|para mi hermana|para una amiga|para mi hija|es un regalo|para regalar/i.test(message)) {
+          nuevaMemoria.infoPersonal.compraParaRegalo = true;
+          const destinatarioMatch = message.match(/para mi\s+(\w+)|para una\s+(\w+)/i);
+          if (destinatarioMatch) {
+            nuevaMemoria.infoPersonal.destinatarioRegalo = destinatarioMatch[1] || destinatarioMatch[2];
+          }
+        }
+
+        // Detectar motivo de interés
+        if (/busco protección|necesito protección|quiero proteger/i.test(message)) {
+          nuevaMemoria.infoPersonal.motivoPrincipal = 'protección';
+        } else if (/abundancia|dinero|trabajo|prosperidad/i.test(message)) {
+          nuevaMemoria.infoPersonal.motivoPrincipal = 'abundancia';
+        } else if (/amor|pareja|relación|corazón/i.test(message)) {
+          nuevaMemoria.infoPersonal.motivoPrincipal = 'amor';
+        } else if (/salud|sanación|sanar|curar/i.test(message)) {
+          nuevaMemoria.infoPersonal.motivoPrincipal = 'sanación';
+        }
+
         // Detectar duda económica
         if (/caro|expensive|precio|presupuesto|después|despues|no puedo|no tengo|mucho dinero|mucha plata/i.test(message)) {
           nuevaMemoria.dudaEconomica = true;
+          nuevaMemoria.infoPersonal.mostróDudaEconómica = true;
         }
-        
+
         // Guardar producto visto
         if (contexto?.producto) {
           if (!nuevaMemoria.productosVistos) nuevaMemoria.productosVistos = [];
@@ -685,9 +795,24 @@ ${esAdmin ?
             nuevaMemoria.productosVistos = nuevaMemoria.productosVistos.slice(0, 10);
           }
         }
-        
+
+        // Guardar país si está disponible
+        if (codigoPais && paisNombre) {
+          nuevaMemoria.infoPersonal.pais = paisNombre;
+          nuevaMemoria.infoPersonal.codigoPais = codigoPais;
+        }
+
         await kv.set(`tito:visitante:${visitorId}`, nuevaMemoria, { ex: 60 * 24 * 60 * 60 });
-      } catch (e) {}
+
+        // === GUARDAR EN LISTA DE PERFILES PARA ADMIN ===
+        // Crear entrada en lista indexada para fácil acceso admin
+        if (nuevaMemoria.nombre || nuevaMemoria.email || Object.keys(nuevaMemoria.infoPersonal).length > 2) {
+          await kv.sadd('tito:perfiles:activos', visitorId);
+        }
+
+      } catch (e) {
+        console.error('Error guardando memoria Tito:', e);
+      }
     }
 
     // ═══════════════════════════════════════════════════════════

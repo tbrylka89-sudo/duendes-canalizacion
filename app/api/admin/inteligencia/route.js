@@ -191,6 +191,197 @@ export async function POST(request) {
         resultado = { mensaje: `Clasificación cambiada a ${datos.clasificacion}` };
         break;
 
+      case 'eliminar_usuario':
+        // Eliminar usuario completamente
+        const emailNorm = email.toLowerCase();
+        const keysToDelete = [
+          `user:${emailNorm}`,
+          `elegido:${emailNorm}`,
+          `perfil:${emailNorm}`,
+          `circulo:${emailNorm}`,
+          `grimorio:${emailNorm}`,
+          `mensaje_tito:${emailNorm}`
+        ];
+
+        let eliminados = 0;
+        for (const key of keysToDelete) {
+          try {
+            const existe = await kv.get(key);
+            if (existe) {
+              await kv.del(key);
+              eliminados++;
+            }
+          } catch (e) {
+            console.error(`Error eliminando ${key}:`, e);
+          }
+        }
+
+        // También eliminar de tito perfiles activos si existe
+        try {
+          const titoKeys = await kv.keys(`tito:visitante:*`);
+          for (const tk of titoKeys) {
+            const tito = await kv.get(tk);
+            if (tito?.email?.toLowerCase() === emailNorm) {
+              await kv.del(tk);
+              eliminados++;
+            }
+          }
+        } catch (e) {}
+
+        resultado = { mensaje: `Usuario ${email} eliminado`, keysEliminadas: eliminados };
+        break;
+
+      case 'obtener_perfil_completo':
+        // Obtener toda la información del usuario
+        const emailLower = email.toLowerCase();
+        const userDataComplete = await kv.get(`user:${emailLower}`) || await kv.get(`elegido:${emailLower}`);
+        const perfilData = await kv.get(`perfil:${emailLower}`);
+        const circuloData = await kv.get(`circulo:${emailLower}`);
+        const grimorioData = await kv.get(`grimorio:${emailLower}`);
+        const mensajeTitoData = await kv.get(`mensaje_tito:${emailLower}`);
+
+        // Buscar conversaciones de Tito
+        let titoConversaciones = null;
+        try {
+          const titoKeys = await kv.keys(`tito:visitante:*`);
+          for (const tk of titoKeys) {
+            const titoData = await kv.get(tk);
+            if (titoData?.email?.toLowerCase() === emailLower) {
+              titoConversaciones = titoData;
+              break;
+            }
+          }
+        } catch (e) {}
+
+        // Buscar visitas del día
+        const hoy = new Date().toISOString().split('T')[0];
+        const visitasHoy = await kv.get(`visitas:${emailLower}:${hoy}`);
+
+        resultado = {
+          usuario: userDataComplete,
+          perfil: perfilData,
+          circulo: circuloData,
+          grimorio: grimorioData,
+          mensajeTito: mensajeTitoData,
+          tito: titoConversaciones,
+          visitasHoy
+        };
+        break;
+
+      case 'buscar_duplicados':
+        // Buscar todos los usuarios con emails duplicados
+        const allUserKeys = await kv.keys('user:*');
+        const allElegidoKeys = await kv.keys('elegido:*');
+        const emailCount = {};
+        const duplicadosInfo = [];
+
+        // Contar ocurrencias de cada email
+        for (const key of [...allUserKeys, ...allElegidoKeys]) {
+          const userData = await kv.get(key);
+          if (userData?.email) {
+            const em = userData.email.toLowerCase();
+            if (!emailCount[em]) {
+              emailCount[em] = [];
+            }
+            emailCount[em].push({
+              key,
+              runas: userData.runas || 0,
+              treboles: userData.treboles || 0,
+              creado: userData.creado || userData.fechaCreacion,
+              nombre: userData.nombre || userData.nombrePreferido
+            });
+          }
+        }
+
+        // Encontrar duplicados
+        for (const [em, entries] of Object.entries(emailCount)) {
+          if (entries.length > 1) {
+            duplicadosInfo.push({
+              email: em,
+              cantidad: entries.length,
+              entradas: entries
+            });
+          }
+        }
+
+        resultado = {
+          duplicados: duplicadosInfo,
+          totalDuplicados: duplicadosInfo.length,
+          totalEntradas: duplicadosInfo.reduce((sum, d) => sum + d.cantidad, 0)
+        };
+        break;
+
+      case 'limpiar_duplicados':
+        // Mergear y limpiar duplicados
+        const userKeysAll = await kv.keys('user:*');
+        const elegidoKeysAll = await kv.keys('elegido:*');
+        const emailMap = {};
+
+        // Recopilar todos los datos por email
+        for (const key of [...userKeysAll, ...elegidoKeysAll]) {
+          const ud = await kv.get(key);
+          if (ud?.email) {
+            const em = ud.email.toLowerCase();
+            if (!emailMap[em]) {
+              emailMap[em] = [];
+            }
+            emailMap[em].push({ key, data: ud });
+          }
+        }
+
+        let mergeados = 0;
+        let keysEliminadas = 0;
+
+        for (const [em, entries] of Object.entries(emailMap)) {
+          if (entries.length > 1) {
+            // Ordenar por fecha de creación (más antigua primero)
+            entries.sort((a, b) => {
+              const fechaA = new Date(a.data.creado || a.data.fechaCreacion || 0);
+              const fechaB = new Date(b.data.creado || b.data.fechaCreacion || 0);
+              return fechaA - fechaB;
+            });
+
+            // La primera es la principal (más antigua)
+            const principal = entries[0];
+            let runasTotal = principal.data.runas || 0;
+            let trebolesTotal = principal.data.treboles || 0;
+
+            // Sumar runas y tréboles de todas las demás
+            for (let i = 1; i < entries.length; i++) {
+              runasTotal += entries[i].data.runas || 0;
+              trebolesTotal += entries[i].data.treboles || 0;
+
+              // Eliminar la entrada duplicada
+              await kv.del(entries[i].key);
+              keysEliminadas++;
+            }
+
+            // Actualizar la principal con el total
+            principal.data.runas = runasTotal;
+            principal.data.treboles = trebolesTotal;
+            principal.data.mergeadoEn = new Date().toISOString();
+            principal.data.cuentasMergeadas = entries.length - 1;
+
+            // Guardar con key normalizada (user:email)
+            await kv.set(`user:${em}`, principal.data);
+
+            // Si la key original era diferente, eliminarla
+            if (principal.key !== `user:${em}`) {
+              await kv.del(principal.key);
+            }
+
+            mergeados++;
+          }
+        }
+
+        resultado = {
+          mensaje: `Limpieza completada`,
+          emailsMergeados: mergeados,
+          keysEliminadas,
+          totalUsuariosAhora: Object.keys(emailMap).length
+        };
+        break;
+
       default:
         return Response.json({ success: false, error: 'Acción no reconocida' }, { status: 400 });
     }

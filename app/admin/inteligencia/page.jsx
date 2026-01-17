@@ -43,6 +43,12 @@ export default function InteligenciaPage() {
   });
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [modalAccion, setModalAccion] = useState(null);
+  const [modalEliminar, setModalEliminar] = useState(null);
+  const [modalPerfil, setModalPerfil] = useState(null);
+  const [perfilCompleto, setPerfilCompleto] = useState(null);
+  const [cargandoPerfil, setCargandoPerfil] = useState(false);
+  const [duplicados, setDuplicados] = useState(null);
+  const [mostrarDuplicados, setMostrarDuplicados] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -71,14 +77,14 @@ export default function InteligenciaPage() {
     }
   }
 
-  async function ejecutarAccion(accion, datos) {
+  async function ejecutarAccion(accion, datos, email = null) {
     try {
       const res = await fetch('/api/admin/inteligencia', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           accion,
-          email: usuarioSeleccionado?.email,
+          email: email || usuarioSeleccionado?.email,
           datos
         })
       });
@@ -88,11 +94,119 @@ export default function InteligenciaPage() {
         alert(data.mensaje || 'Acción completada');
         setModalAccion(null);
         cargarDatos();
+        return data;
+      } else {
+        alert('Error: ' + data.error);
+        return null;
+      }
+    } catch (err) {
+      alert('Error de conexión');
+      return null;
+    }
+  }
+
+  async function eliminarUsuario(email) {
+    try {
+      const res = await fetch('/api/admin/inteligencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'eliminar_usuario',
+          email
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`Usuario ${email} eliminado correctamente`);
+        setModalEliminar(null);
+        setUsuarioSeleccionado(null);
+        cargarDatos();
       } else {
         alert('Error: ' + data.error);
       }
     } catch (err) {
       alert('Error de conexión');
+    }
+  }
+
+  async function cargarPerfilCompleto(email) {
+    setCargandoPerfil(true);
+    try {
+      const res = await fetch('/api/admin/inteligencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'obtener_perfil_completo',
+          email
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setPerfilCompleto(data);
+        setModalPerfil(email);
+      } else {
+        alert('Error cargando perfil: ' + data.error);
+      }
+    } catch (err) {
+      alert('Error de conexión');
+    } finally {
+      setCargandoPerfil(false);
+    }
+  }
+
+  async function buscarDuplicados() {
+    setCargando(true);
+    try {
+      const res = await fetch('/api/admin/inteligencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'buscar_duplicados',
+          email: 'admin'
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setDuplicados(data);
+        setMostrarDuplicados(true);
+      }
+    } catch (err) {
+      alert('Error buscando duplicados');
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  async function limpiarDuplicados() {
+    if (!confirm('¿Estás seguro de que querés limpiar los duplicados? Se mergearán las cuentas duplicadas sumando runas y tréboles.')) {
+      return;
+    }
+
+    setCargando(true);
+    try {
+      const res = await fetch('/api/admin/inteligencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'limpiar_duplicados',
+          email: 'admin'
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`Limpieza completada:\n- Emails mergeados: ${data.emailsMergeados}\n- Keys eliminadas: ${data.keysEliminadas}\n- Total usuarios ahora: ${data.totalUsuariosAhora}`);
+        setMostrarDuplicados(false);
+        setDuplicados(null);
+        cargarDatos();
+      }
+    } catch (err) {
+      alert('Error limpiando duplicados');
+    } finally {
+      setCargando(false);
     }
   }
 
@@ -102,6 +216,11 @@ export default function InteligenciaPage() {
       <header className="header">
         <h1>🧠 Inteligencia de Usuarios</h1>
         <p>Panel de análisis y segmentación</p>
+        <div className="header-tools">
+          <button onClick={buscarDuplicados} className="btn-tool duplicados">
+            🔍 Buscar Duplicados
+          </button>
+        </div>
       </header>
 
       {/* Estadísticas */}
@@ -250,9 +369,11 @@ export default function InteligenciaPage() {
                   </td>
                   <td>
                     <div className="acciones-btns">
+                      <button onClick={(e) => { e.stopPropagation(); cargarPerfilCompleto(u.email); }} title="Ver perfil completo" className="btn-perfil">👤</button>
                       <button onClick={(e) => { e.stopPropagation(); setUsuarioSeleccionado(u); setModalAccion('regalar'); }} title="Regalar">🎁</button>
                       <button onClick={(e) => { e.stopPropagation(); setUsuarioSeleccionado(u); setModalAccion('mensaje'); }} title="Mensaje">💬</button>
                       <button onClick={(e) => { e.stopPropagation(); setUsuarioSeleccionado(u); setModalAccion('nota'); }} title="Nota">📝</button>
+                      <button onClick={(e) => { e.stopPropagation(); setModalEliminar(u); }} title="Eliminar" className="btn-eliminar">🗑️</button>
                     </div>
                   </td>
                 </tr>
@@ -343,6 +464,223 @@ export default function InteligenciaPage() {
           onCerrar={() => setModalAccion(null)}
           onEjecutar={ejecutarAccion}
         />
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {modalEliminar && (
+        <div className="modal-overlay" onClick={() => setModalEliminar(null)}>
+          <div className="modal-eliminar" onClick={e => e.stopPropagation()}>
+            <div className="eliminar-icon">🗑️</div>
+            <h3>¿Eliminar usuario?</h3>
+            <p className="eliminar-nombre">{modalEliminar.nombre}</p>
+            <p className="eliminar-email">{modalEliminar.email}</p>
+            <p className="eliminar-advertencia">
+              Esta acción eliminará permanentemente todos los datos del usuario:
+              perfil, círculo, grimorio, mensajes y conversaciones con Tito.
+            </p>
+            <div className="eliminar-btns">
+              <button className="btn-cancelar" onClick={() => setModalEliminar(null)}>
+                Cancelar
+              </button>
+              <button className="btn-confirmar-eliminar" onClick={() => eliminarUsuario(modalEliminar.email)}>
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de perfil completo */}
+      {modalPerfil && perfilCompleto && (
+        <div className="modal-overlay" onClick={() => { setModalPerfil(null); setPerfilCompleto(null); }}>
+          <div className="modal-perfil-completo" onClick={e => e.stopPropagation()}>
+            <button className="modal-cerrar" onClick={() => { setModalPerfil(null); setPerfilCompleto(null); }}>✕</button>
+
+            <h2>📋 Perfil Completo</h2>
+            <p className="perfil-email">{modalPerfil}</p>
+
+            {/* Datos básicos del usuario */}
+            <div className="perfil-seccion">
+              <h4>👤 Datos del Usuario</h4>
+              {perfilCompleto.usuario ? (
+                <div className="perfil-datos">
+                  <div className="dato"><span>Nombre:</span> {perfilCompleto.usuario.nombre || 'Sin nombre'}</div>
+                  <div className="dato"><span>Email:</span> {perfilCompleto.usuario.email}</div>
+                  <div className="dato"><span>Runas:</span> <strong className="runas">ᚱ {perfilCompleto.usuario.runas || 0}</strong></div>
+                  <div className="dato"><span>Tréboles:</span> <strong className="treboles">☘ {perfilCompleto.usuario.treboles || 0}</strong></div>
+                  <div className="dato"><span>Es Círculo:</span> {perfilCompleto.usuario.esCirculo ? '✅ Sí' : '❌ No'}</div>
+                  {perfilCompleto.usuario.circuloExpira && (
+                    <div className="dato"><span>Círculo expira:</span> {perfilCompleto.usuario.circuloExpira}</div>
+                  )}
+                  <div className="dato"><span>Guardianes adoptados:</span> {perfilCompleto.usuario.guardiansAdoptados || 0}</div>
+                  <div className="dato"><span>Creado:</span> {perfilCompleto.usuario.creado ? new Date(perfilCompleto.usuario.creado).toLocaleDateString() : 'N/A'}</div>
+                  <div className="dato"><span>Última actividad:</span> {perfilCompleto.usuario.ultimaActividad ? new Date(perfilCompleto.usuario.ultimaActividad).toLocaleString() : 'N/A'}</div>
+                  {perfilCompleto.usuario.compras?.length > 0 && (
+                    <div className="dato">
+                      <span>Compras:</span> {perfilCompleto.usuario.compras.length}
+                      (Total: ${perfilCompleto.usuario.compras.reduce((s, c) => s + (c.monto || 0), 0)})
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="sin-datos">No hay datos de usuario</p>
+              )}
+            </div>
+
+            {/* Perfil/Onboarding */}
+            <div className="perfil-seccion">
+              <h4>🔮 Perfil Espiritual</h4>
+              {perfilCompleto.perfil ? (
+                <div className="perfil-datos">
+                  <div className="dato"><span>Nombre preferido:</span> {perfilCompleto.perfil.nombrePreferido || 'N/A'}</div>
+                  <div className="dato"><span>Género:</span> {perfilCompleto.perfil.genero || 'N/A'}</div>
+                  <div className="dato"><span>País:</span> {perfilCompleto.perfil.pais || 'N/A'}</div>
+                  <div className="dato"><span>Clasificación:</span> {perfilCompleto.perfil.clasificacionEmoji} {perfilCompleto.perfil.clasificacion || 'Sin clasificar'}</div>
+                  <div className="dato"><span>Experiencia:</span> {perfilCompleto.perfil.experienciaEspiritual || 'N/A'}</div>
+                  <div className="dato"><span>Cómo llegó:</span> {perfilCompleto.perfil.comoLlegaste || 'N/A'}</div>
+                  {perfilCompleto.perfil.atraccionPrincipal?.length > 0 && (
+                    <div className="dato"><span>Intereses:</span> {perfilCompleto.perfil.atraccionPrincipal.join(', ')}</div>
+                  )}
+                  {perfilCompleto.perfil.queBusca?.length > 0 && (
+                    <div className="dato"><span>Busca:</span> {perfilCompleto.perfil.queBusca.join(', ')}</div>
+                  )}
+                  {perfilCompleto.perfil.objetivoPrincipal && (
+                    <div className="dato-largo">
+                      <span>Objetivo:</span>
+                      <p>{perfilCompleto.perfil.objetivoPrincipal}</p>
+                    </div>
+                  )}
+                  <div className="dato"><span>Onboarding completado:</span> {perfilCompleto.perfil.onboardingCompletado ? '✅' : '❌'}</div>
+                </div>
+              ) : (
+                <p className="sin-datos">No ha completado el onboarding</p>
+              )}
+            </div>
+
+            {/* Círculo */}
+            {perfilCompleto.circulo && (
+              <div className="perfil-seccion">
+                <h4>⭕ Datos del Círculo</h4>
+                <div className="perfil-datos">
+                  <pre className="json-data">{JSON.stringify(perfilCompleto.circulo, null, 2)}</pre>
+                </div>
+              </div>
+            )}
+
+            {/* Grimorio */}
+            {perfilCompleto.grimorio && (
+              <div className="perfil-seccion">
+                <h4>📖 Grimorio</h4>
+                <div className="perfil-datos">
+                  <pre className="json-data">{JSON.stringify(perfilCompleto.grimorio, null, 2)}</pre>
+                </div>
+              </div>
+            )}
+
+            {/* Conversaciones Tito */}
+            {perfilCompleto.tito && (
+              <div className="perfil-seccion">
+                <h4>🦉 Historial con Tito</h4>
+                <div className="perfil-datos">
+                  {perfilCompleto.tito.conversaciones?.slice(-10).map((conv, i) => (
+                    <div key={i} className={`tito-msg ${conv.rol}`}>
+                      <strong>{conv.rol === 'user' ? '👤' : '🦉'}</strong>
+                      <span>{conv.contenido?.substring(0, 200)}{conv.contenido?.length > 200 ? '...' : ''}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Mensaje Tito pendiente */}
+            {perfilCompleto.mensajeTito && !perfilCompleto.mensajeTito.leido && (
+              <div className="perfil-seccion mensaje-pendiente">
+                <h4>💬 Mensaje de Admin pendiente</h4>
+                <p>{perfilCompleto.mensajeTito.mensaje}</p>
+                <small>Enviado: {new Date(perfilCompleto.mensajeTito.fecha).toLocaleString()}</small>
+              </div>
+            )}
+
+            {/* Notas admin */}
+            {perfilCompleto.usuario?.notasAdmin?.length > 0 && (
+              <div className="perfil-seccion">
+                <h4>📝 Notas de Admin</h4>
+                <div className="notas-lista">
+                  {perfilCompleto.usuario.notasAdmin.map((n, i) => (
+                    <div key={i} className="nota-item">
+                      <p>{n.texto}</p>
+                      <small>{n.autor} - {new Date(n.fecha).toLocaleString()}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Panel de duplicados */}
+      {mostrarDuplicados && duplicados && (
+        <div className="modal-overlay" onClick={() => setMostrarDuplicados(false)}>
+          <div className="modal-duplicados" onClick={e => e.stopPropagation()}>
+            <button className="modal-cerrar" onClick={() => setMostrarDuplicados(false)}>✕</button>
+
+            <h2>🔍 Usuarios Duplicados</h2>
+
+            <div className="duplicados-stats">
+              <div className="dup-stat">
+                <strong>{duplicados.totalDuplicados}</strong>
+                <span>Emails duplicados</span>
+              </div>
+              <div className="dup-stat">
+                <strong>{duplicados.totalEntradas}</strong>
+                <span>Entradas totales</span>
+              </div>
+            </div>
+
+            {duplicados.duplicados?.length > 0 ? (
+              <>
+                <div className="duplicados-lista">
+                  {duplicados.duplicados.map((dup, i) => (
+                    <div key={i} className="duplicado-item">
+                      <div className="dup-header">
+                        <strong>{dup.email}</strong>
+                        <span className="dup-count">{dup.cantidad} entradas</span>
+                      </div>
+                      <div className="dup-entradas">
+                        {dup.entradas.map((e, j) => (
+                          <div key={j} className="dup-entrada">
+                            <span className="dup-key">{e.key}</span>
+                            <span>ᚱ {e.runas} | ☘ {e.treboles}</span>
+                            <span>{e.creado ? new Date(e.creado).toLocaleDateString() : 'Sin fecha'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={limpiarDuplicados} className="btn-limpiar-duplicados">
+                  🧹 Limpiar Duplicados (Mergear cuentas)
+                </button>
+                <p className="limpiar-nota">
+                  Se conservará la cuenta más antigua y se sumarán las runas y tréboles de todas las cuentas duplicadas.
+                </p>
+              </>
+            ) : (
+              <div className="sin-duplicados">
+                ✅ No se encontraron usuarios duplicados
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Loading overlay */}
+      {cargandoPerfil && (
+        <div className="loading-overlay">
+          <div className="loading-spinner">Cargando perfil...</div>
+        </div>
       )}
 
       <style jsx>{`
@@ -690,12 +1028,372 @@ export default function InteligenciaPage() {
           border: 1px solid rgba(74, 222, 128, 0.3);
         }
 
+        /* Header tools */
+        .header-tools {
+          margin-top: 15px;
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+        }
+        .btn-tool {
+          padding: 10px 20px;
+          background: rgba(212, 175, 55, 0.1);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 8px;
+          color: #d4af37;
+          cursor: pointer;
+          font-family: 'Cinzel', serif;
+          transition: all 0.3s;
+        }
+        .btn-tool:hover {
+          background: rgba(212, 175, 55, 0.2);
+        }
+
+        /* Botones de acción en tabla */
+        .btn-perfil {
+          background: rgba(96, 165, 250, 0.1) !important;
+          border: 1px solid rgba(96, 165, 250, 0.3) !important;
+        }
+        .btn-perfil:hover {
+          background: rgba(96, 165, 250, 0.2) !important;
+        }
+        .btn-eliminar {
+          background: rgba(239, 68, 68, 0.1) !important;
+          border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        }
+        .btn-eliminar:hover {
+          background: rgba(239, 68, 68, 0.2) !important;
+        }
+
+        /* Modal eliminar */
+        .modal-eliminar {
+          background: #1a1a1a;
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 20px;
+          padding: 30px;
+          max-width: 400px;
+          width: 100%;
+          text-align: center;
+        }
+        .eliminar-icon {
+          font-size: 3rem;
+          margin-bottom: 15px;
+        }
+        .modal-eliminar h3 {
+          font-family: 'Cinzel', serif;
+          color: #ef4444;
+          margin: 0 0 15px;
+        }
+        .eliminar-nombre {
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin: 0;
+          color: #fff;
+        }
+        .eliminar-email {
+          color: rgba(255, 255, 255, 0.5);
+          margin: 5px 0 20px;
+        }
+        .eliminar-advertencia {
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          border-radius: 10px;
+          padding: 15px;
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.7);
+          margin-bottom: 20px;
+        }
+        .eliminar-btns {
+          display: flex;
+          gap: 15px;
+        }
+        .btn-cancelar {
+          flex: 1;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          color: #fff;
+          cursor: pointer;
+          font-family: 'Cinzel', serif;
+        }
+        .btn-confirmar-eliminar {
+          flex: 1;
+          padding: 12px;
+          background: #ef4444;
+          border: none;
+          border-radius: 10px;
+          color: #fff;
+          cursor: pointer;
+          font-family: 'Cinzel', serif;
+          font-weight: 600;
+        }
+        .btn-confirmar-eliminar:hover {
+          background: #dc2626;
+        }
+
+        /* Modal perfil completo */
+        .modal-perfil-completo {
+          background: #1a1a1a;
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 20px;
+          padding: 30px;
+          max-width: 700px;
+          width: 100%;
+          max-height: 85vh;
+          overflow-y: auto;
+          position: relative;
+        }
+        .modal-perfil-completo h2 {
+          font-family: 'Cinzel', serif;
+          color: #d4af37;
+          margin: 0 0 5px;
+        }
+        .perfil-email {
+          color: rgba(255, 255, 255, 0.5);
+          margin: 0 0 25px;
+        }
+        .perfil-seccion {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 15px;
+        }
+        .perfil-seccion h4 {
+          color: #d4af37;
+          margin: 0 0 15px;
+          font-size: 1rem;
+        }
+        .perfil-datos {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .dato {
+          display: flex;
+          justify-content: space-between;
+          padding: 6px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .dato span:first-child {
+          color: rgba(255, 255, 255, 0.5);
+        }
+        .dato .runas { color: #d4af37; }
+        .dato .treboles { color: #4ade80; }
+        .dato-largo {
+          padding: 10px 0;
+        }
+        .dato-largo span {
+          color: rgba(255, 255, 255, 0.5);
+          display: block;
+          margin-bottom: 8px;
+        }
+        .dato-largo p {
+          background: rgba(255, 255, 255, 0.03);
+          padding: 12px;
+          border-radius: 8px;
+          margin: 0;
+          font-style: italic;
+        }
+        .sin-datos {
+          color: rgba(255, 255, 255, 0.4);
+          font-style: italic;
+        }
+        .json-data {
+          background: rgba(0, 0, 0, 0.3);
+          padding: 12px;
+          border-radius: 8px;
+          font-size: 0.8rem;
+          overflow-x: auto;
+          white-space: pre-wrap;
+          word-break: break-all;
+        }
+        .tito-msg {
+          padding: 10px;
+          border-radius: 8px;
+          margin-bottom: 8px;
+          display: flex;
+          gap: 10px;
+          align-items: flex-start;
+        }
+        .tito-msg.user {
+          background: rgba(96, 165, 250, 0.1);
+        }
+        .tito-msg.assistant {
+          background: rgba(212, 175, 55, 0.1);
+        }
+        .tito-msg span {
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+        .mensaje-pendiente {
+          background: rgba(251, 191, 36, 0.1);
+          border-color: rgba(251, 191, 36, 0.3);
+        }
+        .mensaje-pendiente h4 {
+          color: #fbbf24;
+        }
+        .notas-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .nota-item {
+          background: rgba(255, 255, 255, 0.03);
+          padding: 12px;
+          border-radius: 8px;
+        }
+        .nota-item p {
+          margin: 0 0 8px;
+        }
+        .nota-item small {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Modal duplicados */
+        .modal-duplicados {
+          background: #1a1a1a;
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 20px;
+          padding: 30px;
+          max-width: 600px;
+          width: 100%;
+          max-height: 85vh;
+          overflow-y: auto;
+          position: relative;
+        }
+        .modal-duplicados h2 {
+          font-family: 'Cinzel', serif;
+          color: #d4af37;
+          margin: 0 0 20px;
+        }
+        .duplicados-stats {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+          margin-bottom: 25px;
+        }
+        .dup-stat {
+          background: rgba(255, 255, 255, 0.05);
+          padding: 20px;
+          border-radius: 12px;
+          text-align: center;
+        }
+        .dup-stat strong {
+          display: block;
+          font-size: 2rem;
+          color: #ef4444;
+        }
+        .dup-stat span {
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.5);
+        }
+        .duplicados-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+        .duplicado-item {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          border-radius: 12px;
+          padding: 15px;
+        }
+        .dup-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dup-header strong {
+          color: #ef4444;
+        }
+        .dup-count {
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+          padding: 4px 10px;
+          border-radius: 10px;
+          font-size: 0.8rem;
+        }
+        .dup-entradas {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .dup-entrada {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 6px;
+          font-size: 0.85rem;
+        }
+        .dup-key {
+          color: rgba(255, 255, 255, 0.5);
+          font-family: monospace;
+        }
+        .btn-limpiar-duplicados {
+          width: 100%;
+          padding: 15px;
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+          border: none;
+          border-radius: 12px;
+          color: #fff;
+          font-family: 'Cinzel', serif;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          margin-bottom: 10px;
+        }
+        .btn-limpiar-duplicados:hover {
+          background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        .limpiar-nota {
+          text-align: center;
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.5);
+        }
+        .sin-duplicados {
+          text-align: center;
+          padding: 40px;
+          font-size: 1.2rem;
+          color: #4ade80;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2000;
+        }
+        .loading-spinner {
+          background: #1a1a1a;
+          padding: 30px 50px;
+          border-radius: 15px;
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          color: #d4af37;
+        }
+
         @media (max-width: 768px) {
           .stats-grid { grid-template-columns: repeat(2, 1fr); }
           .clasificacion-grid { grid-template-columns: repeat(2, 1fr); }
           .filtros-row { flex-direction: column; }
           .usuarios-tabla { font-size: 0.85rem; }
           .usuario-stats { grid-template-columns: repeat(2, 1fr); }
+          .duplicados-stats { grid-template-columns: 1fr; }
+          .dup-entrada { flex-direction: column; gap: 5px; text-align: center; }
         }
       `}</style>
     </div>

@@ -210,6 +210,48 @@ export async function GET(request) {
   }
 }
 
+// Respuestas de bots a posts reales (más variadas y contextuales)
+const RESPUESTAS_A_USUARIOS = {
+  experiencia: [
+    '¡Qué hermoso lo que compartís! Me emociona leer esto 💜',
+    'Gracias por abrir tu corazón. Este es un espacio seguro para todas 🤗',
+    'Me pasó algo similar con mi guardián. Son increíbles',
+    'Esto me da escalofríos de lo real que es. ¡Gracias por compartir!',
+    'Justo necesitaba leer algo así hoy. El universo no se equivoca',
+    'Tu experiencia me inspira a seguir confiando en el proceso ✨',
+    '¡Qué lindo! Los guardianes siempre encuentran la forma de comunicarse'
+  ],
+  pregunta: [
+    '¡Buena pregunta! A mí me funciona [respuesta], pero cada una encuentra su camino',
+    'Yo también tuve esa duda al principio. Con el tiempo vas encontrando tu ritmo',
+    '¡Qué bueno que preguntes! Acá todas aprendemos juntas',
+    'Te recomiendo empezar por lo que más te llame. Tu intuición sabe',
+    'Me pasó lo mismo cuando empecé. Dale tiempo y vas a ver que fluye 💫'
+  ],
+  general: [
+    '¡Me encanta leer esto! 💜',
+    'Qué bueno que lo compartas con nosotras',
+    'Anotado! Gracias por el aporte ✨',
+    'Esto es oro. Gracias por compartir',
+    'Amo esta comunidad, de verdad',
+    '¡Qué hermoso! 🌟',
+    'Tu energía se siente desde acá'
+  ]
+};
+
+// Función para generar respuesta contextual de bot
+function generarRespuestaBot(post) {
+  const tipoPost = post.tipo || 'general';
+  const respuestas = RESPUESTAS_A_USUARIOS[tipoPost] || RESPUESTAS_A_USUARIOS.general;
+  return respuestas[Math.floor(Math.random() * respuestas.length)];
+}
+
+// Función para seleccionar bots que interactúan
+function seleccionarBotsParaInteraccion(cantidad = 3) {
+  const shuffled = [...PERFILES_BOT].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, cantidad);
+}
+
 // POST: Agregar contenido de bot (para admin)
 export async function POST(request) {
   try {
@@ -251,6 +293,251 @@ export async function POST(request) {
 
       case 'obtener_perfiles':
         return Response.json({ success: true, perfiles: PERFILES_BOT });
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // NUEVAS ACCIONES: INTERACCIÓN CON USUARIOS REALES
+      // ═══════════════════════════════════════════════════════════════════════
+
+      case 'interactuar_con_post': {
+        // Cuando un usuario real publica, los bots pueden dar like y responder
+        const { postId, postContenido, postTipo, autorEmail } = datos;
+
+        if (!postId) {
+          return Response.json({ success: false, error: 'postId requerido' }, { status: 400 });
+        }
+
+        // Determinar cuántos bots interactúan (2-5 likes, 1-3 respuestas)
+        const numLikes = 2 + Math.floor(Math.random() * 4);
+        const numRespuestas = Math.random() > 0.3 ? 1 + Math.floor(Math.random() * 3) : 0;
+
+        const botsLike = seleccionarBotsParaInteraccion(numLikes);
+        const botsRespuesta = seleccionarBotsParaInteraccion(numRespuestas);
+
+        // Guardar interacciones de bots para este post
+        const interacciones = {
+          postId,
+          likes: botsLike.map(bot => ({
+            botId: bot.id,
+            nombre: bot.nombre,
+            pais: bot.pais,
+            fecha: new Date().toISOString()
+          })),
+          respuestas: botsRespuesta.map(bot => ({
+            botId: bot.id,
+            nombre: bot.nombre,
+            pais: bot.pais,
+            avatar: bot.avatar,
+            contenido: generarRespuestaBot({ tipo: postTipo, contenido: postContenido }),
+            fecha: new Date(Date.now() + Math.random() * 3600000).toISOString() // Delay aleatorio hasta 1 hora
+          })),
+          creado: new Date().toISOString()
+        };
+
+        // Guardar en KV
+        await kv.set(`comunidad:interaccion:${postId}`, interacciones, { ex: 30 * 24 * 60 * 60 }); // 30 días
+
+        // Agregar a lista de interacciones pendientes (para mostrar gradualmente)
+        const pendientes = await kv.get('comunidad:interacciones_pendientes') || [];
+        pendientes.push({
+          postId,
+          likes: interacciones.likes.length,
+          respuestas: interacciones.respuestas.length,
+          programadoHasta: new Date(Date.now() + 3600000).toISOString()
+        });
+        await kv.set('comunidad:interacciones_pendientes', pendientes.slice(-100)); // Mantener últimas 100
+
+        return Response.json({
+          success: true,
+          interacciones: {
+            likes: interacciones.likes.length,
+            respuestas: interacciones.respuestas.length
+          }
+        });
+      }
+
+      case 'obtener_interacciones_post': {
+        // Obtener likes y respuestas de bots para un post específico
+        const { postId } = datos;
+        if (!postId) {
+          return Response.json({ success: false, error: 'postId requerido' }, { status: 400 });
+        }
+
+        const interacciones = await kv.get(`comunidad:interaccion:${postId}`);
+        return Response.json({
+          success: true,
+          interacciones: interacciones || { likes: [], respuestas: [] }
+        });
+      }
+
+      case 'dar_like_bot': {
+        // Un bot específico da like a un post
+        const { postId, botId } = datos;
+        if (!postId) {
+          return Response.json({ success: false, error: 'postId requerido' }, { status: 400 });
+        }
+
+        const bot = botId
+          ? PERFILES_BOT.find(b => b.id === botId)
+          : PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
+
+        if (!bot) {
+          return Response.json({ success: false, error: 'Bot no encontrado' }, { status: 404 });
+        }
+
+        // Obtener o crear interacciones del post
+        let interacciones = await kv.get(`comunidad:interaccion:${postId}`) || { likes: [], respuestas: [] };
+
+        // Verificar que el bot no haya dado like ya
+        if (!interacciones.likes.find(l => l.botId === bot.id)) {
+          interacciones.likes.push({
+            botId: bot.id,
+            nombre: bot.nombre,
+            pais: bot.pais,
+            fecha: new Date().toISOString()
+          });
+          await kv.set(`comunidad:interaccion:${postId}`, interacciones, { ex: 30 * 24 * 60 * 60 });
+        }
+
+        return Response.json({
+          success: true,
+          like: { bot: bot.nombre, pais: bot.pais }
+        });
+      }
+
+      case 'responder_post_bot': {
+        // Un bot específico responde a un post
+        const { postId, botId, contenido, postTipo } = datos;
+        if (!postId) {
+          return Response.json({ success: false, error: 'postId requerido' }, { status: 400 });
+        }
+
+        const bot = botId
+          ? PERFILES_BOT.find(b => b.id === botId)
+          : PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
+
+        if (!bot) {
+          return Response.json({ success: false, error: 'Bot no encontrado' }, { status: 404 });
+        }
+
+        // Generar o usar contenido proporcionado
+        const respuestaContenido = contenido || generarRespuestaBot({ tipo: postTipo });
+
+        // Obtener o crear interacciones del post
+        let interacciones = await kv.get(`comunidad:interaccion:${postId}`) || { likes: [], respuestas: [] };
+
+        const nuevaRespuesta = {
+          botId: bot.id,
+          nombre: bot.nombre,
+          pais: bot.pais,
+          avatar: bot.avatar,
+          contenido: respuestaContenido,
+          fecha: new Date().toISOString()
+        };
+
+        interacciones.respuestas.push(nuevaRespuesta);
+        await kv.set(`comunidad:interaccion:${postId}`, interacciones, { ex: 30 * 24 * 60 * 60 });
+
+        return Response.json({
+          success: true,
+          respuesta: nuevaRespuesta
+        });
+      }
+
+      case 'actividad_diaria': {
+        // Generar actividad diaria de bots (llamar desde cron o manualmente)
+        const config = await kv.get('comunidad:config') || { postsPerDay: 3, respuestasPerDay: 8, activo: true };
+
+        if (!config.activo) {
+          return Response.json({ success: false, mensaje: 'Actividad de bots desactivada' });
+        }
+
+        // Obtener posts reales de usuarios para interactuar
+        const postsReales = await kv.keys('foro:post:*');
+        const resultados = { postsCreados: 0, interacciones: 0 };
+
+        // 1. Crear posts de bots
+        for (let i = 0; i < config.postsPerDay; i++) {
+          const post = POSTS_PREGENERADOS[Math.floor(Math.random() * POSTS_PREGENERADOS.length)];
+          const bot = PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
+
+          const nuevoPost = {
+            id: `bot_post_${Date.now()}_${i}`,
+            autorId: bot.id,
+            autorNombre: bot.nombre,
+            autorPais: bot.pais,
+            autorAvatar: bot.avatar,
+            esBot: true,
+            tipo: post.tipo,
+            contenido: post.contenido,
+            guardian: post.guardian,
+            likes: [],
+            respuestas: [],
+            creado: new Date().toISOString()
+          };
+
+          await kv.set(`foro:post:${nuevoPost.id}`, nuevoPost, { ex: 90 * 24 * 60 * 60 }); // 90 días
+          resultados.postsCreados++;
+        }
+
+        // 2. Interactuar con posts reales
+        for (const postKey of postsReales.slice(0, 10)) {
+          const post = await kv.get(postKey);
+          if (!post || post.esBot) continue; // No interactuar con otros bots
+
+          // 70% de probabilidad de interactuar
+          if (Math.random() < 0.7) {
+            // Dar likes
+            const numLikes = 1 + Math.floor(Math.random() * 3);
+            const botsLike = seleccionarBotsParaInteraccion(numLikes);
+
+            for (const bot of botsLike) {
+              if (!post.likes) post.likes = [];
+              if (!post.likes.find(l => l.id === bot.id)) {
+                post.likes.push({
+                  id: bot.id,
+                  nombre: bot.nombre,
+                  pais: bot.pais,
+                  fecha: new Date().toISOString(),
+                  esBot: true
+                });
+                resultados.interacciones++;
+              }
+            }
+
+            // 40% de probabilidad de responder
+            if (Math.random() < 0.4) {
+              const botResp = PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
+              if (!post.respuestas) post.respuestas = [];
+
+              post.respuestas.push({
+                id: `resp_bot_${Date.now()}`,
+                autorId: botResp.id,
+                autorNombre: botResp.nombre,
+                autorPais: botResp.pais,
+                autorAvatar: botResp.avatar,
+                contenido: generarRespuestaBot(post),
+                fecha: new Date().toISOString(),
+                esBot: true
+              });
+              resultados.interacciones++;
+            }
+
+            await kv.set(postKey, post);
+          }
+        }
+
+        // Guardar registro de actividad
+        await kv.set('comunidad:ultima_actividad', {
+          fecha: new Date().toISOString(),
+          ...resultados
+        });
+
+        return Response.json({
+          success: true,
+          resultados,
+          mensaje: `Creados ${resultados.postsCreados} posts, ${resultados.interacciones} interacciones`
+        });
+      }
 
       default:
         return Response.json({ success: false, error: 'Acción no reconocida' }, { status: 400 });
