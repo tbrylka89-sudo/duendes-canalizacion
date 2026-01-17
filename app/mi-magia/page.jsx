@@ -678,6 +678,690 @@ function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
   );
 }
 
+// ═══════════════════════════════════════════════════════════════
+// TIENDA DE RUNAS - GAMIFICACIÓN
+// ═══════════════════════════════════════════════════════════════
+
+const PAQUETES_RUNAS_UI = [
+  {
+    id: 'chispa',
+    nombre: 'Chispa',
+    runas: 30,
+    precio: 5,
+    bonus: 0,
+    slug: 'paquete-runas-30',
+    popular: false,
+    descripcion: 'Perfecto para empezar',
+    icono: '✧',
+    color: '#8B9A46'
+  },
+  {
+    id: 'destello',
+    nombre: 'Destello',
+    runas: 80,
+    precio: 10,
+    bonus: 10,
+    slug: 'paquete-runas-80',
+    popular: true,
+    descripcion: '+10 runas de regalo',
+    icono: '✦',
+    color: '#D4AF37'
+  },
+  {
+    id: 'resplandor',
+    nombre: 'Resplandor',
+    runas: 200,
+    precio: 20,
+    bonus: 40,
+    slug: 'paquete-runas-200',
+    popular: false,
+    descripcion: '+40 runas de regalo',
+    icono: '◆',
+    color: '#9B59B6'
+  },
+  {
+    id: 'fulgor',
+    nombre: 'Fulgor',
+    runas: 550,
+    precio: 50,
+    bonus: 150,
+    slug: 'paquete-runas-550',
+    popular: false,
+    descripcion: '+150 runas de regalo',
+    icono: '❖',
+    color: '#3498db'
+  },
+  {
+    id: 'aurora',
+    nombre: 'Aurora',
+    runas: 1200,
+    precio: 100,
+    bonus: 400,
+    slug: 'paquete-runas-1200',
+    popular: false,
+    destacado: true,
+    descripcion: 'El mejor valor - +400 runas',
+    icono: '✹',
+    color: '#e74c3c'
+  }
+];
+
+function TiendaRunas({ usuario, onCompra }) {
+  const [paqueteHover, setPaqueteHover] = useState(null);
+
+  const calcularRatio = (paquete) => {
+    return (paquete.runas / paquete.precio).toFixed(1);
+  };
+
+  return (
+    <div className="tienda-runas-container">
+      {/* Header */}
+      <div className="tienda-runas-header">
+        <div className="header-glow"></div>
+        <div className="runa-grande">ᚱ</div>
+        <h2>Tienda de Runas</h2>
+        <p>Las runas son la moneda mágica del bosque. Usalas para acceder a lecturas, experiencias y secretos ancestrales.</p>
+
+        <div className="balance-actual">
+          <span className="balance-label">Tu balance actual</span>
+          <div className="balance-valor">
+            <span className="runa-icono">ᚱ</span>
+            <span className="balance-numero">{usuario?.runas || 0}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid de paquetes */}
+      <div className="paquetes-grid">
+        {PAQUETES_RUNAS_UI.map((paquete, index) => (
+          <a
+            key={paquete.id}
+            href={`https://duendesuy.10web.cloud/producto/${paquete.slug}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`paquete-card ${paquete.popular ? 'popular' : ''} ${paquete.destacado ? 'destacado' : ''}`}
+            style={{ '--paquete-color': paquete.color, '--card-delay': `${index * 0.1}s` }}
+            onMouseEnter={() => setPaqueteHover(paquete.id)}
+            onMouseLeave={() => setPaqueteHover(null)}
+          >
+            {paquete.popular && <div className="tag-popular">MÁS POPULAR</div>}
+            {paquete.destacado && <div className="tag-destacado">MEJOR VALOR</div>}
+
+            <div className="paquete-glow"></div>
+            <div className="paquete-frame"></div>
+
+            {/* Corners */}
+            <div className="paquete-corner tl"></div>
+            <div className="paquete-corner tr"></div>
+            <div className="paquete-corner bl"></div>
+            <div className="paquete-corner br"></div>
+
+            <div className="paquete-icono">
+              <span>{paquete.icono}</span>
+            </div>
+
+            <h3 className="paquete-nombre">{paquete.nombre}</h3>
+
+            <div className="paquete-runas">
+              <span className="runas-numero">{paquete.runas}</span>
+              <span className="runas-simbolo">ᚱ</span>
+            </div>
+
+            {paquete.bonus > 0 && (
+              <div className="paquete-bonus">
+                +{paquete.bonus} runas gratis
+              </div>
+            )}
+
+            <p className="paquete-desc">{paquete.descripcion}</p>
+
+            <div className="paquete-precio">
+              <span className="precio-moneda">$</span>
+              <span className="precio-numero">{paquete.precio}</span>
+              <span className="precio-usd">USD</span>
+            </div>
+
+            <div className="paquete-ratio">
+              {calcularRatio(paquete)} runas por dólar
+            </div>
+
+            <div className="paquete-cta">
+              <span>Obtener</span>
+              <span className="cta-arrow">→</span>
+            </div>
+
+            {/* Partículas en hover */}
+            {paqueteHover === paquete.id && (
+              <div className="particulas">
+                {[...Array(6)].map((_, i) => (
+                  <span key={i} className="particula" style={{ '--delay': `${i * 0.15}s`, '--x': `${Math.random() * 100}%` }}>ᚱ</span>
+                ))}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+
+      {/* Info adicional */}
+      <div className="tienda-info">
+        <div className="info-item">
+          <span className="info-icono">🔒</span>
+          <div>
+            <strong>Pago seguro</strong>
+            <p>Procesado por WooCommerce</p>
+          </div>
+        </div>
+        <div className="info-item">
+          <span className="info-icono">⚡</span>
+          <div>
+            <strong>Entrega instantánea</strong>
+            <p>Tus runas se acreditan al instante</p>
+          </div>
+        </div>
+        <div className="info-item">
+          <span className="info-icono">♾️</span>
+          <div>
+            <strong>No expiran</strong>
+            <p>Usalas cuando quieras</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Qué puedo hacer con runas */}
+      <div className="runas-usos">
+        <h3>¿Qué puedo hacer con las runas?</h3>
+        <div className="usos-grid">
+          <div className="uso-card">
+            <span className="uso-icono">ᚱ</span>
+            <strong>Tiradas de Runas</strong>
+            <small>Desde 15 ᚱ</small>
+          </div>
+          <div className="uso-card">
+            <span className="uso-icono">✦</span>
+            <strong>Lecturas del Alma</strong>
+            <small>Desde 25 ᚱ</small>
+          </div>
+          <div className="uso-card">
+            <span className="uso-icono">☽</span>
+            <strong>Oráculos del Mes</strong>
+            <small>Desde 40 ᚱ</small>
+          </div>
+          <div className="uso-card">
+            <span className="uso-icono">∞</span>
+            <strong>Registros Akáshicos</strong>
+            <small>Desde 200 ᚱ</small>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .tienda-runas-container {
+          padding: 20px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .tienda-runas-header {
+          text-align: center;
+          padding: 40px 20px;
+          background: linear-gradient(180deg, rgba(20,20,30,0.95) 0%, rgba(10,10,20,0.98) 100%);
+          border-radius: 24px;
+          margin-bottom: 30px;
+          position: relative;
+          overflow: hidden;
+          border: 1px solid rgba(212,175,55,0.2);
+        }
+
+        .header-glow {
+          position: absolute;
+          top: -50%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
+          pointer-events: none;
+        }
+
+        .runa-grande {
+          font-size: 64px;
+          color: #d4af37;
+          text-shadow: 0 0 40px rgba(212,175,55,0.5);
+          margin-bottom: 15px;
+          animation: pulseRuna 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseRuna {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .tienda-runas-header h2 {
+          font-family: 'Cinzel', serif;
+          font-size: clamp(24px, 5vw, 36px);
+          color: #d4af37;
+          margin: 0 0 10px;
+          letter-spacing: 3px;
+          position: relative;
+        }
+
+        .tienda-runas-header p {
+          color: rgba(255,255,255,0.6);
+          font-size: 15px;
+          max-width: 500px;
+          margin: 0 auto 25px;
+          line-height: 1.6;
+          position: relative;
+        }
+
+        .balance-actual {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          background: rgba(212,175,55,0.1);
+          border: 1px solid rgba(212,175,55,0.3);
+          border-radius: 16px;
+          padding: 15px 30px;
+          position: relative;
+        }
+
+        .balance-label {
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          margin-bottom: 5px;
+        }
+
+        .balance-valor {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .balance-valor .runa-icono {
+          font-size: 24px;
+          color: #d4af37;
+        }
+
+        .balance-numero {
+          font-family: 'Cinzel', serif;
+          font-size: 32px;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        /* Grid de paquetes */
+        .paquetes-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+          margin-bottom: 40px;
+        }
+
+        .paquete-card {
+          position: relative;
+          background: linear-gradient(145deg, rgba(20,20,30,0.95) 0%, rgba(10,10,20,0.98) 100%);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 20px;
+          padding: 25px 20px;
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          overflow: hidden;
+          animation: fadeInCard 0.5s ease forwards;
+          animation-delay: var(--card-delay);
+          opacity: 0;
+        }
+
+        @keyframes fadeInCard {
+          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(20px); }
+        }
+
+        .paquete-card:hover {
+          transform: translateY(-8px) scale(1.02);
+          border-color: var(--paquete-color);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px color-mix(in srgb, var(--paquete-color) 30%, transparent);
+        }
+
+        .paquete-card.popular {
+          border-color: rgba(212,175,55,0.5);
+          box-shadow: 0 0 20px rgba(212,175,55,0.2);
+        }
+
+        .paquete-card.destacado {
+          border-color: rgba(231,76,60,0.5);
+        }
+
+        .tag-popular, .tag-destacado {
+          position: absolute;
+          top: -1px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #d4af37, #b8962e);
+          color: #0a0a0a;
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          padding: 4px 12px;
+          border-radius: 0 0 8px 8px;
+        }
+
+        .tag-destacado {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: #fff;
+        }
+
+        .paquete-glow {
+          position: absolute;
+          inset: -100%;
+          background: radial-gradient(circle at center, var(--paquete-color), transparent 70%);
+          opacity: 0;
+          transition: opacity 0.4s;
+          pointer-events: none;
+        }
+
+        .paquete-card:hover .paquete-glow {
+          opacity: 0.1;
+        }
+
+        .paquete-frame {
+          position: absolute;
+          inset: 4px;
+          border: 1px solid rgba(255,255,255,0.05);
+          border-radius: 18px;
+          pointer-events: none;
+        }
+
+        .paquete-corner {
+          position: absolute;
+          width: 14px;
+          height: 14px;
+          border: 2px solid var(--paquete-color);
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .paquete-card:hover .paquete-corner {
+          opacity: 0.7;
+        }
+
+        .paquete-corner.tl { top: 8px; left: 8px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
+        .paquete-corner.tr { top: 8px; right: 8px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
+        .paquete-corner.bl { bottom: 8px; left: 8px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
+        .paquete-corner.br { bottom: 8px; right: 8px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
+
+        .paquete-icono {
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          color: var(--paquete-color);
+          margin-bottom: 12px;
+          position: relative;
+          text-shadow: 0 0 20px var(--paquete-color);
+        }
+
+        .paquete-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          color: #fff;
+          margin: 0 0 10px;
+          letter-spacing: 1px;
+        }
+
+        .paquete-runas {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+
+        .runas-numero {
+          font-family: 'Cinzel', serif;
+          font-size: 36px;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .runas-simbolo {
+          font-size: 20px;
+          color: #d4af37;
+        }
+
+        .paquete-bonus {
+          background: linear-gradient(135deg, rgba(46,204,113,0.2), rgba(39,174,96,0.2));
+          border: 1px solid rgba(46,204,113,0.4);
+          color: #2ecc71;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 20px;
+          margin-bottom: 10px;
+        }
+
+        .paquete-desc {
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+          margin: 0 0 12px;
+          text-align: center;
+        }
+
+        .paquete-precio {
+          display: flex;
+          align-items: baseline;
+          gap: 2px;
+          margin-bottom: 5px;
+        }
+
+        .precio-moneda {
+          font-size: 16px;
+          color: #d4af37;
+        }
+
+        .precio-numero {
+          font-family: 'Cinzel', serif;
+          font-size: 28px;
+          color: #d4af37;
+          font-weight: 600;
+        }
+
+        .precio-usd {
+          font-size: 12px;
+          color: rgba(212,175,55,0.7);
+          margin-left: 4px;
+        }
+
+        .paquete-ratio {
+          font-size: 10px;
+          color: rgba(255,255,255,0.4);
+          margin-bottom: 15px;
+        }
+
+        .paquete-cta {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, var(--paquete-color), color-mix(in srgb, var(--paquete-color) 70%, #000));
+          color: #fff;
+          font-size: 13px;
+          font-weight: 600;
+          padding: 10px 20px;
+          border-radius: 25px;
+          transition: all 0.3s;
+        }
+
+        .paquete-card:hover .paquete-cta {
+          transform: scale(1.05);
+          box-shadow: 0 5px 20px color-mix(in srgb, var(--paquete-color) 40%, transparent);
+        }
+
+        .cta-arrow {
+          transition: transform 0.3s;
+        }
+
+        .paquete-card:hover .cta-arrow {
+          transform: translateX(4px);
+        }
+
+        /* Partículas */
+        .particulas {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .particula {
+          position: absolute;
+          bottom: 0;
+          left: var(--x);
+          font-size: 14px;
+          color: #d4af37;
+          animation: floatUp 1.5s ease-out forwards;
+          animation-delay: var(--delay);
+          opacity: 0;
+        }
+
+        @keyframes floatUp {
+          0% { transform: translateY(0); opacity: 0; }
+          20% { opacity: 1; }
+          100% { transform: translateY(-150px) rotate(20deg); opacity: 0; }
+        }
+
+        /* Info items */
+        .tienda-info {
+          display: flex;
+          justify-content: center;
+          gap: 30px;
+          flex-wrap: wrap;
+          padding: 30px 20px;
+          background: rgba(255,255,255,0.02);
+          border-radius: 16px;
+          margin-bottom: 30px;
+        }
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .info-icono {
+          font-size: 24px;
+        }
+
+        .info-item strong {
+          display: block;
+          color: #fff;
+          font-size: 14px;
+        }
+
+        .info-item p {
+          margin: 0;
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+        }
+
+        /* Usos de runas */
+        .runas-usos {
+          background: linear-gradient(145deg, rgba(20,20,30,0.95) 0%, rgba(10,10,20,0.98) 100%);
+          border: 1px solid rgba(212,175,55,0.15);
+          border-radius: 20px;
+          padding: 30px;
+          text-align: center;
+        }
+
+        .runas-usos h3 {
+          font-family: 'Cinzel', serif;
+          color: #d4af37;
+          font-size: 18px;
+          margin: 0 0 20px;
+          letter-spacing: 2px;
+        }
+
+        .usos-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 15px;
+        }
+
+        .uso-card {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px;
+          padding: 20px 15px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s;
+        }
+
+        .uso-card:hover {
+          border-color: rgba(212,175,55,0.3);
+          background: rgba(212,175,55,0.05);
+        }
+
+        .uso-icono {
+          font-size: 24px;
+          color: #d4af37;
+        }
+
+        .uso-card strong {
+          color: #fff;
+          font-size: 13px;
+        }
+
+        .uso-card small {
+          color: rgba(255,255,255,0.5);
+          font-size: 11px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .paquetes-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+
+          .paquete-card {
+            padding: 20px 15px;
+          }
+
+          .runas-numero {
+            font-size: 28px;
+          }
+
+          .precio-numero {
+            font-size: 22px;
+          }
+
+          .tienda-info {
+            flex-direction: column;
+            gap: 15px;
+          }
+
+          .runa-grande {
+            font-size: 48px;
+          }
+        }
+
+        @media (max-width: 400px) {
+          .paquetes-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // Helper: Limpiar tags HTML que aparecen como texto
 function limpiarTexto(texto) {
   if (!texto) return '';
@@ -1823,6 +2507,7 @@ export default function MiMagia() {
       case 'experiencias': return <SeccionExperiencias usuario={usuario} setUsuario={setUsuario} />;
       case 'experiencias_catalogo': return <CatalogoExperiencias usuario={usuario} setUsuario={setUsuario} />;
       case 'lecturas_gamificadas': return <CatalogoLecturasGamificado usuario={usuario} token={token} setUsuario={setUsuario} />;
+      case 'tienda_runas': return <TiendaRunas usuario={usuario} />;
       case 'regalos': return <Regalos ir={setSeccion} />;
       case 'mundo': return <MundoSec />;
       case 'cuidados': return <CuidadosSec />;
@@ -2217,7 +2902,7 @@ function Inicio({ usuario, ir, token, setUsuario }) {
       <div className="stats-g">
         <div className="stat-c" onClick={() => ir('canalizaciones')}><div className="stat-n">{(usuario?.guardianes?.length || 0) + (usuario?.lecturas?.length || 0)}</div><div className="stat-t">Conexiones</div></div>
         <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.treboles || 0}</div><div className="stat-t">Tréboles</div></div>
-        <div className="stat-c" onClick={() => ir('jardin')}><div className="stat-n">{usuario?.runas || 0}</div><div className="stat-t">Runas</div></div>
+        <div className="stat-c stat-runas" onClick={() => ir('tienda_runas')}><div className="stat-n">{usuario?.runas || 0}</div><div className="stat-t">Runas</div><div className="stat-plus">+</div></div>
         <div className="stat-c" onClick={() => ir('grimorio')}><div className="stat-n">{usuario?.diario?.length || 0}</div><div className="stat-t">Escritos</div></div>
       </div>
 
@@ -2251,6 +2936,7 @@ function Inicio({ usuario, ir, token, setUsuario }) {
       {/* ACCESOS RÁPIDOS REESCRITOS */}
       <div className="accesos-g">
         <button className="acceso acceso-destacado" onClick={() => ir('lecturas_gamificadas')}><span>ᚱ</span><strong>Catálogo de Lecturas</strong><small>30+ experiencias por nivel</small></button>
+        <button className="acceso acceso-runas" onClick={() => ir('tienda_runas')}><span>✧</span><strong>Tienda de Runas</strong><small>Obtené runas para tus lecturas</small></button>
         <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Pedirle algo al universo</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
         <button className="acceso" onClick={() => ir('test_elemental')}><span>◈</span><strong>Descubrir quién me eligió</strong><small>Test de elemento y guardián</small></button>
         <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalar magia a alguien</strong><small>Que otro sienta lo que vos sentiste</small></button>
@@ -6700,16 +7386,23 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .banner h1{font-family:'Cinzel',serif;font-size:1.8rem;color:#fff;margin-bottom:0.5rem}
 .banner p{color:rgba(255,255,255,0.9)}
 .stats-g{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-.stat-c{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center}
+.stat-c{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center;position:relative}
 .stat-c:hover{border-color:#d4af37}
 .stat-n{font-family:'Cinzel',serif;font-size:2rem;line-height:1;color:#d4af37}
 .stat-t{font-size:0.85rem;color:#666;margin-top:0.25rem}
+.stat-runas{background:linear-gradient(135deg,#fff,#fffbf0);border-color:#d4af37}
+.stat-runas:hover{background:linear-gradient(135deg,#fffbf0,#fff5e0);box-shadow:0 4px 15px rgba(212,175,55,0.2)}
+.stat-plus{position:absolute;top:8px;right:8px;width:20px;height:20px;background:#d4af37;color:#fff;border-radius:50%;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;animation:pulsePlus 2s ease-in-out infinite}
+@keyframes pulsePlus{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 .accesos-g{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
 .acceso{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;cursor:pointer;text-align:left;transition:all 0.2s}
 .acceso:hover{border-color:#d4af37}
 .acceso span{font-size:1.5rem;color:#d4af37}
 .acceso strong{display:block;font-family:'Cinzel',serif;margin:0.5rem 0 0.25rem}
 .acceso small{color:#666;font-size:0.85rem}
+.acceso-runas{background:linear-gradient(135deg,#fffbf0,#fff);border-color:#d4af37;position:relative;overflow:hidden}
+.acceso-runas::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle,rgba(212,175,55,0.2),transparent 70%);pointer-events:none}
+.acceso-runas:hover{background:linear-gradient(135deg,#fff5e0,#fffbf0);box-shadow:0 4px 15px rgba(212,175,55,0.2)}
 .banner-circ{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1.25rem;cursor:pointer;margin-bottom:2rem}
 .banner-circ span:first-child{font-size:2rem;color:#d4af37}
 .banner-circ h3{font-family:'Cinzel',serif;color:#fff;font-size:1rem}

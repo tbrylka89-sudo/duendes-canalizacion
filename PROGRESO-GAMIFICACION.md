@@ -185,6 +185,20 @@ WordPress mu-plugins:
   - Vista de resultado con XP ganado y nivel
   - Ruta: /mi-magia → lecturas_gamificadas
 
+### Tienda de Runas (2026-01-17 19:30)
+
+- [x] `app/mi-magia/page.jsx` - Componente TiendaRunas
+  - 5 paquetes de runas (Chispa, Destello, Resplandor, Fulgor, Aurora)
+  - Cards con diseño místico y animaciones hover
+  - Bonus visibles (+10 a +400 runas gratis)
+  - Ratio de runas por dólar
+  - Balance actual del usuario
+  - Enlaces a WooCommerce para compra
+  - Info de pago seguro/entrega instantánea
+  - Sección "¿Qué puedo hacer con runas?"
+  - Ruta: /mi-magia → tienda_runas
+  - Acceso desde: Stat de runas (con +), Botón en accesos rápidos
+
 ---
 
 ## 4. EN PROGRESO 🔄
