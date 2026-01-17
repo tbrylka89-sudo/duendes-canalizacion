@@ -227,6 +227,457 @@ function CofreDiario({ usuario, token, onRunasGanadas }) {
   );
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CATÁLOGO DE LECTURAS GAMIFICADO
+// ═══════════════════════════════════════════════════════════════
+
+const CATEGORIAS_LECTURAS = {
+  basicas: { nombre: 'Básicas', icono: '🌱', color: '#8B9A46', desc: 'Para empezar tu camino' },
+  estandar: { nombre: 'Estándar', icono: '🌿', color: '#5D8A4A', desc: 'Profundizá tu conexión' },
+  premium: { nombre: 'Premium', icono: '🌳', color: '#4A7C59', desc: 'Experiencias transformadoras' },
+  ultraPremium: { nombre: 'Ultra Premium', icono: '✨', color: '#D4AF37', desc: 'Lo más profundo del bosque' },
+  eventos: { nombre: 'Eventos Lunares', icono: '🌙', color: '#9370DB', desc: 'Solo en momentos especiales' },
+  temporada: { nombre: 'Portales Estacionales', icono: '🌀', color: '#4169E1', desc: 'Energías de los solsticios' }
+};
+
+const NIVELES_INFO = {
+  iniciada: { nombre: 'Iniciada', icono: '🌱', color: '#8B9A46' },
+  aprendiz: { nombre: 'Aprendiz', icono: '🌿', color: '#5D8A4A' },
+  guardiana: { nombre: 'Guardiana', icono: '🌳', color: '#4A7C59' },
+  maestra: { nombre: 'Maestra', icono: '✨', color: '#D4AF37' },
+  sabia: { nombre: 'Sabia', icono: '👑', color: '#9B59B6' }
+};
+
+function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
+  const [catalogo, setCatalogo] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [categoriaActiva, setCategoriaActiva] = useState('basicas');
+  const [lecturaSeleccionada, setLecturaSeleccionada] = useState(null);
+  const [ejecutando, setEjecutando] = useState(false);
+  const [resultado, setResultado] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [vistaDetalle, setVistaDetalle] = useState('info'); // info, form, resultado
+
+  useEffect(() => {
+    cargarCatalogo();
+  }, []);
+
+  const cargarCatalogo = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/gamificacion/lecturas?token=${token}`);
+      const data = await res.json();
+      if (data.success) {
+        setCatalogo(data);
+      }
+    } catch (e) {
+      console.error('Error cargando catálogo:', e);
+    }
+    setCargando(false);
+  };
+
+  const ejecutarLectura = async () => {
+    if (!lecturaSeleccionada || ejecutando) return;
+
+    setEjecutando(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/gamificacion/ejecutar-lectura`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          lecturaId: lecturaSeleccionada.id,
+          contexto: formData.contexto || '',
+          pregunta: formData.pregunta || '',
+          fechaNacimiento: formData.fechaNacimiento || ''
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setResultado(data);
+        setVistaDetalle('resultado');
+        // Actualizar runas del usuario
+        if (setUsuario) {
+          setUsuario(prev => ({
+            ...prev,
+            runas: data.solicitud.runasRestantes
+          }));
+        }
+        // Recargar catálogo para actualizar estados
+        cargarCatalogo();
+      } else {
+        setResultado({ error: data.error });
+      }
+    } catch (e) {
+      setResultado({ error: 'Error al ejecutar la lectura' });
+    }
+    setEjecutando(false);
+  };
+
+  const cerrarDetalle = () => {
+    setLecturaSeleccionada(null);
+    setVistaDetalle('info');
+    setFormData({});
+    setResultado(null);
+  };
+
+  if (cargando) {
+    return (
+      <div className="sec catalogo-cargando">
+        <div className="catalogo-spinner"></div>
+        <p>Cargando el catálogo mágico...</p>
+      </div>
+    );
+  }
+
+  if (!catalogo) {
+    return (
+      <div className="sec">
+        <p>Error al cargar el catálogo</p>
+      </div>
+    );
+  }
+
+  const usuarioInfo = catalogo.usuario || {};
+  const nivelActual = usuarioInfo.nivel || 'iniciada';
+  const nivelInfo = NIVELES_INFO[nivelActual];
+
+  // Vista de detalle de lectura
+  if (lecturaSeleccionada) {
+    return (
+      <div className="sec lectura-detalle-gamificada">
+        <button className="btn-back" onClick={cerrarDetalle}>← Volver al catálogo</button>
+
+        {vistaDetalle === 'info' && (
+          <div className="lectura-info-card">
+            <div className="lectura-header-detalle">
+              <span className="lectura-icono-grande">{lecturaSeleccionada.icono}</span>
+              <div className="lectura-titulo-info">
+                <h1>{lecturaSeleccionada.nombre}</h1>
+                <div className="lectura-meta-detalle">
+                  <span className="meta-nivel" style={{ background: NIVELES_INFO[lecturaSeleccionada.nivel]?.color }}>
+                    {NIVELES_INFO[lecturaSeleccionada.nivel]?.icono} {NIVELES_INFO[lecturaSeleccionada.nivel]?.nombre}
+                  </span>
+                  <span className="meta-tiempo">⏱ {lecturaSeleccionada.duracion}</span>
+                  <span className="meta-palabras">📝 ~{lecturaSeleccionada.palabras} palabras</span>
+                </div>
+              </div>
+            </div>
+
+            <p className="lectura-descripcion-larga">{lecturaSeleccionada.descripcion}</p>
+
+            {lecturaSeleccionada.requiereGuardian && (
+              <div className="lectura-requisito guardian">
+                <span>🛡️</span>
+                <span>Requiere tener un guardián adoptado</span>
+                {!usuarioInfo.tieneGuardian && <span className="no-cumple">No tenés guardián aún</span>}
+              </div>
+            )}
+
+            <div className="lectura-precio-detalle">
+              <div className="precio-info">
+                {lecturaSeleccionada.descuento > 0 && (
+                  <span className="precio-original">{lecturaSeleccionada.precioOriginal} ᚱ</span>
+                )}
+                <span className="precio-final">{lecturaSeleccionada.precioFinal} ᚱ</span>
+                {lecturaSeleccionada.descuento > 0 && (
+                  <span className="descuento-badge">-{lecturaSeleccionada.descuento}%</span>
+                )}
+              </div>
+              <div className="balance-info">
+                <span>Tenés: {usuarioInfo.runas || 0} ᚱ</span>
+                {(usuarioInfo.runas || 0) < lecturaSeleccionada.precioFinal && (
+                  <span className="faltan">Faltan {lecturaSeleccionada.precioFinal - (usuarioInfo.runas || 0)} ᚱ</span>
+                )}
+              </div>
+            </div>
+
+            {lecturaSeleccionada.disponible ? (
+              <button
+                className="btn-gold btn-ejecutar"
+                onClick={() => setVistaDetalle('form')}
+                disabled={(usuarioInfo.runas || 0) < lecturaSeleccionada.precioFinal}
+              >
+                {(usuarioInfo.runas || 0) >= lecturaSeleccionada.precioFinal
+                  ? 'Continuar →'
+                  : 'Runas insuficientes'}
+              </button>
+            ) : (
+              <div className="lectura-bloqueada-info">
+                {lecturaSeleccionada.bloqueadoPorNivel && (
+                  <p>🔒 Necesitás nivel {NIVELES_INFO[lecturaSeleccionada.nivelRequerido]?.nombre} para desbloquear</p>
+                )}
+                {lecturaSeleccionada.bloqueadoPorGuardian && (
+                  <p>🛡️ Necesitás adoptar un guardián primero</p>
+                )}
+                {lecturaSeleccionada.razonNoDisponible && (
+                  <p>⏰ {lecturaSeleccionada.razonNoDisponible}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {vistaDetalle === 'form' && (
+          <div className="lectura-form-card">
+            <h2>Completá tu solicitud</h2>
+            <p className="form-intro">Cuanta más información nos des, más personalizada será tu lectura.</p>
+
+            <div className="form-campos-gamificado">
+              <div className="campo">
+                <label>Tu pregunta o intención</label>
+                <textarea
+                  value={formData.pregunta || ''}
+                  onChange={e => setFormData({ ...formData, pregunta: e.target.value })}
+                  placeholder="¿Qué querés saber o trabajar?"
+                  rows={3}
+                />
+              </div>
+
+              <div className="campo">
+                <label>Contexto de tu situación</label>
+                <textarea
+                  value={formData.contexto || ''}
+                  onChange={e => setFormData({ ...formData, contexto: e.target.value })}
+                  placeholder="¿Qué está pasando en tu vida relacionado a esto?"
+                  rows={3}
+                />
+              </div>
+
+              {(lecturaSeleccionada.categoria === 'estudios' || lecturaSeleccionada.id.includes('numerolog')) && (
+                <div className="campo">
+                  <label>Fecha de nacimiento</label>
+                  <input
+                    type="date"
+                    value={formData.fechaNacimiento || ''}
+                    onChange={e => setFormData({ ...formData, fechaNacimiento: e.target.value })}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="form-resumen">
+              <div className="resumen-item">
+                <span>Lectura:</span>
+                <span>{lecturaSeleccionada.nombre}</span>
+              </div>
+              <div className="resumen-item">
+                <span>Costo:</span>
+                <span>{lecturaSeleccionada.precioFinal} ᚱ</span>
+              </div>
+              <div className="resumen-item">
+                <span>XP que ganarás:</span>
+                <span>+{lecturaSeleccionada.nivel === 'iniciada' ? 10 : lecturaSeleccionada.nivel === 'aprendiz' ? 25 : lecturaSeleccionada.nivel === 'guardiana' ? 50 : 100}</span>
+              </div>
+            </div>
+
+            {resultado?.error && (
+              <div className="error-msg">{resultado.error}</div>
+            )}
+
+            <div className="form-actions">
+              <button className="btn-sec" onClick={() => setVistaDetalle('info')}>← Volver</button>
+              <button
+                className="btn-gold"
+                onClick={ejecutarLectura}
+                disabled={ejecutando}
+              >
+                {ejecutando ? 'Canalizando...' : 'Solicitar Lectura'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {vistaDetalle === 'resultado' && resultado && !resultado.error && (
+          <div className="lectura-resultado-card">
+            <div className="resultado-header">
+              <span className="resultado-check">✓</span>
+              <h2>¡Tu lectura está lista!</h2>
+            </div>
+
+            {resultado.gamificacion?.subioNivel && (
+              <div className="nivel-up-banner">
+                <span>🎉</span>
+                <span>¡Subiste a {resultado.gamificacion.nuevoNivel.nombre}!</span>
+              </div>
+            )}
+
+            <div className="resultado-stats">
+              <div className="stat">
+                <span className="stat-valor">+{resultado.gamificacion?.xpGanado}</span>
+                <span className="stat-label">XP</span>
+              </div>
+              <div className="stat">
+                <span className="stat-valor">{resultado.solicitud?.runasRestantes}</span>
+                <span className="stat-label">Runas</span>
+              </div>
+              <div className="stat">
+                <span className="stat-valor">{resultado.gamificacion?.lecturasCompletadas}</span>
+                <span className="stat-label">Lecturas</span>
+              </div>
+            </div>
+
+            {resultado.resultado && (
+              <div className="lectura-contenido">
+                <h3>{resultado.resultado.titulo}</h3>
+                <div className="contenido-texto">
+                  {resultado.resultado.contenido.split('\n').map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+                <small>{resultado.resultado.palabras} palabras</small>
+              </div>
+            )}
+
+            <button className="btn-gold" onClick={cerrarDetalle}>
+              Volver al catálogo
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Vista principal del catálogo
+  return (
+    <div className="sec catalogo-gamificado">
+      <div className="catalogo-header">
+        <h1>Lecturas Mágicas</h1>
+        <p>Explorá el catálogo de experiencias. Tu nivel desbloquea nuevas posibilidades.</p>
+      </div>
+
+      {/* Info del usuario */}
+      <div className="usuario-info-bar">
+        <div className="nivel-badge" style={{ borderColor: nivelInfo?.color }}>
+          <span className="nivel-icono">{nivelInfo?.icono}</span>
+          <span className="nivel-nombre">{nivelInfo?.nombre}</span>
+        </div>
+        <div className="runas-badge">
+          <span className="runas-icono">ᚱ</span>
+          <span className="runas-valor">{usuarioInfo.runas || 0}</span>
+        </div>
+        {usuarioInfo.esCirculo && (
+          <div className="circulo-badge">
+            <span>★</span>
+            <span>Círculo</span>
+          </div>
+        )}
+      </div>
+
+      {/* Eventos activos */}
+      {catalogo.eventosActivos && catalogo.eventosActivos.length > 0 && (
+        <div className="eventos-activos">
+          <h3>🌙 Disponibles ahora</h3>
+          <div className="eventos-lista">
+            {catalogo.eventosActivos.map(evento => (
+              <div
+                key={evento.id}
+                className="evento-card activo"
+                onClick={() => setLecturaSeleccionada(evento)}
+              >
+                <span className="evento-icono">{evento.icono}</span>
+                <div className="evento-info">
+                  <strong>{evento.nombre}</strong>
+                  <span>{evento.runas} ᚱ</span>
+                </div>
+                <span className="evento-badge">ACTIVO</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Categorías */}
+      <div className="categorias-tabs">
+        {Object.entries(CATEGORIAS_LECTURAS).map(([key, cat]) => (
+          <button
+            key={key}
+            className={`cat-tab ${categoriaActiva === key ? 'activa' : ''}`}
+            onClick={() => setCategoriaActiva(key)}
+            style={categoriaActiva === key ? { borderColor: cat.color, color: cat.color } : {}}
+          >
+            <span>{cat.icono}</span>
+            <span>{cat.nombre}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Info de categoría */}
+      <div className="categoria-info">
+        <p>{CATEGORIAS_LECTURAS[categoriaActiva]?.desc}</p>
+      </div>
+
+      {/* Grid de lecturas */}
+      <div className="lecturas-grid">
+        {catalogo.catalogo[categoriaActiva]?.map(lectura => (
+          <div
+            key={lectura.id}
+            className={`lectura-card ${lectura.disponible ? '' : 'bloqueada'} ${lectura.popular ? 'popular' : ''} ${lectura.destacado ? 'destacada' : ''}`}
+            onClick={() => setLecturaSeleccionada(lectura)}
+          >
+            {lectura.popular && <span className="tag-popular">Popular</span>}
+            {lectura.destacado && <span className="tag-destacado">Destacado</span>}
+
+            <div className="lectura-card-top">
+              <span className="lectura-icono">{lectura.icono}</span>
+              {!lectura.disponible && (
+                <span className="lock-icon">🔒</span>
+              )}
+            </div>
+
+            <h3>{lectura.nombre}</h3>
+
+            <div className="lectura-meta">
+              <span className="nivel-tag" style={{ background: NIVELES_INFO[lectura.nivel]?.color }}>
+                {NIVELES_INFO[lectura.nivel]?.icono}
+              </span>
+              {lectura.requiereGuardian && <span className="guardian-tag">🛡️</span>}
+            </div>
+
+            <p className="lectura-desc">{lectura.descripcion?.substring(0, 80)}...</p>
+
+            <div className="lectura-precio">
+              {lectura.descuento > 0 && (
+                <span className="precio-tachado">{lectura.precioOriginal}</span>
+              )}
+              <span className="precio-runas">{lectura.precioFinal} ᚱ</span>
+              {lectura.descuento > 0 && (
+                <span className="descuento">-{lectura.descuento}%</span>
+              )}
+            </div>
+
+            {lectura.bloqueadoPorNivel && (
+              <div className="bloqueado-msg">
+                Nivel {NIVELES_INFO[lectura.nivelRequerido]?.nombre}
+              </div>
+            )}
+
+            {lectura.esEvento && !lectura.disponible && lectura.proximaDisponibilidad && (
+              <div className="proximo-evento">
+                Próximo: {new Date(lectura.proximaDisponibilidad).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {(!catalogo.catalogo[categoriaActiva] || catalogo.catalogo[categoriaActiva].length === 0) && (
+          <div className="sin-lecturas">
+            <p>No hay lecturas disponibles en esta categoría actualmente.</p>
+          </div>
+        )}
+      </div>
+
+      {/* CTA para obtener runas */}
+      <div className="cta-runas">
+        <p>¿Necesitás más runas?</p>
+        <a href="https://duendesuy.10web.cloud/producto-categoria/runas/" target="_blank" rel="noopener" className="btn-gold-sm">
+          Obtener Runas ↗
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // Helper: Limpiar tags HTML que aparecen como texto
 function limpiarTexto(texto) {
   if (!texto) return '';
@@ -1371,6 +1822,7 @@ export default function MiMagia() {
       case 'jardin': return <Jardin usuario={usuario} setUsuario={setUsuario} pais={pais} token={token} />;
       case 'experiencias': return <SeccionExperiencias usuario={usuario} setUsuario={setUsuario} />;
       case 'experiencias_catalogo': return <CatalogoExperiencias usuario={usuario} setUsuario={setUsuario} />;
+      case 'lecturas_gamificadas': return <CatalogoLecturasGamificado usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'regalos': return <Regalos ir={setSeccion} />;
       case 'mundo': return <MundoSec />;
       case 'cuidados': return <CuidadosSec />;
@@ -1798,6 +2250,7 @@ function Inicio({ usuario, ir, token, setUsuario }) {
 
       {/* ACCESOS RÁPIDOS REESCRITOS */}
       <div className="accesos-g">
+        <button className="acceso acceso-destacado" onClick={() => ir('lecturas_gamificadas')}><span>ᚱ</span><strong>Catálogo de Lecturas</strong><small>30+ experiencias por nivel</small></button>
         <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Pedirle algo al universo</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
         <button className="acceso" onClick={() => ir('test_elemental')}><span>◈</span><strong>Descubrir quién me eligió</strong><small>Test de elemento y guardián</small></button>
         <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalar magia a alguien</strong><small>Que otro sienta lo que vos sentiste</small></button>
@@ -5408,6 +5861,736 @@ const estilos = `
 .cofre-cerrar-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* CATÁLOGO DE LECTURAS GAMIFICADO */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.catalogo-gamificado {
+  padding-bottom: 2rem;
+}
+
+.catalogo-cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.catalogo-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(212,175,55,0.2);
+  border-top-color: #d4af37;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.catalogo-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.catalogo-header h1 {
+  color: #d4af37;
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.catalogo-header p {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.95rem;
+}
+
+/* Barra de info del usuario */
+.usuario-info-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.nivel-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255,255,255,0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 2px solid;
+}
+
+.nivel-icono {
+  font-size: 1.1rem;
+}
+
+.nivel-nombre {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.runas-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(212,175,55,0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(212,175,55,0.3);
+}
+
+.runas-icono {
+  color: #d4af37;
+  font-size: 1.1rem;
+}
+
+.runas-valor {
+  color: #d4af37;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.circulo-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(147,112,219,0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(147,112,219,0.4);
+  color: #9370db;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Eventos activos */
+.eventos-activos {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(147,112,219,0.1) 0%, rgba(65,105,225,0.1) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(147,112,219,0.3);
+}
+
+.eventos-activos h3 {
+  color: #9370db;
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+.eventos-lista {
+  display: flex;
+  gap: 0.8rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.evento-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba(0,0,0,0.3);
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: fit-content;
+  border: 1px solid transparent;
+}
+
+.evento-card:hover {
+  background: rgba(147,112,219,0.2);
+  border-color: rgba(147,112,219,0.4);
+}
+
+.evento-card.activo {
+  border-color: #9370db;
+}
+
+.evento-icono {
+  font-size: 1.5rem;
+}
+
+.evento-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.evento-info strong {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.evento-info span {
+  color: #d4af37;
+  font-size: 0.8rem;
+}
+
+.evento-badge {
+  background: #9370db;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Tabs de categorías */
+.categorias-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cat-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid transparent;
+  padding: 0.6rem 1rem;
+  border-radius: 20px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.cat-tab:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.cat-tab.activa {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.categoria-info {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.categoria-info p {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Grid de lecturas */
+.lecturas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lectura-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.lectura-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(212,175,55,0.4);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.lectura-card.bloqueada {
+  opacity: 0.6;
+}
+
+.lectura-card.bloqueada:hover {
+  transform: none;
+}
+
+.lectura-card.popular::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, transparent 50%, #d4af37 50%);
+  border-radius: 0 16px 0 0;
+}
+
+.lectura-card.destacada {
+  border-color: #d4af37;
+  box-shadow: 0 0 20px rgba(212,175,55,0.2);
+}
+
+.tag-popular, .tag-destacado {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  z-index: 1;
+}
+
+.tag-popular {
+  background: #d4af37;
+}
+
+.tag-destacado {
+  background: linear-gradient(135deg, #d4af37 0%, #f0e68c 100%);
+}
+
+.lectura-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.lectura-icono {
+  font-size: 1.8rem;
+}
+
+.lock-icon {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+.lectura-card h3 {
+  color: #fff;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.lectura-meta {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.nivel-tag {
+  padding: 0.15rem 0.4rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+}
+
+.guardian-tag {
+  font-size: 0.8rem;
+}
+
+.lectura-desc {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.lectura-precio {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+}
+
+.precio-tachado {
+  color: rgba(255,255,255,0.4);
+  text-decoration: line-through;
+  font-size: 0.75rem;
+}
+
+.precio-runas {
+  color: #d4af37;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.descuento {
+  background: #27ae60;
+  color: #fff;
+  padding: 0.1rem 0.3rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.bloqueado-msg {
+  margin-top: 0.5rem;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.7rem;
+}
+
+.proximo-evento {
+  margin-top: 0.5rem;
+  color: #9370db;
+  font-size: 0.7rem;
+}
+
+.sin-lecturas {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255,255,255,0.5);
+}
+
+/* CTA de runas */
+.cta-runas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(212,175,55,0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+
+.cta-runas p {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Detalle de lectura */
+.lectura-detalle-gamificada {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.lectura-info-card, .lectura-form-card, .lectura-resultado-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.lectura-header-detalle {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.lectura-icono-grande {
+  font-size: 3rem;
+}
+
+.lectura-titulo-info h1 {
+  color: #fff;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.lectura-meta-detalle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.meta-nivel {
+  padding: 0.3rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
+.meta-tiempo, .meta-palabras {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem;
+}
+
+.lectura-descripcion-larga {
+  color: rgba(255,255,255,0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.lectura-requisito {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  background: rgba(147,112,219,0.1);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.lectura-requisito .no-cumple {
+  color: #e74c3c;
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.lectura-precio-detalle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.precio-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.precio-original {
+  color: rgba(255,255,255,0.4);
+  text-decoration: line-through;
+  font-size: 1rem;
+}
+
+.precio-final {
+  color: #d4af37;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.descuento-badge {
+  background: #27ae60;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.balance-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+}
+
+.balance-info .faltan {
+  color: #e74c3c;
+}
+
+.btn-ejecutar {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+.lectura-bloqueada-info {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(231,76,60,0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(231,76,60,0.3);
+}
+
+.lectura-bloqueada-info p {
+  color: rgba(255,255,255,0.7);
+  margin: 0.3rem 0;
+}
+
+/* Form de lectura */
+.form-intro {
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.form-campos-gamificado .campo {
+  margin-bottom: 1rem;
+}
+
+.form-campos-gamificado label {
+  display: block;
+  color: #d4af37;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.form-campos-gamificado input,
+.form-campos-gamificado textarea {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 0.8rem;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.form-campos-gamificado input:focus,
+.form-campos-gamificado textarea:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+.form-resumen {
+  background: rgba(212,175,55,0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.resumen-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9rem;
+}
+
+.resumen-item:last-child {
+  margin-bottom: 0;
+}
+
+.error-msg {
+  background: rgba(231,76,60,0.2);
+  border: 1px solid rgba(231,76,60,0.4);
+  color: #e74c3c;
+  padding: 0.8rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-actions .btn-sec {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.form-actions .btn-gold {
+  flex: 2;
+}
+
+/* Resultado de lectura */
+.resultado-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.resultado-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  border-radius: 50%;
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.resultado-header h2 {
+  color: #fff;
+  font-size: 1.3rem;
+}
+
+.nivel-up-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #d4af37 0%, #f0e68c 100%);
+  color: #1a1a2e;
+  padding: 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.resultado-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.resultado-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.resultado-stats .stat-valor {
+  color: #d4af37;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.resultado-stats .stat-label {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem;
+}
+
+.lectura-contenido {
+  background: rgba(0,0,0,0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.lectura-contenido h3 {
+  color: #d4af37;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.contenido-texto p {
+  color: rgba(255,255,255,0.85);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.lectura-contenido small {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+}
+
+/* Acceso destacado */
+.acceso.acceso-destacado {
+  background: linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.1) 100%);
+  border: 2px solid rgba(212,175,55,0.4);
+}
+
+.acceso.acceso-destacado span {
+  color: #d4af37;
 }
 
 /* ═══════════════════════════════════════════════════════════════ */

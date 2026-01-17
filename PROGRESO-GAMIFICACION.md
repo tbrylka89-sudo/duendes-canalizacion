@@ -1,6 +1,6 @@
 # PROGRESO: Sistema de Gamificación Duendes del Uruguay
 
-**Última actualización:** 2026-01-17 17:35
+**Última actualización:** 2026-01-17 18:00
 
 ---
 
@@ -150,7 +150,7 @@ WordPress mu-plugins:
   - Generación IA con prompts específicos por categoría
   - Tracking de XP y progresión
 
-### UI de Gamificación (2026-01-17 17:35)
+### UI de Gamificación (2026-01-17 18:00)
 
 - [x] `app/mi-magia/page.jsx` - Componente CofreDiario
   - Animación de rueda giratoria al abrir cofre
@@ -158,6 +158,18 @@ WordPress mu-plugins:
   - Indicador de racha (1-100 días)
   - Barra de progreso hacia próximo bonus
   - Integración con API de cofre diario
+
+- [x] `app/mi-magia/page.jsx` - Componente CatalogoLecturasGamificado
+  - Catálogo completo con 6 categorías
+  - Tabs navegables por categoría
+  - Cards de lecturas con estados (disponible, bloqueada, popular, destacada)
+  - Indicadores de nivel y requisitos de guardián
+  - Eventos lunares activos destacados
+  - Descuentos visibles para miembros Círculo
+  - Vista de detalle con info completa
+  - Formulario de solicitud
+  - Vista de resultado con XP ganado y nivel
+  - Ruta: /mi-magia → lecturas_gamificadas
 
 ---
 
@@ -193,8 +205,15 @@ APIs creadas:
   - Modal de recompensas con efectos visuales
   - Indicador de racha y progreso hacia bonus
   - Integración con API /api/gamificacion/cofre-diario
+- [x] Crear UI de catálogo de lecturas gamificado
+  - Componente CatalogoLecturasGamificado completo
+  - Organizado por categorías (básicas, estándar, premium, ultra, eventos, temporada)
+  - Indicadores de nivel con candados para bloqueadas
+  - Descuentos visibles para miembros del Círculo
+  - Eventos lunares activos destacados
+  - Vista de detalle con formulario
+  - Vista de resultado con XP y nivel
 - [ ] Integrar con sistema de experiencias existente
-- [ ] Crear UI de catálogo de lecturas gamificado
 
 ---
 
