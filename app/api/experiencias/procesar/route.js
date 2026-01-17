@@ -1,6 +1,77 @@
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import { Resend } from 'resend';
+import { XP_ACCIONES, obtenerNivel } from '@/lib/gamificacion/config';
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Actualizar gamificación al completar experiencia async
+// ═══════════════════════════════════════════════════════════════
+async function actualizarGamificacionAsync(email, tipo, runas = 0) {
+  try {
+    let gamificacion = await kv.get(`gamificacion:${email}`);
+
+    if (!gamificacion) {
+      gamificacion = {
+        xp: 0,
+        nivel: 'iniciada',
+        racha: 0,
+        rachaMax: 0,
+        ultimoLogin: null,
+        ultimoCofre: null,
+        lecturasCompletadas: [],
+        tiposLecturaUsados: [],
+        misionesCompletadas: [],
+        badges: [],
+        referidos: [],
+        codigoReferido: null,
+        creadoEn: new Date().toISOString()
+      };
+    }
+
+    // Registrar tipo de lectura
+    if (tipo && !gamificacion.lecturasCompletadas.includes(tipo)) {
+      gamificacion.lecturasCompletadas.push(tipo);
+    }
+
+    // Determinar categoría
+    const categorias = {
+      'tirada-runas': 'tiradas',
+      'susurro-guardian': 'mensajes',
+      'oraculo': 'lecturas',
+      'lectura-alma': 'estudios',
+      'canalizacion-guardian': 'canalizaciones'
+    };
+    const categoria = categorias[tipo] || 'otros';
+    if (!gamificacion.tiposLecturaUsados.includes(categoria)) {
+      gamificacion.tiposLecturaUsados.push(categoria);
+    }
+
+    // Calcular XP según runas
+    let xpGanado = XP_ACCIONES.lecturaBasica;
+    if (runas <= 30) {
+      xpGanado = XP_ACCIONES.lecturaBasica;
+    } else if (runas <= 75) {
+      xpGanado = XP_ACCIONES.lecturaEstandar;
+    } else if (runas <= 150) {
+      xpGanado = XP_ACCIONES.lecturaPremium;
+    } else {
+      xpGanado = XP_ACCIONES.lecturaUltraPremium;
+    }
+
+    gamificacion.xp += xpGanado;
+
+    // Actualizar nivel
+    const nuevoNivel = obtenerNivel(gamificacion.xp);
+    gamificacion.nivel = nuevoNivel.id;
+
+    await kv.set(`gamificacion:${email}`, gamificacion);
+
+    return { xpGanado, nivel: nuevoNivel };
+  } catch (error) {
+    console.error('Error actualizando gamificación async:', error);
+    return null;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // PROCESAR COLA DE EXPERIENCIAS
@@ -84,10 +155,22 @@ export async function GET(request) {
         solicitud.contenido = contenido;
         solicitud.completada = new Date().toISOString();
         await kv.set(`solicitud:${solicitudId}`, solicitud);
-        
+
+        // === GAMIFICACIÓN: Actualizar XP y progreso ===
+        try {
+          const runas = solicitud.runas || solicitud.runasGastadas || 0;
+          const gamificacionResult = await actualizarGamificacionAsync(solicitud.email, solicitud.tipo, runas);
+          if (gamificacionResult) {
+            solicitud.gamificacion = gamificacionResult;
+            await kv.set(`solicitud:${solicitudId}`, solicitud);
+          }
+        } catch (gamError) {
+          console.error('Error actualizando gamificación en procesar:', gamError);
+        }
+
         // Enviar email de notificación
         await enviarEmailLecturaLista(resend, solicitud, contenido);
-        
+
         procesadas++;
         
       } catch (error) {

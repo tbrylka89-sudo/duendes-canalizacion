@@ -150,6 +150,20 @@ WordPress mu-plugins:
   - Generación IA con prompts específicos por categoría
   - Tracking de XP y progresión
 
+### Integración Experiencias ↔ Gamificación (2026-01-17 19:00)
+
+- [x] `app/api/experiencias/solicitar/route.js`
+  - Import de XP_ACCIONES y obtenerNivel
+  - Helper actualizarGamificacion para tracking
+  - Helper determinarCategoria para mapeo de tipos
+  - Tracking automático al completar experiencia inmediata
+  - Respuesta incluye datos de gamificación
+
+- [x] `app/api/experiencias/procesar/route.js`
+  - Helper actualizarGamificacionAsync para cron
+  - Tracking de XP al completar experiencias async
+  - Almacenamiento de datos de gamificación en solicitud
+
 ### UI de Gamificación (2026-01-17 18:00)
 
 - [x] `app/mi-magia/page.jsx` - Componente CofreDiario
@@ -213,7 +227,10 @@ APIs creadas:
   - Eventos lunares activos destacados
   - Vista de detalle con formulario
   - Vista de resultado con XP y nivel
-- [ ] Integrar con sistema de experiencias existente
+- [x] Integrar con sistema de experiencias existente
+  - `app/api/experiencias/solicitar/route.js` - Tracking de XP en solicitudes inmediatas
+  - `app/api/experiencias/procesar/route.js` - Tracking de XP en experiencias async
+  - Respuestas incluyen datos de gamificación (XP ganado, nivel, subida de nivel)
 
 ---
 
