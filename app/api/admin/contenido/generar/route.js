@@ -1,9 +1,13 @@
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
+import { kv } from '@vercel/kv';
+import { infoDiaActual } from '@/lib/ciclos-naturales';
+
 // ═══════════════════════════════════════════════════════════════
 // SISTEMA DE GENERACIÓN DE CONTENIDO - DUENDES DEL URUGUAY
 // Basado en CLAUDE.md - Escritura emocional, NUNCA genérica
+// Integrado con Duende de la Semana y ciclos naturales
 // ═══════════════════════════════════════════════════════════════
 
 const SYSTEM_PROMPT_BASE = `Sos Thibisay, la voz de Duendes del Uruguay. Escribís en español rioplatense (vos, tenés, podés, querés).
@@ -141,7 +145,10 @@ export async function POST(request) {
       tipo = 'articulo',
       instruccionesExtra = '',
       tono = 'normal', // normal, intimo, energetico, serio
-      audiencia = 'general' // general, principiante, avanzado
+      audiencia = 'general', // general, principiante, avanzado
+      usarDuendeSemana = false,
+      integrarLuna = false,
+      integrarEstacion = false
     } = body;
 
     if (!tema) {
@@ -153,6 +160,70 @@ export async function POST(request) {
 
     // Construir instrucciones de tipo
     const instruccionesTipo = PROMPTS_POR_TIPO[tipo] || PROMPTS_POR_TIPO.articulo;
+
+    // Integración con Duende de la Semana
+    let contextoDuende = '';
+    let duendeSemana = null;
+    if (usarDuendeSemana) {
+      duendeSemana = await kv.get('duende-semana-actual');
+      if (duendeSemana) {
+        const personalidad = duendeSemana.personalidadGenerada || {};
+        contextoDuende = `
+
+## ESCRIBE COMO ${duendeSemana.nombre.toUpperCase()}
+Este contenido es narrado por ${duendeSemana.nombre}, el Duende de la Semana.
+- Manera de hablar: ${personalidad.manera_de_hablar || 'Cálida y sabia'}
+- Temas que le apasionan: ${personalidad.temas_favoritos?.join(', ') || 'naturaleza, cristales'}
+- Frase característica: "${personalidad.frase_caracteristica || ''}"
+- Cómo da consejos: ${personalidad.como_da_consejos || 'Con metáforas de la naturaleza'}
+- Despedida: "${personalidad.despedida || 'Hasta pronto'}"
+- Tono predominante: ${personalidad.tono_emocional || 'Esperanzador'}
+
+El contenido debe sentirse escrito por ${duendeSemana.nombre}, con su voz única.
+Usa su frase característica al menos una vez de forma natural.
+Cierra con su despedida personal.`;
+      }
+    }
+
+    // Integración con fases lunares y estaciones celtas
+    let contextoNatural = '';
+    let infoHoy = null;
+    if (integrarLuna || integrarEstacion) {
+      try {
+        infoHoy = infoDiaActual();
+
+        if (integrarLuna && infoHoy.faseLunar) {
+          const luna = infoHoy.faseLunar;
+          contextoNatural += `
+
+## FASE LUNAR: ${luna.datos.nombre} ${luna.datos.icono}
+- Energía actual: ${luna.datos.energia}
+- Actividades afines: ${luna.datos.actividades.join(', ')}
+Integra sutilmente esta energía lunar en el contenido si es apropiado.`;
+        }
+
+        if (integrarEstacion) {
+          if (infoHoy.celebracionActual) {
+            const celeb = infoHoy.celebracionActual.datos;
+            contextoNatural += `
+
+## CELEBRACIÓN CELTA EN CURSO: ${celeb.nombre}
+- Significado: ${celeb.significado}
+- ${celeb.descripcion}
+El contenido puede celebrar este momento especial del año.`;
+          } else if (infoHoy.celebracionProxima?.esCercana) {
+            const celeb = infoHoy.celebracionProxima.datos;
+            contextoNatural += `
+
+## CELEBRACIÓN CERCANA: ${celeb.nombre} (en ${infoHoy.celebracionProxima.diasRestantes} días)
+- Significado: ${celeb.significado}
+Menciona la preparación para ${celeb.nombre} si es apropiado.`;
+          }
+        }
+      } catch (e) {
+        console.error('Error obteniendo info de ciclos:', e);
+      }
+    }
 
     // Ajustes de tono
     const ajusteTono = {
@@ -173,6 +244,8 @@ export async function POST(request) {
 
 ## CONTEXTO DE ESTA PIEZA:
 ${contextoCategoria}
+${contextoDuende}
+${contextoNatural}
 
 ${ajusteTono}
 ${ajusteAudiencia}`;
@@ -226,6 +299,31 @@ RECORDÁ:
     // Contar palabras reales
     const palabrasReales = contenido.split(/\s+/).filter(w => w.length > 0).length;
 
+    // Guardar en historial si hay duende
+    if (duendeSemana) {
+      try {
+        const historial = await kv.get('contenido-historial') || [];
+        historial.unshift({
+          id: `contenido_${Date.now()}`,
+          tipo,
+          titulo,
+          tema,
+          duende: {
+            id: duendeSemana.duendeId,
+            nombre: duendeSemana.nombre,
+            imagen: duendeSemana.imagen
+          },
+          faseLunar: infoHoy?.faseLunar?.fase,
+          celebracion: infoHoy?.celebracionActual?.celebracion || infoHoy?.celebracionProxima?.celebracion,
+          generadoEn: new Date().toISOString(),
+          estado: 'borrador'
+        });
+        await kv.set('contenido-historial', historial.slice(0, 100));
+      } catch (e) {
+        console.error('Error guardando historial:', e);
+      }
+    }
+
     return Response.json({
       success: true,
       contenido,
@@ -234,7 +332,15 @@ RECORDÁ:
       categoria,
       tipo,
       tono,
-      audiencia
+      audiencia,
+      duendeSemana: duendeSemana ? {
+        nombre: duendeSemana.nombre,
+        imagen: duendeSemana.imagen
+      } : null,
+      infoContextual: infoHoy ? {
+        faseLunar: infoHoy.faseLunar,
+        celebracion: infoHoy.celebracionProxima
+      } : null
     });
 
   } catch (error) {

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperiencias, estilosNuevos } from './nuevas-funciones';
 import TestGuardian from './test-guardian';
 import { personalizarTexto, saludoPersonalizado } from '@/lib/personalizacion';
+import DuendeDisponible from '@/components/DuendeDisponible';
 
 const API_BASE = '';
 
@@ -1338,19 +1339,8 @@ export default function MiMagia() {
               </button>
             </div>
 
-            {/* GUARDIANES */}
-            <div className="sidebar-card">
-              <div className="oferta-mini">
-                <span>🧙</span>
-                <div>
-                  <strong>Nuevos Guardianes</strong>
-                  <p>Descubrí quién te llama</p>
-                </div>
-              </div>
-              <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-outline-sm">
-                Ver tienda
-              </a>
-            </div>
+            {/* GUARDIÁN EN ADOPCIÓN */}
+            <DuendeDisponible compacto={true} />
 
             {/* FOOTER SIDEBAR */}
             <div className="sidebar-footer">
@@ -2290,22 +2280,56 @@ function Canalizaciones({ usuario }) {
 function PromocionesMagicas({ usuario, ir }) {
   const [promociones, setPromociones] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [cuentasRegresivas, setCuentasRegresivas] = useState({});
 
   useEffect(() => {
     cargarPromociones();
   }, []);
 
+  // Actualizar cuentas regresivas cada minuto
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nuevas = {};
+      promociones.forEach(promo => {
+        if (promo.cuentaRegresiva) {
+          nuevas[promo.id] = promo.cuentaRegresiva;
+        }
+      });
+      setCuentasRegresivas(nuevas);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [promociones]);
+
   const cargarPromociones = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/mi-magia/promociones`);
+      const email = usuario?.email || '';
+      const res = await fetch(`${API_BASE}/api/mi-magia/promociones?ubicacion=mi-magia-promos&email=${encodeURIComponent(email)}`);
       const data = await res.json();
       if (data.success) {
         setPromociones(data.promociones || []);
+        // Registrar vistas
+        data.promociones?.forEach(p => {
+          if (p.origen === 'crud') {
+            fetch(`${API_BASE}/api/admin/promociones/crud`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accion: 'registrar-vista', id: p.id })
+            }).catch(() => {});
+          }
+        });
       }
     } catch(e) {
       console.error('Error cargando promociones:', e);
     }
     setCargando(false);
+  };
+
+  const registrarClick = (promoId) => {
+    fetch(`${API_BASE}/api/admin/promociones/crud`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accion: 'registrar-click', id: promoId })
+    }).catch(() => {});
   };
 
   // Promociones predefinidas si no hay en la API
@@ -2338,6 +2362,23 @@ function PromocionesMagicas({ usuario, ir }) {
 
   const promosActivas = promociones.length > 0 ? promociones : promosPredefinidas.filter(p => p.activa);
 
+  // Función para obtener el color de fondo seguro
+  const getPromoColor = (promo) => {
+    if (promo.colores?.textoTitulo) return promo.colores.textoTitulo;
+    if (promo.color) return promo.color;
+    return '#d4af37';
+  };
+
+  // Función para formatear cuenta regresiva
+  const formatCuentaRegresiva = (cr) => {
+    if (!cr) return null;
+    const parts = [];
+    if (cr.dias > 0) parts.push(`${cr.dias}d`);
+    if (cr.horas > 0) parts.push(`${cr.horas}h`);
+    if (cr.minutos > 0 || parts.length === 0) parts.push(`${cr.minutos}m`);
+    return parts.join(' ');
+  };
+
   return (
     <div className="sec">
       <div className="sec-head">
@@ -2352,34 +2393,92 @@ function PromocionesMagicas({ usuario, ir }) {
         </div>
       ) : promosActivas.length > 0 ? (
         <div className="promos-grid">
-          {promosActivas.map(promo => (
-            <div key={promo.id} className="promo-card" style={{'--promo-color': promo.color || '#d4af37'}}>
-              <div className="promo-header">
-                <span className="promo-icono">{promo.icono}</span>
-                <div className="promo-badge-card">{promo.subtitulo}</div>
+          {promosActivas.map(promo => {
+            const promoColor = getPromoColor(promo);
+            const esNuevoSistema = promo.origen === 'crud';
+            const fondoStyle = esNuevoSistema && promo.colores?.fondo
+              ? { background: promo.colores.fondo }
+              : {};
+
+            return (
+              <div
+                key={promo.id}
+                className={`promo-card ${esNuevoSistema ? 'promo-card-nuevo' : ''}`}
+                style={{
+                  '--promo-color': promoColor,
+                  ...fondoStyle
+                }}
+              >
+                {/* Cuenta regresiva */}
+                {promo.cuentaRegresiva && (
+                  <div className="promo-countdown">
+                    ⏰ Termina en: {formatCuentaRegresiva(promo.cuentaRegresiva)}
+                  </div>
+                )}
+
+                <div className="promo-header">
+                  <span className="promo-icono">{promo.icono}</span>
+                  <div className="promo-badge-card" style={esNuevoSistema ? {
+                    background: promo.colores?.botonFondo || promoColor,
+                    color: promo.colores?.botonTexto || '#fff'
+                  } : {}}>
+                    {promo.subtitulo}
+                  </div>
+                </div>
+
+                <h3 style={esNuevoSistema && promo.colores?.textoTitulo ? { color: promo.colores.textoTitulo } : {}}>
+                  {promo.titulo}
+                </h3>
+
+                {promo.descripcion && (
+                  <p className="promo-desc" style={esNuevoSistema && promo.colores?.textoSub ? { color: promo.colores.textoSub } : {}}>
+                    {promo.descripcion}
+                  </p>
+                )}
+
+                {promo.beneficios && promo.beneficios.length > 0 && (
+                  <ul className="promo-beneficios-list">
+                    {promo.beneficios.map((b, i) => (
+                      <li key={i}>✓ {b}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {promo.url ? (
+                  <a
+                    href={promo.url}
+                    target={promo.url.startsWith('/') ? '_self' : '_blank'}
+                    rel="noopener"
+                    className="btn-promo"
+                    onClick={() => registrarClick(promo.id)}
+                    style={esNuevoSistema ? {
+                      background: promo.colores?.botonFondo || promoColor,
+                      color: promo.colores?.botonTexto || '#1a1a1a',
+                      border: promo.colores?.botonBorde ? `2px solid ${promo.colores.botonBorde}` : 'none'
+                    } : {}}
+                  >
+                    {promo.textoBoton || 'Obtener'}
+                  </a>
+                ) : promo.accion ? (
+                  <button
+                    onClick={() => { registrarClick(promo.id); promo.accion(); }}
+                    className="btn-promo"
+                    style={esNuevoSistema ? {
+                      background: promo.colores?.botonFondo || promoColor,
+                      color: promo.colores?.botonTexto || '#1a1a1a'
+                    } : {}}
+                  >
+                    {promo.textoBoton || 'Ver más'}
+                  </button>
+                ) : null}
+
+                {/* Efectos sparkles */}
+                {promo.efectos?.sparkles && (
+                  <div className="promo-sparkles"></div>
+                )}
               </div>
-              <h3>{promo.titulo}</h3>
-              <p className="promo-desc">{promo.descripcion}</p>
-
-              {promo.beneficios && (
-                <ul className="promo-beneficios-list">
-                  {promo.beneficios.map((b, i) => (
-                    <li key={i}>✓ {b}</li>
-                  ))}
-                </ul>
-              )}
-
-              {promo.url ? (
-                <a href={promo.url} target="_blank" rel="noopener" className="btn-promo">
-                  {promo.textoBoton || 'Obtener'}
-                </a>
-              ) : promo.accion ? (
-                <button onClick={promo.accion} className="btn-promo">
-                  {promo.textoBoton || 'Ver más'}
-                </button>
-              ) : null}
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="empty-promos">
@@ -5673,6 +5772,14 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .promo-info-box{background:linear-gradient(135deg,#f8f8f8,#fff);border:1px solid #e0e0e0;border-radius:12px;padding:1.5rem;margin-top:1.5rem}
 .promo-info-box h4{font-family:'Cinzel',serif;color:#d4af37;margin:0 0 0.5rem;font-size:1rem}
 .promo-info-box p{color:#666;font-size:0.9rem;margin:0}
+
+/* Promociones nuevo sistema */
+.promo-card-nuevo{border:none;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+.promo-card-nuevo::before{display:none}
+.promo-card-nuevo h3{color:inherit}
+.promo-countdown{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 10px;border-radius:20px;font-size:0.7rem;font-weight:600;z-index:2}
+.promo-sparkles{position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(212,175,55,0.3) 0%,transparent 30%),radial-gradient(circle at 80% 70%,rgba(212,175,55,0.2) 0%,transparent 25%);pointer-events:none;animation:sparkle-pulse 3s ease-in-out infinite}
+@keyframes sparkle-pulse{0%,100%{opacity:0.5}50%{opacity:1}}
 
 @media(max-width:768px){.promos-grid{grid-template-columns:1fr}.banner-promo{flex-direction:column;text-align:center}.promo-arrow{display:none}}
 

@@ -15,25 +15,124 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const incluirInactivas = searchParams.get('todas') === 'true';
+    const ubicacion = searchParams.get('ubicacion'); // header, mi-magia-promos, etc.
+    const email = searchParams.get('email');
 
-    // Obtener todas las promociones
-    const promociones = await kv.get('promociones:lista') || [];
+    // Obtener datos del usuario para filtrar por audiencia
+    let usuario = null;
+    if (email) {
+      usuario = await kv.get(`user:${email.toLowerCase()}`) || await kv.get(`elegido:${email.toLowerCase()}`);
+    }
 
-    // Filtrar solo las activas si no se piden todas
     const ahora = new Date();
-    const promosFiltradas = incluirInactivas
-      ? promociones
-      : promociones.filter(p => {
-          if (!p.activa) return false;
-          if (p.fechaInicio && new Date(p.fechaInicio) > ahora) return false;
-          if (p.fechaFin && new Date(p.fechaFin) < ahora) return false;
-          return true;
-        });
+    const promocionesActivas = [];
+
+    // 1. Obtener promociones del sistema antiguo (lista)
+    const promocionesLista = await kv.get('promociones:lista') || [];
+    for (const p of promocionesLista) {
+      if (!incluirInactivas) {
+        if (!p.activa) continue;
+        if (p.fechaInicio && new Date(p.fechaInicio) > ahora) continue;
+        if (p.fechaFin && new Date(p.fechaFin) < ahora) continue;
+      }
+      promocionesActivas.push({
+        ...p,
+        origen: 'lista'
+      });
+    }
+
+    // 2. Obtener promociones del nuevo sistema CRUD
+    const keys = await kv.keys('promociones:promo_*');
+    for (const key of keys) {
+      const promo = await kv.get(key);
+      if (!promo || !promo.id) continue;
+
+      // Calcular si está activa
+      const fechaInicio = promo.fechaInicio ? new Date(promo.fechaInicio) : null;
+      const fechaFin = promo.fechaFin ? new Date(promo.fechaFin) : null;
+
+      let estaActiva = promo.estado === 'activa';
+      if (promo.estado !== 'pausada' && promo.estado !== 'borrador') {
+        if (fechaInicio && fechaInicio > ahora) {
+          estaActiva = false;
+        } else if (fechaFin && fechaFin < ahora) {
+          estaActiva = false;
+        } else if (!fechaInicio || fechaInicio <= ahora) {
+          estaActiva = true;
+        }
+      }
+
+      if (!incluirInactivas && !estaActiva) continue;
+
+      // Filtrar por ubicación si se especifica
+      if (ubicacion && promo.ubicaciones && !promo.ubicaciones.includes(ubicacion)) {
+        continue;
+      }
+
+      // Filtrar por audiencia
+      if (promo.audiencia && promo.audiencia !== 'todos') {
+        if (promo.audiencia === 'circulo' && !usuario?.esCirculo) continue;
+        if (promo.audiencia === 'clientes' && (!usuario?.compras || usuario.compras.length === 0)) continue;
+        if (promo.audiencia === 'nuevos' && usuario?.compras && usuario.compras.length > 0) continue;
+      }
+
+      // Calcular cuenta regresiva si aplica
+      let cuentaRegresiva = null;
+      if (promo.cuentaRegresiva && fechaFin) {
+        const diff = fechaFin - ahora;
+        if (diff > 0) {
+          const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          cuentaRegresiva = { dias, horas, minutos };
+        }
+      }
+
+      // Construir URL del botón
+      let urlBoton = '#';
+      if (promo.boton) {
+        switch (promo.boton.tipo) {
+          case 'link':
+            urlBoton = promo.boton.url || '#';
+            break;
+          case 'cupon':
+            urlBoton = `https://duendesuy.10web.cloud/tienda/?coupon=${promo.boton.codigoCupon || ''}`;
+            break;
+          case 'circulo':
+            urlBoton = '/mi-magia/circulo';
+            break;
+          default:
+            urlBoton = '#';
+        }
+      }
+
+      promocionesActivas.push({
+        id: promo.id,
+        titulo: promo.tituloBanner,
+        subtitulo: promo.subtitulo,
+        icono: promo.icono,
+        colores: promo.colores,
+        efectos: promo.efectos,
+        url: urlBoton,
+        textoBoton: promo.boton?.texto || 'Ver más',
+        permitirCerrar: promo.permitirCerrar,
+        cuentaRegresiva,
+        prioridad: promo.prioridad,
+        ubicaciones: promo.ubicaciones,
+        origen: 'crud'
+      });
+    }
+
+    // Ordenar por prioridad
+    promocionesActivas.sort((a, b) => {
+      const prioridadOrder = { alta: 0, media: 1, baja: 2 };
+      return (prioridadOrder[a.prioridad] || 1) - (prioridadOrder[b.prioridad] || 1);
+    });
 
     return Response.json({
       success: true,
-      promociones: promosFiltradas,
-      total: promosFiltradas.length
+      promociones: promocionesActivas,
+      total: promocionesActivas.length
     }, { headers: corsHeaders });
 
   } catch (error) {
