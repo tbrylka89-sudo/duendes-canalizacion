@@ -50,9 +50,9 @@ export async function POST(request) {
     usuario.circuloPruebaUsada = true;
     usuario.circuloPruebaInicio = ahora.toISOString();
 
-    // Dar 50 runas de bienvenida
+    // Dar 100 runas de bienvenida
     const runasAntes = usuario.runas || 0;
-    usuario.runas = runasAntes + 50;
+    usuario.runas = runasAntes + 100;
 
     // Dar 1 tirada gratis
     if (!usuario.experienciasGratis) usuario.experienciasGratis = [];
@@ -80,7 +80,7 @@ export async function POST(request) {
     usuario.actividad.push({
       tipo: 'circulo-prueba',
       fecha: ahora.toISOString(),
-      detalle: '15 dias de prueba + 50 runas + 1 tirada gratis'
+      detalle: '15 dias de prueba + 100 runas + 1 tirada gratis'
     });
 
     return Response.json({
@@ -89,7 +89,7 @@ export async function POST(request) {
       beneficios: {
         diasPrueba: 15,
         expira: expira.toISOString(),
-        runasOtorgadas: 50,
+        runasOtorgadas: 100,
         tiradaGratis: true
       },
       usuario: {

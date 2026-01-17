@@ -251,11 +251,9 @@ function extraerCantidadRunas(sku, nombre) {
 }
 
 function calcularDiasMembresia(sku) {
-  if (sku.includes('mensual')) return 30;
-  if (sku.includes('trimestral')) return 90;
   if (sku.includes('semestral')) return 180;
   if (sku.includes('anual')) return 365;
-  return 30; // Default
+  return 180; // Default: semestral
 }
 
 function calcularNivel(totalCompras) {

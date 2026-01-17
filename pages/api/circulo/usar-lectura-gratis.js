@@ -92,11 +92,11 @@ export default async function handler(req, res) {
 }
 
 function obtenerBeneficiosPlan(plan) {
+  // Semestral: $50 USD | Anual: $80 USD
   const planes = {
-    'mensual': { tiradas: 1, susurros: 0 },
-    'trimestral': { tiradas: 2, susurros: 0 },
+    'trial': { tiradas: 1, susurros: 0 },
     'semestral': { tiradas: 2, susurros: 1 },
-    'anual': { tiradas: 3, susurros: 2 }
+    'anual': { tiradas: 5, susurros: 2 }
   };
   return planes[plan] || { tiradas: 0, susurros: 0 };
 }

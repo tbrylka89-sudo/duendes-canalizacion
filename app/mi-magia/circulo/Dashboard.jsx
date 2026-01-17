@@ -6,6 +6,267 @@ import { useState, useEffect } from 'react';
 // Vista principal después del portal de entrada
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOUR DEL CÍRCULO - Pasos
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const PASOS_TOUR_CIRCULO = [
+  {
+    id: 'bienvenida',
+    titulo: 'Bienvenido/a al Círculo',
+    icono: '★',
+    mensaje: 'Has entrado al santuario secreto de Duendes del Uruguay. Aquí la magia fluye cada día, guiada por la sabiduría ancestral de los guardianes.',
+    tip: 'Este es tu espacio sagrado'
+  },
+  {
+    id: 'duende-semana',
+    titulo: 'El Guardián de la Semana',
+    icono: '🧙',
+    mensaje: 'Cada semana, un guardián diferente toma el liderazgo y guía nuestra comunidad. Todo el contenido de la semana viene desde su mirada y sabiduría única.',
+    tip: 'Si ese guardián es adoptado... desaparece, pero su legado permanece'
+  },
+  {
+    id: 'contenido-diario',
+    titulo: 'Contenido Exclusivo',
+    icono: '📜',
+    mensaje: 'Cada semana recibís contenido nuevo: mensajes del guardián, enseñanzas profundas, rituales guiados, y mensajes de cierre. Todo personalizado según la energía de la temporada.',
+    tip: 'Lunes: Presentación · Miércoles: Enseñanza · Viernes: Ritual · Domingo: Cierre'
+  },
+  {
+    id: 'portales',
+    titulo: 'Los 4 Portales del Año',
+    icono: '◎',
+    mensaje: 'Seguimos el calendario celta con 4 grandes celebraciones: Yule (invierno), Ostara (primavera), Litha (verano) y Mabon (otoño). Cada portal trae energías y prácticas únicas.',
+    tip: 'Estás en el Portal actual - mirá el banner arriba'
+  },
+  {
+    id: 'luna',
+    titulo: 'Guía Lunar',
+    icono: '☽',
+    mensaje: 'Cada mes recibís la guía lunar completa: rituales, intenciones y prácticas alineadas con las fases de la luna. Nueva, creciente, llena, menguante... cada fase tiene su propósito.',
+    tip: 'Sincronizá tus prácticas con la luna'
+  },
+  {
+    id: 'comunidad',
+    titulo: 'La Comunidad',
+    icono: '❧',
+    mensaje: 'Conectá con otros buscadores en nuestro foro privado. Compartí experiencias, hacé preguntas, sugerí temas. El Círculo es una familia.',
+    tip: 'Encontrás el foro en la navegación'
+  },
+  {
+    id: 'regalos',
+    titulo: 'Tus Beneficios',
+    icono: '🎁',
+    mensaje: 'Como miembro del Círculo tenés: runas de regalo, descuentos exclusivos en guardianes (5-10%), acceso anticipado a novedades, y contenido que no está en ningún otro lado.',
+    tip: 'Mirá tu balance de runas arriba'
+  },
+  {
+    id: 'final',
+    titulo: 'La magia te espera',
+    icono: '✨',
+    mensaje: 'Explorá el Círculo a tu ritmo. Cada día hay algo nuevo esperándote. Que los guardianes iluminen tu camino.',
+    tip: 'Podés volver a ver este tour desde el menú'
+  }
+];
+
+// Componente Tour del Círculo
+function TourCirculo({ onFinish }) {
+  const [paso, setPaso] = useState(0);
+  const pasoActual = PASOS_TOUR_CIRCULO[paso];
+  const esUltimo = paso === PASOS_TOUR_CIRCULO.length - 1;
+  const esPrimero = paso === 0;
+
+  return (
+    <div className="tour-circulo-container">
+      <div className="tour-circulo-card">
+        <div className="tour-progress">
+          {PASOS_TOUR_CIRCULO.map((_, i) => (
+            <div key={i} className={`tour-dot ${i === paso ? 'activo' : ''} ${i < paso ? 'completado' : ''}`} />
+          ))}
+        </div>
+
+        <div className="tour-content">
+          <span className="tour-icono">{pasoActual.icono}</span>
+          <h1>{pasoActual.titulo}</h1>
+          <p className="tour-mensaje">{pasoActual.mensaje}</p>
+          <div className="tour-tip">
+            <span>💡</span>
+            <span>{pasoActual.tip}</span>
+          </div>
+        </div>
+
+        <div className="tour-nav">
+          {!esPrimero && (
+            <button className="tour-btn-sec" onClick={() => setPaso(paso - 1)}>
+              ← Anterior
+            </button>
+          )}
+          {esPrimero && (
+            <button className="tour-btn-skip" onClick={onFinish}>
+              Saltar tour
+            </button>
+          )}
+          <button className="tour-btn-primary" onClick={() => esUltimo ? onFinish() : setPaso(paso + 1)}>
+            {esUltimo ? '¡Comenzar! ✨' : 'Siguiente →'}
+          </button>
+        </div>
+
+        <div className="tour-counter">
+          {paso + 1} de {PASOS_TOUR_CIRCULO.length}
+        </div>
+      </div>
+
+      <style jsx>{`
+        .tour-circulo-container {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(5, 5, 8, 0.95);
+          padding: 20px;
+          font-family: 'Cormorant Garamond', serif;
+        }
+
+        .tour-circulo-card {
+          background: linear-gradient(135deg, #111 0%, #0a0a0a 100%);
+          border-radius: 20px;
+          padding: 2.5rem;
+          max-width: 500px;
+          width: 100%;
+          text-align: center;
+          border: 1px solid rgba(212, 175, 55, 0.2);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(212, 175, 55, 0.1);
+        }
+
+        .tour-progress {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 2rem;
+        }
+
+        .tour-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #333;
+          transition: all 0.3s;
+        }
+
+        .tour-dot.activo {
+          background: #d4af37;
+          transform: scale(1.3);
+          box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .tour-dot.completado {
+          background: rgba(212, 175, 55, 0.5);
+        }
+
+        .tour-content {
+          margin-bottom: 2rem;
+        }
+
+        .tour-icono {
+          font-size: 4rem;
+          display: block;
+          margin-bottom: 1rem;
+          filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        .tour-circulo-card h1 {
+          font-family: 'Tangerine', cursive;
+          font-size: 2.5rem;
+          color: #fff;
+          margin: 0 0 1rem;
+        }
+
+        .tour-mensaje {
+          color: rgba(255, 255, 255, 0.85);
+          font-size: 1.1rem;
+          line-height: 1.7;
+          margin: 0;
+        }
+
+        .tour-tip {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 1.5rem;
+          padding: 12px 20px;
+          background: rgba(212, 175, 55, 0.1);
+          border-radius: 10px;
+          font-size: 0.9rem;
+          color: #d4af37;
+        }
+
+        .tour-nav {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-bottom: 1rem;
+        }
+
+        .tour-btn-primary {
+          background: linear-gradient(135deg, #d4af37, #b8972e);
+          color: #0a0a0a;
+          border: none;
+          padding: 14px 30px;
+          border-radius: 50px;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .tour-btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .tour-btn-sec {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: rgba(255, 255, 255, 0.7);
+          padding: 14px 25px;
+          border-radius: 50px;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .tour-btn-sec:hover {
+          border-color: rgba(255, 255, 255, 0.4);
+          color: #fff;
+        }
+
+        .tour-btn-skip {
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 13px;
+          cursor: pointer;
+          padding: 10px;
+        }
+
+        .tour-btn-skip:hover {
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tour-counter {
+          color: rgba(255, 255, 255, 0.3);
+          font-size: 12px;
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // Configuración de portales/temporadas
 const PORTALES = {
   yule: {
@@ -64,10 +325,25 @@ export default function CirculoDashboard({ usuario }) {
   const [portalActual, setPortalActual] = useState(obtenerPortalActual());
   const [cargando, setCargando] = useState(true);
   const [coloresDuende, setColoresDuende] = useState(COLORES_ELEMENTO.espiritu);
+  const [mostrandoTour, setMostrandoTour] = useState(false);
 
   useEffect(() => {
     cargarDatos();
+    // Verificar si es la primera vez (mostrar tour)
+    const tourVisto = localStorage.getItem('tour_circulo_visto');
+    if (!tourVisto) {
+      setMostrandoTour(true);
+    }
   }, []);
+
+  function finalizarTour() {
+    setMostrandoTour(false);
+    localStorage.setItem('tour_circulo_visto', 'true');
+  }
+
+  function verTourDeNuevo() {
+    setMostrandoTour(true);
+  }
 
   async function cargarDatos() {
     try {
@@ -90,6 +366,11 @@ export default function CirculoDashboard({ usuario }) {
 
   // Semana del año para animaciones
   const semanaAno = Math.ceil((new Date() - new Date(new Date().getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000));
+
+  // Mostrar tour si es necesario
+  if (mostrandoTour) {
+    return <TourCirculo onFinish={finalizarTour} />;
+  }
 
   return (
     <div
@@ -151,6 +432,9 @@ export default function CirculoDashboard({ usuario }) {
           </button>
         </nav>
         <div className="header-right">
+          <button className="btn-tour-mini" onClick={verTourDeNuevo} title="Ver tour">
+            ?
+          </button>
           <span className="user-name">{usuario?.nombre || 'Viajero'}</span>
         </div>
       </header>
@@ -407,6 +691,25 @@ export default function CirculoDashboard({ usuario }) {
           font-family: 'Cinzel', serif;
           font-size: 14px;
           color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-tour-mini {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: rgba(212, 175, 55, 0.1);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          color: #d4af37;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .btn-tour-mini:hover {
+          background: rgba(212, 175, 55, 0.2);
+          border-color: #d4af37;
         }
 
         /* Main */

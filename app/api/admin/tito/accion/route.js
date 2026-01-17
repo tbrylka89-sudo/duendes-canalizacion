@@ -41,8 +41,8 @@ export async function POST(request) {
         if (existe) { resultado = `Ya tiene cuenta. Link: https://duendes-vercel.vercel.app/mi-magia?token=${existe.token}`; break; }
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
         let token = ''; for (let i = 0; i < 12; i++) token += chars.charAt(Math.floor(Math.random() * chars.length));
-        await kv.set(`user:${datos.email}`, { email: datos.email, nombre: datos.nombre||'', token, runas: 50, treboles: 0, guardianes: [], lecturas: [], creado: new Date().toISOString() });
-        await enviarEmail(datos.email, '✨ Tu acceso a Mi Magia', `<h1 style="color:#d4af37;">¡Bienvenida!</h1><p><a href="https://duendes-vercel.vercel.app/mi-magia?token=${token}" style="background:#d4af37;color:#1a1a1a;padding:15px 30px;border-radius:50px;text-decoration:none;display:inline-block;">Entrar a Mi Magia</a></p><p>🎁 50 Runas de regalo</p>`);
+        await kv.set(`user:${datos.email}`, { email: datos.email, nombre: datos.nombre||'', token, runas: 100, treboles: 0, guardianes: [], lecturas: [], creado: new Date().toISOString() });
+        await enviarEmail(datos.email, '✨ Tu acceso a Mi Magia', `<h1 style="color:#d4af37;">¡Bienvenida!</h1><p><a href="https://duendes-vercel.vercel.app/mi-magia?token=${token}" style="background:#d4af37;color:#1a1a1a;padding:15px 30px;border-radius:50px;text-decoration:none;display:inline-block;">Entrar a Mi Magia</a></p><p>🎁 100 Runas de regalo</p>`);
         resultado = `✅ Cuenta creada. Link: https://duendes-vercel.vercel.app/mi-magia?token=${token}`;
         break;
       }
@@ -51,9 +51,9 @@ export async function POST(request) {
         const user = await kv.get(`user:${datos.email}`);
         if (!user) { resultado = `❌ No encontré a ${datos.email}`; break; }
         const expira = new Date(); expira.setDate(expira.getDate() + (datos.dias||15));
-        user.esCirculo = true; user.circuloExpira = expira.toLocaleDateString('es-UY'); user.runas = (user.runas||0) + 50;
+        user.esCirculo = true; user.circuloExpira = expira.toLocaleDateString('es-UY'); user.runas = (user.runas||0) + 100;
         await kv.set(`user:${datos.email}`, user);
-        await enviarEmail(datos.email, '★ Bienvenida al Círculo', `<h1 style="color:#d4af37;">¡Felicitaciones!</h1><p>${datos.dias} días de Círculo + 50 Runas</p>`);
+        await enviarEmail(datos.email, '★ Bienvenida al Círculo', `<h1 style="color:#d4af37;">¡Felicitaciones!</h1><p>${datos.dias} días de Círculo + 100 Runas</p>`);
         resultado = `✅ ${datos.dias} días de Círculo para ${user.nombre||datos.email}`;
         break;
       }

@@ -23,10 +23,10 @@ const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemin
 // ═══════════════════════════════════════════════════════════════
 
 const PACKS_RUNAS = [
-  { nombre: 'Chispa', runas: 15, precio: 7, url: 'https://duendesuy.10web.cloud/producto/runas-chispa/', desc: 'Para empezar a explorar' },
-  { nombre: 'Destello', runas: 30, precio: 12, url: 'https://duendesuy.10web.cloud/producto/runas-destello/', desc: 'El más popular' },
-  { nombre: 'Fulgor', runas: 50, precio: 18, url: 'https://duendesuy.10web.cloud/producto/runas-fulgor/', desc: 'Para varias experiencias' },
-  { nombre: 'Resplandor', runas: 100, precio: 32, url: 'https://duendesuy.10web.cloud/producto/runas-resplandor/', desc: 'El mejor valor' }
+  { nombre: 'Chispa', runas: 50, precio: 7, url: 'https://duendesuy.10web.cloud/producto/runas-chispa/', desc: 'Para empezar a explorar' },
+  { nombre: 'Destello', runas: 100, precio: 12, url: 'https://duendesuy.10web.cloud/producto/runas-destello/', desc: 'El más popular' },
+  { nombre: 'Fulgor', runas: 200, precio: 18, url: 'https://duendesuy.10web.cloud/producto/runas-fulgor/', desc: 'Para varias experiencias' },
+  { nombre: 'Resplandor', runas: 350, precio: 32, url: 'https://duendesuy.10web.cloud/producto/runas-resplandor/', desc: 'El mejor valor' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -193,61 +193,28 @@ const CANJES = [
 
 const MEMBRESIAS = [
   {
-    nombre: 'Mensual',
-    precio: 9.99,
-    precioUY: 450,
-    dias: 30,
-    url: 'https://duendesuy.10web.cloud/producto/circulo-mensual/',
+    nombre: 'Semestral',
+    precio: 50,
+    precioUY: 2000,
+    dias: 180,
+    url: 'https://duendesuy.10web.cloud/producto/circulo-semestral/',
     beneficios: [
       'Contenido semanal exclusivo',
-      '10 runas por mes',
-      '2 tréboles por mes',
-      '1 tirada de runas gratis/mes',
-      '24h acceso anticipado',
-      '5% en guardianes nuevos'
-    ]
-  },
-  {
-    nombre: 'Trimestral',
-    precio: 24.99,
-    precioUY: 1150,
-    dias: 90,
-    ahorro: '17%',
-    url: 'https://duendesuy.10web.cloud/producto/circulo-trimestral/',
-    beneficios: [
-      'Todo lo del plan Mensual',
       '15 runas por mes',
       '4 tréboles por mes',
       '2 tiradas de runas gratis/mes',
       '1 lectura de energía gratis/mes',
-      '5% en toda la tienda',
-      'Tito te reconoce'
-    ]
-  },
-  {
-    nombre: 'Semestral',
-    precio: 44.99,
-    precioUY: 2050,
-    dias: 180,
-    ahorro: '25%',
-    url: 'https://duendesuy.10web.cloud/producto/circulo-semestral/',
-    beneficios: [
-      'Todo lo del plan Trimestral',
-      '20 runas por mes',
-      '6 tréboles por mes',
-      '3 tiradas de runas gratis/mes',
-      '2 lecturas de energía gratis/mes',
-      '1 guía de cristal gratis/mes',
       '48h acceso anticipado',
-      '10% en guardianes nuevos'
+      '5% en guardianes nuevos'
     ]
   },
   {
     nombre: 'Anual',
-    precio: 79.99,
-    precioUY: 3650,
+    precio: 80,
+    precioUY: 3200,
     dias: 365,
-    ahorro: '33%',
+    ahorro: '20%',
+    destacado: true,
     url: 'https://duendesuy.10web.cloud/producto/circulo-anual/',
     beneficios: [
       'Todo lo del plan Semestral',
@@ -485,14 +452,605 @@ const CRISTALES = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
+// LOGIN CON MAGIC LINK
+// ═══════════════════════════════════════════════════════════════
+
+function LoginMagicLink({ onLoginExitoso }) {
+  const [email, setEmail] = useState('');
+  const [estado, setEstado] = useState('inicial'); // inicial, enviando, enviado, error
+  const [mensaje, setMensaje] = useState('');
+  const [linkDirecto, setLinkDirecto] = useState(null);
+
+  const enviarMagicLink = async (e) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) {
+      setMensaje('Por favor ingresá un email válido');
+      setEstado('error');
+      return;
+    }
+
+    setEstado('enviando');
+    try {
+      const res = await fetch('/api/mi-magia/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim() })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setEstado('enviado');
+        if (data.linkDirecto) {
+          setLinkDirecto(data.linkDirecto);
+        }
+      } else {
+        setMensaje(data.error || 'Error al enviar el enlace');
+        setEstado('error');
+      }
+    } catch (err) {
+      setMensaje('Error de conexión. Intentá de nuevo.');
+      setEstado('error');
+    }
+  };
+
+  if (estado === 'enviado') {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-success">
+            <span className="login-icono">✨</span>
+            <h1>¡Magia lista!</h1>
+            {linkDirecto ? (
+              <>
+                <p>Tocá el botón para entrar:</p>
+                <a href={linkDirecto} className="login-btn" style={{display: 'inline-block', marginTop: '1rem', textDecoration: 'none'}}>
+                  ✨ Entrar a Mi Magia
+                </a>
+                <p className="login-sub" style={{marginTop: '1.5rem', fontSize: '0.85rem'}}>
+                  (Cuando el dominio esté configurado, esto llegará por email)
+                </p>
+              </>
+            ) : (
+              <>
+                <p>Revisá tu email <strong>{email}</strong></p>
+                <p className="login-sub">Te enviamos un enlace mágico para entrar. Revisá también la carpeta de spam.</p>
+              </>
+            )}
+            <button className="login-btn-sec" onClick={() => { setEstado('inicial'); setLinkDirecto(null); }}>
+              Usar otro email
+            </button>
+          </div>
+        </div>
+        <style jsx>{loginStyles}</style>
+      </div>
+    );
+  }
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <span className="login-icono">🔮</span>
+        <h1>Mi Magia</h1>
+        <p className="login-sub">Tu portal personal en Duendes del Uruguay</p>
+
+        <form onSubmit={enviarMagicLink} className="login-form">
+          <div className="login-campo">
+            <label>Tu email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@email.com"
+              disabled={estado === 'enviando'}
+              autoFocus
+            />
+          </div>
+
+          {estado === 'error' && (
+            <div className="login-error">{mensaje}</div>
+          )}
+
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={estado === 'enviando'}
+          >
+            {estado === 'enviando' ? 'Enviando...' : '✨ Enviar enlace mágico'}
+          </button>
+        </form>
+
+        <div className="login-info">
+          <p>Te enviaremos un enlace a tu email para entrar sin contraseña.</p>
+          <p>¿Primera vez? Se creará tu cuenta automáticamente.</p>
+        </div>
+
+        <div className="login-ayuda">
+          <a href="https://duendesuy.10web.cloud" className="login-link">
+            ← Volver a la tienda
+          </a>
+        </div>
+      </div>
+      <style jsx>{loginStyles}</style>
+    </div>
+  );
+}
+
+const loginStyles = `
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+    padding: 20px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .login-card {
+    background: #111;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid #222;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .login-icono {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 20px #d4af3750);
+  }
+
+  .login-card h1 {
+    font-family: 'Tangerine', cursive;
+    font-size: 3.5rem;
+    color: #fff;
+    margin: 0 0 0.5rem;
+  }
+
+  .login-sub {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  .login-form {
+    margin-bottom: 1.5rem;
+  }
+
+  .login-campo {
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+
+  .login-campo label {
+    display: block;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Cinzel', serif;
+  }
+
+  .login-campo input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-family: inherit;
+    transition: all 0.3s;
+  }
+
+  .login-campo input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 15px #d4af3730;
+  }
+
+  .login-campo input::placeholder {
+    color: rgba(255,255,255,0.3);
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8972e 100%);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .login-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+  }
+
+  .login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .login-btn-sec {
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid #333;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: all 0.3s;
+  }
+
+  .login-btn-sec:hover {
+    border-color: #666;
+    color: #fff;
+  }
+
+  .login-error {
+    background: rgba(255,100,100,0.1);
+    border: 1px solid rgba(255,100,100,0.3);
+    color: #ff9999;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .login-info {
+    background: #0a0a0a;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .login-info p {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    margin: 0.3rem 0;
+  }
+
+  .login-ayuda {
+    padding-top: 1rem;
+    border-top: 1px solid #222;
+  }
+
+  .login-link {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+  }
+
+  .login-link:hover {
+    color: #d4af37;
+  }
+
+  .login-success h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-success p {
+    color: rgba(255,255,255,0.8);
+    margin: 0.5rem 0;
+  }
+
+  .login-success strong {
+    color: #d4af37;
+  }
+
+  @media (max-width: 500px) {
+    .login-card {
+      padding: 2rem 1.5rem;
+    }
+    .login-card h1 {
+      font-size: 2.5rem;
+    }
+  }
+`;
+
+// ═══════════════════════════════════════════════════════════════
+// TOUR DE MI MAGIA (después del onboarding)
+// ═══════════════════════════════════════════════════════════════
+
+const PASOS_TOUR = [
+  {
+    id: 'bienvenida',
+    titulo: '¡Bienvenida a Mi Magia!',
+    icono: '✨',
+    mensaje: 'Este es tu espacio personal en Duendes del Uruguay. Vamos a hacer un recorrido rápido para que sepas todo lo que podés hacer acá.',
+    tip: 'El tour dura menos de 2 minutos'
+  },
+  {
+    id: 'runas',
+    titulo: 'Tus Runas',
+    icono: 'ᚱ',
+    mensaje: 'Las runas son tu moneda mágica. Las usás para acceder a experiencias como tiradas de runas, lecturas del alma, oráculos y más. ¡Tenés 100 runas de regalo para empezar!',
+    tip: 'Podés comprar más runas cuando las necesites'
+  },
+  {
+    id: 'treboles',
+    titulo: 'Tus Tréboles',
+    icono: '☘️',
+    mensaje: 'Los tréboles son puntos de fidelidad. Ganás 1 trébol por cada $10 USD que gastás en la tienda. Podés canjearlos por descuentos, envío gratis y más.',
+    tip: 'Los tréboles nunca expiran'
+  },
+  {
+    id: 'experiencias',
+    titulo: 'Experiencias',
+    icono: '◈',
+    mensaje: 'Acá encontrás todas las experiencias espirituales: tiradas de runas, susurros del guardián, oráculos del mes, lecturas del alma, registros akáshicos y mucho más.',
+    tip: 'Cada experiencia tiene un costo en runas diferente'
+  },
+  {
+    id: 'grimorio',
+    titulo: 'Tu Grimorio',
+    icono: '📖',
+    mensaje: 'El Grimorio es tu diario mágico personal. Podés escribir tus sueños, reflexiones, rituales que hiciste, y ver el calendario lunar para planificar tus prácticas.',
+    tip: 'Todo lo que escribas queda guardado para siempre'
+  },
+  {
+    id: 'jardin',
+    titulo: 'Jardín de Guardianes',
+    icono: '🌿',
+    mensaje: 'Acá ves todos los guardianes que adoptaste. Podés conectar con ellos, ver sus mensajes y fortalecer el vínculo.',
+    tip: 'Tu jardín crece con cada guardián que adoptás'
+  },
+  {
+    id: 'circulo',
+    titulo: 'Círculo de Duendes',
+    icono: '★',
+    mensaje: 'El Círculo es nuestra membresía premium. Te da un guardián semanal con mensajes personalizados, guía lunar, rituales exclusivos, comunidad privada y 100 runas de regalo.',
+    tip: 'Membresía semestral $50 USD o anual $80 USD'
+  },
+  {
+    id: 'tito',
+    titulo: 'Tito, tu Asistente',
+    icono: '🧙',
+    mensaje: 'Si tenés dudas, Tito está ahí para ayudarte. Es un duende sabio que conoce todo sobre Duendes del Uruguay. Lo encontrás en el botón flotante.',
+    tip: 'Preguntale lo que quieras'
+  },
+  {
+    id: 'final',
+    titulo: '¡Listo para la magia!',
+    icono: '🎉',
+    mensaje: 'Ya conocés lo básico. Explorá a tu ritmo, usá tus runas de regalo, y recordá que siempre podés volver a ver este tour desde la sección FAQ.',
+    tip: 'Tu aventura mágica comienza ahora'
+  }
+];
+
+function TourMiMagia({ usuario, onFinish }) {
+  const [paso, setPaso] = useState(0);
+  const pasoActual = PASOS_TOUR[paso];
+  const esUltimo = paso === PASOS_TOUR.length - 1;
+  const esPrimero = paso === 0;
+
+  return (
+    <div className="tour-container">
+      <div className="tour-card">
+        <div className="tour-progress">
+          {PASOS_TOUR.map((_, i) => (
+            <div key={i} className={`tour-dot ${i === paso ? 'activo' : ''} ${i < paso ? 'completado' : ''}`} />
+          ))}
+        </div>
+
+        <div className="tour-content">
+          <span className="tour-icono">{pasoActual.icono}</span>
+          <h1>{pasoActual.titulo}</h1>
+          <p className="tour-mensaje">{pasoActual.mensaje}</p>
+          <div className="tour-tip">
+            <span>💡</span>
+            <span>{pasoActual.tip}</span>
+          </div>
+        </div>
+
+        <div className="tour-nav">
+          {!esPrimero && (
+            <button className="tour-btn-sec" onClick={() => setPaso(paso - 1)}>
+              ← Anterior
+            </button>
+          )}
+          {esPrimero && (
+            <button className="tour-btn-skip" onClick={onFinish}>
+              Saltar tour
+            </button>
+          )}
+          <button className="tour-btn-primary" onClick={() => esUltimo ? onFinish() : setPaso(paso + 1)}>
+            {esUltimo ? '¡Comenzar! ✨' : 'Siguiente →'}
+          </button>
+        </div>
+
+        <div className="tour-counter">
+          {paso + 1} de {PASOS_TOUR.length}
+        </div>
+      </div>
+
+      <style jsx>{`
+        .tour-container {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+          padding: 20px;
+          font-family: 'Cormorant Garamond', serif;
+        }
+
+        .tour-card {
+          background: #111;
+          border-radius: 20px;
+          padding: 2.5rem;
+          max-width: 480px;
+          width: 100%;
+          text-align: center;
+          border: 1px solid #222;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .tour-progress {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 2rem;
+        }
+
+        .tour-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #333;
+          transition: all 0.3s;
+        }
+
+        .tour-dot.activo {
+          background: #d4af37;
+          transform: scale(1.3);
+          box-shadow: 0 0 10px #d4af3750;
+        }
+
+        .tour-dot.completado {
+          background: #d4af3780;
+        }
+
+        .tour-content {
+          margin-bottom: 2rem;
+        }
+
+        .tour-icono {
+          font-size: 4rem;
+          display: block;
+          margin-bottom: 1rem;
+          filter: drop-shadow(0 0 20px #d4af3750);
+        }
+
+        .tour-card h1 {
+          font-family: 'Tangerine', cursive;
+          font-size: 2.5rem;
+          color: #fff;
+          margin: 0 0 1rem;
+        }
+
+        .tour-mensaje {
+          font-size: 1.1rem;
+          line-height: 1.7;
+          color: rgba(255,255,255,0.8);
+          margin: 0;
+        }
+
+        .tour-tip {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #1a1a1a;
+          padding: 10px 16px;
+          border-radius: 8px;
+          margin-top: 1.5rem;
+          font-size: 0.9rem;
+          color: rgba(255,255,255,0.6);
+        }
+
+        .tour-nav {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+          margin-bottom: 1.5rem;
+        }
+
+        .tour-btn-primary {
+          background: linear-gradient(135deg, #d4af37 0%, #b8972e 100%);
+          color: #0a0a0a;
+          border: none;
+          padding: 14px 28px;
+          border-radius: 8px;
+          font-family: 'Cinzel', serif;
+          font-size: 0.95rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .tour-btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .tour-btn-sec {
+          background: transparent;
+          color: rgba(255,255,255,0.7);
+          border: 1px solid #333;
+          padding: 14px 20px;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .tour-btn-sec:hover {
+          border-color: #666;
+          color: #fff;
+        }
+
+        .tour-btn-skip {
+          background: transparent;
+          color: rgba(255,255,255,0.4);
+          border: none;
+          padding: 14px 20px;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .tour-btn-skip:hover {
+          color: rgba(255,255,255,0.7);
+        }
+
+        .tour-counter {
+          font-size: 0.8rem;
+          color: rgba(255,255,255,0.3);
+          font-family: 'Cinzel', serif;
+        }
+
+        @media (max-width: 500px) {
+          .tour-card {
+            padding: 1.5rem;
+          }
+          .tour-card h1 {
+            font-size: 2rem;
+          }
+          .tour-icono {
+            font-size: 3rem;
+          }
+          .tour-mensaje {
+            font-size: 1rem;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 
 export default function MiMagia() {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [necesitaLogin, setNecesitaLogin] = useState(false);
   const [seccion, setSeccion] = useState('inicio');
   const [onboarding, setOnboarding] = useState(false);
+  const [mostrandoTour, setMostrandoTour] = useState(false);
   const [chatAbierto, setChatAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
@@ -518,22 +1076,57 @@ export default function MiMagia() {
 
   const cargarUsuario = async () => {
     const params = new URLSearchParams(window.location.search);
-    const t = params.get('token');
-    if (!t) { window.location.href = 'https://duendesuy.10web.cloud'; return; }
+    let t = params.get('token');
+
+    // Si no hay token en URL, buscar en localStorage
+    if (!t) {
+      t = localStorage.getItem('mimagia_token');
+    }
+
+    // Si todavía no hay token, mostrar login
+    if (!t) {
+      setNecesitaLogin(true);
+      setCargando(false);
+      return;
+    }
+
     setToken(t);
     try {
       const res = await fetch(`${API_BASE}/api/mi-magia/usuario?token=${t}`);
       const data = await res.json();
       if (data.success && data.usuario) {
         setUsuario(data.usuario);
-        if (!data.usuario.onboardingCompleto) setOnboarding(true);
-      } else { window.location.href = 'https://duendesuy.10web.cloud'; }
-    } catch (e) { console.error(e); }
+        // Guardar token en localStorage para próximas visitas
+        localStorage.setItem('mimagia_token', t);
+        // Limpiar token de URL para que quede más limpia
+        if (params.get('token')) {
+          window.history.replaceState({}, '', '/mi-magia');
+        }
+        if (!data.usuario.onboardingCompleto) {
+          setOnboarding(true);
+        } else {
+          // Si ya completó onboarding pero nunca vio el tour, mostrarlo
+          const tourVisto = localStorage.getItem('tour_mimagia_visto');
+          if (!tourVisto) {
+            setMostrandoTour(true);
+          }
+        }
+      } else {
+        // Token inválido, mostrar login
+        localStorage.removeItem('mimagia_token');
+        setNecesitaLogin(true);
+      }
+    } catch (e) {
+      console.error(e);
+      setNecesitaLogin(true);
+    }
     setCargando(false);
   };
 
   if (cargando) return <Carga />;
-  if (onboarding) return <Onboarding usuario={usuario} token={token} onDone={(d) => { setUsuario({...usuario, ...d, onboardingCompleto: true, runas: 50}); setOnboarding(false); }} />;
+  if (necesitaLogin) return <LoginMagicLink onLoginExitoso={() => window.location.reload()} />;
+  if (onboarding) return <Onboarding usuario={usuario} token={token} onDone={(d) => { setUsuario({...usuario, ...d, onboardingCompleto: true, runas: 100}); setOnboarding(false); setMostrandoTour(true); }} />;
+  if (mostrandoTour) return <TourMiMagia usuario={usuario} onFinish={() => { setMostrandoTour(false); localStorage.setItem('tour_mimagia_visto', 'true'); }} />;
 
   const renderSeccion = () => {
     switch(seccion) {
@@ -555,7 +1148,7 @@ export default function MiMagia() {
       case 'grimorio': return <GrimorioSec usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'foro': return <ForoSec usuario={usuario} setUsuario={setUsuario} />;
       case 'utilidades': return <UtilidadesSec usuario={usuario} />;
-      case 'faq': return <FaqSec />;
+      case 'faq': return <FaqSec onVerTour={() => setMostrandoTour(true)} />;
       default: return <Inicio usuario={usuario} ir={setSeccion} />;
     }
   };
@@ -701,14 +1294,14 @@ export default function MiMagia() {
                 </div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                <a href="https://duendesuy.10web.cloud/product/runas-de-poder-30/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>30 Runas</span><span style={{color:'#d4af37'}}>$12</span>
+                <a href="https://duendesuy.10web.cloud/producto/runas-chispa/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>50 Runas</span><span style={{color:'#d4af37'}}>$7</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/product/runas-de-poder-50/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>50 Runas</span><span style={{color:'#d4af37'}}>$18</span>
+                <a href="https://duendesuy.10web.cloud/producto/runas-destello/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>100 Runas</span><span style={{color:'#d4af37'}}>$12</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/product/runas-de-poder-100/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>100 Runas</span><span style={{color:'#d4af37'}}>$32</span>
+                <a href="https://duendesuy.10web.cloud/producto/runas-fulgor/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>200 Runas</span><span style={{color:'#d4af37'}}>$18</span>
                 </a>
               </div>
             </div>
@@ -844,7 +1437,7 @@ function Onboarding({ usuario, token, onDone }) {
                 <div className="regalo-box regalo-box-new">
                   <span className="regalo-runa">ᚱ</span>
                   <p>Tu regalo de bienvenida:</p>
-                  <strong>50 Runas de Poder</strong>
+                  <strong>100 Runas de Poder</strong>
                   <small>Para que descubras las experiencias que te esperan</small>
                 </div>
                 <div className="onb-fomo">
@@ -2373,6 +2966,7 @@ const COLORES_ELEMENTO = {
 };
 
 function CirculoSec({ usuario, setUsuario, token, pais }) {
+  const [tab, setTab] = useState('inicio'); // inicio, luna, contenido, comunidad, rituales
   const [consejo, setConsejo] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [onboardingCompletado, setOnboardingCompletado] = useState(null);
@@ -2616,13 +3210,158 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
           <div className="duende-error">No pudimos conectar con tu guardián. Intentá de nuevo.</div>
         )}
 
-        {/* Accesos rápidos */}
-        <div className="circulo-accesos">
-          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.celeste}}><span>☽</span> Guía Lunar</button>
-          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.verdeMosgo}}><span>✦</span> Contenido</button>
-          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.magenta}}><span>❧</span> Comunidad</button>
-          <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.dorado}}><span>📖</span> Rituales</button>
-        </div>
+        {/* Navegación por tabs */}
+        {tab === 'inicio' ? (
+          <div className="circulo-accesos">
+            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.celeste}} onClick={() => setTab('luna')}><span>☽</span> Guía Lunar</button>
+            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.verdeMosgo}} onClick={() => setTab('contenido')}><span>✦</span> Contenido</button>
+            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.magenta}} onClick={() => setTab('comunidad')}><span>❧</span> Comunidad</button>
+            <button className="acceso-btn" style={{'--btn-color': COLORES_NEON.dorado}} onClick={() => setTab('rituales')}><span>📖</span> Rituales</button>
+          </div>
+        ) : (
+          <div className="tab-content">
+            <button className="btn-volver-inicio" onClick={() => setTab('inicio')}>← Volver al inicio</button>
+
+            {tab === 'luna' && (
+              <div className="seccion-luna">
+                <h2 style={{color: COLORES_NEON.celeste}}>☽ Guía Lunar</h2>
+                <p>Tu conexión con los ciclos de la luna</p>
+                <div className="luna-actual">
+                  <span className="luna-fase">🌙</span>
+                  <div>
+                    <h3>Luna actual</h3>
+                    <p>Pronto tendrás aquí la guía completa de las fases lunares, rituales recomendados y meditaciones para cada momento del ciclo.</p>
+                  </div>
+                </div>
+                <div className="luna-prox">
+                  <p className="proximamente">✦ Contenido en preparación</p>
+                </div>
+              </div>
+            )}
+
+            {tab === 'contenido' && (
+              <div className="seccion-contenido">
+                <h2 style={{color: COLORES_NEON.verdeMosgo}}>✦ Contenido Exclusivo</h2>
+                <p>Material especial solo para miembros del Círculo</p>
+                <div className="contenido-grid">
+                  <div className="contenido-card">
+                    <span>📚</span>
+                    <h4>Biblioteca de Rituales</h4>
+                    <p>Prácticas ancestrales</p>
+                  </div>
+                  <div className="contenido-card">
+                    <span>🔮</span>
+                    <h4>Meditaciones Guiadas</h4>
+                    <p>Con los guardianes</p>
+                  </div>
+                  <div className="contenido-card">
+                    <span>✨</span>
+                    <h4>Cursos Especiales</h4>
+                    <p>Aprendizaje profundo</p>
+                  </div>
+                  <div className="contenido-card">
+                    <span>🌿</span>
+                    <h4>Herbolaria Mágica</h4>
+                    <p>Secretos de plantas</p>
+                  </div>
+                </div>
+                <p className="proximamente">✦ Contenido en preparación</p>
+              </div>
+            )}
+
+            {tab === 'comunidad' && (
+              <div className="seccion-comunidad">
+                <h2 style={{color: COLORES_NEON.magenta}}>❧ Comunidad del Círculo</h2>
+                <p>Tu espacio para conectar, compartir y crecer junto a otros buscadores</p>
+
+                <div className="comunidad-stats">
+                  <div className="stat-item">
+                    <span className="stat-num">✦</span>
+                    <span className="stat-label">Miembros activos</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-num">☽</span>
+                    <span className="stat-label">Círculos de luna</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-num">❧</span>
+                    <span className="stat-label">Historias compartidas</span>
+                  </div>
+                </div>
+
+                <div className="foro-seccion">
+                  <div className="foro-titulo">
+                    <span className="foro-icono">📋</span>
+                    <div>
+                      <h3>Tablero de Experiencias</h3>
+                      <p>Compartí tu camino con los guardianes</p>
+                    </div>
+                  </div>
+                  <div className="foro-estado">
+                    <span className="estado-badge">En desarrollo</span>
+                    <p>Estamos creando un espacio sagrado para que puedas compartir tus experiencias, sueños y descubrimientos con otros miembros del Círculo.</p>
+                  </div>
+                </div>
+
+                <div className="comunidad-features">
+                  <div className="feature-card">
+                    <span style={{color: COLORES_NEON.magenta}}>💬</span>
+                    <h4>Historias con Guardianes</h4>
+                    <p>Contá cómo te conectaste con tu guardián y qué aprendiste</p>
+                  </div>
+                  <div className="feature-card">
+                    <span style={{color: COLORES_NEON.celeste}}>🌙</span>
+                    <h4>Círculos Lunares</h4>
+                    <p>Encuentros virtuales cada luna llena y nueva</p>
+                  </div>
+                  <div className="feature-card">
+                    <span style={{color: COLORES_NEON.verdeMosgo}}>🌿</span>
+                    <h4>Intercambio de Rituales</h4>
+                    <p>Compartí prácticas que funcionaron para vos</p>
+                  </div>
+                  <div className="feature-card">
+                    <span style={{color: COLORES_NEON.dorado}}>✨</span>
+                    <h4>Preguntas al Círculo</h4>
+                    <p>Consultá a la comunidad sobre tu camino</p>
+                  </div>
+                </div>
+
+                <div className="comunidad-cta">
+                  <p>¿Tenés algo para compartir? Escribinos a <strong>circulo@duendesuy.com</strong></p>
+                </div>
+              </div>
+            )}
+
+            {tab === 'rituales' && (
+              <div className="seccion-rituales">
+                <h2 style={{color: COLORES_NEON.dorado}}>📖 Rituales del Portal</h2>
+                <p>Prácticas sagradas para el portal de {portalActual.nombre}</p>
+                <div className="ritual-destacado">
+                  <span className="ritual-icon">{portalActual.icono}</span>
+                  <div>
+                    <h3>Ritual de {portalActual.nombre}</h3>
+                    <p>Conectá con la energía de este momento del año a través de prácticas específicas para el portal actual.</p>
+                  </div>
+                </div>
+                <div className="rituales-lista">
+                  <div className="ritual-mini">
+                    <span>🕯️</span>
+                    <span>Ritual de velas</span>
+                  </div>
+                  <div className="ritual-mini">
+                    <span>🌿</span>
+                    <span>Limpieza energética</span>
+                  </div>
+                  <div className="ritual-mini">
+                    <span>✨</span>
+                    <span>Meditación guiada</span>
+                  </div>
+                </div>
+                <p className="proximamente">✦ Rituales en preparación</p>
+              </div>
+            )}
+          </div>
+        )}
 
         <style jsx>{`
           .circulo-dark-dashboard { background: #0a0a0a; border-radius: 16px; overflow: hidden; color: #fff; font-family: 'Cormorant Garamond', serif; }
@@ -2662,6 +3401,64 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
           .acceso-btn { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #111; border: 1px solid #222; border-radius: 10px; color: #fff; font-family: 'Cinzel', serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
           .acceso-btn:hover { border-color: var(--btn-color); box-shadow: 0 0 15px var(--btn-color)30; }
           .acceso-btn span { font-size: 1.3rem; color: var(--btn-color); }
+
+          /* Tab content sections */
+          .tab-content { padding: 1.5rem; }
+          .btn-volver-inicio { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #333; color: rgba(255,255,255,0.7); padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; margin-bottom: 1.5rem; transition: all 0.3s; }
+          .btn-volver-inicio:hover { border-color: #666; color: #fff; }
+
+          .tab-content h2 { font-family: 'Tangerine', cursive; font-size: 2.2rem; margin: 0 0 0.5rem; }
+          .tab-content > p { color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; font-size: 1rem; }
+          .proximamente { text-align: center; color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 1.5rem; padding: 1rem; background: #0a0a0a; border-radius: 8px; }
+
+          /* Luna section */
+          .luna-actual { display: flex; gap: 1rem; align-items: flex-start; background: #111; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; }
+          .luna-fase { font-size: 3rem; filter: drop-shadow(0 0 10px ${COLORES_NEON.celeste}); }
+          .luna-actual h3 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0 0 0.5rem; color: ${COLORES_NEON.celeste}; }
+          .luna-actual p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.95rem; line-height: 1.5; }
+
+          /* Contenido section */
+          .contenido-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+          .contenido-card { background: #111; padding: 1.2rem; border-radius: 10px; text-align: center; border: 1px solid #222; transition: all 0.3s; }
+          .contenido-card:hover { border-color: ${COLORES_NEON.verdeMosgo}40; }
+          .contenido-card span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+          .contenido-card h4 { font-family: 'Cinzel', serif; font-size: 0.85rem; margin: 0 0 0.3rem; color: #fff; }
+          .contenido-card p { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin: 0; }
+
+          /* Comunidad section */
+          .comunidad-stats { display: flex; justify-content: space-around; padding: 1.2rem; background: linear-gradient(135deg, ${COLORES_NEON.magenta}10 0%, transparent 100%); border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid ${COLORES_NEON.magenta}20; }
+          .stat-item { text-align: center; }
+          .stat-num { font-size: 1.5rem; color: ${COLORES_NEON.magenta}; display: block; margin-bottom: 4px; }
+          .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+
+          .foro-seccion { background: #111; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+          .foro-titulo { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+          .foro-icono { font-size: 2rem; }
+          .foro-titulo h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0 0 0.3rem; color: #fff; }
+          .foro-titulo p { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin: 0; }
+          .foro-estado { background: #0a0a0a; padding: 1rem; border-radius: 8px; }
+          .estado-badge { display: inline-block; font-size: 0.7rem; background: ${COLORES_NEON.violeta}30; color: ${COLORES_NEON.violeta}; padding: 4px 12px; border-radius: 20px; margin-bottom: 0.8rem; }
+          .foro-estado p { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin: 0; line-height: 1.5; }
+
+          .comunidad-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+          .feature-card { background: #111; padding: 1rem; border-radius: 10px; border: 1px solid #1a1a1a; transition: all 0.3s; }
+          .feature-card:hover { border-color: #333; }
+          .feature-card span { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+          .feature-card h4 { font-family: 'Cinzel', serif; font-size: 0.8rem; margin: 0 0 0.3rem; color: #fff; }
+          .feature-card p { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin: 0; line-height: 1.4; }
+
+          .comunidad-cta { text-align: center; padding: 1rem; background: #0a0a0a; border-radius: 8px; }
+          .comunidad-cta p { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin: 0; }
+          .comunidad-cta strong { color: ${COLORES_NEON.magenta}; }
+
+          /* Rituales section */
+          .ritual-destacado { display: flex; gap: 1rem; align-items: flex-start; background: linear-gradient(135deg, #1a1a0a 0%, #111 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid ${COLORES_NEON.dorado}30; margin-bottom: 1rem; }
+          .ritual-icon { font-size: 3rem; filter: drop-shadow(0 0 10px ${COLORES_NEON.dorado}); }
+          .ritual-destacado h3 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0 0 0.5rem; color: ${COLORES_NEON.dorado}; }
+          .ritual-destacado p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.95rem; line-height: 1.5; }
+          .rituales-lista { display: flex; flex-direction: column; gap: 8px; }
+          .ritual-mini { display: flex; align-items: center; gap: 12px; background: #111; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; color: rgba(255,255,255,0.8); }
+          .ritual-mini span:first-child { font-size: 1.2rem; }
         `}</style>
       </div>
     );
@@ -2698,6 +3495,7 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
           <div className="beneficio"><span style={{color: COLORES_NEON.verdeMosgo}}>🕯️</span> Rituales y prácticas exclusivas</div>
           <div className="beneficio"><span style={{color: COLORES_NEON.dorado}}>❧</span> Comunidad privada de buscadores</div>
           <div className="beneficio"><span style={{color: COLORES_NEON.violeta}}>◈</span> 5-10% OFF en guardianes</div>
+          <div className="beneficio destacado"><span style={{color: COLORES_NEON.dorado}}>🎁</span> <strong>100 runas de regalo</strong> para usar en la tienda</div>
         </div>
 
         <h3>Elegí tu membresía</h3>
@@ -2706,15 +3504,15 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
         <div className="membresias-grid">
           <a href="https://duendesuy.10web.cloud/producto/circulo-semestral/" target="_blank" rel="noopener" className="membresia-card">
             <h4>Semestral</h4>
-            <div className="precio">{esUY ? '$3.600' : '$90'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
+            <div className="precio">{esUY ? '$2.000' : '$50'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
             <span className="duracion">6 meses de magia</span>
           </a>
           <a href="https://duendesuy.10web.cloud/producto/circulo-anual/" target="_blank" rel="noopener" className="membresia-card destacada">
             <span className="badge-mejor">Mejor valor</span>
             <h4>Anual</h4>
-            <div className="precio">{esUY ? '$5.900' : '$150'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
+            <div className="precio">{esUY ? '$3.200' : '$80'}<small>{esUY ? 'UYU' : 'USD'}</small></div>
             <span className="duracion">12 meses de magia</span>
-            <span className="ahorro">Ahorrás 25%</span>
+            <span className="ahorro">Ahorrás 20%</span>
           </a>
         </div>
       </div>
@@ -2737,6 +3535,8 @@ function CirculoSec({ usuario, setUsuario, token, pais }) {
         .beneficios-lista { text-align: left; max-width: 320px; margin: 0 auto 2rem; }
         .beneficio { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 1rem; color: rgba(255,255,255,0.85); border-bottom: 1px solid #1a1a1a; }
         .beneficio span { font-size: 1.2rem; }
+        .beneficio.destacado { background: linear-gradient(90deg, ${COLORES_NEON.dorado}15 0%, transparent 100%); padding: 12px 10px; margin: 8px -10px; border-radius: 8px; border-bottom: none; }
+        .beneficio.destacado strong { color: ${COLORES_NEON.dorado}; }
 
         .circulo-modal h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0 0 0.3rem; color: #fff; letter-spacing: 1px; }
         .pago-unico { font-size: 0.85rem; color: ${COLORES_NEON.verdeMosgo}; margin-bottom: 1.5rem; }
@@ -3689,10 +4489,58 @@ const FAQS = [
         a: 'Depende del uso. Si trabajás mucho con ellos, una vez por semana. Si son decorativos, una vez al mes en luna llena es suficiente. Confía en tu intuición - si sentís que lo necesitan, limpiálos.'
       }
     ]
+  },
+  {
+    categoria: 'Acceso y Login',
+    preguntas: [
+      {
+        q: '¿Cómo entro a Mi Magia?',
+        a: 'Para entrar solo necesitás tu email. Vas a /mi-magia, ponés tu email, y te enviamos un "enlace mágico" que te permite entrar sin contraseña. El enlace es válido por 30 minutos.'
+      },
+      {
+        q: '¿Por qué no usan contraseña?',
+        a: 'Usamos "Magic Link" (enlace mágico) porque es más seguro y más fácil. No tenés que recordar ninguna contraseña, no hay riesgo de que te la roben, y es más rápido. Es el mismo sistema que usan apps como Notion y Slack.'
+      },
+      {
+        q: '¿Tengo que pedir el enlace cada vez?',
+        a: 'No. Una vez que entrás, quedás conectada por 30 días en ese dispositivo. Solo necesitás pedir un nuevo enlace si: cambiás de dispositivo, borrás los datos del navegador, o pasaron más de 30 días.'
+      },
+      {
+        q: '¿Y si no me llega el email?',
+        a: 'Revisá la carpeta de spam o correo no deseado. Si no está ahí, esperá unos minutos y volvé a intentar. Si sigue sin llegar, escribinos a hola@duendesuy.com'
+      },
+      {
+        q: '¿Es seguro?',
+        a: 'Muy seguro. El enlace es único, expira en 30 minutos, y solo funciona una vez. Nadie puede entrar a tu cuenta sin acceso a tu email.'
+      }
+    ]
+  },
+  {
+    categoria: 'Guía y Tour',
+    preguntas: [
+      {
+        q: '¿Cómo funciona Mi Magia?',
+        a: 'Mi Magia es tu portal personal en Duendes del Uruguay. Desde acá podés usar tus runas para experiencias, escribir en tu grimorio, ver tus guardianes adoptados, y acceder al Círculo si sos miembro.',
+        esTour: true
+      },
+      {
+        q: '¿Qué puedo hacer con las runas?',
+        a: 'Las runas te permiten acceder a experiencias como tiradas de runas, susurros del guardián, oráculos del mes, lecturas del alma y más. Cada experiencia tiene un costo diferente en runas.'
+      },
+      {
+        q: '¿Qué es el Grimorio?',
+        a: 'El Grimorio es tu diario mágico personal. Podés escribir tus sueños, reflexiones, rituales que hiciste, y ver el calendario lunar para planificar tus prácticas. Todo queda guardado para siempre.'
+      },
+      {
+        q: '¿Puedo volver a ver el tour de bienvenida?',
+        a: 'Sí, podés ver el tour cuando quieras tocando el botón "Ver Tour" más abajo.',
+        mostrarBotonTour: true
+      }
+    ]
   }
 ];
 
-function FaqSec() {
+function FaqSec({ onVerTour }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(FAQS[0].categoria);
   const [preguntaAbierta, setPreguntaAbierta] = useState(null);
 
@@ -3731,11 +4579,31 @@ function FaqSec() {
             {preguntaAbierta === i && (
               <div className="faq-respuesta">
                 <p>{faq.a}</p>
+                {faq.mostrarBotonTour && onVerTour && (
+                  <button className="btn-gold btn-tour-faq" onClick={onVerTour}>
+                    ✨ Ver Tour de Mi Magia
+                  </button>
+                )}
               </div>
             )}
           </div>
         ))}
       </div>
+
+      {categoriaAbierta === 'Guía y Tour' && onVerTour && (
+        <div className="faq-tour-box">
+          <div className="tour-box-content">
+            <span className="tour-box-icon">🎓</span>
+            <div>
+              <h3>¿Primera vez acá?</h3>
+              <p>Hacé el tour para conocer todo lo que podés hacer en Mi Magia.</p>
+            </div>
+          </div>
+          <button className="btn-gold" onClick={onVerTour}>
+            ✨ Iniciar Tour
+          </button>
+        </div>
+      )}
 
       <div className="faq-contacto">
         <h3>¿No encontraste lo que buscabas?</h3>
@@ -3744,6 +4612,53 @@ function FaqSec() {
           💬 Contactar por WhatsApp
         </a>
       </div>
+
+      <style jsx>{`
+        .btn-tour-faq {
+          margin-top: 1rem;
+          display: block;
+        }
+        .faq-tour-box {
+          background: linear-gradient(135deg, #1a1a0a 0%, #111 100%);
+          border: 1px solid #d4af3740;
+          border-radius: 12px;
+          padding: 1.5rem;
+          margin: 2rem 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+        .tour-box-content {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        .tour-box-icon {
+          font-size: 2.5rem;
+        }
+        .tour-box-content h3 {
+          margin: 0 0 0.3rem;
+          color: #d4af37;
+          font-family: 'Cinzel', serif;
+          font-size: 1.1rem;
+        }
+        .tour-box-content p {
+          margin: 0;
+          color: rgba(255,255,255,0.7);
+          font-size: 0.95rem;
+        }
+        @media (max-width: 500px) {
+          .faq-tour-box {
+            flex-direction: column;
+            text-align: center;
+          }
+          .tour-box-content {
+            flex-direction: column;
+          }
+        }
+      `}</style>
     </div>
   );
 }

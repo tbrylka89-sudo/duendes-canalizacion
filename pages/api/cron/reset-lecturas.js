@@ -7,11 +7,11 @@
 import { kv } from '@vercel/kv';
 
 // Beneficios por plan
+// Semestral: $50 USD | Anual: $80 USD
 const BENEFICIOS_PLAN = {
-  'mensual': { tiradas: 1, susurros: 0, runas: 10, treboles: 2 },
-  'trimestral': { tiradas: 2, susurros: 0, runas: 15, treboles: 4 },
-  'semestral': { tiradas: 2, susurros: 1, runas: 20, treboles: 6 },
-  'anual': { tiradas: 3, susurros: 2, runas: 25, treboles: 10 }
+  'trial': { tiradas: 1, susurros: 0, runas: 10, treboles: 2 },
+  'semestral': { tiradas: 2, susurros: 1, runas: 15, treboles: 5 },
+  'anual': { tiradas: 5, susurros: 2, runas: 25, treboles: 10 }
 };
 
 export default async function handler(req, res) {
