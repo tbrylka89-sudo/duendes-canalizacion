@@ -1,6 +1,6 @@
 # PROGRESO: Sistema de Gamificación Duendes del Uruguay
 
-**Última actualización:** 2026-01-17 15:45
+**Última actualización:** 2026-01-17 17:00
 
 ---
 
@@ -109,15 +109,67 @@ WordPress mu-plugins:
 - duendes-circulo-landing.php (landing del círculo)
 ```
 
+### Análisis de infraestructura existente (2026-01-17 16:00)
+
+- [x] Base de datos: **Vercel KV (Redis/Upstash)**
+- [x] Sistema de usuarios ya existe con: runas, treboles, guardianes, lecturas
+- [x] Webhooks WooCommerce ya configurados en `/api/webhooks/woocommerce`
+- [x] Sistema de experiencias parcialmente implementado
+- [x] Packs de runas ya definidos (pero hardcodeados en frontend)
+
+### Configuración de gamificación (2026-01-17 16:15)
+
+- [x] Crear `lib/gamificacion/config.js` con toda la configuración central
+  - Niveles y XP
+  - Sistema de rachas
+  - Paquetes de runas
+  - Membresías
+  - Catálogo de 30+ lecturas
+  - Misiones
+  - Badges
+  - Referidos
+  - Helpers para obtener datos
+
+### APIs de gamificación (2026-01-17 17:00)
+
+- [x] `app/api/gamificacion/usuario/route.js`
+  - GET: datos de gamificación con nivel calculado
+  - POST: acciones (login_diario, lectura_completada, compra, referido, mision_completada, publicacion_foro)
+- [x] `app/api/gamificacion/cofre-diario/route.js`
+  - Rueda de probabilidades (1-10 runas)
+  - Sistema de rachas con bonuses
+- [x] `app/api/gamificacion/lecturas/route.js`
+  - Catálogo filtrado por nivel y requisitos
+  - Eventos de luna llena/nueva
+  - Portales estacionales
+  - Descuentos para miembros Círculo
+
 ---
 
 ## 4. EN PROGRESO 🔄
 
-**Fase 1: Productos WooCommerce + Base de datos**
+**Fase 1: APIs de gamificación - COMPLETADA ✅**
 
-- [ ] Crear productos de paquetes de runas en WooCommerce
-- [ ] Crear/verificar productos de membresías
-- [ ] Diseñar esquema de base de datos para runas/usuarios
+APIs creadas:
+- ✅ `lib/gamificacion/config.js` - Configuración central (747 líneas)
+- ✅ `app/api/gamificacion/usuario/route.js` - GET/POST datos gamificación
+  - GET: obtener nivel, XP, racha, badges, estado cofre
+  - POST: registrar acciones (login, lectura, compra, referido, misión, foro)
+- ✅ `app/api/gamificacion/cofre-diario/route.js` - Sistema de cofre diario
+  - Rueda de runas con probabilidades ponderadas
+  - Bonuses por racha (7, 14, 30, 60, 100 días)
+  - Lecturas gratis y badges de recompensa
+- ✅ `app/api/gamificacion/lecturas/route.js` - Catálogo de lecturas
+  - GET: catálogo completo filtrado por nivel/guardián/membresía
+  - POST: detalle de lectura específica con acceso y precios
+  - Eventos de luna llena/nueva con calendario real
+  - Portales estacionales con fechas exactas
+  - Descuentos automáticos para miembros del Círculo
+
+**Siguiente paso - Fase 2:**
+- [ ] Crear API para ejecutar lectura: `/api/gamificacion/ejecutar-lectura`
+- [ ] Integrar con sistema de experiencias existente
+- [ ] Crear UI del cofre diario en Mi Magia
 
 ---
 
