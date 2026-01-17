@@ -776,7 +776,7 @@ function TiendaRunas({ usuario, onCompra }) {
         {PAQUETES_RUNAS_UI.map((paquete, index) => (
           <a
             key={paquete.id}
-            href={`https://duendesuy.10web.cloud/producto/${paquete.slug}/`}
+            href={`https://duendesuy.10web.cloud/product/${paquete.slug}/`}
             target="_blank"
             rel="noopener noreferrer"
             className={`paquete-card ${paquete.popular ? 'popular' : ''} ${paquete.destacado ? 'destacado' : ''}`}

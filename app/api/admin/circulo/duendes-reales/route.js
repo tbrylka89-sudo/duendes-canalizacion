@@ -148,14 +148,14 @@ export async function POST(request) {
 
       case 'sincronizar-woo': {
         // Intentar obtener productos de WooCommerce
-        const WOO_URL = 'https://duendesuy.10web.cloud';
-        const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-        const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+        const WOO_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+        const WOO_KEY = process.env.WC_CONSUMER_KEY;
+        const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
 
         if (!WOO_KEY || !WOO_SECRET) {
           return Response.json({
             success: false,
-            error: 'Credenciales de WooCommerce no configuradas. Agrega los duendes manualmente.'
+            error: 'Credenciales de WooCommerce no configuradas (WC_CONSUMER_KEY, WC_CONSUMER_SECRET). Agrega los duendes manualmente.'
           }, { status: 400 });
         }
 

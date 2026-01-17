@@ -1653,8 +1653,8 @@ async function queHacerHoy() {
 
   // Revisar ordenes pendientes
   try {
-    const WOO_KEY = process.env.WOO_CONSUMER_KEY;
-    const WOO_SECRET = process.env.WOO_CONSUMER_SECRET;
+    const WOO_KEY = process.env.WC_CONSUMER_KEY;
+    const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
     if (WOO_KEY && WOO_SECRET) {
       const auth = Buffer.from(`${WOO_KEY}:${WOO_SECRET}`).toString('base64');
       const res = await fetch(
