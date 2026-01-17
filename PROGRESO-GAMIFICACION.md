@@ -1,6 +1,6 @@
 # PROGRESO: Sistema de Gamificación Duendes del Uruguay
 
-**Última actualización:** 2026-01-17 17:00
+**Última actualización:** 2026-01-17 17:10
 
 ---
 
@@ -33,6 +33,7 @@ Sistema de gamificación tipo videojuegos/casinos para Duendes del Uruguay:
 
 | Plan | Precio | Runas Bienvenida | Runas/Mes | Slug |
 |------|--------|------------------|-----------|------|
+| Mensual | $15 | 20 | 12 | circulo-mensual |
 | Seis Meses | $50 | 60 | 15 | circulo-seis-meses |
 | Anual | $80 | 120 | 25 | circulo-anual |
 
