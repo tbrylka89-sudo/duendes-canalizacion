@@ -1,11 +1,32 @@
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import { Resend } from 'resend';
+import { PAQUETES_RUNAS, MEMBRESIAS, XP_ACCIONES, obtenerNivel } from '@/lib/gamificacion/config';
 
 // ═══════════════════════════════════════════════════════════════
 // WEBHOOK DE WOOCOMMERCE - COMPRA COMPLETADA
 // Maneja: Guardianes, Runas de Poder, Membresías del Círculo
 // ═══════════════════════════════════════════════════════════════
+
+// Mapa de paquetes de runas por SKU y slug para lookup rápido
+const RUNAS_POR_SKU = {};
+const RUNAS_POR_SLUG = {};
+for (const paquete of PAQUETES_RUNAS) {
+  RUNAS_POR_SKU[paquete.sku.toLowerCase()] = paquete;
+  RUNAS_POR_SLUG[paquete.slug.toLowerCase()] = paquete;
+}
+
+// Mapa de membresías por SKU y slug
+const MEMBRESIAS_POR_SKU = {};
+const MEMBRESIAS_POR_SLUG = {};
+for (const [key, membresia] of Object.entries(MEMBRESIAS)) {
+  if (membresia.sku) {
+    MEMBRESIAS_POR_SKU[membresia.sku.toLowerCase()] = membresia;
+  }
+  if (membresia.slug) {
+    MEMBRESIAS_POR_SLUG[membresia.slug.toLowerCase()] = membresia;
+  }
+}
 
 export async function POST(request) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -51,34 +72,55 @@ export async function POST(request) {
     
     for (const item of items) {
       const sku = item.sku?.toLowerCase() || '';
+      const slug = item.slug?.toLowerCase() || '';
       const categorias = item.meta_data?.find(m => m.key === '_category_slugs')?.value || [];
       const categoriasArray = Array.isArray(categorias) ? categorias : [categorias];
-      
+
       // Detectar tipo de producto
-      if (sku.startsWith('runas-de-poder-') || categoriasArray.includes('monedas')) {
+      // 1. Buscar por SKU/slug en paquetes de runas de gamificación
+      const paqueteRunas = RUNAS_POR_SKU[sku] || RUNAS_POR_SLUG[slug] ||
+        PAQUETES_RUNAS.find(p => sku.includes(p.id) || item.name?.toLowerCase().includes(p.nombre.toLowerCase()));
+
+      if (paqueteRunas || sku.startsWith('runas-de-poder-') || sku.startsWith('runas-') || categoriasArray.includes('monedas') || categoriasArray.includes('runas')) {
         // Es compra de Runas de Poder
-        const cantidadRunas = extraerCantidadRunas(sku, item.name);
+        let cantidadRunas = 0;
+        let bonusRunas = 0;
+
+        if (paqueteRunas) {
+          // Paquete conocido de gamificación - incluye bonus
+          cantidadRunas = paqueteRunas.runas;
+          bonusRunas = paqueteRunas.bonus || 0;
+        } else {
+          // Fallback: extraer de SKU/nombre
+          cantidadRunas = extraerCantidadRunas(sku, item.name);
+        }
+
         runasCompradas.push({
           nombre: item.name,
-          cantidad: cantidadRunas * item.quantity,
-          precio: item.total
+          paqueteId: paqueteRunas?.id || null,
+          cantidadBase: cantidadRunas * item.quantity,
+          bonus: bonusRunas * item.quantity,
+          cantidad: (cantidadRunas + bonusRunas) * item.quantity,
+          precio: parseFloat(item.total) || 0
         });
       }
-      else if (sku.startsWith('circulo-') || categoriasArray.includes('membresias')) {
-        // Es membresía del Círculo
+      // 2. Buscar membresía del Círculo
+      else if (MEMBRESIAS_POR_SKU[sku] || MEMBRESIAS_POR_SLUG[slug] || sku.startsWith('circulo-') || categoriasArray.includes('membresias')) {
+        const membresiaConfig = MEMBRESIAS_POR_SKU[sku] || MEMBRESIAS_POR_SLUG[slug] || null;
         membresias.push({
           nombre: item.name,
           sku: sku,
-          precio: item.total
+          precio: parseFloat(item.total) || 0,
+          config: membresiaConfig // Info de gamificación si existe
         });
       }
+      // 3. Guardianes
       else if (categoriasArray.some(c => ['proteccion', 'abundancia', 'amor', 'salud', 'sanacion'].includes(c))) {
-        // Es un guardián
         guardianes.push({
           id: item.product_id,
           nombre: item.name,
           categoria: categoriasArray[0],
-          precio: item.total,
+          precio: parseFloat(item.total) || 0,
           fecha: new Date().toISOString(),
           imagen: item.image?.src || null
         });
@@ -102,13 +144,67 @@ export async function POST(request) {
     // ═══════════════════════════════════════════════════════════
 
     if (runasCompradas.length > 0) {
+      const totalRunasBase = runasCompradas.reduce((sum, r) => sum + r.cantidadBase, 0);
+      const totalBonus = runasCompradas.reduce((sum, r) => sum + r.bonus, 0);
       const totalRunas = runasCompradas.reduce((sum, r) => sum + r.cantidad, 0);
+      const totalGastado = runasCompradas.reduce((sum, r) => sum + r.precio, 0);
+
       elegido.runas = (elegido.runas || 0) + totalRunas;
-      
-      console.log(`Agregadas ${totalRunas} Runas de Poder a ${email}`);
-      
-      // Enviar email confirmando runas
-      await enviarEmailRunas(resend, email, nombre, totalRunas, elegido.runas, elegido.token);
+
+      console.log(`Agregadas ${totalRunas} Runas de Poder a ${email} (${totalRunasBase} base + ${totalBonus} bonus)`);
+
+      // === GAMIFICACIÓN: Actualizar XP por compra ===
+      try {
+        let gamificacion = await kv.get(`gamificacion:${email}`);
+
+        if (!gamificacion) {
+          gamificacion = {
+            xp: 0,
+            nivel: 'iniciada',
+            racha: 0,
+            rachaMax: 0,
+            ultimoLogin: null,
+            ultimoCofre: null,
+            lecturasCompletadas: [],
+            tiposLecturaUsados: [],
+            misionesCompletadas: [],
+            badges: [],
+            referidos: [],
+            codigoReferido: null,
+            comprasRunas: [],
+            creadoEn: new Date().toISOString()
+          };
+        }
+
+        // XP por compra: 1 XP por cada dólar gastado
+        const xpGanado = Math.floor(totalGastado * XP_ACCIONES.compraPorDolar);
+        gamificacion.xp = (gamificacion.xp || 0) + xpGanado;
+
+        // Registrar compra
+        if (!gamificacion.comprasRunas) gamificacion.comprasRunas = [];
+        gamificacion.comprasRunas.push({
+          fecha: new Date().toISOString(),
+          ordenId,
+          runas: totalRunas,
+          bonus: totalBonus,
+          gastado: totalGastado,
+          xpGanado
+        });
+
+        // Actualizar nivel si corresponde
+        const nuevoNivel = obtenerNivel(gamificacion.xp);
+        const subioNivel = nuevoNivel.id !== gamificacion.nivel;
+        gamificacion.nivel = nuevoNivel.id;
+
+        await kv.set(`gamificacion:${email}`, gamificacion);
+
+        console.log(`Gamificación: +${xpGanado} XP, nivel: ${nuevoNivel.nombre}${subioNivel ? ' (¡SUBIÓ!)' : ''}`);
+      } catch (gamError) {
+        console.error('Error actualizando gamificación:', gamError);
+      }
+
+      // Enviar email confirmando runas (incluye bonus si hay)
+      await enviarEmailRunas(resend, email, nombre, totalRunas, totalBonus, elegido.runas, elegido.token);
     }
     
     // ═══════════════════════════════════════════════════════════
@@ -117,32 +213,49 @@ export async function POST(request) {
     
     if (membresias.length > 0) {
       for (const membresia of membresias) {
-        const diasMembresia = calcularDiasMembresia(membresia.sku);
-        
+        const membresiaConfig = membresia.config;
+        const diasMembresia = membresiaConfig ? (membresiaConfig.meses * 30) : calcularDiasMembresia(membresia.sku);
+
         let circulo = await kv.get(`circulo:${email}`) || {
           activo: false,
           plan: null,
           expira: null
         };
-        
-        const fechaBase = circulo.expira && new Date(circulo.expira) > new Date() 
-          ? new Date(circulo.expira) 
+
+        const fechaBase = circulo.expira && new Date(circulo.expira) > new Date()
+          ? new Date(circulo.expira)
           : new Date();
-        
+
         const nuevaExpiracion = new Date(fechaBase);
         nuevaExpiracion.setDate(nuevaExpiracion.getDate() + diasMembresia);
-        
+
         circulo.activo = true;
-        circulo.plan = membresia.sku;
+        circulo.plan = membresiaConfig?.id || membresia.sku;
+        circulo.planNombre = membresiaConfig?.nombre || membresia.nombre;
         circulo.expira = nuevaExpiracion.toISOString();
         circulo.ultimaCompra = new Date().toISOString();
-        
+        circulo.descuentoTienda = membresiaConfig?.descuentoTienda || 0;
+        circulo.runasMensuales = membresiaConfig?.runasMensuales || 0;
+
         await kv.set(`circulo:${email}`, circulo);
-        
-        console.log(`Membresía ${membresia.sku} activada para ${email} hasta ${nuevaExpiracion}`);
-        
+
+        // También guardar en el elegido para fácil acceso
+        elegido.circulo = {
+          activo: true,
+          plan: circulo.plan,
+          expira: circulo.expira
+        };
+
+        // Dar runas de bienvenida si tiene config
+        if (membresiaConfig?.runasBienvenida > 0) {
+          elegido.runas = (elegido.runas || 0) + membresiaConfig.runasBienvenida;
+          console.log(`Runas de bienvenida del Círculo: +${membresiaConfig.runasBienvenida}`);
+        }
+
+        console.log(`Membresía ${circulo.planNombre || membresia.sku} activada para ${email} hasta ${nuevaExpiracion}`);
+
         // Enviar email de bienvenida al Círculo
-        await enviarEmailCirculo(resend, email, nombre, membresia.sku, nuevaExpiracion, elegido.token);
+        await enviarEmailCirculo(resend, email, nombre, circulo.planNombre || membresia.sku, nuevaExpiracion, membresiaConfig?.runasBienvenida || 0, elegido.token);
       }
     }
     
@@ -251,9 +364,10 @@ function extraerCantidadRunas(sku, nombre) {
 }
 
 function calcularDiasMembresia(sku) {
-  if (sku.includes('semestral')) return 180;
-  if (sku.includes('anual')) return 365;
-  return 180; // Default: semestral
+  if (sku.includes('mensual') || sku.includes('1m')) return 30;
+  if (sku.includes('semestral') || sku.includes('seis-meses') || sku.includes('6m')) return 180;
+  if (sku.includes('anual') || sku.includes('12m')) return 365;
+  return 30; // Default: mensual
 }
 
 function calcularNivel(totalCompras) {
@@ -473,10 +587,14 @@ async function generarTarjetaQR(kv, ordenId, email, nombreCliente, guardian) {
 // EMAILS
 // ═══════════════════════════════════════════════════════════════
 
-async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRunas, token) {
+async function enviarEmailRunas(resend, email, nombre, runasAgregadas, bonusRunas, totalRunas, token) {
   const linkMiMagia = token
     ? `https://duendes-vercel.vercel.app/mi-magia?token=${token}`
     : 'https://duendes-vercel.vercel.app/mi-magia';
+
+  const bonusMsg = bonusRunas > 0
+    ? `<p style="background: rgba(46,204,113,0.15); border: 1px solid rgba(46,204,113,0.3); border-radius: 10px; padding: 12px; text-align: center; color: #2ecc71;">🎁 ¡Incluye <strong>${bonusRunas} runas de regalo</strong>!</p>`
+    : '';
 
   try {
     await resend.emails.send({
@@ -489,10 +607,16 @@ async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRuna
             <h1 style="color: #d4af37; text-align: center;">ᚱ Runas de Poder</h1>
             <p>Hola ${nombre},</p>
             <p>Se agregaron <strong style="color: #d4af37;">${runasAgregadas} Runas de Poder</strong> a tu cuenta.</p>
+            ${bonusMsg}
             <p>Ahora tenés un total de <strong style="color: #d4af37;">${totalRunas} Runas</strong> para usar en experiencias mágicas.</p>
+            <div style="background: rgba(212,175,55,0.1); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
+              <p style="margin: 0 0 10px; font-size: 14px; color: rgba(255,255,255,0.7);">¿Qué podés hacer con tus runas?</p>
+              <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.5);">Tiradas de runas · Lecturas del alma · Oráculos · Registros akáshicos</p>
+            </div>
             <p style="text-align: center; margin-top: 30px;">
-              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Ir a Mi Magia</a>
+              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Usar mis runas ✦</a>
             </p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 12px; text-align: center; margin-top: 25px;">Tus runas nunca expiran. Usalas cuando quieras.</p>
           </div>
         </div>
       `
@@ -502,11 +626,18 @@ async function enviarEmailRunas(resend, email, nombre, runasAgregadas, totalRuna
   }
 }
 
-async function enviarEmailCirculo(resend, email, nombre, plan, expira, token) {
+async function enviarEmailCirculo(resend, email, nombre, plan, expira, runasBienvenida, token) {
   const fechaExpira = new Date(expira).toLocaleDateString('es-UY');
   const linkMiMagia = token
     ? `https://duendes-vercel.vercel.app/mi-magia?token=${token}`
     : 'https://duendes-vercel.vercel.app/mi-magia';
+
+  const runasMsg = runasBienvenida > 0
+    ? `<div style="background: rgba(46,204,113,0.15); border: 1px solid rgba(46,204,113,0.3); border-radius: 10px; padding: 15px; text-align: center; margin: 20px 0;">
+        <p style="margin: 0; color: #2ecc71; font-size: 16px;">🎁 ¡Regalo de bienvenida!</p>
+        <p style="margin: 5px 0 0; color: #d4af37; font-size: 24px; font-weight: bold;">${runasBienvenida} ᚱ Runas</p>
+      </div>`
+    : '';
 
   try {
     await resend.emails.send({
@@ -518,17 +649,20 @@ async function enviarEmailCirculo(resend, email, nombre, plan, expira, token) {
           <div style="max-width: 500px; margin: 0 auto; background: #141420; padding: 40px; border-radius: 15px; border: 1px solid rgba(212,175,55,0.2);">
             <h1 style="color: #d4af37; text-align: center;">⭐ Círculo de Duendes</h1>
             <p>Bienvenida al Santuario, ${nombre}.</p>
-            <p>Tu membresía está activa hasta el <strong style="color: #d4af37;">${fechaExpira}</strong>.</p>
+            <p>Tu membresía <strong style="color: #d4af37;">${plan}</strong> está activa hasta el <strong style="color: #d4af37;">${fechaExpira}</strong>.</p>
+            ${runasMsg}
             <p>Ahora tenés acceso a:</p>
-            <ul>
+            <ul style="line-height: 1.8;">
               <li>Contenido exclusivo semanal</li>
+              <li>Foro privado de la comunidad</li>
               <li>Acceso anticipado a nuevos guardianes</li>
-              <li>Descuentos permanentes</li>
-              <li>Tiradas de runas gratis cada mes</li>
+              <li>Descuentos permanentes en la tienda</li>
+              <li>Runas mensuales de regalo</li>
             </ul>
             <p style="text-align: center; margin-top: 30px;">
-              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Entrar al Círculo</a>
+              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Entrar al Círculo ✦</a>
             </p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 12px; text-align: center; margin-top: 25px;">El Santuario te espera. No sos una más. Sos parte de la familia.</p>
           </div>
         </div>
       `

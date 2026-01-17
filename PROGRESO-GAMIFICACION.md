@@ -199,6 +199,19 @@ WordPress mu-plugins:
   - Ruta: /mi-magia → tienda_runas
   - Acceso desde: Stat de runas (con +), Botón en accesos rápidos
 
+### Webhook Runas y Membresías (2026-01-17 20:00)
+
+- [x] `app/api/webhooks/woocommerce/route.js` - Actualizado para gamificación
+  - Mapas de lookup rápido por SKU y slug para paquetes de runas
+  - Mapas de lookup para membresías del Círculo
+  - Detección automática de paquetes de runas por SKU (RUNAS-30, etc.)
+  - Bonus de runas incluidos automáticamente en compras
+  - XP por compra: 1 XP por cada dólar gastado
+  - Tracking de compras en gamificación (`comprasRunas[]`)
+  - Runas de bienvenida para membresías del Círculo
+  - Emails mejorados con info de bonus y runas de bienvenida
+  - Soporte para plan mensual del Círculo
+
 ---
 
 ## 4. EN PROGRESO 🔄
