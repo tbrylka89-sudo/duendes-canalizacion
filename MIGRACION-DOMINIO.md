@@ -1,21 +1,27 @@
 # MIGRACIÓN DE DOMINIO: Wix → WordPress (10Web)
 
-## ESTADO ACTUAL (Actualizado: 17 enero 2026)
+## ESTADO ACTUAL (Actualizado: 17 enero 2026 - 21:30)
 
 | Paso | Estado | Notas |
 |------|--------|-------|
 | DNS en Wix configurado | ✅ LISTO | A record → 34.70.139.72, CNAME www → duendesuy.10web.cloud |
 | DNS propagado | ✅ LISTO | Verificado con dig @8.8.8.8 |
-| Redirects Wix→WP instalados | ✅ LISTO | Plugin duendes-redirects-wix activo |
-| 10Web detecta dominio | ⏳ ESPERANDO | Puede tardar hasta 24hs |
-| SSL generado | ⏳ PENDIENTE | Hacer cuando 10Web diga "Pointed" |
+| Redirects Wix→WP instalados | ✅ LISTO | Plugin duendes-redirects-wix activo en servidor |
+| 10Web detecta dominio | ✅ POINTED | 10Web reconoce el dominio correctamente |
+| Make Primary | ⏳ PENDIENTE | **NO ACTIVAR AÚN** - esperando terminar detalles del sitio |
+| SSL generado | ⏳ PENDIENTE | Hacer después de Make Primary |
 | URLs WordPress actualizadas | ⏳ PENDIENTE | Hacer después del SSL |
 
-### PRÓXIMOS PASOS (cuando 10Web diga "Pointed"):
+### ⚠️ ESTADO: ESPERANDO PARA ACTIVAR
+
+El sitio NO está activo aún. Los visitantes de duendesdeluruguay.com ven página de nginx.
+Motivo: Se están terminando detalles del sitio nuevo antes de lanzar.
+
+### PRÓXIMOS PASOS (cuando el sitio esté listo para lanzar):
 
 1. En 10Web → Domains → click 3 puntitos en duendesdeluruguay.com → **Make Primary**
 2. En 10Web → Tools → SSL → **Generate Free SSL** → Seleccionar duendesdeluruguay.com → Apply
-3. Avisar a Claude para cambiar URLs de WordPress automáticamente
+3. Avisar a Claude con "listo para activar" para cambiar URLs de WordPress automáticamente
 
 ### URLs importantes:
 - **Sitio actual:** https://duendesuy.10web.cloud
