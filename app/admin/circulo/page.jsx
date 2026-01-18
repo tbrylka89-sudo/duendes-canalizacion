@@ -96,6 +96,20 @@ export default function AdminCirculo() {
         <div style={styles.titoArrow}>→</div>
       </Link>
 
+      {/* Asistente del Círculo - Chat conversacional */}
+      <Link href="/admin/circulo/asistente" style={{...styles.titoCard, borderColor: 'rgba(107, 142, 159, 0.5)', background: 'linear-gradient(135deg, rgba(107, 142, 159, 0.15), rgba(107, 142, 159, 0.05))'}}>
+        <div style={{...styles.titoIcon, background: 'linear-gradient(135deg, #6B8E9F, #4A6670)'}}>✦</div>
+        <div style={styles.titoContent}>
+          <h2 style={{...styles.titoTitle, color: '#6B8E9F'}}>Asistente del Círculo</h2>
+          <p style={styles.titoDesc}>Gestión conversacional. Decime qué necesitás y lo genero todo.</p>
+          <div style={styles.titoExamples}>
+            <span style={{...styles.titoExample, borderColor: 'rgba(107, 142, 159, 0.3)'}}>"Generá una semana de contenido"</span>
+            <span style={{...styles.titoExample, borderColor: 'rgba(107, 142, 159, 0.3)'}}>"Cambiá el duende a Ember"</span>
+          </div>
+        </div>
+        <div style={{...styles.titoArrow, color: '#6B8E9F'}}>→</div>
+      </Link>
+
       {/* Stats rápidas */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>

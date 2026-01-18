@@ -556,11 +556,12 @@ function LandingCirculo({ onTrialClick }) {
         }
 
         .que-es-imagen img {
-          width: 100%;
-          max-width: 350px;
-          border-radius: 20px;
-          border: 2px solid rgba(212, 175, 55, 0.3);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          width: 300px;
+          height: 300px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.2);
         }
 
         .imagen-caption {
