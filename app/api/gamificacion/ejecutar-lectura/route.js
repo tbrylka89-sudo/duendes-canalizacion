@@ -335,11 +335,61 @@ export async function POST(request) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GENERADOR DE LECTURAS CON IA
+// SISTEMA DE MEMORIA - Obtener lecturas anteriores
+// ═══════════════════════════════════════════════════════════════
+
+async function obtenerMemoriaLecturas(email, limiteLecturas = 10) {
+  try {
+    // Obtener historial de lecturas
+    const historial = await kv.get(`lecturas:${email}`) || [];
+
+    if (historial.length === 0) return null;
+
+    // Obtener las últimas N lecturas completas
+    const lecturasCompletas = [];
+    for (const item of historial.slice(0, limiteLecturas)) {
+      const lecturaCompleta = await kv.get(`lectura:${item.id}`);
+      if (lecturaCompleta && lecturaCompleta.resultado) {
+        lecturasCompletas.push({
+          fecha: lecturaCompleta.fechaSolicitud,
+          tipo: lecturaCompleta.lecturaNombre,
+          pregunta: lecturaCompleta.pregunta || '',
+          contexto: lecturaCompleta.contexto || '',
+          // Resumen del resultado (primeros 500 caracteres)
+          resumen: lecturaCompleta.resultado.contenido?.slice(0, 500) + '...'
+        });
+      }
+    }
+
+    if (lecturasCompletas.length === 0) return null;
+
+    // Crear resumen para la IA
+    const memoriaTexto = lecturasCompletas.map((l, i) =>
+      `[Lectura ${i + 1} - ${new Date(l.fecha).toLocaleDateString('es-UY')}]
+Tipo: ${l.tipo}
+${l.pregunta ? `Pregunta: ${l.pregunta}` : ''}
+${l.contexto ? `Contexto: ${l.contexto}` : ''}
+Resumen: ${l.resumen}`
+    ).join('\n\n');
+
+    return {
+      cantidad: lecturasCompletas.length,
+      texto: memoriaTexto,
+      lecturas: lecturasCompletas
+    };
+  } catch (error) {
+    console.error('Error obteniendo memoria:', error);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GENERADOR DE LECTURAS CON IA + MEMORIA
 // ═══════════════════════════════════════════════════════════════
 
 async function generarLecturaIA(solicitud, lectura) {
   const {
+    email,
     nombreUsuario,
     pronombre,
     elemento,
@@ -348,6 +398,9 @@ async function generarLecturaIA(solicitud, lectura) {
     pregunta,
     fechaNacimiento
   } = solicitud;
+
+  // MEMORIA: Obtener lecturas anteriores del usuario
+  const memoria = await obtenerMemoriaLecturas(email);
 
   // Prompt base según categoría
   const promptsPorCategoria = {
@@ -411,19 +464,76 @@ Pronombre: ${pronombre}.`,
 
   const categoriaConfig = promptsPorCategoria[lectura.categoria] || promptsPorCategoria.lecturas;
 
+  // Construir sección de memoria si existe
+  let seccionMemoria = '';
+  if (memoria && memoria.cantidad > 0) {
+    seccionMemoria = `
+═══════════════════════════════════════════════════════════════
+MEMORIA - LECTURAS ANTERIORES DE ${nombreUsuario.toUpperCase()}
+═══════════════════════════════════════════════════════════════
+${nombreUsuario} ya ha recibido ${memoria.cantidad} lecturas anteriores.
+USA ESTA INFORMACIÓN para:
+- NO repetir consejos ya dados
+- Hacer referencias a lo que ya trabajaron juntos
+- Notar su evolución y crecimiento
+- Profundizar en temas recurrentes
+- Personalizar basándote en su historial
+
+RESÚMENES DE LECTURAS ANTERIORES:
+${memoria.texto}
+═══════════════════════════════════════════════════════════════
+`;
+  }
+
   const systemPrompt = `${categoriaConfig.system}
 
 LECTURA: ${lectura.nombre}
 DESCRIPCIÓN: ${lectura.descripcion}
-
+${seccionMemoria}
 REGLAS CRÍTICAS:
 - Mínimo ${lectura.palabras} palabras (OBLIGATORIO)
 - Español rioplatense natural (vos, tenés, podés)
 - Profundo, significativo y personalizado
 - ${categoriaConfig.instrucciones}
+${memoria ? `- IMPORTANTE: ${nombreUsuario} ya tiene ${memoria.cantidad} lecturas previas. Reconocé su camino y evolución. NO repitas consejos.` : `- Esta es posiblemente su primera lectura. Dale una bienvenida especial.`}
 - Firmá como parte de la familia Duendes del Uruguay`;
 
-  const userPrompt = `Generá "${lectura.nombre}" para ${nombreUsuario}.
+  // Usar promptBase de la lectura si existe, sino prompt genérico
+  let userPrompt;
+
+  if (lectura.promptBase) {
+    // Reemplazar variables en el promptBase
+    userPrompt = lectura.promptBase
+      .replace(/\{nombre\}/g, nombreUsuario)
+      .replace(/\{pronombre\}/g, pronombre || 'ella')
+      .replace(/\{elemento\}/g, elemento || 'no especificado')
+      .replace(/\{momentoVida\}/g, solicitud.momentoVida || contexto || 'no especificado')
+      .replace(/\{preguntaEspecifica\}/g, pregunta || 'guía general')
+      .replace(/\{pregunta\}/g, pregunta || 'guía general')
+      .replace(/\{contexto\}/g, contexto || '')
+      .replace(/\{areaVida\}/g, solicitud.areaVida || 'general')
+      .replace(/\{intencion\}/g, solicitud.intencion || '')
+      .replace(/\{fechaNacimiento\}/g, fechaNacimiento || 'no proporcionada')
+      .replace(/\{horaNacimiento\}/g, solicitud.horaNacimiento || 'no proporcionada')
+      .replace(/\{lugarNacimiento\}/g, solicitud.lugarNacimiento || 'no proporcionado')
+      .replace(/\{nombreGuardian\}/g, guardianes?.[0]?.nombre || guardianes?.[0] || 'Guardián del Bosque')
+      .replace(/\{tipoGuardian\}/g, solicitud.tipoGuardian || guardianes?.[0]?.tipo || 'guardián')
+      .replace(/\{descripcionHogar\}/g, solicitud.descripcionHogar || '')
+      .replace(/\{preocupaciones\}/g, solicitud.preocupaciones || '')
+      .replace(/\{elementoAfinidad\}/g, solicitud.elementoAfinidad || elemento || '')
+      .replace(/\{cristalesTiene\}/g, solicitud.cristalesTiene || 'ninguno mencionado')
+      .replace(/\{relacionPersona\}/g, solicitud.relacionPersona || '')
+      .replace(/\{situacionRelacion\}/g, solicitud.situacionRelacion || '')
+      .replace(/\{fecha\}/g, new Date().toLocaleDateString('es-UY'))
+      .replace(/\{mes_actual\}/g, new Date().toLocaleDateString('es-UY', { month: 'long' }));
+
+    // Agregar recordatorio de memoria si tiene lecturas previas
+    if (memoria && memoria.cantidad > 0) {
+      userPrompt += `\n\nRECORDÁ: ${nombreUsuario} ya tiene ${memoria.cantidad} lecturas previas contigo. Reconocé su camino, no repitas consejos y mostrá que la conocés.`;
+    }
+  } else {
+    // Prompt genérico fallback
+    userPrompt = `Generá "${lectura.nombre}" para ${nombreUsuario}.
 
 ${elemento ? `Elemento: ${elemento}` : ''}
 ${guardianes?.length > 0 ? `Guardián: ${guardianes[0]?.nombre || guardianes[0]}` : ''}
@@ -431,7 +541,8 @@ ${pregunta ? `Pregunta: ${pregunta}` : ''}
 ${contexto ? `Contexto: ${contexto}` : ''}
 ${fechaNacimiento ? `Fecha de nacimiento: ${fechaNacimiento}` : ''}
 
-Mínimo ${lectura.palabras} palabras. Que sea profundo, personal y memorable.`;
+Mínimo ${lectura.palabras} palabras. Que sea profundo, personal y memorable.${memoria ? `\n\nIMPORTANTE: Ya tiene ${memoria.cantidad} lecturas previas. Reconocé su evolución.` : ''}`;
+  }
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',

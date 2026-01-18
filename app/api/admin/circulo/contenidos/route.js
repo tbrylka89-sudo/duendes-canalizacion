@@ -45,7 +45,7 @@ export async function GET(request) {
   }
 }
 
-// POST - Actualizar un contenido específico
+// POST - Crear o actualizar un contenido específico
 export async function POST(request) {
   try {
     const { dia, mes, año, contenido } = await request.json();
@@ -57,25 +57,37 @@ export async function POST(request) {
     const key = `circulo:contenido:${año}:${mes}:${dia}`;
     const existente = await kv.get(key);
 
-    if (!existente) {
-      return Response.json({ success: false, error: 'Contenido no encontrado' }, { status: 404 });
+    const ahora = new Date().toISOString();
+    const datos = existente
+      ? { ...existente, ...contenido, modificadoEn: ahora }
+      : { ...contenido, creadoEn: ahora };
+
+    await kv.set(key, datos);
+
+    // Actualizar índice del mes
+    const indiceKey = `circulo:indice:${año}:${mes}`;
+    let indice = await kv.get(indiceKey) || { dias: [], totalDias: 0 };
+
+    const diaExiste = indice.dias.find(d => d.dia === dia);
+    if (!diaExiste) {
+      indice.dias.push({
+        dia,
+        titulo: contenido.titulo || datos.titulo,
+        estado: contenido.estado || datos.estado || 'borrador'
+      });
+      indice.dias.sort((a, b) => a.dia - b.dia);
+      indice.totalDias = indice.dias.length;
+      await kv.set(indiceKey, indice);
     }
-
-    const actualizado = {
-      ...existente,
-      ...contenido,
-      modificadoEn: new Date().toISOString()
-    };
-
-    await kv.set(key, actualizado);
 
     return Response.json({
       success: true,
-      contenido: actualizado
+      contenido: datos,
+      accion: existente ? 'actualizado' : 'creado'
     });
 
   } catch (error) {
-    console.error('Error actualizando contenido:', error);
+    console.error('Error guardando contenido:', error);
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }

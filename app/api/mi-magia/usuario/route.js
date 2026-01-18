@@ -71,9 +71,20 @@ export async function GET(request) {
       nombrePreferido: elegido.nombrePreferido || elegido.nombre || tokenData.nombre,
       pronombre: elegido.pronombre || 'ella',
       
-      // Onboarding
+      // Onboarding, Tour y Perfil
       onboardingCompleto: elegido.onboardingCompleto || false,
+      tourVisto: elegido.tourVisto || false,
+      perfilCompleto: elegido.perfilCompleto || false,
       ultimaVerificacion: elegido.ultimaVerificacion,
+
+      // Datos del perfil "Para Conocerme"
+      fechaNacimiento: elegido.fechaNacimiento,
+      signoZodiacal: elegido.signoZodiacal,
+      queBusca: elegido.queBusca || [],
+      momentoVida: elegido.momentoVida,
+      tieneGuardianesFisicos: elegido.tieneGuardianesFisicos,
+      guardianesFisicos: elegido.guardianesFisicos,
+      comoNosConociste: elegido.comoNosConociste,
       
       // Monedas
       treboles: elegido.treboles || 0,
@@ -119,6 +130,63 @@ export async function GET(request) {
     return Response.json({ 
       success: false, 
       error: error.message 
+    }, { status: 500, headers: CORS_HEADERS });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTUALIZAR DATOS DEL USUARIO (tour, preferencias)
+// ═══════════════════════════════════════════════════════════════
+
+export async function POST(request) {
+  try {
+    const datos = await request.json();
+    const { email, tourVisto, perfil } = datos;
+
+    if (!email) {
+      return Response.json({
+        success: false,
+        error: 'Email requerido'
+      }, { status: 400, headers: CORS_HEADERS });
+    }
+
+    const emailLower = email.toLowerCase();
+
+    // Obtener datos existentes
+    const elegido = await kv.get(`elegido:${emailLower}`) || {};
+
+    // Actualizar solo los campos proporcionados
+    const elegidoActualizado = { ...elegido };
+
+    if (tourVisto !== undefined) {
+      elegidoActualizado.tourVisto = tourVisto;
+    }
+
+    // Si viene perfil (formulario "Para conocerme")
+    if (perfil) {
+      elegidoActualizado.fechaNacimiento = perfil.fechaNacimiento || elegido.fechaNacimiento;
+      elegidoActualizado.signoZodiacal = perfil.signoZodiacal || elegido.signoZodiacal;
+      elegidoActualizado.queBusca = perfil.queBusca || elegido.queBusca;
+      elegidoActualizado.momentoVida = perfil.momentoVida || elegido.momentoVida;
+      elegidoActualizado.tieneGuardianesFisicos = perfil.tieneGuardianesFisicos || elegido.tieneGuardianesFisicos;
+      elegidoActualizado.guardianesFisicos = perfil.guardianesFisicos || elegido.guardianesFisicos;
+      elegidoActualizado.comoNosConociste = perfil.comoNosConociste || elegido.comoNosConociste;
+      elegidoActualizado.perfilCompleto = true;
+    }
+
+    // Guardar
+    await kv.set(`elegido:${emailLower}`, elegidoActualizado);
+
+    return Response.json({
+      success: true,
+      mensaje: 'Usuario actualizado correctamente'
+    }, { headers: CORS_HEADERS });
+
+  } catch (error) {
+    console.error('Error actualizando usuario:', error);
+    return Response.json({
+      success: false,
+      error: error.message
     }, { status: 500, headers: CORS_HEADERS });
   }
 }

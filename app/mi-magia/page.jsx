@@ -286,9 +286,9 @@ function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
         body: JSON.stringify({
           token,
           lecturaId: lecturaSeleccionada.id,
-          contexto: formData.contexto || '',
-          pregunta: formData.pregunta || '',
-          fechaNacimiento: formData.fechaNacimiento || ''
+          categoria: lecturaSeleccionada.categoria,
+          // Enviar todos los campos del formulario
+          ...formData
         })
       });
       const data = await res.json();
@@ -424,35 +424,252 @@ function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
             <p className="form-intro">Cuanta más información nos des, más personalizada será tu lectura.</p>
 
             <div className="form-campos-gamificado">
-              <div className="campo">
-                <label>Tu pregunta o intención</label>
-                <textarea
-                  value={formData.pregunta || ''}
-                  onChange={e => setFormData({ ...formData, pregunta: e.target.value })}
-                  placeholder="¿Qué querés saber o trabajar?"
-                  rows={3}
-                />
-              </div>
+              {/* TIRADAS (Runas, Tarot) */}
+              {lecturaSeleccionada.categoria === 'tiradas' && (
+                <>
+                  <div className="campo">
+                    <label>Tu pregunta específica</label>
+                    <textarea
+                      value={formData.pregunta || ''}
+                      onChange={e => setFormData({ ...formData, pregunta: e.target.value })}
+                      placeholder="Formulá tu pregunta de forma clara. Ej: ¿Qué necesito saber sobre mi situación laboral?"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="campo">
+                    <label>¿En qué área de tu vida se centra?</label>
+                    <select value={formData.areaVida || ''} onChange={e => setFormData({ ...formData, areaVida: e.target.value })}>
+                      <option value="">Seleccioná un área</option>
+                      <option value="amor">Amor y relaciones</option>
+                      <option value="trabajo">Trabajo y carrera</option>
+                      <option value="dinero">Dinero y abundancia</option>
+                      <option value="salud">Salud y bienestar</option>
+                      <option value="familia">Familia</option>
+                      <option value="espiritual">Crecimiento espiritual</option>
+                      <option value="general">General / Guía del momento</option>
+                    </select>
+                  </div>
+                  <div className="campo">
+                    <label>Contexto breve (opcional)</label>
+                    <textarea
+                      value={formData.contexto || ''}
+                      onChange={e => setFormData({ ...formData, contexto: e.target.value })}
+                      placeholder="¿Hay algo específico que necesitemos saber para interpretar mejor?"
+                      rows={2}
+                    />
+                  </div>
+                </>
+              )}
 
-              <div className="campo">
-                <label>Contexto de tu situación</label>
-                <textarea
-                  value={formData.contexto || ''}
-                  onChange={e => setFormData({ ...formData, contexto: e.target.value })}
-                  placeholder="¿Qué está pasando en tu vida relacionado a esto?"
-                  rows={3}
-                />
-              </div>
+              {/* MENSAJES (del guardián, susurros) */}
+              {lecturaSeleccionada.categoria === 'mensajes' && (
+                <>
+                  <div className="campo">
+                    <label>¿Qué necesitás escuchar hoy?</label>
+                    <select value={formData.necesidad || ''} onChange={e => setFormData({ ...formData, necesidad: e.target.value })}>
+                      <option value="">Dejá que el guardián elija</option>
+                      <option value="guia">Guía para una decisión</option>
+                      <option value="consuelo">Consuelo y contención</option>
+                      <option value="motivacion">Motivación y fuerza</option>
+                      <option value="claridad">Claridad mental</option>
+                      <option value="sanacion">Palabras de sanación</option>
+                    </select>
+                  </div>
+                  <div className="campo">
+                    <label>¿Qué está pasando en tu vida ahora?</label>
+                    <textarea
+                      value={formData.contexto || ''}
+                      onChange={e => setFormData({ ...formData, contexto: e.target.value })}
+                      placeholder="Contanos brevemente qué estás atravesando..."
+                      rows={3}
+                    />
+                  </div>
+                  {lecturaSeleccionada.requiereGuardian && (
+                    <div className="campo">
+                      <label>¿Qué guardián tenés?</label>
+                      <input
+                        type="text"
+                        value={formData.nombreGuardian || ''}
+                        onChange={e => setFormData({ ...formData, nombreGuardian: e.target.value })}
+                        placeholder="El nombre de tu duende guardián"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
 
-              {(lecturaSeleccionada.categoria === 'estudios' || lecturaSeleccionada.id.includes('numerolog')) && (
-                <div className="campo">
-                  <label>Fecha de nacimiento</label>
-                  <input
-                    type="date"
-                    value={formData.fechaNacimiento || ''}
-                    onChange={e => setFormData({ ...formData, fechaNacimiento: e.target.value })}
-                  />
-                </div>
+              {/* RITUALES */}
+              {lecturaSeleccionada.categoria === 'rituales' && (
+                <>
+                  <div className="campo">
+                    <label>¿Cuál es el objetivo del ritual?</label>
+                    <select value={formData.objetivoRitual || ''} onChange={e => setFormData({ ...formData, objetivoRitual: e.target.value })}>
+                      <option value="">Seleccioná un objetivo</option>
+                      <option value="proteccion">Protección</option>
+                      <option value="limpieza">Limpieza energética</option>
+                      <option value="abundancia">Atraer abundancia</option>
+                      <option value="amor">Abrir caminos al amor</option>
+                      <option value="sanacion">Sanación emocional</option>
+                      <option value="cortar">Cortar lazos o bloqueos</option>
+                      <option value="manifestar">Manifestar un deseo</option>
+                    </select>
+                  </div>
+                  <div className="campo">
+                    <label>Describí tu situación</label>
+                    <textarea
+                      value={formData.contexto || ''}
+                      onChange={e => setFormData({ ...formData, contexto: e.target.value })}
+                      placeholder="¿Por qué necesitás este ritual? ¿Qué querés lograr?"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="campo">
+                    <label>¿Tenés materiales? (velas, cristales, etc.)</label>
+                    <select value={formData.materiales || ''} onChange={e => setFormData({ ...formData, materiales: e.target.value })}>
+                      <option value="basico">Solo cosas básicas (velas, sal)</option>
+                      <option value="algunos">Tengo algunos cristales y hierbas</option>
+                      <option value="completo">Tengo variedad de materiales</option>
+                      <option value="ninguno">No tengo nada especial</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* ESTUDIOS (numerología, carta astral, akáshicos, etc.) */}
+              {lecturaSeleccionada.categoria === 'estudios' && (
+                <>
+                  <div className="campo">
+                    <label>Fecha de nacimiento completa *</label>
+                    <input
+                      type="date"
+                      value={formData.fechaNacimiento || ''}
+                      onChange={e => setFormData({ ...formData, fechaNacimiento: e.target.value })}
+                      required
+                    />
+                  </div>
+                  {(lecturaSeleccionada.id.includes('astral') || lecturaSeleccionada.id.includes('gran_estudio')) && (
+                    <>
+                      <div className="campo">
+                        <label>Hora de nacimiento (si la sabés)</label>
+                        <input
+                          type="time"
+                          value={formData.horaNacimiento || ''}
+                          onChange={e => setFormData({ ...formData, horaNacimiento: e.target.value })}
+                        />
+                      </div>
+                      <div className="campo">
+                        <label>Lugar de nacimiento</label>
+                        <input
+                          type="text"
+                          value={formData.lugarNacimiento || ''}
+                          onChange={e => setFormData({ ...formData, lugarNacimiento: e.target.value })}
+                          placeholder="Ciudad, País"
+                        />
+                      </div>
+                    </>
+                  )}
+                  {lecturaSeleccionada.id.includes('akashico') && (
+                    <div className="campo">
+                      <label>Tu pregunta para los registros</label>
+                      <textarea
+                        value={formData.pregunta || ''}
+                        onChange={e => setFormData({ ...formData, pregunta: e.target.value })}
+                        placeholder="¿Qué querés preguntar a tus registros del alma? Sé específica."
+                        rows={3}
+                      />
+                    </div>
+                  )}
+                  {(lecturaSeleccionada.id.includes('vidas') || lecturaSeleccionada.id.includes('ancestro')) && (
+                    <div className="campo">
+                      <label>¿Hay algo que se repite en tu vida?</label>
+                      <textarea
+                        value={formData.patronesRepetidos || ''}
+                        onChange={e => setFormData({ ...formData, patronesRepetidos: e.target.value })}
+                        placeholder="Patrones, bloqueos, situaciones que se repiten..."
+                        rows={3}
+                      />
+                    </div>
+                  )}
+                  <div className="campo">
+                    <label>¿Qué área te interesa más explorar?</label>
+                    <select value={formData.areaInteres || ''} onChange={e => setFormData({ ...formData, areaInteres: e.target.value })}>
+                      <option value="">Todas las áreas</option>
+                      <option value="personalidad">Mi personalidad y esencia</option>
+                      <option value="proposito">Mi propósito de vida</option>
+                      <option value="relaciones">Mis relaciones</option>
+                      <option value="carrera">Mi carrera y vocación</option>
+                      <option value="espiritual">Mi camino espiritual</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* LECTURAS GENERALES */}
+              {(lecturaSeleccionada.categoria === 'lecturas' || lecturaSeleccionada.categoria === 'guias') && (
+                <>
+                  <div className="campo">
+                    <label>¿Qué querés explorar?</label>
+                    <textarea
+                      value={formData.pregunta || ''}
+                      onChange={e => setFormData({ ...formData, pregunta: e.target.value })}
+                      placeholder="Tu intención o pregunta para esta lectura..."
+                      rows={3}
+                    />
+                  </div>
+                  <div className="campo">
+                    <label>Momento de vida actual</label>
+                    <select value={formData.momentoVida || ''} onChange={e => setFormData({ ...formData, momentoVida: e.target.value })}>
+                      <option value="">Seleccioná</option>
+                      <option value="transicion">En transición/cambios</option>
+                      <option value="crisis">Atravesando una crisis</option>
+                      <option value="crecimiento">En crecimiento y expansión</option>
+                      <option value="estabilidad">Momento estable</option>
+                      <option value="busqueda">Buscando algo nuevo</option>
+                    </select>
+                  </div>
+                  <div className="campo">
+                    <label>Contexto adicional (opcional)</label>
+                    <textarea
+                      value={formData.contexto || ''}
+                      onChange={e => setFormData({ ...formData, contexto: e.target.value })}
+                      placeholder="Cualquier información que creas relevante..."
+                      rows={2}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* EVENTOS Y PORTALES */}
+              {(lecturaSeleccionada.categoria === 'eventos' || lecturaSeleccionada.categoria === 'portales') && (
+                <>
+                  <div className="campo">
+                    <label>¿Qué querés trabajar en este portal/evento?</label>
+                    <textarea
+                      value={formData.intencion || ''}
+                      onChange={e => setFormData({ ...formData, intencion: e.target.value })}
+                      placeholder="Tu intención para aprovechar esta energía especial..."
+                      rows={3}
+                    />
+                  </div>
+                  <div className="campo">
+                    <label>¿Qué necesitás soltar?</label>
+                    <textarea
+                      value={formData.soltar || ''}
+                      onChange={e => setFormData({ ...formData, soltar: e.target.value })}
+                      placeholder="Lo que ya no te sirve..."
+                      rows={2}
+                    />
+                  </div>
+                  <div className="campo">
+                    <label>¿Qué querés manifestar?</label>
+                    <textarea
+                      value={formData.manifestar || ''}
+                      onChange={e => setFormData({ ...formData, manifestar: e.target.value })}
+                      placeholder="Lo que querés atraer a tu vida..."
+                      rows={2}
+                    />
+                  </div>
+                </>
               )}
             </div>
 
@@ -1362,6 +1579,588 @@ function TiendaRunas({ usuario, onCompra }) {
   );
 }
 
+// ═══════════════════════════════════════════════════════════════
+// TIENDA DE MEMBRESÍAS DEL CÍRCULO
+// ═══════════════════════════════════════════════════════════════
+
+const MEMBRESIAS_UI = [
+  {
+    id: 'mensual',
+    nombre: 'Mensual',
+    precio: 15,
+    meses: 1,
+    runasBienvenida: 20,
+    runasMensuales: 12,
+    slug: 'circulo-mensual',
+    descripcion: 'Perfecto para probar',
+    icono: '☽',
+    color: '#8B9A46',
+    beneficios: ['Contenido exclusivo semanal', 'Foro privado', '12 runas cada mes']
+  },
+  {
+    id: 'semestral',
+    nombre: 'Seis Meses',
+    precio: 50,
+    meses: 6,
+    runasBienvenida: 60,
+    runasMensuales: 15,
+    slug: 'circulo-seis-meses',
+    popular: true,
+    descripcion: 'Ahorrás $40',
+    icono: '✦',
+    color: '#D4AF37',
+    beneficios: ['Todo lo del mensual', '15 runas cada mes', 'Descuento en tienda']
+  },
+  {
+    id: 'anual',
+    nombre: 'Año del Guardián',
+    precio: 80,
+    meses: 12,
+    runasBienvenida: 120,
+    runasMensuales: 25,
+    slug: 'circulo-anual',
+    destacado: true,
+    descripcion: 'El mejor valor - Ahorrás $100',
+    icono: '👑',
+    color: '#9B59B6',
+    beneficios: ['Todo lo anterior', '25 runas cada mes', 'Acceso anticipado', 'Badge exclusivo']
+  }
+];
+
+function TiendaMembresias({ usuario, circulo }) {
+  const [planHover, setPlanHover] = useState(null);
+
+  const calcularAhorro = (plan) => {
+    const costoMensual = 15 * plan.meses;
+    return costoMensual - plan.precio;
+  };
+
+  const esMiembro = circulo?.activo;
+
+  return (
+    <div className="tienda-membresias-container">
+      {/* Header */}
+      <div className="membresias-header">
+        <div className="header-glow"></div>
+        <div className="circulo-icono">⭐</div>
+        <h2>El Círculo de Duendes</h2>
+        <p>Únete al Santuario. Acceso exclusivo a contenido, comunidad y runas mensuales.</p>
+
+        {esMiembro ? (
+          <div className="estado-miembro activo">
+            <span className="estado-icono">✓</span>
+            <div>
+              <strong>Sos parte del Círculo</strong>
+              <small>Plan: {circulo.planNombre || circulo.plan}</small>
+            </div>
+          </div>
+        ) : (
+          <div className="estado-miembro inactivo">
+            <span className="estado-icono">☆</span>
+            <span>Todavía no sos miembro</span>
+          </div>
+        )}
+      </div>
+
+      {/* Grid de planes */}
+      <div className="planes-grid">
+        {MEMBRESIAS_UI.map((plan, index) => (
+          <a
+            key={plan.id}
+            href={`https://duendesuy.10web.cloud/product/${plan.slug}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`plan-card ${plan.popular ? 'popular' : ''} ${plan.destacado ? 'destacado' : ''}`}
+            style={{ '--plan-color': plan.color, '--card-delay': `${index * 0.1}s` }}
+            onMouseEnter={() => setPlanHover(plan.id)}
+            onMouseLeave={() => setPlanHover(null)}
+          >
+            {plan.popular && <div className="tag-popular">MÁS POPULAR</div>}
+            {plan.destacado && <div className="tag-destacado">MEJOR VALOR</div>}
+
+            <div className="plan-glow"></div>
+
+            <div className="plan-icono">
+              <span>{plan.icono}</span>
+            </div>
+
+            <h3 className="plan-nombre">{plan.nombre}</h3>
+
+            <div className="plan-precio">
+              <span className="precio-moneda">$</span>
+              <span className="precio-numero">{plan.precio}</span>
+              <span className="precio-periodo">USD</span>
+            </div>
+
+            {plan.meses > 1 && (
+              <div className="plan-ahorro">
+                Ahorrás ${calcularAhorro(plan)}
+              </div>
+            )}
+
+            <div className="plan-runas-bienvenida">
+              <span className="runa-icono">ᚱ</span>
+              <span>{plan.runasBienvenida} runas de bienvenida</span>
+            </div>
+
+            <ul className="plan-beneficios">
+              {plan.beneficios.map((b, i) => (
+                <li key={i}><span className="check">✓</span> {b}</li>
+              ))}
+            </ul>
+
+            <div className="plan-runas-mensuales">
+              +{plan.runasMensuales} ᚱ cada mes
+            </div>
+
+            <div className="plan-cta">
+              <span>Unirme al Círculo</span>
+              <span className="cta-arrow">→</span>
+            </div>
+
+            {planHover === plan.id && (
+              <div className="particulas-circulo">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="estrella" style={{ '--delay': `${i * 0.2}s`, '--x': `${20 + Math.random() * 60}%` }}>✦</span>
+                ))}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+
+      {/* Beneficios del Círculo */}
+      <div className="circulo-beneficios">
+        <h3>¿Qué incluye el Círculo?</h3>
+        <div className="beneficios-grid">
+          <div className="beneficio-card">
+            <span className="beneficio-icono">📿</span>
+            <strong>Contenido Exclusivo</strong>
+            <p>Rituales, guías y conocimiento ancestral cada semana</p>
+          </div>
+          <div className="beneficio-card">
+            <span className="beneficio-icono">💬</span>
+            <strong>Foro Privado</strong>
+            <p>Comunidad de buscadores como vos</p>
+          </div>
+          <div className="beneficio-card">
+            <span className="beneficio-icono">ᚱ</span>
+            <strong>Runas Mensuales</strong>
+            <p>Recibís runas cada mes mientras seas miembro</p>
+          </div>
+          <div className="beneficio-card">
+            <span className="beneficio-icono">🏷️</span>
+            <strong>Descuentos</strong>
+            <p>Precios especiales en guardianes y experiencias</p>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .tienda-membresias-container {
+          padding: 20px;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+
+        .membresias-header {
+          text-align: center;
+          padding: 40px 20px;
+          background: linear-gradient(180deg, rgba(20,20,35,0.95) 0%, rgba(10,10,25,0.98) 100%);
+          border-radius: 24px;
+          margin-bottom: 30px;
+          position: relative;
+          overflow: hidden;
+          border: 1px solid rgba(155,89,182,0.3);
+        }
+
+        .header-glow {
+          position: absolute;
+          top: -50%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(155,89,182,0.15) 0%, transparent 70%);
+          pointer-events: none;
+        }
+
+        .circulo-icono {
+          font-size: 56px;
+          margin-bottom: 15px;
+          animation: pulseCirculo 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseCirculo {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(155,89,182,0.5)); }
+          50% { transform: scale(1.1); filter: drop-shadow(0 0 40px rgba(155,89,182,0.8)); }
+        }
+
+        .membresias-header h2 {
+          font-family: 'Cinzel', serif;
+          font-size: clamp(22px, 5vw, 32px);
+          color: #fff;
+          margin: 0 0 10px;
+          letter-spacing: 3px;
+        }
+
+        .membresias-header p {
+          color: rgba(255,255,255,0.6);
+          font-size: 15px;
+          max-width: 450px;
+          margin: 0 auto 25px;
+          line-height: 1.6;
+        }
+
+        .estado-miembro {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 24px;
+          border-radius: 50px;
+          font-size: 14px;
+        }
+
+        .estado-miembro.activo {
+          background: rgba(46,204,113,0.15);
+          border: 1px solid rgba(46,204,113,0.4);
+          color: #2ecc71;
+        }
+
+        .estado-miembro.activo strong {
+          display: block;
+          color: #fff;
+        }
+
+        .estado-miembro.activo small {
+          color: rgba(255,255,255,0.6);
+          font-size: 12px;
+        }
+
+        .estado-miembro.inactivo {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: rgba(255,255,255,0.6);
+        }
+
+        .estado-icono {
+          font-size: 20px;
+        }
+
+        /* Grid de planes */
+        .planes-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          margin-bottom: 40px;
+        }
+
+        .plan-card {
+          position: relative;
+          background: linear-gradient(145deg, rgba(20,20,35,0.95) 0%, rgba(10,10,25,0.98) 100%);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 20px;
+          padding: 30px 20px;
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          overflow: hidden;
+          animation: fadeInCard 0.5s ease forwards;
+          animation-delay: var(--card-delay);
+          opacity: 0;
+        }
+
+        @keyframes fadeInCard {
+          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(20px); }
+        }
+
+        .plan-card:hover {
+          transform: translateY(-8px) scale(1.02);
+          border-color: var(--plan-color);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px color-mix(in srgb, var(--plan-color) 30%, transparent);
+        }
+
+        .plan-card.popular {
+          border-color: rgba(212,175,55,0.5);
+          box-shadow: 0 0 25px rgba(212,175,55,0.2);
+        }
+
+        .plan-card.destacado {
+          border-color: rgba(155,89,182,0.5);
+          box-shadow: 0 0 25px rgba(155,89,182,0.2);
+        }
+
+        .tag-popular, .tag-destacado {
+          position: absolute;
+          top: -1px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #d4af37, #b8962e);
+          color: #0a0a0a;
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          padding: 5px 14px;
+          border-radius: 0 0 10px 10px;
+        }
+
+        .tag-destacado {
+          background: linear-gradient(135deg, #9b59b6, #8e44ad);
+          color: #fff;
+        }
+
+        .plan-glow {
+          position: absolute;
+          inset: -100%;
+          background: radial-gradient(circle at center, var(--plan-color), transparent 70%);
+          opacity: 0;
+          transition: opacity 0.4s;
+          pointer-events: none;
+        }
+
+        .plan-card:hover .plan-glow {
+          opacity: 0.1;
+        }
+
+        .plan-icono {
+          font-size: 40px;
+          margin-bottom: 12px;
+        }
+
+        .plan-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 18px;
+          color: #fff;
+          margin: 0 0 15px;
+          text-align: center;
+        }
+
+        .plan-precio {
+          display: flex;
+          align-items: baseline;
+          gap: 4px;
+          margin-bottom: 8px;
+        }
+
+        .precio-moneda {
+          font-size: 18px;
+          color: rgba(255,255,255,0.6);
+        }
+
+        .precio-numero {
+          font-family: 'Cinzel', serif;
+          font-size: 42px;
+          color: #fff;
+          font-weight: 600;
+          line-height: 1;
+        }
+
+        .precio-periodo {
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+          margin-left: 4px;
+        }
+
+        .plan-ahorro {
+          background: rgba(46,204,113,0.15);
+          color: #2ecc71;
+          font-size: 12px;
+          font-weight: 600;
+          padding: 4px 12px;
+          border-radius: 20px;
+          margin-bottom: 15px;
+        }
+
+        .plan-runas-bienvenida {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(212,175,55,0.1);
+          border: 1px solid rgba(212,175,55,0.2);
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 13px;
+          color: #d4af37;
+          margin-bottom: 20px;
+        }
+
+        .runa-icono {
+          font-size: 16px;
+        }
+
+        .plan-beneficios {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 20px;
+          width: 100%;
+        }
+
+        .plan-beneficios li {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: rgba(255,255,255,0.7);
+          padding: 6px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .plan-beneficios li:last-child {
+          border-bottom: none;
+        }
+
+        .check {
+          color: #2ecc71;
+          font-size: 12px;
+        }
+
+        .plan-runas-mensuales {
+          color: var(--plan-color);
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 20px;
+        }
+
+        .plan-cta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: var(--plan-color);
+          color: #fff;
+          padding: 12px 24px;
+          border-radius: 50px;
+          font-size: 14px;
+          font-weight: 600;
+          transition: all 0.3s;
+          width: 100%;
+          justify-content: center;
+        }
+
+        .plan-card:hover .plan-cta {
+          transform: scale(1.05);
+          box-shadow: 0 5px 20px color-mix(in srgb, var(--plan-color) 50%, transparent);
+        }
+
+        .cta-arrow {
+          transition: transform 0.3s;
+        }
+
+        .plan-card:hover .cta-arrow {
+          transform: translateX(4px);
+        }
+
+        .particulas-circulo {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .estrella {
+          position: absolute;
+          bottom: 20%;
+          left: var(--x);
+          font-size: 16px;
+          color: var(--plan-color);
+          animation: floatStar 2s ease-out forwards;
+          animation-delay: var(--delay);
+          opacity: 0;
+        }
+
+        @keyframes floatStar {
+          0% { transform: translateY(0) scale(0); opacity: 0; }
+          20% { opacity: 1; transform: scale(1); }
+          100% { transform: translateY(-100px) rotate(180deg); opacity: 0; }
+        }
+
+        /* Beneficios del Círculo */
+        .circulo-beneficios {
+          background: linear-gradient(145deg, rgba(20,20,35,0.95) 0%, rgba(10,10,25,0.98) 100%);
+          border: 1px solid rgba(155,89,182,0.2);
+          border-radius: 20px;
+          padding: 30px;
+          text-align: center;
+        }
+
+        .circulo-beneficios h3 {
+          font-family: 'Cinzel', serif;
+          color: #fff;
+          font-size: 18px;
+          margin: 0 0 25px;
+          letter-spacing: 2px;
+        }
+
+        .beneficios-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 20px;
+        }
+
+        .beneficio-card {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 16px;
+          padding: 25px 15px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.3s;
+        }
+
+        .beneficio-card:hover {
+          border-color: rgba(155,89,182,0.3);
+          background: rgba(155,89,182,0.05);
+        }
+
+        .beneficio-icono {
+          font-size: 28px;
+        }
+
+        .beneficio-card strong {
+          color: #fff;
+          font-size: 14px;
+        }
+
+        .beneficio-card p {
+          margin: 0;
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+          line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+          .planes-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+            margin: 0 auto 40px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .circulo-icono {
+            font-size: 44px;
+          }
+
+          .beneficios-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 500px) {
+          .beneficios-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // Helper: Limpiar tags HTML que aparecen como texto
 function limpiarTexto(texto) {
   if (!texto) return '';
@@ -2115,7 +2914,616 @@ const loginStyles = `
       font-size: 2.5rem;
     }
   }
+
+  /* ═══════════════════════════════════════════════════════════════
+     FORMULARIO "PARA CONOCERME"
+     ═══════════════════════════════════════════════════════════════ */
+
+  .perfil-form-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #0a0a0f 0%, #141420 50%, #0a0a0f 100%);
+  }
+
+  .perfil-form-card {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16162a 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 100%;
+    border: 1px solid rgba(212,175,55,0.2);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .perfil-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .perfil-icono {
+    font-size: 2.5rem;
+    color: #d4af37;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .perfil-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    color: #fff;
+    margin: 0 0 0.5rem;
+  }
+
+  .perfil-header p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem;
+  }
+
+  .perfil-progress {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .progress-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    transition: all 0.3s;
+  }
+
+  .progress-dot.active {
+    background: linear-gradient(135deg, #d4af37, #c4a030);
+    color: #1a1a2e;
+    font-weight: 600;
+  }
+
+  .perfil-paso {
+    margin-bottom: 2rem;
+  }
+
+  .perfil-paso h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    color: #fff;
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+
+  .perfil-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .perfil-date-input {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .perfil-date-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 20px rgba(212,175,55,0.2);
+  }
+
+  .signo-resultado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(212,175,55,0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(212,175,55,0.2);
+  }
+
+  .signo-icono {
+    font-size: 1.5rem;
+  }
+
+  .signo-resultado span {
+    color: rgba(255,255,255,0.8);
+  }
+
+  .signo-resultado strong {
+    color: #d4af37;
+  }
+
+  .busquedas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .busqueda-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+
+  .busqueda-btn:hover {
+    border-color: rgba(212,175,55,0.4);
+    background: rgba(212,175,55,0.1);
+  }
+
+  .busqueda-btn.active {
+    background: rgba(212,175,55,0.2);
+    border-color: #d4af37;
+    color: #fff;
+  }
+
+  .momentos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .momento-btn {
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .momento-btn:hover {
+    border-color: rgba(212,175,55,0.4);
+    background: rgba(212,175,55,0.1);
+  }
+
+  .momento-btn.active {
+    background: rgba(212,175,55,0.15);
+    border-color: #d4af37;
+  }
+
+  .momento-btn strong {
+    display: block;
+    color: #fff;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .momento-btn small {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+  }
+
+  .momento-btn.active strong {
+    color: #d4af37;
+  }
+
+  .perfil-field {
+    margin-bottom: 1.5rem;
+  }
+
+  .perfil-field label {
+    display: block;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .radio-btn {
+    flex: 1;
+    padding: 0.9rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .radio-btn:hover {
+    border-color: rgba(212,175,55,0.4);
+  }
+
+  .radio-btn.active {
+    background: rgba(212,175,55,0.2);
+    border-color: #d4af37;
+    color: #fff;
+  }
+
+  .perfil-text-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.95rem;
+  }
+
+  .perfil-text-input:focus {
+    outline: none;
+    border-color: #d4af37;
+  }
+
+  .fuentes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .fuente-btn {
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .fuente-btn:hover {
+    border-color: rgba(212,175,55,0.4);
+  }
+
+  .fuente-btn.active {
+    background: rgba(212,175,55,0.2);
+    border-color: #d4af37;
+    color: #fff;
+  }
+
+  .perfil-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .perfil-buttons .btn-sec {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    padding: 0.9rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .perfil-buttons .btn-pri {
+    background: linear-gradient(135deg, #d4af37, #c4a030);
+    border: none;
+    color: #1a1a2e;
+    padding: 0.9rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .perfil-buttons .btn-skip {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+  }
+
+  .perfil-buttons .btn-gold {
+    background: linear-gradient(135deg, #d4af37, #c4a030);
+    border: none;
+    color: #1a1a2e;
+    padding: 0.9rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .perfil-buttons .btn-gold:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .perfil-bonus {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(212,175,55,0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(212,175,55,0.2);
+  }
+
+  .perfil-bonus span {
+    font-size: 1.25rem;
+  }
+
+  .perfil-bonus p {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  @media (max-width: 500px) {
+    .perfil-form-card {
+      padding: 1.5rem;
+    }
+    .busquedas-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 `;
+
+// ═══════════════════════════════════════════════════════════════
+// FORMULARIO "PARA CONOCERME" (después del tour)
+// ═══════════════════════════════════════════════════════════════
+
+const SIGNOS_ZODIACALES = [
+  { nombre: 'Aries', icono: '♈', inicio: '03-21', fin: '04-19' },
+  { nombre: 'Tauro', icono: '♉', inicio: '04-20', fin: '05-20' },
+  { nombre: 'Géminis', icono: '♊', inicio: '05-21', fin: '06-20' },
+  { nombre: 'Cáncer', icono: '♋', inicio: '06-21', fin: '07-22' },
+  { nombre: 'Leo', icono: '♌', inicio: '07-23', fin: '08-22' },
+  { nombre: 'Virgo', icono: '♍', inicio: '08-23', fin: '09-22' },
+  { nombre: 'Libra', icono: '♎', inicio: '09-23', fin: '10-22' },
+  { nombre: 'Escorpio', icono: '♏', inicio: '10-23', fin: '11-21' },
+  { nombre: 'Sagitario', icono: '♐', inicio: '11-22', fin: '12-21' },
+  { nombre: 'Capricornio', icono: '♑', inicio: '12-22', fin: '01-19' },
+  { nombre: 'Acuario', icono: '♒', inicio: '01-20', fin: '02-18' },
+  { nombre: 'Piscis', icono: '♓', inicio: '02-19', fin: '03-20' }
+];
+
+function calcularSigno(fechaNacimiento) {
+  if (!fechaNacimiento) return null;
+  const fecha = new Date(fechaNacimiento);
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  const mmdd = `${mes}-${dia}`;
+
+  for (const signo of SIGNOS_ZODIACALES) {
+    if (signo.nombre === 'Capricornio') {
+      if (mmdd >= '12-22' || mmdd <= '01-19') return signo;
+    } else {
+      if (mmdd >= signo.inicio && mmdd <= signo.fin) return signo;
+    }
+  }
+  return null;
+}
+
+function FormularioPerfil({ usuario, onComplete, onSkip }) {
+  const [paso, setPaso] = useState(1);
+  const [guardando, setGuardando] = useState(false);
+  const [perfil, setPerfil] = useState({
+    fechaNacimiento: usuario?.fechaNacimiento || '',
+    queBusca: usuario?.queBusca || [],
+    momentoVida: usuario?.momentoVida || '',
+    tieneGuardianesFisicos: usuario?.tieneGuardianesFisicos || '',
+    guardianesFisicos: usuario?.guardianesFisicos || '',
+    comoNosConociste: usuario?.comoNosConociste || ''
+  });
+
+  const signoCalculado = calcularSigno(perfil.fechaNacimiento);
+
+  const BUSQUEDAS = [
+    { id: 'proteccion', label: 'Protección', icono: '🛡️' },
+    { id: 'amor', label: 'Amor', icono: '💕' },
+    { id: 'abundancia', label: 'Abundancia', icono: '✨' },
+    { id: 'sanacion', label: 'Sanación', icono: '🌿' },
+    { id: 'guia', label: 'Guía espiritual', icono: '🔮' },
+    { id: 'claridad', label: 'Claridad mental', icono: '💎' },
+    { id: 'paz', label: 'Paz interior', icono: '☮️' },
+    { id: 'proposito', label: 'Propósito de vida', icono: '⭐' }
+  ];
+
+  const MOMENTOS = [
+    { id: 'transicion', label: 'En transición', desc: 'Cambios importantes en mi vida' },
+    { id: 'crisis', label: 'Atravesando una crisis', desc: 'Momento difícil que necesita luz' },
+    { id: 'crecimiento', label: 'En crecimiento', desc: 'Expandiendo mi consciencia' },
+    { id: 'estabilidad', label: 'Estable', desc: 'Buscando profundizar mi camino' },
+    { id: 'despertar', label: 'Despertando', desc: 'Recién conectando con lo espiritual' }
+  ];
+
+  const FUENTES = [
+    'Instagram', 'Facebook', 'TikTok', 'Google',
+    'Recomendación de amiga', 'YouTube', 'Otro'
+  ];
+
+  const guardar = async () => {
+    setGuardando(true);
+    try {
+      const perfilConSigno = {
+        ...perfil,
+        signoZodiacal: signoCalculado?.nombre || null
+      };
+      await fetch(`${API_BASE}/api/mi-magia/usuario`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: usuario.email, perfil: perfilConSigno })
+      });
+      onComplete(perfilConSigno);
+    } catch(e) {
+      console.error('Error guardando perfil:', e);
+    }
+    setGuardando(false);
+  };
+
+  const toggleBusqueda = (id) => {
+    setPerfil(prev => ({
+      ...prev,
+      queBusca: prev.queBusca.includes(id)
+        ? prev.queBusca.filter(x => x !== id)
+        : [...prev.queBusca, id]
+    }));
+  };
+
+  return (
+    <div className="perfil-form-container">
+      <style jsx global>{estilos}</style>
+      <div className="perfil-form-card">
+        <div className="perfil-header">
+          <span className="perfil-icono">✦</span>
+          <h1>Para conocerte mejor</h1>
+          <p>Esta información nos ayuda a personalizar tus lecturas y experiencias</p>
+          <div className="perfil-progress">
+            {[1,2,3,4].map(p => (
+              <div key={p} className={`progress-dot ${paso >= p ? 'active' : ''}`}>{p}</div>
+            ))}
+          </div>
+        </div>
+
+        {paso === 1 && (
+          <div className="perfil-paso">
+            <h3>¿Cuándo naciste?</h3>
+            <p className="perfil-sub">Para numerología, carta astral y mensajes personalizados</p>
+            <input
+              type="date"
+              value={perfil.fechaNacimiento}
+              onChange={e => setPerfil({...perfil, fechaNacimiento: e.target.value})}
+              className="perfil-date-input"
+              max={new Date().toISOString().split('T')[0]}
+            />
+            {signoCalculado && (
+              <div className="signo-resultado">
+                <span className="signo-icono">{signoCalculado.icono}</span>
+                <span>Tu signo es <strong>{signoCalculado.nombre}</strong></span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {paso === 2 && (
+          <div className="perfil-paso">
+            <h3>¿Qué estás buscando?</h3>
+            <p className="perfil-sub">Elegí todo lo que resuene con vos</p>
+            <div className="busquedas-grid">
+              {BUSQUEDAS.map(b => (
+                <button
+                  key={b.id}
+                  className={`busqueda-btn ${perfil.queBusca.includes(b.id) ? 'active' : ''}`}
+                  onClick={() => toggleBusqueda(b.id)}
+                >
+                  <span>{b.icono}</span>
+                  <span>{b.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {paso === 3 && (
+          <div className="perfil-paso">
+            <h3>¿Qué momento estás atravesando?</h3>
+            <p className="perfil-sub">Para entender cómo acompañarte mejor</p>
+            <div className="momentos-list">
+              {MOMENTOS.map(m => (
+                <button
+                  key={m.id}
+                  className={`momento-btn ${perfil.momentoVida === m.id ? 'active' : ''}`}
+                  onClick={() => setPerfil({...perfil, momentoVida: m.id})}
+                >
+                  <strong>{m.label}</strong>
+                  <small>{m.desc}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {paso === 4 && (
+          <div className="perfil-paso">
+            <h3>Últimas preguntas</h3>
+
+            <div className="perfil-field">
+              <label>¿Tenés guardianes físicos (duendes)?</label>
+              <div className="radio-group">
+                <button
+                  className={`radio-btn ${perfil.tieneGuardianesFisicos === 'si' ? 'active' : ''}`}
+                  onClick={() => setPerfil({...perfil, tieneGuardianesFisicos: 'si'})}
+                >Sí, tengo</button>
+                <button
+                  className={`radio-btn ${perfil.tieneGuardianesFisicos === 'no' ? 'active' : ''}`}
+                  onClick={() => setPerfil({...perfil, tieneGuardianesFisicos: 'no', guardianesFisicos: ''})}
+                >No todavía</button>
+              </div>
+              {perfil.tieneGuardianesFisicos === 'si' && (
+                <input
+                  type="text"
+                  placeholder="¿Cuáles? (ej: Guardián del Hogar, Duende de la Abundancia)"
+                  value={perfil.guardianesFisicos}
+                  onChange={e => setPerfil({...perfil, guardianesFisicos: e.target.value})}
+                  className="perfil-text-input"
+                />
+              )}
+            </div>
+
+            <div className="perfil-field">
+              <label>¿Cómo nos conociste?</label>
+              <div className="fuentes-grid">
+                {FUENTES.map(f => (
+                  <button
+                    key={f}
+                    className={`fuente-btn ${perfil.comoNosConociste === f ? 'active' : ''}`}
+                    onClick={() => setPerfil({...perfil, comoNosConociste: f})}
+                  >{f}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="perfil-buttons">
+          {paso > 1 && (
+            <button className="btn-sec" onClick={() => setPaso(paso - 1)}>Atrás</button>
+          )}
+          {paso === 1 && (
+            <button className="btn-skip" onClick={onSkip}>Completar después</button>
+          )}
+          {paso < 4 && (
+            <button className="btn-pri" onClick={() => setPaso(paso + 1)}>Continuar</button>
+          )}
+          {paso === 4 && (
+            <button className="btn-gold" onClick={guardar} disabled={guardando}>
+              {guardando ? 'Guardando...' : 'Guardar y continuar'}
+            </button>
+          )}
+        </div>
+
+        <div className="perfil-bonus">
+          <span>🎁</span>
+          <p>Al completar tu perfil, tus lecturas serán mucho más precisas y personalizadas</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════
 // TOUR DE MI MAGIA (después del onboarding)
@@ -2159,10 +3567,10 @@ const PASOS_TOUR = [
   },
   {
     id: 'jardin',
-    titulo: 'Jardín de Guardianes',
-    icono: '🌿',
-    mensaje: 'Acá ves todos los guardianes que adoptaste. Podés conectar con ellos, ver sus mensajes y fortalecer el vínculo.',
-    tip: 'Tu jardín crece con cada guardián que adoptás'
+    titulo: 'Jardín de Tréboles',
+    icono: '☘️',
+    mensaje: 'Acá canjeás tus tréboles por beneficios reales: descuentos, envío gratis, runas extra y más. Mientras más tréboles acumulás, mejores premios podés obtener.',
+    tip: 'Ganás tréboles con cada compra en la tienda'
   },
   {
     id: 'circulo',
@@ -2422,6 +3830,7 @@ export default function MiMagia() {
   const [seccion, setSeccion] = useState('inicio');
   const [onboarding, setOnboarding] = useState(false);
   const [mostrandoTour, setMostrandoTour] = useState(false);
+  const [mostrandoPerfil, setMostrandoPerfil] = useState(false);
   const [chatAbierto, setChatAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
@@ -2477,9 +3886,14 @@ export default function MiMagia() {
           setOnboarding(true);
         } else {
           // Si ya completó onboarding pero nunca vio el tour, mostrarlo
-          const tourVisto = localStorage.getItem('tour_mimagia_visto');
-          if (!tourVisto) {
+          // Verificar en backend Y localStorage (doble check para robustez)
+          const tourVistoLocal = localStorage.getItem('tour_mimagia_visto');
+          const tourVistoBackend = data.usuario.tourVisto;
+          if (!tourVistoLocal && !tourVistoBackend) {
             setMostrandoTour(true);
+          } else if (!tourVistoLocal && tourVistoBackend) {
+            // Sincronizar localStorage con backend
+            localStorage.setItem('tour_mimagia_visto', 'true');
           }
         }
       } else {
@@ -2497,7 +3911,31 @@ export default function MiMagia() {
   if (cargando) return <Carga />;
   if (necesitaLogin) return <LoginMagicLink onLoginExitoso={() => window.location.reload()} />;
   if (onboarding) return <Onboarding usuario={usuario} token={token} onDone={(d) => { setUsuario({...usuario, ...d, onboardingCompleto: true, runas: 100}); setOnboarding(false); setMostrandoTour(true); }} />;
-  if (mostrandoTour) return <TourMiMagia usuario={usuario} onFinish={() => { setMostrandoTour(false); localStorage.setItem('tour_mimagia_visto', 'true'); }} />;
+  if (mostrandoTour) return <TourMiMagia usuario={usuario} onFinish={async () => {
+    setMostrandoTour(false);
+    localStorage.setItem('tour_mimagia_visto', 'true');
+    // Guardar también en backend para persistencia
+    try {
+      await fetch(`${API_BASE}/api/mi-magia/usuario`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: usuario.email, tourVisto: true })
+      });
+    } catch(e) { console.error('Error guardando tourVisto:', e); }
+    // Si no completó el perfil, mostrarlo
+    if (!usuario?.perfilCompleto) {
+      setMostrandoPerfil(true);
+    }
+  }} />;
+
+  if (mostrandoPerfil) return <FormularioPerfil
+    usuario={usuario}
+    onComplete={(perfilData) => {
+      setUsuario({...usuario, ...perfilData, perfilCompleto: true});
+      setMostrandoPerfil(false);
+    }}
+    onSkip={() => setMostrandoPerfil(false)}
+  />;
 
   const renderSeccion = () => {
     switch(seccion) {
@@ -2508,7 +3946,8 @@ export default function MiMagia() {
       case 'experiencias_catalogo': return <CatalogoExperiencias usuario={usuario} setUsuario={setUsuario} />;
       case 'lecturas_gamificadas': return <CatalogoLecturasGamificado usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'tienda_runas': return <TiendaRunas usuario={usuario} />;
-      case 'regalos': return <Regalos ir={setSeccion} />;
+      case 'tienda_membresias': return <TiendaMembresias usuario={usuario} circulo={circulo} />;
+      case 'regalos': return <Regalos ir={setSeccion} usuario={usuario} setUsuario={setUsuario} />;
       case 'mundo': return <MundoSec />;
       case 'cuidados': return <CuidadosSec />;
       case 'cristales': return <CristalesSec />;
@@ -2586,7 +4025,7 @@ export default function MiMagia() {
 
       {menuAbierto && isMobile && <div style={mobileOverlay} onClick={() => setMenuAbierto(false)} />}
       <nav className={`nav ${menuAbierto ? 'abierto' : ''}`} style={isMobile ? mobileNav : {}}>
-        {[['inicio','◇','Inicio'],['test_guardian','🔮','Test del Guardián'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín Mágico'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
+        {[['inicio','◇','Inicio'],['test_guardian','🔮','Test del Guardián'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín de Tréboles'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">El Mundo Elemental</div>
@@ -2937,6 +4376,7 @@ function Inicio({ usuario, ir, token, setUsuario }) {
       <div className="accesos-g">
         <button className="acceso acceso-destacado" onClick={() => ir('lecturas_gamificadas')}><span>ᚱ</span><strong>Catálogo de Lecturas</strong><small>30+ experiencias por nivel</small></button>
         <button className="acceso acceso-runas" onClick={() => ir('tienda_runas')}><span>✧</span><strong>Tienda de Runas</strong><small>Obtené runas para tus lecturas</small></button>
+        <button className="acceso acceso-circulo" onClick={() => ir('tienda_membresias')}><span>⭐</span><strong>Círculo de Duendes</strong><small>Membresía con beneficios exclusivos</small></button>
         <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Pedirle algo al universo</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
         <button className="acceso" onClick={() => ir('test_elemental')}><span>◈</span><strong>Descubrir quién me eligió</strong><small>Test de elemento y guardián</small></button>
         <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalar magia a alguien</strong><small>Que otro sienta lo que vos sentiste</small></button>
@@ -3907,7 +5347,7 @@ function Jardin({ usuario, setUsuario, pais, token }) {
   
   return (
     <div className="sec">
-      <div className="sec-head"><h1>Jardín Mágico</h1><p>Tu riqueza en el mundo elemental.</p></div>
+      <div className="sec-head"><h1>Jardín de Tréboles</h1><p>Tu riqueza en el mundo elemental.</p></div>
       
       <div className="balances">
         <div className="bal-card">
@@ -4131,62 +5571,304 @@ function SeccionExperiencias({ usuario, setUsuario }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// REGALOS
+// REGALOS (COMPLETO CON FLUJO DE REGALO DE LECTURAS)
 // ═══════════════════════════════════════════════════════════════
 
-function Regalos({ ir }) {
-  const [expandido, setExpandido] = useState(null);
-  
+const LECTURAS_REGALABLES = [
+  // Temática Duendes - Básicas
+  { id: 'consejo_bosque', nombre: 'Consejo del Bosque', runas: 15, icono: '🌲', descripcion: 'Mensaje breve del bosque', categoria: 'duendes' },
+  { id: 'energia_dia', nombre: 'Energía del Día', runas: 15, icono: '☀️', descripcion: 'Qué energía te rodea hoy', categoria: 'duendes' },
+  { id: 'susurro_guardian', nombre: 'Susurro del Guardián', runas: 20, icono: '👂', descripcion: 'Un guardián te susurra un mensaje', categoria: 'duendes' },
+  { id: 'mensaje_hogar_protegido', nombre: 'Mensaje del Hogar', runas: 25, icono: '🏠', descripcion: 'Tu guardián habla sobre tu hogar', categoria: 'duendes' },
+  { id: 'cuatro_elementales', nombre: 'Los 4 Elementales', runas: 50, icono: '🌍', descripcion: 'Tierra, Agua, Fuego y Aire te hablan', categoria: 'duendes' },
+
+  // Tiradas Clásicas
+  { id: 'tirada_3_runas', nombre: 'Tirada de 3 Runas', runas: 25, icono: 'ᚱ', descripcion: 'Pasado, Presente y Futuro', categoria: 'clasicas' },
+  { id: 'tirada_5_runas', nombre: 'Tirada de 5 Runas', runas: 40, icono: 'ᚱᛏ', descripcion: 'Situación completa con consejo', categoria: 'clasicas' },
+  { id: 'tarot_3_cartas', nombre: 'Tarot 3 Cartas', runas: 50, icono: '🃏', descripcion: 'Tres cartas con interpretación', categoria: 'clasicas' },
+  { id: 'tarot_amor', nombre: 'Tarot del Amor', runas: 75, icono: '💕', descripcion: 'Especializado en relaciones', categoria: 'clasicas' },
+
+  // Estudios y Rituales
+  { id: 'registros_akashicos', nombre: 'Registros Akáshicos', runas: 75, icono: '📜', descripcion: 'Tu biblioteca cósmica personal', categoria: 'estudios' },
+  { id: 'numerologia_personal', nombre: 'Numerología Personal', runas: 65, icono: '🔢', descripcion: 'Tu número de vida y ciclos', categoria: 'estudios' },
+  { id: 'ritual_abundancia', nombre: 'Ritual de Abundancia', runas: 65, icono: '🌟', descripcion: 'Abrí los canales de prosperidad', categoria: 'rituales' },
+  { id: 'limpieza_energetica', nombre: 'Limpieza Energética', runas: 45, icono: '✨', descripcion: 'Limpieza de energía y espacio', categoria: 'rituales' },
+
+  // Premium
+  { id: 'tirada_7_runas', nombre: 'Tirada de 7 Runas', runas: 100, icono: 'ᚱᛏᚠ', descripcion: 'La tirada profunda completa', categoria: 'premium' },
+  { id: 'tarot_cruz_celta', nombre: 'Tarot Cruz Celta', runas: 120, icono: '🎴', descripcion: '10 cartas revelando todo', categoria: 'premium' },
+  { id: 'lectura_ano_personal', nombre: 'Lectura de Año Personal', runas: 140, icono: '📅', descripcion: 'Los 12 meses que vienen', categoria: 'premium' },
+  { id: 'mapa_karmico', nombre: 'Mapa Kármico', runas: 180, icono: '🔄', descripcion: 'Tus lecciones y misión', categoria: 'premium' },
+  { id: 'mision_alma', nombre: 'Misión del Alma', runas: 200, icono: '🎯', descripcion: 'Para qué viniste a este mundo', categoria: 'premium' },
+  { id: 'estudio_alma', nombre: 'Estudio del Alma', runas: 200, icono: '👁️', descripcion: 'Quién sos realmente, revelado', categoria: 'premium' }
+];
+
+function Regalos({ ir, usuario, setUsuario }) {
+  const [vista, setVista] = useState('menu'); // menu, lecturas, form, enviando, exito
+  const [lecturaSeleccionada, setLecturaSeleccionada] = useState(null);
+  const [form, setForm] = useState({ nombreDestinatario: '', emailDestinatario: '', mensaje: '' });
+  const [error, setError] = useState(null);
+  const [codigoRegalo, setCodigoRegalo] = useState(null);
+
+  const enviarRegalo = async () => {
+    if (!lecturaSeleccionada || !form.emailDestinatario) {
+      setError('Completá todos los campos requeridos');
+      return;
+    }
+
+    if ((usuario?.runas || 0) < lecturaSeleccionada.runas) {
+      setError('No tenés suficientes runas');
+      return;
+    }
+
+    setVista('enviando');
+    setError(null);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/regalos/crear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailRemitente: usuario.email,
+          nombreRemitente: usuario.nombrePreferido || usuario.nombre,
+          emailDestinatario: form.emailDestinatario,
+          nombreDestinatario: form.nombreDestinatario,
+          mensaje: form.mensaje,
+          lecturaId: lecturaSeleccionada.id,
+          lecturaNombre: lecturaSeleccionada.nombre,
+          runasUsadas: lecturaSeleccionada.runas
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setCodigoRegalo(data.codigo);
+        setUsuario({ ...usuario, runas: (usuario.runas || 0) - lecturaSeleccionada.runas });
+        setVista('exito');
+      } else {
+        setError(data.error || 'Error al enviar el regalo');
+        setVista('form');
+      }
+    } catch (e) {
+      setError('Error de conexión');
+      setVista('form');
+    }
+  };
+
+  const reset = () => {
+    setVista('menu');
+    setLecturaSeleccionada(null);
+    setForm({ nombreDestinatario: '', emailDestinatario: '', mensaje: '' });
+    setCodigoRegalo(null);
+    setError(null);
+  };
+
+  // Vista de éxito
+  if (vista === 'exito') {
+    return (
+      <div className="sec regalo-exito">
+        <div className="exito-card">
+          <span className="exito-icono">🎁</span>
+          <h1>¡Regalo enviado!</h1>
+          <p>{form.nombreDestinatario || 'Tu ser querido'} recibirá un email con el regalo.</p>
+          <div className="codigo-box">
+            <small>Código del regalo:</small>
+            <strong>{codigoRegalo}</strong>
+          </div>
+          <p className="nota">La persona recibirá instrucciones para canjear su lectura y completar sus propios datos.</p>
+          <button className="btn-gold" onClick={reset}>Volver a Regalos</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Vista enviando
+  if (vista === 'enviando') {
+    return (
+      <div className="sec regalo-enviando">
+        <div className="enviando-card">
+          <div className="spinner-regalo"></div>
+          <p>Preparando tu regalo mágico...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Vista formulario
+  if (vista === 'form' && lecturaSeleccionada) {
+    const puedeEnviar = (usuario?.runas || 0) >= lecturaSeleccionada.runas;
+
+    return (
+      <div className="sec regalo-form-sec">
+        <button className="btn-back" onClick={() => setVista('lecturas')}>← Cambiar lectura</button>
+
+        <div className="regalo-form-card">
+          <div className="lectura-seleccionada">
+            <span className="lectura-icono">{lecturaSeleccionada.icono}</span>
+            <div>
+              <h3>{lecturaSeleccionada.nombre}</h3>
+              <p>{lecturaSeleccionada.descripcion}</p>
+              <span className="lectura-precio">{lecturaSeleccionada.runas} ᚱ</span>
+            </div>
+          </div>
+
+          <h2>¿A quién le regalás?</h2>
+
+          <div className="form-campos">
+            <div className="campo">
+              <label>Email del destinatario *</label>
+              <input
+                type="email"
+                value={form.emailDestinatario}
+                onChange={e => setForm({ ...form, emailDestinatario: e.target.value })}
+                placeholder="email@ejemplo.com"
+              />
+            </div>
+            <div className="campo">
+              <label>Nombre (para personalizar)</label>
+              <input
+                type="text"
+                value={form.nombreDestinatario}
+                onChange={e => setForm({ ...form, nombreDestinatario: e.target.value })}
+                placeholder="¿Cómo se llama?"
+              />
+            </div>
+            <div className="campo">
+              <label>Tu mensaje personal (opcional)</label>
+              <textarea
+                value={form.mensaje}
+                onChange={e => setForm({ ...form, mensaje: e.target.value })}
+                placeholder="Un mensaje que acompañará el regalo..."
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <div className="regalo-resumen">
+            <div className="resumen-row">
+              <span>Lectura:</span>
+              <span>{lecturaSeleccionada.nombre}</span>
+            </div>
+            <div className="resumen-row">
+              <span>Costo:</span>
+              <span>{lecturaSeleccionada.runas} ᚱ</span>
+            </div>
+            <div className="resumen-row">
+              <span>Tus runas:</span>
+              <span className={puedeEnviar ? '' : 'insuficientes'}>{usuario?.runas || 0} ᚱ</span>
+            </div>
+            {!puedeEnviar && (
+              <div className="resumen-alerta">
+                Te faltan {lecturaSeleccionada.runas - (usuario?.runas || 0)} runas
+              </div>
+            )}
+          </div>
+
+          {error && <div className="error-msg">{error}</div>}
+
+          <div className="form-actions">
+            <button className="btn-sec" onClick={() => setVista('lecturas')}>Cancelar</button>
+            <button
+              className="btn-gold"
+              onClick={enviarRegalo}
+              disabled={!puedeEnviar || !form.emailDestinatario}
+            >
+              Enviar Regalo 🎁
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Vista selección de lecturas
+  if (vista === 'lecturas') {
+    return (
+      <div className="sec regalo-lecturas">
+        <button className="btn-back" onClick={() => setVista('menu')}>← Volver</button>
+
+        <div className="sec-head">
+          <h1>Elegí qué regalar</h1>
+          <p>Seleccioná la lectura que querés regalar. La persona recibirá un email y completará sus propios datos.</p>
+        </div>
+
+        <div className="runas-header">
+          <div className="runas-balance"><span>ᚱ</span><strong>{usuario?.runas || 0}</strong><small>disponibles</small></div>
+        </div>
+
+        <div className="lecturas-regalo-grid">
+          {LECTURAS_REGALABLES.map(lectura => {
+            const puedeRegalar = (usuario?.runas || 0) >= lectura.runas;
+            return (
+              <div
+                key={lectura.id}
+                className={`lectura-regalo-card ${puedeRegalar ? '' : 'bloqueada'}`}
+                onClick={() => {
+                  if (puedeRegalar) {
+                    setLecturaSeleccionada(lectura);
+                    setVista('form');
+                  }
+                }}
+              >
+                <span className="lectura-icono">{lectura.icono}</span>
+                <h3>{lectura.nombre}</h3>
+                <p>{lectura.descripcion}</p>
+                <div className="lectura-precio">{lectura.runas} ᚱ</div>
+                {!puedeRegalar && <span className="bloqueado-tag">Runas insuficientes</span>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Vista menú principal
   return (
     <div className="sec">
       <div className="sec-head regalo-head"><span>❤</span><h1>Regalá Magia</h1><p>Un regalo de Duendes del Uruguay es diferente. Es compañía, protección, transformación.</p></div>
-      
+
       <div className="regalos-grid">
-        <div className="regalo-card" onClick={() => setExpandido(expandido === 'guardianes' ? null : 'guardianes')}>
-          <span>◆</span><h3>Guardianes</h3><p>Un compañero de vida para alguien especial.</p>
-          {expandido === 'guardianes' && (
-            <div className="regalo-exp">
-              <p>Un guardián canalizado es un regalo que trasciende lo material. Es protección, compañía, conexión con el mundo elemental.</p>
-              <p><strong>¿Cómo funciona?</strong> Elegís el guardián en la tienda, en el checkout indicás que es regalo y ponés el email del destinatario. Le llega la sorpresa con toda la información de su nuevo compañero.</p>
-              <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-gold-sm">Ver guardianes ↗</a>
-            </div>
-          )}
+        <div className="regalo-card regalo-card-principal" onClick={() => setVista('lecturas')}>
+          <span>✦</span>
+          <h3>Regalar una Lectura</h3>
+          <p>Tiradas de runas, registros akáshicos, estudios del alma y más.</p>
+          <small className="regalo-badge">Pagás con tus runas</small>
         </div>
-        
-        <div className="regalo-card" onClick={() => setExpandido(expandido === 'exp' ? null : 'exp')}>
-          <span>✦</span><h3>Experiencias Mágicas</h3><p>Una lectura personalizada.</p>
-          {expandido === 'exp' && (
-            <div className="regalo-exp">
-              <p>Regalá una Tirada de Runas, Lectura del Alma, Registros Akáshicos o cualquier experiencia.</p>
-              <p><strong>¿Cómo funciona?</strong> Vas a Experiencias, elegís la que querés regalar, marcás "Es un regalo" y ponés el email. La persona recibe acceso a Mi Magia donde completa SUS propios datos y recibe la lectura personalizada.</p>
-              <button className="btn-gold-sm" onClick={(e) => { e.stopPropagation(); ir('experiencias'); }}>Ir a Experiencias</button>
-            </div>
-          )}
+
+        <div className="regalo-card" onClick={() => window.open('https://duendesuy.10web.cloud/shop/', '_blank')}>
+          <span>◆</span>
+          <h3>Regalar un Guardián</h3>
+          <p>Un compañero de vida para alguien especial.</p>
+          <small>Ir a la tienda ↗</small>
         </div>
-        
-        <div className="regalo-card" onClick={() => setExpandido(expandido === 'circulo' ? null : 'circulo')}>
-          <span>★</span><h3>Círculo de Duendes</h3><p>Membresía. El regalo que sigue dando.</p>
-          {expandido === 'circulo' && (
-            <div className="regalo-exp">
-              <p>3 meses de Círculo = 3 meses de descuentos, lecturas gratis, contenido exclusivo, comunidad.</p>
-              <p><strong>¿Cómo funciona?</strong> Comprás la membresía trimestral como regalo, indicás el email y la persona recibe acceso completo.</p>
-              <a href="https://duendesuy.10web.cloud/producto/circulo-trimestral/" target="_blank" rel="noopener" className="btn-gold-sm">Regalar 3 meses ↗</a>
-            </div>
-          )}
+
+        <div className="regalo-card" onClick={() => window.open('/product/circulo-seis-meses/', '_blank')}>
+          <span>★</span>
+          <h3>Regalar Membresía</h3>
+          <p>6 meses de Círculo: contenido, comunidad, descuentos.</p>
+          <small>Ver membresías ↗</small>
         </div>
-        
-        <div className="regalo-card" onClick={() => setExpandido(expandido === 'runas' ? null : 'runas')}>
-          <span>ᚱ</span><h3>Runas de Poder</h3><p>Libertad para elegir qué experiencia quiere.</p>
-          {expandido === 'runas' && (
-            <div className="regalo-exp">
-              <p>Regalá Runas y dejá que la persona elija qué experiencia mágica quiere tener.</p>
-              <p><strong>¿Cómo funciona?</strong> Comprás el pack, indicás el email del destinatario, y las Runas aparecen en su cuenta de Mi Magia.</p>
-              <div className="mini-packs">
-                {PACKS_RUNAS.map(p => <a key={p.nombre} href={p.url} target="_blank" rel="noopener">{p.runas}ᚱ ${p.precio}</a>)}
-              </div>
-            </div>
-          )}
+
+        <div className="regalo-card" onClick={() => window.open('/product/paquete-runas-80/', '_blank')}>
+          <span>ᚱ</span>
+          <h3>Regalar Runas</h3>
+          <p>Que elija qué experiencia mágica quiere tener.</p>
+          <small>Ver paquetes ↗</small>
         </div>
+      </div>
+
+      <div className="regalo-info">
+        <h4>¿Cómo funcionan los regalos de lecturas?</h4>
+        <ol>
+          <li>Elegís la lectura que querés regalar</li>
+          <li>Ponés el email de quien recibe</li>
+          <li>Pagás con tus runas</li>
+          <li>La persona recibe un email con un código</li>
+          <li>Canjea el código y completa SUS propios datos</li>
+          <li>Recibe la lectura personalizada para ELLA</li>
+        </ol>
       </div>
     </div>
   );
@@ -6006,7 +7688,7 @@ function Tito({ usuario, abierto, setAbierto }) {
         role: msg.r === 'u' ? 'user' : 'assistant',
         content: msg.t
       }));
-      const contexto = `[CONTEXTO MI MAGIA: Usuario con ${usuario?.runas||0} runas, ${usuario?.treboles||0} tréboles. Secciones: Canalizaciones (guardianes, lecturas, regalos), Jardín Mágico (tréboles/runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas y diario). 1 trébol = $10 USD. Runas para experiencias.]
+      const contexto = `[CONTEXTO MI MAGIA: Usuario con ${usuario?.runas||0} runas, ${usuario?.treboles||0} tréboles. Secciones: Canalizaciones (guardianes, lecturas, regalos), Jardín de Tréboles (tréboles/runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas y diario). 1 trébol = $10 USD. Runas para experiencias.]
 IMPORTANTE: Mantené el contexto de la conversación. Si el usuario dice "ayudame" o "sí" o "dale", referite a lo que acabás de decir/ofrecer.
 FORMATO: Usá párrafos cortos separados por líneas en blanco. NO escribas todo junto. Hacé el texto fácil de leer.
 Mensaje actual: ${m}`;
@@ -7403,6 +9085,12 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .acceso-runas{background:linear-gradient(135deg,#fffbf0,#fff);border-color:#d4af37;position:relative;overflow:hidden}
 .acceso-runas::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle,rgba(212,175,55,0.2),transparent 70%);pointer-events:none}
 .acceso-runas:hover{background:linear-gradient(135deg,#fff5e0,#fffbf0);box-shadow:0 4px 15px rgba(212,175,55,0.2)}
+.acceso-circulo{background:linear-gradient(135deg,#1a1a2e,#2d2d44);border-color:#d4af37;position:relative;overflow:hidden}
+.acceso-circulo span{color:#d4af37}
+.acceso-circulo strong{color:#fff}
+.acceso-circulo small{color:rgba(255,255,255,0.7)}
+.acceso-circulo::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(212,175,55,0.15),transparent 70%);pointer-events:none}
+.acceso-circulo:hover{background:linear-gradient(135deg,#252540,#3a3a55);box-shadow:0 4px 20px rgba(212,175,55,0.25)}
 .banner-circ{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1.25rem;cursor:pointer;margin-bottom:2rem}
 .banner-circ span:first-child{font-size:2rem;color:#d4af37}
 .banner-circ h3{font-family:'Cinzel',serif;color:#fff;font-size:1rem}
@@ -7527,6 +9215,50 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .regalo-exp p{font-size:0.9rem;color:#666;margin-bottom:0.75rem}
 .mini-packs{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem}
 .mini-packs a{background:#f5f5f5;padding:0.4rem 0.75rem;border-radius:6px;font-size:0.8rem;text-decoration:none;color:#1a1a1a}
+
+/* Regalos - Nuevos estilos */
+.regalo-card-principal{background:linear-gradient(135deg,#fff5e0,#fff);border-color:#d4af37}
+.regalo-card small{display:block;margin-top:0.5rem;font-size:0.8rem;color:#999}
+.regalo-badge{background:#d4af37;color:#1a1a1a;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.75rem}
+.regalo-info{background:#f9f9f9;border-radius:12px;padding:1.5rem;margin-top:2rem}
+.regalo-info h4{font-family:'Cinzel',serif;margin-bottom:1rem}
+.regalo-info ol{margin:0;padding-left:1.5rem}
+.regalo-info li{margin-bottom:0.5rem;color:#555;font-size:0.9rem}
+.lecturas-regalo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1rem}
+.lectura-regalo-card{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:1.25rem;text-align:center;cursor:pointer;transition:all 0.2s}
+.lectura-regalo-card:hover{border-color:#d4af37;transform:translateY(-2px)}
+.lectura-regalo-card.bloqueada{opacity:0.5;cursor:not-allowed}
+.lectura-regalo-card .lectura-icono{font-size:2rem;display:block;margin-bottom:0.5rem}
+.lectura-regalo-card h3{font-family:'Cinzel',serif;font-size:1rem;margin:0 0 0.25rem}
+.lectura-regalo-card p{font-size:0.85rem;color:#666;margin:0 0 0.5rem}
+.lectura-regalo-card .lectura-precio{background:#f5f5f5;display:inline-block;padding:0.3rem 0.75rem;border-radius:15px;font-size:0.85rem;font-weight:600}
+.bloqueado-tag{display:block;margin-top:0.5rem;font-size:0.75rem;color:#e74c3c}
+.regalo-form-sec{max-width:500px;margin:0 auto}
+.regalo-form-card{background:#fff;border-radius:16px;padding:2rem;border:1px solid #f0f0f0}
+.lectura-seleccionada{display:flex;gap:1rem;align-items:center;padding:1rem;background:#f9f9f9;border-radius:12px;margin-bottom:1.5rem}
+.lectura-seleccionada .lectura-icono{font-size:2rem}
+.lectura-seleccionada h3{font-family:'Cinzel',serif;margin:0}
+.lectura-seleccionada p{font-size:0.85rem;color:#666;margin:0.25rem 0}
+.lectura-seleccionada .lectura-precio{font-weight:600;color:#d4af37}
+.regalo-resumen{background:#f9f9f9;border-radius:10px;padding:1rem;margin:1.5rem 0}
+.resumen-row{display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #eee}
+.resumen-row:last-child{border-bottom:none}
+.resumen-row span.insuficientes{color:#e74c3c}
+.resumen-alerta{background:#fff3cd;color:#856404;padding:0.5rem;border-radius:6px;text-align:center;font-size:0.85rem;margin-top:0.75rem}
+.regalo-exito{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.exito-card{text-align:center;background:#fff;padding:3rem;border-radius:20px;max-width:400px}
+.exito-icono{font-size:4rem;display:block;margin-bottom:1rem}
+.exito-card h1{font-family:'Cinzel',serif;margin:0 0 0.5rem}
+.exito-card p{color:#666}
+.codigo-box{background:#f5f5f5;padding:1rem;border-radius:10px;margin:1.5rem 0}
+.codigo-box small{display:block;font-size:0.8rem;color:#888;margin-bottom:0.25rem}
+.codigo-box strong{font-size:1.25rem;font-family:monospace;letter-spacing:2px}
+.exito-card .nota{font-size:0.85rem;color:#888;margin-bottom:1.5rem}
+.regalo-enviando{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.enviando-card{text-align:center}
+.spinner-regalo{width:50px;height:50px;border:3px solid #f0f0f0;border-top-color:#d4af37;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 .elementos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
 .elem-card{border:2px solid #f0f0f0;border-radius:12px;overflow:hidden}
 .elem-head{padding:0.75rem;text-align:center;color:#fff;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:'Cinzel',serif}

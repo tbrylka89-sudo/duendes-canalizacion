@@ -396,21 +396,22 @@ export default function Onboarding({ email, nombreInicial, onComplete }) {
             </div>
 
             <div className="campo">
-              <label>¿Cuánto invertirías en algo que te haga feliz?</label>
-              <div className="opciones-rango">
+              <label>Cuando algo te conecta profundamente, ¿cómo honrás ese vínculo?</label>
+              <div className="opciones-visual">
                 {[
-                  { valor: '20-50', texto: '$20-50' },
-                  { valor: '50-100', texto: '$50-100' },
-                  { valor: '100-200', texto: '$100-200' },
-                  { valor: 'mas-200', texto: '+$200' }
+                  { valor: '20-50', icono: '🌿', texto: 'Con tiempo y atención' },
+                  { valor: '50-100', icono: '✨', texto: 'Con detalles simbólicos' },
+                  { valor: '100-200', icono: '🔮', texto: 'Colecciono piezas especiales' },
+                  { valor: 'mas-200', icono: '👑', texto: 'Invierto en lo que transforma' }
                 ].map(op => (
                   <button
                     key={op.valor}
                     type="button"
-                    className={`rango-btn ${datos.inversionFelicidad === op.valor ? 'seleccionado' : ''}`}
+                    className={`visual-btn ${datos.inversionFelicidad === op.valor ? 'seleccionado' : ''}`}
                     onClick={() => handleChange('inversionFelicidad', op.valor)}
                   >
-                    {op.texto}
+                    <span className="visual-icono">{op.icono}</span>
+                    <span className="visual-texto">{op.texto}</span>
                   </button>
                 ))}
               </div>

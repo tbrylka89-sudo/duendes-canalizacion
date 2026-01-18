@@ -62,6 +62,11 @@ const SYSTEM_PROMPT_BASE = `Sos Thibisay, la voz de Duendes del Uruguay. Escrib�
 
 // Prompts específicos por tipo de contenido
 const PROMPTS_POR_TIPO = {
+  mensaje: `Escribí un mensaje del día que conecte directamente con el corazón.
+No es un horóscopo ni una frase motivacional vacía.
+Algo que la persona pueda llevarse y aplicar HOY.
+Primera frase: golpe emocional. Última frase: esperanza activa.`,
+
   articulo: `Escribí un artículo que enseñe algo real y útil.
 No es un ensayo académico ni un texto motivacional genérico.
 Es una conversación donde compartís sabiduría práctica.
@@ -70,17 +75,30 @@ La persona debe terminar de leer sabiendo HACER algo nuevo o VIENDO algo diferen
   ritual: `Creá un ritual que la persona pueda hacer ESTA NOCHE con cosas que tiene en su casa.
 Nada de ingredientes imposibles de conseguir.
 Explicá el POR QUÉ de cada paso, no solo el cómo.
-Que sienta que vos misma lo hacés regularmente.`,
+Que sienta que vos misma lo hacés regularmente.
+ESTRUCTURA: Intención → Preparación → Pasos numerados → Cierre → Variaciones opcionales`,
 
   meditacion: `Escribí una meditación guiada que se pueda leer en voz alta o grabar.
 Ritmo pausado, frases cortas.
 Guía sensorial específica (no "sentí la energía", sino "notá el peso de tus manos sobre tus piernas").
-Un viaje con inicio, transformación y cierre.`,
+Un viaje con inicio, transformación y cierre.
+INCLUIR: Música/sonido sugerido, duración, momento ideal.`,
+
+  curso: `Creá una lección estructurada con teoría y práctica.
+Como una clase particular con una amiga.
+Empezá por lo básico pero llegá a algo que sorprenda.
+ESTRUCTURA: Introducción → Conceptos clave → Ejemplos → Ejercicio práctico → Resumen`,
+
+  conocimiento: `Enseñá sobre este elemento/cristal/hierba/runa de forma completa.
+Historia y origen, propiedades, usos prácticos, cuidados, combinaciones.
+No solo información - CONEXIÓN personal con el elemento.
+ESTRUCTURA: Presentación → Propiedades → Cómo usarlo → Meditación/Ritual corto`,
 
   historia: `Contá una historia de duendes que se sienta REAL.
 No un cuento infantil ni una leyenda genérica.
 Una historia con personaje, conflicto, transformación.
-Que transmita una verdad profunda sin ser moraleja obvia.`,
+Que transmita una verdad profunda sin ser moraleja obvia.
+ESTRUCTURA: Inicio envolvente → Desarrollo → Momento de quiebre → Resolución → Eco en el presente`,
 
   guia: `Creá una guía práctica paso a paso.
 Lenguaje claro, instrucciones precisas.
@@ -97,6 +115,86 @@ Como una clase particular con una amiga.
 Empezá por lo básico pero llegá a algo que sorprenda.
 Incluí ejemplos concretos de tu práctica.`
 };
+
+// Función para construir prompt específico según campos del form
+function construirPromptDesdeCampos(tipo, camposForm) {
+  const prompts = {
+    mensaje: () => {
+      const { tema, enfoque, intencion } = camposForm;
+      return `
+TEMA DEL MENSAJE: ${tema || 'Inspiración general'}
+ENFOQUE: ${enfoque || 'reflexivo'}
+INTENCIÓN: ${intencion || 'Que la persona sienta paz y claridad'}
+
+Escribí un mensaje del día con este enfoque específico.`;
+    },
+
+    meditacion: () => {
+      const { duracion, objetivo, elementos, musica } = camposForm;
+      return `
+DURACIÓN: ${duracion || '10 minutos'}
+OBJETIVO: ${objetivo || 'Relajación profunda'}
+ELEMENTOS VISUALES: ${elementos || 'Naturaleza, luz, agua'}
+MÚSICA SUGERIDA: ${musica || 'Sonidos suaves de naturaleza'}
+
+Escribí una meditación guiada completa con estas especificaciones.
+INCLUÍ al principio: Duración, música recomendada, momento ideal.
+Al final: sugerencia de journaling post-meditación.`;
+    },
+
+    ritual: () => {
+      const { proposito, materiales, momento, nivel } = camposForm;
+      return `
+PROPÓSITO DEL RITUAL: ${proposito || 'Limpieza energética'}
+MATERIALES: ${materiales || 'Lo que tenga en casa'}
+MEJOR MOMENTO: ${momento || 'Cuando sienta la necesidad'}
+NIVEL: ${nivel || 'Principiante'}
+
+Creá un ritual completo con estos parámetros.
+Si los materiales son específicos, ofrecé alternativas accesibles.
+INCLUÍ: Por qué funciona, variaciones para otros propósitos.`;
+    },
+
+    curso: () => {
+      const { tema_curso, nivel, objetivos, incluirEjercicio } = camposForm;
+      return `
+TEMA DE LA LECCIÓN: ${tema_curso || 'Introducción'}
+NIVEL: ${nivel || 'Principiante'}
+OBJETIVOS DE APRENDIZAJE: ${objetivos || 'Comprender los fundamentos'}
+${incluirEjercicio ? 'INCLUIR: Ejercicio práctico al final' : ''}
+
+Creá una lección educativa estructurada.
+ESTRUCTURA: Introducción enganchadora → Concepto 1 → Concepto 2 → Aplicación → Resumen → (Ejercicio si aplica)`;
+    },
+
+    conocimiento: () => {
+      const { subtipo, elemento, propiedades, usos } = camposForm;
+      return `
+TIPO: ${subtipo || 'Cristal'}
+ELEMENTO ESPECÍFICO: ${elemento || 'A tu elección'}
+PROPIEDADES A DESTACAR: ${propiedades || 'Las principales'}
+USOS PRÁCTICOS: ${usos || 'Los más comunes y algunos sorprendentes'}
+
+Creá un artículo de conocimiento profundo sobre este elemento.
+INCLUÍ: Historia/origen, propiedades energéticas, cómo usarlo, cuidados, combinaciones, un mini-ritual o meditación con él.`;
+    },
+
+    historia: () => {
+      const { tipo_historia, moraleja, personajes, ambientacion } = camposForm;
+      return `
+TIPO DE HISTORIA: ${tipo_historia || 'Cuento de duendes'}
+MORALEJA/ENSEÑANZA: ${moraleja || 'A tu elección'}
+PERSONAJES: ${personajes || 'Un duende sabio como protagonista'}
+AMBIENTACIÓN: ${ambientacion || 'Bosque encantado'}
+
+Contá una historia cautivadora con estos elementos.
+Que la moraleja emerja naturalmente, sin explicitarla de forma obvia.`;
+    }
+  };
+
+  const constructor = prompts[tipo];
+  return constructor ? constructor() : '';
+}
 
 // Categorías con contexto
 const CONTEXTO_CATEGORIAS = {
@@ -139,20 +237,29 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const {
+      // Nuevo formato con campos dinámicos
+      tipo = 'mensaje',
+      tipoNombre = '',
+      promptBase = '',
+      camposForm = {},
+      // O formato legacy
       tema,
       palabras = 1500,
       categoria = 'general',
-      tipo = 'articulo',
       instruccionesExtra = '',
-      tono = 'normal', // normal, intimo, energetico, serio
-      audiencia = 'general', // general, principiante, avanzado
+      tono = 'normal',
+      audiencia = 'general',
       usarDuendeSemana = false,
       integrarLuna = false,
       integrarEstacion = false
     } = body;
 
-    if (!tema) {
-      return Response.json({ success: false, error: 'Tema requerido' }, { status: 400 });
+    // Extraer tema de camposForm si existe, o usar tema legacy
+    const temaFinal = camposForm.tema || camposForm.tema_curso || camposForm.objetivo ||
+                      camposForm.proposito || camposForm.elemento || tema;
+
+    if (!temaFinal && Object.keys(camposForm).length === 0) {
+      return Response.json({ success: false, error: 'Completá al menos un campo del formulario' }, { status: 400 });
     }
 
     // Construir contexto de categoría
@@ -250,9 +357,14 @@ ${contextoNatural}
 ${ajusteTono}
 ${ajusteAudiencia}`;
 
-    const userPrompt = `TEMA: "${tema}"
+    // Construir prompt específico si tenemos campos del form
+    const promptEspecifico = Object.keys(camposForm).length > 0
+      ? construirPromptDesdeCampos(tipo, camposForm)
+      : `TEMA: "${temaFinal}"`;
 
-TIPO DE CONTENIDO: ${tipo}
+    const userPrompt = `${promptEspecifico}
+
+TIPO DE CONTENIDO: ${tipoNombre || tipo}
 ${instruccionesTipo}
 
 EXTENSIÓN: Aproximadamente ${palabras} palabras. No rellenes para llegar al número - si el tema se cubre bien en menos, está perfecto.
@@ -294,7 +406,7 @@ RECORDÁ:
 
     // Extraer título (primera línea con #)
     const tituloMatch = contenido.match(/^#\s+(.+)$/m);
-    const titulo = tituloMatch ? tituloMatch[1].replace(/\*\*/g, '').trim() : tema;
+    const titulo = tituloMatch ? tituloMatch[1].replace(/\*\*/g, '').trim() : temaFinal;
 
     // Contar palabras reales
     const palabrasReales = contenido.split(/\s+/).filter(w => w.length > 0).length;
@@ -307,7 +419,7 @@ RECORDÁ:
           id: `contenido_${Date.now()}`,
           tipo,
           titulo,
-          tema,
+          tema: temaFinal,
           duende: {
             id: duendeSemana.duendeId,
             nombre: duendeSemana.nombre,

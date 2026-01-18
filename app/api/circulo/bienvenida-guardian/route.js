@@ -3,76 +3,37 @@ import Anthropic from '@anthropic-ai/sdk';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: Generar bienvenida personalizada del Guardián de la Semana
-// Usa Claude AI para generar un mensaje único desde la perspectiva del guardián
+// Usa duendes REALES de WooCommerce sincronizados en KV
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const anthropic = new Anthropic();
 
-// Guardianes disponibles para rotar semanalmente
-const GUARDIANES_SEMANA = [
-  {
-    id: 'rowan',
-    nombre: 'Rowan',
-    elemento: 'tierra',
-    especialidad: 'abundancia y prosperidad',
-    personalidad: 'sabio y sereno, con voz profunda y cálida',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/12/Rowan.jpg',
-    color: '#8B4513'
-  },
-  {
-    id: 'luna',
-    nombre: 'Luna',
-    elemento: 'agua',
-    especialidad: 'intuición y sueños',
-    personalidad: 'mística y etérea, habla con suavidad y misterio',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/12/Luna.jpg',
-    color: '#6B5B95'
-  },
-  {
-    id: 'ember',
-    nombre: 'Ember',
-    elemento: 'fuego',
-    especialidad: 'pasión y transformación',
-    personalidad: 'energética y apasionada, directa y motivadora',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/12/Ember.jpg',
-    color: '#FF6B35'
-  },
-  {
-    id: 'sage',
-    nombre: 'Sage',
-    elemento: 'aire',
-    especialidad: 'sanación y paz interior',
-    personalidad: 'tranquila y sanadora, transmite calma profunda',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/12/Sage.jpg',
-    color: '#4A7C59'
-  },
-  {
-    id: 'frost',
-    nombre: 'Frost',
-    elemento: 'hielo',
-    especialidad: 'claridad mental y protección',
-    personalidad: 'directo y protector, pocas palabras pero poderosas',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/12/Frost.jpg',
-    color: '#5DADE2'
-  },
-  {
-    id: 'aurora',
-    nombre: 'Aurora',
-    elemento: 'luz',
-    especialidad: 'nuevos comienzos y esperanza',
-    personalidad: 'radiante y optimista, llena de luz y alegría',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/12/Aurora.jpg',
-    color: '#FFD700'
+// Obtener guardián de la semana desde KV (sincronizado de WooCommerce)
+async function obtenerGuardianSemana() {
+  // Primero intentar obtener el guardián configurado
+  const guardianActual = await kv.get('duende-semana-actual');
+  if (guardianActual) {
+    return guardianActual;
   }
-];
 
-// Obtener guardián de la semana basado en la fecha
-function obtenerGuardianSemana() {
-  const ahora = new Date();
-  const inicioAno = new Date(ahora.getFullYear(), 0, 1);
-  const semanaDelAno = Math.ceil(((ahora - inicioAno) / 86400000 + inicioAno.getDay() + 1) / 7);
-  const indice = semanaDelAno % GUARDIANES_SEMANA.length;
-  return GUARDIANES_SEMANA[indice];
+  // Si no hay, obtener de la lista de guardianes reales
+  const guardianes = await kv.get('duendes:guardianes');
+  if (guardianes && guardianes.length > 0) {
+    // Rotar basado en la semana del año
+    const ahora = new Date();
+    const inicioAno = new Date(ahora.getFullYear(), 0, 1);
+    const semanaDelAno = Math.ceil(((ahora - inicioAno) / 86400000 + inicioAno.getDay() + 1) / 7);
+    const indice = semanaDelAno % guardianes.length;
+    return guardianes[indice];
+  }
+
+  // Fallback a un guardián por defecto si no hay datos
+  return {
+    id: 'finnian',
+    nombre: 'Finnian',
+    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/Finnian.jpg',
+    especialidad: 'protección y sabiduría ancestral'
+  };
 }
 
 export async function POST(request) {
@@ -97,8 +58,8 @@ export async function POST(request) {
       });
     }
 
-    // Obtener guardián de la semana
-    const guardian = obtenerGuardianSemana();
+    // Obtener guardián de la semana (REAL de WooCommerce)
+    const guardian = await obtenerGuardianSemana();
 
     // Construir contexto del usuario para personalizar el mensaje
     let contextoUsuario = `Nombre: ${nombre}`;
@@ -123,7 +84,7 @@ export async function POST(request) {
       max_tokens: 500,
       messages: [{
         role: 'user',
-        content: `Sos ${guardian.nombre}, un guardián de Duendes del Uruguay. Tu elemento es ${guardian.elemento} y tu especialidad es ${guardian.especialidad}. Tu personalidad: ${guardian.personalidad}.
+        content: `Sos ${guardian.nombre}, un guardián mágico de Duendes del Uruguay.
 
 Un nuevo miembro acaba de unirse al Círculo de Duendes. Escribí un mensaje de bienvenida PERSONAL y CÁLIDO desde tu perspectiva como guardián.
 
@@ -131,8 +92,8 @@ INFORMACIÓN DEL NUEVO MIEMBRO:
 ${contextoUsuario}
 
 INSTRUCCIONES:
-- El mensaje debe empezar con "Bienvenida ${nombre}..." o similar
-- Mencioná quién sos y tu especialidad brevemente
+- El mensaje debe empezar saludando a ${nombre} por su nombre
+- Presentate brevemente como guardián
 - Conectá con algo que la persona busca o le interesa (si hay info)
 - Contale qué van a aprender juntos esta semana
 - Máximo 3-4 párrafos cortos
@@ -149,11 +110,10 @@ Escribí SOLO el mensaje, sin explicaciones ni formato markdown.`
     // Guardar que ya recibió la bienvenida
     await kv.set(`bienvenida:${email}`, {
       guardian: {
-        id: guardian.id,
+        id: guardian.id || guardian.slug,
         nombre: guardian.nombre,
         imagen: guardian.imagen,
-        color: guardian.color,
-        especialidad: guardian.especialidad
+        color: '#D4AF37'
       },
       mensaje: mensajeBienvenida,
       fecha: new Date().toISOString()
@@ -162,11 +122,10 @@ Escribí SOLO el mensaje, sin explicaciones ni formato markdown.`
     return Response.json({
       success: true,
       guardian: {
-        id: guardian.id,
+        id: guardian.id || guardian.slug,
         nombre: guardian.nombre,
         imagen: guardian.imagen,
-        color: guardian.color,
-        especialidad: guardian.especialidad
+        color: '#D4AF37'
       },
       mensaje: mensajeBienvenida
     });
@@ -183,16 +142,14 @@ Escribí SOLO el mensaje, sin explicaciones ni formato markdown.`
 // GET: Obtener guardián de la semana actual (sin generar mensaje)
 export async function GET() {
   try {
-    const guardian = obtenerGuardianSemana();
+    const guardian = await obtenerGuardianSemana();
     return Response.json({
       success: true,
       guardian: {
-        id: guardian.id,
+        id: guardian.id || guardian.slug,
         nombre: guardian.nombre,
         imagen: guardian.imagen,
-        color: guardian.color,
-        especialidad: guardian.especialidad,
-        elemento: guardian.elemento
+        color: '#D4AF37'
       }
     });
   } catch (error) {
