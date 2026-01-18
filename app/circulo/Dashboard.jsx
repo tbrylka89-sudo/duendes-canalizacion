@@ -908,27 +908,276 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function SeccionContenido() {
+  const [contenidos, setContenidos] = useState([]);
+  const [contenidoActivo, setContenidoActivo] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    cargarContenidoSemana();
+  }, []);
+
+  async function cargarContenidoSemana() {
+    setCargando(true);
+    try {
+      const res = await fetch('/api/circulo/contenido?tipo=semana');
+      const data = await res.json();
+      if (data.success && data.contenidos) {
+        setContenidos(data.contenidos);
+        if (data.contenidos.length > 0) {
+          setContenidoActivo(data.contenidos[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando contenido:', error);
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  const DIAS_SEMANA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
   return (
     <div className="seccion-contenido">
       <h2>Contenido de la Semana</h2>
-      <p className="placeholder">El contenido de esta semana aparecerá aquí...</p>
+
+      {cargando ? (
+        <p className="cargando">Cargando contenido...</p>
+      ) : contenidos.length === 0 ? (
+        <div className="sin-contenido">
+          <p>Aún no hay contenido publicado para esta semana.</p>
+          <p className="sub">El guardián de la semana estará compartiendo enseñanzas muy pronto.</p>
+        </div>
+      ) : (
+        <div className="contenido-layout">
+          {/* Selector de días */}
+          <div className="dias-selector">
+            {contenidos.map((c, i) => (
+              <button
+                key={i}
+                className={`dia-btn ${contenidoActivo?.fecha?.dia === c.fecha?.dia ? 'activo' : ''}`}
+                onClick={() => setContenidoActivo(c)}
+              >
+                <span className="dia-nombre">{c.fecha?.diaSemana || DIAS_SEMANA[new Date(c.fecha?.año, c.fecha?.mes - 1, c.fecha?.dia).getDay()]}</span>
+                <span className="dia-numero">{c.fecha?.dia}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Contenido del día */}
+          {contenidoActivo && (
+            <div className="contenido-dia">
+              <div className="contenido-header">
+                <span className="contenido-fecha">
+                  {contenidoActivo.fecha?.dia} de {['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][contenidoActivo.fecha?.mes]}
+                </span>
+                {contenidoActivo.guardian && (
+                  <span className="contenido-guardian">Por {contenidoActivo.guardian.nombre}</span>
+                )}
+              </div>
+
+              <h3 className="contenido-titulo">{contenidoActivo.titulo || 'Enseñanza del día'}</h3>
+
+              {contenidoActivo.mensaje && (
+                <div className="contenido-mensaje">
+                  <p>{contenidoActivo.mensaje}</p>
+                </div>
+              )}
+
+              {contenidoActivo.ensenanza && (
+                <div className="contenido-ensenanza">
+                  <h4>Enseñanza</h4>
+                  <p>{contenidoActivo.ensenanza}</p>
+                </div>
+              )}
+
+              {contenidoActivo.practica && (
+                <div className="contenido-practica">
+                  <h4>Práctica del día</h4>
+                  <p>{contenidoActivo.practica}</p>
+                </div>
+              )}
+
+              {contenidoActivo.reflexion && (
+                <div className="contenido-reflexion">
+                  <blockquote>"{contenidoActivo.reflexion}"</blockquote>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <style jsx>{`
         .seccion-contenido {
-          text-align: center;
-          padding: 60px 20px;
+          animation: fadeIn 0.5s ease;
         }
 
         h2 {
           font-family: 'Tangerine', cursive;
           font-size: 48px;
           color: #ffffff;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .cargando, .sin-contenido {
+          text-align: center;
+          padding: 60px 20px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sin-contenido .sub {
+          font-size: 14px;
+          margin-top: 10px;
+          font-style: italic;
+        }
+
+        .contenido-layout {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+        }
+
+        /* Selector de días */
+        .dias-selector {
+          display: flex;
+          gap: 10px;
+          overflow-x: auto;
+          padding: 10px 0;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .dia-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 15px 20px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 15px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          min-width: 80px;
+        }
+
+        .dia-btn:hover {
+          border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .dia-btn.activo {
+          background: rgba(212, 175, 55, 0.15);
+          border-color: #d4af37;
+        }
+
+        .dia-nombre {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.5);
+          text-transform: capitalize;
+        }
+
+        .dia-btn.activo .dia-nombre {
+          color: #d4af37;
+        }
+
+        .dia-numero {
+          font-family: 'Cinzel', serif;
+          font-size: 24px;
+          font-weight: 600;
+          color: #ffffff;
+        }
+
+        .dia-btn.activo .dia-numero {
+          color: #d4af37;
+        }
+
+        /* Contenido del día */
+        .contenido-dia {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 25px;
+          padding: 40px;
+        }
+
+        .contenido-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
           margin-bottom: 20px;
         }
 
-        .placeholder {
+        .contenido-fecha {
+          font-size: 14px;
+          color: rgba(212, 175, 55, 0.8);
+          text-transform: capitalize;
+        }
+
+        .contenido-guardian {
+          font-size: 13px;
           color: rgba(255, 255, 255, 0.5);
+        }
+
+        .contenido-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 28px;
+          color: #ffffff;
+          margin-bottom: 25px;
+        }
+
+        .contenido-mensaje p,
+        .contenido-ensenanza p,
+        .contenido-practica p {
+          font-size: 16px;
+          line-height: 1.8;
+          color: rgba(255, 255, 255, 0.85);
+          white-space: pre-wrap;
+        }
+
+        .contenido-ensenanza,
+        .contenido-practica {
+          margin-top: 30px;
+          padding-top: 25px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contenido-ensenanza h4,
+        .contenido-practica h4 {
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          color: #d4af37;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          margin-bottom: 15px;
+        }
+
+        .contenido-reflexion {
+          margin-top: 30px;
+          padding: 25px;
+          background: rgba(212, 175, 55, 0.05);
+          border-left: 3px solid #d4af37;
+          border-radius: 0 15px 15px 0;
+        }
+
+        .contenido-reflexion blockquote {
+          margin: 0;
           font-style: italic;
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.9);
+          line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+          .contenido-dia {
+            padding: 25px;
+          }
+
+          .contenido-titulo {
+            font-size: 22px;
+          }
+
+          .dias-selector {
+            justify-content: flex-start;
+          }
         }
       `}</style>
     </div>
@@ -1179,27 +1428,306 @@ function SeccionForo({ usuario }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function SeccionArchivo() {
+  const [meses, setMeses] = useState([]);
+  const [mesActivo, setMesActivo] = useState(null);
+  const [contenidosMes, setContenidosMes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [cargandoMes, setCargandoMes] = useState(false);
+
+  useEffect(() => {
+    cargarArchivo();
+  }, []);
+
+  async function cargarArchivo() {
+    setCargando(true);
+    try {
+      const res = await fetch('/api/circulo/contenido?tipo=archivo');
+      const data = await res.json();
+      if (data.success && data.meses) {
+        setMeses(data.meses);
+      }
+    } catch (error) {
+      console.error('Error cargando archivo:', error);
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  async function cargarMes(año, mes) {
+    setCargandoMes(true);
+    setMesActivo({ año, mes });
+    try {
+      const res = await fetch(`/api/circulo/contenido?tipo=mes&año=${año}&mes=${mes}`);
+      const data = await res.json();
+      if (data.success) {
+        setContenidosMes(data.contenidos || []);
+      }
+    } catch (error) {
+      console.error('Error cargando mes:', error);
+    } finally {
+      setCargandoMes(false);
+    }
+  }
+
+  const MESES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
   return (
     <div className="seccion-archivo">
       <h2>Archivo del Círculo</h2>
-      <p className="placeholder">Aquí encontrarás todo el contenido de semanas anteriores...</p>
+      <p className="archivo-desc">Revisá las enseñanzas de meses anteriores</p>
+
+      {cargando ? (
+        <p className="cargando">Cargando archivo...</p>
+      ) : meses.length === 0 ? (
+        <div className="sin-archivo">
+          <p>Aún no hay contenido archivado.</p>
+          <p className="sub">A medida que pasen los meses, aquí encontrarás todo el historial.</p>
+        </div>
+      ) : (
+        <div className="archivo-layout">
+          {/* Selector de meses */}
+          <div className="meses-grid">
+            {meses.map((m, i) => (
+              <button
+                key={i}
+                className={`mes-btn ${mesActivo?.año === m.año && mesActivo?.mes === m.mes ? 'activo' : ''}`}
+                onClick={() => cargarMes(m.año, m.mes)}
+              >
+                <span className="mes-nombre">{m.nombreMes}</span>
+                <span className="mes-año">{m.año}</span>
+                <span className="mes-contenidos">{m.totalContenidos} días</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Contenidos del mes seleccionado */}
+          {mesActivo && (
+            <div className="contenidos-mes">
+              <h3 className="mes-titulo">
+                {MESES[mesActivo.mes]} {mesActivo.año}
+              </h3>
+
+              {cargandoMes ? (
+                <p className="cargando">Cargando...</p>
+              ) : contenidosMes.length === 0 ? (
+                <p className="sin-contenido">No hay contenido para este mes.</p>
+              ) : (
+                <div className="contenidos-lista">
+                  {contenidosMes.map((c, i) => (
+                    <div key={i} className="contenido-mini">
+                      <div className="mini-fecha">
+                        <span className="mini-dia">{c.fecha?.dia}</span>
+                        <span className="mini-mes">{MESES[c.fecha?.mes]?.substring(0, 3)}</span>
+                      </div>
+                      <div className="mini-info">
+                        <h4>{c.titulo || 'Enseñanza del día'}</h4>
+                        <p>{c.mensaje?.substring(0, 100) || c.ensenanza?.substring(0, 100)}...</p>
+                        {c.guardian && <span className="mini-guardian">Por {c.guardian.nombre}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <style jsx>{`
         .seccion-archivo {
-          text-align: center;
-          padding: 60px 20px;
+          animation: fadeIn 0.5s ease;
         }
 
         h2 {
           font-family: 'Tangerine', cursive;
           font-size: 48px;
           color: #ffffff;
-          margin-bottom: 20px;
+          margin-bottom: 10px;
+          text-align: center;
         }
 
-        .placeholder {
+        .archivo-desc {
+          text-align: center;
           color: rgba(255, 255, 255, 0.5);
+          margin-bottom: 40px;
+        }
+
+        .cargando, .sin-archivo {
+          text-align: center;
+          padding: 60px 20px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sin-archivo .sub {
+          font-size: 14px;
+          margin-top: 10px;
           font-style: italic;
+        }
+
+        .archivo-layout {
+          display: flex;
+          flex-direction: column;
+          gap: 40px;
+        }
+
+        /* Grid de meses */
+        .meses-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+          gap: 15px;
+        }
+
+        .mes-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 25px 20px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .mes-btn:hover {
+          border-color: rgba(212, 175, 55, 0.5);
+          transform: translateY(-3px);
+        }
+
+        .mes-btn.activo {
+          background: rgba(212, 175, 55, 0.15);
+          border-color: #d4af37;
+        }
+
+        .mes-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 18px;
+          color: #ffffff;
+          text-transform: capitalize;
+          margin-bottom: 5px;
+        }
+
+        .mes-btn.activo .mes-nombre {
+          color: #d4af37;
+        }
+
+        .mes-año {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .mes-contenidos {
+          font-size: 12px;
+          color: rgba(212, 175, 55, 0.7);
+          margin-top: 8px;
+        }
+
+        /* Contenidos del mes */
+        .contenidos-mes {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 25px;
+          padding: 30px;
+        }
+
+        .mes-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 24px;
+          color: #d4af37;
+          text-transform: capitalize;
+          margin-bottom: 25px;
+          text-align: center;
+        }
+
+        .contenidos-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .contenido-mini {
+          display: flex;
+          gap: 20px;
+          padding: 20px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 15px;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+
+        .contenido-mini:hover {
+          border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .mini-fecha {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-width: 60px;
+          padding: 10px;
+          background: rgba(212, 175, 55, 0.1);
+          border-radius: 10px;
+        }
+
+        .mini-dia {
+          font-family: 'Cinzel', serif;
+          font-size: 24px;
+          font-weight: 600;
+          color: #d4af37;
+        }
+
+        .mini-mes {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.5);
+          text-transform: uppercase;
+        }
+
+        .mini-info {
+          flex: 1;
+        }
+
+        .mini-info h4 {
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          color: #ffffff;
+          margin-bottom: 8px;
+        }
+
+        .mini-info p {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.6);
+          line-height: 1.5;
+        }
+
+        .mini-guardian {
+          display: inline-block;
+          margin-top: 8px;
+          font-size: 12px;
+          color: rgba(212, 175, 55, 0.7);
+        }
+
+        .sin-contenido {
+          text-align: center;
+          padding: 40px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 768px) {
+          .meses-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .contenido-mini {
+            flex-direction: column;
+            gap: 15px;
+          }
+
+          .mini-fecha {
+            flex-direction: row;
+            gap: 10px;
+          }
         }
       `}</style>
     </div>

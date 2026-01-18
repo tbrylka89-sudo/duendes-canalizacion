@@ -117,162 +117,216 @@ export async function OPTIONS() {
   return new Response(null, { headers: CORS_HEADERS });
 }
 
-// Catálogo completo de experiencias (incluye las del frontend Mi Magia)
+// ═══════════════════════════════════════════════════════════════
+// CATÁLOGO UNIFICADO DE EXPERIENCIAS
+// Sincronizado con /api/experiencias/catalogo/route.js
+// ═══════════════════════════════════════════════════════════════
 const EXPERIENCIAS = {
-  // === Experiencias del Catálogo de Runas ===
-  'mensaje_dia': {
-    nombre: 'Mensaje del Día Personalizado',
+  // === BÁSICAS (15-30 runas) ===
+  'consejo_bosque': {
+    nombre: 'Consejo del Bosque',
     runas: 15,
     generaIA: true,
-    palabras: 300,
+    palabras: 200,
     tiempoMs: 0
   },
-  'tirada_basica': {
-    nombre: 'Tirada de Runas (3 Runas)',
+  'susurro_guardian': {
+    nombre: 'Susurro del Guardián',
+    runas: 20,
+    generaIA: true,
+    palabras: 250,
+    tiempoMs: 0
+  },
+  'tirada_3_runas': {
+    nombre: 'Tirada de 3 Runas',
     runas: 25,
     generaIA: true,
-    palabras: 800,
-    tiempoMinMs: 20 * 60 * 1000,
-    tiempoMaxMs: 40 * 60 * 1000
-  },
-  'lectura_energia': {
-    nombre: 'Lectura de Energía Básica',
-    runas: 40,
-    generaIA: true,
-    palabras: 1000,
+    palabras: 500,
     tiempoMinMs: 30 * 60 * 1000,
     tiempoMaxMs: 60 * 60 * 1000
   },
-  'guia_cristal': {
-    nombre: 'Guía de Cristal del Mes',
+  'energia_dia': {
+    nombre: 'Energía del Día',
+    runas: 15,
+    generaIA: true,
+    palabras: 200,
+    tiempoMs: 0
+  },
+
+  // === ESTÁNDAR (40-75 runas) ===
+  'tirada_5_runas': {
+    nombre: 'Tirada de 5 Runas',
+    runas: 40,
+    generaIA: true,
+    palabras: 800,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 2 * 60 * 60 * 1000
+  },
+  'oraculo_elementales': {
+    nombre: 'Oráculo de los Elementales',
+    runas: 50,
+    generaIA: true,
+    palabras: 1000,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 2 * 60 * 60 * 1000
+  },
+  'mapa_energia': {
+    nombre: 'Mapa de tu Energía',
     runas: 60,
     generaIA: true,
     palabras: 1200,
-    tiempoMinMs: 60 * 60 * 1000,
-    tiempoMaxMs: 2 * 60 * 60 * 1000
-  },
-  'tirada_completa': {
-    nombre: 'Tirada de Runas Completa (7 Runas)',
-    runas: 80,
-    generaIA: true,
-    palabras: 2000,
     tiempoMinMs: 2 * 60 * 60 * 1000,
     tiempoMaxMs: 4 * 60 * 60 * 1000
   },
-  'lectura_profunda': {
-    nombre: 'Lectura de Energía Profunda',
-    runas: 100,
+  'ritual_mes': {
+    nombre: 'Ritual del Mes',
+    runas: 55,
     generaIA: true,
-    palabras: 2500,
-    tiempoMinMs: 3 * 60 * 60 * 1000,
-    tiempoMaxMs: 6 * 60 * 60 * 1000
+    palabras: 1000,
+    tiempoMinMs: 2 * 60 * 60 * 1000,
+    tiempoMaxMs: 4 * 60 * 60 * 1000
   },
-  'ritual_personalizado': {
-    nombre: 'Ritual Personalizado',
-    runas: 150,
-    generaIA: true,
-    palabras: 2000,
-    tiempoMinMs: 12 * 60 * 60 * 1000,
-    tiempoMaxMs: 24 * 60 * 60 * 1000
-  },
-  'estudio_numerologico': {
-    nombre: 'Estudio Numerológico Completo',
-    runas: 200,
-    generaIA: true,
-    palabras: 4000,
-    tiempoMinMs: 24 * 60 * 60 * 1000,
-    tiempoMaxMs: 48 * 60 * 60 * 1000
-  },
-  'carta_astral_basica': {
-    nombre: 'Carta Astral Básica',
-    runas: 300,
-    generaIA: false,
-    palabras: 5000,
-    tiempoMinMs: 4 * 24 * 60 * 60 * 1000,
-    tiempoMaxMs: 7 * 24 * 60 * 60 * 1000
-  },
-  'estudio_alma': {
-    nombre: 'Estudio del Alma Completo',
-    runas: 500,
-    generaIA: false,
-    palabras: 8000,
-    tiempoMinMs: 10 * 24 * 60 * 60 * 1000,
-    tiempoMaxMs: 14 * 24 * 60 * 60 * 1000
-  },
-
-  // === Experiencias de Mi Magia (precios accesibles) ===
-  'tirada-runas': {
-    nombre: 'Tirada de Runas',
-    runas: 5,
-    generaIA: true,
-    palabras: 800,
-    tiempoMinMs: 15 * 60 * 1000,
-    tiempoMaxMs: 30 * 60 * 1000
-  },
-  'susurro-guardian': {
-    nombre: 'Susurro del Guardián',
-    runas: 10,
-    generaIA: true,
-    palabras: 600,
-    tiempoMinMs: 30 * 60 * 1000,
-    tiempoMaxMs: 60 * 60 * 1000
-  },
-  'oraculo-mes': {
-    nombre: 'Oráculo del Mes',
-    runas: 12,
+  'numerologia_personal': {
+    nombre: 'Numerología Personal',
+    runas: 65,
     generaIA: true,
     palabras: 1500,
-    tiempoMinMs: 60 * 60 * 1000,
-    tiempoMaxMs: 2 * 60 * 60 * 1000
-  },
-  'gran-oraculo': {
-    nombre: 'El Gran Oráculo',
-    runas: 20,
-    generaIA: true,
-    palabras: 2500,
-    tiempoMinMs: 2 * 60 * 60 * 1000,
-    tiempoMaxMs: 4 * 60 * 60 * 1000
-  },
-  'lectura-alma': {
-    nombre: 'Lectura del Alma',
-    runas: 25,
-    generaIA: true,
-    palabras: 3000,
     tiempoMinMs: 4 * 60 * 60 * 1000,
     tiempoMaxMs: 8 * 60 * 60 * 1000
   },
-  'registros-akashicos': {
-    nombre: 'Registros Akáshicos',
-    runas: 35,
+  'tarot_simple': {
+    nombre: 'Lectura de Tarot Simple',
+    runas: 50,
     generaIA: true,
-    palabras: 4000,
-    tiempoMinMs: 6 * 60 * 60 * 1000,
-    tiempoMaxMs: 12 * 60 * 60 * 1000
-  },
-  'carta-ancestral': {
-    nombre: 'Carta Ancestral',
-    runas: 15,
-    generaIA: true,
-    palabras: 1200,
+    palabras: 800,
     tiempoMinMs: 60 * 60 * 1000,
     tiempoMaxMs: 2 * 60 * 60 * 1000
   },
-  'mapa-energetico': {
-    nombre: 'Mapa Energético',
-    runas: 18,
+  'mensaje_guardian': {
+    nombre: 'Mensaje de TU Guardián',
+    runas: 45,
+    generaIA: true,
+    palabras: 600,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 2 * 60 * 60 * 1000,
+    requiereGuardian: true
+  },
+
+  // === PREMIUM (100-150 runas) ===
+  'tirada_7_runas': {
+    nombre: 'Tirada de 7 Runas Completa',
+    runas: 100,
     generaIA: true,
     palabras: 2000,
-    tiempoMinMs: 2 * 60 * 60 * 1000,
-    tiempoMaxMs: 4 * 60 * 60 * 1000
+    tiempoMinMs: 4 * 60 * 60 * 1000,
+    tiempoMaxMs: 8 * 60 * 60 * 1000
   },
-  'pregunta-especifica': {
-    nombre: 'Pregunta Específica',
-    runas: 8,
+  'tarot_profundo': {
+    nombre: 'Lectura de Tarot Profunda',
+    runas: 120,
     generaIA: true,
-    palabras: 500,
-    tiempoMinMs: 20 * 60 * 1000,
-    tiempoMaxMs: 45 * 60 * 1000
-  }
+    palabras: 2500,
+    tiempoMinMs: 6 * 60 * 60 * 1000,
+    tiempoMaxMs: 12 * 60 * 60 * 1000
+  },
+  'carta_astral_esencial': {
+    nombre: 'Carta Astral Esencial',
+    runas: 130,
+    generaIA: true,
+    palabras: 3000,
+    tiempoMinMs: 24 * 60 * 60 * 1000,
+    tiempoMaxMs: 48 * 60 * 60 * 1000
+  },
+  'lectura_año_personal': {
+    nombre: 'Lectura de Año Personal',
+    runas: 140,
+    generaIA: true,
+    palabras: 4000,
+    tiempoMinMs: 24 * 60 * 60 * 1000,
+    tiempoMaxMs: 72 * 60 * 60 * 1000
+  },
+  'conexion_guardian': {
+    nombre: 'Conexión con tu Guardián',
+    runas: 110,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 4 * 60 * 60 * 1000,
+    tiempoMaxMs: 8 * 60 * 60 * 1000,
+    requiereGuardian: true
+  },
+
+  // === ULTRA PREMIUM (200-400 runas) ===
+  'estudio_alma': {
+    nombre: 'Estudio del Alma',
+    runas: 200,
+    generaIA: true,
+    palabras: 6000,
+    tiempoMinMs: 48 * 60 * 60 * 1000,
+    tiempoMaxMs: 96 * 60 * 60 * 1000
+  },
+  'conexion_ancestros': {
+    nombre: 'Conexión con Ancestros',
+    runas: 250,
+    generaIA: true,
+    palabras: 4000,
+    tiempoMinMs: 48 * 60 * 60 * 1000,
+    tiempoMaxMs: 96 * 60 * 60 * 1000
+  },
+  'registros_akashicos': {
+    nombre: 'Registros Akáshicos',
+    runas: 250,
+    generaIA: true,
+    palabras: 5000,
+    tiempoMinMs: 48 * 60 * 60 * 1000,
+    tiempoMaxMs: 96 * 60 * 60 * 1000
+  },
+  'vidas_pasadas': {
+    nombre: 'Mapa de Vidas Pasadas',
+    runas: 300,
+    generaIA: true,
+    palabras: 6000,
+    tiempoMinMs: 96 * 60 * 60 * 1000,
+    tiempoMaxMs: 168 * 60 * 60 * 1000
+  },
+  'proposito_vida': {
+    nombre: 'Propósito de Vida',
+    runas: 350,
+    generaIA: true,
+    palabras: 8000,
+    tiempoMinMs: 168 * 60 * 60 * 1000,
+    tiempoMaxMs: 336 * 60 * 60 * 1000
+  },
+  'gran_estudio_anual': {
+    nombre: 'Gran Estudio Anual',
+    runas: 400,
+    generaIA: true,
+    palabras: 12000,
+    tiempoMinMs: 168 * 60 * 60 * 1000,
+    tiempoMaxMs: 336 * 60 * 60 * 1000
+  },
+
+  // === ALIASES PARA COMPATIBILIDAD ===
+  // IDs alternativos que apuntan a las experiencias correctas
+  'mensaje_dia': { alias: 'consejo_bosque', nombre: 'Consejo del Bosque', runas: 15, generaIA: true, palabras: 200, tiempoMs: 0 },
+  'tirada_basica': { alias: 'tirada_3_runas', nombre: 'Tirada de 3 Runas', runas: 25, generaIA: true, palabras: 500, tiempoMinMs: 30 * 60 * 1000, tiempoMaxMs: 60 * 60 * 1000 },
+  'tirada_completa': { alias: 'tirada_7_runas', nombre: 'Tirada de 7 Runas Completa', runas: 100, generaIA: true, palabras: 2000, tiempoMinMs: 4 * 60 * 60 * 1000, tiempoMaxMs: 8 * 60 * 60 * 1000 },
+  'lectura_energia': { alias: 'mapa_energia', nombre: 'Mapa de tu Energía', runas: 60, generaIA: true, palabras: 1200, tiempoMinMs: 2 * 60 * 60 * 1000, tiempoMaxMs: 4 * 60 * 60 * 1000 },
+  'guia_cristal': { alias: 'oraculo_elementales', nombre: 'Oráculo de los Elementales', runas: 50, generaIA: true, palabras: 1000, tiempoMinMs: 60 * 60 * 1000, tiempoMaxMs: 2 * 60 * 60 * 1000 },
+  'lectura_profunda': { alias: 'tarot_profundo', nombre: 'Lectura de Tarot Profunda', runas: 120, generaIA: true, palabras: 2500, tiempoMinMs: 6 * 60 * 60 * 1000, tiempoMaxMs: 12 * 60 * 60 * 1000 },
+  'ritual_personalizado': { alias: 'ritual_mes', nombre: 'Ritual del Mes', runas: 55, generaIA: true, palabras: 1000, tiempoMinMs: 2 * 60 * 60 * 1000, tiempoMaxMs: 4 * 60 * 60 * 1000 },
+  'estudio_numerologico': { alias: 'numerologia_personal', nombre: 'Numerología Personal', runas: 65, generaIA: true, palabras: 1500, tiempoMinMs: 4 * 60 * 60 * 1000, tiempoMaxMs: 8 * 60 * 60 * 1000 },
+  'carta_astral_basica': { alias: 'carta_astral_esencial', nombre: 'Carta Astral Esencial', runas: 130, generaIA: true, palabras: 3000, tiempoMinMs: 24 * 60 * 60 * 1000, tiempoMaxMs: 48 * 60 * 60 * 1000 },
+
+  // === IDs con guiones (Mi Magia frontend) ===
+  'tirada-runas': { alias: 'tirada_3_runas', nombre: 'Tirada de 3 Runas', runas: 25, generaIA: true, palabras: 500, tiempoMinMs: 30 * 60 * 1000, tiempoMaxMs: 60 * 60 * 1000 },
+  'susurro-guardian': { alias: 'susurro_guardian', nombre: 'Susurro del Guardián', runas: 20, generaIA: true, palabras: 250, tiempoMs: 0 },
+  'oraculo-mes': { alias: 'oraculo_elementales', nombre: 'Oráculo de los Elementales', runas: 50, generaIA: true, palabras: 1000, tiempoMinMs: 60 * 60 * 1000, tiempoMaxMs: 2 * 60 * 60 * 1000 },
+  'gran-oraculo': { alias: 'tarot_profundo', nombre: 'Lectura de Tarot Profunda', runas: 120, generaIA: true, palabras: 2500, tiempoMinMs: 6 * 60 * 60 * 1000, tiempoMaxMs: 12 * 60 * 60 * 1000 },
+  'lectura-alma': { alias: 'estudio_alma', nombre: 'Estudio del Alma', runas: 200, generaIA: true, palabras: 6000, tiempoMinMs: 48 * 60 * 60 * 1000, tiempoMaxMs: 96 * 60 * 60 * 1000 },
+  'registros-akashicos': { alias: 'registros_akashicos', nombre: 'Registros Akáshicos', runas: 250, generaIA: true, palabras: 5000, tiempoMinMs: 48 * 60 * 60 * 1000, tiempoMaxMs: 96 * 60 * 60 * 1000 },
+  'carta-ancestral': { alias: 'conexion_ancestros', nombre: 'Conexión con Ancestros', runas: 250, generaIA: true, palabras: 4000, tiempoMinMs: 48 * 60 * 60 * 1000, tiempoMaxMs: 96 * 60 * 60 * 1000 },
+  'mapa-energetico': { alias: 'mapa_energia', nombre: 'Mapa de tu Energía', runas: 60, generaIA: true, palabras: 1200, tiempoMinMs: 2 * 60 * 60 * 1000, tiempoMaxMs: 4 * 60 * 60 * 1000 },
+  'pregunta-especifica': { alias: 'consejo_bosque', nombre: 'Consejo del Bosque', runas: 15, generaIA: true, palabras: 200, tiempoMs: 0 }
 };
 
 // POST - Solicitar una experiencia
