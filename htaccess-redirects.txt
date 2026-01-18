@@ -1,0 +1,75 @@
+# ================================================
+# REDIRECTS WIX → WORDPRESS
+# Agregar ANTES de # BEGIN WordPress
+# ================================================
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# ================================================
+# PÁGINAS PRINCIPALES
+# ================================================
+
+# Tienda
+RewriteRule ^shop-1/?$ /shop/ [R=301,L]
+RewriteRule ^stock/?$ /shop/ [R=301,L]
+RewriteRule ^accesorios/?$ /shop/ [R=301,L]
+
+# Información
+RewriteRule ^cuidados/?$ /como-funciona/ [R=301,L]
+RewriteRule ^encargue/?$ /contacto/ [R=301,L]
+RewriteRule ^preguntas-frecuentes/?$ /faq/ [R=301,L]
+
+# Políticas (con y sin tilde)
+RewriteRule ^pol%C3%ADticas/?$ /politica-de-privacidad/ [R=301,L]
+RewriteRule ^políticas/?$ /politica-de-privacidad/ [R=301,L]
+
+# Membresías y programas
+RewriteRule ^plans-pricing/?$ /circulo-de-duendes/ [R=301,L]
+RewriteRule ^loyalty/?$ /circulo-de-duendes/ [R=301,L]
+RewriteRule ^members/?$ /mi-cuenta/ [R=301,L]
+
+# Formularios y test
+RewriteRule ^formulario-de-duende-maestro/?$ /descubri-que-duende-te-elige/ [R=301,L]
+RewriteRule ^maestros/?$ /descubri-que-duende-te-elige/ [R=301,L]
+
+# Otros
+RewriteRule ^portfolio/?$ /testimonios/ [R=301,L]
+RewriteRule ^copia-de-info/?$ / [R=301,L]
+
+# ================================================
+# PRODUCTOS - Redirect genérico
+# ================================================
+
+# Captura cualquier /product-page/X y redirige a /product/X
+# NOTA: Algunos productos tienen slugs diferentes, agregar excepciones arriba
+RewriteRule ^product-page/(.*)$ /product/$1 [R=301,L]
+
+# ================================================
+# PRODUCTOS - Excepciones con slugs diferentes
+# ================================================
+
+# Productos con nombres que cambiaron
+RewriteRule ^product-page/dani-tu-compa%C3%B1ero-para-los-d%C3%ADas-de-ansiedad/?$ /product/dani-para-los-dias-de-ansiedad/ [R=301,L]
+RewriteRule ^product-page/duende-de-la-sanaci%C3%B3n-1/?$ /product/duende-de-la-sanacion/ [R=301,L]
+RewriteRule ^product-page/lil-el-duende-maestro-1/?$ /product/lil/ [R=301,L]
+RewriteRule ^product-page/cash-el-duende-del-dinero-1/?$ /product/cash/ [R=301,L]
+RewriteRule ^product-page/tr%C3%A9vor/?$ /product/trevor-el-duende-de-la-suerte/ [R=301,L]
+RewriteRule ^product-page/luke-duende-viajero/?$ /product/luke-el-duende-viajero-protector/ [R=301,L]
+RewriteRule ^product-page/matheo-selecci%C3%B3n-universo/?$ /product/matheo/ [R=301,L]
+RewriteRule ^product-page/rahmus-1/?$ /product/rahmus/ [R=301,L]
+RewriteRule ^product-page/micelio-1/?$ /product/micelio/ [R=301,L]
+RewriteRule ^product-page/gaia/?$ /product/gaia-2/ [R=301,L]
+RewriteRule ^product-page/m%C3%BCrh/?$ /product/murh/ [R=301,L]
+RewriteRule ^product-page/%C3%A9lowen/?$ /product/elowen/ [R=301,L]
+RewriteRule ^product-page/estelar/?$ /product/estelar-el-duende-de-los-deseos/ [R=301,L]
+
+# Promos que ya no existen - redirigir a tienda
+RewriteRule ^product-page/promo-3x2/?$ /shop/ [R=301,L]
+RewriteRule ^product-page/promo-matheo-y-lil.*$ /shop/ [R=301,L]
+
+</IfModule>
+
+# ================================================
+# FIN REDIRECTS WIX → WORDPRESS
+# ================================================
