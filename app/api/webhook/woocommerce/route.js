@@ -1,5 +1,6 @@
 import { kv } from '@vercel/kv';
 import { notificarCompra } from '@/lib/emails';
+import crypto from 'crypto';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // WEBHOOK: WOOCOMMERCE
@@ -7,6 +8,7 @@ import { notificarCompra } from '@/lib/emails';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'; // Forzar Node.js runtime para crypto
 
 // Configuración de runas por tipo de producto
 const RUNAS_CONFIG = {
@@ -68,7 +70,6 @@ function calcularRunas(precio, categorias = [], esCirculo = false) {
 function verificarFirma(payload, signature, secret) {
   if (!secret) return true; // Si no hay secret configurado, aceptar todo (dev)
 
-  const crypto = require('crypto');
   const expectedSignature = crypto
     .createHmac('sha256', secret)
     .update(payload)
