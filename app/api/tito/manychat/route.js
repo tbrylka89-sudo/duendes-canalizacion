@@ -57,7 +57,7 @@ async function obtenerProductos(params = {}) {
       url: p.permalink,
       descripcionCorta: p.short_description?.replace(/<[^>]*>/g, '').substring(0, 100),
       categorias: p.categories?.map(c => c.name).join(', ')
-    })).filter(p => p.imagen); // Solo productos con imagen
+    })); // Incluir todos los productos
 
   } catch (error) {
     console.error('[MANYCHAT] Error obteniendo productos:', error);
@@ -266,8 +266,9 @@ Incluye: contenido semanal, rituales, meditaciones, comunidad privada, descuento
 === SI PIDEN VER GUARDIANES ===
 Tenés acceso a los productos disponibles. Cuando alguien quiere ver:
 - Te voy a pasar info de productos disponibles
-- Usá esa info para recomendar
-- Siempre mencioná el nombre del guardián y algo especial de él
+- SOLO mencioná los que te paso, NUNCA inventes nombres de guardianes
+- Si no hay productos disponibles, invitalos a ver la tienda web: www.duendesdeluruguay.com
+- PROHIBIDO inventar nombres como "Mago Alderan" o "Hada Lunaria" - solo usá nombres reales del catálogo
 
 === SI QUIEREN RECOMENDACIÓN ===
 Hacé 1-2 preguntas para entender qué necesitan:
@@ -336,7 +337,11 @@ export async function POST(request) {
         contextoProductos = `\n\n[PRODUCTOS DISPONIBLES PARA MOSTRAR:]
 ${productosParaMostrar.map(p => `- ${p.nombre}: $${p.precio} USD (${p.categorias || 'guardián'})`).join('\n')}
 
-Mencioná alguno de estos guardianes por nombre. El sistema mostrará sus fotos automáticamente.`;
+IMPORTANTE: Solo mencioná estos productos por nombre. El sistema mostrará sus fotos automáticamente.`;
+      } else {
+        contextoProductos = `\n\n[SIN PRODUCTOS EN CATÁLOGO]
+No hay productos cargados en este momento. Invitá a la persona a ver la tienda en www.duendesdeluruguay.com donde puede ver los guardianes disponibles con sus fotos.
+NO INVENTES nombres de guardianes.`;
       }
     }
 
