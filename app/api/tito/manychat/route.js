@@ -35,8 +35,8 @@ async function obtenerProductos(params = {}) {
       return [];
     }
 
-    const { limite = 12 } = params;
-    const url = `${WP_URL}/wp-json/wc/v3/products?per_page=${limite}&status=publish&orderby=date&order=desc`;
+    // Traer más productos para poder filtrar
+    const url = `${WP_URL}/wp-json/wc/v3/products?per_page=50&status=publish&orderby=date&order=desc`;
 
     const res = await fetch(url, {
       headers: { 'Authorization': `Basic ${auth}` }
@@ -49,15 +49,36 @@ async function obtenerProductos(params = {}) {
 
     const productos = await res.json();
 
-    return productos.map(p => ({
-      id: p.id,
-      nombre: p.name,
-      precio: p.price,
-      imagen: p.images?.[0]?.src || null,
-      url: p.permalink,
-      descripcionCorta: p.short_description?.replace(/<[^>]*>/g, '').substring(0, 100),
-      categorias: p.categories?.map(c => c.name).join(', ')
-    })); // Incluir todos los productos
+    // Filtrar: solo guardianes físicos (con imagen, excluyendo membresías y runas)
+    const guardianes = productos
+      .filter(p => {
+        // Debe tener imagen
+        if (!p.images || p.images.length === 0) return false;
+
+        // Excluir membresías y paquetes de runas
+        const nombre = p.name.toLowerCase();
+        const categorias = p.categories?.map(c => c.name.toLowerCase()).join(' ') || '';
+
+        if (nombre.includes('círculo') || nombre.includes('circulo')) return false;
+        if (nombre.includes('membresía') || nombre.includes('membresia')) return false;
+        if (nombre.includes('paquete') && nombre.includes('runa')) return false;
+        if (nombre.includes('runas')) return false;
+        if (categorias.includes('membresía')) return false;
+
+        return true;
+      })
+      .slice(0, params.limite || 6)
+      .map(p => ({
+        id: p.id,
+        nombre: p.name,
+        precio: p.price,
+        imagen: p.images[0]?.src || null,
+        url: p.permalink,
+        descripcionCorta: p.short_description?.replace(/<[^>]*>/g, '').substring(0, 100),
+        categorias: p.categories?.map(c => c.name).join(', ')
+      }));
+
+    return guardianes;
 
   } catch (error) {
     console.error('[MANYCHAT] Error obteniendo productos:', error);
