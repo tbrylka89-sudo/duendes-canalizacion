@@ -4,8 +4,11 @@ import {
   obtenerLecturaPorId,
   obtenerNivel,
   puedeAccederALectura,
-  XP_ACCIONES
+  XP_ACCIONES,
+  BADGES
 } from '@/lib/gamificacion/config';
+
+export const dynamic = 'force-dynamic';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
@@ -49,13 +52,15 @@ export async function POST(request) {
 
     let userEmail = email;
     if (token && !email) {
-      userEmail = await kv.get(`token:${token}`);
-      if (!userEmail) {
+      const tokenData = await kv.get(`token:${token}`);
+      if (!tokenData) {
         return Response.json({
           success: false,
           error: 'Token inválido'
         }, { status: 401, headers: CORS_HEADERS });
       }
+      // El token puede ser un string (email) o un objeto {email, nombre, creado}
+      userEmail = typeof tokenData === 'string' ? tokenData : tokenData.email;
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -295,8 +300,27 @@ export async function POST(request) {
     });
     await kv.set(`lecturas:${userEmail}`, historialLecturas);
 
+    // También guardar en historial con key diferente para el componente de historial
+    const historialGamificacion = await kv.get(`historial:${userEmail}`) || [];
+    historialGamificacion.unshift({
+      id: solicitudId,
+      lecturaId,
+      nombre: lectura.nombre,
+      icono: lectura.icono,
+      categoria: lectura.categoria,
+      runas: precioFinal,
+      fecha: ahora.toISOString()
+    });
+    // Mantener solo las últimas 100 lecturas
+    await kv.set(`historial:${userEmail}`, historialGamificacion.slice(0, 100));
+
     // ─────────────────────────────────────────────────────────────
-    // 13. RESPUESTA
+    // 13. VERIFICAR Y OTORGAR BADGES
+    // ─────────────────────────────────────────────────────────────
+    const nuevosBadges = await verificarYOtorgarBadges(userEmail, gamificacion, usuario);
+
+    // ─────────────────────────────────────────────────────────────
+    // 14. RESPUESTA
     // ─────────────────────────────────────────────────────────────
     return Response.json({
       success: true,
@@ -321,7 +345,8 @@ export async function POST(request) {
         xpTotal: gamificacion.xp,
         nivel: nuevoNivel,
         subioNivel,
-        lecturasCompletadas: gamificacion.lecturasCompletadas.length
+        lecturasCompletadas: gamificacion.lecturasCompletadas.length,
+        nuevosBadges: nuevosBadges || []
       }
     }, { headers: CORS_HEADERS });
 
@@ -576,6 +601,63 @@ function generarCodigoReferido(nombre) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// VERIFICAR Y OTORGAR BADGES AUTOMÁTICAMENTE
+// ═══════════════════════════════════════════════════════════════
+
+async function verificarYOtorgarBadges(email, gamificacion, usuario) {
+  try {
+    const badgesActuales = gamificacion.badges || [];
+    const nuevosBadges = [];
+
+    // Construir datos para verificación
+    const lecturas = gamificacion.lecturasCompletadas?.length || 0;
+    const tiposLectura = gamificacion.tiposLecturaUsados?.length || 0;
+    const rachaMax = gamificacion.rachaMax || 0;
+    const nivel = gamificacion.nivel;
+    const referidos = gamificacion.referidos?.length || 0;
+    const guardianes = usuario?.guardianes?.length || 0;
+
+    // Condiciones de badges
+    const condiciones = {
+      erudita: lecturas >= 25,
+      conectada: rachaMax >= 30,
+      sabia_bosque: nivel === 'sabia',
+      generosa: referidos >= 5,
+      coleccionista: guardianes >= 3,
+      exploradora: tiposLectura >= 10,
+      racha_100: rachaMax >= 100
+    };
+
+    // Verificar cada badge
+    for (const [badgeId, cumple] of Object.entries(condiciones)) {
+      if (cumple && !badgesActuales.includes(badgeId)) {
+        badgesActuales.push(badgeId);
+        const badgeInfo = BADGES.find(b => b.id === badgeId);
+        if (badgeInfo) {
+          nuevosBadges.push({
+            id: badgeId,
+            nombre: badgeInfo.nombre,
+            icono: badgeInfo.icono,
+            descripcion: badgeInfo.descripcion
+          });
+        }
+      }
+    }
+
+    // Guardar si hay nuevos badges
+    if (nuevosBadges.length > 0) {
+      gamificacion.badges = badgesActuales;
+      await kv.set(`gamificacion:${email}`, gamificacion);
+    }
+
+    return nuevosBadges;
+  } catch (error) {
+    console.error('Error verificando badges:', error);
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // GET - Obtener una lectura completada
 // ═══════════════════════════════════════════════════════════════
 export async function GET(request) {
@@ -595,7 +677,9 @@ export async function GET(request) {
     // Autenticar
     let userEmail = email;
     if (token && !email) {
-      userEmail = await kv.get(`token:${token}`);
+      const tokenData = await kv.get(`token:${token}`);
+      // El token puede ser un string (email) o un objeto {email, nombre, creado}
+      userEmail = tokenData ? (typeof tokenData === 'string' ? tokenData : tokenData.email) : null;
     }
 
     if (!userEmail) {

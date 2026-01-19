@@ -25,13 +25,15 @@ export async function GET(request) {
     // Obtener email desde token si es necesario
     let userEmail = email;
     if (token && !email) {
-      userEmail = await kv.get(`token:${token}`);
-      if (!userEmail) {
+      const tokenData = await kv.get(`token:${token}`);
+      if (!tokenData) {
         return Response.json({
           success: false,
           error: 'Token inválido'
         }, { status: 401 });
       }
+      // El token puede ser un string (email) o un objeto {email, nombre, creado}
+      userEmail = typeof tokenData === 'string' ? tokenData : tokenData.email;
     }
 
     // Obtener datos del usuario
@@ -132,13 +134,14 @@ export async function POST(request) {
     // Obtener email desde token
     let userEmail = email;
     if (token && !email) {
-      userEmail = await kv.get(`token:${token}`);
-      if (!userEmail) {
+      const tokenData = await kv.get(`token:${token}`);
+      if (!tokenData) {
         return Response.json({
           success: false,
           error: 'Token inválido'
         }, { status: 401 });
       }
+      userEmail = typeof tokenData === 'string' ? tokenData : tokenData.email;
     }
 
     // Obtener datos actuales

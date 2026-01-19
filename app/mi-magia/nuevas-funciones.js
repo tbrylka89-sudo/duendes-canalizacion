@@ -840,226 +840,369 @@ export function GuiaCristales({ usuario }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CATÁLOGO DE EXPERIENCIAS MEJORADO
+// TIENDA DE RUNAS - Packs de runas para comprar
 // ═══════════════════════════════════════════════════════════════
 
+const PACKS_RUNAS = [
+  {
+    id: 'chispa',
+    nombre: 'Chispa',
+    runas: 30,
+    bonus: 0,
+    precio: 5,
+    precioOriginal: null,
+    url: `${WORDPRESS_URL}/producto/runas-chispa/`,
+    descripcion: 'Para empezar a explorar (30 runas)',
+    experienciasAprox: '1-2 experiencias básicas',
+    icono: '✦',
+    color: '#E8B86D'
+  },
+  {
+    id: 'destello',
+    nombre: 'Destello',
+    runas: 80,
+    bonus: 10,
+    precio: 10,
+    precioOriginal: null,
+    url: `${WORDPRESS_URL}/producto/runas-destello/`,
+    descripcion: 'El más popular (80 + 10 bonus = 90 runas)',
+    experienciasAprox: '3-6 experiencias',
+    popular: true,
+    icono: '◆',
+    color: '#D4AF37'
+  },
+  {
+    id: 'resplandor',
+    nombre: 'Resplandor',
+    runas: 200,
+    bonus: 40,
+    precio: 20,
+    precioOriginal: null,
+    url: `${WORDPRESS_URL}/producto/runas-resplandor/`,
+    descripcion: 'Para varias experiencias (200 + 40 bonus = 240 runas)',
+    experienciasAprox: '6-15 experiencias',
+    icono: '❋',
+    color: '#C0A060'
+  },
+  {
+    id: 'fulgor',
+    nombre: 'Fulgor',
+    runas: 550,
+    bonus: 150,
+    precio: 50,
+    precioOriginal: null,
+    url: `${WORDPRESS_URL}/producto/runas-fulgor/`,
+    descripcion: 'Pack potente (550 + 150 bonus = 700 runas)',
+    experienciasAprox: '15-40 experiencias',
+    icono: '✧',
+    color: '#FFD700'
+  },
+  {
+    id: 'aurora',
+    nombre: 'Aurora',
+    runas: 1200,
+    bonus: 400,
+    precio: 100,
+    precioOriginal: null,
+    url: `${WORDPRESS_URL}/producto/runas-aurora/`,
+    descripcion: 'El mejor valor (1200 + 400 bonus = 1600 runas)',
+    experienciasAprox: '40-100+ experiencias',
+    destacado: true,
+    icono: '👑',
+    color: '#9B59B6'
+  }
+];
+
 export function CatalogoExperiencias({ usuario, setUsuario }) {
-  const [experiencias, setExperiencias] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [categoriaActiva, setCategoriaActiva] = useState('');
-  const [experienciaActiva, setExperienciaActiva] = useState(null);
-  const [cargando, setCargando] = useState(true);
-  const [solicitando, setSolicitando] = useState(false);
-  const [contexto, setContexto] = useState('');
-  const [pregunta, setPregunta] = useState('');
-  const [resultado, setResultado] = useState(null);
-
-  useEffect(() => {
-    cargarCatalogo();
-  }, [categoriaActiva]);
-
-  const cargarCatalogo = async () => {
-    setCargando(true);
-    try {
-      let url = `${API_BASE}/api/experiencias/catalogo`;
-      if (categoriaActiva) url += `?categoria=${categoriaActiva}`;
-
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.success) {
-        setExperiencias(data.experiencias);
-        setCategorias(data.categorias);
-      }
-    } catch (e) {
-      console.error('Error cargando catálogo:', e);
+  const styles = {
+    container: {
+      minHeight: '100%',
+      background: 'linear-gradient(180deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%)',
+      padding: '0',
+      fontFamily: "'Inter', -apple-system, sans-serif"
+    },
+    header: {
+      textAlign: 'center',
+      padding: '50px 20px 40px',
+      background: 'radial-gradient(ellipse at center top, rgba(212,175,55,0.08) 0%, transparent 60%)'
+    },
+    title: {
+      fontFamily: "'Cinzel', 'Times New Roman', serif",
+      fontSize: '2.5rem',
+      color: '#d4af37',
+      margin: '0 0 12px',
+      letterSpacing: '3px',
+      textShadow: '0 0 40px rgba(212,175,55,0.3)',
+      fontWeight: '400'
+    },
+    subtitle: {
+      color: 'rgba(255,255,255,0.5)',
+      fontSize: '1rem',
+      margin: '0 0 30px',
+      fontWeight: '300',
+      letterSpacing: '1px',
+      maxWidth: '500px',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    },
+    runasActuales: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '10px',
+      background: 'rgba(212,175,55,0.1)',
+      border: '1px solid rgba(212,175,55,0.25)',
+      padding: '12px 24px',
+      borderRadius: '30px',
+      color: '#d4af37',
+      fontSize: '1.1rem',
+      fontFamily: "'Cinzel', serif"
+    },
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: '24px',
+      padding: '0 24px 40px',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    },
+    card: (color, destacado, popular) => ({
+      position: 'relative',
+      background: 'linear-gradient(165deg, rgba(25,25,35,0.95) 0%, rgba(15,15,22,0.98) 100%)',
+      borderRadius: '20px',
+      padding: '32px 28px',
+      border: destacado ? `2px solid ${color}` : '1px solid rgba(255,255,255,0.06)',
+      overflow: 'hidden',
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: destacado ? `0 0 30px ${color}20` : '0 4px 20px rgba(0,0,0,0.3)'
+    }),
+    cardGlow: (color) => ({
+      position: 'absolute',
+      top: '-50%',
+      right: '-50%',
+      width: '250px',
+      height: '250px',
+      background: `radial-gradient(circle, ${color}12 0%, transparent 70%)`,
+      pointerEvents: 'none'
+    }),
+    badge: (type) => ({
+      position: 'absolute',
+      top: '16px',
+      right: '16px',
+      padding: '6px 14px',
+      borderRadius: '20px',
+      fontSize: '0.75rem',
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: '1px',
+      background: type === 'popular' ? 'linear-gradient(135deg, #d4af37 0%, #b8962e 100%)' : 'linear-gradient(135deg, #9370DB 0%, #7B5FB8 100%)',
+      color: type === 'popular' ? '#000' : '#fff'
+    }),
+    iconoContainer: (color) => ({
+      width: '70px',
+      height: '70px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: `linear-gradient(135deg, ${color}20 0%, ${color}08 100%)`,
+      borderRadius: '20px',
+      marginBottom: '20px',
+      fontSize: '2.2rem',
+      color: color,
+      filter: `drop-shadow(0 0 15px ${color}30)`
+    }),
+    packName: {
+      fontFamily: "'Cinzel', serif",
+      color: '#fff',
+      fontSize: '1.5rem',
+      margin: '0 0 6px',
+      fontWeight: '500'
+    },
+    runas: (color) => ({
+      color: color,
+      fontSize: '2rem',
+      fontFamily: "'Cinzel', serif",
+      fontWeight: '600',
+      margin: '0 0 16px',
+      display: 'flex',
+      alignItems: 'baseline',
+      gap: '6px'
+    }),
+    runasSymbol: {
+      fontSize: '1.5rem'
+    },
+    descripcion: {
+      color: 'rgba(255,255,255,0.55)',
+      fontSize: '0.95rem',
+      lineHeight: '1.6',
+      marginBottom: '16px'
+    },
+    experiencias: {
+      color: 'rgba(255,255,255,0.4)',
+      fontSize: '0.85rem',
+      marginBottom: '24px',
+      fontStyle: 'italic'
+    },
+    precioContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '20px'
+    },
+    precio: {
+      fontSize: '1.8rem',
+      color: '#fff',
+      fontWeight: '600'
+    },
+    precioOriginal: {
+      fontSize: '1.1rem',
+      color: 'rgba(255,255,255,0.35)',
+      textDecoration: 'line-through'
+    },
+    moneda: {
+      fontSize: '1rem',
+      color: 'rgba(255,255,255,0.5)'
+    },
+    boton: (color) => ({
+      width: '100%',
+      padding: '16px',
+      background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
+      border: 'none',
+      color: '#000',
+      fontSize: '1rem',
+      fontWeight: '600',
+      borderRadius: '12px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      textDecoration: 'none',
+      display: 'block',
+      textAlign: 'center',
+      boxShadow: `0 4px 15px ${color}30`
+    }),
+    infoSection: {
+      maxWidth: '800px',
+      margin: '40px auto 60px',
+      padding: '0 24px'
+    },
+    infoBox: {
+      background: 'rgba(255,255,255,0.02)',
+      border: '1px solid rgba(255,255,255,0.05)',
+      borderRadius: '16px',
+      padding: '30px'
+    },
+    infoTitle: {
+      fontFamily: "'Cinzel', serif",
+      color: '#d4af37',
+      fontSize: '1.2rem',
+      margin: '0 0 20px',
+      textAlign: 'center'
+    },
+    infoGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+      gap: '20px'
+    },
+    infoItem: {
+      textAlign: 'center',
+      padding: '20px'
+    },
+    infoIcon: {
+      fontSize: '2rem',
+      marginBottom: '12px',
+      display: 'block',
+      color: '#d4af37'
+    },
+    infoText: {
+      color: 'rgba(255,255,255,0.6)',
+      fontSize: '0.9rem',
+      lineHeight: '1.5'
     }
-    setCargando(false);
   };
-
-  const solicitar = async (exp) => {
-    setSolicitando(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/experiencias/solicitar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: usuario?.email,
-          experienciaId: exp.id,
-          contexto,
-          preguntaEspecifica: pregunta
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setResultado(data);
-        if (data.solicitud?.runasRestantes !== undefined) {
-          setUsuario({ ...usuario, runas: data.solicitud.runasRestantes });
-        }
-      } else {
-        alert(data.error || 'Error al solicitar');
-      }
-    } catch (e) {
-      console.error('Error solicitando:', e);
-      alert('Error de conexión');
-    }
-    setSolicitando(false);
-  };
-
-  if (resultado) {
-    return (
-      <div className="exp-resultado">
-        <div className="resultado-header-exp">
-          <span>✦</span>
-          <h2>{resultado.mensaje}</h2>
-        </div>
-
-        {resultado.resultado ? (
-          <div className="resultado-contenido">
-            <h3>{resultado.resultado.titulo}</h3>
-            <div className="resultado-texto">
-              {resultado.resultado.contenido.split('\n').map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
-            <p className="resultado-palabras">{resultado.resultado.palabras} palabras</p>
-          </div>
-        ) : (
-          <div className="resultado-pendiente">
-            <p>Tu solicitud está en proceso. Te notificaremos cuando esté lista.</p>
-            <p>ID: {resultado.solicitud?.id}</p>
-            <p>Entrega estimada: {new Date(resultado.solicitud?.fechaEntregaEstimada).toLocaleString('es-UY')}</p>
-          </div>
-        )}
-
-        <button className="btn-pri" onClick={() => { setResultado(null); setExperienciaActiva(null); }}>
-          Volver al catálogo
-        </button>
-      </div>
-    );
-  }
-
-  if (experienciaActiva) {
-    const puedeComprar = (usuario?.runas || 0) >= experienciaActiva.runas;
-
-    return (
-      <div className="exp-detalle">
-        <button className="btn-volver" onClick={() => setExperienciaActiva(null)}>
-          ← Volver
-        </button>
-
-        <div className="exp-header-det">
-          <span className="exp-icono-lg">{experienciaActiva.icono}</span>
-          <div>
-            <h2>{experienciaActiva.nombre}</h2>
-            <div className="exp-meta">
-              <span className="exp-runas-lg">ᚱ {experienciaActiva.runas}</span>
-              <span className="exp-duracion">{experienciaActiva.duracion}</span>
-            </div>
-          </div>
-        </div>
-
-        <p className="exp-desc-full">{experienciaActiva.descripcion}</p>
-
-        <div className="exp-entregable">
-          <strong>Recibís:</strong> {experienciaActiva.entregable}
-        </div>
-
-        <div className="exp-formulario">
-          <h4>Contanos un poco más</h4>
-          <textarea
-            placeholder="Contexto o situación actual (opcional)"
-            value={contexto}
-            onChange={(e) => setContexto(e.target.value)}
-            rows={3}
-          />
-          <textarea
-            placeholder="Pregunta específica (opcional)"
-            value={pregunta}
-            onChange={(e) => setPregunta(e.target.value)}
-            rows={2}
-          />
-        </div>
-
-        <div className="exp-accion">
-          {puedeComprar ? (
-            <button
-              className="btn-gold"
-              onClick={() => solicitar(experienciaActiva)}
-              disabled={solicitando}
-            >
-              {solicitando ? 'Procesando...' : `Solicitar por ᚱ ${experienciaActiva.runas}`}
-            </button>
-          ) : (
-            <div className="runas-insuficientes">
-              <p>Necesitás {experienciaActiva.runas - (usuario?.runas || 0)} runas más</p>
-              <a href={`${WORDPRESS_URL}/producto/runas-chispa/`} target="_blank" className="btn-sec">
-                Conseguir más runas
-              </a>
-            </div>
-          )}
-          <p className="runas-actuales">Tus runas: ᚱ {usuario?.runas || 0}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="catalogo-exp">
-      <div className="catalogo-header">
-        <h2>Experiencias Mágicas</h2>
-        <p>Servicios exclusivos pagados con Runas de Poder</p>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Tienda de Runas</h1>
+        <p style={styles.subtitle}>
+          Las runas son la moneda mágica del bosque. Usalas para acceder a experiencias, lecturas y estudios personalizados.
+        </p>
+        <div style={styles.runasActuales}>
+          <span>Tus runas:</span>
+          <strong>ᚱ {usuario?.runas || 0}</strong>
+        </div>
       </div>
 
-      <div className="categorias-tabs">
-        <button
-          className={`cat-tab ${!categoriaActiva ? 'activo' : ''}`}
-          onClick={() => setCategoriaActiva('')}
-        >
-          Todas
-        </button>
-        {categorias.map(cat => (
-          <button
-            key={cat.id}
-            className={`cat-tab ${categoriaActiva === cat.id ? 'activo' : ''}`}
-            onClick={() => setCategoriaActiva(cat.id)}
+      <div style={styles.grid}>
+        {PACKS_RUNAS.map(pack => (
+          <div
+            key={pack.id}
+            style={styles.card(pack.color, pack.destacado, pack.popular)}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-8px)';
+              e.currentTarget.style.boxShadow = `0 20px 40px rgba(0,0,0,0.4), 0 0 40px ${pack.color}15`;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = pack.destacado ? `0 0 30px ${pack.color}20` : '0 4px 20px rgba(0,0,0,0.3)';
+            }}
           >
-            {cat.nombre}
-          </button>
+            <div style={styles.cardGlow(pack.color)}></div>
+
+            {pack.popular && <span style={styles.badge('popular')}>Más elegido</span>}
+            {pack.destacado && <span style={styles.badge('destacado')}>Mejor valor</span>}
+
+            <div style={styles.iconoContainer(pack.color)}>{pack.icono}</div>
+
+            <h3 style={styles.packName}>{pack.nombre}</h3>
+
+            <div style={styles.runas(pack.color)}>
+              <span style={styles.runasSymbol}>ᚱ</span>
+              <span>{pack.runas}</span>
+            </div>
+
+            <p style={styles.descripcion}>{pack.descripcion}</p>
+            <p style={styles.experiencias}>{pack.experienciasAprox}</p>
+
+            <div style={styles.precioContainer}>
+              <span style={styles.precio}>US$ {pack.precio}</span>
+              {pack.precioOriginal && (
+                <span style={styles.precioOriginal}>US$ {pack.precioOriginal}</span>
+              )}
+            </div>
+
+            <a
+              href={pack.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.boton(pack.color)}
+            >
+              Comprar {pack.nombre}
+            </a>
+          </div>
         ))}
       </div>
 
-      {cargando ? (
-        <div className="catalogo-cargando">
-          <span className="pulse">✦</span>
-          <p>Cargando experiencias...</p>
-        </div>
-      ) : (
-        <div className="experiencias-grid-new">
-          {experiencias.map(exp => (
-            <div
-              key={exp.id}
-              className={`exp-card-new ${exp.popular ? 'popular' : ''} ${exp.premium ? 'premium' : ''}`}
-              onClick={() => setExperienciaActiva(exp)}
-            >
-              {exp.popular && <span className="badge-popular">Popular</span>}
-              {exp.premium && <span className="badge-premium">Premium</span>}
-              <span className="exp-icono">{exp.icono}</span>
-              <h4>{exp.nombre}</h4>
-              <p className="exp-desc">{exp.descripcion.substring(0, 80)}...</p>
-              <div className="exp-footer">
-                <span className="exp-runas">ᚱ {exp.runas}</span>
-                <span className="exp-duracion">{exp.duracion}</span>
-              </div>
+      <div style={styles.infoSection}>
+        <div style={styles.infoBox}>
+          <h3 style={styles.infoTitle}>¿Cómo funcionan las runas?</h3>
+          <div style={styles.infoGrid}>
+            <div style={styles.infoItem}>
+              <span style={styles.infoIcon}>◈</span>
+              <p style={styles.infoText}>Comprás un pack de runas con dinero real</p>
             </div>
-          ))}
+            <div style={styles.infoItem}>
+              <span style={styles.infoIcon}>✧</span>
+              <p style={styles.infoText}>Las runas se acreditan instantáneamente en tu cuenta</p>
+            </div>
+            <div style={styles.infoItem}>
+              <span style={styles.infoIcon}>❋</span>
+              <p style={styles.infoText}>Usás las runas para acceder a experiencias mágicas</p>
+            </div>
+            <div style={styles.infoItem}>
+              <span style={styles.infoIcon}>◆</span>
+              <p style={styles.infoText}>Las runas nunca vencen, usalas cuando quieras</p>
+            </div>
+          </div>
         </div>
-      )}
-
-      <div className="runas-info">
-        <p>Tus runas: <strong>ᚱ {usuario?.runas || 0}</strong></p>
-        <a href={`${WORDPRESS_URL}/tienda/?product_cat=runas`} target="_blank" className="btn-sec">
-          Conseguir más runas
-        </a>
       </div>
     </div>
   );

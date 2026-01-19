@@ -5,6 +5,8 @@ import TestGuardian from './test-guardian';
 import { personalizarTexto, saludoPersonalizado } from '@/lib/personalizacion';
 import DuendeDisponible from '@/components/DuendeDisponible';
 import Referidos from './referidos';
+import { DashboardGamificacion, ColeccionBadges, MisionesPanel, HistorialLecturas, LeaderboardRachas, ToastProvider } from './gamificacion-components';
+import { ExperienciasMagicas } from './experiencias-magicas';
 
 const API_BASE = '';
 
@@ -20,23 +22,33 @@ const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdelur
 function CofreDiario({ usuario, token, onRunasGanadas }) {
   const [gamificacion, setGamificacion] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
   const [reclamando, setReclamando] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [animacion, setAnimacion] = useState('cerrado'); // cerrado, girando, abierto
 
   useEffect(() => {
-    cargarGamificacion();
-  }, []);
+    if (token) {
+      cargarGamificacion();
+    } else {
+      setCargando(false);
+    }
+  }, [token]);
 
   const cargarGamificacion = async () => {
+    setCargando(true);
+    setError(null);
     try {
       const res = await fetch(`${API_BASE}/api/gamificacion/usuario?token=${token}`);
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.gamificacion) {
         setGamificacion(data.gamificacion);
+      } else {
+        setError(data.error || 'No se pudo cargar el cofre');
       }
     } catch (e) {
       console.error('Error cargando gamificación:', e);
+      setError('Error de conexión');
     }
     setCargando(false);
   };
@@ -90,6 +102,28 @@ function CofreDiario({ usuario, token, onRunasGanadas }) {
     return (
       <div className="cofre-container cofre-cargando">
         <div className="cofre-spinner"></div>
+      </div>
+    );
+  }
+
+  // Si hay error o no hay gamificación, mostrar botón de reintentar
+  if (error || !gamificacion) {
+    return (
+      <div className="cofre-container">
+        <div className="cofre-box error-state">
+          <div className="cofre-header">
+            <h3>Cofre Diario</h3>
+          </div>
+          <div className="cofre-icono cerrado">
+            <span className="cofre-cerrado">📦</span>
+          </div>
+          <div className="cofre-info">
+            <p className="cofre-error-msg">{error || 'No se pudo cargar'}</p>
+            <button className="cofre-btn" onClick={cargarGamificacion}>
+              Reintentar
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -2185,10 +2219,11 @@ const TITO_IMG = `${WORDPRESS_URL}/wp-content/uploads/2025/12/gemini-image-2_que
 // ═══════════════════════════════════════════════════════════════
 
 const PACKS_RUNAS = [
-  { nombre: 'Chispa', runas: 50, precio: 7, url: `${WORDPRESS_URL}/producto/runas-chispa/`, desc: 'Para empezar a explorar' },
-  { nombre: 'Destello', runas: 100, precio: 12, url: `${WORDPRESS_URL}/producto/runas-destello/`, desc: 'El más popular' },
-  { nombre: 'Fulgor', runas: 200, precio: 18, url: `${WORDPRESS_URL}/producto/runas-fulgor/`, desc: 'Para varias experiencias' },
-  { nombre: 'Resplandor', runas: 350, precio: 32, url: `${WORDPRESS_URL}/producto/runas-resplandor/`, desc: 'El mejor valor' }
+  { nombre: 'Chispa', runas: 30, bonus: 0, precio: 5, url: `${WORDPRESS_URL}/producto/runas-chispa/`, desc: 'Para empezar a explorar (30 runas)' },
+  { nombre: 'Destello', runas: 80, bonus: 10, precio: 10, url: `${WORDPRESS_URL}/producto/runas-destello/`, desc: 'El más popular (80 + 10 bonus = 90 runas)' },
+  { nombre: 'Resplandor', runas: 200, bonus: 40, precio: 20, url: `${WORDPRESS_URL}/producto/runas-resplandor/`, desc: 'Para varias experiencias (200 + 40 bonus = 240 runas)' },
+  { nombre: 'Fulgor', runas: 550, bonus: 150, precio: 50, url: `${WORDPRESS_URL}/producto/runas-fulgor/`, desc: 'Pack potente (550 + 150 bonus = 700 runas)' },
+  { nombre: 'Aurora', runas: 1200, bonus: 400, precio: 100, url: `${WORDPRESS_URL}/producto/runas-aurora/`, desc: 'El mejor valor (1200 + 400 bonus = 1600 runas)' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -3947,8 +3982,9 @@ export default function MiMagia() {
     switch(seccion) {
       case 'inicio': return <Inicio usuario={usuario} ir={setSeccion} token={token} setUsuario={setUsuario} />;
       case 'canalizaciones': return <Canalizaciones usuario={usuario} />;
+      case 'historial_lecturas': return <SeccionHistorialLecturas token={token} />;
       case 'jardin': return <Jardin usuario={usuario} setUsuario={setUsuario} pais={pais} token={token} />;
-      case 'experiencias': return <SeccionExperiencias usuario={usuario} setUsuario={setUsuario} />;
+      case 'experiencias': return <ExperienciasMagicas usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'experiencias_catalogo': return <CatalogoExperiencias usuario={usuario} setUsuario={setUsuario} />;
       case 'lecturas_gamificadas': return <CatalogoLecturasGamificado usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'tienda_runas': return <TiendaRunas usuario={usuario} />;
@@ -4031,7 +4067,7 @@ export default function MiMagia() {
 
       {menuAbierto && isMobile && <div style={mobileOverlay} onClick={() => setMenuAbierto(false)} />}
       <nav className={`nav ${menuAbierto ? 'abierto' : ''}`} style={isMobile ? mobileNav : {}}>
-        {[['inicio','◇','Inicio'],['test_guardian','🔮','Test del Guardián'],['canalizaciones','♦','Mis Canalizaciones'],['jardin','☘','Jardín de Tréboles'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Catálogo Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
+        {[['inicio','◇','Inicio'],['test_guardian','🔮','Test del Guardián'],['canalizaciones','♦','Mis Canalizaciones'],['historial_lecturas','📖','Mis Lecturas'],['jardin','☘','Jardín de Tréboles'],['experiencias','✦','Experiencias'],['experiencias_catalogo','ᚱ','Tienda Runas'],['regalos','❤','Regalos']].map(([k,i,t]) =>
           <button key={k} className={`nav-item ${seccion===k?'activo':''}`} onClick={() => {setSeccion(k);setMenuAbierto(false);}}><span className="nav-i">{i}</span>{t}</button>
         )}
         <div className="nav-sep">El Mundo Elemental</div>
@@ -4048,7 +4084,7 @@ export default function MiMagia() {
         )}
         <div className="nav-links-externos">
           <a href="/mi-magia/circulo" className="nav-volver nav-circulo">★ Entrar al Círculo</a>
-          <a href="/tienda" className="nav-volver nav-tienda">🃏 Tienda Mágica</a>
+          <a href={`${WORDPRESS_URL}/tienda/`} target="_blank" rel="noopener" className="nav-volver nav-tienda">🃏 Tienda Mágica</a>
         </div>
       </nav>
       
@@ -4332,6 +4368,36 @@ function Inicio({ usuario, ir, token, setUsuario }) {
         }}
       />
 
+      {/* ══════ DASHBOARD DE GAMIFICACIÓN ══════ */}
+      <div className="gamificacion-section">
+        <h2 className="seccion-titulo">
+          <span className="titulo-icono">⚔️</span>
+          Tu Progreso Mágico
+        </h2>
+        <DashboardGamificacion usuario={usuario} token={token} />
+      </div>
+
+      {/* ══════ MISIONES ══════ */}
+      <div className="gamificacion-section">
+        <h2 className="seccion-titulo">
+          <span className="titulo-icono">📜</span>
+          Misiones
+        </h2>
+        <MisionesPanel token={token} />
+      </div>
+
+      {/* ══════ BADGES ══════ */}
+      <div className="gamificacion-section">
+        <h2 className="seccion-titulo">
+          <span className="titulo-icono">🏆</span>
+          Tu Colección de Badges
+        </h2>
+        <ColeccionBadges token={token} />
+      </div>
+
+      {/* ══════ LEADERBOARD ══════ */}
+      <LeaderboardRachas token={token} />
+
       {/* ══════ SISTEMA DE REFERIDOS ══════ */}
       <Referidos usuario={usuario} token={token} />
 
@@ -4383,10 +4449,9 @@ function Inicio({ usuario, ir, token, setUsuario }) {
 
       {/* ACCESOS RÁPIDOS REESCRITOS */}
       <div className="accesos-g">
-        <button className="acceso acceso-destacado" onClick={() => ir('lecturas_gamificadas')}><span>ᚱ</span><strong>Catálogo de Lecturas</strong><small>30+ experiencias por nivel</small></button>
-        <button className="acceso acceso-runas" onClick={() => ir('tienda_runas')}><span>✧</span><strong>Tienda de Runas</strong><small>Obtené runas para tus lecturas</small></button>
+        <button className="acceso acceso-destacado" onClick={() => ir('experiencias')}><span>✦</span><strong>Experiencias Mágicas</strong><small>30+ lecturas, estudios y rituales</small></button>
+        <button className="acceso acceso-runas" onClick={() => ir('experiencias_catalogo')}><span>ᚱ</span><strong>Tienda de Runas</strong><small>Obtené runas para tus lecturas</small></button>
         <button className="acceso acceso-circulo" onClick={() => ir('tienda_membresias')}><span>⭐</span><strong>Círculo de Duendes</strong><small>Membresía con beneficios exclusivos</small></button>
-        <button className="acceso" onClick={() => ir('experiencias')}><span>✦</span><strong>Pedirle algo al universo</strong><small>Tiradas, lecturas, registros akáshicos</small></button>
         <button className="acceso" onClick={() => ir('test_elemental')}><span>◈</span><strong>Descubrir quién me eligió</strong><small>Test de elemento y guardián</small></button>
         <button className="acceso" onClick={() => ir('regalos')}><span>❤</span><strong>Regalar magia a alguien</strong><small>Que otro sienta lo que vos sentiste</small></button>
       </div>
@@ -4439,6 +4504,42 @@ function Inicio({ usuario, ir, token, setUsuario }) {
           <div><span>▣</span><h4>Grimorio</h4><p>Tu diario espiritual. Todo lo que recibís queda guardado para siempre.</p></div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HISTORIAL DE LECTURAS GAMIFICADAS
+// ═══════════════════════════════════════════════════════════════
+
+function SeccionHistorialLecturas({ token }) {
+  return (
+    <div className="sec historial-sec">
+      <div className="sec-header">
+        <h1>📖 Mis Lecturas</h1>
+        <p>Todas tus lecturas completadas con runas</p>
+      </div>
+      <HistorialLecturas token={token} />
+      <style jsx>{`
+        .historial-sec {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+        .sec-header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+        .sec-header h1 {
+          font-family: 'Cinzel', serif;
+          font-size: 28px;
+          color: #1a1a2e;
+          margin: 0 0 8px;
+        }
+        .sec-header p {
+          color: #666;
+          font-size: 15px;
+        }
+      `}</style>
     </div>
   );
 }
@@ -7799,6 +7900,30 @@ const estilos = `
 *{margin:0;padding:0;box-sizing:border-box!important}
 
 /* ═══════════════════════════════════════════════════════════════ */
+/* SECCIONES DE GAMIFICACIÓN */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.gamificacion-section {
+  margin: 2rem 0;
+  padding: 0;
+}
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: #1a1a2e;
+  font-weight: 500;
+}
+
+.titulo-icono {
+  font-size: 22px;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
 /* COFRE DIARIO - GAMIFICACIÓN */
 /* ═══════════════════════════════════════════════════════════════ */
 
@@ -7853,6 +7978,17 @@ const estilos = `
 .cofre-box.disponible:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 40px rgba(212,175,55,0.3);
+}
+
+.cofre-box.error-state {
+  border-color: #888;
+  opacity: 0.9;
+}
+
+.cofre-error-msg {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 
 .cofre-header {

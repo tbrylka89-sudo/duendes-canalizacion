@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { WORDPRESS_URL } from '@/lib/config/urls';
 
 // Componente Test del Guardian Evolutivo - Chat con Tito
 export default function TestGuardian({ usuario, onComplete }) {
@@ -339,7 +340,7 @@ export default function TestGuardian({ usuario, onComplete }) {
             </div>
           )}
 
-          <button className="btn-explorar" onClick={() => window.open('/tienda', '_blank')}>
+          <button className="btn-explorar" onClick={() => window.open(`${WORDPRESS_URL}/tienda/`, '_blank')}>
             Explorar Guardianes →
           </button>
         </div>

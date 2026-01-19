@@ -1,4 +1,5 @@
 import { kv } from '@vercel/kv';
+import { NIVELES, obtenerNivel } from '@/lib/gamificacion/config';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: MÉTRICAS DE GAMIFICACIÓN (Admin)
@@ -7,27 +8,9 @@ import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 
-// Definición de niveles (debe coincidir con el sistema principal)
-const NIVELES = [
-  { nivel: 1, nombre: 'Buscador', xpRequerido: 0 },
-  { nivel: 2, nombre: 'Iniciado', xpRequerido: 100 },
-  { nivel: 3, nombre: 'Aprendiz', xpRequerido: 300 },
-  { nivel: 4, nombre: 'Adepto', xpRequerido: 600 },
-  { nivel: 5, nombre: 'Guardián', xpRequerido: 1000 },
-  { nivel: 6, nombre: 'Sabio', xpRequerido: 1500 },
-  { nivel: 7, nombre: 'Maestro', xpRequerido: 2100 },
-  { nivel: 8, nombre: 'Archimago', xpRequerido: 2800 },
-  { nivel: 9, nombre: 'Iluminado', xpRequerido: 3600 },
-  { nivel: 10, nombre: 'Ascendido', xpRequerido: 4500 }
-];
-
+// Usar niveles del config central para mantener consistencia
 function calcularNivel(xp) {
-  for (let i = NIVELES.length - 1; i >= 0; i--) {
-    if (xp >= NIVELES[i].xpRequerido) {
-      return NIVELES[i];
-    }
-  }
-  return NIVELES[0];
+  return obtenerNivel(xp);
 }
 
 export async function GET(request) {
@@ -60,7 +43,7 @@ export async function GET(request) {
     const distribucionNiveles = {};
     const topRachas = [];
 
-    // Inicializar distribución
+    // Inicializar distribución (usando estructura de config.js)
     NIVELES.forEach(n => {
       distribucionNiveles[n.nombre] = 0;
     });
@@ -78,9 +61,11 @@ export async function GET(request) {
 
       if (racha > mejorRacha) mejorRacha = racha;
 
-      // Distribución por nivel
+      // Distribución por nivel (config.js usa 'nombre' para el nombre del nivel)
       const nivel = calcularNivel(xp);
-      distribucionNiveles[nivel.nombre]++;
+      if (nivel && nivel.nombre) {
+        distribucionNiveles[nivel.nombre] = (distribucionNiveles[nivel.nombre] || 0) + 1;
+      }
 
       // Badges
       const badges = await kv.get(`user:${usuario.email}:badges`) || [];

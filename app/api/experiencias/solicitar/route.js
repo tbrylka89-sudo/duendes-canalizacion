@@ -131,11 +131,13 @@ const EXPERIENCIAS = {
     tiempoMs: 0
   },
   'susurro_guardian': {
-    nombre: 'Susurro del Guardián',
+    nombre: 'Susurro de tu Guardián',
     runas: 20,
     generaIA: true,
-    palabras: 250,
-    tiempoMs: 0
+    palabras: 500,
+    tiempoMinMs: 10 * 60 * 1000,
+    tiempoMaxMs: 20 * 60 * 1000,
+    requiereGuardian: true
   },
   'tirada_3_runas': {
     nombre: 'Tirada de 3 Runas',
@@ -223,11 +225,11 @@ const EXPERIENCIAS = {
   },
   'tarot_profundo': {
     nombre: 'Lectura de Tarot Profunda',
-    runas: 120,
+    runas: 50,
     generaIA: true,
-    palabras: 2500,
-    tiempoMinMs: 6 * 60 * 60 * 1000,
-    tiempoMaxMs: 12 * 60 * 60 * 1000
+    palabras: 1200,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 45 * 60 * 1000
   },
   'carta_astral_esencial': {
     nombre: 'Carta Astral Esencial',
@@ -326,7 +328,231 @@ const EXPERIENCIAS = {
   'registros-akashicos': { alias: 'registros_akashicos', nombre: 'Registros Akáshicos', runas: 250, generaIA: true, palabras: 5000, tiempoMinMs: 48 * 60 * 60 * 1000, tiempoMaxMs: 96 * 60 * 60 * 1000 },
   'carta-ancestral': { alias: 'conexion_ancestros', nombre: 'Conexión con Ancestros', runas: 250, generaIA: true, palabras: 4000, tiempoMinMs: 48 * 60 * 60 * 1000, tiempoMaxMs: 96 * 60 * 60 * 1000 },
   'mapa-energetico': { alias: 'mapa_energia', nombre: 'Mapa de tu Energía', runas: 60, generaIA: true, palabras: 1200, tiempoMinMs: 2 * 60 * 60 * 1000, tiempoMaxMs: 4 * 60 * 60 * 1000 },
-  'pregunta-especifica': { alias: 'consejo_bosque', nombre: 'Consejo del Bosque', runas: 15, generaIA: true, palabras: 200, tiempoMs: 0 }
+  'pregunta-especifica': { alias: 'consejo_bosque', nombre: 'Consejo del Bosque', runas: 15, generaIA: true, palabras: 200, tiempoMs: 0 },
+
+  // === EXPERIENCIAS MÁGICAS (nuevo catálogo premium - PRECIOS ACTUALIZADOS) ===
+  // Mensajes Canalizados
+  'mensaje_universo': {
+    nombre: 'Lo que el Universo Quiere Decirte',
+    runas: 25,
+    generaIA: true,
+    palabras: 800,
+    tiempoMinMs: 15 * 60 * 1000,
+    tiempoMaxMs: 30 * 60 * 1000
+  },
+  'carta_ancestros': {
+    nombre: 'Carta de tus Ancestros',
+    runas: 45,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+
+  // Guardianes
+  'estado_guardian': {
+    nombre: 'Estado Energético de tu Guardián',
+    runas: 20,
+    generaIA: true,
+    palabras: 600,
+    tiempoMinMs: 15 * 60 * 1000,
+    tiempoMaxMs: 30 * 60 * 1000,
+    requiereGuardian: true
+  },
+  'mision_guardian': {
+    nombre: 'La Misión de tu Guardián',
+    runas: 45,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000,
+    requiereGuardian: true
+  },
+  'historia_guardian': {
+    nombre: 'La Historia de tu Guardián',
+    runas: 55,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 45 * 60 * 1000,
+    tiempoMaxMs: 90 * 60 * 1000,
+    requiereGuardian: true
+  },
+
+  // Elementales
+  'elemento_dominante': {
+    nombre: 'Tu Elemento Dominante Oculto',
+    runas: 25,
+    generaIA: true,
+    palabras: 800,
+    tiempoMinMs: 15 * 60 * 1000,
+    tiempoMaxMs: 30 * 60 * 1000
+  },
+  'sanacion_elemental': {
+    nombre: 'Sanación con los 4 Elementos',
+    runas: 50,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+  'elemental_personal': {
+    nombre: 'Tu Elemental Personal',
+    runas: 35,
+    generaIA: true,
+    palabras: 1000,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 45 * 60 * 1000
+  },
+
+  // Cristales
+  'cristal_alma': {
+    nombre: 'El Cristal de tu Alma',
+    runas: 30,
+    generaIA: true,
+    palabras: 900,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 40 * 60 * 1000
+  },
+  'grid_cristales': {
+    nombre: 'Tu Grid de Cristales',
+    runas: 40,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 25 * 60 * 1000,
+    tiempoMaxMs: 50 * 60 * 1000
+  },
+
+  // Tarot y Oráculos
+  'oraculo_duendes': {
+    nombre: 'Oráculo de los Duendes',
+    runas: 25,
+    generaIA: true,
+    palabras: 700,
+    tiempoMinMs: 15 * 60 * 1000,
+    tiempoMaxMs: 30 * 60 * 1000
+  },
+  'carta_año': {
+    nombre: 'Tu Carta del Año',
+    runas: 40,
+    generaIA: true,
+    palabras: 800,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 40 * 60 * 1000
+  },
+
+  // Runas Nórdicas
+  'tirada_runas_3': {
+    nombre: 'Tirada de 3 Runas',
+    runas: 25,
+    generaIA: true,
+    palabras: 600,
+    tiempoMinMs: 10 * 60 * 1000,
+    tiempoMaxMs: 25 * 60 * 1000
+  },
+  'tirada_runas_9': {
+    nombre: 'Tirada de las 9 Runas',
+    runas: 65,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+  'runa_personal': {
+    nombre: 'Tu Runa de Nacimiento',
+    runas: 30,
+    generaIA: true,
+    palabras: 800,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 40 * 60 * 1000
+  },
+
+  // Astrología
+  'luna_personal': {
+    nombre: 'Tu Luna Personal',
+    runas: 40,
+    generaIA: true,
+    palabras: 1000,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 45 * 60 * 1000
+  },
+  'ciclo_lunar_mes': {
+    nombre: 'Tu Mes Lunar',
+    runas: 45,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 25 * 60 * 1000,
+    tiempoMaxMs: 50 * 60 * 1000
+  },
+
+  // Energía
+  'lectura_aura': {
+    nombre: 'Lectura de Aura',
+    runas: 40,
+    generaIA: true,
+    palabras: 1000,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 45 * 60 * 1000
+  },
+  'corte_cordones': {
+    nombre: 'Análisis de Cordones Energéticos',
+    runas: 55,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+  'chakras_estado': {
+    nombre: 'Estado de tus Chakras',
+    runas: 50,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 25 * 60 * 1000,
+    tiempoMaxMs: 50 * 60 * 1000
+  },
+
+  // Alma (PREMIUM)
+  'mision_alma': {
+    nombre: 'La Misión de tu Alma',
+    runas: 200,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 45 * 60 * 1000,
+    tiempoMaxMs: 90 * 60 * 1000
+  },
+  'contratos_alma': {
+    nombre: 'Contratos del Alma',
+    runas: 180,
+    generaIA: true,
+    palabras: 2500,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 120 * 60 * 1000
+  },
+
+  // Protección
+  'escudo_protector': {
+    nombre: 'Tu Escudo Protector',
+    runas: 40,
+    generaIA: true,
+    palabras: 1000,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 45 * 60 * 1000
+  },
+  'limpieza_casa': {
+    nombre: 'Limpieza Energética del Hogar',
+    runas: 45,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 25 * 60 * 1000,
+    tiempoMaxMs: 50 * 60 * 1000
+  },
+  'deteccion_influencias': {
+    nombre: 'Detección de Influencias Negativas',
+    runas: 55,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 35 * 60 * 1000,
+    tiempoMaxMs: 70 * 60 * 1000
+  }
 };
 
 // POST - Solicitar una experiencia
@@ -335,6 +561,7 @@ export async function POST(request) {
     const body = await request.json();
     const {
       email,
+      token,
       experienciaId,
       tipo, // Alias para compatibilidad con frontend
       contexto = '',
@@ -347,10 +574,23 @@ export async function POST(request) {
     // Aceptar tanto experienciaId como tipo
     const expId = experienciaId || tipo;
 
-    if (!email) {
+    // Obtener email desde token si se proporciona
+    let userEmail = email;
+    if (token && !email) {
+      const tokenData = await kv.get(`token:${token}`);
+      if (!tokenData) {
+        return Response.json({
+          success: false,
+          error: 'Token inválido'
+        }, { status: 401, headers: CORS_HEADERS });
+      }
+      userEmail = typeof tokenData === 'string' ? tokenData : tokenData.email;
+    }
+
+    if (!userEmail) {
       return Response.json({
         success: false,
-        error: 'Email requerido'
+        error: 'Email o token requerido'
       }, { status: 400, headers: CORS_HEADERS });
     }
 
@@ -363,7 +603,7 @@ export async function POST(request) {
     }
 
     const experiencia = EXPERIENCIAS[expId];
-    const emailNorm = email.toLowerCase().trim();
+    const emailNorm = userEmail.toLowerCase().trim();
 
     // Combinar contexto de diferentes fuentes
     const contextoCompleto = contexto || datos?.contexto || datos?.pregunta || '';
@@ -565,16 +805,30 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
+    const token = searchParams.get('token');
     const id = searchParams.get('id');
 
-    if (!email) {
+    // Obtener email desde token si se proporciona
+    let userEmail = email;
+    if (token && !email) {
+      const tokenData = await kv.get(`token:${token}`);
+      if (!tokenData) {
+        return Response.json({
+          success: false,
+          error: 'Token inválido'
+        }, { status: 401, headers: CORS_HEADERS });
+      }
+      userEmail = typeof tokenData === 'string' ? tokenData : tokenData.email;
+    }
+
+    if (!userEmail) {
       return Response.json({
         success: false,
-        error: 'Email requerido'
+        error: 'Email o token requerido'
       }, { status: 400, headers: CORS_HEADERS });
     }
 
-    const emailNorm = email.toLowerCase().trim();
+    const emailNorm = userEmail.toLowerCase().trim();
 
     // Si piden una experiencia específica
     if (id) {

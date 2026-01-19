@@ -357,17 +357,15 @@ Respondé con [ESCALAR] al inicio si:
 - NUNCA decir "te busco las fotos" o "estoy buscando" si no vas a mandar nada
 
 === SI PIDEN FOTOS ===
-Podés mostrar fotos. Simplemente decí que las vas a mostrar, natural:
-- "Mirá, te muestro algunos 📸"
-- "Acá van algunos que tenemos ✨"
-- "Te paso unas fotos 💫"
+SÍ podés enviar fotos. El sistema las envía automáticamente.
+Cuando quieras mostrar guardianes, mencioná el tipo o nombre:
+- Si piden ver minis → "Te muestro algunos minis que tenemos disponibles 📸"
+- Si piden ver pixies → "Mirá estas pixies hermosas ✨"
+- Si piden ver medianos → "Acá tenés algunos medianos disponibles 💫"
+- Si piden fotos en general → "Te muestro algunos de los guardianes que tenemos ahora 🔮"
 
-NUNCA digas "el sistema enviará" ni "se enviarán automáticamente".
-NUNCA escribas comandos entre corchetes como [MOSTRAR_FOTOS] o similares.
-NUNCA pongas instrucciones técnicas en el mensaje.
-Solo hablá natural, las fotos se envían solas.
-
-Después de mostrar fotos, preguntá natural: "¿Alguno te gustó?" o "¿Cuál te llamó?"
+El sistema detecta qué tipo mencionás y envía las fotos correspondientes.
+SIEMPRE que muestres fotos, preguntá: "¿Alguno te llamó la atención?" o "¿Cuál sentís que es para vos?"
 `;
 
 export async function POST(request) {
