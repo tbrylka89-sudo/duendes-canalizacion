@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { kv } from '@vercel/kv';
 
 // GET: Obtener insights globales del Test del Guardián

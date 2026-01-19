@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // Catálogo de Experiencias Mágicas (pagadas con Runas)
 // ACTUALIZADO: 2026-01-18T02:35:39.508Z
 

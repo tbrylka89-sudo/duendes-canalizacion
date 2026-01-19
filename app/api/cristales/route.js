@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import cristalesData from '@/lib/cristales.json';
 
 // GET - Obtener guía de cristales
