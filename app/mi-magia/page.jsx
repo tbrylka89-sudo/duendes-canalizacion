@@ -4084,7 +4084,7 @@ export default function MiMagia() {
         )}
         <div className="nav-links-externos">
           <a href="/mi-magia/circulo" className="nav-volver nav-circulo">★ Entrar al Círculo</a>
-          <a href={`${WORDPRESS_URL}/tienda/`} target="_blank" rel="noopener" className="nav-volver nav-tienda">🃏 Tienda Mágica</a>
+          <a href="/tienda" className="nav-volver nav-tienda">🃏 Tienda Mágica</a>
         </div>
       </nav>
       
