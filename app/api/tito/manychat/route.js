@@ -15,7 +15,103 @@ const anthropic = new Anthropic({
 });
 
 // URL de WordPress para imágenes de productos
-const WORDPRESS_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WORDPRESS_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
+
+// Catálogo de guardianes con imágenes
+const CATALOGO_GUARDIANES = {
+  // MINIS CLÁSICOS - $70
+  minis: [
+    { nombre: 'Dani', precio: 70, tipo: 'mini', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0deaaa-572b-64d0-9668-8244f3e1145b_2_2_45d2ec67-e038-4178-bb1c-f91df54de778.png' },
+    { nombre: 'Lil', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Matheo', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Cash', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Luke', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Trévor', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Estelar', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Leo', precio: 70, tipo: 'mini', imagen: null },
+    { nombre: 'Compañero', precio: 70, tipo: 'mini', imagen: null },
+  ],
+  // PIXIES - $150
+  pixies: [
+    { nombre: 'Violeta', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/IMG_1409.png' },
+    { nombre: 'Azucena', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/IMG_1402.png' },
+    { nombre: 'Margarita', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/IMG_1393.png' },
+    { nombre: 'Tulipa', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/IMG_1385.png' },
+    { nombre: 'Dalia', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1d7-c861-6f00-89db-63b34df564ca_2_2_0d8e2c46-ae0d-4d04-a55c-53d09d4a47a6.png' },
+    { nombre: 'Flor', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1d8-3680-6db0-877a-f578c8af3352_1_1_3032aafe-8c3d-4ed2-931e-22cbe2873f30.png' },
+    { nombre: 'Azalea', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1d9-a82f-6870-863a-fb402323dc4b_1_1_405fe077-de45-4fe2-a4c5-03eb488d5cf4.png' },
+    { nombre: 'Canela', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1da-00cd-6130-96a5-6b544c59724b_2_2_26008cae-c8f0-4eea-b265-bef1b22edf53.png' },
+    { nombre: 'Cintia', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1da-6848-6c60-9222-4f0904984ebd_0_0_bf82ab98-c653-4113-9ceb-2a0b25e5909a.png' },
+    { nombre: 'Laura', precio: 150, tipo: 'pixie', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1dc-89da-64d0-ba9d-503ab1e62342_0_0_403d1749-5ade-417e-b623-631ad7af90b4.png' },
+  ],
+  // MEDIANOS ESPECIALES - $200
+  medianos: [
+    { nombre: 'Tony', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc608-4541-6740-9aa5-21d8d8cd67eb_2_2_8f89d239-345b-4927-a67c-6da0422621a1-1.png' },
+    { nombre: 'Naia', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc605-7e5e-6260-adf8-59a2f358a11a_0_0_2a421248-07c5-440e-9d49-442405cc739c-1.png' },
+    { nombre: 'Brianna', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc609-39f5-67f0-b040-de0c4468280b_1_1_328ca344-6e41-4f68-b611-63774f812570-1.png' },
+    { nombre: 'Asher', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc60a-819c-6e40-afad-596a18ae6390_2_2_30b8d185-b55e-437e-af5a-08b5c2467008-1.png' },
+    { nombre: 'Rasiel', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc60f-69c6-60a0-80e7-b885c2ea3e60_0_0_45cbfff7-a938-4e90-8eeb-e7558860028a-1.png' },
+    { nombre: 'Altair', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc60e-d1ae-67e0-9138-a31157dd4f49_2_2_99a240db-ff40-462b-a64b-993c4b4c2933-1.png' },
+    { nombre: 'Idris', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc616-d4a2-6700-b217-9205777ff7f7_2_2_fd599de9-cff7-4718-8307-3b10e9427623-1.png' },
+    { nombre: 'Rahmus', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1d6-4530-6d80-b07b-0bb9f533414e_2_2_5df856db-c432-4a60-a8dd-362d9fc0b23d.png' },
+    { nombre: 'Sara', precio: 200, tipo: 'mediano', imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1ef-8ba9-6460-96fc-e2a2718bc371_1_1_2e177f17-1306-4167-99d8-8af8a0a842e7.png' },
+    { nombre: 'Diana', precio: 200, tipo: 'mediano', imagen: null },
+    { nombre: 'Iris', precio: 200, tipo: 'mediano', imagen: null },
+    { nombre: 'Stan', precio: 200, tipo: 'mediano', imagen: null },
+    { nombre: 'Andy', precio: 200, tipo: 'mediano', imagen: null },
+  ],
+  // GRANDES ESPECIALES - $450
+  grandes: [
+    { nombre: 'Freya', precio: 450, tipo: 'grande', imagen: null },
+    { nombre: 'Zoe', precio: 450, tipo: 'grande', imagen: null },
+  ],
+};
+
+// Función para buscar guardianes por criterio
+function buscarGuardianes(criterio) {
+  const todos = [
+    ...CATALOGO_GUARDIANES.minis,
+    ...CATALOGO_GUARDIANES.pixies,
+    ...CATALOGO_GUARDIANES.medianos,
+    ...CATALOGO_GUARDIANES.grandes,
+  ];
+
+  const criterioLower = criterio.toLowerCase();
+
+  // Buscar por nombre
+  const porNombre = todos.filter(g =>
+    g.nombre.toLowerCase().includes(criterioLower)
+  );
+  if (porNombre.length > 0) return porNombre;
+
+  // Buscar por tipo
+  if (criterioLower.includes('mini') && !criterioLower.includes('pixie')) {
+    return CATALOGO_GUARDIANES.minis.filter(g => g.imagen);
+  }
+  if (criterioLower.includes('pixie')) {
+    return CATALOGO_GUARDIANES.pixies.filter(g => g.imagen);
+  }
+  if (criterioLower.includes('median')) {
+    return CATALOGO_GUARDIANES.medianos.filter(g => g.imagen);
+  }
+  if (criterioLower.includes('grande')) {
+    return CATALOGO_GUARDIANES.grandes.filter(g => g.imagen);
+  }
+
+  // Por defecto, devolver algunos con imagen
+  return todos.filter(g => g.imagen).slice(0, 4);
+}
+
+// Obtener imágenes aleatorias del catálogo para mostrar
+function obtenerImagenesAleatorias(cantidad = 3) {
+  const conImagen = [
+    ...CATALOGO_GUARDIANES.pixies,
+    ...CATALOGO_GUARDIANES.medianos,
+  ].filter(g => g.imagen);
+
+  const shuffled = conImagen.sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, cantidad);
+}
 
 // Palabras clave que indican que alguien pregunta por un pedido
 const PALABRAS_PEDIDO = [
@@ -229,11 +325,15 @@ Respondé con [ESCALAR] al inicio si:
 - NUNCA decir "te busco las fotos" o "estoy buscando" si no vas a mandar nada
 
 === SI PIDEN FOTOS ===
-Por ahora NO podés enviar fotos directamente.
-Opciones de respuesta:
-- "Las fotos las maneja Thibisay directamente. ¿Qué tipo de guardián te interesa? ¿Mini, mediano, grande? ¿Alguna especialidad? Así le paso el pedido y te manda fotos de los que tenemos disponibles 📸"
-- "Dame más detalles de lo que buscás y le pido a Thibisay que te mande fotos de los que podrían ser para vos ✨"
-- Preguntá qué buscan (tamaño, especialidad, presupuesto) para que Thibisay sepa qué mostrarles
+SÍ podés enviar fotos. El sistema las envía automáticamente.
+Cuando quieras mostrar guardianes, mencioná el tipo o nombre:
+- Si piden ver minis → "Te muestro algunos minis que tenemos disponibles 📸"
+- Si piden ver pixies → "Mirá estas pixies hermosas ✨"
+- Si piden ver medianos → "Acá tenés algunos medianos disponibles 💫"
+- Si piden fotos en general → "Te muestro algunos de los guardianes que tenemos ahora 🔮"
+
+El sistema detecta qué tipo mencionás y envía las fotos correspondientes.
+SIEMPRE que muestres fotos, preguntá: "¿Alguno te llamó la atención?" o "¿Cuál sentís que es para vos?"
 `;
 
 export async function POST(request) {
@@ -279,7 +379,7 @@ export async function POST(request) {
     }
 
     if (pideFotos) {
-      contextoAdicional += '\n[CONTEXTO: Pide fotos. RECORDÁ: no podés enviar fotos, preguntá qué busca y decile que Thibisay le va a mandar fotos. ESCALAR para que Thibisay envíe las fotos.]';
+      contextoAdicional += '\n[CONTEXTO: Pide fotos. PODÉS mostrarle fotos - el sistema las enviará automáticamente. Decí algo como "Te muestro algunos que tenemos" y mencioná el tipo (minis, pixies, medianos). Después preguntá cuál le gustó.]';
     }
 
     if (nombre) {
@@ -319,20 +419,49 @@ export async function POST(request) {
 
     const respuestaTito = response.content[0].text;
 
-    // Detectar si Tito quiere escalar
+    // Detectar si Tito quiere escalar (ya no escala por fotos, ahora las manda)
     const debeEscalar = respuestaTito.includes('[ESCALAR]') ||
                         preguntaPorPedido ||
-                        estaNervioso ||
-                        pideFotos;
+                        estaNervioso;
 
     // Limpiar el [ESCALAR] de la respuesta
     const respuestaLimpia = respuestaTito.replace('[ESCALAR]', '').trim();
+
+    // Detectar qué tipo de guardianes mostrar basado en mensaje + respuesta
+    let imagenesParaEnviar = [];
+    const textoCompleto = (mensaje + ' ' + respuestaLimpia).toLowerCase();
+
+    if (pideFotos || quiereComprar) {
+      // Detectar tipo específico
+      if (textoCompleto.includes('pixie')) {
+        imagenesParaEnviar = CATALOGO_GUARDIANES.pixies.filter(g => g.imagen).slice(0, 3);
+      } else if (textoCompleto.includes('mini') && !textoCompleto.includes('pixie')) {
+        imagenesParaEnviar = CATALOGO_GUARDIANES.minis.filter(g => g.imagen).slice(0, 3);
+      } else if (textoCompleto.includes('median')) {
+        imagenesParaEnviar = CATALOGO_GUARDIANES.medianos.filter(g => g.imagen).slice(0, 3);
+      } else if (textoCompleto.includes('grande')) {
+        imagenesParaEnviar = CATALOGO_GUARDIANES.grandes.filter(g => g.imagen).slice(0, 3);
+      } else {
+        // Mostrar variedad
+        imagenesParaEnviar = obtenerImagenesAleatorias(3);
+      }
+    }
 
     // Preparar respuesta para ManyChat
     const respuestaManychat = {
       success: true,
       respuesta: respuestaLimpia,
       escalar: debeEscalar,
+      // Imágenes para enviar (ManyChat debe configurarse para usar esto)
+      imagenes: imagenesParaEnviar.map(g => ({
+        url: g.imagen,
+        nombre: g.nombre,
+        precio: g.precio,
+        tipo: g.tipo,
+      })),
+      imagen_url: imagenesParaEnviar[0]?.imagen || null, // Primera imagen para campo simple
+      imagen_url_2: imagenesParaEnviar[1]?.imagen || null,
+      imagen_url_3: imagenesParaEnviar[2]?.imagen || null,
       contexto: {
         preguntaPorPedido,
         estaNervioso,
@@ -344,8 +473,7 @@ export async function POST(request) {
       // Datos para notificación si hay que escalar
       notificacion: debeEscalar ? {
         mensaje: `🚨 ${nombre || 'Alguien'} desde ${plataforma || 'redes'} necesita atención`,
-        razon: pideFotos ? '📸 Pide fotos de guardianes' :
-               preguntaPorPedido ? 'Pregunta por pedido' :
+        razon: preguntaPorPedido ? 'Pregunta por pedido' :
                estaNervioso ? 'Cliente nervioso/molesto' :
                'Escalado por Tito',
         mensajeOriginal: mensaje,
