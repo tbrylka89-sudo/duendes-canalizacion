@@ -1,11 +1,11 @@
 /**
  * TITO para ManyChat - Instagram, Facebook, WhatsApp
  *
- * Endpoint que conecta Tito con ManyChat para responder en redes sociales.
- * Incluye lógica especial para:
- * - Web en construcción
- * - Clientes con pedidos pendientes
- * - Escalamiento a humanos cuando es necesario
+ * Endpoint inteligente que:
+ * - Responde preguntas sobre guardianes
+ * - Muestra imágenes de productos de WooCommerce
+ * - Recomienda guardianes basado en necesidades
+ * - Usa formato Dynamic Block de ManyChat para texto + imágenes
  */
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -14,10 +14,52 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// URL de WordPress para imágenes de productos
-const WORDPRESS_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+// URL base de la API
+const API_BASE = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : 'https://duendes-vercel.vercel.app';
 
-// Palabras clave que indican que alguien pregunta por un pedido
+// ═══════════════════════════════════════════════════════════════
+// FUNCIONES PARA OBTENER PRODUCTOS
+// ═══════════════════════════════════════════════════════════════
+
+async function obtenerProductos(params = {}) {
+  try {
+    const url = new URL(`${API_BASE}/api/tito/woo`);
+    url.searchParams.set('accion', 'productos');
+    if (params.categoria) url.searchParams.set('categoria', params.categoria);
+    if (params.busqueda) url.searchParams.set('busqueda', params.busqueda);
+    if (params.limite) url.searchParams.set('limite', params.limite);
+
+    const res = await fetch(url.toString());
+    const data = await res.json();
+    return data.success ? data.data : [];
+  } catch (error) {
+    console.error('[MANYCHAT] Error obteniendo productos:', error);
+    return [];
+  }
+}
+
+async function obtenerRecomendaciones(intencion, presupuesto) {
+  try {
+    const url = new URL(`${API_BASE}/api/tito/woo`);
+    url.searchParams.set('accion', 'recomendaciones');
+    if (intencion) url.searchParams.set('intencion', intencion);
+    if (presupuesto) url.searchParams.set('presupuesto', presupuesto);
+
+    const res = await fetch(url.toString());
+    const data = await res.json();
+    return data.success ? data.data : [];
+  } catch (error) {
+    console.error('[MANYCHAT] Error obteniendo recomendaciones:', error);
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DETECTORES DE INTENCIÓN
+// ═══════════════════════════════════════════════════════════════
+
 const PALABRAS_PEDIDO = [
   'pedido', 'orden', 'envío', 'envio', 'paquete', 'compré', 'compre',
   'pagué', 'pague', 'cuándo llega', 'cuando llega', 'mi guardián',
@@ -26,7 +68,6 @@ const PALABRAS_PEDIDO = [
   'no me llegó', 'no me llego', 'estado de mi', 'mi compra'
 ];
 
-// Palabras que indican nerviosismo o urgencia
 const PALABRAS_NERVIOSISMO = [
   'preocupado', 'preocupada', 'nervioso', 'nerviosa', 'urgente',
   'ya pasaron', 'hace días', 'hace semanas', 'no responden',
@@ -34,53 +75,135 @@ const PALABRAS_NERVIOSISMO = [
   'reclamo', 'queja', 'enojado', 'enojada', 'molesto', 'molesta'
 ];
 
-// Detectar si pregunta por pedido
-function detectaPreguntaPedido(mensaje) {
-  const msgLower = mensaje.toLowerCase();
-  return PALABRAS_PEDIDO.some(palabra => msgLower.includes(palabra));
-}
-
-// Detectar nerviosismo
-function detectaNerviosismo(mensaje) {
-  const msgLower = mensaje.toLowerCase();
-  return PALABRAS_NERVIOSISMO.some(palabra => msgLower.includes(palabra));
-}
-
-// Detectar intención de compra
-function detectaIntencionCompra(mensaje) {
-  const msgLower = mensaje.toLowerCase();
-  const palabrasCompra = [
-    'quiero comprar', 'quiero uno', 'cómo compro', 'como compro',
-    'precio', 'cuánto', 'cuanto', 'cómo pago', 'como pago',
-    'reservar', 'apartar', 'disponible', 'tienen', 'hay'
-  ];
-  return palabrasCompra.some(palabra => msgLower.includes(palabra));
-}
-
-// Detectar si quiere ver imágenes/fotos de guardianes
-function detectaQuiereVerImagenes(mensaje) {
-  const msgLower = mensaje.toLowerCase();
-  const palabrasImagen = [
-    'mostrame', 'muéstrame', 'mostrá', 'quiero ver', 'tienen fotos',
-    'fotos', 'imágenes', 'imagenes', 'ver uno', 'ver alguno',
-    'cómo son', 'como son', 'cómo lucen', 'como lucen',
-    'puedo ver', 'tienen disponibles', 'qué tienen', 'que tienen',
-    'ver guardianes', 'ver duendes', 'ver elfos', 'ver hadas'
-  ];
-  return palabrasImagen.some(palabra => msgLower.includes(palabra));
-}
-
-// Imágenes de muestra de guardianes (URLs públicas de la tienda)
-const IMAGENES_GUARDIANES = [
-  {
-    url: 'https://duendesdeluruguay.com/wp-content/uploads/2024/guardian-muestra-1.jpg',
-    tipo: 'duende',
-    nombre: 'Guardián del Bosque'
-  },
-  // Se pueden agregar más imágenes aquí
+const PALABRAS_VER_PRODUCTOS = [
+  'mostrame', 'muéstrame', 'mostrá', 'quiero ver', 'tienen fotos',
+  'fotos', 'imágenes', 'imagenes', 'ver uno', 'ver alguno',
+  'cómo son', 'como son', 'cómo lucen', 'como lucen',
+  'puedo ver', 'qué tienen', 'que tienen', 'tienen disponibles',
+  'ver guardianes', 'ver duendes', 'ver elfos', 'ver hadas',
+  'mostrar', 'enseñame', 'enseñá'
 ];
 
-// Sistema de prompt para Tito en ManyChat
+const PALABRAS_RECOMENDAR = [
+  'recomienda', 'recomendás', 'recomendas', 'sugerí', 'sugeri',
+  'cuál me sirve', 'cual me sirve', 'necesito', 'busco',
+  'para protección', 'para proteccion', 'para abundancia',
+  'para el amor', 'para sanar', 'para sanación', 'para sanacion',
+  'qué guardián', 'que guardian', 'cuál guardián', 'cual guardian',
+  'ayudame a elegir', 'no sé cuál', 'no se cual'
+];
+
+function detectarIntencion(mensaje) {
+  const msgLower = mensaje.toLowerCase();
+
+  return {
+    preguntaPedido: PALABRAS_PEDIDO.some(p => msgLower.includes(p)),
+    nervioso: PALABRAS_NERVIOSISMO.some(p => msgLower.includes(p)),
+    quiereVerProductos: PALABRAS_VER_PRODUCTOS.some(p => msgLower.includes(p)),
+    quiereRecomendacion: PALABRAS_RECOMENDAR.some(p => msgLower.includes(p)),
+    // Detectar necesidades específicas para recomendación
+    necesidad: detectarNecesidad(msgLower)
+  };
+}
+
+function detectarNecesidad(msg) {
+  if (msg.includes('protec')) return 'protección';
+  if (msg.includes('abundan') || msg.includes('prosper') || msg.includes('dinero')) return 'abundancia';
+  if (msg.includes('amor') || msg.includes('pareja') || msg.includes('relacion')) return 'amor';
+  if (msg.includes('sana') || msg.includes('salud') || msg.includes('curar')) return 'sanación';
+  if (msg.includes('paz') || msg.includes('tranquil') || msg.includes('calma')) return 'paz';
+  if (msg.includes('creativ') || msg.includes('inspira') || msg.includes('arte')) return 'creatividad';
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORMATO MANYCHAT DYNAMIC BLOCK
+// ═══════════════════════════════════════════════════════════════
+
+function crearRespuestaTexto(texto) {
+  return {
+    version: 'v2',
+    content: {
+      messages: [
+        { type: 'text', text: texto }
+      ]
+    }
+  };
+}
+
+function crearRespuestaConImagen(texto, imagenUrl) {
+  return {
+    version: 'v2',
+    content: {
+      messages: [
+        { type: 'text', text: texto },
+        { type: 'image', url: imagenUrl }
+      ]
+    }
+  };
+}
+
+function crearRespuestaConGaleria(texto, productos) {
+  // ManyChat Gallery/Cards format
+  const cards = productos.slice(0, 10).map(p => ({
+    title: p.nombre,
+    subtitle: `$${p.precio} USD`,
+    image_url: p.imagen,
+    buttons: [
+      {
+        type: 'url',
+        caption: 'Ver más',
+        url: p.url || `https://duendesdeluruguay.com/?p=${p.id}`
+      }
+    ]
+  }));
+
+  return {
+    version: 'v2',
+    content: {
+      messages: [
+        { type: 'text', text: texto },
+        {
+          type: 'cards',
+          elements: cards,
+          image_aspect_ratio: 'square'
+        }
+      ]
+    }
+  };
+}
+
+function crearRespuestaConProducto(texto, producto) {
+  return {
+    version: 'v2',
+    content: {
+      messages: [
+        { type: 'text', text: texto },
+        {
+          type: 'cards',
+          elements: [{
+            title: producto.nombre,
+            subtitle: `$${producto.precio} USD${producto.descripcionCorta ? ' - ' + producto.descripcionCorta : ''}`,
+            image_url: producto.imagen,
+            buttons: [
+              {
+                type: 'url',
+                caption: 'Conocer más',
+                url: producto.url || `https://duendesdeluruguay.com/?p=${producto.id}`
+              }
+            ]
+          }],
+          image_aspect_ratio: 'square'
+        }
+      ]
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SYSTEM PROMPT PARA TITO
+// ═══════════════════════════════════════════════════════════════
+
 const SYSTEM_PROMPT = `
 === QUIÉN SOS ===
 Sos TITO, el asistente de Duendes del Uruguay.
@@ -108,126 +231,119 @@ Cada guardián se especializa en: Protección, Amor, Abundancia, Intuición, Sal
 Piriápolis es un punto energético único donde convergen líneas de energía.
 Los cerros sagrados + el océano crean un portal natural.
 Los guardianes nacen cargados con esta energía especial.
-Esto es lo que los hace diferentes a cualquier otra cosa.
 
 === LA WEB ===
 Web principal: www.duendesdeluruguay.com
 Portal Mi Magia: duendes-vercel.vercel.app (para quienes ya compraron)
 
 === EL CÍRCULO DE DUENDES ===
-Es nuestra membresía privada - "una hermandad, no una suscripción".
-Los miembros se llaman "Los Elegidos".
+Membresía privada - "una hermandad, no una suscripción".
 - Trial gratis 15 días
-- Mensual $15 USD
-- Semestral $50 USD
-- Anual $80 USD
-Incluye: contenido semanal de guardianes, rituales, meditaciones, comunidad privada, descuentos.
-
-=== SI PREGUNTAN POR UN PEDIDO ===
-1. Calmar con empatía genuina
-2. Pedir info: nombre, email o número de pedido
-3. Decir que lo pasás al equipo para revisar
-4. NUNCA inventar estados de pedido
-5. NUNCA decir "no tenemos registro"
-
-=== SI ESTÁN NERVIOSOS O MOLESTOS ===
-1. Validar: "Entiendo perfectamente"
-2. Tranquilizar: "Tu guardián está en buenas manos"
-3. Explicar: "Como cada uno es único, a veces el proceso lleva unos días más"
-4. Escalar: "Le paso tu mensaje a Thibisay para que te contacte"
-
-=== SI QUIEREN COMPRAR ===
-- Invitalos a ver la tienda en la web
-- Explicá que cada guardián es único e irrepetible
-- Cuando se va, no vuelve
-- Incluye canalización personal
-- Envíos a todo el mundo
-- NO ofrecer seña/reserva de entrada - solo si la persona lo pide o si no le alcanza
-
-=== VISITAS AL ESPACIO FÍSICO ===
-- Las visitas son por cita previa, no se recibe sin agendar
-- Es una experiencia exclusiva y preparada
-- Si preguntan por visitar, pedí que escriban para coordinar
+- Mensual $15 USD / Semestral $50 USD / Anual $80 USD
+Incluye: contenido semanal, rituales, meditaciones, comunidad privada, descuentos.
 
 === CÓMO RESPONDER ===
 - Mensajes CORTOS (2-3 oraciones máximo)
 - 1-2 emojis máximo
 - Preguntá algo al final para mantener la conversación
-- Usá el nombre de la persona si lo tenés
+- Usá el nombre si lo tenés
 
-=== CUÁNDO ESCALAR ===
-Respondé con [ESCALAR] al inicio si:
-- Preguntan por pedido específico
-- Están muy nerviosos o molestos
-- Quieren hacer un reclamo
-- Piden hablar con una persona
+=== SI PIDEN VER GUARDIANES ===
+Tenés acceso a los productos disponibles. Cuando alguien quiere ver:
+- Te voy a pasar info de productos disponibles
+- Usá esa info para recomendar
+- Siempre mencioná el nombre del guardián y algo especial de él
+
+=== SI QUIEREN RECOMENDACIÓN ===
+Hacé 1-2 preguntas para entender qué necesitan:
+- ¿Para qué lo buscan? (protección, abundancia, amor, sanación...)
+- ¿Es para ellos o para regalar?
+Después recomendá basado en lo que necesitan.
+
+=== SI PREGUNTAN POR UN PEDIDO ===
+1. Calmar con empatía
+2. Pedir nombre/email/número de pedido
+3. Decir que lo pasás al equipo
+4. NUNCA inventar estados de pedido
+
+=== SI ESTÁN NERVIOSOS O MOLESTOS ===
+1. Validar: "Entiendo perfectamente"
+2. Escalar: "Le paso tu mensaje a Thibisay"
+
+=== VISITAS AL ESPACIO FÍSICO ===
+Solo por cita previa. Si preguntan, que escriban para coordinar.
 
 === PROHIBIDO ===
 - Decir "los guardianes de Thibisay" (decí "los guardianes" o "nuestros guardianes")
 - Llamarlos "muñecos" o "productos"
 - Inventar información
-- Frases de IA: "en los confines", "la bruma del tiempo", "el velo entre mundos"
-- Sonar a respuesta automática
+- Frases de IA tipo "en los confines", "la bruma del tiempo"
 `;
+
+// ═══════════════════════════════════════════════════════════════
+// HANDLER PRINCIPAL
+// ═══════════════════════════════════════════════════════════════
 
 export async function POST(request) {
   try {
     const body = await request.json();
 
-    // Datos que manda ManyChat
     const {
-      mensaje,           // El mensaje del usuario
-      nombre,            // Nombre del usuario (si ManyChat lo tiene)
-      plataforma,        // instagram, facebook, whatsapp
-      subscriber_id,     // ID único del usuario en ManyChat
-      historial,         // Historial de conversación (opcional)
-      email,             // Email si lo tiene
-      telefono,          // Teléfono si lo tiene
+      mensaje,
+      nombre,
+      plataforma,
+      subscriber_id,
+      historial,
     } = body;
 
     if (!mensaje) {
-      return Response.json({
-        error: 'Falta el mensaje'
-      }, { status: 400 });
+      return Response.json({ error: 'Falta el mensaje' }, { status: 400 });
     }
 
-    // Detectar situaciones especiales
-    const preguntaPorPedido = detectaPreguntaPedido(mensaje);
-    const estaNervioso = detectaNerviosismo(mensaje);
-    const quiereComprar = detectaIntencionCompra(mensaje);
-    const quiereVerImagenes = detectaQuiereVerImagenes(mensaje);
+    // Detectar intención del mensaje
+    const intencion = detectarIntencion(mensaje);
 
-    // Construir contexto adicional
+    // Construir contexto para Claude
+    let contextoProductos = '';
+    let productosParaMostrar = [];
+
+    // Si quiere ver productos o recomendación, obtenerlos
+    if (intencion.quiereVerProductos || intencion.quiereRecomendacion) {
+      if (intencion.necesidad) {
+        // Buscar por necesidad específica
+        productosParaMostrar = await obtenerRecomendaciones(intencion.necesidad);
+      } else {
+        // Mostrar productos disponibles
+        productosParaMostrar = await obtenerProductos({ limite: 6 });
+      }
+
+      if (productosParaMostrar.length > 0) {
+        contextoProductos = `\n\n[PRODUCTOS DISPONIBLES PARA MOSTRAR:]
+${productosParaMostrar.map(p => `- ${p.nombre}: $${p.precio} USD (${p.categorias || 'guardián'})`).join('\n')}
+
+Mencioná alguno de estos guardianes por nombre. El sistema mostrará sus fotos automáticamente.`;
+      }
+    }
+
+    // Contexto adicional
     let contextoAdicional = '';
 
-    if (preguntaPorPedido) {
-      contextoAdicional += '\n[CONTEXTO: Esta persona pregunta por un pedido. Tratala con cuidado, probablemente ya compró antes.]';
+    if (intencion.preguntaPedido) {
+      contextoAdicional += '\n[CONTEXTO: Pregunta por un pedido. Pedir datos y calmar.]';
     }
-
-    if (estaNervioso) {
-      contextoAdicional += '\n[CONTEXTO: Detecté palabras de nerviosismo/molestia. Priorizar calmar y escalar.]';
+    if (intencion.nervioso) {
+      contextoAdicional += '\n[CONTEXTO: Cliente nervioso. Priorizar calmar y escalar a Thibisay.]';
     }
-
-    if (quiereComprar) {
-      contextoAdicional += '\n[CONTEXTO: Parece interesada en comprar. Mostrar info de productos.]';
-    }
-
-    if (quiereVerImagenes) {
-      contextoAdicional += '\n[CONTEXTO: Quiere ver fotos. Invitala a ver la tienda en www.duendesdeluruguay.com/tienda donde puede ver todos los guardianes disponibles con sus fotos.]';
-    }
-
     if (nombre) {
-      contextoAdicional += `\n[CONTEXTO: Se llama ${nombre}. Usá su nombre en la respuesta.]`;
+      contextoAdicional += `\n[CONTEXTO: Se llama ${nombre}. Usá su nombre.]`;
     }
-
     if (plataforma) {
       contextoAdicional += `\n[CONTEXTO: Escribe desde ${plataforma}.]`;
     }
 
-    // Construir historial para Claude
+    // Construir mensajes para Claude
     const mensajesParaClaude = [];
 
-    // Si hay historial previo, agregarlo
     if (historial && Array.isArray(historial)) {
       historial.forEach(msg => {
         mensajesParaClaude.push({
@@ -237,7 +353,6 @@ export async function POST(request) {
       });
     }
 
-    // Agregar mensaje actual
     mensajesParaClaude.push({
       role: 'user',
       content: mensaje
@@ -246,60 +361,57 @@ export async function POST(request) {
     // Llamar a Claude
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,  // Respuestas cortas para chat
-      system: SYSTEM_PROMPT + contextoAdicional,
+      max_tokens: 500,
+      system: SYSTEM_PROMPT + contextoAdicional + contextoProductos,
       messages: mensajesParaClaude,
     });
 
     const respuestaTito = response.content[0].text;
-
-    // Detectar si Tito quiere escalar
-    const debeEscalar = respuestaTito.includes('[ESCALAR]') ||
-                        preguntaPorPedido ||
-                        estaNervioso;
-
-    // Limpiar el [ESCALAR] de la respuesta
     const respuestaLimpia = respuestaTito.replace('[ESCALAR]', '').trim();
 
-    // Determinar si enviar imagen
-    // Por ahora, redirigimos a la web para ver fotos (ManyChat no permite enviar imágenes dinámicas fácilmente)
-    let imagenUrl = null;
+    // Detectar si hay que escalar
+    const debeEscalar = respuestaTito.includes('[ESCALAR]') ||
+                        intencion.preguntaPedido ||
+                        intencion.nervioso;
 
-    // Solo incluir imagen_url si es una URL válida de imagen real
-    // Para enviar imágenes en ManyChat, necesitamos URLs públicas y estables
-    // Por ahora dejamos null y redirigimos a la tienda web
+    // Construir respuesta para ManyChat
+    let respuestaManychat;
 
-    // Preparar respuesta para ManyChat
-    const respuestaManychat = {
+    if (productosParaMostrar.length > 0 && (intencion.quiereVerProductos || intencion.quiereRecomendacion)) {
+      // Enviar galería de productos
+      if (productosParaMostrar.length === 1) {
+        respuestaManychat = crearRespuestaConProducto(respuestaLimpia, productosParaMostrar[0]);
+      } else {
+        respuestaManychat = crearRespuestaConGaleria(respuestaLimpia, productosParaMostrar);
+      }
+    } else {
+      // Solo texto
+      respuestaManychat = crearRespuestaTexto(respuestaLimpia);
+    }
+
+    // Agregar metadata
+    respuestaManychat.metadata = {
       success: true,
-      respuesta: respuestaLimpia,
-      imagen_url: imagenUrl,  // Campo para ManyChat - null si no hay imagen
       escalar: debeEscalar,
-      contexto: {
-        preguntaPorPedido,
-        estaNervioso,
-        quiereComprar,
-        quiereVerImagenes,
-        plataforma: plataforma || 'desconocida',
-        nombre: nombre || null,
-      },
-      // Datos para notificación si hay que escalar
-      notificacion: debeEscalar ? {
-        mensaje: `🚨 ${nombre || 'Alguien'} desde ${plataforma || 'redes'} necesita atención`,
-        razon: preguntaPorPedido ? 'Pregunta por pedido' :
-               estaNervioso ? 'Cliente nervioso/molesto' :
-               'Escalado por Tito',
-        mensajeOriginal: mensaje,
-        subscriberId: subscriber_id,
-      } : null,
+      productos_mostrados: productosParaMostrar.length,
+      intencion: {
+        verProductos: intencion.quiereVerProductos,
+        recomendacion: intencion.quiereRecomendacion,
+        necesidad: intencion.necesidad,
+        pedido: intencion.preguntaPedido,
+        nervioso: intencion.nervioso
+      }
     };
 
-    // Log para debug
+    // También incluir respuesta simple para compatibilidad
+    respuestaManychat.respuesta = respuestaLimpia;
+
     console.log('[TITO MANYCHAT]', {
       plataforma,
       nombre,
-      mensaje: mensaje.substring(0, 50) + '...',
-      escalar: debeEscalar,
+      intencion: intencion.necesidad || (intencion.quiereVerProductos ? 'ver' : 'chat'),
+      productos: productosParaMostrar.length,
+      escalar: debeEscalar
     });
 
     return Response.json(respuestaManychat);
@@ -307,31 +419,50 @@ export async function POST(request) {
   } catch (error) {
     console.error('[TITO MANYCHAT ERROR]', error);
 
-    // Respuesta de fallback amigable
     return Response.json({
-      success: false,
-      respuesta: "Hola! Disculpá, estoy teniendo un problemita técnico. ¿Podés escribirme de nuevo en un ratito? 🙏",
-      escalar: true,
-      error: error.message,
+      version: 'v2',
+      content: {
+        messages: [
+          { type: 'text', text: "Hola! Disculpá, estoy teniendo un problemita técnico. ¿Podés escribirme de nuevo en un ratito?" }
+        ]
+      },
+      respuesta: "Hola! Disculpá, estoy teniendo un problemita técnico. ¿Podés escribirme de nuevo en un ratito?",
+      metadata: { success: false, error: error.message }
     });
   }
 }
 
-// GET para verificar que el endpoint funciona
+// GET para verificar
 export async function GET() {
+  // Test: obtener algunos productos
+  let productosTest = [];
+  try {
+    productosTest = await obtenerProductos({ limite: 3 });
+  } catch (e) {
+    console.error('Error test productos:', e);
+  }
+
   return Response.json({
     status: 'ok',
-    endpoint: 'Tito ManyChat',
-    version: '1.0',
-    mensaje: 'Endpoint listo para recibir mensajes de ManyChat',
-    ejemplo: {
+    endpoint: 'Tito ManyChat v2 - Con imágenes',
+    formato: 'ManyChat Dynamic Block',
+    productos_disponibles: productosTest.length,
+    ejemplo_productos: productosTest.slice(0, 2).map(p => ({
+      nombre: p.nombre,
+      precio: p.precio,
+      imagen: p.imagen ? 'Sí' : 'No'
+    })),
+    ejemplo_request: {
       method: 'POST',
       body: {
-        mensaje: "Hola, quiero saber sobre los guardianes",
+        mensaje: "Mostrame guardianes de protección",
         nombre: "María",
-        plataforma: "instagram",
-        subscriber_id: "123456"
+        plataforma: "instagram"
       }
+    },
+    formato_respuesta: {
+      descripcion: "Usa ManyChat Dynamic Block v2 para texto + galería de productos",
+      campos: ['version', 'content.messages', 'respuesta', 'metadata']
     }
   });
 }
