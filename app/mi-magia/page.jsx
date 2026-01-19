@@ -4,6 +4,7 @@ import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperienc
 import TestGuardian from './test-guardian';
 import { personalizarTexto, saludoPersonalizado } from '@/lib/personalizacion';
 import DuendeDisponible from '@/components/DuendeDisponible';
+import Referidos from './referidos';
 
 const API_BASE = '';
 
@@ -4330,6 +4331,9 @@ function Inicio({ usuario, ir, token, setUsuario }) {
           }
         }}
       />
+
+      {/* ══════ SISTEMA DE REFERIDOS ══════ */}
+      <Referidos usuario={usuario} token={token} />
 
       {/* ══════ TEST DEL GUARDIÁN - EMBEBIDO EN INICIO ══════ */}
       <div className="test-guardian-inicio-wrapper">
