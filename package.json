@@ -2,6 +2,9 @@
   "name": "duendes-canalizacion",
   "version": "1.0.0",
   "description": "Sistema de canalización post-compra para Duendes del Uruguay",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
