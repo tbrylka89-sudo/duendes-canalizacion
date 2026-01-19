@@ -65,9 +65,20 @@ Si no hay productos, invitá a ver www.duendesdeluruguay.com`;
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { mensaje, nombre } = body;
 
-    console.log('[MC] Recibido:', { mensaje, nombre });
+    // Intentar extraer mensaje y nombre de diferentes formatos
+    let mensaje = body.mensaje || body.last_input_text || body.lastInputText || '';
+    let nombre = body.nombre || body.first_name || body.firstName || body.name || '';
+
+    // Si ManyChat envía Full Contact Data, extraer de ahí
+    if (body.first_name) nombre = body.first_name;
+    if (body.last_input_text) mensaje = body.last_input_text;
+
+    // Si las variables vienen como texto literal {{...}}, ignorarlas
+    if (mensaje && mensaje.includes('{{')) mensaje = '';
+    if (nombre && nombre.includes('{{')) nombre = '';
+
+    console.log('[MC] Recibido:', { mensaje, nombre, bodyKeys: Object.keys(body) });
 
     if (!mensaje || mensaje.trim() === '') {
       return Response.json({
