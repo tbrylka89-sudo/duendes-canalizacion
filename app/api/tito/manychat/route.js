@@ -425,6 +425,11 @@ export async function POST(request) {
 
     const respuestaTito = response.content[0].text;
 
+    // Simular tiempo de escritura (1-3 segundos según largo del mensaje)
+    const largoRespuesta = respuestaTito.length;
+    const delayMs = Math.min(Math.max(largoRespuesta * 15, 1000), 3000); // Entre 1 y 3 segundos
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+
     // Detectar si Tito quiere escalar (ya no escala por fotos, ahora las manda)
     const debeEscalar = respuestaTito.includes('[ESCALAR]') ||
                         preguntaPorPedido ||
