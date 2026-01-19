@@ -8,6 +8,11 @@ import DuendeDisponible from '@/components/DuendeDisponible';
 const API_BASE = '';
 
 // ═══════════════════════════════════════════════════════════════
+// URLs CENTRALIZADAS - Cambiar aquí cuando migre el dominio
+// ═══════════════════════════════════════════════════════════════
+const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+
+// ═══════════════════════════════════════════════════════════════
 // COFRE DIARIO - GAMIFICACIÓN
 // ═══════════════════════════════════════════════════════════════
 
@@ -887,7 +892,7 @@ function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
       {/* CTA para obtener runas */}
       <div className="cta-runas">
         <p>¿Necesitás más runas?</p>
-        <a href="https://duendesuy.10web.cloud/producto-categoria/runas/" target="_blank" rel="noopener" className="btn-gold-sm">
+        <a href={`${WORDPRESS_URL}/producto-categoria/runas/`} target="_blank" rel="noopener" className="btn-gold-sm">
           Obtener Runas ↗
         </a>
       </div>
@@ -993,7 +998,7 @@ function TiendaRunas({ usuario, onCompra }) {
         {PAQUETES_RUNAS_UI.map((paquete, index) => (
           <a
             key={paquete.id}
-            href={`https://duendesuy.10web.cloud/product/${paquete.slug}/`}
+            href={`${WORDPRESS_URL}/product/${paquete.slug}/`}
             target="_blank"
             rel="noopener noreferrer"
             className={`paquete-card ${paquete.popular ? 'popular' : ''} ${paquete.destacado ? 'destacado' : ''}`}
@@ -1667,7 +1672,7 @@ function TiendaMembresias({ usuario, circulo }) {
         {MEMBRESIAS_UI.map((plan, index) => (
           <a
             key={plan.id}
-            href={`https://duendesuy.10web.cloud/product/${plan.slug}/`}
+            href={`${WORDPRESS_URL}/product/${plan.slug}/`}
             target="_blank"
             rel="noopener noreferrer"
             className={`plan-card ${plan.popular ? 'popular' : ''} ${plan.destacado ? 'destacado' : ''}`}
@@ -2172,17 +2177,17 @@ function limpiarTexto(texto) {
     .replace(/\*\*/g, '')
     .replace(/\*/g, '');
 }
-const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
+const TITO_IMG = `${WORDPRESS_URL}/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg`;
 
 // ═══════════════════════════════════════════════════════════════
 // PACKS DE RUNAS (con URLs directas)
 // ═══════════════════════════════════════════════════════════════
 
 const PACKS_RUNAS = [
-  { nombre: 'Chispa', runas: 50, precio: 7, url: 'https://duendesuy.10web.cloud/producto/runas-chispa/', desc: 'Para empezar a explorar' },
-  { nombre: 'Destello', runas: 100, precio: 12, url: 'https://duendesuy.10web.cloud/producto/runas-destello/', desc: 'El más popular' },
-  { nombre: 'Fulgor', runas: 200, precio: 18, url: 'https://duendesuy.10web.cloud/producto/runas-fulgor/', desc: 'Para varias experiencias' },
-  { nombre: 'Resplandor', runas: 350, precio: 32, url: 'https://duendesuy.10web.cloud/producto/runas-resplandor/', desc: 'El mejor valor' }
+  { nombre: 'Chispa', runas: 50, precio: 7, url: `${WORDPRESS_URL}/producto/runas-chispa/`, desc: 'Para empezar a explorar' },
+  { nombre: 'Destello', runas: 100, precio: 12, url: `${WORDPRESS_URL}/producto/runas-destello/`, desc: 'El más popular' },
+  { nombre: 'Fulgor', runas: 200, precio: 18, url: `${WORDPRESS_URL}/producto/runas-fulgor/`, desc: 'Para varias experiencias' },
+  { nombre: 'Resplandor', runas: 350, precio: 32, url: `${WORDPRESS_URL}/producto/runas-resplandor/`, desc: 'El mejor valor' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -2353,7 +2358,7 @@ const MEMBRESIAS = [
     precio: 50,
     precioUY: 2000,
     dias: 180,
-    url: 'https://duendesuy.10web.cloud/producto/circulo-semestral/',
+    url: `${WORDPRESS_URL}/producto/circulo-semestral/`,
     beneficios: [
       'Contenido semanal exclusivo',
       '15 runas por mes',
@@ -2371,7 +2376,7 @@ const MEMBRESIAS = [
     dias: 365,
     ahorro: '20%',
     destacado: true,
-    url: 'https://duendesuy.10web.cloud/producto/circulo-anual/',
+    url: `${WORDPRESS_URL}/producto/circulo-anual/`,
     beneficios: [
       'Todo lo del plan Semestral',
       '25 runas por mes',
@@ -2721,7 +2726,7 @@ function LoginMagicLink({ onLoginExitoso }) {
         </div>
 
         <div className="login-ayuda">
-          <a href="https://duendesuy.10web.cloud" className="login-link">
+          <a href={`${WORDPRESS_URL}`} className="login-link">
             ← Volver a la tienda
           </a>
         </div>
@@ -3386,7 +3391,7 @@ function FormularioPerfil({ usuario, onComplete, onSkip }) {
 
   return (
     <div className="perfil-form-container">
-      <style jsx global>{estilos}</style>
+      <style jsx global>{loginStyles}</style>
       <div className="perfil-form-card">
         <div className="perfil-header">
           <span className="perfil-icono">✦</span>
@@ -3583,7 +3588,7 @@ const PASOS_TOUR = [
     id: 'tito',
     titulo: 'Tito, tu Asistente',
     icono: '🧙',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2026/01/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-1_53c2ddf7-82d8-47fa-823e-7b0f3af1398e-scaled.jpg',
+    imagen: `${WORDPRESS_URL}/wp-content/uploads/2026/01/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-1_53c2ddf7-82d8-47fa-823e-7b0f3af1398e-scaled.jpg`,
     mensaje: 'Si tenés dudas, Tito está ahí para ayudarte. Es un duende sabio que conoce todo sobre Duendes del Uruguay. Lo encontrás en el botón flotante.',
     tip: 'Preguntale lo que quieras'
   },
@@ -4109,13 +4114,13 @@ export default function MiMagia() {
                 </div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                <a href="https://duendesuy.10web.cloud/producto/runas-chispa/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                <a href={`${WORDPRESS_URL}/producto/runas-chispa/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
                   <span>50 Runas</span><span style={{color:'#d4af37'}}>$7</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/producto/runas-destello/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                <a href={`${WORDPRESS_URL}/producto/runas-destello/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
                   <span>100 Runas</span><span style={{color:'#d4af37'}}>$12</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/producto/runas-fulgor/" target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                <a href={`${WORDPRESS_URL}/producto/runas-fulgor/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
                   <span>200 Runas</span><span style={{color:'#d4af37'}}>$18</span>
                 </a>
               </div>
@@ -4349,22 +4354,22 @@ function Inicio({ usuario, ir, token, setUsuario }) {
       <div className="dolor-section">
         <h2 className="dolor-titulo">¿Qué necesitás sanar?</h2>
         <div className="dolor-cards">
-          <a href="https://duendesuy.10web.cloud/categoria-producto/amor/" target="_blank" rel="noopener" className="dolor-card dolor-amor">
+          <a href={`${WORDPRESS_URL}/categoria-producto/amor/`} target="_blank" rel="noopener" className="dolor-card dolor-amor">
             <span className="dolor-icon">◈</span>
             <strong>Me siento sola</strong>
             <small>Guardianes de Conexión</small>
           </a>
-          <a href="https://duendesuy.10web.cloud/categoria-producto/abundancia/" target="_blank" rel="noopener" className="dolor-card dolor-abundancia">
+          <a href={`${WORDPRESS_URL}/categoria-producto/abundancia/`} target="_blank" rel="noopener" className="dolor-card dolor-abundancia">
             <span className="dolor-icon">✦</span>
             <strong>Nada me alcanza</strong>
             <small>Guardianes de Abundancia</small>
           </a>
-          <a href="https://duendesuy.10web.cloud/categoria-producto/proteccion/" target="_blank" rel="noopener" className="dolor-card dolor-proteccion">
+          <a href={`${WORDPRESS_URL}/categoria-producto/proteccion/`} target="_blank" rel="noopener" className="dolor-card dolor-proteccion">
             <span className="dolor-icon">◇</span>
             <strong>Tengo miedo</strong>
             <small>Guardianes Protectores</small>
           </a>
-          <a href="https://duendesuy.10web.cloud/categoria-producto/sanacion/" target="_blank" rel="noopener" className="dolor-card dolor-sanacion">
+          <a href={`${WORDPRESS_URL}/categoria-producto/sanacion/`} target="_blank" rel="noopener" className="dolor-card dolor-sanacion">
             <span className="dolor-icon">❧</span>
             <strong>Quiero sanar</strong>
             <small>Guardianes Sanadores</small>
@@ -4409,7 +4414,7 @@ function Inicio({ usuario, ir, token, setUsuario }) {
             <p className="fomo-sub">Si se vende, no vuelve. No es marketing. Es canalización.</p>
           </div>
         </div>
-        <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="fomo-cta">Conocer a mi guardián</a>
+        <a href={`${WORDPRESS_URL}/shop/`} target="_blank" rel="noopener" className="fomo-cta">Conocer a mi guardián</a>
       </div>
 
       {/* Banner Promociones */}
@@ -4515,7 +4520,7 @@ function Canalizaciones({ usuario }) {
               <span>◆</span>
               <h3>Tus guardianes te esperan</h3>
               <p>Cuando adoptes tu primer guardián, aparecerá acá con toda su información, su historia y cómo cuidarlo.</p>
-              <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-gold">Explorar Guardianes ↗</a>
+              <a href={`${WORDPRESS_URL}/shop/`} target="_blank" rel="noopener" className="btn-gold">Explorar Guardianes ↗</a>
             </div>
           )}
 
@@ -4600,7 +4605,7 @@ function Canalizaciones({ usuario }) {
             <div className="elegidos-explore">
               <p>Los guardianes siguen esperando.</p>
               <div className="explore-paths">
-                <a href="https://duendesuy.10web.cloud/categoria-producto/proteccion/" className="path-link path-proteccion">
+                <a href={`${WORDPRESS_URL}/categoria-producto/proteccion/`} className="path-link path-proteccion">
                   <div className="path-icon-anim">
                     <svg viewBox="0 0 40 40" className="icon-escudo">
                       <path d="M20 5 L35 12 L35 22 C35 30, 20 38, 20 38 C20 38, 5 30, 5 22 L5 12 Z" fill="none" stroke="#4A90D9" strokeWidth="2" className="escudo-base"/>
@@ -4616,7 +4621,7 @@ function Canalizaciones({ usuario }) {
                   <span className="path-name">Protectores</span>
                   <span className="path-desc">Guardianes del escudo</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/categoria-producto/amor/" className="path-link path-amor">
+                <a href={`${WORDPRESS_URL}/categoria-producto/amor/`} className="path-link path-amor">
                   <div className="path-icon-anim">
                     <svg viewBox="0 0 40 40" className="icon-corazon">
                       <path d="M20 35 C20 35, 5 25, 5 15 C5 8, 12 5, 20 12 C28 5, 35 8, 35 15 C35 25, 20 35, 20 35" fill="#E91E8C" className="corazon-base"/>
@@ -4631,7 +4636,7 @@ function Canalizaciones({ usuario }) {
                   <span className="path-name">Sanadores del Corazón</span>
                   <span className="path-desc">Guardianes del vínculo</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/categoria-producto/dinero-abundancia-negocios/" className="path-link path-abundancia">
+                <a href={`${WORDPRESS_URL}/categoria-producto/dinero-abundancia-negocios/`} className="path-link path-abundancia">
                   <div className="path-icon-anim">
                     <svg viewBox="0 0 40 40" className="icon-moneda">
                       <circle cx="20" cy="20" r="15" fill="#C6A962" className="moneda-base"/>
@@ -4647,7 +4652,7 @@ function Canalizaciones({ usuario }) {
                   <span className="path-name">Portadores de Oro</span>
                   <span className="path-desc">Guardianes del flujo</span>
                 </a>
-                <a href="https://duendesuy.10web.cloud/categoria-producto/salud/" className="path-link path-sanacion">
+                <a href={`${WORDPRESS_URL}/categoria-producto/salud/`} className="path-link path-sanacion">
                   <div className="path-icon-anim">
                     <svg viewBox="0 0 40 40" className="icon-vida">
                       <circle cx="20" cy="20" r="15" fill="none" stroke="#2ECC71" strokeWidth="2" className="vida-circulo"/>
@@ -4759,7 +4764,7 @@ function Canalizaciones({ usuario }) {
                 </div>
               </div>
 
-              <a href="https://duendesuy.10web.cloud/categoria-producto/talismanes/" className="seccion-cta">
+              <a href={`${WORDPRESS_URL}/categoria-producto/talismanes/`} className="seccion-cta">
                 <span>Ver los talismanes</span>
                 <span className="cta-arrow">→</span>
               </a>
@@ -4921,7 +4926,7 @@ function Canalizaciones({ usuario }) {
                 </div>
               </div>
 
-              <a href="https://duendesuy.10web.cloud/categoria-producto/lecturas/" className="seccion-cta">
+              <a href={`${WORDPRESS_URL}/categoria-producto/lecturas/`} className="seccion-cta">
                 <span>Pedir una lectura</span>
                 <span className="cta-arrow">→</span>
               </a>
@@ -4999,7 +5004,7 @@ function Canalizaciones({ usuario }) {
                 </div>
               </div>
 
-              <a href="https://duendesuy.10web.cloud/tienda/" className="seccion-cta">
+              <a href={`${WORDPRESS_URL}/tienda/`} className="seccion-cta">
                 <span>Elegir un regalo</span>
                 <span className="cta-arrow">→</span>
               </a>
@@ -5168,7 +5173,7 @@ function PromocionesMagicas({ usuario, ir }) {
       icono: 'ᚱ',
       color: '#7B1FA2',
       activa: true,
-      url: 'https://duendesuy.10web.cloud/producto/runas-resplandor/',
+      url: `${WORDPRESS_URL}/producto/runas-resplandor/`,
       textoBoton: 'Obtener $32 USD'
     }
   ];
@@ -5549,7 +5554,7 @@ function SeccionExperiencias({ usuario, setUsuario }) {
       
       <div className="runas-header">
         <div className="runas-balance"><span>ᚱ</span><strong>{usuario?.runas || 0}</strong><small>disponibles</small></div>
-        <a href="https://duendesuy.10web.cloud/producto-categoria/runas/" target="_blank" rel="noopener" className="btn-gold-sm">Obtener más ↗</a>
+        <a href={`${WORDPRESS_URL}/producto-categoria/runas/`} target="_blank" rel="noopener" className="btn-gold-sm">Obtener más ↗</a>
       </div>
       
       <div className="exp-grid">
@@ -5837,7 +5842,7 @@ function Regalos({ ir, usuario, setUsuario }) {
           <small className="regalo-badge">Pagás con tus runas</small>
         </div>
 
-        <div className="regalo-card" onClick={() => window.open('https://duendesuy.10web.cloud/shop/', '_blank')}>
+        <div className="regalo-card" onClick={() => window.open(`${WORDPRESS_URL}/shop/`, '_blank')}>
           <span>◆</span>
           <h3>Regalar un Guardián</h3>
           <p>Un compañero de vida para alguien especial.</p>

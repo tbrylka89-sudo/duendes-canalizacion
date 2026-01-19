@@ -20,10 +20,14 @@
   'use strict';
 
   // Configuracion
+  // URLs centralizadas - cambiar aqui cuando migre el dominio
+  const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+  const VERCEL_URL = 'https://duendes-vercel.vercel.app';
+
   const script = document.currentScript;
-  const API_BASE = script?.getAttribute('data-api') || 'https://duendes-canalizacion.vercel.app';
+  const API_BASE = script?.getAttribute('data-api') || VERCEL_URL;
   const MODE = script?.getAttribute('data-mode') || 'full';
-  const TITO_IMG = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
+  const TITO_IMG = script?.getAttribute('data-avatar') || `${WORDPRESS_URL}/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg`;
 
   // Estado
   let mensajes = [];

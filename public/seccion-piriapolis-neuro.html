@@ -1,0 +1,408 @@
+<!--
+  SECCIÓN PIRIÁPOLIS - Duendes del Uruguay
+  Neuromarketing + Emoción + Conexión
+  Para insertar en WordPress via Elementor o HTML block
+-->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Uncial+Antiqua&display=swap');
+
+  .seccion-piriapolis {
+    background-color: #0a0a0a;
+    padding: 80px 20px;
+    overflow: hidden;
+  }
+
+  .piriapolis-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .titulo-magico {
+    font-family: 'Uncial Antiqua', cursive;
+    color: #d4af37;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    letter-spacing: 3px;
+  }
+
+  .subtitulo-seccion {
+    font-family: 'Cinzel', serif;
+    color: #ffffff;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    text-align: center;
+    margin-bottom: 60px;
+    opacity: 0.9;
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+
+  /* Slider */
+  .piriapolis-slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .slider-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slide {
+    min-width: 100%;
+    padding: 40px;
+    box-sizing: border-box;
+  }
+
+  .slide-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .slide-icono {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+  }
+
+  .slide-titulo {
+    font-family: 'Cinzel', serif;
+    color: #d4af37;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+
+  .slide-texto {
+    font-family: 'Cinzel', serif;
+    color: #ffffff;
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    text-align: center;
+    line-height: 1.9;
+    opacity: 0.95;
+    max-width: 750px;
+  }
+
+  .slide-texto em {
+    color: #d4af37;
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .slide-destacado {
+    font-family: 'Cinzel', serif;
+    color: #d4af37;
+    font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+    text-align: center;
+    margin-top: 30px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 15px 30px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 4px;
+    background: rgba(212, 175, 55, 0.05);
+  }
+
+  /* Controles del slider */
+  .slider-controles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 50px;
+  }
+
+  .slider-btn {
+    background: transparent;
+    border: 1px solid #d4af37;
+    color: #d4af37;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slider-btn:hover {
+    background: #d4af37;
+    color: #0a0a0a;
+  }
+
+  .slider-dots {
+    display: flex;
+    gap: 12px;
+  }
+
+  .slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .slider-dot.active {
+    background: #d4af37;
+    transform: scale(1.2);
+  }
+
+  /* Línea decorativa */
+  .linea-dorada {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .seccion-piriapolis {
+      padding: 60px 15px;
+    }
+
+    .slide {
+      padding: 20px;
+    }
+
+    .slide-icono {
+      width: 60px;
+      height: 60px;
+    }
+
+    .slider-btn {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<section class="seccion-piriapolis">
+  <div class="piriapolis-container">
+
+    <h2 class="titulo-magico">Donde la Magia Nace</h2>
+    <div class="linea-dorada"></div>
+    <p class="subtitulo-seccion">Tres verdades que hacen únicos a nuestros guardianes</p>
+
+    <div class="piriapolis-slider">
+      <div class="slider-track" id="sliderTrack">
+
+        <!-- Slide 1: El Punto Energético -->
+        <div class="slide">
+          <div class="slide-content">
+            <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="45" stroke="#d4af37" stroke-width="2"/>
+              <path d="M50 15 L55 45 L85 50 L55 55 L50 85 L45 55 L15 50 L45 45 Z" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#d4af37"/>
+            </svg>
+            <h3 class="slide-titulo">Piriápolis: Portal Energético del Sur</h3>
+            <p class="slide-texto">
+              Francisco Piria no eligió este lugar por casualidad. Los antiguos ya lo sabían:
+              hay puntos en la Tierra donde <em>la energía se concentra</em>, donde lo invisible
+              se hace más accesible. Piriápolis es uno de ellos.
+              <br><br>
+              Aquí, en la intersección de cerros sagrados y el océano, cada guardián absorbe
+              una carga energética que no encontrarás en ningún otro lugar del mundo.
+              <em>No es folklore. Es geografía energética.</em>
+            </p>
+            <div class="slide-destacado">
+              Cada pieza nace cargada con la energía de este punto único del planeta
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: La Canalización -->
+        <div class="slide">
+          <div class="slide-content">
+            <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 10 L50 90" stroke="#d4af37" stroke-width="2" stroke-dasharray="4 4"/>
+              <circle cx="50" cy="25" r="8" stroke="#d4af37" stroke-width="2"/>
+              <circle cx="50" cy="50" r="12" fill="#d4af37" fill-opacity="0.3" stroke="#d4af37" stroke-width="2"/>
+              <circle cx="50" cy="75" r="8" stroke="#d4af37" stroke-width="2"/>
+              <path d="M30 50 Q40 40 50 50 Q60 60 70 50" stroke="#d4af37" stroke-width="2"/>
+            </svg>
+            <h3 class="slide-titulo">Canalización: El Mensaje que te Encuentra</h3>
+            <p class="slide-texto">
+              Un guardián sin canalización es solo una figura. Con ella, <em>es un puente</em>.
+              <br><br>
+              Cuando elegís un guardián, recibís un mensaje que fue canalizado específicamente
+              para vos. No es un texto genérico. No es un horóscopo. Es una comunicación
+              directa que llega en el momento exacto en que la necesitás.
+              <br><br>
+              <em>Muchos nos escriben meses después</em>: "Releí la canalización y ahora
+              entiendo todo". El mensaje sabe esperar.
+            </p>
+            <div class="slide-destacado">
+              Tu guardián ya tiene algo que decirte. Solo falta que lo escuches.
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Hecho a Mano -->
+        <div class="slide">
+          <div class="slide-content">
+            <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 20 C30 30 25 50 30 70 C35 85 50 90 50 90 C50 90 65 85 70 70 C75 50 70 30 50 20" stroke="#d4af37" stroke-width="2"/>
+              <path d="M40 45 Q50 55 60 45" stroke="#d4af37" stroke-width="2"/>
+              <circle cx="42" cy="38" r="3" fill="#d4af37"/>
+              <circle cx="58" cy="38" r="3" fill="#d4af37"/>
+              <path d="M35 60 L65 60" stroke="#d4af37" stroke-width="1" stroke-dasharray="2 2"/>
+            </svg>
+            <h3 class="slide-titulo">Manos que Crean, No Máquinas</h3>
+            <p class="slide-texto">
+              Cada guardián pasa por las manos de Thibisay. <em>Literalmente cada uno.</em>
+              <br><br>
+              No hay moldes. No hay producción en serie. Cada rostro tiene expresiones
+              únicas, cada detalle cuenta una historia diferente. Por eso dos guardianes
+              del mismo tipo nunca son idénticos.
+              <br><br>
+              El que llega a tus manos <em>fue creado una sola vez en la historia del universo</em>.
+              Nadie más tiene exactamente el mismo. Nadie más lo tendrá.
+            </p>
+            <div class="slide-destacado">
+              Tu guardián no existe en ningún otro lugar. Solo contigo.
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: La Conexión -->
+        <div class="slide">
+          <div class="slide-content">
+            <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="30" cy="50" r="15" stroke="#d4af37" stroke-width="2"/>
+              <circle cx="70" cy="50" r="15" stroke="#d4af37" stroke-width="2"/>
+              <path d="M45 50 L55 50" stroke="#d4af37" stroke-width="2"/>
+              <path d="M30 35 L30 25 L70 25 L70 35" stroke="#d4af37" stroke-width="1.5"/>
+              <path d="M30 65 L30 75 L70 75 L70 65" stroke="#d4af37" stroke-width="1.5"/>
+              <circle cx="50" cy="25" r="4" fill="#d4af37"/>
+              <circle cx="50" cy="75" r="4" fill="#d4af37"/>
+            </svg>
+            <h3 class="slide-titulo">Energía + Mensaje + Singularidad = Conexión Real</h3>
+            <p class="slide-texto">
+              Estas tres cosas juntas crean algo que no se puede replicar:
+              <em>un vínculo que sentís desde el primer momento</em>.
+              <br><br>
+              No te estamos vendiendo una figura decorativa. Te estamos ofreciendo
+              un compañero energético que nace en un lugar de poder, llega con un
+              mensaje para vos, y existe únicamente en tu realidad.
+              <br><br>
+              <em>Los guardianes encuentran a sus personas.</em> Si llegaste hasta acá,
+              quizás uno ya te está buscando.
+            </p>
+            <div class="slide-destacado">
+              ¿Sentís el llamado? Tu guardián está esperando.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Controles -->
+    <div class="slider-controles">
+      <button class="slider-btn" id="btnPrev" aria-label="Anterior">&#8249;</button>
+      <div class="slider-dots">
+        <span class="slider-dot active" data-slide="0"></span>
+        <span class="slider-dot" data-slide="1"></span>
+        <span class="slider-dot" data-slide="2"></span>
+        <span class="slider-dot" data-slide="3"></span>
+      </div>
+      <button class="slider-btn" id="btnNext" aria-label="Siguiente">&#8250;</button>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function() {
+  const track = document.getElementById('sliderTrack');
+  const dots = document.querySelectorAll('.slider-dot');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  let currentSlide = 0;
+  const totalSlides = 4;
+  let autoplayInterval;
+
+  function goToSlide(index) {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+
+    currentSlide = index;
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentSlide);
+    });
+  }
+
+  function nextSlide() {
+    goToSlide(currentSlide + 1);
+  }
+
+  function prevSlide() {
+    goToSlide(currentSlide - 1);
+  }
+
+  function startAutoplay() {
+    autoplayInterval = setInterval(nextSlide, 6000);
+  }
+
+  function stopAutoplay() {
+    clearInterval(autoplayInterval);
+  }
+
+  // Event listeners
+  btnNext.addEventListener('click', () => {
+    stopAutoplay();
+    nextSlide();
+    startAutoplay();
+  });
+
+  btnPrev.addEventListener('click', () => {
+    stopAutoplay();
+    prevSlide();
+    startAutoplay();
+  });
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      stopAutoplay();
+      goToSlide(parseInt(dot.dataset.slide));
+      startAutoplay();
+    });
+  });
+
+  // Touch/swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    stopAutoplay();
+  }, { passive: true });
+
+  track.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    if (touchStartX - touchEndX > 50) nextSlide();
+    if (touchEndX - touchStartX > 50) prevSlide();
+    startAutoplay();
+  }, { passive: true });
+
+  // Start autoplay
+  startAutoplay();
+})();
+</script>

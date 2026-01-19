@@ -3,6 +3,7 @@ export const maxDuration = 120;
 
 import { kv } from '@vercel/kv';
 import { infoDiaActual } from '@/lib/ciclos-naturales';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // ═══════════════════════════════════════════════════════════════
 // SISTEMA DE GENERACIÓN DE CONTENIDO - DUENDES DEL URUGUAY
@@ -221,17 +222,39 @@ const CONTEXTO_CATEGORIAS = {
   general: `Contenido espiritual y místico en general. Siempre con los pies en la tierra, siempre aplicable a la vida real.`
 };
 
-export async function POST(request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+// Función para generar con Gemini
+async function generarConGemini(systemPrompt, userPrompt) {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
+  const fullPrompt = `${systemPrompt}\n\n---\n\n${userPrompt}`;
+
+  const result = await model.generateContent({
+    contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+    generationConfig: {
+      temperature: 0.8,
+      maxOutputTokens: 8000,
+    }
+  });
+
+  return result.response.text();
+}
+
+export async function POST(request) {
   // Test mode
   const url = new URL(request.url);
   if (url.searchParams.get('test') === '1') {
-    return Response.json({ success: true, test: true, hasApiKey: !!apiKey });
+    return Response.json({
+      success: true,
+      test: true,
+      hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+      hasGeminiKey: !!process.env.GEMINI_API_KEY
+    });
   }
 
-  if (!apiKey) {
-    return Response.json({ success: false, error: 'API key no configurada' }, { status: 500 });
+  // Verificar que al menos una API key exista
+  if (!process.env.ANTHROPIC_API_KEY && !process.env.GEMINI_API_KEY) {
+    return Response.json({ success: false, error: 'No hay API keys configuradas' }, { status: 500 });
   }
 
   try {
@@ -251,8 +274,21 @@ export async function POST(request) {
       audiencia = 'general',
       usarDuendeSemana = false,
       integrarLuna = false,
-      integrarEstacion = false
+      integrarEstacion = false,
+      // NUEVO: elegir modelo (claude o gemini)
+      modelo = 'claude' // 'claude' | 'gemini'
     } = body;
+
+    // Determinar qué modelo usar
+    let modeloFinal = modelo;
+    if (modelo === 'gemini' && !process.env.GEMINI_API_KEY) {
+      console.log('[GENERAR] Gemini solicitado pero no hay API key, usando Claude');
+      modeloFinal = 'claude';
+    }
+    if (modelo === 'claude' && !process.env.ANTHROPIC_API_KEY) {
+      console.log('[GENERAR] Claude solicitado pero no hay API key, usando Gemini');
+      modeloFinal = 'gemini';
+    }
 
     // Extraer tema de camposForm si existe, o usar tema legacy
     const temaFinal = camposForm.tema || camposForm.tema_curso || camposForm.objetivo ||
@@ -377,32 +413,55 @@ RECORDÁ:
 - Valor real en cada párrafo
 - Que la persona se sienta vista y acompañada`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 6000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
+    let contenido = '';
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Anthropic error:', response.status, errorData);
-      return Response.json({
-        success: false,
-        error: `Error API: ${response.status}`
-      }, { status: 500 });
+    // GENERAR CON GEMINI
+    if (modeloFinal === 'gemini') {
+      console.log('[GENERAR] Usando Gemini...');
+      try {
+        contenido = await generarConGemini(systemPrompt, userPrompt);
+      } catch (geminiError) {
+        console.error('[GENERAR] Error Gemini:', geminiError);
+        // Fallback a Claude si falla
+        if (process.env.ANTHROPIC_API_KEY) {
+          console.log('[GENERAR] Fallback a Claude...');
+          modeloFinal = 'claude';
+        } else {
+          throw geminiError;
+        }
+      }
     }
 
-    const data = await response.json();
-    const contenido = data.content?.[0]?.text || '';
+    // GENERAR CON CLAUDE
+    if (modeloFinal === 'claude') {
+      console.log('[GENERAR] Usando Claude...');
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 6000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Anthropic error:', response.status, errorData);
+        return Response.json({
+          success: false,
+          error: `Error API: ${response.status}`
+        }, { status: 500 });
+      }
+
+      const data = await response.json();
+      contenido = data.content?.[0]?.text || '';
+    }
 
     // Extraer título (primera línea con #)
     const tituloMatch = contenido.match(/^#\s+(.+)$/m);
@@ -445,6 +504,7 @@ RECORDÁ:
       tipo,
       tono,
       audiencia,
+      modeloUsado: modeloFinal, // NUEVO: indicar qué modelo se usó
       duendeSemana: duendeSemana ? {
         nombre: duendeSemana.nombre,
         imagen: duendeSemana.imagen

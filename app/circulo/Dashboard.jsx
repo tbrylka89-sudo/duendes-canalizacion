@@ -165,7 +165,7 @@ export default function CirculoDashboard({ usuario }) {
             onCambiarSeccion={setSeccion}
           />
         )}
-        {seccion === 'contenido' && <SeccionContenido />}
+        {seccion === 'contenido' && <SeccionContenido usuario={usuario} />}
         {seccion === 'foro' && <SeccionForo usuario={usuario} />}
         {seccion === 'archivo' && <SeccionArchivo />}
       </main>
@@ -907,14 +907,23 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
 // SECCIÓN CONTENIDO
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function SeccionContenido() {
+function SeccionContenido({ usuario }) {
   const [contenidos, setContenidos] = useState([]);
   const [contenidoActivo, setContenidoActivo] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [likes, setLikes] = useState({ total: 0, yaDioLike: false });
+  const [likeCargando, setLikeCargando] = useState(false);
 
   useEffect(() => {
     cargarContenidoSemana();
   }, []);
+
+  // Cargar likes cuando cambia el contenido activo
+  useEffect(() => {
+    if (contenidoActivo?.fecha) {
+      cargarLikes(contenidoActivo.fecha);
+    }
+  }, [contenidoActivo]);
 
   async function cargarContenidoSemana() {
     setCargando(true);
@@ -931,6 +940,50 @@ function SeccionContenido() {
       console.error('Error cargando contenido:', error);
     } finally {
       setCargando(false);
+    }
+  }
+
+  async function cargarLikes(fecha) {
+    try {
+      const params = new URLSearchParams({
+        dia: fecha.dia,
+        mes: fecha.mes,
+        año: fecha.año,
+        ...(usuario?.email && { email: usuario.email })
+      });
+      const res = await fetch(`/api/circulo/likes?${params}`);
+      const data = await res.json();
+      if (data.success) {
+        setLikes({ total: data.likes, yaDioLike: data.yaDioLike });
+      }
+    } catch (error) {
+      console.error('Error cargando likes:', error);
+    }
+  }
+
+  async function toggleLike() {
+    if (!usuario?.email || likeCargando) return;
+
+    setLikeCargando(true);
+    try {
+      const res = await fetch('/api/circulo/likes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dia: contenidoActivo.fecha.dia,
+          mes: contenidoActivo.fecha.mes,
+          año: contenidoActivo.fecha.año,
+          email: usuario.email
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setLikes({ total: data.likes, yaDioLike: data.yaDioLike });
+      }
+    } catch (error) {
+      console.error('Error toggle like:', error);
+    } finally {
+      setLikeCargando(false);
     }
   }
 
@@ -1002,6 +1055,24 @@ function SeccionContenido() {
                   <blockquote>"{contenidoActivo.reflexion}"</blockquote>
                 </div>
               )}
+
+              {/* Botón de likes */}
+              <div className="contenido-likes">
+                <button
+                  className={`like-btn ${likes.yaDioLike ? 'liked' : ''} ${likeCargando ? 'cargando' : ''}`}
+                  onClick={toggleLike}
+                  disabled={!usuario?.email || likeCargando}
+                  title={likes.yaDioLike ? 'Quitar corazón' : 'Me encanta esta enseñanza'}
+                >
+                  <span className="heart">{likes.yaDioLike ? '❤️' : '🤍'}</span>
+                  <span className="count">{likes.total > 0 ? likes.total : ''}</span>
+                </button>
+                {likes.total > 0 && (
+                  <span className="likes-label">
+                    {likes.total === 1 ? 'A alguien le encanta' : `A ${likes.total} les encanta`}
+                  </span>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -1164,6 +1235,79 @@ function SeccionContenido() {
           font-size: 18px;
           color: rgba(255, 255, 255, 0.9);
           line-height: 1.6;
+        }
+
+        /* Likes */
+        .contenido-likes {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-top: 30px;
+          padding-top: 25px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .like-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 25px;
+          padding: 10px 18px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .like-btn:hover:not(:disabled) {
+          background: rgba(212, 175, 55, 0.1);
+          border-color: rgba(212, 175, 55, 0.3);
+          transform: scale(1.05);
+        }
+
+        .like-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .like-btn.liked {
+          background: rgba(255, 100, 100, 0.15);
+          border-color: rgba(255, 100, 100, 0.3);
+        }
+
+        .like-btn.cargando {
+          pointer-events: none;
+          opacity: 0.7;
+        }
+
+        .like-btn .heart {
+          font-size: 20px;
+          transition: transform 0.3s ease;
+        }
+
+        .like-btn:hover .heart {
+          transform: scale(1.2);
+        }
+
+        .like-btn.liked .heart {
+          animation: heartPop 0.4s ease;
+        }
+
+        .like-btn .count {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+          font-weight: 500;
+        }
+
+        .likes-label {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes heartPop {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.4); }
+          100% { transform: scale(1); }
         }
 
         @media (max-width: 768px) {

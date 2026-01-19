@@ -7,6 +7,9 @@ import Link from 'next/link';
 // Productos de WooCommerce con diseño de cartas de tarot místicas
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// URLs centralizadas - cambiar aquí cuando migre el dominio
+const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+
 const CATEGORIAS = [
   { slug: 'proteccion', nombre: 'Protección', desc: 'Algo te drena', color: '#3b82f6', icono: '🛡️' },
   { slug: 'amor', nombre: 'Amor', desc: 'El corazón pide', color: '#ec4899', icono: '💜' },
@@ -151,7 +154,7 @@ export default function TiendaMagica() {
         ) : error ? (
           <div className="error-msg">
             <p>{error}</p>
-            <a href="https://duendesuy.10web.cloud/shop/" target="_blank" rel="noopener" className="btn-alternativo">
+            <a href={`${WORDPRESS_URL}/shop/`} target="_blank" rel="noopener" className="btn-alternativo">
               Ver tienda en WordPress →
             </a>
           </div>
@@ -169,7 +172,7 @@ export default function TiendaMagica() {
                   style={{ '--card-index': index }}
                 >
                   <a
-                    href={producto.permalink || `https://duendesuy.10web.cloud/producto/${producto.slug}/`}
+                    href={producto.permalink || `${WORDPRESS_URL}/producto/${producto.slug}/`}
                     target="_blank"
                     rel="noopener"
                     className="tarot-inner"

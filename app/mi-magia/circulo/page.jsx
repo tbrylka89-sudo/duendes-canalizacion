@@ -9,7 +9,10 @@ import Onboarding from './Onboarding';
 // Diseño premium con landing page completa para no miembros
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const IMAGEN_TITO = 'https://duendesuy.10web.cloud/wp-content/uploads/2026/01/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-1_53c2ddf7-82d8-47fa-823e-7b0f3af1398e-scaled.jpg';
+// URLs centralizadas - cambiar aquí cuando migre el dominio
+const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+
+const IMAGEN_TITO = `${WORDPRESS_URL}/wp-content/uploads/2026/01/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-1_53c2ddf7-82d8-47fa-823e-7b0f3af1398e-scaled.jpg`;
 
 const BENEFICIOS_SEMESTRAL = [
   { icono: '✦', texto: '100 runas de bienvenida', valor: 'valor $12' },
@@ -284,7 +287,7 @@ function LandingCirculo({ onTrialClick }) {
                   </li>
                 ))}
               </ul>
-              <a href="https://duendesuy.10web.cloud/producto/circulo-semestral/" className="plan-btn">
+              <a href={`${WORDPRESS_URL}/producto/circulo-semestral/`} className="plan-btn">
                 Elegir Semestral
               </a>
             </div>
@@ -310,7 +313,7 @@ function LandingCirculo({ onTrialClick }) {
                   </li>
                 ))}
               </ul>
-              <a href="https://duendesuy.10web.cloud/producto/circulo-anual/" className="plan-btn">
+              <a href={`${WORDPRESS_URL}/producto/circulo-anual/`} className="plan-btn">
                 Elegir Anual
               </a>
             </div>
@@ -2190,7 +2193,7 @@ export default function CirculoPage() {
           <div style={{ padding: '20px 20px 0', maxWidth: '1200px', margin: '0 auto' }}>
             <TrialBanner
               diasRestantes={diasTrial}
-              onSuscribirse={() => window.open('https://duendesuy.10web.cloud/producto/circulo-anual/', '_blank')}
+              onSuscribirse={() => window.open(`${WORDPRESS_URL}/producto/circulo-anual/`, '_blank')}
             />
           </div>
         )}

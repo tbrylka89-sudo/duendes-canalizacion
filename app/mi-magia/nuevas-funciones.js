@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 
 const API_BASE = '';
 
+// URLs centralizadas - cambiar aquí cuando migre el dominio
+const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+
 // Helper: Limpiar tags HTML que aparecen como texto (ej: <em>, <strong>)
 function limpiarTexto(texto) {
   if (!texto) return '';
@@ -989,7 +992,7 @@ export function CatalogoExperiencias({ usuario, setUsuario }) {
           ) : (
             <div className="runas-insuficientes">
               <p>Necesitás {experienciaActiva.runas - (usuario?.runas || 0)} runas más</p>
-              <a href="https://duendesuy.10web.cloud/producto/runas-chispa/" target="_blank" className="btn-sec">
+              <a href={`${WORDPRESS_URL}/producto/runas-chispa/`} target="_blank" className="btn-sec">
                 Conseguir más runas
               </a>
             </div>
@@ -1054,7 +1057,7 @@ export function CatalogoExperiencias({ usuario, setUsuario }) {
 
       <div className="runas-info">
         <p>Tus runas: <strong>ᚱ {usuario?.runas || 0}</strong></p>
-        <a href="https://duendesuy.10web.cloud/tienda/?product_cat=runas" target="_blank" className="btn-sec">
+        <a href={`${WORDPRESS_URL}/tienda/?product_cat=runas`} target="_blank" className="btn-sec">
           Conseguir más runas
         </a>
       </div>

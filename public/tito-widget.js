@@ -1,5 +1,5 @@
 /**
- * TITO WIDGET v7.1 - Duendes del Uruguay
+ * TITO WIDGET v7.2 - Duendes del Uruguay
  * Precios en moneda local segun geolocalizacion
  * <script src="https://duendes-vercel.vercel.app/tito-widget.js"></script>
  */
@@ -7,9 +7,13 @@
 (function() {
   'use strict';
 
+  // URLs centralizadas - cambiar aqui cuando migre el dominio
+  const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+  const VERCEL_URL = 'https://duendes-vercel.vercel.app';
+
   const CONFIG = {
-    API_URL: 'https://duendes-vercel.vercel.app/api/tito/chat',
-    AVATAR: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg'
+    API_URL: `${VERCEL_URL}/api/tito/chat`,
+    AVATAR: `${WORDPRESS_URL}/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg`
   };
 
   const CSS = `

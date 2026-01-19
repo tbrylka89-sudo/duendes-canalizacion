@@ -6,6 +6,9 @@ import { useState, useEffect } from 'react';
 // Vista principal después del portal de entrada
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// URLs centralizadas - cambiar aquí cuando migre el dominio
+const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENTE: INDICADORES DE COMUNIDAD EN VIVO
 // Muestra actividad simulada de la comunidad (social proof)
@@ -660,7 +663,7 @@ export default function CirculoDashboard({ usuario }) {
         <div className="header-right">
           <div className="nav-links-externos">
             <a href="/mi-magia" className="link-externo">Mi Magia</a>
-            <a href="https://duendesuy.10web.cloud" target="_blank" rel="noopener" className="link-externo link-tienda">
+            <a href={WORDPRESS_URL} target="_blank" rel="noopener" className="link-externo link-tienda">
               Tienda
             </a>
           </div>
