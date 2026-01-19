@@ -26,6 +26,13 @@ const PALABRAS_PEDIDO = [
   'no me llegó', 'no me llego', 'estado de mi', 'mi compra'
 ];
 
+// Palabras que indican que piden fotos
+const PALABRAS_FOTOS = [
+  'foto', 'fotos', 'imagen', 'imágenes', 'imagenes', 'ver', 'mostrar',
+  'mostrá', 'muestra', 'muestrame', 'mostrame', 'envía foto', 'envia foto',
+  'mandá foto', 'manda foto', 'tenés foto', 'tenes foto', 'tienen fotos'
+];
+
 // Palabras que indican nerviosismo o urgencia
 const PALABRAS_NERVIOSISMO = [
   'preocupado', 'preocupada', 'nervioso', 'nerviosa', 'urgente',
@@ -38,6 +45,12 @@ const PALABRAS_NERVIOSISMO = [
 function detectaPreguntaPedido(mensaje) {
   const msgLower = mensaje.toLowerCase();
   return PALABRAS_PEDIDO.some(palabra => msgLower.includes(palabra));
+}
+
+// Detectar si pide fotos
+function detectaPideFotos(mensaje) {
+  const msgLower = mensaje.toLowerCase();
+  return PALABRAS_FOTOS.some(palabra => msgLower.includes(palabra));
 }
 
 // Detectar nerviosismo
@@ -213,6 +226,14 @@ Respondé con [ESCALAR] al inicio si:
 - Sonar a bot o respuesta automática
 - Mandar a la web a comprar (está en construcción)
 - Ofrecer seña/reserva de entrada - solo si la persona lo pide o no le alcanza
+- NUNCA decir "te busco las fotos" o "estoy buscando" si no vas a mandar nada
+
+=== SI PIDEN FOTOS ===
+Por ahora NO podés enviar fotos directamente.
+Opciones de respuesta:
+- "Las fotos las maneja Thibisay directamente. ¿Qué tipo de guardián te interesa? ¿Mini, mediano, grande? ¿Alguna especialidad? Así le paso el pedido y te manda fotos de los que tenemos disponibles 📸"
+- "Dame más detalles de lo que buscás y le pido a Thibisay que te mande fotos de los que podrían ser para vos ✨"
+- Preguntá qué buscan (tamaño, especialidad, presupuesto) para que Thibisay sepa qué mostrarles
 `;
 
 export async function POST(request) {
@@ -240,6 +261,7 @@ export async function POST(request) {
     const preguntaPorPedido = detectaPreguntaPedido(mensaje);
     const estaNervioso = detectaNerviosismo(mensaje);
     const quiereComprar = detectaIntencionCompra(mensaje);
+    const pideFotos = detectaPideFotos(mensaje);
 
     // Construir contexto adicional
     let contextoAdicional = '';
@@ -254,6 +276,10 @@ export async function POST(request) {
 
     if (quiereComprar) {
       contextoAdicional += '\n[CONTEXTO: Parece interesada en comprar. Mostrar info de productos.]';
+    }
+
+    if (pideFotos) {
+      contextoAdicional += '\n[CONTEXTO: Pide fotos. RECORDÁ: no podés enviar fotos, preguntá qué busca y decile que Thibisay le va a mandar fotos. ESCALAR para que Thibisay envíe las fotos.]';
     }
 
     if (nombre) {
@@ -296,7 +322,8 @@ export async function POST(request) {
     // Detectar si Tito quiere escalar
     const debeEscalar = respuestaTito.includes('[ESCALAR]') ||
                         preguntaPorPedido ||
-                        estaNervioso;
+                        estaNervioso ||
+                        pideFotos;
 
     // Limpiar el [ESCALAR] de la respuesta
     const respuestaLimpia = respuestaTito.replace('[ESCALAR]', '').trim();
@@ -310,13 +337,15 @@ export async function POST(request) {
         preguntaPorPedido,
         estaNervioso,
         quiereComprar,
+        pideFotos,
         plataforma: plataforma || 'desconocida',
         nombre: nombre || null,
       },
       // Datos para notificación si hay que escalar
       notificacion: debeEscalar ? {
         mensaje: `🚨 ${nombre || 'Alguien'} desde ${plataforma || 'redes'} necesita atención`,
-        razon: preguntaPorPedido ? 'Pregunta por pedido' :
+        razon: pideFotos ? '📸 Pide fotos de guardianes' :
+               preguntaPorPedido ? 'Pregunta por pedido' :
                estaNervioso ? 'Cliente nervioso/molesto' :
                'Escalado por Tito',
         mensajeOriginal: mensaje,
