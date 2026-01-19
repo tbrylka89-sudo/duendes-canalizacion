@@ -14,46 +14,61 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// URL base de la API
-const API_BASE = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'https://duendes-vercel.vercel.app';
+// ═══════════════════════════════════════════════════════════════
+// CONEXIÓN DIRECTA A WOOCOMMERCE
+// ═══════════════════════════════════════════════════════════════
 
-// ═══════════════════════════════════════════════════════════════
-// FUNCIONES PARA OBTENER PRODUCTOS
-// ═══════════════════════════════════════════════════════════════
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+
+function getWooAuth() {
+  const key = process.env.WC_CONSUMER_KEY;
+  const secret = process.env.WC_CONSUMER_SECRET;
+  if (!key || !secret) return null;
+  return Buffer.from(`${key}:${secret}`).toString('base64');
+}
 
 async function obtenerProductos(params = {}) {
   try {
-    const url = new URL(`${API_BASE}/api/tito/woo`);
-    url.searchParams.set('accion', 'productos');
-    if (params.categoria) url.searchParams.set('categoria', params.categoria);
-    if (params.busqueda) url.searchParams.set('busqueda', params.busqueda);
-    if (params.limite) url.searchParams.set('limite', params.limite);
+    const auth = getWooAuth();
+    if (!auth) {
+      console.error('[MANYCHAT] No hay credenciales de WooCommerce');
+      return [];
+    }
 
-    const res = await fetch(url.toString());
-    const data = await res.json();
-    return data.success ? data.data : [];
+    const { limite = 12 } = params;
+    const url = `${WP_URL}/wp-json/wc/v3/products?per_page=${limite}&status=publish&orderby=date&order=desc`;
+
+    const res = await fetch(url, {
+      headers: { 'Authorization': `Basic ${auth}` }
+    });
+
+    if (!res.ok) {
+      console.error('[MANYCHAT] Error WooCommerce:', res.status);
+      return [];
+    }
+
+    const productos = await res.json();
+
+    return productos.map(p => ({
+      id: p.id,
+      nombre: p.name,
+      precio: p.price,
+      imagen: p.images?.[0]?.src || null,
+      url: p.permalink,
+      descripcionCorta: p.short_description?.replace(/<[^>]*>/g, '').substring(0, 100),
+      categorias: p.categories?.map(c => c.name).join(', ')
+    })).filter(p => p.imagen); // Solo productos con imagen
+
   } catch (error) {
     console.error('[MANYCHAT] Error obteniendo productos:', error);
     return [];
   }
 }
 
-async function obtenerRecomendaciones(intencion, presupuesto) {
-  try {
-    const url = new URL(`${API_BASE}/api/tito/woo`);
-    url.searchParams.set('accion', 'recomendaciones');
-    if (intencion) url.searchParams.set('intencion', intencion);
-    if (presupuesto) url.searchParams.set('presupuesto', presupuesto);
-
-    const res = await fetch(url.toString());
-    const data = await res.json();
-    return data.success ? data.data : [];
-  } catch (error) {
-    console.error('[MANYCHAT] Error obteniendo recomendaciones:', error);
-    return [];
-  }
+async function obtenerRecomendaciones(intencion) {
+  // Por ahora devuelve todos los productos
+  // Después se puede filtrar por categoría según intención
+  return obtenerProductos({ limite: 6 });
 }
 
 // ═══════════════════════════════════════════════════════════════
