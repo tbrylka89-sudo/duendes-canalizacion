@@ -225,8 +225,16 @@ async function construirContexto(mensaje, intencion, datos) {
     // Ya sabemos el país - dar formato de moneda
     if (paisFinal === 'UY') {
       // URUGUAY: Precios FIJOS en pesos uruguayos
-      contexto += `\n\n💰 ES DE URUGUAY - USA ESTOS PRECIOS FIJOS (en pesos uruguayos):
+      contexto += `\n\n💰 ES DE URUGUAY - PRECIOS EN PESOS URUGUAYOS:
 ${PRECIOS_URUGUAY.listaCompleta}
+
+CUANDO HABLES DE PRECIOS:
+- NO tires la lista seca. Explicá la MAGIA detrás de cada categoría.
+- Preguntá primero qué busca (protección, abundancia, etc.) y recién ahí recomendá tamaño.
+- Contá la diferencia entre Clásico, Especial y Maestros Místicos.
+- Usá tu expertise de 847 años: "En mi experiencia..." "Los que buscan X suelen conectar con..."
+- Conectá el precio con el VALOR: días de trabajo, cristales reales, pieza única.
+- Si pregunta por uno específico, describí qué lo hace especial.
 
 ⚠️ SOLO pesos uruguayos. NUNCA menciones USD a uruguayos.
 ⚠️ YA SABÉS SU PAÍS - NO preguntes de nuevo de dónde es.`;
