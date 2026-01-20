@@ -108,7 +108,8 @@ async function construirContexto(mensaje, intencion, datos) {
         datos._esPrimeraInteraccion = false;
 
         contexto += `\n\n🔄 CONVERSACIÓN EN CURSO (interacción #${memoria.interacciones + 1})`;
-        contexto += `\n⚠️ NO repitas su nombre en cada mensaje. Solo usalo en momentos especiales (felicitación, algo emotivo, cerrar venta). En mensajes normales, hablá directo sin nombre.`;
+        contexto += `\n⚠️ PROHIBIDO: NO te presentes de nuevo, NO digas "soy Tito", NO repitas tu historia. Ya te conoce.`;
+        contexto += `\n⚠️ NO repitas su nombre en cada mensaje. Hablá directo.`;
 
         if (memoria.necesidad) contexto += `\n- Busca: ${memoria.necesidad}`;
         if (memoria.productosVistos?.length) contexto += `\n- Vio: ${memoria.productosVistos.slice(0,3).join(', ')}`;
@@ -116,15 +117,15 @@ async function construirContexto(mensaje, intencion, datos) {
         if (memoria.objecionPrecio) contexto += `\n- ⚠️ Mostró duda por precio antes`;
       } else {
         datos._esPrimeraInteraccion = true;
-        contexto += `\n\n✨ PRIMERA INTERACCIÓN - PRESENTATE como Tito (duende de 847 años del bosque de Piriápolis). Hacelo corto, simpático y memorable. Después preguntá qué busca.`;
+        contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
       }
     } catch (e) {
       datos._esPrimeraInteraccion = true;
-      contexto += `\n\n✨ PRIMERA INTERACCIÓN - PRESENTATE como Tito (duende de 847 años del bosque de Piriápolis). Hacelo corto, simpático y memorable. Después preguntá qué busca.`;
+      contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
     }
   } else {
     datos._esPrimeraInteraccion = true;
-    contexto += `\n\n✨ PRIMERA INTERACCIÓN - PRESENTATE como Tito (duende de 847 años del bosque de Piriápolis). Hacelo corto, simpático y memorable. Después preguntá qué busca.`;
+    contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
   }
 
   // Si pregunta por pedido
@@ -274,10 +275,10 @@ export async function POST(request) {
     const subscriberId = subscriber_id;
     const conversationHistory = historial || history || [];
 
-    // Si mensaje vacío, saludo con presentación
+    // Si mensaje vacío, saludo casual
     if (!msg.trim()) {
       return Response.json(crearRespuestaManychat(
-        `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀\n\nUn duende de 847 años que vive en el bosque de Piriápolis.\n\n¿Qué te trajo por acá?`
+        `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀\n\n¿Cómo andás?`
       ));
     }
 
