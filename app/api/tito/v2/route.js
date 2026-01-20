@@ -191,7 +191,12 @@ async function construirContexto(mensaje, intencion, datos) {
 
         if (memoria.necesidad) contexto += `\n- Busca: ${memoria.necesidad}`;
         if (memoria.productosVistos?.length) contexto += `\n- Vio: ${memoria.productosVistos.slice(0,3).join(', ')}`;
-        if (memoria.interacciones > 3) contexto += `\n- Ya chateó ${memoria.interacciones} veces (MUY interesada)`;
+        if (memoria.interacciones > 3 && memoria.interacciones <= 8) {
+          contexto += `\n- Ya chateó ${memoria.interacciones} veces (interesada)`;
+        }
+        if (memoria.interacciones > 8) {
+          contexto += `\n- ⚠️ LLEVA ${memoria.interacciones} MENSAJES - Está dando vueltas. Usá cierre o psicología inversa.`;
+        }
         if (memoria.objecionPrecio) contexto += `\n- ⚠️ Mostró duda por precio antes`;
 
         // Guardar país si lo mencionó ahora
