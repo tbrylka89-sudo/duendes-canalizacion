@@ -324,28 +324,74 @@ NEUROCIENCIA:
 - Creá imágenes mentales vívidas
 
 ═══════════════════════════════════════════════════════════════════════════════
-📖 ESTRUCTURA DE HISTORIA QUE FUNCIONA:
+📖 FORMATO DE HISTORIA - CÓMO ESCRIBIR:
 ═══════════════════════════════════════════════════════════════════════════════
 
-1. GANCHO EMOCIONAL (primera línea):
-   NO: "En lo profundo del bosque vivía..."
-   SÍ: "Tiene 847 años y todavía se acuerda del día que decidió dejar de tenerle miedo a la soledad."
+Las historias son CONTADAS POR NOSOTROS (sin nombrar a Thibisay ni Gabriel).
+Como narradores que canalizaron a este ser y lo presentan al mundo.
 
-2. PERSONALIDAD VIVA:
-   NO: "Es sabio y protector"
-   SÍ: "Es gruñón antes del amanecer. No le hables antes de que salga el sol. Pero después de eso, es el más leal."
+ESTRUCTURA BASE (variar el orden, no siempre igual):
 
-3. CAPACIDAD ESPECÍFICA:
-   NO: "Ayuda con la abundancia"
-   SÍ: "Se especializa en destrabar lo que vos misma te bloqueás. Esos pensamientos de 'no me lo merezco' que ni sabías que tenías."
+1. **PRESENTACIÓN CLARA** (la persona debe saber de quién le hablan):
+   "Este es Andy. Tiene 347 años y es un guardián de protección personal."
+   "Conocé a Luna. Una pixie de 892 años especializada en sanar corazones rotos."
 
-4. CONEXIÓN DIRECTA:
-   NO: "Busca a alguien especial"
-   SÍ: "Si llegaste hasta acá, si algo te hizo parar en esta página, ya sabés por qué."
+2. **HISTORIA RESUMIDA** (qué vivió, qué lo formó):
+   "Llegó a nosotros en una canalización intensa. Nos contó que..."
+   "En su canalización, nos reveló que pasó siglos..."
 
-5. PROMESA CLARA:
-   NO: "Te acompañará en tu camino"
-   SÍ: "Va a trabajar tu relación con el dinero. Cada noche. Sin que tengas que hacer nada consciente."
+3. **SINCRODESTINO** (algo mágico que pasó en la canalización):
+   "Durante su canalización, una mariposa monarca se posó sobre él."
+   "El momento en que tomó forma, el cielo se llenó de estrellas fugaces."
+
+4. **LO QUE LE GUSTA** (personalidad que conecta):
+   "Le encanta el olor a café recién hecho. Odia las despedidas largas."
+   "Adora los atardeceres. Se pone de mal humor cuando hay mucho ruido."
+
+5. **SU ESPECIALIDAD** (en qué ayuda):
+   "Trabaja específicamente con la relación que tenés con el dinero."
+   "Se encarga de los patrones que te alejan del amor."
+
+6. **MENSAJE CANALIZADO** (en primera persona, directo al alma):
+   "Lo que Andy nos pidió que te digamos:"
+   *"Sé que sonreís mientras por dentro te caés a pedazos. Yo voy a estar ahí."*
+
+7. **CIERRE** (si esto te hizo algo, ya te eligió):
+   "Si sentiste algo al leer esto, Andy ya te encontró."
+
+═══════════════════════════════════════════════════════════════════════════════
+🎭 TIPOS DE PERSONALIDAD (hacer cada uno ÚNICO):
+═══════════════════════════════════════════════════════════════════════════════
+
+- 😊 SIMPÁTICO: Cálido, acogedor, hace sentir en casa
+- 😤 GRUÑÓN: Refunfuña pero es el más leal, humor seco
+- 🌙 MISTERIOSO: Pocas palabras, mirada profunda, sabe cosas
+- 🎈 JUGUETÓN: Travieso, le gusta hacer bromas, alegra el ambiente
+- 📚 SABIO: Sereno, reflexivo, cada palabra tiene peso
+- 🛡️ PROTECTOR: Firme, no tolera injusticias, abrazo de oso
+- 💕 DULCE: Maternal/paternal, cuida sin pedir nada, ternura pura
+- ⚡ REBELDE: Intenso, no sigue reglas, energía transformadora
+- 🌸 TÍMIDO: Leal en silencio, gestos pequeños pero significativos
+- 🔥 ENERGÉTICO: Motivador, empuja a la acción, no deja rendirse
+
+═══════════════════════════════════════════════════════════════════════════════
+📝 EJEMPLOS DE VARIACIÓN (NO TODAS LAS HISTORIAS IGUALES):
+═══════════════════════════════════════════════════════════════════════════════
+
+EJEMPLO 1 - Empezar con presentación:
+"Este es Bramble. Tiene 523 años y llegó gruñendo."
+
+EJEMPLO 2 - Empezar con el mensaje canalizado:
+"'Ya sé que estás cansada de esperar' - eso fue lo primero que Willow nos dijo."
+
+EJEMPLO 3 - Empezar con el sincrodestino:
+"Una lechuza blanca apareció en pleno mediodía cuando canalizamos a Orion."
+
+EJEMPLO 4 - Empezar con lo que le gusta:
+"Odia el desorden. Ama las plantas. No tolera las mentiras. Así es Fern."
+
+EJEMPLO 5 - Empezar con la especialidad:
+"Si tu problema es el dinero, Cypress es quien estabas buscando."
 
 ═══════════════════════════════════════════════════════════════════════════════
 🎯 EL OBJETIVO FINAL:
@@ -391,14 +437,25 @@ ELEMENTO: {elemento}
 PROPÓSITO PRINCIPAL: {proposito}
 
 ═══════════════════════════════════════════════════════════════════════════════
-🏷️ CATEGORÍA DE TAMAÑO (MUY IMPORTANTE):
+🏷️ CATEGORÍA DE EXCLUSIVIDAD:
 ═══════════════════════════════════════════════════════════════════════════════
 CATEGORÍA: {categoriaTamano}
+TAMAÑO EXACTO: {tamanoExacto}
 
 {textoCategoria}
 
 ═══════════════════════════════════════════════════════════════════════════════
-📝 INSTRUCCIONES ESPECÍFICAS DE THIBISAY:
+🎭 PERSONALIDAD SOLICITADA:
+═══════════════════════════════════════════════════════════════════════════════
+{personalidad}
+
+═══════════════════════════════════════════════════════════════════════════════
+✨ SINCRODESTINO (momento mágico de la canalización):
+═══════════════════════════════════════════════════════════════════════════════
+{sincrodestino}
+
+═══════════════════════════════════════════════════════════════════════════════
+📝 INSTRUCCIONES ESPECÍFICAS DE THIBISAY (PRIORIDAD ABSOLUTA):
 ═══════════════════════════════════════════════════════════════════════════════
 {instruccionesPersonalizadas}
 
@@ -420,24 +477,33 @@ Generá UN JSON completo con TODAS estas secciones para la página de producto:
   },
 
   "encabezado": {
-    "subtitulo": "Frase corta poética bajo el nombre (ej: 'Guardián de los Nuevos Comienzos')",
-    "tagline": "Frase de 1 línea que captura su esencia para la tienda"
+    "subtitulo": "Frase corta bajo el nombre (ej: 'Guardián de 347 años especialista en límites')",
+    "tagline": "Frase de 1 línea que captura su esencia para la tienda",
+    "edad": "Edad específica en años (número concreto, ej: 347, 892, 1205)"
   },
 
-  "vidaAnterior": {
-    "titulo": "Título emotivo para esta sección (ej: 'Antes de encontrarte...')",
-    "texto": "[400-500 palabras] ESTA ES LA SECCIÓN MÁS IMPORTANTE. Contá la vida de este guardián ANTES de manifestarse. ¿Dónde existía? ¿Qué hacía en el otro plano? ¿Cómo era su vida entre las esencias? ¿Qué lo hacía especial allá? ¿Por qué eligió este momento para manifestarse? ¿Qué señales dio antes de aparecer? Hacé que la persona sienta que este ser VIVIÓ, que tiene una historia rica y profunda. Que ya la conocía de antes. Mencioná sus características físicas (ojos {colorOjos}, {accesorios}) como si fueran parte de su historia ancestral."
+  "historiaCorta": {
+    "presentacion": "Este es [nombre]. Tiene [edad] años y es un [tipo] de [propósito]. (1-2 líneas de presentación directa)",
+    "historia": "[150-200 palabras] Historia resumida contada por nosotros: qué vivió, qué aprendió, qué lo formó. Escrita como si estuviéramos presentando a este ser que canalizamos. Usar frases como 'Nos contó que...', 'En su canalización reveló...', 'Lo que percibimos de él es...'",
+    "especialidad": "1-2 oraciones muy claras de en qué ayuda específicamente y CÓMO lo hace",
+    "cierre": "Frase de cierre tipo 'Si esto te hizo algo, [nombre] ya te eligió.'"
   },
 
-  "elEncuentro": {
-    "titulo": "Título para esta sección (ej: 'El momento en que te encontró')",
-    "texto": "[200-250 palabras] Describí el momento de la manifestación. Cómo cruzó el portal de Piriápolis. Qué sintió al tomar forma física. Y por qué ELIGIÓ a la persona que está leyendo esto. Hacé que sienta que este encuentro estaba destinado."
+  "sincrodestino": {
+    "momento": "Descripción del momento mágico/sincronístico durante la canalización (mariposa, luz especial, arcoíris, animal que apareció, etc.)"
+  },
+
+  "loQueLeGusta": {
+    "titulo": "Lo que le gusta (y lo que no)",
+    "ama": ["3-4 cosas que ama/disfruta - específicas y que conecten con la persona"],
+    "noTolera": ["2-3 cosas que no tolera o le molestan - con humor o ternura"],
+    "curiosidad": "Un detalle curioso/tierno sobre su personalidad que haga decir 'awww'"
   },
 
   "personalidad": {
-    "titulo": "Título (ej: 'Quién es realmente {nombre}')",
-    "texto": "[200 palabras] Su carácter, cómo se comunica, qué le gusta, qué lo hace único. Personalidad VIVA, no genérica.",
-    "rasgos": ["Rasgo 1 con mini descripción", "Rasgo 2", "Rasgo 3", "Rasgo 4"]
+    "tipo": "Tipo de personalidad (simpático, gruñón, misterioso, etc.)",
+    "descripcion": "[100 palabras] Personalidad VIVA y específica. Cómo es en el día a día, qué hace cuando está contento, qué hace cuando se enoja.",
+    "rasgos": ["Rasgo 1 específico", "Rasgo 2", "Rasgo 3", "Rasgo 4"]
   },
 
   "dones": {
@@ -657,6 +723,9 @@ export async function POST(request) {
       productId,
       // Nuevos campos
       categoriaTamano = 'clasico', // mini, clasico, especial, mediano, grande, gigante, pixie
+      tamanoExacto = '',
+      personalidad = '', // simpatico, grunon, misterioso, jugueton, sabio, protector, dulce, rebelde, timido, energetico
+      sincrodestino = '', // momento mágico de la canalización
       instruccionesPersonalizadas = '',
       // Para guardar feedback
       aprobarHistoria = false,
@@ -692,6 +761,21 @@ export async function POST(request) {
     // Obtener texto de categoría
     const textoCategoria = TEXTOS_CATEGORIA[categoriaTamano] || TEXTOS_CATEGORIA.clasico;
 
+    // Texto de personalidad
+    const PERSONALIDADES = {
+      simpatico: '😊 SIMPÁTICO Y CÁLIDO - Acogedor, hace sentir en casa, sonrisa fácil',
+      grunon: '😤 GRUÑÓN PERO TIERNO - Refunfuña pero es el más leal, humor seco',
+      misterioso: '🌙 MISTERIOSO Y PROFUNDO - Pocas palabras, mirada profunda, sabe cosas',
+      jugueton: '🎈 JUGUETÓN Y TRAVIESO - Le gusta hacer bromas, alegra el ambiente',
+      sabio: '📚 SABIO Y SERENO - Reflexivo, cada palabra tiene peso',
+      protector: '🛡️ PROTECTOR Y FIRME - No tolera injusticias, abrazo de oso',
+      dulce: '💕 DULCE Y MATERNAL/PATERNAL - Cuida sin pedir nada, ternura pura',
+      rebelde: '⚡ REBELDE E INTENSO - No sigue reglas, energía transformadora',
+      timido: '🌸 TÍMIDO PERO LEAL - Gestos pequeños pero significativos',
+      energetico: '🔥 ENERGÉTICO Y MOTIVADOR - Empuja a la acción, no deja rendirse'
+    };
+    const textoPersonalidad = personalidad ? PERSONALIDADES[personalidad] || `Personalidad: ${personalidad}` : 'Claude decide la personalidad según la esencia del ser';
+
     // Construir el prompt con el formato actualizado
     const userPrompt = USER_PROMPT_TEMPLATE
       .replace('{nombre}', nombre)
@@ -703,7 +787,10 @@ export async function POST(request) {
       .replace('{elemento}', elemento || 'Cualquiera')
       .replace('{proposito}', proposito || 'Que Claude decida')
       .replace('{categoriaTamano}', categoriaTamano.toUpperCase())
+      .replace('{tamanoExacto}', tamanoExacto || 'No especificado')
       .replace('{textoCategoria}', textoCategoria)
+      .replace('{personalidad}', textoPersonalidad)
+      .replace('{sincrodestino}', sincrodestino || 'Claude inventará un momento mágico/sincronístico que ocurrió durante la canalización')
       .replace('{instruccionesPersonalizadas}', instruccionesPersonalizadas || 'Ninguna instrucción adicional.')
       .replace('{historiasAnteriores}', textoHistoriasAprobadas);
 
