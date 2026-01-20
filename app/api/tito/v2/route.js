@@ -116,14 +116,15 @@ async function construirContexto(mensaje, intencion, datos) {
         if (memoria.objecionPrecio) contexto += `\n- ⚠️ Mostró duda por precio antes`;
       } else {
         datos._esPrimeraInteraccion = true;
-        contexto += `\n\n✨ PRIMERA INTERACCIÓN - Podés usar su nombre UNA vez para saludar.`;
+        contexto += `\n\n✨ PRIMERA INTERACCIÓN - PRESENTATE como Tito (duende de 847 años del bosque de Piriápolis). Hacelo corto, simpático y memorable. Después preguntá qué busca.`;
       }
     } catch (e) {
       datos._esPrimeraInteraccion = true;
+      contexto += `\n\n✨ PRIMERA INTERACCIÓN - PRESENTATE como Tito (duende de 847 años del bosque de Piriápolis). Hacelo corto, simpático y memorable. Después preguntá qué busca.`;
     }
   } else {
     datos._esPrimeraInteraccion = true;
-    contexto += `\n\n✨ PRIMERA INTERACCIÓN - Podés usar su nombre UNA vez para saludar.`;
+    contexto += `\n\n✨ PRIMERA INTERACCIÓN - PRESENTATE como Tito (duende de 847 años del bosque de Piriápolis). Hacelo corto, simpático y memorable. Después preguntá qué busca.`;
   }
 
   // Si pregunta por pedido
@@ -273,10 +274,10 @@ export async function POST(request) {
     const subscriberId = subscriber_id;
     const conversationHistory = historial || history || [];
 
-    // Si mensaje vacío, saludo
+    // Si mensaje vacío, saludo con presentación
     if (!msg.trim()) {
       return Response.json(crearRespuestaManychat(
-        `¡Ey${userName ? ' ' + userName : ''}! ✨\n\n¿Qué te trajo por el bosque hoy?`
+        `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀\n\nUn duende de 847 años que vive en el bosque de Piriápolis.\n\n¿Qué te trajo por acá?`
       ));
     }
 

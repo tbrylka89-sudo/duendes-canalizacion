@@ -951,6 +951,30 @@ function duendes_canalizar_get_scripts() {
                     }
                 }
 
+                // RankMath Focus Keyword
+                if (result.focus_keyword) {
+                    var focusKeywordSelectors = [
+                        'input[name=\"rank_math_focus_keyword\"]',
+                        '#rank_math_focus_keyword',
+                        '.rank-math-focus-keyword input',
+                        'input[id*=\"focus-keyword\"]',
+                        '.rank-math-focus-keyword'
+                    ];
+                    var focusKeywordField = null;
+                    for (var i = 0; i < focusKeywordSelectors.length; i++) {
+                        focusKeywordField = document.querySelector(focusKeywordSelectors[i]);
+                        if (focusKeywordField) break;
+                    }
+                    if (focusKeywordField) {
+                        focusKeywordField.value = result.focus_keyword;
+                        focusKeywordField.dispatchEvent(new Event('input', { bubbles: true }));
+                        focusKeywordField.dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log('Focus Keyword aplicado:', result.focus_keyword);
+                    } else {
+                        console.log('Campo Focus Keyword no encontrado. Valor:', result.focus_keyword);
+                    }
+                }
+
                 // Actualizar nombre en el campo si se generó
                 if (result.nombre_generado) {
                     var nombreField = document.getElementById('dc_nombre');
@@ -964,8 +988,11 @@ function duendes_canalizar_get_scripts() {
                 console.log('Título:', result.titulo || 'N/A');
                 console.log('SEO Title:', result.seo_title || 'N/A');
                 console.log('SEO Desc:', result.seo_description || 'N/A');
+                console.log('Focus Keyword:', result.focus_keyword || 'N/A');
                 console.log('Tags:', result.tags || 'N/A');
                 console.log('Tipo de ser:', result.tipo_ser || 'N/A');
+                console.log('Categoría sugerida:', result.categoria_sugerida || 'N/A');
+                console.log('Personalidad:', result.personalidad || 'N/A');
                 console.log('============================');
             },
 
