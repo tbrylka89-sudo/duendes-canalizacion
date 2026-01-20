@@ -13,7 +13,7 @@ export async function OPTIONS() {
   return new Response(null, { status: 200, headers: corsHeaders });
 }
 
-const SYSTEM_PROMPT = `Eres un experto en SEO para ecommerce de productos artesanales místicos/espirituales.
+const SYSTEM_PROMPT = `Eres un experto en SEO y copywriting para ecommerce de productos artesanales místicos/espirituales.
 
 Tu trabajo es generar contenido SEO PERFECTO para Rank Math (100/100) para productos de "Duendes del Uruguay" - guardianes artesanales canalizados.
 
@@ -28,11 +28,19 @@ REGLAS CRÍTICAS:
 
 3. Las FAQs van DESPUÉS de la historia - agregan contenido sin modificar nada
 
-4. Focus Keyword ideal: "[nombre] duende/guardian de [propósito]" o "comprar [nombre] [propósito]"
+4. Focus Keyword ideal: "[Nombre] Duende/Guardián de [Propósito]" o "Comprar [Nombre] [Propósito]"
 
 5. Todo en español rioplatense (vos, tenés, etc.)
 
-6. Las FAQs deben ser preguntas que la gente realmente buscaría`;
+6. Las FAQs deben ser preguntas que la gente realmente buscaría
+
+ESTILO Y FORMATO:
+- Usar mayúsculas correctamente (nombres propios, inicio de oración)
+- Focus Keyword con mayúsculas: "Abraham Guardián de la Abundancia"
+- SEO Title profesional y atractivo
+- Intro SEO debe ser emotivo y enganchador, como si hablaras con el cliente
+- FAQs con preguntas naturales y respuestas cálidas
+- Todo debe sentirse premium y místico, no genérico`;
 
 const USER_PROMPT = `Generá SEO PERFECTO para este producto:
 
@@ -47,43 +55,41 @@ DESCRIPCIÓN ACTUAL (NO MODIFICAR, solo usar como referencia):
 
 ═══════════════════════════════════════════════════════════════
 
-Generá un JSON con:
+Generá un JSON con contenido ESTÉTICO y PROFESIONAL:
 
 {
-  "focus_keyword": "[keyword principal de 2-4 palabras que incluya el nombre]",
+  "focus_keyword": "[Keyword con Mayúsculas Correctas, ej: 'Abraham Guardián de Abundancia']",
 
-  "seo_title": "[título SEO de max 60 caracteres con focus keyword al inicio] | Duendes del Uruguay",
+  "seo_title": "[Título atractivo con keyword al inicio, max 55 chars] | Duendes del Uruguay",
 
-  "seo_description": "[meta description de 150-160 caracteres que empiece con el focus keyword, sea persuasiva y tenga call to action]",
+  "seo_description": "[Meta description de 150-155 caracteres. Empezar con keyword. Ser emotivo y persuasivo. Incluir call to action como 'Descubrí', 'Conocé', 'Adoptá'.]",
 
-  "intro_seo": "[Párrafo de 80-100 palabras que VA ANTES de la historia. DEBE empezar con el focus keyword. Presenta al guardián, menciona el propósito, y engancha emocionalmente. Usar keywords secundarias como 'comprar duende', 'guardian espiritual', 'artesanal Uruguay'.]",
+  "intro_seo": "[Párrafo EMOTIVO de 80-100 palabras que va ANTES de la historia. Empezar con el nombre del guardián. Hablar directo al cliente con 'vos'. Mencionar el propósito principal. Crear conexión emocional. Usar frases como 'llegó para transformar tu vida', 'fue canalizado especialmente', 'guardián artesanal único'. NO repetir lo que dice la historia.]",
 
   "faqs": [
     {
-      "pregunta": "¿Qué es [nombre] y para qué sirve?",
-      "respuesta": "[Respuesta de 50-80 palabras explicando el propósito del guardián]"
+      "pregunta": "¿Quién es {nombre} y cuál es su propósito?",
+      "respuesta": "[Respuesta cálida de 60-80 palabras explicando quién es y su misión principal. Usar 'vos' y 'tu'.]"
     },
     {
-      "pregunta": "¿Cómo se canaliza un guardián como [nombre]?",
-      "respuesta": "[Respuesta sobre el proceso de canalización artesanal]"
+      "pregunta": "¿Cómo fue canalizado {nombre}?",
+      "respuesta": "[Explicar brevemente el proceso de canalización artesanal. Mencionar que cada pieza es única, hecha a mano con intención.]"
     },
     {
-      "pregunta": "¿Qué beneficios trae [nombre] a mi vida?",
-      "respuesta": "[Respuesta con beneficios específicos según el propósito]"
+      "pregunta": "¿Qué beneficios puedo esperar de {nombre}?",
+      "respuesta": "[Listar 3-4 beneficios específicos según el propósito: abundancia, protección, amor, etc. Ser concreto.]"
     },
     {
-      "pregunta": "¿[nombre] es pieza única o recreable?",
-      "respuesta": "[Respuesta según el tamaño - minis recreables, medianos/grandes únicos]"
+      "pregunta": "¿{nombre} es una pieza única?",
+      "respuesta": "[Responder según tamaño: minis/especiales son recreables pero cada rostro es único; medianos/grandes son piezas únicas irrepetibles.]"
     },
     {
-      "pregunta": "¿Cómo cuido a mi guardián [nombre]?",
-      "respuesta": "[Respuesta con consejos de cuidado y conexión]"
+      "pregunta": "¿Cómo conecto con mi guardián {nombre}?",
+      "respuesta": "[Dar consejos prácticos: ubicación en el hogar, ritual de bienvenida, cómo hablarle, etc.]"
     }
   ],
 
-  "tags": "[lista de 8-10 tags separados por coma: incluir nombre, propósito, tipo, 'duende artesanal', 'guardian espiritual', 'hecho a mano Uruguay', etc.]",
-
-  "keywords_secundarias": "[5 keywords long-tail para usar en el contenido]"
+  "tags": "[8-10 tags separados por coma, con mayúsculas: Nombre, Propósito, Duende Artesanal, Guardián Espiritual, Hecho a Mano, Uruguay, etc.]"
 }`;
 
 export async function POST(request) {
@@ -140,12 +146,13 @@ export async function POST(request) {
 
     const seoData = JSON.parse(jsonMatch[0]);
 
-    // Formatear FAQs como HTML
-    let faqsHtml = '<div class="duendes-faqs"><h3>Preguntas Frecuentes sobre ' + nombre + '</h3>';
+    // Formatear FAQs como HTML estético
+    let faqsHtml = '<div class="duendes-faqs">';
+    faqsHtml += '<h3>✨ Preguntas Frecuentes sobre ' + nombre + '</h3>';
     if (seoData.faqs && Array.isArray(seoData.faqs)) {
-      seoData.faqs.forEach(faq => {
+      seoData.faqs.forEach((faq, index) => {
         faqsHtml += '<div class="faq-item">';
-        faqsHtml += '<h4>' + faq.pregunta + '</h4>';
+        faqsHtml += '<h4><span class="faq-icon">❓</span> ' + faq.pregunta + '</h4>';
         faqsHtml += '<p>' + faq.respuesta + '</p>';
         faqsHtml += '</div>';
       });
