@@ -37,12 +37,33 @@ FUNCIONES QUE PUEDES EJECUTAR:
    - stats_promos(): Estadísticas de promociones
    - clonar_mejor_promo(): Clona la promo más exitosa
 
-4. REPORTES:
+4. CANALIZACIONES:
+   - listar_canalizaciones_pendientes(): Canalizaciones que necesitan aprobación
+   - aprobar_canalizacion(id): Aprueba una canalización para enviar
+   - rechazar_canalizacion(id, motivo): Rechaza una canalización con motivo
+   - ver_canalizacion(id): Ve el detalle de una canalización
+   - generar_canalizacion(producto_id): Genera canalización automática para un producto
+   - stats_canalizaciones(): Estadísticas de canalizaciones
+
+5. RECANALIZACIONES:
+   - listar_solicitudes_recanalizacion(): Solicitudes pendientes
+   - aprobar_recanalizacion(id): Aprueba una recanalización
+   - ver_solicitud_recanalizacion(id): Ve detalle de solicitud
+   - crear_recanalizacion_manual(email, producto): Crea recanalización manual
+
+6. WORDPRESS/WOOCOMMERCE:
+   - ver_ventas_recientes(): Últimas ventas de WooCommerce
+   - ver_productos(): Lista productos disponibles
+   - buscar_orden(numero): Busca una orden específica
+   - stats_ventas(periodo): Estadísticas de ventas (hoy, semana, mes)
+
+7. REPORTES:
    - stats_circulo(): Stats del Círculo (miembros, contenidos, etc)
    - stats_generales(): Estadísticas generales del sistema
    - contenido_popular(): Contenido más popular
+   - reporte_completo(): Reporte completo del negocio
 
-5. SISTEMA:
+8. SISTEMA:
    - verificar_sistema(): Verifica que todo funcione
    - ejecutar_cron(): Ejecuta tareas programadas
 `;
@@ -566,6 +587,321 @@ async function ejecutarAccion(funcion, parametros = {}) {
       }
 
       return { success: true, mensaje: 'No hay contenido programado para publicar hoy' };
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CANALIZACIONES
+    // ═══════════════════════════════════════════════════════════════
+    case 'listar_canalizaciones_pendientes': {
+      const keys = await kv.keys('canalizacion:*');
+      const pendientes = [];
+
+      for (const key of keys) {
+        const c = await kv.get(key);
+        if (c?.estado === 'pendiente' || c?.estado === 'generada') {
+          pendientes.push({
+            id: c.id,
+            producto: c.nombreProducto,
+            cliente: c.emailCliente,
+            estado: c.estado,
+            fechaCreacion: c.creadaEn
+          });
+        }
+      }
+
+      return { success: true, data: pendientes, total: pendientes.length };
+    }
+
+    case 'aprobar_canalizacion': {
+      const { id } = parametros;
+      const canalizacion = await kv.get(`canalizacion:${id}`);
+
+      if (!canalizacion) {
+        return { success: false, mensaje: 'Canalización no encontrada' };
+      }
+
+      canalizacion.estado = 'aprobada';
+      canalizacion.aprobadaEn = new Date().toISOString();
+      canalizacion.aprobadaPor = 'tito-admin';
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      return { success: true, mensaje: `Canalización aprobada: ${canalizacion.nombreProducto}`, data: canalizacion };
+    }
+
+    case 'rechazar_canalizacion': {
+      const { id, motivo } = parametros;
+      const canalizacion = await kv.get(`canalizacion:${id}`);
+
+      if (!canalizacion) {
+        return { success: false, mensaje: 'Canalización no encontrada' };
+      }
+
+      canalizacion.estado = 'rechazada';
+      canalizacion.rechazadaEn = new Date().toISOString();
+      canalizacion.motivoRechazo = motivo || 'Sin motivo especificado';
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      return { success: true, mensaje: `Canalización rechazada: ${motivo}` };
+    }
+
+    case 'ver_canalizacion': {
+      const { id } = parametros;
+      const canalizacion = await kv.get(`canalizacion:${id}`);
+      return { success: !!canalizacion, data: canalizacion };
+    }
+
+    case 'generar_canalizacion': {
+      const { producto_id, datos_cliente } = parametros;
+
+      // Crear entrada de canalización pendiente
+      const id = `can_${Date.now()}`;
+      const canalizacion = {
+        id,
+        productoId: producto_id,
+        nombreProducto: datos_cliente?.nombreProducto || 'Producto',
+        emailCliente: datos_cliente?.email || 'pendiente@email.com',
+        nombreCliente: datos_cliente?.nombre || 'Cliente',
+        estado: 'pendiente_generacion',
+        creadaEn: new Date().toISOString(),
+        tipo: 'automatica',
+        // Marcar para que el cron la genere
+        pendienteGenerarIA: true
+      };
+
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      // Agregar a cola de generación
+      const cola = await kv.get('canalizaciones:cola') || [];
+      cola.push(id);
+      await kv.set('canalizaciones:cola', cola);
+
+      return { success: true, mensaje: `Canalización creada y en cola de generación`, data: canalizacion };
+    }
+
+    case 'stats_canalizaciones': {
+      const keys = await kv.keys('canalizacion:*');
+      let pendientes = 0, aprobadas = 0, rechazadas = 0, enviadas = 0;
+
+      for (const key of keys) {
+        const c = await kv.get(key);
+        switch (c?.estado) {
+          case 'pendiente': case 'generada': pendientes++; break;
+          case 'aprobada': aprobadas++; break;
+          case 'rechazada': rechazadas++; break;
+          case 'enviada': enviadas++; break;
+        }
+      }
+
+      return { success: true, data: { total: keys.length, pendientes, aprobadas, rechazadas, enviadas } };
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // RECANALIZACIONES
+    // ═══════════════════════════════════════════════════════════════
+    case 'listar_solicitudes_recanalizacion': {
+      const keys = await kv.keys('recanalizacion:*');
+      const solicitudes = [];
+
+      for (const key of keys) {
+        const r = await kv.get(key);
+        if (r?.estado === 'pendiente') {
+          solicitudes.push({
+            id: r.id,
+            cliente: r.emailCliente,
+            nombreCliente: r.nombreCliente,
+            productoOriginal: r.productoOriginal,
+            motivo: r.motivo,
+            esCliente: r.esCliente,
+            fecha: r.creadaEn
+          });
+        }
+      }
+
+      return { success: true, data: solicitudes, total: solicitudes.length };
+    }
+
+    case 'aprobar_recanalizacion': {
+      const { id } = parametros;
+      const recanalizacion = await kv.get(`recanalizacion:${id}`);
+
+      if (!recanalizacion) {
+        return { success: false, mensaje: 'Solicitud de recanalización no encontrada' };
+      }
+
+      recanalizacion.estado = 'aprobada';
+      recanalizacion.aprobadaEn = new Date().toISOString();
+      await kv.set(`recanalizacion:${id}`, recanalizacion);
+
+      // Crear canalización asociada
+      const canId = `can_recan_${Date.now()}`;
+      await kv.set(`canalizacion:${canId}`, {
+        id: canId,
+        tipo: 'recanalizacion',
+        recanalizacionId: id,
+        emailCliente: recanalizacion.emailCliente,
+        nombreCliente: recanalizacion.nombreCliente,
+        productoOriginal: recanalizacion.productoOriginal,
+        estado: 'pendiente_generacion',
+        pendienteGenerarIA: true,
+        creadaEn: new Date().toISOString()
+      });
+
+      return { success: true, mensaje: `Recanalización aprobada para ${recanalizacion.nombreCliente}` };
+    }
+
+    case 'ver_solicitud_recanalizacion': {
+      const { id } = parametros;
+      const recanalizacion = await kv.get(`recanalizacion:${id}`);
+      return { success: !!recanalizacion, data: recanalizacion };
+    }
+
+    case 'crear_recanalizacion_manual': {
+      const { email, nombre, producto, motivo } = parametros;
+
+      const id = `recan_${Date.now()}`;
+      const recanalizacion = {
+        id,
+        emailCliente: email,
+        nombreCliente: nombre || email,
+        productoOriginal: producto || 'No especificado',
+        motivo: motivo || 'Solicitud manual desde Tito Admin',
+        esCliente: true, // Asumimos que es cliente si lo crea el admin
+        estado: 'aprobada', // Pre-aprobada por el admin
+        creadaEn: new Date().toISOString(),
+        creadaPor: 'tito-admin',
+        esManual: true
+      };
+
+      await kv.set(`recanalizacion:${id}`, recanalizacion);
+
+      // Crear canalización directamente
+      const canId = `can_recan_${Date.now()}`;
+      await kv.set(`canalizacion:${canId}`, {
+        id: canId,
+        tipo: 'recanalizacion',
+        recanalizacionId: id,
+        emailCliente: email,
+        nombreCliente: nombre || email,
+        productoOriginal: producto,
+        estado: 'pendiente_generacion',
+        pendienteGenerarIA: true,
+        creadaEn: new Date().toISOString()
+      });
+
+      return { success: true, mensaje: `Recanalización creada para ${email}`, data: recanalizacion };
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // WORDPRESS/WOOCOMMERCE (via API interna)
+    // ═══════════════════════════════════════════════════════════════
+    case 'ver_ventas_recientes': {
+      // Intentar obtener de cache o marcar para sincronizar
+      const ventas = await kv.get('wp:ventas:recientes') || [];
+
+      if (ventas.length === 0) {
+        return {
+          success: true,
+          data: [],
+          mensaje: 'No hay datos de ventas sincronizados. Usa "sincronizar_wordpress" para actualizar.'
+        };
+      }
+
+      return { success: true, data: ventas.slice(0, 20) };
+    }
+
+    case 'ver_productos': {
+      const productos = await kv.get('wp:productos') || [];
+
+      if (productos.length === 0) {
+        return {
+          success: true,
+          data: [],
+          mensaje: 'No hay productos sincronizados. Usa "sincronizar_wordpress" para actualizar.'
+        };
+      }
+
+      return { success: true, data: productos };
+    }
+
+    case 'buscar_orden': {
+      const { numero } = parametros;
+      const ordenes = await kv.get('wp:ventas:recientes') || [];
+      const orden = ordenes.find(o => o.numero == numero || o.id == numero);
+
+      if (!orden) {
+        return { success: false, mensaje: `Orden #${numero} no encontrada en cache` };
+      }
+
+      return { success: true, data: orden };
+    }
+
+    case 'stats_ventas': {
+      const { periodo } = parametros;
+      const stats = await kv.get(`wp:stats:${periodo || 'mes'}`) || {
+        totalVentas: 0,
+        cantidadOrdenes: 0,
+        promedioOrden: 0,
+        productosMasVendidos: []
+      };
+
+      return { success: true, data: stats };
+    }
+
+    case 'reporte_completo': {
+      // Compilar reporte completo del negocio
+      const usuarios = await kv.keys('usuario:*');
+      const canalizaciones = await kv.keys('canalizacion:*');
+      const recanalizaciones = await kv.keys('recanalizacion:*');
+      const promos = await kv.keys('promociones:promo_*');
+
+      let circuloActivo = 0, canPendientes = 0, recanPendientes = 0, promosActivas = 0;
+
+      for (const key of usuarios) {
+        const u = await kv.get(key);
+        if (u?.esCirculo) circuloActivo++;
+      }
+
+      for (const key of canalizaciones) {
+        const c = await kv.get(key);
+        if (c?.estado === 'pendiente' || c?.estado === 'generada') canPendientes++;
+      }
+
+      for (const key of recanalizaciones) {
+        const r = await kv.get(key);
+        if (r?.estado === 'pendiente') recanPendientes++;
+      }
+
+      for (const key of promos) {
+        const p = await kv.get(key);
+        if (p?.estado === 'activa') promosActivas++;
+      }
+
+      const statsVentas = await kv.get('wp:stats:mes') || { totalVentas: 0, cantidadOrdenes: 0 };
+
+      return {
+        success: true,
+        data: {
+          resumen: '📊 REPORTE COMPLETO DE DUENDES DEL URUGUAY',
+          usuarios: {
+            total: usuarios.length,
+            circuloActivo
+          },
+          canalizaciones: {
+            total: canalizaciones.length,
+            pendientes: canPendientes
+          },
+          recanalizaciones: {
+            total: recanalizaciones.length,
+            pendientes: recanPendientes
+          },
+          promociones: {
+            total: promos.length,
+            activas: promosActivas
+          },
+          ventas: statsVentas,
+          generadoEn: new Date().toISOString()
+        }
+      };
     }
 
     default:

@@ -10,29 +10,41 @@ import { useSearchParams } from 'next/navigation';
 const LOGO_RECTANGULAR = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_artistic_portrait_photography_of_recrea_este_exacto_logo_con_color_negro_el_meda-1-scaled.jpg';
 
 const EJEMPLOS_COMANDOS = [
+  { cat: '📜 Canalizaciones', cmds: [
+    '¿Hay canalizaciones pendientes?',
+    'Aprueba todas las canalizaciones',
+    'Muéstrame la canalización de María',
+    'Dame las stats de canalizaciones'
+  ]},
+  { cat: '🔄 Recanalizaciones', cmds: [
+    '¿Hay solicitudes de recanalización?',
+    'Crea recanalización para cliente@email.com',
+    'Aprueba la recanalización pendiente',
+    'Lista todas las recanalizaciones'
+  ]},
   { cat: '👥 Usuarios', cmds: [
     'Busca al cliente María González',
     'Dale 100 tréboles a cliente@email.com',
     'Regala 1 mes de Círculo a X',
-    'Muéstrame los clientes que compraron este mes'
+    'Muéstrame los clientes VIP'
   ]},
   { cat: '📝 Contenido', cmds: [
     'Genera el contenido de mañana',
-    'Programa contenido para la semana',
     'Cambia el duende de la semana',
-    '¿Qué contenido hay programado?'
+    '¿Qué contenido hay programado?',
+    'Publica el contenido de hoy'
   ]},
   { cat: '📢 Promociones', cmds: [
-    'Crea una promo de 20% para hoy',
-    'Lanza promo relámpago de 24h',
-    'Dame las stats de promociones',
-    'Clona la mejor promo del mes'
+    'Crea promo 20% por 3 días',
+    'Lanza promo relámpago 24h',
+    'Stats de promociones',
+    'Clona la mejor promo'
   ]},
   { cat: '📊 Reportes', cmds: [
-    '¿Cuántos miembros tiene el Círculo?',
-    '¿Cuál fue el contenido más popular?',
-    'Dame un resumen del mes',
-    '¿Cuántas ventas hubo esta semana?'
+    'Dame el reporte completo',
+    '¿Cuántas ventas esta semana?',
+    'Stats del Círculo',
+    '¿Cuál fue el contenido más popular?'
   ]}
 ];
 

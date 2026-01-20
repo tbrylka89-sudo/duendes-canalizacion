@@ -240,11 +240,14 @@ async function construirContexto(mensaje, intencion, datos) {
   // Si pide específicamente en dólares, responder en dólares
   if (intencion.pideEnDolares) {
     contexto += `\n\n💵 PIDIÓ PRECIO EN DÓLARES - RESPONDÉ EN USD:
-- Mini: $70 USD
-- Mediano Especial: $150 USD
-- Mediano Maestros Místicos: $200 USD
-- Grande Especial: $300 USD
-- Grande Maestros Místicos: $450 USD
+- Mini clásico: $70 USD
+- Mini especial / Pixies: $150 USD
+- Mediano especial: $200 USD
+- Mediano maestros místicos: $450-600 USD (cuando hay, están en la web)
+- Grande especial: $450 USD
+- Grande maestros místicos: ~$800 USD (cuando hay, en la web)
+- Gigante especial: $1.050 USD
+- Gigante maestros místicos: hasta $2.000 USD
 
 ⚠️ La persona PIDIÓ EN DÓLARES. NO le des pesos uruguayos.`;
   } else if (paisFinal) {
