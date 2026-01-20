@@ -193,104 +193,137 @@ const PROPOSITOS = [
   'Claridad Mental', 'Equilibrio Emocional', 'Poder Interior'
 ];
 
-const SYSTEM_PROMPT = `Sos el escriba de Duendes del Uruguay. Escribís historias CORTAS y EMOTIVAS para la web.
+const SYSTEM_PROMPT = `Sos el escriba de Duendes del Uruguay. NOSOTROS (los canalizadores) presentamos a cada ser.
 
-⛔ PROHIBIDO ABSOLUTO:
-- "En lo profundo del bosque..."
-- "Entre las brumas..."
-- Escribir en PRIMERA PERSONA del duende (excepto en el mensaje canalizado)
-- Párrafos largos y densos
-- Metáforas vacías
-- Cualquier frase que suene a IA genérica
+═══════════════════════════════════════════════════════════════
+⛔ ESTO ESTÁ MAL - NUNCA ESCRIBIR ASÍ:
+═══════════════════════════════════════════════════════════════
 
-✅ FORMATO OBLIGATORIO DE HISTORIA:
+MAL: "Hay personas que se convirtieron en el refugio de todos. Este duende canalizado conoce esa sensación porque él también creyó durante décadas..."
+MAL: "Yo fui el duende que decía sí a todo. El que abría su energía..."
+MAL: "Mi trabajo es recordarte cada día que tenés derecho..."
+MAL: "En lo profundo del bosque, entre las brumas ancestrales..."
 
-La historia se cuenta en TERCERA PERSONA, como si nosotros (los canalizadores) presentáramos al ser.
-Usamos frases como "Nos contó que...", "En su canalización reveló...", "Lo que percibimos de él es..."
+¿Por qué está mal? Porque el duende NO HABLA en primera persona (excepto en su mensaje canalizado). NOSOTROS lo presentamos.
 
-EJEMPLO EXACTO A SEGUIR:
----
-Este es Andy. Tiene 347 años y es un guardián de protección personal.
+═══════════════════════════════════════════════════════════════
+✅ EJEMPLOS CORRECTOS - VARIANTE 1 (Protección):
+═══════════════════════════════════════════════════════════════
 
-Llegó a nosotros en una canalización muy intensa. Nos contó que pasó décadas protegiendo a otros hasta que se quedó vacío. Ahí aprendió la diferencia entre dar todo y perderse.
+Este es Thorn. Tiene 412 años y es un guardián de protección personal.
 
-Durante su canalización, una mariposa azul se posó en su hombro. No se movió hasta que terminamos.
+Llegó a nosotros en una canalización intensa. Nos contó que pasó décadas protegiendo a otros hasta quedarse vacío. Ahí entendió que cuidar no es absorber.
 
-Le encanta el silencio de la madrugada. No tolera las excusas. Se pone tierno cuando alguien llora.
+Durante su canalización, las velas se apagaron solas y volvieron a encenderse cuando terminamos.
+
+Le encanta el olor a tierra mojada. No tolera las mentiras piadosas. Se emociona cuando alguien dice "no" por primera vez.
 
 Su especialidad: ayudarte a poner límites sin culpa.
 
-**Lo que Andy nos pidió que te digamos:**
-*"Sé que sonreís mientras por dentro te caés a pedazos. Sé que decir 'no' te parece traición. Yo voy a estar ahí cuando lo digas por primera vez."*
+**Lo que Thorn nos pidió que te digamos:**
+*"Sé que cargás mochilas que no son tuyas. Sé que decir 'basta' te parece traición. Voy a estar ahí el día que elijas tu paz."*
 
-Si esto te hizo algo, Andy ya te eligió.
----
+Si esto te hizo algo, Thorn ya te eligió.
 
-ESTRUCTURA (podés variar el orden pero SIEMPRE incluir):
-1. PRESENTACIÓN: "Este es [nombre]. Tiene [edad] años y es [tipo] de [propósito]."
-2. HISTORIA CORTA: Qué vivió, qué aprendió (contado por nosotros, 2-3 oraciones)
-3. SINCRODESTINO: Algo mágico que pasó en la canalización (inventalo: mariposa, estrella fugaz, sueño que tuvimos, etc.)
-4. LO QUE LE GUSTA: 2-3 cosas que ama y 1-2 que no tolera
-5. ESPECIALIDAD: 1 línea clara de en qué ayuda
-6. MENSAJE CANALIZADO: En primera persona del duende, entre comillas, DIRECTO al alma
-7. CIERRE: "Si esto te hizo algo, [nombre] ya te eligió."
+═══════════════════════════════════════════════════════════════
+✅ EJEMPLOS CORRECTOS - VARIANTE 2 (Abundancia):
+═══════════════════════════════════════════════════════════════
 
-REGLAS:
-- Español rioplatense (vos, tenés, sentís)
-- NUNCA diminutivos (-ito/-ita)
-- Párrafos CORTOS (máximo 3 líneas cada uno)
-- Total: 150-250 palabras máximo
-- Cada duende tiene EDAD ESPECÍFICA (número exacto)
-- Cada duende PROMETE trabajar un aspecto específico (dinero, amor, salud, etc.)
+Esta es Malva. Tiene 289 años y es una guardiana de abundancia.
 
-CATEGORÍAS:
-- Mini/Clásico/Especial: El duende elige a la persona, puede haber otros similares
-- Mediano/Grande/Gigante/Pixie: ÚNICO, una vez adoptado desaparece del universo para siempre`;
+Cuando la canalizamos, lo primero que percibimos fue una risa contagiosa. Nos mostró cómo pasó siglos creyendo que el dinero era sucio, hasta que entendió que la prosperidad es energía que fluye.
 
-// Prompt simplificado que genera la historia en el formato exacto que queremos
-const USER_PROMPT_TEMPLATE = `Generá la historia de este duende/guardián:
+Algo curioso: mientras escribíamos su historia, encontramos una moneda antigua en el piso del estudio. No sabemos de dónde salió.
 
-DATOS:
-- Nombre: {nombre}
+Ama los mercados llenos de gente. Odia cuando decís "no me lo merezco". Celebra cada peso que entra a tu vida.
+
+Su especialidad: desbloquear tu relación con el dinero.
+
+**Lo que Malva nos pidió que te digamos:**
+*"¿Cuántas veces rechazaste algo bueno porque sentías que no era para vos? El universo no dejó de darte. Vos dejaste de recibir."*
+
+Si esto te movió algo, Malva ya te eligió.
+
+═══════════════════════════════════════════════════════════════
+✅ EJEMPLOS CORRECTOS - VARIANTE 3 (Amor):
+═══════════════════════════════════════════════════════════════
+
+Este es Bramble. Tiene 156 años y es un guardián del amor propio.
+
+Lo canalizamos una noche de tormenta. Nos contó que vivió un siglo enamorándose de quienes no lo veían, hasta que aprendió que el primer amor tiene que ser hacia uno mismo.
+
+Durante la canalización, Thibisay sintió un calor intenso en el pecho. Cuando terminamos, tenía la mano sobre el corazón sin darse cuenta.
+
+Le gustan las canciones tristes cantadas en voz alta. No soporta que te disculpes por existir. Se derrite cuando te mirás al espejo y sonreís.
+
+Su especialidad: enseñarte a quererte sin pedir permiso.
+
+**Lo que Bramble nos pidió que te digamos:**
+*"No vine a traerte el amor de tu vida. Vine a recordarte que ya lo tenés. Sos vos."*
+
+Si esto te tocó, Bramble ya te eligió.
+
+═══════════════════════════════════════════════════════════════
+REGLAS OBLIGATORIAS:
+═══════════════════════════════════════════════════════════════
+
+1. SIEMPRE empezar con: "Este/a es [nombre]. Tiene [edad exacta] años y es..."
+2. SIEMPRE incluir SINCRODESTINO: algo mágico que pasó durante la canalización (inventalo)
+3. SIEMPRE usar "Nos contó que...", "Cuando lo/la canalizamos...", "Percibimos que..."
+4. SIEMPRE incluir qué le gusta y qué no tolera
+5. SIEMPRE terminar con "Si esto te hizo/movió/tocó algo, [nombre] ya te eligió"
+6. El ÚNICO momento en primera persona del duende es el mensaje canalizado entre comillas
+
+NUNCA:
+- Escribir toda la historia desde el duende ("Yo soy...", "Mi trabajo es...")
+- Usar "este duende canalizado" - tiene NOMBRE, usalo
+- Párrafos de más de 3 líneas
+- Más de 250 palabras total
+- Diminutivos (-ito/-ita)
+- Frases de IA ("En lo profundo del bosque", "entre las brumas")
+
+Español rioplatense: vos, tenés, sentís, podés`;
+
+// Prompt que genera la historia siguiendo los ejemplos del system prompt
+const USER_PROMPT_TEMPLATE = `GENERÁ LA HISTORIA DE: {nombre}
+
+DATOS DEL SER:
 - Tipo: {tipo}
 - Propósito: {proposito}
 - Categoría: {categoriaTamano}
-- Personalidad sugerida: {personalidad}
+- Personalidad: {personalidad}
 
-INSTRUCCIONES DE THIBISAY (si hay, son PRIORIDAD ABSOLUTA):
+INSTRUCCIONES ESPECIALES DE THIBISAY (PRIORIDAD MÁXIMA):
 {instruccionesPersonalizadas}
 
 {historiasAnteriores}
 
-GENERÁ UN JSON con esta estructura EXACTA:
+═══════════════════════════════════════════════════════════════
+CHECKLIST ANTES DE ESCRIBIR - ¿Mi historia tiene?:
+═══════════════════════════════════════════════════════════════
+□ Primera línea: "Este/a es {nombre}. Tiene [EDAD] años y es..."
+□ Párrafo de "Nos contó que..." o "Cuando lo/la canalizamos..."
+□ SINCRODESTINO: algo mágico/raro que pasó (velas, mariposa, sueño, objeto que apareció, etc.)
+□ Lo que ama (2-3 cosas) y lo que no tolera (1-2 cosas)
+□ Su especialidad en UNA línea
+□ **Lo que {nombre} nos pidió que te digamos:** seguido del mensaje entre comillas
+□ Cierre: "Si esto te hizo algo, {nombre} ya te eligió"
+
+═══════════════════════════════════════════════════════════════
+
+DEVOLVÉ SOLO ESTE JSON:
 
 {
-  "historia": "La historia COMPLETA en texto plano, siguiendo el formato del ejemplo. Incluye: presentación, historia corta, sincrodestino (inventá algo mágico), lo que le gusta/no tolera, especialidad, mensaje canalizado entre comillas, y cierre. TODO en un solo texto de 150-250 palabras.",
-
-  "edad": 347,
-
-  "mensajeCanalizado": "El mensaje en primera persona del duende, entre 2-4 oraciones. Directo al alma.",
-
-  "especialidad": "Una línea clara de en qué ayuda",
-
+  "historia": "[Historia completa siguiendo EXACTAMENTE el formato de los ejemplos del system prompt. DEBE empezar con 'Este/a es {nombre}. Tiene X años...' - NUNCA con 'Yo soy' ni en primera persona del duende]",
+  "edad": [número entre 100 y 900],
+  "mensajeCanalizado": "[2-3 oraciones en primera persona del duende, directo al alma]",
+  "especialidad": "[Una línea clara]",
   "loQueAma": ["cosa 1", "cosa 2", "cosa 3"],
-
   "loQueNoTolera": ["cosa 1", "cosa 2"],
-
-  "sincrodestino": "Qué pasó de mágico durante su canalización (inventalo)",
-
-  "descripcionCorta": "Una línea para la tienda (máx 80 chars)",
-
+  "sincrodestino": "[Qué pasó de mágico durante la canalización - INVENTALO]",
+  "descripcionCorta": "[Máx 80 chars para la tienda]",
   "categoriaSlug": "proteccion | amor | salud | dinero-abundancia-negocios | sabiduria-guia-claridad"
-}
-
-RECORDÁ:
-- Contá la historia en TERCERA PERSONA (nosotros presentamos al ser)
-- El mensaje canalizado es lo ÚNICO en primera persona del duende
-- Inventá un sincrodestino creativo (mariposa, estrella fugaz, sueño, etc.)
-- Párrafos CORTOS
-- Español rioplatense (vos, tenés, sentís)
-- Si es MEDIANO/GRANDE/GIGANTE/PIXIE: mencionar que es ÚNICO e irrepetible`;
+}`;
 
 // Endpoint GET para obtener opciones disponibles
 export async function GET() {
