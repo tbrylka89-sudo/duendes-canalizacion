@@ -1784,9 +1784,9 @@ add_action('wp_ajax_duendes_guardar_seo', function() {
     }
 
     // Guardar los campos de Rank Math
-    $seo_title = sanitize_text_field($_POST['seo_title'] ?? '');
-    $seo_description = sanitize_text_field($_POST['seo_description'] ?? '');
-    $focus_keyword = sanitize_text_field($_POST['focus_keyword'] ?? '');
+    $seo_title = isset($_POST['seo_title']) ? sanitize_text_field($_POST['seo_title']) : '';
+    $seo_description = isset($_POST['seo_description']) ? sanitize_text_field($_POST['seo_description']) : '';
+    $focus_keyword = isset($_POST['focus_keyword']) ? sanitize_text_field($_POST['focus_keyword']) : '';
 
     if ($seo_title) {
         update_post_meta($post_id, 'rank_math_title', $seo_title);

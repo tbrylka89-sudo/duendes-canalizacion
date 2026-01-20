@@ -14,6 +14,7 @@ import {
   recomendarGuardianes,
   formatearPrecio,
   detectarPaisDeMensaje,
+  ejemplosSeña,
   FAQ,
   INFO_EMPRESA,
   PRECIOS_URUGUAY
@@ -319,20 +320,29 @@ ${info.tracking ? `- Tracking: ${info.tracking}` : '- Tracking: Aún no disponib
     }
   }
 
-  // Si tiene objeción de precio
+  // Si tiene objeción de precio - USAR LA SEÑA
   if (intencion.objecionPrecio) {
-    contexto += `\n\n💰 OBJECIÓN DE PRECIO DETECTADA
-Técnicas a usar:
+    const paisParaSeña = paisFinal || 'US';
+    contexto += `\n\n💰 OBJECIÓN DE PRECIO - HORA DE LA SEÑA:
+${ejemplosSeña(paisParaSeña)}
+
+Técnicas:
 1. "¿Caro comparado con qué? ¿Con la paz mental?"
 2. "Son días de trabajo artesanal, cristales reales, pieza única"
-3. "Con el 30% ($21 en un mini) lo reservás 30 días"
-4. "Cuando se va, no vuelve. Es ahora o nunca."`;
+3. USÁS LA SEÑA: "Mirá, con [MONTO ESPECÍFICO] lo reservás 30 días y pagás el resto cuando puedas"
+4. "Cuando se va, no vuelve. Es ahora o nunca."
+
+SÉ ESPECÍFICO con el monto de seña. Decí el número en plata, no solo "30%".`;
   }
 
-  // Si se quiere ir
+  // Si se quiere ir o duda - USAR LA SEÑA
   if (intencion.quiereIrse && !intencion.esSaludo) {
-    contexto += `\n\n🚨 SE QUIERE IR - Usá el closer:
-"Antes de que te vayas... este guardián ya te eligió. Con el 30% lo asegurás."`;
+    const paisParaSeña = paisFinal || 'US';
+    contexto += `\n\n🚨 SE QUIERE IR - USÁS LA SEÑA COMO CIERRE:
+${ejemplosSeña(paisParaSeña)}
+
+Decí algo como: "Antes de irte... con [MONTO ESPECÍFICO] lo reservás 30 días. Si no, mañana capaz ya no está."
+SÉ ESPECÍFICO con el monto, no digas solo "30%".`;
   }
 
   // Si está nervioso
