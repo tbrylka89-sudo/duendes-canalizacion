@@ -69,7 +69,10 @@ function detectarIntencion(mensaje) {
     paisMencionado: detectarPais(msg),
 
     // Pregunta por precio
-    preguntaPrecio: /precio|cuánto|cuanto|cuesta|vale|cost|plata|pesos|dólares|dolares/i.test(msg),
+    preguntaPrecio: /precio|cuánto|cuanto|cuesta|vale|cost|plata|pesos|dólares|dolares|valor/i.test(msg),
+
+    // PIDE ESPECÍFICAMENTE EN DÓLARES
+    pideEnDolares: /en d[oó]l|en usd|en us\$|dls|dolares|d[oó]lares/i.test(msg),
 
     // QUIERE PAGAR - MOMENTO DE CIERRE
     quierePagar: /pagar|pago|comprar|compro|lo quiero|me lo llevo|c[oó]mo pago|quiero ese|transferencia|mercado pago|tarjeta|western|moneygram|link de pago/i.test(msg),
@@ -234,9 +237,19 @@ async function construirContexto(mensaje, intencion, datos) {
   }
 
   // PAÍS Y PRECIOS
-  if (paisFinal) {
+  // Si pide específicamente en dólares, responder en dólares
+  if (intencion.pideEnDolares) {
+    contexto += `\n\n💵 PIDIÓ PRECIO EN DÓLARES - RESPONDÉ EN USD:
+- Mini: $70 USD
+- Mediano Especial: $150 USD
+- Mediano Maestros Místicos: $200 USD
+- Grande Especial: $300 USD
+- Grande Maestros Místicos: $450 USD
+
+⚠️ La persona PIDIÓ EN DÓLARES. NO le des pesos uruguayos.`;
+  } else if (paisFinal) {
     // Ya sabemos el país - dar formato de moneda
-    if (paisFinal === 'UY') {
+    if (paisFinal === 'UY' && !intencion.pideEnDolares) {
       // URUGUAY: Precios FIJOS en pesos uruguayos
       contexto += `\n\n💰 ES DE URUGUAY - PRECIOS EN PESOS URUGUAYOS:
 ${PRECIOS_URUGUAY.listaCompleta}
