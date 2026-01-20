@@ -145,6 +145,7 @@ function detectarPreguntaFAQ(msg) {
   if (/garant[ií]a|roto|da[ñn]ado|devoluci[oó]n/i.test(msg)) return 'garantia';
   if (/visita|conocer|ir|piri[aá]polis/i.test(msg)) return 'visitas';
   if (/canaliza|mensaje|energ[ií]a/i.test(msg)) return 'canalizacion';
+  if (/reventa|revender|mayorista|mayor|por mayor|distribu|tienda|negocio.*vender|vender.*negocio/i.test(msg)) return 'reventa';
   return null;
 }
 
