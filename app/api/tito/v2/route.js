@@ -69,7 +69,14 @@ function detectarIntencion(mensaje) {
     paisMencionado: detectarPais(msg),
 
     // Pregunta por precio
-    preguntaPrecio: /precio|cuánto|cuanto|cuesta|vale|cost|plata|pesos|dólares|dolares/i.test(msg)
+    preguntaPrecio: /precio|cuánto|cuanto|cuesta|vale|cost|plata|pesos|dólares|dolares/i.test(msg),
+
+    // QUIERE PAGAR - MOMENTO DE CIERRE
+    quierePagar: /pagar|pago|comprar|compro|lo quiero|me lo llevo|c[oó]mo pago|quiero ese|transferencia|mercado pago|tarjeta|western|moneygram|link de pago/i.test(msg),
+
+    // Ya dio datos de contacto
+    daDireccion: /calle|avenida|av\.|direcci[oó]n|vivo en|domicilio/i.test(msg),
+    daTelefono: /\+?\d{7,}|tel[eé]fono|celular|whatsapp/i.test(msg)
   };
 }
 
@@ -351,6 +358,30 @@ SÉ ESPECÍFICO con el monto, no digas solo "30%".`;
 1. Validá: "Entiendo perfectamente"
 2. Calmá: "Dejame revisar qué está pasando"
 3. Si no podés resolver: "Le paso tu mensaje al equipo ahora mismo"`;
+  }
+
+  // QUIERE PAGAR - MOMENTO DE CIERRE
+  if (intencion.quierePagar) {
+    contexto += `\n\n💳 ¡QUIERE PAGAR! - ESTE ES TU CIERRE:
+
+OPCIONES DE PAGO:
+• EXTERIOR: Link de pago (Visa/Mastercard), Western Union, MoneyGram
+• URUGUAY: Transferencia bancaria, Mercado Pago, Link de pago Handy
+
+ANTES DE DERIVAR, PEDÍ ESTOS DATOS:
+"¡Genial! Para coordinar el pago y envío necesito:
+- Nombre y apellido completo
+- País
+- Dirección completa (calle, número, ciudad)
+- Código postal
+- Teléfono con código de país
+- Email"
+
+UNA VEZ QUE TENÉS LOS DATOS:
+"Perfecto, te derivo con el equipo para coordinar el pago 💚"
+
+⚠️ NO inventes datos de cuentas ni links. Solo recopilás info y derivás.
+⚠️ SÉ CLARO Y DIRECTO. Nada de dar vueltas.`;
   }
 
   return contexto;
