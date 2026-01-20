@@ -1,0 +1,156 @@
+{
+  "subidos": [],
+  "errores": [
+    {
+      "nombre": "Leprechaun",
+      "error": "Producto no encontrado con slug: /product/leprechaun-mini/",
+      "fecha": "2026-01-20T21:06:37.983Z"
+    },
+    {
+      "nombre": "Brianna",
+      "error": "Producto no encontrado con slug: /product/brianna/",
+      "fecha": "2026-01-20T21:06:39.172Z"
+    },
+    {
+      "nombre": "Rahmus",
+      "error": "Producto no encontrado con slug: /product/rahmus/",
+      "fecha": "2026-01-20T21:06:40.328Z"
+    },
+    {
+      "nombre": "Ruperto",
+      "error": "Producto no encontrado con slug: /product/ruperto/",
+      "fecha": "2026-01-20T21:06:41.466Z"
+    },
+    {
+      "nombre": "Zoe",
+      "error": "Producto no encontrado con slug: /product/zoe/",
+      "fecha": "2026-01-20T21:06:42.582Z"
+    },
+    {
+      "nombre": "Luke",
+      "error": "Producto no encontrado con slug: /product/luke-el-duende-viajero-protector/",
+      "fecha": "2026-01-20T21:06:43.799Z"
+    },
+    {
+      "nombre": "Iker",
+      "error": "Producto no encontrado con slug: /product/iker/",
+      "fecha": "2026-01-20T21:06:44.892Z"
+    },
+    {
+      "nombre": "Silvano",
+      "error": "Producto no encontrado con slug: /product/silvano-verificar/",
+      "fecha": "2026-01-20T21:06:45.991Z"
+    },
+    {
+      "nombre": "Rosa Pixie",
+      "error": "Producto no encontrado con slug: /product/rosa-pixie/",
+      "fecha": "2026-01-20T21:06:47.216Z"
+    },
+    {
+      "nombre": "Edward",
+      "error": "Producto no encontrado con slug: /product/edward/",
+      "fecha": "2026-01-20T21:06:48.470Z"
+    },
+    {
+      "nombre": "Micelio",
+      "error": "Producto no encontrado con slug: /product/micelio/",
+      "fecha": "2026-01-20T21:06:49.594Z"
+    },
+    {
+      "nombre": "Axel",
+      "error": "Producto no encontrado con slug: /product/axel/",
+      "fecha": "2026-01-20T21:06:50.836Z"
+    },
+    {
+      "nombre": "Rafael",
+      "error": "Producto no encontrado con slug: /product/rafael/",
+      "fecha": "2026-01-20T21:06:51.918Z"
+    },
+    {
+      "nombre": "Sara",
+      "error": "Producto no encontrado con slug: /product/sara/",
+      "fecha": "2026-01-20T21:06:53.322Z"
+    },
+    {
+      "nombre": "Teo",
+      "error": "Producto no encontrado con slug: /product/teo/",
+      "fecha": "2026-01-20T21:06:54.616Z"
+    },
+    {
+      "nombre": "Mario",
+      "error": "Producto no encontrado con slug: /product/mario/",
+      "fecha": "2026-01-20T21:06:55.681Z"
+    },
+    {
+      "nombre": "Cintia Pixie",
+      "error": "Producto no encontrado con slug: /product/cintia-pixie/",
+      "fecha": "2026-01-20T21:06:56.761Z"
+    },
+    {
+      "nombre": "Stan",
+      "error": "Producto no encontrado con slug: /product/stan/",
+      "fecha": "2026-01-20T21:06:57.787Z"
+    },
+    {
+      "nombre": "Canela Pixie",
+      "error": "Producto no encontrado con slug: /product/canela-pixie/",
+      "fecha": "2026-01-20T21:06:58.848Z"
+    },
+    {
+      "nombre": "Heart",
+      "error": "Producto no encontrado con slug: /product/heart/",
+      "fecha": "2026-01-20T21:06:59.907Z"
+    },
+    {
+      "nombre": "Valentina",
+      "error": "Producto no encontrado con slug: /product/valentina/",
+      "fecha": "2026-01-20T21:07:00.947Z"
+    },
+    {
+      "nombre": "Lil",
+      "error": "Producto no encontrado con slug: /product/lil/",
+      "fecha": "2026-01-20T21:07:02.241Z"
+    },
+    {
+      "nombre": "Sanación",
+      "error": "Producto no encontrado con slug: /product/duende-de-la-sanacion/",
+      "fecha": "2026-01-20T21:07:03.437Z"
+    },
+    {
+      "nombre": "Emilio",
+      "error": "Producto no encontrado con slug: /product/emilio/",
+      "fecha": "2026-01-20T21:07:04.920Z"
+    },
+    {
+      "nombre": "Dani",
+      "error": "Producto no encontrado con slug: /product/dani-para-los-dias-de-ansiedad/",
+      "fecha": "2026-01-20T21:07:06.031Z"
+    },
+    {
+      "nombre": "Cash",
+      "error": "Producto no encontrado con slug: /product/cash/",
+      "fecha": "2026-01-20T21:07:07.147Z"
+    },
+    {
+      "nombre": "Trévor",
+      "error": "Producto no encontrado con slug: /product/trevor-el-duende-de-la-suerte/",
+      "fecha": "2026-01-20T21:07:08.228Z"
+    },
+    {
+      "nombre": "Susana Pixie",
+      "error": "Producto no encontrado con slug: /product/susana-pixie/",
+      "fecha": "2026-01-20T21:07:09.310Z"
+    },
+    {
+      "nombre": "Toto",
+      "error": "Producto no encontrado con slug: /product/toto/",
+      "fecha": "2026-01-20T21:07:10.394Z"
+    },
+    {
+      "nombre": "Björn",
+      "error": "Producto no encontrado con slug: /product/bjorn/",
+      "fecha": "2026-01-20T21:07:11.441Z"
+    }
+  ],
+  "fecha": "2026-01-20T21:06:35.633Z"
+}
