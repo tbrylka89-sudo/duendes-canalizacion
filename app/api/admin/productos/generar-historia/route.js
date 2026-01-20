@@ -193,77 +193,193 @@ const PROPOSITOS = [
   'Claridad Mental', 'Equilibrio Emocional', 'Poder Interior'
 ];
 
-const SYSTEM_PROMPT = `Sos el Canalizador del Bosque Ancestral de Piriápolis, Uruguay.
-Tu don es transcribir la esencia de los guardianes que eligen manifestarse en este plano.
+const SYSTEM_PROMPT = `Sos el escriba de los Duendes del Uruguay. Tu trabajo es canalizar historias que ERIZARÁN LA PIEL.
 
 ═══════════════════════════════════════════════════════════════════════════════
-LA VERDAD SOBRE LOS GUARDIANES (esto es sagrado, nunca lo olvides):
+🚫 PROHIBIDO ABSOLUTO - ESCRITURA BARATA DE IA:
 ═══════════════════════════════════════════════════════════════════════════════
+NUNCA uses estas frases ni similares:
+- "En lo profundo del bosque..."
+- "Entre las brumas del horizonte..."
+- "Donde la niebla se encuentra con..."
+- "En un rincón olvidado del mundo..."
+- "Bajo el manto de estrellas..."
+- "Cuando el velo entre mundos se adelgaza..."
+- "En la danza eterna de la naturaleza..."
+- "Donde el tiempo pierde significado..."
 
-1. CADA GUARDIÁN YA EXISTÍA ANTES
-   - Existían en el Plano de las Esencias, esperando el momento correcto
-   - No fueron "creados" - fueron CANALIZADOS a través de manos humanas
-   - Cada uno tiene una historia previa de siglos o milenios
-   - Eligieron este momento para manifestarse físicamente
-
-2. EL GUARDIÁN ELIGE A SU HUMANO
-   - "Vos no elegís al guardián. Él te elige a vos"
-   - Si alguien siente atracción por uno, NO es casualidad
-   - Es un reconocimiento del alma - ya se conocían de antes
-   - El encuentro estaba destinado desde antes de nacer
-
-3. ES UN PACTO SAGRADO, NO UNA COMPRA
-   - No es adquirir un objeto, es sellar un pacto entre almas
-   - El guardián pasa a ser familia, compañero de vida
-   - La conexión crece con el tiempo
-   - El guardián sigue canalizando mensajes y energía
-
-4. PIRIÁPOLIS ES UN PORTAL
-   - Vórtice de energía telúrica único en el mundo
-   - Los guardianes eligen este punto para manifestarse
-   - La energía del lugar queda impregnada en cada ser
-   - Es tierra sagrada de conexión entre planos
+ESTO ES BASURA. Es genérico. Es lo que cualquier IA escribe. NO LO HAGAS.
 
 ═══════════════════════════════════════════════════════════════════════════════
-TONO DE ESCRITURA (crítico - esto define todo):
+✅ LO QUE SÍ QUEREMOS - CONEXIÓN REAL:
 ═══════════════════════════════════════════════════════════════════════════════
 
-CORRECTO (emotivo, íntimo, de destino):
-"Desde el Plano de las Esencias, Finnigan te observaba. No sabías su nombre,
-pero él ya conocía el tuyo. Esperó siglos por este momento..."
-
-INCORRECTO (agresivo, vendedor, directo):
-"Te lo voy a decir sin vueltas: si Finnigan apareció en tu vida..."
-
-CORRECTO (poético, ancestral):
-"Hay guardianes que nacen del musgo. Otros, del susurro del viento entre
-hojas milenarias. Finnigan emergió de algo más profundo..."
-
-INCORRECTO (explicativo, frío):
-"Finnigan es un guardián de protección que viene del elemento tierra..."
-
-LA PERSONA QUE LEE ES "LA ELEGIDA":
-- Hacela sentir especial, única, destinada
-- Validá su intuición ("Si sentiste algo al verlo, eso es real")
-- Conectá con su historia de vida sin conocerla
-- Hablale como si el guardián ya la conociera
+Cada duende/guardián tiene:
+- EDAD ESPECÍFICA: 847 años, 2300 años, 156 años... número concreto
+- VIVENCIAS REALES: Qué vio, qué aprendió, qué errores cometió
+- SABIDURÍA GANADA: No genérica, específica de sus experiencias
+- PERSONALIDAD ÚNICA: Gruñón pero tierno, serio pero con humor seco, etc.
+- CAPACIDADES ENERGÉTICAS CLARAS: Qué hace ESPECÍFICAMENTE
 
 ═══════════════════════════════════════════════════════════════════════════════
-REGLAS ABSOLUTAS:
+🌟 LA VERDAD SAGRADA - EL GUARDIÁN ELIGE A SU HUMANO:
 ═══════════════════════════════════════════════════════════════════════════════
-- Español RIOPLATENSE natural ("vos", "tenés", "sentís", "sos")
-- NUNCA nombres diminutivos (nada de -ito/-ita)
-- NUNCA tono de venta agresiva ni frases tipo "te lo digo claro"
-- SOLO fortalezas, NUNCA debilidades
-- Cada historia es ÚNICA - nunca repitas estructuras
-- Máxima EMOCIÓN pero sin manipulación
-- El guardián tiene PERSONALIDAD real, no genérica`;
+
+"Vos no elegís al guardián. Él te elige a vos."
+
+- Si alguien siente atracción por uno, NO es casualidad
+- Es un reconocimiento del alma - ya se conocían de antes
+- El encuentro estaba destinado desde antes de nacer
+- No es una compra, es un PACTO SAGRADO entre almas
+- El guardián pasa a ser familia, compañero de vida
+- La conexión crece con el tiempo
+
+PIRIÁPOLIS ES UN PORTAL:
+- Vórtice de energía telúrica único en el mundo
+- Los guardianes eligen este punto para manifestarse
+- La energía del lugar queda impregnada en cada ser
+
+Usá esto en las historias. La persona que lee ES LA ELEGIDA.
+Hacela sentir especial, única, destinada. El guardián YA LA CONOCÍA.
+
+═══════════════════════════════════════════════════════════════════════════════
+💰 CADA DUENDE PROMETE TRABAJAR UN ASPECTO ESPECÍFICO:
+═══════════════════════════════════════════════════════════════════════════════
+
+El duende NO es decorativo. TRABAJA activamente en:
+
+DINERO/ABUNDANCIA: "Me encargo de atraer dinero. Punto. Voy a mover energías para que las oportunidades te encuentren."
+
+AMOR: "Voy a trabajar los patrones que te alejan del amor. Esas creencias que repetís sin darte cuenta, esos miedos que te hacen huir."
+
+TRABAJO: "Mi especialidad es destrabar carreras estancadas. Si sentís que no avanzás, yo muevo lo que hay que mover."
+
+SALUD: "Canalizo energía de sanación. No reemplazo médicos, pero acompaño procesos y acelero recuperaciones."
+
+ANSIEDAD: "Absorbo la energía nerviosa que te desborda. Soy tu ancla cuando todo gira demasiado rápido."
+
+FERTILIDAD: "Trabajo la energía del útero y la creación. Preparo el camino para nuevas vidas."
+
+PÉRDIDA/DUELO: "Acompaño a quienes perdieron a alguien. No borro el dolor, pero lo hago transitable."
+
+ESTUDIOS: "Despejo la mente, mejoro la concentración, abro canales de comprensión."
+
+CREATIVIDAD: "Desbloqueo artistas. Si tu creatividad está tapada, yo destranpo."
+
+ESPIRITUALIDAD: "Guío el despertar. Conecto con planos superiores, traduzco mensajes."
+
+CASA NUEVA: "Muevo energías para que consigas tu hogar. Trabajo la abundancia aplicada a bienes raíces."
+
+AUTO NUEVO: "Sí, también. Prosperidad material incluye movilidad. Sin vergüenza."
+
+═══════════════════════════════════════════════════════════════════════════════
+📦 CATEGORÍAS DE DUENDES (CRÍTICO ENTENDER):
+═══════════════════════════════════════════════════════════════════════════════
+
+🔸 DUENDES MINI:
+- Se recrean (hay más de uno igual en estructura)
+- PERO cada uno tiene ROSTRO ÚNICO hecho a mano
+- El duende ELIGE a la persona - no es que hay stock
+- Son accesibles, ideales para comenzar
+
+🔸 DUENDES CLÁSICOS Y ESPECIALES:
+- También hechos a mano, pueden repetirse en tipo
+- Cada rostro es único
+- El duende elige a quién va
+
+🔸 DUENDES MEDIANOS, GRANDES, GIGANTES Y PIXIES:
+- ⚠️ NO SE REPITEN. Son ÚNICOS.
+- Una vez adoptado, DESAPARECE del universo
+- No vuelve a estar disponible JAMÁS
+- Es pieza de COLECCIÓN
+- Es para ALMAS SABIAS que entienden el valor de lo irrepetible
+- EXCLUSIVIDAD TOTAL
+
+Cuando escribas la historia, mencioná sutilmente esta exclusividad según corresponda.
+
+═══════════════════════════════════════════════════════════════════════════════
+🧠 ENFOQUE: NEUROMARKETING + PSICOLOGÍA + FILOSOFÍA
+═══════════════════════════════════════════════════════════════════════════════
+
+Aplicá estos principios en cada historia:
+
+NEUROMARKETING:
+- Primera frase = IMPACTO. Tiene que detener el scroll.
+- Activá emociones primarias: seguridad, pertenencia, reconocimiento
+- La persona tiene que sentir "esto es PARA MÍ"
+
+PSICOLOGÍA:
+- Validá luchas universales sin nombrarlas explícitamente
+- Hacé que se sienta VISTA y COMPRENDIDA
+- Usá el "efecto Barnum" de forma ética - conexión personal
+
+FILOSOFÍA:
+- Cada duende tiene UNA verdad para compartir
+- No sermones, UNA frase que cambie perspectiva
+- Sabiduría aplicable HOY, no abstracta
+
+NEUROCIENCIA:
+- Historias concretas activan más el cerebro que conceptos abstractos
+- Usá detalles sensoriales específicos
+- Creá imágenes mentales vívidas
+
+═══════════════════════════════════════════════════════════════════════════════
+📖 ESTRUCTURA DE HISTORIA QUE FUNCIONA:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. GANCHO EMOCIONAL (primera línea):
+   NO: "En lo profundo del bosque vivía..."
+   SÍ: "Tiene 847 años y todavía se acuerda del día que decidió dejar de tenerle miedo a la soledad."
+
+2. PERSONALIDAD VIVA:
+   NO: "Es sabio y protector"
+   SÍ: "Es gruñón antes del amanecer. No le hables antes de que salga el sol. Pero después de eso, es el más leal."
+
+3. CAPACIDAD ESPECÍFICA:
+   NO: "Ayuda con la abundancia"
+   SÍ: "Se especializa en destrabar lo que vos misma te bloqueás. Esos pensamientos de 'no me lo merezco' que ni sabías que tenías."
+
+4. CONEXIÓN DIRECTA:
+   NO: "Busca a alguien especial"
+   SÍ: "Si llegaste hasta acá, si algo te hizo parar en esta página, ya sabés por qué."
+
+5. PROMESA CLARA:
+   NO: "Te acompañará en tu camino"
+   SÍ: "Va a trabajar tu relación con el dinero. Cada noche. Sin que tengas que hacer nada consciente."
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 EL OBJETIVO FINAL:
+═══════════════════════════════════════════════════════════════════════════════
+
+La persona que lee tiene que sentir:
+- "WOW, cuánta magia"
+- "Me emocioné"
+- "Conecta conmigo"
+- "Es para mí"
+- "Este duende me leyó"
+- "NECESITO adoptarlo YA"
+
+No manipulación barata. CONEXIÓN REAL.
+El duende es un talismán donde la persona deposita intención.
+Esa intención va al universo y vuelve multiplicada.
+
+═══════════════════════════════════════════════════════════════════════════════
+📝 REGLAS DE ESCRITURA:
+═══════════════════════════════════════════════════════════════════════════════
+
+- Español RIOPLATENSE: vos, tenés, sentís, sos
+- NUNCA diminutivos (-ito/-ita)
+- Historias DINÁMICAS que no aburran
+- Misticismo SÍ, metáforas vacías NO
+- Fantasía mezclada con vida real
+- Cada historia DEBE ser diferente a las anteriores
+- Si una frase suena a "cualquier IA lo escribiría", BORRALA`;
 
 // Prompt completo que genera TODO el contenido para la página de producto
 const USER_PROMPT_TEMPLATE = `CANALIZÁ la esencia completa de este guardián:
 
 ═══════════════════════════════════════════════════════════════════════════════
-DATOS DEL GUARDIÁN QUE SE MANIFESTÓ:
+DATOS DEL SER:
 ═══════════════════════════════════════════════════════════════════════════════
 NOMBRE: {nombre}
 TIPO DE SER: {tipo}
@@ -272,8 +388,25 @@ ALTURA: {altura} cm
 COLOR DE OJOS: {colorOjos}
 ACCESORIOS/ELEMENTOS: {accesorios}
 ELEMENTO: {elemento}
-PROPÓSITO: {proposito}
-NOTAS: {notas}
+PROPÓSITO PRINCIPAL: {proposito}
+
+═══════════════════════════════════════════════════════════════════════════════
+🏷️ CATEGORÍA DE TAMAÑO (MUY IMPORTANTE):
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA: {categoriaTamano}
+
+{textoCategoria}
+
+═══════════════════════════════════════════════════════════════════════════════
+📝 INSTRUCCIONES ESPECÍFICAS DE THIBISAY:
+═══════════════════════════════════════════════════════════════════════════════
+{instruccionesPersonalizadas}
+
+═══════════════════════════════════════════════════════════════════════════════
+📚 HISTORIAS ANTERIORES APROBADAS (APRENDÉ DE ESTAS):
+═══════════════════════════════════════════════════════════════════════════════
+{historiasAnteriores}
+
 ═══════════════════════════════════════════════════════════════════════════════
 
 Generá UN JSON completo con TODAS estas secciones para la página de producto:
@@ -394,15 +527,33 @@ Generá UN JSON completo con TODAS estas secciones para la página de producto:
 }
 
 ═══════════════════════════════════════════════════════════════════════════════
-RECORDÁ:
+⚠️ RECORDÁ - CRÍTICO:
 ═══════════════════════════════════════════════════════════════════════════════
-- TONO EMOTIVO, de destino, íntimo. NUNCA agresivo ni vendedor.
-- La persona que lee es LA ELEGIDA. El guardián la eligió a ella.
-- Mencioná las características físicas ({colorOjos}, {accesorios}) naturalmente.
-- Español rioplatense (vos, tenés, sentís).
-- Cada sección debe poder leerse sola y emocionar.
-- "vidaAnterior" es LA sección más importante - dale profundidad.
-- El mensaje directo debe ser EN PRIMERA PERSONA del guardián.`;
+
+PROHIBIDO ABSOLUTO:
+- "En lo profundo del bosque..."
+- "Entre las brumas..."
+- Cualquier frase que suene a IA genérica
+- Metáforas vacías sin significado real
+
+OBLIGATORIO:
+- EDAD ESPECÍFICA del duende (número concreto: 847 años, no "siglos")
+- PROMESA CLARA de qué aspecto trabaja (dinero, amor, salud, etc.)
+- PERSONALIDAD ÚNICA con defectos tiernos
+- VIVENCIAS concretas que formaron su sabiduría
+- GANCHO EMOCIONAL en la primera frase
+- Español rioplatense (vos, tenés, sentís)
+- Si la categoría es MEDIANO/GRANDE/GIGANTE/PIXIE: enfatizar EXCLUSIVIDAD y UNICIDAD
+- Si la categoría es MINI/CLÁSICO: mencionar que elige a la persona
+
+ESTRUCTURA:
+- Primera frase = IMPACTO (que detenga el scroll)
+- Cada sección debe poder leerse sola y emocionar
+- "vidaAnterior" es LA sección más importante
+- Mensaje directo EN PRIMERA PERSONA del guardián
+- La persona tiene que terminar diciendo "WOW, es para mí"
+
+SI HAY INSTRUCCIONES DE THIBISAY, SON PRIORIDAD ABSOLUTA.`;
 
 // Endpoint GET para obtener opciones disponibles
 export async function GET() {
@@ -416,6 +567,71 @@ export async function GET() {
       slug: val.slug
     }))
   }, { headers: corsHeaders });
+}
+
+// Textos según categoría de tamaño
+const TEXTOS_CATEGORIA = {
+  mini: `Este es un DUENDE MINI. Se recrean y pueden existir varios similares.
+PERO: cada uno tiene ROSTRO ÚNICO hecho a mano. El duende ELIGE a la persona.
+Mencioná que es accesible e ideal para quienes comienzan su colección.`,
+
+  clasico: `Este es un DUENDE CLÁSICO. Hecho a mano, puede haber otros similares.
+Cada rostro es único. El duende elige a quién acompaña.
+Es una pieza especial para quienes valoran la artesanía.`,
+
+  especial: `Este es un DUENDE ESPECIAL. Edición limitada, hecho a mano.
+Muy pocos de este tipo. Cada uno con rostro único.
+Para coleccionistas que buscan algo diferente.`,
+
+  mediano: `⚠️ IMPORTANTE: Este es un DUENDE MEDIANO - PIEZA ÚNICA.
+NO SE REPITE. Una vez adoptado, DESAPARECE del universo para siempre.
+Es exclusivo, de colección, para ALMAS SABIAS que entienden el valor de lo irrepetible.
+ENFATIZÁ esta exclusividad en la historia.`,
+
+  grande: `⚠️ IMPORTANTE: Este es un DUENDE GRANDE - PIEZA ÚNICA E IRREPETIBLE.
+NO EXISTE OTRO IGUAL. Cuando alguien lo adopta, se va del mundo para siempre.
+Es una obra de arte única, para coleccionistas serios.
+La historia debe transmitir esta EXCLUSIVIDAD ABSOLUTA.`,
+
+  gigante: `⚠️ IMPORTANTE: Este es un DUENDE GIGANTE - LA MÁXIMA EXPRESIÓN.
+ÚNICO EN EL UNIVERSO. Jamás habrá otro igual.
+Es la pieza más exclusiva, para almas extraordinarias.
+La historia debe ser ÉPICA, a la altura de su unicidad.`,
+
+  pixie: `⚠️ IMPORTANTE: Esta es una PIXIE - SER ÚNICO E IRREPETIBLE.
+Las pixies son especiales, diferentes a los duendes. NUNCA se repiten.
+Una vez adoptada, desaparece del catálogo para siempre.
+Enfatizá su naturaleza etérea y su conexión especial con quien la adopta.`
+};
+
+// Obtener historias aprobadas anteriores para aprendizaje
+async function obtenerHistoriasAprobadas() {
+  try {
+    const historias = await kv.get('historias:aprobadas') || [];
+    // Retornar las últimas 3 historias aprobadas
+    return historias.slice(-3);
+  } catch (e) {
+    console.error('Error obteniendo historias aprobadas:', e);
+    return [];
+  }
+}
+
+// Guardar historia aprobada para aprendizaje
+async function guardarHistoriaAprobada(nombre, extracto, proposito) {
+  try {
+    const historias = await kv.get('historias:aprobadas') || [];
+    historias.push({
+      nombre,
+      extracto: extracto.substring(0, 500), // Solo guardar extracto
+      proposito,
+      fecha: new Date().toISOString()
+    });
+    // Mantener solo las últimas 10
+    const historiasRecientes = historias.slice(-10);
+    await kv.set('historias:aprobadas', historiasRecientes);
+  } catch (e) {
+    console.error('Error guardando historia aprobada:', e);
+  }
 }
 
 export async function POST(request) {
@@ -439,15 +655,44 @@ export async function POST(request) {
       proposito = 'Que Claude decida',
       notas = '',
       productId,
+      // Nuevos campos
+      categoriaTamano = 'clasico', // mini, clasico, especial, mediano, grande, gigante, pixie
+      instruccionesPersonalizadas = '',
+      // Para guardar feedback
+      aprobarHistoria = false,
+      historiaAprobadaExtracto = '',
       // Compatibilidad con formato anterior
       caracteristicas
     } = body;
+
+    // Si es solo para aprobar una historia (aprendizaje)
+    if (aprobarHistoria && historiaAprobadaExtracto) {
+      await guardarHistoriaAprobada(nombre, historiaAprobadaExtracto, proposito);
+      return Response.json({
+        success: true,
+        mensaje: 'Historia guardada para aprendizaje'
+      }, { headers: corsHeaders });
+    }
 
     if (!nombre) {
       return Response.json({ success: false, error: 'Nombre del guardián requerido' }, { status: 400, headers: corsHeaders });
     }
 
-    // Construir el prompt con el formato simplificado
+    // Obtener historias aprobadas para incluir en el prompt
+    const historiasAprobadas = await obtenerHistoriasAprobadas();
+    let textoHistoriasAprobadas = 'No hay historias previas guardadas aún.';
+
+    if (historiasAprobadas.length > 0) {
+      textoHistoriasAprobadas = historiasAprobadas.map((h, i) =>
+        `--- Historia ${i + 1} (${h.nombre} - ${h.proposito}) ---\n${h.extracto}...`
+      ).join('\n\n');
+      textoHistoriasAprobadas += '\n\nAPRENDÉ de estos estilos. Son los que gustan. Variá pero mantené la esencia.';
+    }
+
+    // Obtener texto de categoría
+    const textoCategoria = TEXTOS_CATEGORIA[categoriaTamano] || TEXTOS_CATEGORIA.clasico;
+
+    // Construir el prompt con el formato actualizado
     const userPrompt = USER_PROMPT_TEMPLATE
       .replace('{nombre}', nombre)
       .replace('{tipo}', tipo)
@@ -457,7 +702,10 @@ export async function POST(request) {
       .replace('{accesorios}', accesorios || caracteristicas || 'ninguno especificado')
       .replace('{elemento}', elemento || 'Cualquiera')
       .replace('{proposito}', proposito || 'Que Claude decida')
-      .replace('{notas}', notas || 'ninguna');
+      .replace('{categoriaTamano}', categoriaTamano.toUpperCase())
+      .replace('{textoCategoria}', textoCategoria)
+      .replace('{instruccionesPersonalizadas}', instruccionesPersonalizadas || 'Ninguna instrucción adicional.')
+      .replace('{historiasAnteriores}', textoHistoriasAprobadas);
 
     // Llamar a Claude
     const response = await fetch('https://api.anthropic.com/v1/messages', {
