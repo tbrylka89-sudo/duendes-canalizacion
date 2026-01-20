@@ -479,24 +479,28 @@ export async function POST(request) {
     };
     const textoPersonalidad = personalidad ? PERSONALIDADES[personalidad] || `Personalidad: ${personalidad}` : 'Claude decide la personalidad según la esencia del ser';
 
-    // Construir el prompt con el formato actualizado
+    // Construir el prompt - usar replaceAll para reemplazar TODAS las ocurrencias
     const userPrompt = USER_PROMPT_TEMPLATE
-      .replace('{nombre}', nombre)
-      .replace('{tipo}', tipo)
-      .replace('{genero}', genero)
-      .replace('{altura}', altura)
-      .replace('{colorOjos}', colorOjos)
-      .replace('{accesorios}', accesorios || caracteristicas || 'ninguno especificado')
-      .replace('{elemento}', elemento || 'Cualquiera')
-      .replace('{proposito}', proposito || 'Que Claude decida')
-      .replace('{categoriaTamano}', categoriaTamano.toUpperCase())
-      .replace('{tamanoExacto}', tamanoExacto || 'No especificado')
-      .replace('{textoCategoria}', textoCategoria)
-      .replace('{personalidad}', textoPersonalidad)
-      .replace('{instruccionesPersonalizadas}', instruccionesPersonalizadas || 'Ninguna instrucción adicional.')
-      .replace('{historiasAnteriores}', textoHistoriasAprobadas);
+      .replaceAll('{nombre}', nombre)
+      .replaceAll('{tipo}', tipo)
+      .replaceAll('{genero}', genero)
+      .replaceAll('{altura}', altura)
+      .replaceAll('{colorOjos}', colorOjos)
+      .replaceAll('{accesorios}', accesorios || caracteristicas || 'ninguno especificado')
+      .replaceAll('{elemento}', elemento || 'Cualquiera')
+      .replaceAll('{proposito}', proposito || 'Que Claude decida')
+      .replaceAll('{categoriaTamano}', categoriaTamano.toUpperCase())
+      .replaceAll('{tamanoExacto}', tamanoExacto || 'No especificado')
+      .replaceAll('{textoCategoria}', textoCategoria)
+      .replaceAll('{personalidad}', textoPersonalidad)
+      .replaceAll('{instruccionesPersonalizadas}', instruccionesPersonalizadas || 'Ninguna instrucción adicional.')
+      .replaceAll('{historiasAnteriores}', textoHistoriasAprobadas);
 
-    // Llamar a Claude
+    // Determinar género para el prefill
+    const articuloGenero = genero === 'femenino' ? 'Esta es' : 'Este es';
+
+    // Llamar a Claude con temperatura baja para seguir el formato exacto
+    // y prefill para forzar el inicio correcto
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -507,8 +511,12 @@ export async function POST(request) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
+        temperature: 0.4, // Baja para seguir el formato, pero no 0 para mantener creatividad
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: userPrompt }]
+        messages: [
+          { role: 'user', content: userPrompt },
+          { role: 'assistant', content: `{\n  "historia": "${articuloGenero} ${nombre}. Tiene` }
+        ]
       })
     });
 
@@ -519,9 +527,13 @@ export async function POST(request) {
     }
 
     const data = await response.json();
-    const texto = data.content?.[0]?.text || '';
+    const textoRespuesta = data.content?.[0]?.text || '';
 
-    // Extraer JSON de la respuesta
+    // Concatenar el prefill con la respuesta de Claude para formar el JSON completo
+    const prefillUsado = `{\n  "historia": "${articuloGenero} ${nombre}. Tiene`;
+    const texto = prefillUsado + textoRespuesta;
+
+    // Extraer JSON de la respuesta completa
     const jsonMatch = texto.match(/\{[\s\S]*\}/);
 
     if (!jsonMatch) {
