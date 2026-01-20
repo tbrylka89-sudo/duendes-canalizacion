@@ -219,7 +219,8 @@ SEO_DESCRIPTION: [meta description, máximo 155 caracteres]`;
 function buildGenerationPrompt(data, existingProducts, imageDescriptions, titoInsights) {
     const {
         categoria, tipo_ser, genero, especie_nueva,
-        tamano, edicion, es_literatura,
+        tamano, tamano_exacto, edicion, es_literatura,
+        es_virtual, tipo_virtual, formato_virtual, caracteristicas_virtual,
         fecha_nacimiento, hora_nacimiento, lugar_nacimiento,
         nombre, proposito, elemento, cristales, edad_aparente, notas
     } = data;
@@ -267,28 +268,102 @@ function buildGenerationPrompt(data, existingProducts, imageDescriptions, titoIn
         ? `\nINSIGHTS DE TITO (lo que la gente busca):\n${titoInsights}`
         : '';
 
-    return `Sos el canalizador oficial de historias de Duendes del Uruguay.
-Tu trabajo es crear historias únicas para seres místicos que se venden como piezas artesanales.
+    // Información de producto virtual
+    const virtualInfo = es_virtual ? `
+
+PRODUCTO VIRTUAL:
+- Tipo: ${tipo_virtual || 'digital'}
+- Formato: ${formato_virtual || 'digital'}
+- Características: ${caracteristicas_virtual || 'producto digital'}
+- IMPORTANTE: No mencionar tamaño físico en la descripción, enfocarse en beneficios y contenido digital` : '';
+
+    // Tamaño exacto si está especificado
+    const tamanoExactoInfo = tamano_exacto ? `\n- Medidas exactas: ${tamano_exacto}` : '';
+
+    return `Sos el canalizador maestro de Duendes del Uruguay, experto en neuroventas, neuromarketing y conexión emocional profunda.
+Tu misión es crear historias que hagan que la persona SIENTA que este ser llegó a su vida por una razón.
+
+═══════════════════════════════════════════════════════════════
+TÉCNICAS DE NEUROVENTA QUE DEBES APLICAR
+═══════════════════════════════════════════════════════════════
+
+1. DISPARADORES EMOCIONALES:
+- Identificá el dolor/necesidad que el ser resuelve
+- Conectá con experiencias universales (soledad, miedo, búsqueda de propósito)
+- Usá el principio de reciprocidad: el ser ya eligió a quien lo leerá
+
+2. NEUROMARKETING:
+- Activá el sistema límbico con imágenes sensoriales específicas
+- Usá el efecto de escasez: este ser es ÚNICO, irrepetible
+- Generá pertenencia: formar parte de algo mágico
+
+3. PSICOLOGÍA DE LA CONEXIÓN:
+- Validá emociones sin nombrarlas explícitamente
+- Hacé que el lector se sienta VISTO y comprendido
+- El ser debe tener sabiduría ganada a través de experiencias
+
+4. FILOSOFÍA APLICADA:
+- Cada ser porta una verdad universal
+- No predica, comparte desde la experiencia
+- Ofrece perspectivas que expanden la comprensión de la vida
+
+═══════════════════════════════════════════════════════════════
+ESTRUCTURA NARRATIVA - MIXTA (OBLIGATORIA)
+═══════════════════════════════════════════════════════════════
+
+La descripción debe seguir ESTE FORMATO EXACTO:
+
+PÁRRAFO 1 (Tercera persona - Introducción impactante):
+- Presentación del ser con gancho emocional
+- Sin clichés de IA, directo al corazón
+- Ejemplo: "Hay seres que aparecen justo cuando dejaste de buscar."
+
+PÁRRAFO 2-3 (Primera persona - El ser habla):
+- El ser cuenta SU historia, SUS experiencias
+- Habla directamente a quien lo lee
+- Usa "yo", "mi", "me"
+- Debe sentirse como una conversación íntima
+- Ejemplo: "Yo aprendí que la abundancia no se persigue, se permite."
+
+PÁRRAFO 4-5 (Primera persona - Conexión y propósito):
+- El ser explica POR QUÉ llegó a esta persona
+- Qué va a ayudarle a transformar
+- Sus poderes específicos y cómo los usa
+- Sin decir "comprame" sino "estoy aquí para..."
+
+═══════════════════════════════════════════════════════════════
+PERSONALIDAD ÚNICA DEL SER
+═══════════════════════════════════════════════════════════════
+
+Cada ser DEBE tener:
+- Historia de vida específica (no genérica)
+- Aprendizajes concretos de experiencias vividas
+- Forma única de expresarse (serio, juguetón, sabio, directo, cálido)
+- Un "don" o poder que viene de su historia personal
+- Algo que lo hace DIFERENTE a cualquier otro ser
 
 ═══════════════════════════════════════════════════════════════
 REGLAS ABSOLUTAS - NO ROMPER NUNCA
 ═══════════════════════════════════════════════════════════════
 
-PROHIBIDO usar estas frases (son genéricas de IA):
+PROHIBIDO (suena a IA genérica):
 - "En lo profundo del bosque..."
 - "Las brumas del otoño..."
 - "El susurro del viento ancestral..."
 - "Desde tiempos inmemoriales..."
 - "Un manto de estrellas..."
 - "La danza de las hojas..."
-- Cualquier metáfora vacía que no aporte significado real
+- "En las dulces aguas saladas..."
+- "Empatizo contigo..."
+- Metáforas vacías que no aportan significado real
+- Relleno poético sin sustancia
 
 OBLIGATORIO:
 - Primera frase con impacto emocional inmediato
-- Historia que se siente VIVIDA, no inventada
 - Detalles específicos y concretos
 - Un mensaje central claro y poderoso
-- Conexión emocional real con quien lo lea
+- Que el lector se sienta reflejado sin decirle "te entiendo"
+- Lenguaje cercano, como un amigo sabio
 
 ═══════════════════════════════════════════════════════════════
 INFORMACIÓN DEL SER A CREAR
@@ -298,13 +373,14 @@ CLASIFICACIÓN:
 - Categoría: ${categoria || 'guardián'}
 - Tipo de ser: ${tipo_ser || 'duende'}
 - Género/Energía: ${genero || 'neutro'}
-- ${especie_nueva ? 'INVENTAR ESPECIE ÚNICA para este ser' : ''}
+- ${especie_nueva ? 'INVENTAR ESPECIE ÚNICA para este ser (nombre creativo y significado)' : ''}
 
 TAMAÑO Y EDICIÓN:
-- Tamaño: ${tamano} (${infoTamano.medida})
+- Tamaño: ${tamano} (${infoTamano.medida})${tamanoExactoInfo}
 - Edición: ${edicion}
 - ${es_literatura ? 'Es personaje de literatura clásica - nuestra interpretación canalizada' : 'Ser único, irrepetible'}
 - Nota de edición: ${notaTamano}
+${virtualInfo}
 
 DATOS DE NACIMIENTO:
 - Fecha: ${fecha_nacimiento || 'Desconocida'}
@@ -329,20 +405,32 @@ Total de productos: ${existingProducts.length}
 ${titoInfo}
 
 ═══════════════════════════════════════════════════════════════
+SEO PARA RANK MATH (COMPLETAR TODO)
+═══════════════════════════════════════════════════════════════
+
+Generá contenido SEO optimizado:
+- Focus keyword basada en el tipo de ser y propósito
+- Título SEO que incluya la keyword y genere clicks
+- Meta description que venda sin ser spam
+- Tags relevantes para el producto
+
+═══════════════════════════════════════════════════════════════
 FORMATO DE RESPUESTA
 ═══════════════════════════════════════════════════════════════
 
 Respondé EXACTAMENTE con este formato:
 
 NOMBRE_GENERADO: [nombre único si no se proporcionó uno]
-TITULO: [Nombre - Subtítulo místico corto]
-DESCRIPCION_CORTA: [Frase gancho de máximo 2 líneas que atrape]
-DESCRIPCION: [Historia completa del ser - 3 a 5 párrafos]
-SEO_TITLE: [Título optimizado para Google, máximo 60 caracteres]
-SEO_DESCRIPTION: [Meta description atractiva, máximo 155 caracteres]
+TITULO: [Nombre - Subtítulo místico corto que venda]
+DESCRIPCION_CORTA: [Frase gancho de máximo 2 líneas - debe generar curiosidad y emoción]
+DESCRIPCION: [Historia completa siguiendo estructura MIXTA: intro tercera persona + ser habla en primera persona]
+SEO_TITLE: [Título optimizado para Google, máximo 60 caracteres, incluir keyword]
+SEO_DESCRIPTION: [Meta description atractiva, máximo 155 caracteres, con llamado a la acción sutil]
+FOCUS_KEYWORD: [Palabra clave principal para Rank Math, ej: "duende de la abundancia"]
 TIPO_SER: [Qué tipo de ser es exactamente]
 CATEGORIA_SUGERIDA: [Categoría de WooCommerce sugerida]
-TAGS: [tags separados por coma: cristales, propósito, elemento, etc.]`;
+TAGS: [tags separados por coma: cristales, propósito, elemento, etc.]
+PERSONALIDAD: [Breve descripción de la personalidad única de este ser]`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -447,9 +535,11 @@ function parseClaudeResponse(content) {
         descripcion: /DESCRIPCION:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
         seo_title: /SEO_TITLE:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
         seo_description: /SEO_DESCRIPTION:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
+        focus_keyword: /FOCUS_KEYWORD:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
         tipo_ser: /TIPO_SER:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
         categoria_sugerida: /CATEGORIA_SUGERIDA:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
-        tags: /TAGS:\s*(.+?)(?=\n[A-Z_]+:|$)/s
+        tags: /TAGS:\s*(.+?)(?=\n[A-Z_]+:|$)/s,
+        personalidad: /PERSONALIDAD:\s*(.+?)(?=\n[A-Z_]+:|$)/s
     };
 
     for (const [key, pattern] of Object.entries(patterns)) {
