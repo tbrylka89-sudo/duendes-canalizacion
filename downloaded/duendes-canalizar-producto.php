@@ -863,14 +863,14 @@ function duendes_canalizar_get_scripts() {
                 function textoAHtml(texto) {
                     if (!texto) return '';
                     // Dividir por doble salto de línea y envolver en <p>
-                    var parrafos = texto.split(/\n\n+/);
+                    var parrafos = texto.split(/\\n\\n+/);
                     return parrafos.map(function(p) {
                         p = p.trim();
                         if (!p) return '';
                         // Reemplazar saltos simples por <br>
-                        p = p.replace(/\n/g, '<br>');
+                        p = p.replace(/\\n/g, '<br>');
                         return '<p>' + p + '</p>';
-                    }).filter(function(p) { return p; }).join('\n');
+                    }).filter(function(p) { return p; }).join('\\n');
                 }
 
                 // Título del producto

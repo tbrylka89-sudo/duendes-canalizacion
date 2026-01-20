@@ -369,6 +369,11 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
+
+    // DEBUG: Imprimir TODO lo que llega de ManyChat
+    console.log('[TITO v2] === REQUEST COMPLETO ===');
+    console.log(JSON.stringify(body, null, 2));
+
     const {
       mensaje,
       message,
@@ -386,6 +391,14 @@ export async function POST(request) {
     const platform_ = plataforma || platform || 'instagram';
     const subscriberId = subscriber_id;
     const conversationHistory = historial || history || [];
+
+    // DEBUG: Ver valores parseados
+    console.log('[TITO v2] Parseado:', {
+      mensaje: msg,
+      nombre: userName,
+      subscriberId: subscriberId || 'NO HAY SUBSCRIBER_ID!!!',
+      historialLength: conversationHistory.length
+    });
 
     // Si mensaje vacío, saludo casual
     if (!msg.trim()) {
@@ -576,10 +589,41 @@ ${instruccionFinal}`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GET - STATUS Y TEST
+// GET - STATUS Y DEBUG
 // ═══════════════════════════════════════════════════════════════
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const subscriberId = searchParams.get('subscriber_id');
+  const clearMemory = searchParams.get('clear');
+
+  // Si piden ver/limpiar memoria de un subscriber
+  if (subscriberId) {
+    try {
+      if (clearMemory === 'true') {
+        await kv.del(`tito:mc:${subscriberId}`);
+        return Response.json({
+          status: 'memoria_borrada',
+          subscriber_id: subscriberId
+        });
+      }
+
+      const memoria = await kv.get(`tito:mc:${subscriberId}`);
+      return Response.json({
+        status: 'debug_memoria',
+        subscriber_id: subscriberId,
+        memoria: memoria || 'NO HAY MEMORIA GUARDADA',
+        kv_key: `tito:mc:${subscriberId}`
+      });
+    } catch (e) {
+      return Response.json({
+        status: 'error_kv',
+        error: e.message,
+        subscriber_id: subscriberId
+      });
+    }
+  }
+
   let productosTest = [];
   try {
     productosTest = await obtenerProductosWoo();
@@ -599,6 +643,10 @@ export async function GET() {
       'Formato ManyChat Dynamic Block'
     ],
     productos_cargados: productosTest.length,
+    debug: {
+      ver_memoria: '/api/tito/v2?subscriber_id=TU_ID',
+      borrar_memoria: '/api/tito/v2?subscriber_id=TU_ID&clear=true'
+    },
     ejemplo_uso: {
       method: 'POST',
       body: {
