@@ -1,6 +1,6 @@
 /**
- * TITO para ManyChat - Versión simplificada para Dynamic Block
- * Solo devuelve el formato exacto que ManyChat espera
+ * TITO para ManyChat - Versión optimizada para Dynamic Block
+ * Timeout de ManyChat: 10 segundos
  */
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -11,6 +11,11 @@ const anthropic = new Anthropic({
 
 const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 
+// Cache de productos (5 minutos)
+let productosCache = null;
+let cacheTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000;
+
 function getWooAuth() {
   const key = process.env.WC_CONSUMER_KEY;
   const secret = process.env.WC_CONSUMER_SECRET;
@@ -19,11 +24,16 @@ function getWooAuth() {
 }
 
 async function obtenerProductos() {
+  // Usar cache si está disponible
+  if (productosCache && (Date.now() - cacheTime) < CACHE_DURATION) {
+    return productosCache;
+  }
+
   try {
     const auth = getWooAuth();
     if (!auth) return [];
 
-    const url = `${WP_URL}/wp-json/wc/v3/products?per_page=50&status=publish`;
+    const url = `${WP_URL}/wp-json/wc/v3/products?per_page=20&status=publish`;
     const res = await fetch(url, {
       headers: { 'Authorization': `Basic ${auth}` }
     });
@@ -31,7 +41,7 @@ async function obtenerProductos() {
     if (!res.ok) return [];
     const productos = await res.json();
 
-    return productos
+    productosCache = productos
       .filter(p => {
         if (!p.images || p.images.length === 0) return false;
         const nombre = p.name.toLowerCase();
@@ -47,7 +57,11 @@ async function obtenerProductos() {
         imagen: p.images[0]?.src,
         url: p.permalink
       }));
+
+    cacheTime = Date.now();
+    return productosCache;
   } catch (e) {
+    console.error('[MC] Error productos:', e);
     return [];
   }
 }
@@ -58,27 +72,18 @@ function quiereVerProductos(msg) {
 }
 
 const SYSTEM = `Sos TITO, asistente de Duendes del Uruguay. Hablás como uruguayo (vos, tenés).
-Sos cálido y cercano. Respuestas CORTAS (2-3 oraciones). 1-2 emojis máximo.
-Si te pasan productos, mencioná algunos por nombre. NUNCA inventes nombres.
+Sos cálido y cercano. Respuestas MUY CORTAS (1-2 oraciones). 1 emoji máximo.
+Si te pasan productos, mencioná 2-3 por nombre. NUNCA inventes nombres.
 Si no hay productos, invitá a ver www.duendesdeluruguay.com`;
 
 export async function POST(request) {
+  const startTime = Date.now();
+
   try {
     const body = await request.json();
+    const { mensaje, nombre } = body;
 
-    // Intentar extraer mensaje y nombre de diferentes formatos
-    let mensaje = body.mensaje || body.last_input_text || body.lastInputText || '';
-    let nombre = body.nombre || body.first_name || body.firstName || body.name || '';
-
-    // Si ManyChat envía Full Contact Data, extraer de ahí
-    if (body.first_name) nombre = body.first_name;
-    if (body.last_input_text) mensaje = body.last_input_text;
-
-    // Si las variables vienen como texto literal {{...}}, ignorarlas
-    if (mensaje && mensaje.includes('{{')) mensaje = '';
-    if (nombre && nombre.includes('{{')) nombre = '';
-
-    console.log('[MC] Recibido:', { mensaje, nombre, bodyKeys: Object.keys(body) });
+    console.log('[MC] Recibido:', { mensaje, nombre });
 
     if (!mensaje || mensaje.trim() === '') {
       return Response.json({
@@ -89,24 +94,50 @@ export async function POST(request) {
       });
     }
 
+    // Obtener productos en paralelo con la llamada a Claude si es necesario
     let productos = [];
     let contexto = '';
+    const quiereVer = quiereVerProductos(mensaje);
 
-    if (quiereVerProductos(mensaje)) {
+    if (quiereVer) {
       productos = await obtenerProductos();
       if (productos.length > 0) {
-        contexto = `\n\nPRODUCTOS DISPONIBLES:\n${productos.map(p => `- ${p.nombre}: $${p.precio}`).join('\n')}\n\nMencioná algunos por nombre.`;
+        contexto = `\nPRODUCTOS: ${productos.map(p => `${p.nombre} $${p.precio}`).join(', ')}. Mencioná 2-3.`;
       }
+    }
+
+    // Verificar tiempo antes de llamar a Claude
+    if (Date.now() - startTime > 7000) {
+      console.log('[MC] Timeout prevention - skipping Claude');
+      return Response.json({
+        version: 'v2',
+        content: {
+          messages: [
+            { type: 'text', text: `¡Hola${nombre ? ' ' + nombre : ''}! 😊 Acá te muestro algunos guardianes:` },
+            ...(productos.length > 0 ? [{
+              type: 'cards',
+              elements: productos.map(p => ({
+                title: p.nombre,
+                subtitle: `$${p.precio} USD`,
+                image_url: p.imagen,
+                buttons: [{ type: 'url', caption: 'Ver más', url: p.url }]
+              })),
+              image_aspect_ratio: 'square'
+            }] : [])
+          ]
+        }
+      });
     }
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 300,
+      max_tokens: 150, // Reducido para respuesta más rápida
       system: SYSTEM + contexto,
-      messages: [{ role: 'user', content: `${nombre ? `Me llamo ${nombre}. ` : ''}${mensaje}` }]
+      messages: [{ role: 'user', content: `${nombre ? `Soy ${nombre}. ` : ''}${mensaje}` }]
     });
 
     const texto = response.content[0].text;
+    console.log('[MC] Tiempo total:', Date.now() - startTime, 'ms');
 
     // Si hay productos, devolver con galería
     if (productos.length > 0) {
@@ -143,12 +174,18 @@ export async function POST(request) {
     return Response.json({
       version: 'v2',
       content: {
-        messages: [{ type: 'text', text: 'Disculpá, tuve un problemita. ¿Podés escribirme de nuevo?' }]
+        messages: [{ type: 'text', text: 'Disculpá, tuve un problemita. ¿Podés escribirme de nuevo? 🙏' }]
       }
     });
   }
 }
 
 export async function GET() {
-  return Response.json({ status: 'ok', endpoint: 'Tito MC - Dynamic Block' });
+  // Pre-cargar cache
+  const productos = await obtenerProductos();
+  return Response.json({
+    status: 'ok',
+    endpoint: 'Tito MC - Dynamic Block optimizado',
+    productos_en_cache: productos.length
+  });
 }
