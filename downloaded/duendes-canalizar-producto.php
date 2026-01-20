@@ -649,6 +649,12 @@ function duendes_canalizar_get_scripts() {
                     edad_aparente: document.getElementById('dc_edad_aparente')?.value || '',
                     notas: document.getElementById('dc_notas')?.value || '',
 
+                    // NUEVOS CAMPOS - Categoría, personalidad e instrucciones
+                    categoriaTamano: document.getElementById('dc_categoria_tamano')?.value || 'clasico',
+                    tamanoExacto: document.getElementById('dc_tamano_exacto')?.value || '',
+                    personalidad: document.getElementById('dc_personalidad')?.value || '',
+                    instruccionesPersonalizadas: document.getElementById('dc_instrucciones_claude')?.value || '',
+
                     // Producto ID para obtener imágenes
                     product_id: document.getElementById('post_ID')?.value || ''
                 };
@@ -1030,21 +1036,45 @@ function duendes_canalizar_get_scripts() {
             },
 
             feedback: function(type) {
-                var data = {
-                    action: 'feedback',
-                    type: type,
-                    product_id: document.getElementById('post_ID')?.value || '',
-                    form_data: this.getFormData()
-                };
+                var feedbackEl = document.getElementById('dc-feedback');
+                var formData = this.getFormData();
 
+                if (type === 'like') {
+                    // Guardar historia para aprendizaje
+                    var previewContent = document.getElementById('dc-preview-content');
+                    var historiaTexto = previewContent ? previewContent.innerText : '';
+
+                    // Llamar a la API de generar-historia con flag de aprobación
+                    fetch(API + '/admin/productos/generar-historia', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: formData.nombre || 'Sin nombre',
+                            proposito: formData.proposito || 'General',
+                            aprobarHistoria: true,
+                            historiaAprobadaExtracto: historiaTexto.substring(0, 500)
+                        })
+                    }).then(function() {
+                        feedbackEl.innerHTML = '<p style=\"color:#22c55e;font-weight:600;\">✅ ¡Historia guardada! Claude aprenderá de este estilo.</p>';
+                    });
+                } else {
+                    // Feedback negativo - limpiar para regenerar
+                    feedbackEl.innerHTML = '<p style=\"color:#f59e0b;font-weight:600;\">💡 Usá las instrucciones arriba para guiar a Claude y regenerá.</p>';
+                    // Scroll hacia las instrucciones
+                    document.getElementById('dc_instrucciones_claude')?.focus();
+                }
+
+                // Log del feedback
                 fetch(API + '/admin/canalizar-producto', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        action: 'feedback',
+                        type: type,
+                        product_id: document.getElementById('post_ID')?.value || '',
+                        form_data: formData
+                    })
                 });
-
-                var feedbackEl = document.getElementById('dc-feedback');
-                feedbackEl.innerHTML = '<p style=\"color:#22c55e;font-weight:600;\">Gracias por tu feedback</p>';
             }
         };
 
@@ -1268,65 +1298,7 @@ function duendes_clasificacion_metabox_html($post) {
             </div>
         </div>
 
-        <!-- SECCIÓN: Tamaño y Edición -->
-        <div class="dc-section">
-            <h3 class="dc-section-title"><span>📏</span> Tamaño y Edición</h3>
-
-            <div class="dc-grid">
-                <div class="dc-field">
-                    <label class="dc-label">Tamaño</label>
-                    <div class="dc-radio-group">
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_tamano" id="dc_tamano_mini" value="mini" <?php checked($tamano_value, 'mini'); ?>>
-                            <label for="dc_tamano_mini">Mini (10-15 cm)</label>
-                        </div>
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_tamano" id="dc_tamano_mediano" value="mediano" <?php checked($tamano_value, 'mediano'); ?>>
-                            <label for="dc_tamano_mediano">Mediano (16-26 cm)</label>
-                        </div>
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_tamano" id="dc_tamano_grande" value="grande" <?php checked($tamano_value, 'grande'); ?>>
-                            <label for="dc_tamano_grande">Grande (25-40 cm)</label>
-                        </div>
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_tamano" id="dc_tamano_gigante" value="gigante" <?php checked($tamano_value, 'gigante'); ?>>
-                            <label for="dc_tamano_gigante">Gigante (50-80 cm)</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dc-field">
-                    <label class="dc-label">Edición</label>
-                    <div class="dc-radio-group">
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_edicion" id="dc_edicion_clasica" value="clasica" <?php checked($edicion_value, 'clasica'); ?>>
-                            <label for="dc_edicion_clasica">Clásica</label>
-                        </div>
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_edicion" id="dc_edicion_especial" value="especial" <?php checked($edicion_value, 'especial'); ?>>
-                            <label for="dc_edicion_especial">Especial</label>
-                        </div>
-                        <div class="dc-radio-item">
-                            <input type="radio" name="dc_edicion" id="dc_edicion_mistica" value="mistica" <?php checked($edicion_value, 'mistica'); ?>>
-                            <label for="dc_edicion_mistica">Edición Mística ✨</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dc-field" style="margin-top: 15px;">
-                <label class="dc-label">Tamaño Exacto (medidas precisas)</label>
-                <input type="text" id="dc_tamano_exacto" name="dc_tamano_exacto" class="dc-input"
-                    placeholder="Ej: 23 cm de alto x 15 cm de ancho"
-                    value="<?php echo esc_attr($tamano_exacto); ?>">
-                <small style="color: #666; display: block; margin-top: 5px;">Ingresá las medidas exactas del ser para mostrar en la página de producto</small>
-            </div>
-
-            <div class="dc-checkbox-item">
-                <input type="checkbox" id="dc_es_literatura" name="dc_es_literatura" value="1" <?php checked($es_literatura, '1'); ?>>
-                <label for="dc_es_literatura">Es personaje de literatura clásica (Merlín, Gandalf, Leprechaun) - puede tener múltiples versiones</label>
-            </div>
-        </div>
+        <!-- SECCIÓN ELIMINADA: Tamaño y Edición (movida a Categoría de Exclusividad) -->
 
         <!-- SECCIÓN: Producto Virtual (solo si es virtual) -->
         <div class="dc-section dc-section-virtual" id="dc_seccion_virtual" style="<?php echo $es_virtual ? '' : 'display: none;'; ?> background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #7dd3fc;">
@@ -1372,27 +1344,7 @@ function duendes_clasificacion_metabox_html($post) {
             </div>
         </div>
 
-        <!-- SECCIÓN: Datos de Nacimiento -->
-        <div class="dc-section">
-            <h3 class="dc-section-title"><span>⭐</span> Datos de Nacimiento</h3>
-
-            <div class="dc-grid dc-grid-3">
-                <div class="dc-field">
-                    <label class="dc-label">Fecha de Nacimiento</label>
-                    <input type="date" id="dc_fecha_nacimiento" name="dc_fecha_nacimiento" class="dc-input" value="<?php echo esc_attr($fecha_nac); ?>">
-                </div>
-
-                <div class="dc-field">
-                    <label class="dc-label">Hora de Nacimiento</label>
-                    <input type="time" id="dc_hora_nacimiento" name="dc_hora_nacimiento" class="dc-input" value="<?php echo esc_attr($hora_nac); ?>">
-                </div>
-
-                <div class="dc-field">
-                    <label class="dc-label">Lugar de Nacimiento</label>
-                    <input type="text" id="dc_lugar_nacimiento" name="dc_lugar_nacimiento" class="dc-input" placeholder="Ej: Bosque de cristales de cuarzo" value="<?php echo esc_attr($lugar_nac); ?>">
-                </div>
-            </div>
-        </div>
+        <!-- SECCIÓN: Datos de Nacimiento - ELIMINADA -->
 
     </div>
     <?php
@@ -1502,6 +1454,66 @@ function duendes_canalizar_metabox_html($post) {
             </div>
         </div>
 
+        <!-- SECCIÓN: Categoría y Personalidad -->
+        <div class="dc-section" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #f59e0b;">
+            <h3 class="dc-section-title"><span>👑</span> Categoría, Tamaño y Personalidad</h3>
+
+            <div class="dc-grid">
+                <div class="dc-field">
+                    <label class="dc-label">Tipo de Pieza (Exclusividad)</label>
+                    <select id="dc_categoria_tamano" name="dc_categoria_tamano" class="dc-select" style="font-weight: 600;">
+                        <option value="mini" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'mini'); ?>>🔸 MINI - Se recrea, rostro único</option>
+                        <option value="clasico" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'clasico'); ?>>🔸 CLÁSICO - Hecho a mano</option>
+                        <option value="especial" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'especial'); ?>>🔸 ESPECIAL - Edición limitada</option>
+                        <option value="mediano" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'mediano'); ?>>⚠️ MEDIANO - ÚNICO</option>
+                        <option value="grande" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'grande'); ?>>⚠️ GRANDE - ÚNICO</option>
+                        <option value="gigante" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'gigante'); ?>>⚠️ GIGANTE - ÚNICO</option>
+                        <option value="pixie" <?php selected(get_post_meta($post->ID, '_dc_categoria_tamano', true), 'pixie'); ?>>⚠️ PIXIE - ÚNICA</option>
+                    </select>
+                </div>
+                <div class="dc-field">
+                    <label class="dc-label">Tamaño Exacto</label>
+                    <input type="text" id="dc_tamano_exacto" name="dc_tamano_exacto" class="dc-input"
+                        placeholder="Ej: 23 cm de alto x 15 cm de ancho"
+                        value="<?php echo esc_attr(get_post_meta($post->ID, '_dc_tamano_exacto', true)); ?>">
+                </div>
+            </div>
+
+            <div class="dc-field" style="margin-top: 15px;">
+                <label class="dc-label">🎭 Tipo de Personalidad</label>
+                <select id="dc_personalidad" name="dc_personalidad" class="dc-select">
+                    <option value="">Claude decide...</option>
+                    <option value="simpatico" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'simpatico'); ?>>😊 Simpático y cálido</option>
+                    <option value="grunon" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'grunon'); ?>>😤 Gruñón pero tierno</option>
+                    <option value="misterioso" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'misterioso'); ?>>🌙 Misterioso y profundo</option>
+                    <option value="jugueton" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'jugueton'); ?>>🎈 Juguetón y travieso</option>
+                    <option value="sabio" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'sabio'); ?>>📚 Sabio y sereno</option>
+                    <option value="protector" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'protector'); ?>>🛡️ Protector y firme</option>
+                    <option value="dulce" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'dulce'); ?>>💕 Dulce y maternal/paternal</option>
+                    <option value="rebelde" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'rebelde'); ?>>⚡ Rebelde e intenso</option>
+                    <option value="timido" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'timido'); ?>>🌸 Tímido pero leal</option>
+                    <option value="energetico" <?php selected(get_post_meta($post->ID, '_dc_personalidad', true), 'energetico'); ?>>🔥 Energético y motivador</option>
+                </select>
+                <small style="color: #92400e; display: block; margin-top: 4px;">Claude inventará automáticamente el "sincrodestino" (momento mágico de la canalización).</small>
+            </div>
+
+            <div style="padding: 10px; background: #fff; border-radius: 6px; font-size: 12px; color: #78350f; margin-top: 15px;">
+                <strong>Mini/Clásico/Especial:</strong> El duende elige a la persona, pero puede haber otros similares.<br>
+                <strong>Mediano/Grande/Gigante/Pixie:</strong> ÚNICO. Una vez adoptado, desaparece del universo. Exclusivo. Para coleccionistas.
+            </div>
+        </div>
+
+        <!-- SECCIÓN: Instrucciones para Claude -->
+        <div class="dc-section" style="background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-color: #8b5cf6;">
+            <h3 class="dc-section-title"><span>💬</span> Instrucciones Directas para Claude</h3>
+            <p style="color: #5b21b6; font-size: 13px; margin-bottom: 15px;">Si la historia generada no te convence, escribí acá EXACTAMENTE qué querés. Claude aprenderá de tus preferencias.</p>
+
+            <div class="dc-field full-width">
+                <textarea id="dc_instrucciones_claude" name="dc_instrucciones_claude" class="dc-textarea" rows="4" placeholder="Ej: 'Quiero que la historia sea más directa, menos poética. Que hable específicamente de dinero y cómo va a ayudar a conseguir trabajo. Que tenga un tono más cercano, como si fuera un amigo. No uses la palabra ancestral.'"><?php echo esc_textarea(get_post_meta($post->ID, '_dc_instrucciones_claude', true)); ?></textarea>
+                <small style="color: #7c3aed; display: block; margin-top: 6px;">✨ Estas instrucciones tienen PRIORIDAD ABSOLUTA sobre todo lo demás.</small>
+            </div>
+        </div>
+
         <!-- SECCIÓN: Generación -->
         <div class="dc-section">
             <h3 class="dc-section-title"><span>🔮</span> Generación de Historia</h3>
@@ -1548,26 +1560,35 @@ function duendes_canalizar_metabox_html($post) {
             <div id="dc-feedback" class="dc-feedback">
                 <div class="dc-feedback-title">¿Qué te pareció?</div>
                 <div class="dc-feedback-btns">
-                    <button type="button" class="dc-feedback-btn positive" onclick="DuendesCanalizar.feedback('like')">👍 Me gusta</button>
-                    <button type="button" class="dc-feedback-btn negative" onclick="DuendesCanalizar.feedback('dislike')">👎 No me convence</button>
+                    <button type="button" class="dc-feedback-btn positive" onclick="DuendesCanalizar.feedback('like')" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        👍 Me encanta - GUARDAR para aprendizaje
+                    </button>
+                    <button type="button" class="dc-feedback-btn negative" onclick="DuendesCanalizar.feedback('dislike')">
+                        👎 No me convence - Regenerar
+                    </button>
                 </div>
+                <p style="font-size: 11px; color: #666; margin-top: 8px; text-align: center;">
+                    Al dar "Me encanta", Claude aprenderá de esta historia para futuras generaciones.
+                </p>
             </div>
         </div>
 
         <!-- RECORDATORIO -->
         <div class="dc-reminder">
             <div class="dc-reminder-title">
-                <span>⚠️</span> Recordatorio para Claude
+                <span>⚠️</span> Lo que Claude DEBE hacer
             </div>
             <div class="dc-reminder-list">
-                <div class="dc-reminder-item bad">No usar "En lo profundo del bosque..."</div>
-                <div class="dc-reminder-item good">Impacto emocional desde la primera frase</div>
-                <div class="dc-reminder-item bad">No usar metáforas vacías sin significado</div>
-                <div class="dc-reminder-item good">Historia que se siente VIVIDA</div>
-                <div class="dc-reminder-item bad">No relleno poético genérico</div>
-                <div class="dc-reminder-item good">Detalles específicos del ser</div>
-                <div class="dc-reminder-item bad">No "susurro del viento ancestral"</div>
-                <div class="dc-reminder-item good">Escanear fotos para más detalles</div>
+                <div class="dc-reminder-item bad">NO: "En lo profundo del bosque..."</div>
+                <div class="dc-reminder-item bad">NO: "Entre las brumas del horizonte..."</div>
+                <div class="dc-reminder-item bad">NO: Metáforas vacías sin significado</div>
+                <div class="dc-reminder-item bad">NO: Escritura genérica de IA</div>
+                <div class="dc-reminder-item good">SÍ: Edad específica (847 años, 2300 años...)</div>
+                <div class="dc-reminder-item good">SÍ: Promesa CLARA de qué aspecto trabaja</div>
+                <div class="dc-reminder-item good">SÍ: Personalidad ÚNICA con vivencias</div>
+                <div class="dc-reminder-item good">SÍ: Primera frase que IMPACTE</div>
+                <div class="dc-reminder-item good">SÍ: El duende ELIGE a la persona</div>
+                <div class="dc-reminder-item good">SÍ: Conexión que eriza la piel</div>
             </div>
         </div>
 
@@ -1587,11 +1608,13 @@ add_action('save_post_product', function($post_id) {
     $fields = [
         'dc_categoria', 'dc_tipo_ser', 'dc_genero', 'dc_especie_nueva',
         'dc_tamano', 'dc_tamano_exacto', 'dc_edicion', 'dc_es_literatura',
-        'dc_fecha_nacimiento', 'dc_hora_nacimiento', 'dc_lugar_nacimiento',
+        // dc_fecha_nacimiento, dc_hora_nacimiento, dc_lugar_nacimiento - ELIMINADOS
         'dc_nombre', 'dc_proposito', 'dc_elemento', 'dc_cristales',
         'dc_edad_aparente', 'dc_notas',
         // Campos para productos virtuales
-        'dc_tipo_virtual', 'dc_formato_virtual', 'dc_caracteristicas_virtual'
+        'dc_tipo_virtual', 'dc_formato_virtual', 'dc_caracteristicas_virtual',
+        // NUEVOS: Categoría, personalidad e instrucciones para Claude (sincrodestino lo inventa Claude)
+        'dc_categoria_tamano', 'dc_tamano_exacto', 'dc_personalidad', 'dc_instrucciones_claude'
     ];
 
     foreach ($fields as $field) {
