@@ -306,12 +306,15 @@ export async function POST(request) {
       nombre,
       first_name,
       subscriber_id,
+      contact,  // Full Contact Data de ManyChat
       plataforma
     } = body;
 
     const msg = mensaje || message || '';
-    const userName = nombre || first_name || '';
-    const subscriberId = subscriber_id;
+    // Extraer nombre de contact si existe
+    const userName = nombre || first_name || contact?.first_name || contact?.name || '';
+    // Extraer subscriber_id de contact si existe
+    const subscriberId = subscriber_id || contact?.id || contact?.subscriber_id;
 
     // Validar subscriber_id
     if (!subscriberId) {
@@ -383,8 +386,11 @@ ${contexto}
     // Crear contenido con productos si hay
     const contenido = crearContenidoManychat(textoRespuesta, datos._productos);
 
-    // ENVIAR DIRECTO A MANYCHAT
-    const enviado = await enviarMensajeManychat(subscriberId, contenido);
+    // INTENTAR ENVIAR DIRECTO A MANYCHAT
+    let enviado = false;
+    if (subscriberId) {
+      enviado = await enviarMensajeManychat(subscriberId, contenido);
+    }
 
     // Guardar memoria
     if (subscriberId) {
@@ -410,16 +416,37 @@ ${contexto}
       productos: datos._productos?.length || 0
     });
 
-    // Si se envió directo, responder con status
-    if (enviado) {
-      return Response.json({
-        status: 'sent_direct',
-        message: 'Mensaje enviado directamente a ManyChat'
-      });
-    }
+    // Extraer URLs de imágenes de los productos para mapeo en ManyChat
+    const productos = datos._productos || [];
+    const imagenes = {
+      imagen_1: productos[0]?.imagen || '',
+      imagen_2: productos[1]?.imagen || '',
+      imagen_3: productos[2]?.imagen || '',
+      nombre_1: productos[0]?.nombre || '',
+      nombre_2: productos[1]?.nombre || '',
+      nombre_3: productos[2]?.nombre || '',
+      precio_1: productos[0] ? `$${productos[0].precio} USD` : '',
+      precio_2: productos[1] ? `$${productos[1].precio} USD` : '',
+      precio_3: productos[2] ? `$${productos[2].precio} USD` : '',
+      url_1: productos[0]?.url || '',
+      url_2: productos[1]?.url || '',
+      url_3: productos[2]?.url || '',
+      // ManyChat solo mapea campos Text, así que usamos "si"/"no" en vez de true/false
+      tiene_productos: productos.length > 0 ? 'si' : 'no',
+      hay_productos: productos.length > 0 ? 'si' : 'no'
+    };
 
-    // Fallback: devolver respuesta normal (por si falla el envío directo)
-    return Response.json(contenido);
+    // Devolver respuesta con campos separados para ManyChat
+    return Response.json({
+      ...contenido,
+      respuesta: textoRespuesta,
+      ...imagenes,
+      total_productos: productos.length,
+      _debug: {
+        enviado_directo: enviado,
+        subscriber_id: subscriberId
+      }
+    });
 
   } catch (error) {
     console.error('[MC-DIRECT] Error:', error);
