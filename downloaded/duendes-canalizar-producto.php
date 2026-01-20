@@ -859,121 +859,181 @@ function duendes_canalizar_get_scripts() {
             applyResult: function(result) {
                 console.log('Aplicando resultado:', result);
 
+                // Función auxiliar para convertir texto a HTML con párrafos
+                function textoAHtml(texto) {
+                    if (!texto) return '';
+                    // Dividir por doble salto de línea y envolver en <p>
+                    var parrafos = texto.split(/\n\n+/);
+                    return parrafos.map(function(p) {
+                        p = p.trim();
+                        if (!p) return '';
+                        // Reemplazar saltos simples por <br>
+                        p = p.replace(/\n/g, '<br>');
+                        return '<p>' + p + '</p>';
+                    }).filter(function(p) { return p; }).join('\n');
+                }
+
                 // Título del producto
                 if (result.titulo) {
                     var titleField = document.getElementById('title');
                     if (titleField) {
                         titleField.value = result.titulo;
-                        // Disparar evento para que WP detecte el cambio
                         titleField.dispatchEvent(new Event('input', { bubbles: true }));
+                        // También actualizar el slug si está vacío
+                        var slugField = document.getElementById('editable-post-name');
+                        if (slugField && !slugField.innerText) {
+                            // WordPress generará el slug automáticamente
+                        }
                     }
                 }
 
-                // Descripción larga (WooCommerce usa el editor de contenido)
+                // Descripción larga CON FORMATO HTML
                 if (result.descripcion) {
+                    var descripcionHtml = textoAHtml(result.descripcion);
                     var editor = typeof tinyMCE !== 'undefined' ? tinyMCE.get('content') : null;
                     if (editor) {
-                        editor.setContent(result.descripcion);
-                    } else {
-                        var contentField = document.getElementById('content');
-                        if (contentField) contentField.value = result.descripcion;
+                        editor.setContent(descripcionHtml);
                     }
+                    // También actualizar el textarea por si acaso
+                    var contentField = document.getElementById('content');
+                    if (contentField) {
+                        contentField.value = descripcionHtml;
+                    }
+                    console.log('Descripción aplicada con formato HTML');
                 }
 
                 // Descripción corta de WooCommerce
                 if (result.descripcion_corta) {
+                    var excerptHtml = '<p>' + result.descripcion_corta + '</p>';
                     var excerptEditor = typeof tinyMCE !== 'undefined' ? tinyMCE.get('excerpt') : null;
                     if (excerptEditor) {
-                        excerptEditor.setContent(result.descripcion_corta);
-                    } else {
-                        var excerptField = document.getElementById('excerpt');
-                        if (excerptField) excerptField.value = result.descripcion_corta;
+                        excerptEditor.setContent(excerptHtml);
                     }
+                    var excerptField = document.getElementById('excerpt');
+                    if (excerptField) excerptField.value = excerptHtml;
                 }
 
-                // Tags de producto (WooCommerce)
+                // ═══════════════════════════════════════════════════════════
+                // TAGS - Múltiples métodos
+                // ═══════════════════════════════════════════════════════════
                 if (result.tags) {
+                    console.log('Intentando aplicar tags:', result.tags);
+
+                    // Método 1: Campo de texto de tags
                     var tagsField = document.getElementById('new-tag-product_tag');
                     if (tagsField) {
                         tagsField.value = result.tags;
-                        console.log('Tags aplicados al campo:', result.tags);
-                        // Intentar hacer click en el botón Add para agregar los tags
-                        var addBtn = document.querySelector('.tagadd');
+                        // Simular Enter o click en Add
+                        var addBtn = document.querySelector('#product_tag .tagadd');
                         if (addBtn) {
-                            setTimeout(function() { addBtn.click(); }, 100);
+                            setTimeout(function() {
+                                addBtn.click();
+                                console.log('Tags: Click en botón Add');
+                            }, 200);
                         }
-                    } else {
-                        console.log('Campo de tags no encontrado. Tags generados:', result.tags);
                     }
+
+                    // Método 2: Guardar en campo oculto para procesamiento PHP
+                    var hiddenTagsField = document.getElementById('dc_generated_tags');
+                    if (!hiddenTagsField) {
+                        hiddenTagsField = document.createElement('input');
+                        hiddenTagsField.type = 'hidden';
+                        hiddenTagsField.id = 'dc_generated_tags';
+                        hiddenTagsField.name = 'dc_generated_tags';
+                        document.querySelector('form#post').appendChild(hiddenTagsField);
+                    }
+                    hiddenTagsField.value = result.tags;
+                    console.log('Tags guardados en campo oculto para PHP');
                 }
 
-                // RankMath SEO - buscar en múltiples lugares
-                if (result.seo_title) {
-                    var seoTitleSelectors = [
-                        'input[name=\"rank_math_title\"]',
-                        '#rank_math_title',
-                        '.rank-math-title input',
-                        'input[id*=\"rank-math\"][id*=\"title\"]',
-                        '#rank-math-editor input[type=\"text\"]'
-                    ];
-                    var seoTitleField = null;
-                    for (var i = 0; i < seoTitleSelectors.length; i++) {
-                        seoTitleField = document.querySelector(seoTitleSelectors[i]);
-                        if (seoTitleField) break;
+                // ═══════════════════════════════════════════════════════════
+                // CATEGORÍA - Seleccionar automáticamente
+                // ═══════════════════════════════════════════════════════════
+                if (result.categoria_sugerida) {
+                    console.log('Categoría sugerida:', result.categoria_sugerida);
+
+                    // Buscar checkboxes de categoría de producto
+                    var catCheckboxes = document.querySelectorAll('#product_catchecklist input[type=\"checkbox\"]');
+                    var categoriaLower = result.categoria_sugerida.toLowerCase();
+
+                    catCheckboxes.forEach(function(cb) {
+                        var label = cb.parentElement ? cb.parentElement.textContent.toLowerCase().trim() : '';
+                        // Buscar coincidencia parcial
+                        if (label.includes(categoriaLower) || categoriaLower.includes(label.split(' ')[0])) {
+                            cb.checked = true;
+                            cb.dispatchEvent(new Event('change', { bubbles: true }));
+                            console.log('Categoría seleccionada:', label);
+                        }
+                    });
+
+                    // Guardar en campo oculto para procesamiento PHP
+                    var hiddenCatField = document.getElementById('dc_generated_categoria');
+                    if (!hiddenCatField) {
+                        hiddenCatField = document.createElement('input');
+                        hiddenCatField.type = 'hidden';
+                        hiddenCatField.id = 'dc_generated_categoria';
+                        hiddenCatField.name = 'dc_generated_categoria';
+                        document.querySelector('form#post').appendChild(hiddenCatField);
                     }
-                    if (seoTitleField) {
-                        seoTitleField.value = result.seo_title;
-                        seoTitleField.dispatchEvent(new Event('input', { bubbles: true }));
-                        console.log('SEO Title aplicado:', result.seo_title);
-                    } else {
-                        console.log('Campo SEO Title no encontrado. Valor:', result.seo_title);
-                    }
+                    hiddenCatField.value = result.categoria_sugerida;
                 }
 
-                if (result.seo_description) {
-                    var seoDescSelectors = [
-                        'textarea[name=\"rank_math_description\"]',
-                        '#rank_math_description',
-                        '.rank-math-description textarea',
-                        'textarea[id*=\"rank-math\"][id*=\"description\"]'
-                    ];
-                    var seoDescField = null;
-                    for (var i = 0; i < seoDescSelectors.length; i++) {
-                        seoDescField = document.querySelector(seoDescSelectors[i]);
-                        if (seoDescField) break;
+                // ═══════════════════════════════════════════════════════════
+                // RANK MATH SEO - Método directo con meta campos
+                // ═══════════════════════════════════════════════════════════
+
+                // Guardar SEO data en campos ocultos para que PHP los guarde
+                var seoData = {
+                    'rank_math_title': result.seo_title || '',
+                    'rank_math_description': result.seo_description || '',
+                    'rank_math_focus_keyword': result.focus_keyword || ''
+                };
+
+                Object.keys(seoData).forEach(function(fieldName) {
+                    if (!seoData[fieldName]) return;
+
+                    // Crear o actualizar campo oculto
+                    var hiddenField = document.querySelector('input[name=\"' + fieldName + '\"]');
+                    if (!hiddenField) {
+                        hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = fieldName;
+                        document.querySelector('form#post').appendChild(hiddenField);
                     }
-                    if (seoDescField) {
-                        seoDescField.value = result.seo_description;
-                        seoDescField.dispatchEvent(new Event('input', { bubbles: true }));
-                        console.log('SEO Description aplicado:', result.seo_description);
-                    } else {
-                        console.log('Campo SEO Description no encontrado. Valor:', result.seo_description);
-                    }
+                    hiddenField.value = seoData[fieldName];
+                    console.log('SEO Campo oculto creado:', fieldName, '=', seoData[fieldName]);
+                });
+
+                // También intentar aplicar directamente a Rank Math si está cargado
+                if (typeof rankMath !== 'undefined' && rankMath.hasOwnProperty('updatePermalink')) {
+                    console.log('Rank Math detectado, intentando API directa...');
                 }
 
-                // RankMath Focus Keyword
-                if (result.focus_keyword) {
-                    var focusKeywordSelectors = [
-                        'input[name=\"rank_math_focus_keyword\"]',
-                        '#rank_math_focus_keyword',
-                        '.rank-math-focus-keyword input',
-                        'input[id*=\"focus-keyword\"]',
-                        '.rank-math-focus-keyword'
-                    ];
-                    var focusKeywordField = null;
-                    for (var i = 0; i < focusKeywordSelectors.length; i++) {
-                        focusKeywordField = document.querySelector(focusKeywordSelectors[i]);
-                        if (focusKeywordField) break;
+                // Buscar campos de Rank Math en el DOM (versión clásica)
+                setTimeout(function() {
+                    // Focus Keyword
+                    var fkField = document.querySelector('.rank-math-focus-keyword input, input[name=\"rank_math_focus_keyword\"]');
+                    if (fkField && result.focus_keyword) {
+                        fkField.value = result.focus_keyword;
+                        fkField.dispatchEvent(new Event('input', { bubbles: true }));
+                        fkField.dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log('Focus keyword aplicado directamente');
                     }
-                    if (focusKeywordField) {
-                        focusKeywordField.value = result.focus_keyword;
-                        focusKeywordField.dispatchEvent(new Event('input', { bubbles: true }));
-                        focusKeywordField.dispatchEvent(new Event('change', { bubbles: true }));
-                        console.log('Focus Keyword aplicado:', result.focus_keyword);
-                    } else {
-                        console.log('Campo Focus Keyword no encontrado. Valor:', result.focus_keyword);
+
+                    // SEO Title
+                    var titleField = document.querySelector('#rank_math_title, input[name=\"rank_math_title\"]');
+                    if (titleField && result.seo_title) {
+                        titleField.value = result.seo_title;
+                        titleField.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                }
+
+                    // SEO Description
+                    var descField = document.querySelector('#rank_math_description, textarea[name=\"rank_math_description\"]');
+                    if (descField && result.seo_description) {
+                        descField.value = result.seo_description;
+                        descField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }, 500);
 
                 // Actualizar nombre en el campo si se generó
                 if (result.nombre_generado) {
@@ -983,16 +1043,29 @@ function duendes_canalizar_get_scripts() {
                     }
                 }
 
-                // Mostrar resumen de lo que se aplicó
+                // ═══════════════════════════════════════════════════════════
+                // MOSTRAR PANEL DE RESULTADOS
+                // ═══════════════════════════════════════════════════════════
+                var previewEl = document.getElementById('dc-preview-content');
+                if (previewEl) {
+                    previewEl.innerHTML = '<div style=\"background:#f0fdf4;padding:15px;border-radius:8px;border:1px solid #86efac;\">' +
+                        '<h4 style=\"margin:0 0 10px;color:#166534;\">Historia Generada</h4>' +
+                        '<p><strong>Título:</strong> ' + (result.titulo || 'N/A') + '</p>' +
+                        '<p><strong>SEO Title:</strong> ' + (result.seo_title || 'N/A') + '</p>' +
+                        '<p><strong>Focus Keyword:</strong> ' + (result.focus_keyword || 'N/A') + '</p>' +
+                        '<p><strong>Categoría:</strong> ' + (result.categoria_sugerida || 'N/A') + '</p>' +
+                        '<p><strong>Tags:</strong> ' + (result.tags || 'N/A') + '</p>' +
+                        '<p style=\"color:#666;font-size:12px;margin-top:10px;\">Los campos SEO se guardarán al publicar/actualizar el producto</p>' +
+                        '</div>';
+                }
+
                 console.log('=== RESUMEN DE GENERACIÓN ===');
                 console.log('Título:', result.titulo || 'N/A');
                 console.log('SEO Title:', result.seo_title || 'N/A');
                 console.log('SEO Desc:', result.seo_description || 'N/A');
                 console.log('Focus Keyword:', result.focus_keyword || 'N/A');
                 console.log('Tags:', result.tags || 'N/A');
-                console.log('Tipo de ser:', result.tipo_ser || 'N/A');
                 console.log('Categoría sugerida:', result.categoria_sugerida || 'N/A');
-                console.log('Personalidad:', result.personalidad || 'N/A');
                 console.log('============================');
             },
 
@@ -1575,6 +1648,58 @@ add_action('save_post_product', function($post_id) {
             update_post_meta($post_id, '_' . $field, sanitize_text_field($_POST[$field]));
         } else {
             delete_post_meta($post_id, '_' . $field);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PROCESAR TAGS GENERADOS POR IA
+    // ═══════════════════════════════════════════════════════════════
+    if (!empty($_POST['dc_generated_tags'])) {
+        $tags_string = sanitize_text_field($_POST['dc_generated_tags']);
+        $tags_array = array_map('trim', explode(',', $tags_string));
+        $tags_array = array_filter($tags_array); // Eliminar vacíos
+
+        if (!empty($tags_array)) {
+            wp_set_object_terms($post_id, $tags_array, 'product_tag', true); // true = append
+            error_log("Duendes: Tags aplicados al producto $post_id: " . implode(', ', $tags_array));
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PROCESAR CATEGORÍA SUGERIDA
+    // ═══════════════════════════════════════════════════════════════
+    if (!empty($_POST['dc_generated_categoria'])) {
+        $categoria_sugerida = sanitize_text_field($_POST['dc_generated_categoria']);
+
+        // Buscar categoría existente que coincida
+        $categorias = get_terms([
+            'taxonomy' => 'product_cat',
+            'hide_empty' => false
+        ]);
+
+        $categoria_lower = strtolower($categoria_sugerida);
+        foreach ($categorias as $cat) {
+            $cat_name_lower = strtolower($cat->name);
+            // Buscar coincidencia parcial
+            if (strpos($cat_name_lower, $categoria_lower) !== false ||
+                strpos($categoria_lower, $cat_name_lower) !== false) {
+                wp_set_object_terms($post_id, [$cat->term_id], 'product_cat', true);
+                error_log("Duendes: Categoría aplicada al producto $post_id: {$cat->name}");
+                break;
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // GUARDAR SEO DE RANK MATH
+    // ═══════════════════════════════════════════════════════════════
+    $seo_fields = ['rank_math_title', 'rank_math_description', 'rank_math_focus_keyword'];
+
+    foreach ($seo_fields as $seo_field) {
+        if (!empty($_POST[$seo_field])) {
+            $value = sanitize_text_field($_POST[$seo_field]);
+            update_post_meta($post_id, $seo_field, $value);
+            error_log("Duendes: SEO $seo_field guardado para producto $post_id: $value");
         }
     }
 });

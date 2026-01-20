@@ -18,6 +18,7 @@ import {
   INFO_EMPRESA
 } from '@/lib/tito/conocimiento';
 import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+import { MANUAL_PERSUASION } from '@/lib/tito/manual-persuasion';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -360,6 +361,8 @@ Si hay productos para mostrar, el sistema los agrega automáticamente.`;
     }
 
     const systemPrompt = `${PERSONALIDAD_TITO}
+
+${MANUAL_PERSUASION}
 
 ${CONTEXTO_MANYCHAT}
 
