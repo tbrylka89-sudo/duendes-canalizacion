@@ -15,7 +15,8 @@ import {
   formatearPrecio,
   detectarPaisDeMensaje,
   FAQ,
-  INFO_EMPRESA
+  INFO_EMPRESA,
+  PRECIOS_URUGUAY
 } from '@/lib/tito/conocimiento';
 import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
 import { MANUAL_PERSUASION } from '@/lib/tito/manual-persuasion';
@@ -222,18 +223,26 @@ async function construirContexto(mensaje, intencion, datos) {
   // PAÍS Y PRECIOS
   if (paisFinal) {
     // Ya sabemos el país - dar formato de moneda
-    const instruccionesMoneda = {
-      'UY': '\n💰 Es de URUGUAY: Precios SOLO en pesos uruguayos. Ej: "$3.080 pesos". NO menciones USD.',
-      'AR': '\n💰 Es de ARGENTINA: USD + pesos. Ej: "$70 USD (aprox. $80.500 pesos argentinos)"',
-      'MX': '\n💰 Es de MÉXICO: USD + pesos. Ej: "$70 USD (aprox. $1.400 pesos mexicanos)"',
-      'CO': '\n💰 Es de COLOMBIA: USD + pesos. Ej: "$70 USD (aprox. $308.000 pesos)"',
-      'CL': '\n💰 Es de CHILE: USD + pesos. Ej: "$70 USD (aprox. $70.000 pesos chilenos)"',
-      'PE': '\n💰 Es de PERÚ: USD + soles. Ej: "$70 USD (aprox. S/266 soles)"',
-      'BR': '\n💰 Es de BRASIL: USD + reales. Ej: "$70 USD (aprox. R$434 reales)"',
-      'ES': '\n💰 Es de ESPAÑA: USD + euros. Ej: "$70 USD (aprox. €66 euros)"',
-    };
-    contexto += instruccionesMoneda[paisFinal] || `\n💰 País: ${paisFinal} - Precios en USD.`;
-    contexto += '\n⚠️ YA SABÉS SU PAÍS - NO preguntes de nuevo de dónde es.';
+    if (paisFinal === 'UY') {
+      // URUGUAY: Precios FIJOS en pesos uruguayos
+      contexto += `\n\n💰 ES DE URUGUAY - USA ESTOS PRECIOS FIJOS (en pesos uruguayos):
+${PRECIOS_URUGUAY.listaCompleta}
+
+⚠️ SOLO pesos uruguayos. NUNCA menciones USD a uruguayos.
+⚠️ YA SABÉS SU PAÍS - NO preguntes de nuevo de dónde es.`;
+    } else {
+      const instruccionesMoneda = {
+        'AR': '\n💰 Es de ARGENTINA: USD + pesos. Ej: "$70 USD (aprox. $80.500 pesos argentinos)"',
+        'MX': '\n💰 Es de MÉXICO: USD + pesos. Ej: "$70 USD (aprox. $1.400 pesos mexicanos)"',
+        'CO': '\n💰 Es de COLOMBIA: USD + pesos. Ej: "$70 USD (aprox. $308.000 pesos)"',
+        'CL': '\n💰 Es de CHILE: USD + pesos. Ej: "$70 USD (aprox. $70.000 pesos chilenos)"',
+        'PE': '\n💰 Es de PERÚ: USD + soles. Ej: "$70 USD (aprox. S/266 soles)"',
+        'BR': '\n💰 Es de BRASIL: USD + reales. Ej: "$70 USD (aprox. R$434 reales)"',
+        'ES': '\n💰 Es de ESPAÑA: USD + euros. Ej: "$70 USD (aprox. €66 euros)"',
+      };
+      contexto += instruccionesMoneda[paisFinal] || `\n💰 País: ${paisFinal} - Precios en USD.`;
+      contexto += '\n⚠️ YA SABÉS SU PAÍS - NO preguntes de nuevo de dónde es.';
+    }
   } else if (intencion.preguntaPrecio) {
     // No sabemos país y pregunta precio - preguntar país
     contexto += `\n\n💰 PREGUNTA PRECIO pero NO SABÉS SU PAÍS:

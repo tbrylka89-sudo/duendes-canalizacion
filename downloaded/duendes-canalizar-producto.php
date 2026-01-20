@@ -308,6 +308,32 @@ function duendes_canalizar_get_styles() {
         transform: none !important;
     }
 
+    .dc-btn-seo {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #fff;
+    }
+
+    .dc-btn-seo:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .dc-btn-success {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+        color: #fff !important;
+        animation: pulse-success 2s infinite;
+    }
+
+    @keyframes pulse-success {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    }
+
+    .dc-btn-done {
+        background: #64748b !important;
+        cursor: default !important;
+    }
+
     /* Campo de modificación */
     .dc-modify-field {
         flex: 1;
@@ -979,61 +1005,24 @@ function duendes_canalizar_get_scripts() {
                 }
 
                 // ═══════════════════════════════════════════════════════════
-                // RANK MATH SEO - Método directo con meta campos
+                // RANK MATH SEO - Guardar datos para aplicar con botón
                 // ═══════════════════════════════════════════════════════════
 
-                // Guardar SEO data en campos ocultos para que PHP los guarde
-                var seoData = {
-                    'rank_math_title': result.seo_title || '',
-                    'rank_math_description': result.seo_description || '',
-                    'rank_math_focus_keyword': result.focus_keyword || ''
+                // Guardar SEO data globalmente para el botón "Aplicar SEO"
+                window.duendesSeoData = {
+                    seo_title: result.seo_title || '',
+                    seo_description: result.seo_description || '',
+                    focus_keyword: result.focus_keyword || ''
                 };
 
-                Object.keys(seoData).forEach(function(fieldName) {
-                    if (!seoData[fieldName]) return;
-
-                    // Crear o actualizar campo oculto
-                    var hiddenField = document.querySelector('input[name=\"' + fieldName + '\"]');
-                    if (!hiddenField) {
-                        hiddenField = document.createElement('input');
-                        hiddenField.type = 'hidden';
-                        hiddenField.name = fieldName;
-                        document.querySelector('form#post').appendChild(hiddenField);
-                    }
-                    hiddenField.value = seoData[fieldName];
-                    console.log('SEO Campo oculto creado:', fieldName, '=', seoData[fieldName]);
-                });
-
-                // También intentar aplicar directamente a Rank Math si está cargado
-                if (typeof rankMath !== 'undefined' && rankMath.hasOwnProperty('updatePermalink')) {
-                    console.log('Rank Math detectado, intentando API directa...');
+                // Mostrar botón de aplicar SEO si hay datos
+                var seoBtn = document.getElementById('dc-btn-aplicar-seo');
+                if (seoBtn && (result.seo_title || result.focus_keyword)) {
+                    seoBtn.style.display = 'inline-flex';
+                    seoBtn.classList.add('dc-btn-success');
                 }
 
-                // Buscar campos de Rank Math en el DOM (versión clásica)
-                setTimeout(function() {
-                    // Focus Keyword
-                    var fkField = document.querySelector('.rank-math-focus-keyword input, input[name=\"rank_math_focus_keyword\"]');
-                    if (fkField && result.focus_keyword) {
-                        fkField.value = result.focus_keyword;
-                        fkField.dispatchEvent(new Event('input', { bubbles: true }));
-                        fkField.dispatchEvent(new Event('change', { bubbles: true }));
-                        console.log('Focus keyword aplicado directamente');
-                    }
-
-                    // SEO Title
-                    var titleField = document.querySelector('#rank_math_title, input[name=\"rank_math_title\"]');
-                    if (titleField && result.seo_title) {
-                        titleField.value = result.seo_title;
-                        titleField.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-
-                    // SEO Description
-                    var descField = document.querySelector('#rank_math_description, textarea[name=\"rank_math_description\"]');
-                    if (descField && result.seo_description) {
-                        descField.value = result.seo_description;
-                        descField.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                }, 500);
+                console.log('SEO Data guardada para aplicar:', window.duendesSeoData);
 
                 // Actualizar nombre en el campo si se generó
                 if (result.nombre_generado) {
@@ -1094,6 +1083,55 @@ function duendes_canalizar_get_scripts() {
 
                 var feedbackEl = document.getElementById('dc-feedback');
                 feedbackEl.innerHTML = '<p style=\"color:#22c55e;font-weight:600;\">Gracias por tu feedback</p>';
+            },
+
+            aplicarSeo: function() {
+                var btn = document.getElementById('dc-btn-aplicar-seo');
+                if (!window.duendesSeoData) {
+                    alert('Primero generá una historia para obtener datos SEO');
+                    return;
+                }
+
+                var postId = document.getElementById('post_ID')?.value;
+                if (!postId) {
+                    alert('Error: No se encontró el ID del producto');
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span> Guardando...';
+
+                // Llamar a AJAX de WordPress para guardar SEO
+                var formData = new FormData();
+                formData.append('action', 'duendes_guardar_seo');
+                formData.append('post_id', postId);
+                formData.append('seo_title', window.duendesSeoData.seo_title);
+                formData.append('seo_description', window.duendesSeoData.seo_description);
+                formData.append('focus_keyword', window.duendesSeoData.focus_keyword);
+                formData.append('nonce', nonce);
+
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(result) {
+                    btn.disabled = false;
+                    if (result.success) {
+                        btn.innerHTML = '<span>✅</span> SEO Guardado!';
+                        btn.classList.remove('dc-btn-success');
+                        btn.classList.add('dc-btn-done');
+                        alert('SEO guardado correctamente! Recargá la página para ver los cambios en Rank Math.');
+                    } else {
+                        btn.innerHTML = '<span>📊</span> Aplicar SEO';
+                        alert('Error: ' + (result.data || 'No se pudo guardar'));
+                    }
+                })
+                .catch(function(err) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>📊</span> Aplicar SEO';
+                    alert('Error de conexión: ' + err.message);
+                });
             }
         };
 
@@ -1567,6 +1605,10 @@ function duendes_canalizar_metabox_html($post) {
                 <button type="button" id="dc-btn-mejorar" class="dc-btn dc-btn-secondary" onclick="DuendesCanalizar.mejorar()">
                     <span>✨</span> Mejorar Historia
                 </button>
+
+                <button type="button" id="dc-btn-aplicar-seo" class="dc-btn dc-btn-seo" onclick="DuendesCanalizar.aplicarSeo()" style="display: none;">
+                    <span>📊</span> Aplicar SEO
+                </button>
             </div>
 
             <div class="dc-regen-styles">
@@ -1716,4 +1758,53 @@ add_filter('postbox_classes_product_duendes_clasificacion', function($classes) {
 add_filter('postbox_classes_product_duendes_canalizar', function($classes) {
     $classes[] = 'duendes-metabox';
     return $classes;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// AJAX: GUARDAR SEO DIRECTAMENTE
+// ═══════════════════════════════════════════════════════════════
+
+add_action('wp_ajax_duendes_guardar_seo', function() {
+    // Verificar nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'duendes_canalizar')) {
+        wp_send_json_error('Nonce inválido');
+        return;
+    }
+
+    // Verificar permisos
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
+
+    $post_id = intval($_POST['post_id']);
+    if (!$post_id) {
+        wp_send_json_error('ID de producto inválido');
+        return;
+    }
+
+    // Guardar los campos de Rank Math
+    $seo_title = sanitize_text_field($_POST['seo_title'] ?? '');
+    $seo_description = sanitize_text_field($_POST['seo_description'] ?? '');
+    $focus_keyword = sanitize_text_field($_POST['focus_keyword'] ?? '');
+
+    if ($seo_title) {
+        update_post_meta($post_id, 'rank_math_title', $seo_title);
+    }
+    if ($seo_description) {
+        update_post_meta($post_id, 'rank_math_description', $seo_description);
+    }
+    if ($focus_keyword) {
+        update_post_meta($post_id, 'rank_math_focus_keyword', $focus_keyword);
+    }
+
+    // Log para debug
+    error_log("Duendes SEO AJAX: Guardado para producto $post_id - Title: $seo_title, FK: $focus_keyword");
+
+    wp_send_json_success([
+        'message' => 'SEO guardado correctamente',
+        'post_id' => $post_id,
+        'seo_title' => $seo_title,
+        'focus_keyword' => $focus_keyword
+    ]);
 });
