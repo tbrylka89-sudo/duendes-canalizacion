@@ -61,8 +61,69 @@ function detectarIntencion(mensaje) {
 
     // Info de contacto detectada
     tieneEmail: msg.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0],
-    tieneNumero: msg.match(/\b\d{4,}\b/)?.[0]
+    tieneNumero: msg.match(/\b\d{4,}\b/)?.[0],
+
+    // País detectado
+    paisMencionado: detectarPais(msg),
+
+    // Pregunta por precio
+    preguntaPrecio: /precio|cuánto|cuanto|cuesta|vale|cost|plata|pesos|dólares|dolares/i.test(msg)
   };
+}
+
+// Detectar país del mensaje
+function detectarPais(msg) {
+  const msgLower = msg.toLowerCase();
+
+  const paises = {
+    // Uruguay
+    'uruguay': 'UY', 'uruguayo': 'UY', 'uruguaya': 'UY', 'montevideo': 'UY', 'piriápolis': 'UY', 'piriapolis': 'UY', 'maldonado': 'UY',
+    // Argentina
+    'argentina': 'AR', 'argentino': 'AR', 'argentina': 'AR', 'buenos aires': 'AR', 'cordoba': 'AR', 'rosario': 'AR', 'mendoza': 'AR',
+    // México
+    'méxico': 'MX', 'mexico': 'MX', 'mexicano': 'MX', 'mexicana': 'MX', 'cdmx': 'MX', 'guadalajara': 'MX', 'monterrey': 'MX',
+    // Colombia
+    'colombia': 'CO', 'colombiano': 'CO', 'colombiana': 'CO', 'bogotá': 'CO', 'bogota': 'CO', 'medellín': 'CO', 'medellin': 'CO', 'cali': 'CO',
+    // Chile
+    'chile': 'CL', 'chileno': 'CL', 'chilena': 'CL', 'santiago': 'CL', 'valparaíso': 'CL',
+    // Perú
+    'perú': 'PE', 'peru': 'PE', 'peruano': 'PE', 'peruana': 'PE', 'lima': 'PE',
+    // Brasil
+    'brasil': 'BR', 'brazil': 'BR', 'brasileño': 'BR', 'brasileña': 'BR', 'são paulo': 'BR', 'sao paulo': 'BR', 'rio': 'BR',
+    // España
+    'españa': 'ES', 'spain': 'ES', 'español': 'ES', 'española': 'ES', 'madrid': 'ES', 'barcelona': 'ES',
+    // USA
+    'estados unidos': 'US', 'usa': 'US', 'eeuu': 'US', 'united states': 'US', 'miami': 'US', 'new york': 'US', 'california': 'US', 'texas': 'US',
+    // Ecuador
+    'ecuador': 'EC', 'ecuatoriano': 'EC', 'ecuatoriana': 'EC', 'quito': 'EC', 'guayaquil': 'EC',
+    // Venezuela
+    'venezuela': 'VE', 'venezolano': 'VE', 'venezolana': 'VE', 'caracas': 'VE',
+    // Panamá
+    'panamá': 'PA', 'panama': 'PA', 'panameño': 'PA', 'panameña': 'PA',
+    // Costa Rica
+    'costa rica': 'CR', 'costarricense': 'CR', 'tico': 'CR', 'tica': 'CR', 'san josé': 'CR',
+    // Guatemala
+    'guatemala': 'GT', 'guatemalteco': 'GT', 'guatemalteca': 'GT',
+    // República Dominicana
+    'dominicana': 'DO', 'dominicano': 'DO', 'santo domingo': 'DO',
+    // Bolivia
+    'bolivia': 'BO', 'boliviano': 'BO', 'boliviana': 'BO', 'la paz': 'BO',
+    // Paraguay
+    'paraguay': 'PY', 'paraguayo': 'PY', 'paraguaya': 'PY', 'asunción': 'PY', 'asuncion': 'PY',
+    // Honduras
+    'honduras': 'HN', 'hondureño': 'HN', 'hondureña': 'HN', 'tegucigalpa': 'HN',
+    // El Salvador
+    'el salvador': 'SV', 'salvadoreño': 'SV', 'salvadoreña': 'SV',
+    // Nicaragua
+    'nicaragua': 'NI', 'nicaragüense': 'NI', 'managua': 'NI',
+    // Puerto Rico
+    'puerto rico': 'US', 'puertorriqueño': 'US', 'boricua': 'US',
+  };
+
+  for (const [palabra, codigo] of Object.entries(paises)) {
+    if (msgLower.includes(palabra)) return codigo;
+  }
+  return null;
 }
 
 function detectarNecesidad(msg) {
@@ -112,10 +173,21 @@ async function construirContexto(mensaje, intencion, datos) {
         contexto += `\n⚠️ PROHIBIDO: NO te presentes de nuevo, NO digas "soy Tito", NO repitas tu historia. Ya te conoce.`;
         contexto += `\n⚠️ NO repitas su nombre en cada mensaje. Hablá directo.`;
 
+        // País conocido
+        if (memoria.pais) {
+          datos._pais = memoria.pais;
+          contexto += `\n🌍 PAÍS: ${memoria.pais} - Usá la moneda correcta para este país.`;
+        }
+
         if (memoria.necesidad) contexto += `\n- Busca: ${memoria.necesidad}`;
         if (memoria.productosVistos?.length) contexto += `\n- Vio: ${memoria.productosVistos.slice(0,3).join(', ')}`;
         if (memoria.interacciones > 3) contexto += `\n- Ya chateó ${memoria.interacciones} veces (MUY interesada)`;
         if (memoria.objecionPrecio) contexto += `\n- ⚠️ Mostró duda por precio antes`;
+
+        // Guardar país si lo mencionó ahora
+        if (intencion.paisMencionado && !memoria.pais) {
+          datos._paisNuevo = intencion.paisMencionado;
+        }
       } else {
         datos._esPrimeraInteraccion = true;
         contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
@@ -127,6 +199,34 @@ async function construirContexto(mensaje, intencion, datos) {
   } else {
     datos._esPrimeraInteraccion = true;
     contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
+  }
+
+  // Si pregunta precio pero no sabemos el país
+  if (intencion.preguntaPrecio && !datos._pais && !intencion.paisMencionado) {
+    contexto += `\n\n💰 PREGUNTA POR PRECIO pero NO SABEMOS SU PAÍS.
+ANTES de dar precios, preguntá: "¿De qué país me escribís? Así te paso el precio en tu moneda 🌍"
+NO des precio hasta saber el país.`;
+  }
+
+  // Si sabemos el país, dar instrucciones de moneda
+  const paisFinal = datos._pais || intencion.paisMencionado;
+  if (paisFinal) {
+    datos._paisFinal = paisFinal;
+    const instruccionesMoneda = {
+      'UY': '💰 URUGUAY: Precios SOLO en pesos uruguayos. Ejemplo: "$3.080 pesos uruguayos". NO menciones USD.',
+      'AR': '💰 ARGENTINA: Precios en USD + pesos argentinos. Ejemplo: "$70 USD (aprox. $80.500 pesos argentinos)"',
+      'MX': '💰 MÉXICO: Precios en USD + pesos mexicanos. Ejemplo: "$70 USD (aprox. $1.400 pesos mexicanos)"',
+      'CO': '💰 COLOMBIA: Precios en USD + pesos colombianos. Ejemplo: "$70 USD (aprox. $308.000 pesos colombianos)"',
+      'CL': '💰 CHILE: Precios en USD + pesos chilenos. Ejemplo: "$70 USD (aprox. $70.000 pesos chilenos)"',
+      'PE': '💰 PERÚ: Precios en USD + soles. Ejemplo: "$70 USD (aprox. S/266 soles)"',
+      'BR': '💰 BRASIL: Precios en USD + reales. Ejemplo: "$70 USD (aprox. R$434 reales)"',
+      'ES': '💰 ESPAÑA: Precios en USD + euros. Ejemplo: "$70 USD (aprox. €66 euros)"',
+    };
+    if (instruccionesMoneda[paisFinal]) {
+      contexto += `\n\n${instruccionesMoneda[paisFinal]}`;
+    } else {
+      contexto += `\n\n💰 País: ${paisFinal} - Mostrá precios en USD.`;
+    }
   }
 
   // Si pregunta por pedido
@@ -390,7 +490,9 @@ ${instruccionFinal}`;
           interacciones: (memoriaExistente.interacciones || 0) + 1,
           nombre: userName || memoriaExistente.nombre,
           necesidad: intencion.necesidad || memoriaExistente.necesidad,
-          objecionPrecio: intencion.objecionPrecio || memoriaExistente.objecionPrecio
+          objecionPrecio: intencion.objecionPrecio || memoriaExistente.objecionPrecio,
+          // Guardar país si lo detectamos
+          pais: intencion.paisMencionado || datos._paisNuevo || memoriaExistente.pais
         };
 
         if (datos._productosParaMostrar?.length) {
