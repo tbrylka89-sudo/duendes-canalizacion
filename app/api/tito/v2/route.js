@@ -559,13 +559,27 @@ ${instruccionFinal}`;
 
     const textoRespuesta = response.content[0].text;
 
-    // Guardar memoria - CRÍTICO para evitar loops
+    // Guardar memoria Y HISTORIAL DE CONVERSACIÓN
     if (subscriberId) {
       try {
         const memoriaExistente = await kv.get(`tito:mc:${subscriberId}`) || {};
 
         // Prioridad para país: mensaje actual > mensaje anterior guardado
         const paisParaGuardar = intencion.paisMencionado || datos._paisNuevo || memoriaExistente.pais;
+
+        // Guardar mensaje en historial
+        const historialExistente = memoriaExistente.historial || [];
+        const nuevoMensaje = {
+          timestamp: new Date().toISOString(),
+          usuario: msg,
+          tito: textoRespuesta,
+          intencion: {
+            necesidad: intencion.necesidad,
+            preguntaPrecio: intencion.preguntaPrecio,
+            quiereIrse: intencion.quiereIrse,
+            objecionPrecio: intencion.objecionPrecio
+          }
+        };
 
         const nuevaMemoria = {
           ...memoriaExistente,
@@ -574,7 +588,9 @@ ${instruccionFinal}`;
           nombre: userName || memoriaExistente.nombre,
           necesidad: intencion.necesidad || memoriaExistente.necesidad,
           objecionPrecio: intencion.objecionPrecio || memoriaExistente.objecionPrecio,
-          pais: paisParaGuardar
+          pais: paisParaGuardar,
+          // Guardar últimos 20 mensajes del historial
+          historial: [...historialExistente, nuevoMensaje].slice(-20)
         };
 
         if (datos._productosParaMostrar?.length) {
@@ -586,16 +602,33 @@ ${instruccionFinal}`;
 
         await kv.set(`tito:mc:${subscriberId}`, nuevaMemoria, { ex: 30 * 24 * 60 * 60 }); // 30 días
 
-        console.log('[TITO v2] Memoria guardada:', {
+        console.log('[TITO v2] Conversación guardada:', {
           subscriberId,
           interacciones: nuevaMemoria.interacciones,
-          pais: nuevaMemoria.pais
+          pais: nuevaMemoria.pais,
+          ultimoMensaje: msg.substring(0, 50)
         });
       } catch (e) {
         console.error('[TITO v2] Error guardando memoria:', e);
       }
     } else {
       console.warn('[TITO v2] Sin subscriber_id - no se puede guardar memoria');
+    }
+
+    // LOG GLOBAL para diagnóstico (últimas 100 conversaciones)
+    try {
+      const logGlobal = await kv.get('tito:log:global') || [];
+      logGlobal.push({
+        timestamp: new Date().toISOString(),
+        subscriberId: subscriberId || 'anon',
+        nombre: userName,
+        mensaje: msg,
+        respuesta: textoRespuesta.substring(0, 200),
+        pais: paisConocido
+      });
+      await kv.set('tito:log:global', logGlobal.slice(-100), { ex: 7 * 24 * 60 * 60 }); // 7 días
+    } catch (e) {
+      // No falla si el log global falla
     }
 
     console.log('[TITO v2]', {
@@ -617,13 +650,29 @@ ${instruccionFinal}`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GET - STATUS Y DEBUG
+// GET - STATUS, DEBUG Y VER CONVERSACIONES
 // ═══════════════════════════════════════════════════════════════
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const subscriberId = searchParams.get('subscriber_id');
   const clearMemory = searchParams.get('clear');
+  const verLog = searchParams.get('log');
+  const verTodas = searchParams.get('todas');
+
+  // VER TODAS LAS CONVERSACIONES RECIENTES
+  if (verTodas === 'true' || verLog === 'global') {
+    try {
+      const logGlobal = await kv.get('tito:log:global') || [];
+      return Response.json({
+        status: 'log_global',
+        total: logGlobal.length,
+        conversaciones: logGlobal.reverse() // Más recientes primero
+      });
+    } catch (e) {
+      return Response.json({ status: 'error', error: e.message });
+    }
+  }
 
   // Si piden ver/limpiar memoria de un subscriber
   if (subscriberId) {
@@ -637,6 +686,25 @@ export async function GET(request) {
       }
 
       const memoria = await kv.get(`tito:mc:${subscriberId}`);
+
+      if (memoria && memoria.historial) {
+        // Formatear historial para lectura fácil
+        const historialFormateado = memoria.historial.map(h => ({
+          fecha: h.timestamp,
+          cliente: h.usuario,
+          tito: h.tito
+        }));
+
+        return Response.json({
+          status: 'conversacion_completa',
+          subscriber_id: subscriberId,
+          nombre: memoria.nombre,
+          pais: memoria.pais,
+          interacciones: memoria.interacciones,
+          historial: historialFormateado
+        });
+      }
+
       return Response.json({
         status: 'debug_memoria',
         subscriber_id: subscriberId,
@@ -672,8 +740,9 @@ export async function GET(request) {
     ],
     productos_cargados: productosTest.length,
     debug: {
-      ver_memoria: '/api/tito/v2?subscriber_id=TU_ID',
-      borrar_memoria: '/api/tito/v2?subscriber_id=TU_ID&clear=true'
+      ver_todas_conversaciones: '/api/tito/v2?todas=true',
+      ver_conversacion_especifica: '/api/tito/v2?subscriber_id=ID_DEL_CLIENTE',
+      borrar_memoria: '/api/tito/v2?subscriber_id=ID&clear=true'
     },
     ejemplo_uso: {
       method: 'POST',
