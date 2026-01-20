@@ -457,11 +457,20 @@ ${titoInfo}
 SEO PARA RANK MATH (COMPLETAR TODO)
 ═══════════════════════════════════════════════════════════════
 
+KEYWORDS DE MARCA OBLIGATORIAS (usar al menos 2-3 en tags y descripción):
+- "duende canalizado" / "duendes canalizados"
+- "duende artesanal" / "duendes artesanales"
+- "duende activado" / "duendes activados"
+- "duende real" / "duendes reales"
+- "guardián canalizado" (si es guardián)
+
+Estas palabras son ESENCIALES para el SEO de la marca. SIEMPRE incluirlas.
+
 Generá contenido SEO optimizado:
-- Focus keyword basada en el tipo de ser y propósito
-- Título SEO que incluya la keyword y genere clicks
-- Meta description que venda sin ser spam
-- Tags relevantes para el producto
+- Focus keyword: combinar tipo de ser + propósito + "canalizado" (ej: "duende de abundancia canalizado")
+- Título SEO: incluir "canalizado" o "artesanal"
+- Meta description: mencionar que es artesanal y canalizado
+- Tags: OBLIGATORIO incluir: duende canalizado, duende artesanal, duende real + los específicos del producto
 
 ═══════════════════════════════════════════════════════════════
 FORMATO DE RESPUESTA
@@ -473,12 +482,12 @@ NOMBRE_GENERADO: [nombre único si no se proporcionó uno]
 TITULO: [Nombre - Subtítulo místico corto que venda]
 DESCRIPCION_CORTA: [Frase gancho de máximo 2 líneas - debe generar curiosidad y emoción]
 DESCRIPCION: [Historia completa siguiendo estructura MIXTA: intro tercera persona + ser habla en primera persona]
-SEO_TITLE: [Título optimizado para Google, máximo 60 caracteres, incluir keyword]
-SEO_DESCRIPTION: [Meta description atractiva, máximo 155 caracteres, con llamado a la acción sutil]
-FOCUS_KEYWORD: [Palabra clave principal para Rank Math, ej: "duende de la abundancia"]
+SEO_TITLE: [Título optimizado, máximo 60 chars, DEBE incluir "canalizado" o "artesanal"]
+SEO_DESCRIPTION: [Meta description, máximo 155 chars, mencionar "duende canalizado artesanal"]
+FOCUS_KEYWORD: [Keyword principal, ej: "duende canalizado abundancia" o "guardián artesanal protección"]
 TIPO_SER: [Qué tipo de ser es exactamente]
 CATEGORIA_SUGERIDA: [Categoría de WooCommerce sugerida]
-TAGS: [tags separados por coma: cristales, propósito, elemento, etc.]
+TAGS: [OBLIGATORIO: duende canalizado, duende artesanal, duende real, duende activado + cristales, propósito, elemento, etc.]
 PERSONALIDAD: [Breve descripción de la personalidad única de este ser]`;
 }
 
