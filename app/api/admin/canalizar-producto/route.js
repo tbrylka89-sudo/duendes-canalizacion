@@ -549,7 +549,36 @@ function parseClaudeResponse(content) {
         }
     }
 
+    // Convertir descripción a HTML con párrafos
+    if (result.descripcion) {
+        result.descripcion = textoAHtml(result.descripcion);
+    }
+    if (result.descripcion_corta) {
+        result.descripcion_corta = '<p>' + result.descripcion_corta + '</p>';
+    }
+
     return result;
+}
+
+// Función para convertir texto a HTML con párrafos
+function textoAHtml(texto) {
+    if (!texto) return '';
+    // Dividir por doble salto de línea
+    const parrafos = texto.split(/\n\n+/);
+    return parrafos
+        .map(p => {
+            p = p.trim();
+            if (!p) return '';
+            // Reemplazar saltos simples por <br>
+            p = p.replace(/\n/g, '<br>');
+            // Detectar si es una cita (empieza con ")
+            if (p.startsWith('"') || p.startsWith('«')) {
+                return '<blockquote><p>' + p + '</p></blockquote>';
+            }
+            return '<p>' + p + '</p>';
+        })
+        .filter(p => p)
+        .join('\n');
 }
 
 async function saveGeneration(data, result) {
