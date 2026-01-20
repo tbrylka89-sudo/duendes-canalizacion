@@ -454,23 +454,32 @@ Total de productos: ${existingProducts.length}
 ${titoInfo}
 
 ═══════════════════════════════════════════════════════════════
-SEO PARA RANK MATH (COMPLETAR TODO)
+SEO PARA RANK MATH - CRÍTICO PARA PUNTAJE 80+
 ═══════════════════════════════════════════════════════════════
 
-KEYWORDS DE MARCA OBLIGATORIAS (usar al menos 2-3 en tags y descripción):
-- "duende canalizado" / "duendes canalizados"
-- "duende artesanal" / "duendes artesanales"
-- "duende activado" / "duendes activados"
-- "duende real" / "duendes reales"
-- "guardián canalizado" (si es guardián)
+REGLAS SEO OBLIGATORIAS (Rank Math verifica que el Focus Keyword aparezca en todo):
 
-Estas palabras son ESENCIALES para el SEO de la marca. SIEMPRE incluirlas.
+1. FOCUS KEYWORD: Máximo 3 palabras. Ejemplos correctos:
+   - "duende canalizado" (si es duende)
+   - "guardián canalizado" (si es guardián)
+   - "hada artesanal" (si es hada)
+   - "pixie protección" (si es pixie de protección)
+   NO usar frases largas como "duende de abundancia canalizado protección"
 
-Generá contenido SEO optimizado:
-- Focus keyword: combinar tipo de ser + propósito + "canalizado" (ej: "duende de abundancia canalizado")
-- Título SEO: incluir "canalizado" o "artesanal"
-- Meta description: mencionar que es artesanal y canalizado
-- Tags: OBLIGATORIO incluir: duende canalizado, duende artesanal, duende real + los específicos del producto
+2. SEO TITLE: DEBE contener el FOCUS KEYWORD exacto al principio
+   Formato: "[Focus Keyword] - [Nombre del Ser] | Duendes del Uruguay"
+   Ejemplo: "Duende Canalizado - Próspero el Abundante | Duendes del Uruguay"
+   Máximo 60 caracteres.
+
+3. SEO DESCRIPTION: DEBE contener el FOCUS KEYWORD exacto
+   Debe empezar con el focus keyword o incluirlo en la primera oración.
+   Ejemplo: "Duende canalizado artesanal especializado en abundancia. Pieza única activada..."
+   Máximo 155 caracteres.
+
+4. DESCRIPCIÓN DEL PRODUCTO: El focus keyword debe aparecer en el primer párrafo.
+
+KEYWORDS DE MARCA (usar en tags):
+- duende canalizado, duende artesanal, duende activado, duende real, guardián canalizado
 
 ═══════════════════════════════════════════════════════════════
 FORMATO DE RESPUESTA
@@ -481,13 +490,13 @@ Respondé EXACTAMENTE con este formato:
 NOMBRE_GENERADO: [nombre único si no se proporcionó uno]
 TITULO: [Nombre - Subtítulo místico corto que venda]
 DESCRIPCION_CORTA: [Frase gancho de máximo 2 líneas - debe generar curiosidad y emoción]
-DESCRIPCION: [Historia completa siguiendo estructura MIXTA: intro tercera persona + ser habla en primera persona]
-SEO_TITLE: [Título optimizado, máximo 60 chars, DEBE incluir "canalizado" o "artesanal"]
-SEO_DESCRIPTION: [Meta description, máximo 155 chars, mencionar "duende canalizado artesanal"]
-FOCUS_KEYWORD: [Keyword principal, ej: "duende canalizado abundancia" o "guardián artesanal protección"]
+DESCRIPCION: [Historia completa - EL FOCUS KEYWORD DEBE APARECER EN EL PRIMER PÁRRAFO]
+SEO_TITLE: [FOCUS KEYWORD + nombre + Duendes del Uruguay, máximo 60 chars]
+SEO_DESCRIPTION: [Empezar con FOCUS KEYWORD, máximo 155 chars]
+FOCUS_KEYWORD: [MÁXIMO 3 PALABRAS: tipo + canalizado/artesanal. Ej: "duende canalizado", "guardián artesanal"]
 TIPO_SER: [Qué tipo de ser es exactamente]
 CATEGORIA_SUGERIDA: [Categoría de WooCommerce sugerida]
-TAGS: [OBLIGATORIO: duende canalizado, duende artesanal, duende real, duende activado + cristales, propósito, elemento, etc.]
+TAGS: [duende canalizado, duende artesanal, duende real, duende activado + específicos del producto]
 PERSONALIDAD: [Breve descripción de la personalidad única de este ser]`;
 }
 
