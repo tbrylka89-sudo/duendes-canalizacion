@@ -1,0 +1,431 @@
+/**
+ * TITO 2.0 - EL DUENDE MAESTRO
+ * Endpoint unificado para ManyChat (Instagram, Facebook, WhatsApp)
+ *
+ * Optimizado para timeout de 10 segundos de ManyChat
+ */
+
+import Anthropic from '@anthropic-ai/sdk';
+import { kv } from '@vercel/kv';
+import {
+  obtenerProductosWoo,
+  buscarPedido,
+  formatearPedido,
+  recomendarGuardianes,
+  formatearPrecio,
+  detectarPaisDeMensaje,
+  FAQ,
+  INFO_EMPRESA
+} from '@/lib/tito/conocimiento';
+import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+// ═══════════════════════════════════════════════════════════════
+// DETECTORES DE INTENCIÓN
+// ═══════════════════════════════════════════════════════════════
+
+function detectarIntencion(mensaje) {
+  const msg = mensaje.toLowerCase();
+
+  return {
+    // Pedidos
+    preguntaPedido: /pedido|orden|env[ií]o|tracking|rastreo|compr[eé]|pagu[eé]|lleg[oó]|cu[aá]ndo llega|estado|n[uú]mero/i.test(msg),
+
+    // Ver productos
+    quiereVer: /mostr[aá]|ver|foto|im[aá]gen|tienen|disponible|cat[aá]logo|tienda/i.test(msg),
+
+    // Recomendación
+    quiereRecomendacion: /recomiend|sugier|cu[aá]l|ayud[aá]|necesito|busco|para m[ií]|no s[eé]/i.test(msg),
+
+    // Necesidad específica
+    necesidad: detectarNecesidad(msg),
+
+    // Preguntas FAQ
+    preguntaFAQ: detectarPreguntaFAQ(msg),
+
+    // Objeción de precio
+    objecionPrecio: /caro|precio|presupuesto|mucho|costoso|barato|descuento|oferta|plata|dinero/i.test(msg),
+
+    // Se quiere ir
+    quiereIrse: /gracias|chau|adi[oó]s|despu[eé]s|luego|pienso|veo/i.test(msg),
+
+    // Nervioso/molesto
+    nervioso: /preocupad|molest|enoj|urgente|problema|queja|reclamo|estafa/i.test(msg),
+
+    // Saludo
+    esSaludo: /^(hola|hey|buenas|buenos|hi|hello|ey|que tal|qué tal|buen d[ií]a)/i.test(msg),
+
+    // Info de contacto detectada
+    tieneEmail: msg.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0],
+    tieneNumero: msg.match(/\b\d{4,}\b/)?.[0]
+  };
+}
+
+function detectarNecesidad(msg) {
+  if (/protecci[oó]n|proteger|escudo|defensa|malo|negativ|miedo|peligro/i.test(msg)) return 'proteccion';
+  if (/abundancia|dinero|prosperidad|trabajo|negocio|plata|riqueza|fortuna/i.test(msg)) return 'abundancia';
+  if (/amor|pareja|coraz[oó]n|relaci[oó]n|soledad|solo|sola/i.test(msg)) return 'amor';
+  if (/san|salud|curar|enferm|bienestar|dolor|mejor/i.test(msg)) return 'sanacion';
+  if (/paz|calma|ansiedad|estr[eé]s|tranquil|nervio/i.test(msg)) return 'paz';
+  if (/hogar|casa|familia|espacio/i.test(msg)) return 'hogar';
+  return null;
+}
+
+function detectarPreguntaFAQ(msg) {
+  if (/env[ií]o|llega|cu[aá]nto tarda|d[ií]as/i.test(msg)) return 'envios';
+  if (/pago|pagar|tarjeta|transferencia|mercado pago|paypal/i.test(msg)) return 'pagos';
+  if (/reserva|30%|apartado/i.test(msg)) return 'reserva';
+  if (/material|hecho|porcelana|cristal/i.test(msg)) return 'materiales';
+  if (/tama[ñn]o|grande|chico|medida|cm|cent[ií]metro/i.test(msg)) return 'tamanos';
+  if (/garant[ií]a|roto|da[ñn]ado|devoluci[oó]n/i.test(msg)) return 'garantia';
+  if (/visita|conocer|ir|piri[aá]polis/i.test(msg)) return 'visitas';
+  if (/canaliza|mensaje|energ[ií]a/i.test(msg)) return 'canalizacion';
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONSTRUIR CONTEXTO PARA CLAUDE
+// ═══════════════════════════════════════════════════════════════
+
+async function construirContexto(mensaje, intencion, datos) {
+  const { nombre, plataforma, historial, subscriberId } = datos;
+  let contexto = '';
+
+  // Info del visitante
+  if (nombre) contexto += `\n👤 HABLÁS CON: ${nombre}`;
+  if (plataforma) contexto += ` (desde ${plataforma})`;
+
+  // Cargar memoria si existe
+  if (subscriberId) {
+    try {
+      const memoria = await kv.get(`tito:mc:${subscriberId}`);
+      if (memoria) {
+        contexto += `\n\n📝 LO QUE SABÉS DE ESTA PERSONA:`;
+        if (memoria.nombre) contexto += `\n- Se llama ${memoria.nombre}`;
+        if (memoria.necesidad) contexto += `\n- Busca: ${memoria.necesidad}`;
+        if (memoria.productosVistos?.length) contexto += `\n- Vio: ${memoria.productosVistos.slice(0,3).join(', ')}`;
+        if (memoria.interacciones > 3) contexto += `\n- Ya chateó ${memoria.interacciones} veces (MUY interesada)`;
+        if (memoria.objecionPrecio) contexto += `\n- ⚠️ Mostró duda por precio antes`;
+      }
+    } catch (e) {}
+  }
+
+  // Si pregunta por pedido
+  if (intencion.preguntaPedido) {
+    const identificador = intencion.tieneEmail || intencion.tieneNumero;
+    if (identificador) {
+      const pedido = await buscarPedido(identificador);
+      if (pedido) {
+        const info = Array.isArray(pedido) ? formatearPedido(pedido[0]) : formatearPedido(pedido);
+        if (info) {
+          contexto += `\n\n📦 PEDIDO ENCONTRADO:
+- Número: #${info.id}
+- Estado: ${info.estado}
+- Cliente: ${info.cliente}
+- Productos: ${info.productos}
+- Total: ${info.total}
+- Fecha: ${info.fecha}
+${info.tracking ? `- Tracking: ${info.tracking}` : '- Tracking: Aún no disponible'}`;
+        }
+      } else {
+        contexto += `\n\n⚠️ No encontré pedido con "${identificador}". Pedile más datos.`;
+      }
+    } else {
+      contexto += `\n\n📦 PREGUNTA POR PEDIDO pero no dio número ni email. Pedíselo amablemente.`;
+    }
+  }
+
+  // Si quiere ver productos o recomendación
+  if (intencion.quiereVer || intencion.quiereRecomendacion || intencion.necesidad) {
+    const productos = await obtenerProductosWoo();
+    const pais = detectarPaisDeMensaje(mensaje, datos);
+
+    if (productos.length > 0) {
+      let recomendados;
+      if (intencion.necesidad) {
+        recomendados = recomendarGuardianes(intencion.necesidad, productos, { limite: 6 });
+      } else {
+        recomendados = productos.filter(p => p.disponible).slice(0, 6);
+      }
+
+      if (recomendados.length > 0) {
+        contexto += `\n\n🛡️ GUARDIANES PARA MOSTRAR:`;
+        recomendados.forEach(p => {
+          contexto += `\n- ${p.nombre}: ${formatearPrecio(p.precio, pais)} ${p.enOferta ? '(EN OFERTA)' : ''}`;
+        });
+        contexto += `\n\n💡 El sistema mostrará las fotos automáticamente. Vos enfocate en la conexión emocional.`;
+
+        // Guardar para el response
+        datos._productosParaMostrar = recomendados;
+      }
+    }
+  }
+
+  // Si pregunta FAQ
+  if (intencion.preguntaFAQ) {
+    const faqKey = intencion.preguntaFAQ;
+    const faqData = FAQ[faqKey];
+    if (faqData) {
+      contexto += `\n\n📚 INFO PARA RESPONDER (${faqKey.toUpperCase()}):`;
+      contexto += `\n${JSON.stringify(faqData, null, 2)}`;
+    }
+  }
+
+  // Si tiene objeción de precio
+  if (intencion.objecionPrecio) {
+    contexto += `\n\n💰 OBJECIÓN DE PRECIO DETECTADA
+Técnicas a usar:
+1. "¿Caro comparado con qué? ¿Con la paz mental?"
+2. "Son días de trabajo artesanal, cristales reales, pieza única"
+3. "Con el 30% ($21 en un mini) lo reservás 30 días"
+4. "Cuando se va, no vuelve. Es ahora o nunca."`;
+  }
+
+  // Si se quiere ir
+  if (intencion.quiereIrse && !intencion.esSaludo) {
+    contexto += `\n\n🚨 SE QUIERE IR - Usá el closer:
+"Antes de que te vayas... este guardián ya te eligió. Con el 30% lo asegurás."`;
+  }
+
+  // Si está nervioso
+  if (intencion.nervioso) {
+    contexto += `\n\n⚠️ CLIENTE NERVIOSO/MOLESTO
+1. Validá: "Entiendo perfectamente"
+2. Calmá: "Dejame revisar qué está pasando"
+3. Si no podés resolver: "Le paso tu mensaje al equipo ahora mismo"`;
+  }
+
+  return contexto;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORMATO MANYCHAT
+// ═══════════════════════════════════════════════════════════════
+
+function crearRespuestaManychat(texto, productos = []) {
+  const mensajes = [{ type: 'text', text: texto }];
+
+  if (productos.length > 0) {
+    const cards = productos.slice(0, 10).map(p => ({
+      title: p.nombre,
+      subtitle: `$${p.precio} USD${p.enOferta ? ' ⭐ OFERTA' : ''}`,
+      image_url: p.imagen,
+      buttons: [{
+        type: 'url',
+        caption: '💚 Ver más',
+        url: p.url || `https://duendesdeluruguay.com/?p=${p.id}`
+      }]
+    }));
+
+    mensajes.push({
+      type: 'cards',
+      elements: cards,
+      image_aspect_ratio: 'square'
+    });
+  }
+
+  return {
+    version: 'v2',
+    content: { messages: mensajes }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HANDLER PRINCIPAL
+// ═══════════════════════════════════════════════════════════════
+
+export async function POST(request) {
+  const startTime = Date.now();
+
+  try {
+    const body = await request.json();
+    const {
+      mensaje,
+      message,
+      nombre,
+      first_name,
+      plataforma,
+      platform,
+      subscriber_id,
+      historial,
+      history
+    } = body;
+
+    const msg = mensaje || message || '';
+    const userName = nombre || first_name || '';
+    const platform_ = plataforma || platform || 'instagram';
+    const subscriberId = subscriber_id;
+    const conversationHistory = historial || history || [];
+
+    // Si mensaje vacío, saludo
+    if (!msg.trim()) {
+      return Response.json(crearRespuestaManychat(
+        `¡Ey${userName ? ' ' + userName : ''}! ✨\n\n¿Qué te trajo por el bosque hoy?`
+      ));
+    }
+
+    // Detectar intención
+    const intencion = detectarIntencion(msg);
+
+    // Datos para contexto
+    const datos = {
+      nombre: userName,
+      plataforma: platform_,
+      subscriberId,
+      historial: conversationHistory,
+      _productosParaMostrar: []
+    };
+
+    // Construir contexto (con timeout protection)
+    let contexto = '';
+    try {
+      const contextoPromise = construirContexto(msg, intencion, datos);
+      contexto = await Promise.race([
+        contextoPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout contexto')), 4000))
+      ]);
+    } catch (e) {
+      console.log('[TITO v2] Contexto timeout, continuando sin contexto completo');
+    }
+
+    // Verificar tiempo antes de llamar a Claude
+    if (Date.now() - startTime > 6000) {
+      console.log('[TITO v2] Timeout prevention - respuesta rápida');
+
+      // Respuesta de emergencia inteligente según intención
+      if (intencion.esSaludo) {
+        return Response.json(crearRespuestaManychat(
+          `¡Ey${userName ? ' ' + userName : ''}! ✨\n\n¿Qué andás buscando? ¿Protección, abundancia, amor...?`,
+          datos._productosParaMostrar
+        ));
+      }
+
+      if (datos._productosParaMostrar?.length > 0) {
+        return Response.json(crearRespuestaManychat(
+          `Mirá estos guardianes... ¿Cuál te llama? 💚`,
+          datos._productosParaMostrar
+        ));
+      }
+
+      return Response.json(crearRespuestaManychat(
+        `Dame un segundito que me trabé 😅\n\n¿Podés repetirme qué necesitás?`
+      ));
+    }
+
+    // Construir historial para Claude
+    const mensajesParaClaude = [];
+
+    if (conversationHistory.length > 0) {
+      conversationHistory.slice(-6).forEach(h => {
+        mensajesParaClaude.push({
+          role: h.role === 'assistant' || h.rol === 'asistente' ? 'assistant' : 'user',
+          content: h.content || h.contenido
+        });
+      });
+    }
+
+    mensajesParaClaude.push({ role: 'user', content: msg });
+
+    // System prompt
+    const systemPrompt = `${PERSONALIDAD_TITO}
+
+${CONTEXTO_MANYCHAT}
+
+${contexto}
+
+=== INSTRUCCIÓN ===
+Respondé como TITO. Máximo 3-4 oraciones. Siempre terminá con pregunta o call to action.
+Si hay productos para mostrar, el sistema los agrega automáticamente - vos enfocate en la conexión.`;
+
+    // Llamar a Claude
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: mensajesParaClaude
+    });
+
+    const textoRespuesta = response.content[0].text;
+
+    // Guardar memoria
+    if (subscriberId) {
+      try {
+        const memoriaExistente = await kv.get(`tito:mc:${subscriberId}`) || {};
+        const nuevaMemoria = {
+          ...memoriaExistente,
+          ultimaInteraccion: new Date().toISOString(),
+          interacciones: (memoriaExistente.interacciones || 0) + 1,
+          nombre: userName || memoriaExistente.nombre,
+          necesidad: intencion.necesidad || memoriaExistente.necesidad,
+          objecionPrecio: intencion.objecionPrecio || memoriaExistente.objecionPrecio
+        };
+
+        if (datos._productosParaMostrar?.length) {
+          nuevaMemoria.productosVistos = [
+            ...datos._productosParaMostrar.map(p => p.nombre),
+            ...(memoriaExistente.productosVistos || [])
+          ].slice(0, 10);
+        }
+
+        await kv.set(`tito:mc:${subscriberId}`, nuevaMemoria, { ex: 30 * 24 * 60 * 60 }); // 30 días
+      } catch (e) {
+        console.error('[TITO v2] Error guardando memoria:', e);
+      }
+    }
+
+    console.log('[TITO v2]', {
+      tiempo: Date.now() - startTime,
+      plataforma: platform_,
+      intencion: intencion.necesidad || (intencion.quiereVer ? 'ver' : 'chat'),
+      productos: datos._productosParaMostrar?.length || 0
+    });
+
+    return Response.json(crearRespuestaManychat(textoRespuesta, datos._productosParaMostrar));
+
+  } catch (error) {
+    console.error('[TITO v2] Error:', error);
+
+    return Response.json(crearRespuestaManychat(
+      `Uy, se me cruzaron los cables 😅\n\n¿Podés escribirme de nuevo? Si sigue fallando, escribí al WhatsApp: +598 98 690 629`
+    ));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GET - STATUS Y TEST
+// ═══════════════════════════════════════════════════════════════
+
+export async function GET() {
+  let productosTest = [];
+  try {
+    productosTest = await obtenerProductosWoo();
+  } catch (e) {}
+
+  return Response.json({
+    status: 'ok',
+    version: 'TITO 2.0 - El Duende Maestro',
+    capacidades: [
+      'Personalidad de duende experto en neuroventas',
+      'Conocimiento completo de productos WooCommerce',
+      'Búsqueda de pedidos por número/email',
+      'Recomendación inteligente de guardianes',
+      'Memoria de conversaciones',
+      'FAQ integrado',
+      'Manejo de objeciones',
+      'Formato ManyChat Dynamic Block'
+    ],
+    productos_cargados: productosTest.length,
+    ejemplo_uso: {
+      method: 'POST',
+      body: {
+        mensaje: 'Hola, busco un duende de protección',
+        nombre: 'María',
+        plataforma: 'instagram',
+        subscriber_id: 'abc123'
+      }
+    }
+  });
+}
