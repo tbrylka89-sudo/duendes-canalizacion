@@ -27,3 +27,8 @@ npm-debug.log*
 Thumbs.db
 .env*.local
 *.exp
+
+# Credentials (never commit)
+SFTP-CREDENTIALS.txt
+*-CREDENTIALS.txt
+*.credentials
