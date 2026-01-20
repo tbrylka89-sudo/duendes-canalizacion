@@ -344,16 +344,28 @@ export async function POST(request) {
 
     mensajesParaClaude.push({ role: 'user', content: msg });
 
-    // System prompt
+    // System prompt con instrucción específica según contexto
+    let instruccionFinal = '';
+    if (datos._esPrimeraInteraccion) {
+      instruccionFinal = `=== INSTRUCCIÓN PRIMER MENSAJE ===
+SOLO decí: "¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀 ¿Cómo andás?"
+NADA MÁS. No cuentes tu historia. No menciones duendes. No digas que tenés 847 años.
+Solo saludá casual y preguntá cómo está. MÁXIMO 2 LÍNEAS.`;
+    } else {
+      instruccionFinal = `=== INSTRUCCIÓN ===
+Respondé como TITO. Máximo 3-4 oraciones.
+PROHIBIDO presentarte de nuevo o decir "soy Tito" - ya te conoce.
+Siempre terminá con pregunta o call to action.
+Si hay productos para mostrar, el sistema los agrega automáticamente.`;
+    }
+
     const systemPrompt = `${PERSONALIDAD_TITO}
 
 ${CONTEXTO_MANYCHAT}
 
 ${contexto}
 
-=== INSTRUCCIÓN ===
-Respondé como TITO. Máximo 3-4 oraciones. Siempre terminá con pregunta o call to action.
-Si hay productos para mostrar, el sistema los agrega automáticamente - vos enfocate en la conexión.`;
+${instruccionFinal}`;
 
     // Llamar a Claude
     const response = await anthropic.messages.create({
