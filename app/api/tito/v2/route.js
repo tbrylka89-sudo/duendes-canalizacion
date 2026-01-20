@@ -190,43 +190,54 @@ async function construirContexto(mensaje, intencion, datos) {
         }
       } else {
         datos._esPrimeraInteraccion = true;
-        contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
       }
     } catch (e) {
       datos._esPrimeraInteraccion = true;
-      contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
     }
   } else {
     datos._esPrimeraInteraccion = true;
-    contexto += `\n\n✨ PRIMERA INTERACCIÓN - Presentate CASUAL: "¡Ey! Soy Tito 🍀 ¿Cómo andás?" - NO largues toda tu historia, solo saludá ameno y preguntá cómo está.`;
   }
 
-  // Si pregunta precio pero no sabemos el país
-  if (intencion.preguntaPrecio && !datos._pais && !intencion.paisMencionado) {
-    contexto += `\n\n💰 PREGUNTA POR PRECIO pero NO SABEMOS SU PAÍS.
-ANTES de dar precios, preguntá: "¿De qué país me escribís? Así te paso el precio en tu moneda 🌍"
-NO des precio hasta saber el país.`;
-  }
-
-  // Si sabemos el país, dar instrucciones de moneda
+  // País: detectar de memoria o del mensaje actual
   const paisFinal = datos._pais || intencion.paisMencionado;
+  datos._paisFinal = paisFinal;
+
+  // === INSTRUCCIONES CLARAS Y SIN CONFLICTO ===
+
+  if (datos._esPrimeraInteraccion) {
+    // PRIMERA VEZ: presentarse casual
+    contexto += `\n\n✨ PRIMERA INTERACCIÓN:
+- Presentate casual: "¡Ey! Soy Tito 🍀 ¿Cómo andás?"
+- NO largues tu historia
+- Solo saludá y preguntá cómo está`;
+  } else {
+    // YA SE CONOCEN: no presentarse
+    contexto += `\n\n🔄 YA SE CONOCEN:
+- NO te presentes de nuevo
+- NO digas "soy Tito"
+- Hablá directo, como si continuaras la charla`;
+  }
+
+  // PAÍS Y PRECIOS
   if (paisFinal) {
-    datos._paisFinal = paisFinal;
+    // Ya sabemos el país - dar formato de moneda
     const instruccionesMoneda = {
-      'UY': '💰 URUGUAY: Precios SOLO en pesos uruguayos. Ejemplo: "$3.080 pesos uruguayos". NO menciones USD.',
-      'AR': '💰 ARGENTINA: Precios en USD + pesos argentinos. Ejemplo: "$70 USD (aprox. $80.500 pesos argentinos)"',
-      'MX': '💰 MÉXICO: Precios en USD + pesos mexicanos. Ejemplo: "$70 USD (aprox. $1.400 pesos mexicanos)"',
-      'CO': '💰 COLOMBIA: Precios en USD + pesos colombianos. Ejemplo: "$70 USD (aprox. $308.000 pesos colombianos)"',
-      'CL': '💰 CHILE: Precios en USD + pesos chilenos. Ejemplo: "$70 USD (aprox. $70.000 pesos chilenos)"',
-      'PE': '💰 PERÚ: Precios en USD + soles. Ejemplo: "$70 USD (aprox. S/266 soles)"',
-      'BR': '💰 BRASIL: Precios en USD + reales. Ejemplo: "$70 USD (aprox. R$434 reales)"',
-      'ES': '💰 ESPAÑA: Precios en USD + euros. Ejemplo: "$70 USD (aprox. €66 euros)"',
+      'UY': '\n💰 Es de URUGUAY: Precios SOLO en pesos uruguayos. Ej: "$3.080 pesos". NO menciones USD.',
+      'AR': '\n💰 Es de ARGENTINA: USD + pesos. Ej: "$70 USD (aprox. $80.500 pesos argentinos)"',
+      'MX': '\n💰 Es de MÉXICO: USD + pesos. Ej: "$70 USD (aprox. $1.400 pesos mexicanos)"',
+      'CO': '\n💰 Es de COLOMBIA: USD + pesos. Ej: "$70 USD (aprox. $308.000 pesos)"',
+      'CL': '\n💰 Es de CHILE: USD + pesos. Ej: "$70 USD (aprox. $70.000 pesos chilenos)"',
+      'PE': '\n💰 Es de PERÚ: USD + soles. Ej: "$70 USD (aprox. S/266 soles)"',
+      'BR': '\n💰 Es de BRASIL: USD + reales. Ej: "$70 USD (aprox. R$434 reales)"',
+      'ES': '\n💰 Es de ESPAÑA: USD + euros. Ej: "$70 USD (aprox. €66 euros)"',
     };
-    if (instruccionesMoneda[paisFinal]) {
-      contexto += `\n\n${instruccionesMoneda[paisFinal]}`;
-    } else {
-      contexto += `\n\n💰 País: ${paisFinal} - Mostrá precios en USD.`;
-    }
+    contexto += instruccionesMoneda[paisFinal] || `\n💰 País: ${paisFinal} - Precios en USD.`;
+    contexto += '\n⚠️ YA SABÉS SU PAÍS - NO preguntes de nuevo de dónde es.';
+  } else if (intencion.preguntaPrecio) {
+    // No sabemos país y pregunta precio - preguntar país
+    contexto += `\n\n💰 PREGUNTA PRECIO pero NO SABÉS SU PAÍS:
+- Antes de dar precio preguntá: "¿De qué país me escribís?"
+- NO des precio hasta saber el país`;
   }
 
   // Si pregunta por pedido
@@ -447,17 +458,44 @@ export async function POST(request) {
 
     // System prompt con instrucción específica según contexto
     let instruccionFinal = '';
-    if (datos._esPrimeraInteraccion) {
-      instruccionFinal = `=== INSTRUCCIÓN PRIMER MENSAJE ===
-SOLO decí: "¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀 ¿Cómo andás?"
-NADA MÁS. No cuentes tu historia. No menciones duendes. No digas que tenés 847 años.
-Solo saludá casual y preguntá cómo está. MÁXIMO 2 LÍNEAS.`;
+
+    // Determinar si ya conocemos el país (de memoria O del mensaje actual)
+    const paisConocido = datos._paisFinal || intencion.paisMencionado;
+    const yaPreguntoPais = paisConocido !== null && paisConocido !== undefined;
+
+    // DEBUG: Agregar log para ver qué está pasando
+    console.log('[TITO v2] Estado:', {
+      esPrimeraInteraccion: datos._esPrimeraInteraccion,
+      paisFinal: datos._paisFinal,
+      paisMencionado: intencion.paisMencionado,
+      paisConocido,
+      yaPreguntoPais,
+      subscriberId
+    });
+
+    if (datos._esPrimeraInteraccion && !yaPreguntoPais) {
+      // Primera vez Y no sabemos país - saludo simple
+      instruccionFinal = `=== INSTRUCCIÓN ÚNICA ===
+Decí EXACTAMENTE: "¡Ey! Soy Tito 🍀 ¿Cómo andás?"
+NADA MÁS. NO agregues preguntas sobre país. NO cuentes tu historia.`;
+    } else if (datos._esPrimeraInteraccion && yaPreguntoPais) {
+      // Primera vez PERO ya sabemos país (lo dijo en el mensaje)
+      instruccionFinal = `=== INSTRUCCIÓN ÚNICA ===
+El usuario es de ${paisConocido}. YA SABÉS SU PAÍS.
+Saludá breve y respondé a lo que dice. NO preguntes de dónde es.
+Máximo 3 oraciones cortas.`;
+    } else if (!datos._esPrimeraInteraccion && yaPreguntoPais) {
+      // Ya se conocen Y ya sabemos país
+      instruccionFinal = `=== INSTRUCCIÓN ÚNICA ===
+PROHIBIDO: presentarte, decir "soy Tito", preguntar de dónde es.
+Ya se conocen. Ya sabés que es de ${paisConocido}.
+Respondé DIRECTO a lo que pregunta. Máximo 3 oraciones.`;
     } else {
-      instruccionFinal = `=== INSTRUCCIÓN ===
-Respondé como TITO. Máximo 3-4 oraciones.
-PROHIBIDO presentarte de nuevo o decir "soy Tito" - ya te conoce.
-Siempre terminá con pregunta o call to action.
-Si hay productos para mostrar, el sistema los agrega automáticamente.`;
+      // Ya se conocen pero no sabemos país
+      instruccionFinal = `=== INSTRUCCIÓN ÚNICA ===
+PROHIBIDO: presentarte o decir "soy Tito" (ya te conoce).
+Si pregunta precios, ahí sí preguntá: "¿De qué país me escribís?"
+Respondé directo. Máximo 3 oraciones.`;
     }
 
     const systemPrompt = `${PERSONALIDAD_TITO}
@@ -480,10 +518,14 @@ ${instruccionFinal}`;
 
     const textoRespuesta = response.content[0].text;
 
-    // Guardar memoria
+    // Guardar memoria - CRÍTICO para evitar loops
     if (subscriberId) {
       try {
         const memoriaExistente = await kv.get(`tito:mc:${subscriberId}`) || {};
+
+        // Prioridad para país: mensaje actual > mensaje anterior guardado
+        const paisParaGuardar = intencion.paisMencionado || datos._paisNuevo || memoriaExistente.pais;
+
         const nuevaMemoria = {
           ...memoriaExistente,
           ultimaInteraccion: new Date().toISOString(),
@@ -491,8 +533,7 @@ ${instruccionFinal}`;
           nombre: userName || memoriaExistente.nombre,
           necesidad: intencion.necesidad || memoriaExistente.necesidad,
           objecionPrecio: intencion.objecionPrecio || memoriaExistente.objecionPrecio,
-          // Guardar país si lo detectamos
-          pais: intencion.paisMencionado || datos._paisNuevo || memoriaExistente.pais
+          pais: paisParaGuardar
         };
 
         if (datos._productosParaMostrar?.length) {
@@ -503,9 +544,17 @@ ${instruccionFinal}`;
         }
 
         await kv.set(`tito:mc:${subscriberId}`, nuevaMemoria, { ex: 30 * 24 * 60 * 60 }); // 30 días
+
+        console.log('[TITO v2] Memoria guardada:', {
+          subscriberId,
+          interacciones: nuevaMemoria.interacciones,
+          pais: nuevaMemoria.pais
+        });
       } catch (e) {
         console.error('[TITO v2] Error guardando memoria:', e);
       }
+    } else {
+      console.warn('[TITO v2] Sin subscriber_id - no se puede guardar memoria');
     }
 
     console.log('[TITO v2]', {
