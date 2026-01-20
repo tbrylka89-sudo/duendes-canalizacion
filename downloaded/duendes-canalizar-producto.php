@@ -569,6 +569,39 @@ function duendes_canalizar_get_scripts() {
                         DuendesCanalizar.selectedStyle = this.dataset.style;
                     });
                 });
+
+                // Detectar cambios en producto virtual de WooCommerce
+                var virtualCheckbox = document.getElementById('_virtual');
+                if (virtualCheckbox) {
+                    virtualCheckbox.addEventListener('change', function() {
+                        DuendesCanalizar.toggleVirtualSection(this.checked);
+                    });
+                    // Verificar estado inicial
+                    DuendesCanalizar.toggleVirtualSection(virtualCheckbox.checked);
+                }
+            },
+
+            toggleVirtualSection: function(isVirtual) {
+                var seccionVirtual = document.getElementById('dc_seccion_virtual');
+                var seccionTamano = document.querySelector('.dc-section:has(#dc_tamano_mini)');
+
+                if (seccionVirtual) {
+                    seccionVirtual.style.display = isVirtual ? '' : 'none';
+                }
+                // La sección de tamaño siempre visible pero con nota si es virtual
+                if (seccionTamano && isVirtual) {
+                    var notaVirtual = seccionTamano.querySelector('.dc-nota-virtual');
+                    if (!notaVirtual) {
+                        var nota = document.createElement('div');
+                        nota.className = 'dc-nota-virtual';
+                        nota.style.cssText = 'background: #fef3c7; border: 1px solid #f59e0b; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #92400e;';
+                        nota.innerHTML = '<strong>Producto Virtual:</strong> El tamaño físico no se mostrará en la página de producto, pero podés configurarlo si el ser tiene una versión física.';
+                        seccionTamano.insertBefore(nota, seccionTamano.firstChild.nextSibling);
+                    }
+                } else if (seccionTamano) {
+                    var notaVirtual = seccionTamano.querySelector('.dc-nota-virtual');
+                    if (notaVirtual) notaVirtual.remove();
+                }
             },
 
             updateSubOptions: function() {
@@ -583,6 +616,7 @@ function duendes_canalizar_get_scripts() {
             },
 
             getFormData: function() {
+                var esVirtual = document.getElementById('_virtual')?.checked || false;
                 return {
                     // Clasificación
                     categoria: document.getElementById('dc_categoria')?.value || '',
@@ -592,8 +626,15 @@ function duendes_canalizar_get_scripts() {
 
                     // Tamaño y edición
                     tamano: document.querySelector('input[name=\"dc_tamano\"]:checked')?.value || '',
+                    tamano_exacto: document.getElementById('dc_tamano_exacto')?.value || '',
                     edicion: document.querySelector('input[name=\"dc_edicion\"]:checked')?.value || '',
                     es_literatura: document.getElementById('dc_es_literatura')?.checked || false,
+
+                    // Producto Virtual
+                    es_virtual: esVirtual,
+                    tipo_virtual: esVirtual ? (document.getElementById('dc_tipo_virtual')?.value || '') : '',
+                    formato_virtual: esVirtual ? (document.getElementById('dc_formato_virtual')?.value || '') : '',
+                    caracteristicas_virtual: esVirtual ? (document.getElementById('dc_caracteristicas_virtual')?.value || '') : '',
 
                     // Nacimiento
                     fecha_nacimiento: document.getElementById('dc_fecha_nacimiento')?.value || '',
@@ -1105,11 +1146,18 @@ function duendes_clasificacion_metabox_html($post) {
     $genero_value = get_post_meta($post->ID, '_dc_genero', true) ?: 'neutro';
     $especie_nueva = get_post_meta($post->ID, '_dc_especie_nueva', true);
     $tamano_value = get_post_meta($post->ID, '_dc_tamano', true) ?: 'mediano';
+    $tamano_exacto = get_post_meta($post->ID, '_dc_tamano_exacto', true);
     $edicion_value = get_post_meta($post->ID, '_dc_edicion', true) ?: 'especial';
     $es_literatura = get_post_meta($post->ID, '_dc_es_literatura', true);
     $fecha_nac = get_post_meta($post->ID, '_dc_fecha_nacimiento', true);
     $hora_nac = get_post_meta($post->ID, '_dc_hora_nacimiento', true);
     $lugar_nac = get_post_meta($post->ID, '_dc_lugar_nacimiento', true);
+
+    // Campos para productos virtuales
+    $es_virtual = get_post_meta($post->ID, '_virtual', true) === 'yes';
+    $tipo_virtual = get_post_meta($post->ID, '_dc_tipo_virtual', true);
+    $caracteristicas_virtual = get_post_meta($post->ID, '_dc_caracteristicas_virtual', true);
+    $formato_virtual = get_post_meta($post->ID, '_dc_formato_virtual', true);
 
     ?>
     <div class="duendes-metabox-content">
@@ -1215,9 +1263,61 @@ function duendes_clasificacion_metabox_html($post) {
                 </div>
             </div>
 
+            <div class="dc-field" style="margin-top: 15px;">
+                <label class="dc-label">Tamaño Exacto (medidas precisas)</label>
+                <input type="text" id="dc_tamano_exacto" name="dc_tamano_exacto" class="dc-input"
+                    placeholder="Ej: 23 cm de alto x 15 cm de ancho"
+                    value="<?php echo esc_attr($tamano_exacto); ?>">
+                <small style="color: #666; display: block; margin-top: 5px;">Ingresá las medidas exactas del ser para mostrar en la página de producto</small>
+            </div>
+
             <div class="dc-checkbox-item">
                 <input type="checkbox" id="dc_es_literatura" name="dc_es_literatura" value="1" <?php checked($es_literatura, '1'); ?>>
                 <label for="dc_es_literatura">Es personaje de literatura clásica (Merlín, Gandalf, Leprechaun) - puede tener múltiples versiones</label>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: Producto Virtual (solo si es virtual) -->
+        <div class="dc-section dc-section-virtual" id="dc_seccion_virtual" style="<?php echo $es_virtual ? '' : 'display: none;'; ?> background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #7dd3fc;">
+            <h3 class="dc-section-title"><span>💫</span> Producto Virtual / Digital</h3>
+
+            <div class="dc-grid">
+                <div class="dc-field">
+                    <label class="dc-label">Tipo de Producto Virtual</label>
+                    <select id="dc_tipo_virtual" name="dc_tipo_virtual" class="dc-select">
+                        <option value="">Seleccionar...</option>
+                        <option value="runas" <?php selected($tipo_virtual, 'runas'); ?>>Runas de Poder (moneda virtual)</option>
+                        <option value="ebook" <?php selected($tipo_virtual, 'ebook'); ?>>Libro Digital / eBook</option>
+                        <option value="curso" <?php selected($tipo_virtual, 'curso'); ?>>Curso / Programa</option>
+                        <option value="canalizacion" <?php selected($tipo_virtual, 'canalizacion'); ?>>Canalización Digital</option>
+                        <option value="meditacion" <?php selected($tipo_virtual, 'meditacion'); ?>>Meditación / Audio</option>
+                        <option value="lectura" <?php selected($tipo_virtual, 'lectura'); ?>>Lectura Personalizada</option>
+                        <option value="suscripcion" <?php selected($tipo_virtual, 'suscripcion'); ?>>Suscripción / Membresía</option>
+                        <option value="pack" <?php selected($tipo_virtual, 'pack'); ?>>Pack Digital</option>
+                        <option value="otro" <?php selected($tipo_virtual, 'otro'); ?>>Otro</option>
+                    </select>
+                </div>
+
+                <div class="dc-field">
+                    <label class="dc-label">Formato de Entrega</label>
+                    <select id="dc_formato_virtual" name="dc_formato_virtual" class="dc-select">
+                        <option value="">Seleccionar...</option>
+                        <option value="pdf" <?php selected($formato_virtual, 'pdf'); ?>>PDF</option>
+                        <option value="video" <?php selected($formato_virtual, 'video'); ?>>Video</option>
+                        <option value="audio" <?php selected($formato_virtual, 'audio'); ?>>Audio / MP3</option>
+                        <option value="acceso_plataforma" <?php selected($formato_virtual, 'acceso_plataforma'); ?>>Acceso a Plataforma</option>
+                        <option value="email" <?php selected($formato_virtual, 'email'); ?>>Entrega por Email</option>
+                        <option value="descarga" <?php selected($formato_virtual, 'descarga'); ?>>Descarga Directa</option>
+                        <option value="mixto" <?php selected($formato_virtual, 'mixto'); ?>>Múltiples Formatos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="dc-field" style="margin-top: 15px;">
+                <label class="dc-label">Características del Producto</label>
+                <textarea id="dc_caracteristicas_virtual" name="dc_caracteristicas_virtual" class="dc-textarea" rows="4"
+                    placeholder="Describí qué incluye el producto: cantidad de runas, páginas del libro, duración del curso, etc."><?php echo esc_textarea($caracteristicas_virtual); ?></textarea>
+                <small style="color: #666; display: block; margin-top: 5px;">Esta información se usará para generar la descripción y aparecerá en la página de producto</small>
             </div>
         </div>
 
@@ -1435,10 +1535,12 @@ add_action('save_post_product', function($post_id) {
 
     $fields = [
         'dc_categoria', 'dc_tipo_ser', 'dc_genero', 'dc_especie_nueva',
-        'dc_tamano', 'dc_edicion', 'dc_es_literatura',
+        'dc_tamano', 'dc_tamano_exacto', 'dc_edicion', 'dc_es_literatura',
         'dc_fecha_nacimiento', 'dc_hora_nacimiento', 'dc_lugar_nacimiento',
         'dc_nombre', 'dc_proposito', 'dc_elemento', 'dc_cristales',
-        'dc_edad_aparente', 'dc_notas'
+        'dc_edad_aparente', 'dc_notas',
+        // Campos para productos virtuales
+        'dc_tipo_virtual', 'dc_formato_virtual', 'dc_caracteristicas_virtual'
     ];
 
     foreach ($fields as $field) {

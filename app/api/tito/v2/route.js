@@ -99,18 +99,31 @@ async function construirContexto(mensaje, intencion, datos) {
   if (plataforma) contexto += ` (desde ${plataforma})`;
 
   // Cargar memoria si existe
+  let esPrimeraInteraccion = true;
   if (subscriberId) {
     try {
       const memoria = await kv.get(`tito:mc:${subscriberId}`);
-      if (memoria) {
-        contexto += `\n\n📝 LO QUE SABÉS DE ESTA PERSONA:`;
-        if (memoria.nombre) contexto += `\n- Se llama ${memoria.nombre}`;
+      if (memoria && memoria.interacciones > 0) {
+        esPrimeraInteraccion = false;
+        datos._esPrimeraInteraccion = false;
+
+        contexto += `\n\n🔄 CONVERSACIÓN EN CURSO (interacción #${memoria.interacciones + 1})`;
+        contexto += `\n⚠️ NO repitas su nombre en cada mensaje. Solo usalo en momentos especiales (felicitación, algo emotivo, cerrar venta). En mensajes normales, hablá directo sin nombre.`;
+
         if (memoria.necesidad) contexto += `\n- Busca: ${memoria.necesidad}`;
         if (memoria.productosVistos?.length) contexto += `\n- Vio: ${memoria.productosVistos.slice(0,3).join(', ')}`;
         if (memoria.interacciones > 3) contexto += `\n- Ya chateó ${memoria.interacciones} veces (MUY interesada)`;
         if (memoria.objecionPrecio) contexto += `\n- ⚠️ Mostró duda por precio antes`;
+      } else {
+        datos._esPrimeraInteraccion = true;
+        contexto += `\n\n✨ PRIMERA INTERACCIÓN - Podés usar su nombre UNA vez para saludar.`;
       }
-    } catch (e) {}
+    } catch (e) {
+      datos._esPrimeraInteraccion = true;
+    }
+  } else {
+    datos._esPrimeraInteraccion = true;
+    contexto += `\n\n✨ PRIMERA INTERACCIÓN - Podés usar su nombre UNA vez para saludar.`;
   }
 
   // Si pregunta por pedido
