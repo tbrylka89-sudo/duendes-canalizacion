@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
     // Traer productos publicados con stock
     const response = await fetch(
-      `${WOO_URL}/wp-json/wc/v3/products?status=publish&stock_status=instock&per_page=50`,
+      `${WOO_URL}/wp-json/wc/v3/products?status=publish&per_page=100`,
       {
         headers: {
           'Authorization': `Basic ${auth}`,
