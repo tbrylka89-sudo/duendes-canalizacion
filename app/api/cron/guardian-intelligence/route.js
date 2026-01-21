@@ -1,7 +1,7 @@
 /**
  * GUARDIAN INTELLIGENCE - CRON JOB
  * Se ejecuta cada 15 minutos para monitoreo 24/7
- * Configurar en vercel.json: { "crons": [{ "path": "/api/cron/guardian-intelligence", "schedule": "*/15 * * * *" }] }
+ * Configurado en vercel.json con schedule cada 15 minutos
  */
 
 import { NextResponse } from 'next/server';
