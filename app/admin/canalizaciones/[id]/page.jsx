@@ -307,7 +307,7 @@ export default function CanalizacionDetalle() {
           <div className="header-info">
             <h1 className="titulo">{canalizacion.guardian?.nombre} para {canalizacion.nombreDestinatario || canalizacion.nombreCliente}</h1>
             <p className="subtitulo">
-              Orden #{canalizacion.ordenId?.slice(-4)} &bull;
+              Orden #{canalizacion.ordenId?.toString().slice(-4)} &bull;
               <span className={`estado ${canalizacion.estado}`}>
                 {canalizacion.estado}
               </span>
