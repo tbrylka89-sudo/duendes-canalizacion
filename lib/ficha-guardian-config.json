@@ -1,0 +1,409 @@
+{
+  "version": "1.0.0",
+  "ultima_actualizacion": "2026-01-21",
+
+  "especies": {
+    "clasicas": [
+      {
+        "id": "duende",
+        "nombre": "Duende",
+        "nombre_femenino": "Duenda",
+        "descripcion": "Seres ancestrales protectores del hogar y la familia. Guardianes de los espacios sagrados, tejen redes de protección invisibles alrededor de quienes los adoptan.",
+        "origen": "Tradición celta y nórdica"
+      },
+      {
+        "id": "pixie",
+        "nombre": "Pixie",
+        "nombre_femenino": "Pixie",
+        "descripcion": "Almas salvajes de la naturaleza, eternas niñas tiernas que habitan en plantas, hierbas y flores. Cada una es única con poderes diferentes. No son hadas.",
+        "origen": "Folklore británico",
+        "nota": "Siempre únicas, nunca recreables"
+      },
+      {
+        "id": "leprechaun",
+        "nombre": "Leprechaun",
+        "nombre_femenino": "Leprechaun",
+        "descripcion": "Guardianes ancestrales irlandeses especializados en fortuna, prosperidad y protección de tesoros. Custodian la abundancia de quienes los merecen.",
+        "origen": "Mitología irlandesa",
+        "nota": "Recreables por ser arquetipo conocido"
+      },
+      {
+        "id": "elfo",
+        "nombre": "Elfo",
+        "nombre_femenino": "Elfa",
+        "descripcion": "Seres de luz y sabiduría milenaria. Conectan con las energías más sutiles y ayudan a ver más allá de lo evidente. Maestros de la intuición.",
+        "origen": "Mitología nórdica y germánica"
+      },
+      {
+        "id": "hada",
+        "nombre": "Hada",
+        "nombre_femenino": "Hada",
+        "descripcion": "Seres etéreos que habitan entre el mundo visible e invisible. Trabajan con la magia del corazón, los sueños y las emociones más profundas.",
+        "origen": "Folklore europeo"
+      },
+      {
+        "id": "bruja",
+        "nombre": "Brujo",
+        "nombre_femenino": "Bruja",
+        "descripcion": "Conocedores de las artes antiguas y los misterios de la naturaleza. Trabajan con hierbas, luna y elementos para transmutar energías.",
+        "origen": "Tradiciones paganas"
+      },
+      {
+        "id": "vikingo",
+        "nombre": "Vikingo",
+        "nombre_femenino": "Vikinga",
+        "descripcion": "Guerreros del norte con espíritu indomable. Protegen con fiereza y enseñan el valor de enfrentar las tormentas de la vida.",
+        "origen": "Cultura escandinava"
+      },
+      {
+        "id": "chaman",
+        "nombre": "Chamán",
+        "nombre_femenino": "Chamana",
+        "descripcion": "Puentes entre mundos que caminan con un pie en lo visible y otro en lo invisible. Sanadores del alma y guías espirituales.",
+        "origen": "Tradiciones ancestrales universales"
+      },
+      {
+        "id": "sanador",
+        "nombre": "Sanador",
+        "nombre_femenino": "Sanadora",
+        "descripcion": "Canalizadores de energía curativa que trabajan en los planos físico, emocional y espiritual. Su presencia alivia y restaura.",
+        "origen": "Arquetipo universal"
+      },
+      {
+        "id": "guerrero",
+        "nombre": "Guerrero",
+        "nombre_femenino": "Guerrera",
+        "descripcion": "Protectores fieros que enfrentan cualquier batalla por quienes aman. Enseñan fortaleza interior y coraje.",
+        "origen": "Arquetipo universal"
+      },
+      {
+        "id": "maestro",
+        "nombre": "Maestro",
+        "nombre_femenino": "Maestra",
+        "descripcion": "Seres de sabiduría profunda que han caminado muchos senderos. Guían con paciencia y revelan conocimientos cuando estás listo.",
+        "origen": "Arquetipo universal"
+      },
+      {
+        "id": "hechicero",
+        "nombre": "Hechicero",
+        "nombre_femenino": "Hechicera",
+        "descripcion": "Manipuladores de las energías sutiles que transforman la realidad. Conocen los secretos del universo y los usan para manifestar.",
+        "origen": "Tradiciones mágicas"
+      },
+      {
+        "id": "druida",
+        "nombre": "Druida",
+        "nombre_femenino": "Druida",
+        "descripcion": "Sacerdotes de la naturaleza que conocen el lenguaje de los árboles, las piedras y los animales. Guardianes del equilibrio natural.",
+        "origen": "Cultura celta"
+      },
+      {
+        "id": "alquimista",
+        "nombre": "Alquimista",
+        "nombre_femenino": "Alquimista",
+        "descripcion": "Transformadores de lo ordinario en extraordinario. Trabajan con los elementos para purificar, transmutar y elevar.",
+        "origen": "Tradición hermética"
+      },
+      {
+        "id": "oraculo",
+        "nombre": "Oráculo",
+        "nombre_femenino": "Oráculo",
+        "descripcion": "Canales de mensajes del universo. Revelan verdades ocultas y guían en momentos de incertidumbre con visiones claras.",
+        "origen": "Tradiciones proféticas"
+      }
+    ],
+
+    "exclusivas": [
+      {
+        "id": "luminide",
+        "nombre": "Lumínide",
+        "nombre_femenino": "Lumínide",
+        "descripcion": "Seres nacidos de la primera luz del amanecer uruguayo. Trabajan con la claridad mental y la iluminación de caminos oscurecidos. Disipan confusiones y revelan verdades.",
+        "origen": "Exclusivo Duendes del Uruguay",
+        "exclusivo": true
+      },
+      {
+        "id": "terralma",
+        "nombre": "Terralma",
+        "nombre_femenino": "Terralma",
+        "descripcion": "Guardianes que fusionan tierra y alma. Arraigan, estabilizan y conectan con las raíces más profundas del ser. Ideales para quienes se sienten perdidos o desarraigados.",
+        "origen": "Exclusivo Duendes del Uruguay",
+        "exclusivo": true
+      },
+      {
+        "id": "velarian",
+        "nombre": "Velarián",
+        "nombre_femenino": "Velariana",
+        "descripcion": "Custodios de los velos entre mundos. Protegen durante el sueño, los viajes astrales y las transiciones. Acompañan en los umbrales de la vida.",
+        "origen": "Exclusivo Duendes del Uruguay",
+        "exclusivo": true
+      },
+      {
+        "id": "florian",
+        "nombre": "Florián",
+        "nombre_femenino": "Floriana",
+        "descripcion": "Seres que encarnan el espíritu del florecimiento. Ayudan a que proyectos, relaciones y sueños broten y den frutos. Trabajan con ciclos y paciencia.",
+        "origen": "Exclusivo Duendes del Uruguay",
+        "exclusivo": true
+      }
+    ],
+
+    "arquetipos_conocidos": [
+      {
+        "id": "merlin",
+        "nombre": "Merlín",
+        "descripcion": "El arquetipo del mago sabio. Cada Merlín canalizado trae su propia expresión de esta energía ancestral.",
+        "recreable": true,
+        "nota": "Arquetipo conocido, recreable"
+      },
+      {
+        "id": "gandalf",
+        "nombre": "Gandalf",
+        "descripcion": "El caminante gris, guía de los perdidos. Cada uno trae su propia sabiduría del camino.",
+        "recreable": true,
+        "nota": "Arquetipo conocido, recreable"
+      },
+      {
+        "id": "morgana",
+        "nombre": "Morgana",
+        "descripcion": "La hechicera de los misterios femeninos. Poderosa, compleja, transformadora.",
+        "recreable": true,
+        "nota": "Arquetipo conocido, recreable"
+      },
+      {
+        "id": "aradia",
+        "nombre": "Aradia",
+        "descripcion": "La reina de las brujas. Empoderamiento femenino y magia ancestral.",
+        "recreable": true,
+        "nota": "Arquetipo conocido, recreable"
+      }
+    ]
+  },
+
+  "categorias": {
+    "proteccion": {
+      "nombre": "Protección",
+      "descripcion": "Guardianes que crean escudos y barreras contra energías negativas",
+      "subcategorias": [
+        {"id": "hogar", "nombre": "Del Hogar", "descripcion": "Protección del espacio físico donde vivís"},
+        {"id": "personal", "nombre": "Personal", "descripcion": "Escudo energético individual"},
+        {"id": "familiar", "nombre": "Familiar", "descripcion": "Protección de toda la familia y vínculos"},
+        {"id": "envidias", "nombre": "Contra Envidias", "descripcion": "Bloqueo de malas intenciones y ojos ajenos"},
+        {"id": "energetica", "nombre": "Energética", "descripcion": "Limpieza y protección del campo áurico"},
+        {"id": "viajes", "nombre": "En Viajes", "descripcion": "Protección durante desplazamientos y travesías"}
+      ]
+    },
+    "abundancia": {
+      "nombre": "Abundancia / Prosperidad",
+      "descripcion": "Seres que atraen flujo, oportunidades y riqueza",
+      "subcategorias": [
+        {"id": "dinero", "nombre": "Dinero", "descripcion": "Atracción directa de recursos económicos"},
+        {"id": "oportunidades", "nombre": "Oportunidades", "descripcion": "Apertura de puertas y caminos nuevos"},
+        {"id": "negocios", "nombre": "Negocios", "descripcion": "Éxito en emprendimientos y comercio"},
+        {"id": "trabajo", "nombre": "Trabajo", "descripcion": "Conseguir o mejorar empleo"},
+        {"id": "bloqueos", "nombre": "Desbloqueo", "descripcion": "Remover trabas que impiden prosperar"},
+        {"id": "merecimiento", "nombre": "Merecimiento", "descripcion": "Sanar creencias de escasez"}
+      ]
+    },
+    "amor": {
+      "nombre": "Amor",
+      "descripcion": "Guardianes del corazón y las relaciones",
+      "subcategorias": [
+        {"id": "pareja", "nombre": "Pareja", "descripcion": "Atraer o mejorar relación romántica"},
+        {"id": "autoamor", "nombre": "Amor Propio", "descripcion": "Sanación de la relación con uno mismo"},
+        {"id": "familia", "nombre": "Amor Familiar", "descripcion": "Armonía y vínculos familiares"},
+        {"id": "amistades", "nombre": "Amistades", "descripcion": "Conexiones genuinas y duraderas"},
+        {"id": "perdidas", "nombre": "Pérdidas Amorosas", "descripcion": "Sanar corazones rotos"},
+        {"id": "fertilidad", "nombre": "Fertilidad", "descripcion": "Deseo de ser madre/padre"}
+      ]
+    },
+    "sanacion": {
+      "nombre": "Sanación",
+      "descripcion": "Seres que restauran y equilibran",
+      "subcategorias": [
+        {"id": "emocional", "nombre": "Emocional", "descripcion": "Sanar heridas del corazón y emociones"},
+        {"id": "generacional", "nombre": "Generacional", "descripcion": "Cortar patrones heredados de ancestros"},
+        {"id": "fisica", "nombre": "Física", "descripcion": "Apoyo energético a la salud del cuerpo"},
+        {"id": "energetica", "nombre": "Energética", "descripcion": "Limpieza y restauración del aura"},
+        {"id": "relacional", "nombre": "Relacional", "descripcion": "Sanar vínculos dañados"},
+        {"id": "trauma", "nombre": "Trauma", "descripcion": "Procesar experiencias difíciles"},
+        {"id": "duelo", "nombre": "Duelo", "descripcion": "Acompañar pérdidas y despedidas"}
+      ]
+    },
+    "salud": {
+      "nombre": "Salud",
+      "descripcion": "Guardianes del bienestar integral",
+      "subcategorias": [
+        {"id": "fisica", "nombre": "Física", "descripcion": "Vitalidad y energía del cuerpo"},
+        {"id": "mental", "nombre": "Mental", "descripcion": "Claridad, concentración, paz mental"},
+        {"id": "sueno", "nombre": "Sueño", "descripcion": "Descanso reparador y sueños tranquilos"},
+        {"id": "habitos", "nombre": "Hábitos", "descripcion": "Apoyo para cambiar patrones nocivos"},
+        {"id": "vitalidad", "nombre": "Vitalidad", "descripcion": "Energía y ganas de vivir"}
+      ]
+    },
+    "sabiduria": {
+      "nombre": "Sabiduría",
+      "descripcion": "Maestros que iluminan el camino del conocimiento",
+      "subcategorias": [
+        {"id": "estudios", "nombre": "Estudios", "descripcion": "Apoyo en aprendizaje y exámenes"},
+        {"id": "decisiones", "nombre": "Decisiones", "descripcion": "Claridad para elegir bien"},
+        {"id": "intuicion", "nombre": "Intuición", "descripcion": "Desarrollar el sexto sentido"},
+        {"id": "creatividad", "nombre": "Creatividad", "descripcion": "Inspiración y flujo creativo"},
+        {"id": "proposito", "nombre": "Propósito", "descripcion": "Encontrar el sentido de vida"}
+      ]
+    },
+    "conexion_espiritual": {
+      "nombre": "Conexión Espiritual",
+      "descripcion": "Puentes con lo trascendente",
+      "subcategorias": [
+        {"id": "ancestros", "nombre": "Ancestros", "descripcion": "Conexión con quienes ya partieron"},
+        {"id": "guias", "nombre": "Guías Espirituales", "descripcion": "Comunicación con seres de luz"},
+        {"id": "meditacion", "nombre": "Meditación", "descripcion": "Profundizar la práctica espiritual"},
+        {"id": "despertar", "nombre": "Despertar", "descripcion": "Expandir la consciencia"},
+        {"id": "proteccion_astral", "nombre": "Protección Astral", "descripcion": "Seguridad en viajes y sueños"}
+      ]
+    },
+    "transformacion": {
+      "nombre": "Transformación",
+      "descripcion": "Seres que acompañan los cambios profundos",
+      "subcategorias": [
+        {"id": "crisis", "nombre": "Crisis", "descripcion": "Atravesar momentos difíciles"},
+        {"id": "renacimiento", "nombre": "Renacimiento", "descripcion": "Empezar de nuevo"},
+        {"id": "soltar", "nombre": "Soltar", "descripcion": "Dejar ir lo que ya no sirve"},
+        {"id": "empoderamiento", "nombre": "Empoderamiento", "descripcion": "Recuperar el poder personal"},
+        {"id": "transiciones", "nombre": "Transiciones", "descripcion": "Cambios de etapa de vida"}
+      ]
+    }
+  },
+
+  "tamanos": {
+    "tipos": [
+      {
+        "id": "mini",
+        "nombre": "Mini",
+        "recreable": true,
+        "descripcion": "Compañeros pequeños ideales para llevar siempre con vos"
+      },
+      {
+        "id": "mini_especial",
+        "nombre": "Mini Especial",
+        "recreable": true,
+        "descripcion": "Mini con detalles y accesorios extra. Incluye personajes como Merlín, Leprechaun. Las Pixies son Mini Especial pero siempre únicas.",
+        "nota": "Pixies siempre únicas aunque sean mini"
+      },
+      {
+        "id": "mediano",
+        "nombre": "Mediano",
+        "recreable": false,
+        "descripcion": "Tamaño ideal para altar o espacio especial"
+      },
+      {
+        "id": "mediano_especial",
+        "nombre": "Mediano Especial",
+        "recreable": false,
+        "descripcion": "Mediano con detalles únicos y accesorios especiales"
+      },
+      {
+        "id": "mediano_maestro_mistico",
+        "nombre": "Mediano Maestro Místico",
+        "recreable": false,
+        "descripcion": "Piezas de alta complejidad energética y artesanal"
+      },
+      {
+        "id": "grande",
+        "nombre": "Grande",
+        "recreable": false,
+        "descripcion": "Presencia imponente para espacios amplios"
+      },
+      {
+        "id": "grande_especial",
+        "nombre": "Grande Especial",
+        "recreable": false,
+        "descripcion": "Grande con trabajo artesanal excepcional"
+      },
+      {
+        "id": "grande_maestro_mistico",
+        "nombre": "Grande Maestro Místico",
+        "recreable": false,
+        "descripcion": "Obras maestras de gran tamaño"
+      },
+      {
+        "id": "gigante",
+        "nombre": "Gigante",
+        "recreable": false,
+        "descripcion": "Piezas monumentales de colección"
+      },
+      {
+        "id": "gigante_especial",
+        "nombre": "Gigante Especial",
+        "recreable": false,
+        "descripcion": "Gigante con detalles excepcionales"
+      },
+      {
+        "id": "gigante_maestro_mistico",
+        "nombre": "Gigante Maestro Místico",
+        "recreable": false,
+        "descripcion": "Las piezas más extraordinarias de la colección"
+      }
+    ],
+    "excepciones_recreables": [
+      "leprechaun", "merlin", "gandalf", "morgana", "aradia"
+    ],
+    "siempre_unicos": [
+      "pixie"
+    ]
+  },
+
+  "personalidad": {
+    "rasgos": [
+      {"id": "amoroso", "nombre": "Amoroso/a", "descripcion": "Cariñoso, expresivo en su afecto"},
+      {"id": "protector", "nombre": "Protector/a", "descripcion": "Siempre vigilante, cuida con fiereza"},
+      {"id": "sabio", "nombre": "Sabio/a", "descripcion": "Habla poco pero cada palabra pesa"},
+      {"id": "jugueton", "nombre": "Juguetón/a", "descripcion": "Le encanta la diversión y las sorpresas"},
+      {"id": "serio", "nombre": "Serio/a", "descripcion": "Formal, no pierde el tiempo en tonterías"},
+      {"id": "misterioso", "nombre": "Misterioso/a", "descripcion": "Guarda secretos, revela poco a poco"},
+      {"id": "dulce", "nombre": "Dulce", "descripcion": "Tierno, suave en su energía"},
+      {"id": "intenso", "nombre": "Intenso/a", "descripcion": "Todo lo vive y siente profundamente"},
+      {"id": "tranquilo", "nombre": "Tranquilo/a", "descripcion": "Calma, serenidad, paz"},
+      {"id": "inquieto", "nombre": "Inquieto/a", "descripcion": "Siempre en movimiento, curioso"},
+      {"id": "gruñon", "nombre": "Gruñón/a", "descripcion": "De carácter fuerte, no tolera tonterías"},
+      {"id": "simpatico", "nombre": "Simpático/a", "descripcion": "Carismático, cae bien a todos"},
+      {"id": "distante", "nombre": "Distante", "descripcion": "Necesita su espacio, observa de lejos"},
+      {"id": "bondadoso", "nombre": "Bondadoso/a", "descripcion": "Generoso, siempre dispuesto a dar"},
+      {"id": "firme", "nombre": "Firme", "descripcion": "No se deja manipular, tiene límites claros"},
+      {"id": "leal", "nombre": "Leal", "descripcion": "Una vez que te elige, es para siempre"},
+      {"id": "independiente", "nombre": "Independiente", "descripcion": "No necesita atención constante"},
+      {"id": "demandante", "nombre": "Requiere atención", "descripcion": "Le gusta sentirse importante"},
+      {"id": "timido", "nombre": "Tímido/a", "descripcion": "Le cuesta mostrarse, se abre de a poco"},
+      {"id": "aventurero", "nombre": "Aventurero/a", "descripcion": "Le encanta explorar y las experiencias nuevas"},
+      {"id": "nostalgico", "nombre": "Nostálgico/a", "descripcion": "Conectado con el pasado y los recuerdos"},
+      {"id": "optimista", "nombre": "Optimista", "descripcion": "Siempre ve el lado bueno"},
+      {"id": "melancolico", "nombre": "Melancólico/a", "descripcion": "Sensible, conectado con emociones profundas"},
+      {"id": "rebelde", "nombre": "Rebelde", "descripcion": "No sigue reglas, hace las cosas a su manera"}
+    ],
+    "cantidad_por_ser": 3
+  },
+
+  "ficha_ia": {
+    "campos_generados": [
+      {"id": "flor_favorita", "nombre": "Flor favorita", "tipo": "texto"},
+      {"id": "piedra_favorita", "nombre": "Piedra/Cristal favorito", "tipo": "texto"},
+      {"id": "color_favorito", "nombre": "Color favorito", "tipo": "texto"},
+      {"id": "espacio_casa", "nombre": "Espacio de la casa favorito", "tipo": "texto"},
+      {"id": "elemento", "nombre": "Elemento", "tipo": "selector", "opciones": ["Fuego", "Agua", "Tierra", "Aire", "Éter"]},
+      {"id": "momento_dia", "nombre": "Momento del día favorito", "tipo": "texto"},
+      {"id": "estacion", "nombre": "Estación favorita", "tipo": "selector", "opciones": ["Primavera", "Verano", "Otoño", "Invierno"]},
+      {"id": "le_gusta_pasear", "nombre": "¿Le gusta salir de paseo?", "tipo": "selector", "opciones": ["Sí, le encanta", "No, prefiere quedarse", "Que le pregunte primero"]},
+      {"id": "le_gusta", "nombre": "Qué le gusta", "tipo": "lista", "cantidad": 3},
+      {"id": "no_le_gusta", "nombre": "Qué no le gusta", "tipo": "lista", "cantidad": 3},
+      {"id": "frase_lema", "nombre": "Frase/Lema característico", "tipo": "texto"},
+      {"id": "dato_curioso", "nombre": "Dato curioso", "tipo": "texto", "descripcion": "Algo que haga decir 'ayyy es como yo'"}
+    ]
+  },
+
+  "visual": {
+    "formato_subtitulo": "GUARDIÁN · {ESPECIE_FAMILIA} · {CATEGORIA}",
+    "usa_emojis": false,
+    "animaciones_calidad": true
+  }
+}
