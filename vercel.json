@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/recordatorio-racha",
       "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/guardian-intelligence",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

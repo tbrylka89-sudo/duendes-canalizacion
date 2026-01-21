@@ -12,6 +12,7 @@ RewriteEngine On
 
 # Tienda
 RewriteRule ^shop-1/?$ /shop/ [R=301,L]
+RewriteRule ^tienda/?$ /shop/ [R=301,L]
 RewriteRule ^stock/?$ /shop/ [R=301,L]
 RewriteRule ^accesorios/?$ /shop/ [R=301,L]
 
