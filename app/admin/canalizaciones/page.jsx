@@ -130,7 +130,7 @@ export default function CanalizacionesAdmin() {
                     {c.guardian?.nombre || 'Guardián'} para {c.nombreCliente}
                   </h3>
                   <p className="card-meta">
-                    Orden #{c.ordenId?.slice(-4) || '????'} - {formatearFecha(c.fechaCompra)}
+                    Orden #{c.ordenId?.toString().slice(-4) || '????'} - {formatearFecha(c.fechaCompra)}
                   </p>
                   <p className="card-descripcion">
                     {c.resumen || `Canalización de ${c.guardian?.categoria || 'protección'}`}
