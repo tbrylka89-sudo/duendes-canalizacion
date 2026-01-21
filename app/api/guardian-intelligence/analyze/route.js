@@ -7,6 +7,17 @@ import { NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 import { analizarHistoria, analizarCatalogoCompleto, compararContraOtras } from '@/lib/guardian-intelligence/analyzer';
 
+// CORS headers para permitir llamadas desde WordPress
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return new Response(null, { headers: corsHeaders });
+}
+
 // Helper para obtener productos de WooCommerce
 async function obtenerProductosWoo() {
   const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
@@ -107,7 +118,7 @@ export async function POST(request) {
         analisis,
         similitudes: similitudes.filter(s => s.similitud >= 40),
         timestamp: new Date().toISOString()
-      });
+      }, { headers: corsHeaders });
     }
 
     // Modo completo: analiza todo el catálogo
@@ -121,7 +132,7 @@ export async function POST(request) {
         return NextResponse.json({
           success: false,
           error: 'No se encontraron productos para analizar'
-        }, { status: 400 });
+        }, { status: 400, headers: corsHeaders });
       }
 
       const resultado = analizarCatalogoCompleto(todosLosProductos);
@@ -138,20 +149,20 @@ export async function POST(request) {
         success: true,
         resultado,
         timestamp: new Date().toISOString()
-      });
+      }, { headers: corsHeaders });
     }
 
     return NextResponse.json({
       success: false,
       error: 'Modo no válido o faltan parámetros'
-    }, { status: 400 });
+    }, { status: 400, headers: corsHeaders });
 
   } catch (error) {
     console.error('[GI Analyze] Error:', error);
     return NextResponse.json({
       success: false,
       error: error.message
-    }, { status: 500 });
+    }, { status: 500, headers: corsHeaders });
   }
 }
 
@@ -164,18 +175,18 @@ export async function GET() {
       return NextResponse.json({
         success: false,
         mensaje: 'No hay análisis previo guardado'
-      });
+      }, { headers: corsHeaders });
     }
 
     return NextResponse.json({
       success: true,
       analisis: ultimoAnalisis
-    });
+    }, { headers: corsHeaders });
 
   } catch (error) {
     return NextResponse.json({
       success: false,
       error: error.message
-    }, { status: 500 });
+    }, { status: 500, headers: corsHeaders });
   }
 }
