@@ -186,6 +186,9 @@ class DuendesHubControl {
                 <a href="<?php echo $url; ?>/admin/tito" target="_blank" class="quick-btn">
                     🤖 Tito Admin
                 </a>
+                <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="quick-btn" style="background: linear-gradient(135deg, #9370DB 0%, #6B4E9F 100%);">
+                    📜 Canalizaciones
+                </a>
                 <a href="<?php echo $url; ?>/admin/gamificacion" target="_blank" class="quick-btn secondary">
                     🎮 Gamificación
                 </a>
@@ -264,6 +267,36 @@ class DuendesHubControl {
                             <strong>Usalo para:</strong> Configuraciones avanzadas y control total.
                         </div>
                     </a>
+
+                </div>
+            </div>
+
+            <!-- ADMIN: CANALIZACIONES -->
+            <div class="hub-section" style="border-left: 4px solid #9370DB;">
+                <h2>📜 Panel de Canalizaciones <span class="badge badge-admin">ADMIN</span></h2>
+                <div class="hub-grid">
+
+                    <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card" style="border-color: #9370DB; background: linear-gradient(135deg, rgba(147, 112, 219, 0.1), rgba(147, 112, 219, 0.02));">
+                        <div class="hub-card-title" style="color: #6B4E9F;">📜 Panel de Aprobación</div>
+                        <div class="hub-card-url">/admin/canalizaciones</div>
+                        <div class="hub-card-desc">
+                            Revisá, editá y aprobá canalizaciones antes de enviarlas al cliente. Con resumen IA y chat editor.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Usalo para:</strong> Ver canalizaciones pendientes, aprobar, enviar a Mi Magia del cliente.
+                        </div>
+                    </a>
+
+                    <div class="hub-card">
+                        <div class="hub-card-title">✨ Flujo de Aprobación</div>
+                        <div class="hub-card-desc">
+                            <strong>1.</strong> Cliente compra → canalización se genera automáticamente<br>
+                            <strong>2.</strong> Aparece en "Pendientes" del panel<br>
+                            <strong>3.</strong> Revisás con preview + resumen IA<br>
+                            <strong>4.</strong> Chat editor para ajustes ("acortá el ritual")<br>
+                            <strong>5.</strong> Aprobás → Enviás → Cliente ve en Mi Magia
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -584,6 +617,10 @@ class DuendesHubControl {
                     <tr style="background: #f8f9fa;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">Dar runas/puntos a un usuario</td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/tito</code> → "Dale X runas a email"</td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Aprobar y enviar canalizaciones</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code></td>
                     </tr>
                     <tr style="background: white;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">Crear contenido para el círculo</td>

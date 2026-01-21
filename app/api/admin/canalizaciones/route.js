@@ -39,6 +39,8 @@ export async function GET(request) {
       listaKey = 'canalizaciones:pendientes';
     } else if (estado === 'aprobada') {
       listaKey = 'canalizaciones:aprobadas';
+    } else if (estado === 'enviada') {
+      listaKey = 'canalizaciones:enviadas';
     } else {
       listaKey = 'canalizaciones:todas';
     }
@@ -302,6 +304,19 @@ export async function PUT(request) {
     } else if (accion === 'enviar') {
       canalizacion.estado = 'enviada';
       canalizacion.fechaEnviada = fecha.toISOString();
+
+      // Mover de aprobadas (o pendientes) a enviadas
+      const aprobadas = await kv.get('canalizaciones:aprobadas') || [];
+      const nuevasAprobadas = aprobadas.filter(aid => aid !== id);
+      await kv.set('canalizaciones:aprobadas', nuevasAprobadas);
+
+      const pendientes = await kv.get('canalizaciones:pendientes') || [];
+      const nuevasPendientes = pendientes.filter(pid => pid !== id);
+      await kv.set('canalizaciones:pendientes', nuevasPendientes);
+
+      const enviadas = await kv.get('canalizaciones:enviadas') || [];
+      enviadas.unshift(id);
+      await kv.set('canalizaciones:enviadas', enviadas);
 
       // Guardar en lecturas del cliente para que pueda verla en Mi Magia
       const lecturasKey = `lecturas:${canalizacion.email}`;

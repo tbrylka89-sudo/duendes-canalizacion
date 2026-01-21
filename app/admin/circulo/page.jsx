@@ -110,6 +110,21 @@ export default function AdminCirculo() {
         <div style={{...styles.titoArrow, color: '#6B8E9F'}}>→</div>
       </Link>
 
+      {/* Panel de Canalizaciones - Aprobación con IA */}
+      <Link href="/admin/canalizaciones" style={{...styles.titoCard, borderColor: 'rgba(147, 112, 219, 0.5)', background: 'linear-gradient(135deg, rgba(147, 112, 219, 0.15), rgba(147, 112, 219, 0.05))'}}>
+        <div style={{...styles.titoIcon, background: 'linear-gradient(135deg, #9370DB, #6B4E9F)'}}>📜</div>
+        <div style={styles.titoContent}>
+          <h2 style={{...styles.titoTitle, color: '#9370DB'}}>Panel de Canalizaciones</h2>
+          <p style={styles.titoDesc}>Revisá, editá y aprobá canalizaciones antes de enviarlas al cliente.</p>
+          <div style={styles.titoExamples}>
+            <span style={{...styles.titoExample, borderColor: 'rgba(147, 112, 219, 0.3)'}}>Vista previa estética</span>
+            <span style={{...styles.titoExample, borderColor: 'rgba(147, 112, 219, 0.3)'}}>Resumen IA</span>
+            <span style={{...styles.titoExample, borderColor: 'rgba(147, 112, 219, 0.3)'}}>Chat editor</span>
+          </div>
+        </div>
+        <div style={{...styles.titoArrow, color: '#9370DB'}}>→</div>
+      </Link>
+
       {/* Stats rápidas */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
