@@ -172,7 +172,7 @@ export default function TiendaMagica() {
                   style={{ '--card-index': index }}
                 >
                   <a
-                    href={producto.permalink || `${WORDPRESS_URL}/producto/${producto.slug}/`}
+                    href={producto.permalink || `${WORDPRESS_URL}/product/${producto.slug}/`}
                     target="_blank"
                     rel="noopener"
                     className="tarot-inner"

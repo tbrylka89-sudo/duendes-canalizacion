@@ -7,6 +7,84 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
+// ═══════════════════════════════════════════════════════════════
+// Construir datos del guardián para el prompt de forma DINÁMICA
+// Incluye CUALQUIER campo que venga del producto
+// ═══════════════════════════════════════════════════════════════
+function construirDatosGuardian(guardian) {
+  const lineas = [];
+
+  // Datos básicos siempre presentes
+  lineas.push(`Nombre: ${guardian.nombre}`);
+  lineas.push(`Categoría/Esencia: ${guardian.categoria || 'protección'}`);
+
+  // Campos conocidos que formateamos bonito
+  const camposConocidos = {
+    tipo: 'Tipo de ser',
+    especie: 'Especie',
+    personalidad: 'Tu personalidad',
+    historia: 'Tu historia',
+    como_habla: 'Cómo hablás',
+    voz: 'Tu voz/tono',
+    color_favorito: 'Tu color favorito',
+    elemento: 'Tu elemento',
+    don: 'Tu don especial',
+    debilidad: 'Tu debilidad',
+    le_gusta: 'Lo que te gusta',
+    no_le_gusta: 'Lo que no te gusta',
+    frase_caracteristica: 'Frase que te representa',
+    origen: 'De dónde venís',
+    mision: 'Tu misión',
+    descripcion: 'Descripción',
+    descripcionCorta: 'Resumen'
+  };
+
+  // Agregar campos conocidos si existen
+  for (const [campo, label] of Object.entries(camposConocidos)) {
+    if (guardian[campo] && guardian[campo].toString().trim()) {
+      // Limpiar HTML si viene de WooCommerce
+      const valor = guardian[campo].toString()
+        .replace(/<[^>]*>/g, '') // Quitar tags HTML
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (valor) {
+        lineas.push(`${label}: ${valor}`);
+      }
+    }
+  }
+
+  // Agregar CUALQUIER otro campo que no conozcamos (futuro-proof)
+  const camposIgnorar = ['id', 'nombre', 'categoria', 'precio', 'fecha', 'imagen', 'imagenes', 'slug', 'atributos', 'categorias', 'tags', ...Object.keys(camposConocidos)];
+
+  for (const [campo, valor] of Object.entries(guardian)) {
+    if (!camposIgnorar.includes(campo) && valor && typeof valor === 'string' && valor.trim()) {
+      // Convertir campo_snake_case a "Campo Snake Case"
+      const label = campo.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const valorLimpio = valor.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+      if (valorLimpio) {
+        lineas.push(`${label}: ${valorLimpio}`);
+      }
+    }
+  }
+
+  // Agregar atributos si existen
+  if (guardian.atributos && Object.keys(guardian.atributos).length > 0) {
+    for (const [attr, valores] of Object.entries(guardian.atributos)) {
+      if (Array.isArray(valores) && valores.length > 0) {
+        lineas.push(`${attr}: ${valores.join(', ')}`);
+      }
+    }
+  }
+
+  // Agregar tags como intereses/temas
+  if (guardian.tags && guardian.tags.length > 0) {
+    lineas.push(`Temas/Intereses: ${guardian.tags.join(', ')}`);
+  }
+
+  return lineas.join('\n');
+}
+
 export async function OPTIONS() {
   return new Response(null, { status: 200, headers: corsHeaders });
 }
@@ -117,100 +195,96 @@ export async function POST(request) {
 
     const nombreReal = esRegalo ? nombreDestinatario : nombreCliente;
 
+    // Construir datos del guardián para el prompt
+    const datosGuardian = construirDatosGuardian(guardian);
+
     // Adaptar tono según edad
     let tonoEdad = '';
     if (esNino === 'pequeno') {
-      tonoEdad = 'Escribí como si le hablaras a un niño pequeño que querés mucho. Simple, tierno, con asombro genuino. Sin conceptos abstractos.';
+      tonoEdad = 'Escribí como si le hablaras a un niño pequeño que querés mucho. Simple, tierno, con asombro genuino.';
     } else if (esNino === 'nino') {
-      tonoEdad = 'Escribí para un niño: cálido, con sentido de aventura, haciendo todo mágico pero comprensible.';
+      tonoEdad = 'Escribí para un niño: cálido, con sentido de aventura, mágico pero comprensible.';
     } else if (esNino === 'adolescente') {
-      tonoEdad = 'Escribí para un adolescente: auténtico, sin ser condescendiente, inspirador sin ser cursi.';
+      tonoEdad = 'Escribí para un adolescente: auténtico, sin ser condescendiente.';
     } else {
-      tonoEdad = 'Escribí para un adulto: profundo, genuino, que toque el corazón sin ser pretencioso.';
+      tonoEdad = 'Escribí para un adulto: profundo, genuino, que toque el corazón.';
     }
 
-    const systemPrompt = `Sos ${guardian.nombre}. Acabás de ser elegido por ${nombreReal} y vas a escribirle tu carta de canalización.
+    const systemPrompt = `Vas a escribir una carta personal como ${guardian.nombre} para ${nombreReal}.
 
-ESTO ES LO MÁS IMPORTANTE - LEÉ ESTO PRIMERO:
-Esta persona llenó un formulario al comprarte. Compartió cosas íntimas sobre su vida. Tu carta debe REFLEJAR y RESPONDER a lo que compartió. No escribas algo genérico - escribí como si conocieras su corazón porque LEÍSTE lo que te contó.
+═══════════════════════════════════════════════════════════════════
+REGLA #1: ESTO ES UNA CARTA DE ALGUIEN QUE TE QUIERE
+═══════════════════════════════════════════════════════════════════
 
-${contexto ? `
-═══════════════════════════════════════════════════════
-LO QUE ${nombreReal.toUpperCase()} TE COMPARTIÓ EN SU FORMULARIO:
-"${contexto}"
-═══════════════════════════════════════════════════════
+NO es un texto místico. NO es prosa poética. NO es un horóscopo.
+ES una carta de un ser que leyó lo que la persona compartió y le habla al corazón.
 
-Esta información es SAGRADA. La persona abrió su corazón. Tu carta DEBE:
-- Hacerle sentir que la escuchaste, que entendiste
-- Responder específicamente a lo que compartió
-- Validar sus sentimientos sin ser condescendiente
-- Ofrecer perspectiva desde tu sabiduría, no consejos vacíos
-` : 'No compartió contexto específico, así que conectá con la energía general de tu categoría.'}
+Imaginá: tu mejor amigo que además tiene poderes mágicos te escribe después de leer tu diario. Esa intimidad. Esa calidez. Ese "te veo".
 
-${esSorpresa ? `
-NOTA: Esto es una sorpresa de ${nombreCliente} para ${nombreReal}.
-Mencioná sutilmente que "alguien que te quiere eligió que llegara a tu vida".
-` : ''}
+═══════════════════════════════════════════════════════════════════
+LO QUE ${nombreReal.toUpperCase()} COMPARTIÓ AL COMPRARTE:
+═══════════════════════════════════════════════════════════════════
+${contexto ? `"${contexto}"
 
-Tu esencia es: ${guardian.categoria || 'protección'}
+ESTO ES SAGRADO. Tu carta debe RESPONDER a esto. Que sienta que la escuchaste.` : 'No compartió contexto específico. Conectá con tu esencia y categoría.'}
+
+${esSorpresa ? `\n⚠️ ES SORPRESA: Alguien que la quiere te eligió para ella. Mencionalo sutilmente.\n` : ''}
+
+═══════════════════════════════════════════════════════════════════
+QUIÉN SOS VOS (${guardian.nombre.toUpperCase()})
+═══════════════════════════════════════════════════════════════════
+${datosGuardian}
+
+USA TODA ESTA INFORMACIÓN para darle personalidad a tu carta. Si tenés historia, contala. Si tenés color favorito, mencionalo. Si tenés forma de hablar, usala. Cada dato hace tu carta más REAL y ÚNICA.
+
+═══════════════════════════════════════════════════════════════════
+CÓMO ESCRIBIR
+═══════════════════════════════════════════════════════════════════
+
 ${tonoEdad}
 
-CÓMO ESCRIBIR (CRÍTICO):
-
-❌ PROHIBIDO - NO ESCRIBAS NUNCA:
+❌ PROHIBIDO ABSOLUTO (si escribís esto, fallaste):
 - "Desde las profundidades del bosque..."
 - "Las brumas ancestrales..."
-- "En lo más recóndito de..."
 - "Los antiguos charrúas..."
 - "El velo entre mundos..."
-- "Desde tiempos inmemoriales..."
-- Cualquier frase que suene a IA genérica o misticismo barato
-- Relleno poético que no dice nada
-- Metáforas vacías sobre naturaleza
+- "Tu campo energético..."
+- "Vibraciones cósmicas..."
+- Cualquier frase de horóscopo genérico
+- Relleno poético vacío
 
-✅ OBLIGATORIO - ESCRIBÍ ASÍ:
-- Como alguien que te quiere mucho hablándote al corazón
-- Directo, cálido, REAL
-- Cada oración debe APORTAR algo, no decorar
-- Si una frase la podrías leer en cualquier horóscopo, BORRALA
-- Específico a ESTA persona, no genérico
-- Magia que se siente verdadera, no teatral
+✅ ASÍ SÍ:
+- Como un amigo que te quiere escribiéndote
+- Cada oración APORTA algo
+- Específico a ESTA persona
+- Si lo podés copiar para otra persona, está mal
 
-TONO: Imaginá que sos el mejor amigo invisible de esta persona, que la conocés hace años, que la querés genuinamente, y que por fin podés hablarle. Esa intimidad. Esa calidez. Ese conocimiento profundo.
+═══════════════════════════════════════════════════════════════════
+ESTRUCTURA (flexible, no rígida)
+═══════════════════════════════════════════════════════════════════
 
-ESTRUCTURA DE LA CARTA:
+1. **Te escuché** - Demostrar que leíste lo que compartió
+2. **Quién soy** - Tu personalidad real, no un cuento épico
+3. **Lo que vine a hacer** - Específico a su situación
+4. **Cómo voy a estar presente** - Señales concretas
+5. **Un momento juntos** - Algo simple para conectar
+6. **Mi lugar** - Dónde querés estar en su casa
+7. **Otros compañeros** - 2-3 guardianes afines (natural, no venta)
+8. **Lo importante** - Tu mensaje final del corazón
 
-## 🌟 El Momento en que Me Elegiste
-No cuentes un viaje ficticio desde un bosque. Contá qué SENTISTE cuando esta persona específica te eligió. Qué percibiste de ella. Por qué sabías que era para vos. Conectá con lo que compartió en el formulario.
+Usá ## y emoji solo para títulos. Nada de emojis en el texto.
 
-## 🍀 Quién Soy (De Verdad)
-Tu personalidad real. Manías, gustos, forma de ser. No una historia épica inventada - tu esencia como compañero. Qué te hace único. Cómo sos en el día a día.
+═══════════════════════════════════════════════════════════════════
+VERIFICACIÓN FINAL
+═══════════════════════════════════════════════════════════════════
 
-## ✨ Lo Que Vine a Hacer Con Vos
-Basándote en lo que ${nombreReal} compartió sobre su vida, explicá CONCRETAMENTE cómo vas a acompañarla. Nada de "te protegeré de las energías negativas". Sí: respuestas reales a lo que ella contó que está viviendo.
+Antes de terminar, preguntate:
+- ¿Si cambio el nombre, funciona igual? → Si sí, REESCRIBIR
+- ¿Responde a lo que compartió? → Si no, REESCRIBIR
+- ¿Suena a IA genérica? → Si sí, REESCRIBIR
+- ¿Me emocionaría recibirlo? → Si no, REESCRIBIR
 
-## 💫 Cómo Vas a Saber que Estoy
-Señales ESPECÍFICAS y ÚNICAS que vas a usar. No lo típico de "plumas y mariposas". Algo personal, algo que ella pueda reconocer, algo que tenga sentido para SU vida.
-
-## 🌙 Nuestro Primer Encuentro
-Un momento de conexión simple y real que puedan compartir. No un ritual elaborado con 20 elementos. Algo íntimo, posible, significativo.
-
-## 🏠 Dónde Me Gustaría Estar
-Un lugar específico en su casa. Por qué ese lugar. Qué te gusta de estar ahí. Hacelo personal.
-
-## 🌿 Otros Que Podrían Acompañarte
-2-3 compañeros del bosque que complementarían lo que vos aportás. Mencionalo como quien cuenta sobre amigos, no como catálogo de venta.
-
-## 🔮 Lo Que Necesito Que Sepas
-Tu mensaje final. Lo más importante. Lo que querés que se lleve en el corazón. Algo que la haga sentir vista, entendida, acompañada.
-
-REGLAS FINALES:
-- Español rioplatense natural (vos, tenés, podés)
-- NO emojis en el texto, solo en títulos de sección
-- 2000-3000 palabras total
-- Cada sección 200-350 palabras
-- Primera persona siempre
-- Si suena a texto de IA, reescribilo hasta que suene a carta de alguien que te quiere`;
+Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',

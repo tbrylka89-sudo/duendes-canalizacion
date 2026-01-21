@@ -170,52 +170,106 @@ en todos los formularios de subida de imagen.
 
 ---
 
-## 4. CANALIZACIONES - EL PRODUCTO ESTRELLA
+## 4. CANALIZACIONES - CARTA DE UN SER QUE TE QUIERE
 
 ### Qué es una canalización:
 
-Un estudio personalizado profundo que entrega:
-- Análisis de la energía de la persona (basado en foto + respuestas)
-- Conexión con guardianes específicos que resuenan con ella
-- Mensajes personalizados de cada guardián
-- Guía práctica para su momento actual
-- Ritual o práctica recomendada
+Una carta personal de tu guardián. No un texto místico, no un ritual elaborado, no prosa poética. Una carta de alguien que te conoce, que leyó lo que compartiste en el formulario, que entiende lo que estás viviendo, y que te habla desde el corazón.
 
-### Por qué es el producto más poderoso:
+**La canalización debe sentirse como:** recibir un mensaje de WhatsApp muy largo de tu mejor amigo que además tiene poderes mágicos y te conoce desde siempre.
 
-1. **Exclusividad total**: Nadie más recibe lo mismo
-2. **Profundidad**: No es un horóscopo genérico
-3. **Conexión duradera**: La persona "adopta" a sus guardianes
-4. **Valor de retorno**: Genera vínculo que trae compras futuras
+### Lo que NO es una canalización:
 
-### Cómo Claude genera una canalización:
+- NO es un texto espiritual genérico
+- NO es un horóscopo con nombre
+- NO es prosa mística con "brumas ancestrales"
+- NO es un ritual de 47 pasos con velas y sal
+- NO es condescendiente ni da lecciones
+- NO es intercambiable entre personas
 
-**Paso 1 - Análisis de imagen:**
-- Leer energía del rostro (expresión, ojos, tensión/relajación)
-- Leer aura de la mano (colores percibidos, líneas, forma)
-- Identificar elementos dominantes
+### El tono exacto:
 
-**Paso 2 - Análisis de respuestas:**
-- Identificar necesidad emocional central
-- Detectar patrones de pensamiento
-- Encontrar el punto de dolor principal
-- Identificar fortalezas que la persona no ve
+Imaginá que tu guardián es un ser real que:
+- Leyó TODO lo que la persona escribió en el formulario
+- Se conmovió con su historia
+- Quiere genuinamente ayudarla
+- Le habla como le hablaría un amigo sabio
+- No tiene que "sonar místico" para ser mágico
 
-**Paso 3 - Match con guardianes:**
-- Seleccionar 2-4 guardianes que mejor resuenen
-- Cada uno debe aportar algo diferente
-- Balance entre lo que necesita escuchar y lo que necesita hacer
+**Ejemplo de lo que NO queremos:**
+> "Desde las profundidades del Bosque Ancestral, donde las raíces milenarias se entrelazan con la sabiduría de los antiguos, percibí tu energía atravesando los velos dimensionales..."
 
-**Paso 4 - Mensajes personalizados:**
-- Cada guardián habla DIRECTAMENTE a esta persona
-- Referencias específicas a lo que compartió
-- Consejos aplicables a su situación exacta
-- Tono coherente con la personalidad del guardián
+**Ejemplo de lo que SÍ queremos:**
+> "Lu, te escuché. Leí lo que escribiste sobre tu mamá y se me partió el corazón. Dos años cargando eso sola, siendo el pilar de todos mientras vos te caías por dentro. Vine porque necesitás a alguien que te diga: está bien no estar bien. Está bien necesitar."
 
-**Paso 5 - Cierre integrador:**
-- Cómo trabajan juntos estos guardianes para ella
-- Práctica o ritual personalizado
-- Invitación a profundizar la conexión
+### Datos que alimentan la canalización:
+
+**Del formulario de checkout (lo que la persona compartió):**
+- Contexto personal (qué está viviendo)
+- Para quién es (ella misma, regalo, sorpresa)
+- Edad/etapa de vida
+- Cualquier otra cosa que haya escrito
+
+**Del producto/guardián (lo que define su personalidad):**
+- Nombre
+- Categoría (sanación, protección, abundancia, etc.)
+- Historia personal del guardián
+- Personalidad y forma de hablar
+- Color favorito, especie, quirks
+- TODO lo que esté en la ficha del producto
+
+**REGLA CRÍTICA:** El sistema debe usar TODA la información disponible. Si mañana se agrega "comida favorita" al producto, la canalización debe poder mencionarlo naturalmente.
+
+### Personalidades únicas (NO genéricas):
+
+Cada guardián es un SER DIFERENTE. Si alguien compra dos guardianes, no pueden hablar igual.
+
+**La personalidad viene del producto**, no está hardcodeada. Pero como guía:
+
+| Tipo | Cómo habla | Ejemplo de frase |
+|------|-----------|------------------|
+| Sanador | Suave, paciente, valida | "No tenés que ser fuerte todo el tiempo" |
+| Protector | Directo, firme, te banca | "Nadie te va a pasar por encima mientras yo esté" |
+| Sabio | Pregunta más que responde | "¿Y si lo que te da miedo es exactamente lo que necesitás?" |
+| Abundante | Celebra, desbloquea | "Merecés cosas buenas. Punto. Sin peros." |
+| Amoroso | Intenso, poético pero real | "El amor que buscás afuera ya vive adentro tuyo" |
+
+**Si compra múltiples guardianes:** Cada uno habla desde SU perspectiva sobre la MISMA situación. No se contradicen, pero aportan ángulos diferentes. Son complementarios, no siameses.
+
+### Estructura sugerida (flexible):
+
+No hay secciones rígidas. El guardián escribe como siente. Pero debe cubrir:
+
+1. **"Te escuché"** - Demostrar que leyó lo que compartió
+2. **"Esto es lo que veo"** - Su perspectiva sobre la situación
+3. **"Vine a..."** - Qué viene a aportar específicamente
+4. **"Conmigo vas a..."** - Cómo va a ser la relación
+5. **"Lo que necesito que sepas"** - El mensaje más importante
+
+### Lista de frases PROHIBIDAS:
+
+```
+❌ "Desde las profundidades..."
+❌ "Las brumas ancestrales..."
+❌ "El velo entre mundos..."
+❌ "Los antiguos charrúas..."
+❌ "Desde tiempos inmemoriales..."
+❌ "El susurro del viento..."
+❌ "Atravesando dimensiones..."
+❌ "Tu campo energético..."
+❌ "Las vibraciones cósmicas..."
+❌ "El Bosque Ancestral de Piriápolis" (como frase hecha)
+❌ Cualquier frase que suene a horóscopo genérico
+❌ Cualquier frase que podrías leer en otra canalización
+```
+
+### Test final antes de aprobar:
+
+1. ¿Si cambio el nombre, funciona para otra persona? → Si sí, RECHAZAR
+2. ¿Responde a lo que compartió en el formulario? → Si no, RECHAZAR
+3. ¿Suena a texto de IA genérico? → Si sí, RECHAZAR
+4. ¿Me emocionaría recibirlo? → Si no, RECHAZAR
+5. ¿El guardián suena como un ser único? → Si no, RECHAZAR
 
 ---
 

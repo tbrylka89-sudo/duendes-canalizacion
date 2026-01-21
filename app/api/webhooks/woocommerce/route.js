@@ -116,13 +116,18 @@ export async function POST(request) {
       }
       // 3. Guardianes
       else if (categoriasArray.some(c => ['proteccion', 'abundancia', 'amor', 'salud', 'sanacion'].includes(c))) {
+        // Obtener datos COMPLETOS del producto desde WooCommerce
+        const datosCompletos = await obtenerDatosCompletoProducto(item.product_id);
+
         guardianes.push({
           id: item.product_id,
           nombre: item.name,
           categoria: categoriasArray[0],
           precio: parseFloat(item.total) || 0,
           fecha: new Date().toISOString(),
-          imagen: item.image?.src || null
+          imagen: item.image?.src || null,
+          // Datos completos del producto (personalidad, historia, etc.)
+          ...datosCompletos
         });
       }
       else {
@@ -350,6 +355,76 @@ export async function POST(request) {
 // ═══════════════════════════════════════════════════════════════
 // FUNCIONES AUXILIARES
 // ═══════════════════════════════════════════════════════════════
+
+// Obtener TODOS los datos del producto desde WooCommerce API
+async function obtenerDatosCompletoProducto(productId) {
+  try {
+    const wcKey = process.env.WC_CONSUMER_KEY;
+    const wcSecret = process.env.WC_CONSUMER_SECRET;
+    const wcUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
+
+    const auth = Buffer.from(`${wcKey}:${wcSecret}`).toString('base64');
+
+    const response = await fetch(
+      `${wcUrl}/wp-json/wc/v3/products/${productId}`,
+      {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Error obteniendo producto ${productId}: ${response.status}`);
+      return {};
+    }
+
+    const producto = await response.json();
+
+    // Extraer meta_data como objeto plano
+    const metaData = {};
+    if (producto.meta_data) {
+      for (const meta of producto.meta_data) {
+        // Ignorar campos internos de WooCommerce
+        if (!meta.key.startsWith('_')) {
+          metaData[meta.key] = meta.value;
+        }
+      }
+    }
+
+    // Devolver todos los datos relevantes del producto
+    return {
+      // Datos básicos
+      descripcion: producto.description || '',
+      descripcionCorta: producto.short_description || '',
+      slug: producto.slug || '',
+
+      // Meta data personalizada (personalidad, historia, color, etc.)
+      // Esto incluye CUALQUIER campo personalizado que se agregue en el futuro
+      ...metaData,
+
+      // Atributos del producto
+      atributos: producto.attributes?.reduce((acc, attr) => {
+        acc[attr.name.toLowerCase()] = attr.options;
+        return acc;
+      }, {}) || {},
+
+      // Categorías completas
+      categorias: producto.categories?.map(c => c.name) || [],
+
+      // Tags
+      tags: producto.tags?.map(t => t.name) || [],
+
+      // Imágenes adicionales
+      imagenes: producto.images?.map(img => img.src) || []
+    };
+
+  } catch (error) {
+    console.error('Error obteniendo datos completos del producto:', error);
+    return {};
+  }
+}
 
 function extraerCantidadRunas(sku, nombre) {
   // Buscar número en SKU: runas-de-poder-15, runas-de-poder-30, etc

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bocetos Ficha del Guardián - Duendes del Uruguay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #0a0a12;
+            color: #fff;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #c9a962;
+            margin-bottom: 20px;
+            font-family: 'Cinzel', serif;
+        }
+        .intro {
+            text-align: center;
+            color: #888;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .boceto-section {
+            margin-bottom: 80px;
+        }
+        .boceto-title {
+            color: #c9a962;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-family: 'Cinzel', serif;
+            border-bottom: 1px solid rgba(201,169,98,0.3);
+            padding-bottom: 10px;
+        }
+        .boceto-desc {
+            color: #888;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        /* ==========================================
+           BOCETO 1: TARJETAS ELEGANTES
+        ========================================== */
+        .boceto1 {
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(201,169,98,0.2);
+        }
+        .boceto1 .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .boceto1 .nombre {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .boceto1 .subtitulo {
+            color: #c9a962;
+            font-size: 13px;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        .boceto1 .badge {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 25px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .boceto1 .badge.unico {
+            background: linear-gradient(135deg, #c9a962, #a08030);
+            color: #1a1a2e;
+        }
+        .boceto1 .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .boceto1 .card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+        .boceto1 .card:hover {
+            border-color: rgba(201,169,98,0.3);
+            transform: translateY(-3px);
+        }
+        .boceto1 .card-label {
+            color: #c9a962;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .boceto1 .card-value {
+            color: #fff;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        .boceto1 .frase {
+            text-align: center;
+            padding: 25px;
+            background: rgba(201,169,98,0.08);
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 3px solid #c9a962;
+            border-right: 3px solid #c9a962;
+        }
+        .boceto1 .frase q {
+            font-style: italic;
+            font-size: 18px;
+            color: #e8d5a8;
+        }
+        .boceto1 .dato-curioso {
+            background: rgba(201,169,98,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+        }
+        .boceto1 .dato-curioso-label {
+            color: #c9a962;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==========================================
+           BOCETO 2: MINIMALISTA HORIZONTAL
+        ========================================== */
+        .boceto2 {
+            background: #121218;
+            padding: 40px;
+            border-radius: 16px;
+        }
+        .boceto2 .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a35;
+        }
+        .boceto2 .header-left h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .boceto2 .header-left .subtitle {
+            color: #666;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        .boceto2 .badge {
+            padding: 8px 16px;
+            background: #c9a962;
+            color: #121218;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: 4px;
+        }
+        .boceto2 .info-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .boceto2 .info-item {
+            text-align: center;
+        }
+        .boceto2 .info-label {
+            color: #555;
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .boceto2 .info-value {
+            color: #c9a962;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .boceto2 .preferences {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 20px 0;
+            border-top: 1px solid #2a2a35;
+            border-bottom: 1px solid #2a2a35;
+        }
+        .boceto2 .pref-section h4 {
+            color: #888;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .boceto2 .pref-list {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .boceto2 .bottom-section {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        .boceto2 .lema {
+            padding: 20px;
+            background: rgba(201,169,98,0.05);
+            border-radius: 8px;
+        }
+        .boceto2 .lema q {
+            color: #c9a962;
+            font-size: 16px;
+            font-style: italic;
+        }
+        .boceto2 .dato {
+            padding: 20px;
+            background: #1a1a22;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #888;
+        }
+        .boceto2 .dato strong {
+            color: #c9a962;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* ==========================================
+           BOCETO 3: MISTICA COMPLETA
+        ========================================== */
+        .boceto3 {
+            background:
+                radial-gradient(ellipse at top, rgba(201,169,98,0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #1a1a2e 0%, #0d0d15 100%);
+            padding: 50px 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(201,169,98,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .boceto3::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #c9a962, transparent);
+        }
+        .boceto3 .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .boceto3 .especie-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(201,169,98,0.15);
+            border: 1px solid rgba(201,169,98,0.3);
+            border-radius: 4px;
+            color: #c9a962;
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .boceto3 .nombre {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(201,169,98,0.3);
+            margin-bottom: 8px;
+        }
+        .boceto3 .titulo {
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 3px;
+        }
+        .boceto3 .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .boceto3 .col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .boceto3 .field {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .boceto3 .field-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .boceto3 .field-value {
+            color: #fff;
+            font-size: 14px;
+            text-align: right;
+        }
+        .boceto3 .personality {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .boceto3 .personality h4 {
+            color: #c9a962;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        .boceto3 .traits {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .boceto3 .trait {
+            padding: 8px 16px;
+            background: rgba(201,169,98,0.1);
+            border: 1px solid rgba(201,169,98,0.2);
+            border-radius: 20px;
+            color: #c9a962;
+            font-size: 12px;
+        }
+        .boceto3 .quote-section {
+            margin-top: 40px;
+            text-align: center;
+            padding: 30px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            position: relative;
+        }
+        .boceto3 .quote-section::before {
+            content: '"';
+            font-family: 'Cinzel', serif;
+            font-size: 60px;
+            color: rgba(201,169,98,0.2);
+            position: absolute;
+            top: 10px;
+            left: 30px;
+        }
+        .boceto3 .quote {
+            font-style: italic;
+            font-size: 18px;
+            color: #e8d5a8;
+            line-height: 1.6;
+        }
+        .boceto3 .likes-section {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .boceto3 .likes-box {
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+        }
+        .boceto3 .likes-box h5 {
+            color: #888;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .boceto3 .likes-box ul {
+            list-style: none;
+            color: #ccc;
+            font-size: 13px;
+        }
+        .boceto3 .likes-box li {
+            padding: 6px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+        .boceto3 .likes-box li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #c9a962;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .boceto3 .curiosity {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(201,169,98,0.1) 0%, rgba(201,169,98,0.02) 100%);
+            border-radius: 16px;
+            border-left: 3px solid #c9a962;
+        }
+        .boceto3 .curiosity-label {
+            color: #c9a962;
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .boceto3 .curiosity-text {
+            color: #ddd;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Notas de diseño */
+        .design-notes {
+            background: #1a1a22;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border-left: 3px solid #555;
+        }
+        .design-notes h4 {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .design-notes ul {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .boceto2 .info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .boceto3 .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bocetos: Ficha del Guardian</h1>
+        <p class="intro">Tres propuestas de diseño visual para la ficha que aparece en la pagina de cada guardian. Todos usan los mismos datos, variando el estilo visual.</p>
+
+        <!-- BOCETO 1 -->
+        <section class="boceto-section">
+            <h2 class="boceto-title">Boceto 1: Tarjetas Elegantes</h2>
+            <p class="boceto-desc">Estilo con tarjetas individuales, organizado y facil de escanear. Hover sutil en cada elemento.</p>
+
+            <div class="boceto1">
+                <div class="header">
+                    <div class="nombre">Edward</div>
+                    <div class="subtitulo">GUARDIAN · LEPRECHAUN · PROTECCION</div>
+                    <span class="badge unico">SER UNICO</span>
+                </div>
+
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-label">Especie</div>
+                        <div class="card-value">Duende</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Familia</div>
+                        <div class="card-value">Leprechaun</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Tamano</div>
+                        <div class="card-value">Mediano (23 cm)</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Elemento</div>
+                        <div class="card-value">Tierra</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Flor Favorita</div>
+                        <div class="card-value">Trebol de cuatro hojas</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Cristal</div>
+                        <div class="card-value">Pirita dorada</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Color</div>
+                        <div class="card-value">Verde esmeralda</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Lugar Favorito</div>
+                        <div class="card-value">Junto a la puerta de entrada</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Momento del Dia</div>
+                        <div class="card-value">El amanecer, cuando todo empieza</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Estacion</div>
+                        <div class="card-value">Otono</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Paseos</div>
+                        <div class="card-value">Si, le encanta</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Personalidad</div>
+                        <div class="card-value">Protector, Leal, Jugueton</div>
+                    </div>
+                </div>
+
+                <div class="frase">
+                    <q>La fortuna no se busca, se construye un dia a la vez</q>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <div class="card-label">Lo que le gusta</div>
+                        <div class="card-value">Las monedas brillantes, el olor a cafe recien hecho, que le cuenten como estuvo el dia</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Lo que no le gusta</div>
+                        <div class="card-value">El desorden en la entrada, que hablen mal de la plata, los ruidos muy fuertes de manana</div>
+                    </div>
+                </div>
+
+                <div class="dato-curioso">
+                    <div class="dato-curioso-label">Dato curioso</div>
+                    <div>Si encontras una moneda tirada en cualquier lugar, el dice que fue el quien la puso ahi para vos. Dice que lo hace "para que te acuerdes que la abundancia siempre esta cerca".</div>
+                </div>
+            </div>
+
+            <div class="design-notes">
+                <h4>Notas de diseno:</h4>
+                <ul>
+                    <li>Cards con hover sutil para interactividad</li>
+                    <li>Grid responsive que se adapta a movil</li>
+                    <li>Frase centrada y destacada</li>
+                    <li>Dato curioso con fondo diferenciado</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- BOCETO 2 -->
+        <section class="boceto-section">
+            <h2 class="boceto-title">Boceto 2: Minimalista Horizontal</h2>
+            <p class="boceto-desc">Diseno limpio, mucha informacion en poco espacio. Ideal para pantallas anchas.</p>
+
+            <div class="boceto2">
+                <div class="header">
+                    <div class="header-left">
+                        <h2>Edward</h2>
+                        <div class="subtitle">GUARDIAN · LEPRECHAUN · PROTECCION</div>
+                    </div>
+                    <span class="badge">SER UNICO</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Especie</div>
+                        <div class="info-value">Duende</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Elemento</div>
+                        <div class="info-value">Tierra</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Cristal</div>
+                        <div class="info-value">Pirita</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Flor</div>
+                        <div class="info-value">Trebol</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Estacion</div>
+                        <div class="info-value">Otono</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Tamano</div>
+                        <div class="info-value">23 cm</div>
+                    </div>
+                </div>
+
+                <div class="preferences">
+                    <div class="pref-section">
+                        <h4>LO QUE LE GUSTA</h4>
+                        <div class="pref-list">Las monedas brillantes · El olor a cafe · Que le cuenten el dia</div>
+                    </div>
+                    <div class="pref-section">
+                        <h4>LO QUE NO LE GUSTA</h4>
+                        <div class="pref-list">El desorden · Hablar mal de la plata · Ruidos fuertes</div>
+                    </div>
+                </div>
+
+                <div class="bottom-section">
+                    <div class="lema">
+                        <q>La fortuna no se busca, se construye un dia a la vez</q>
+                    </div>
+                    <div class="dato">
+                        <strong>DATO CURIOSO</strong>
+                        Si encontras una moneda tirada, el dice que la puso el para vos.
+                    </div>
+                </div>
+            </div>
+
+            <div class="design-notes">
+                <h4>Notas de diseno:</h4>
+                <ul>
+                    <li>Muy compacto, ideal si hay mucho contenido en la pagina</li>
+                    <li>Informacion clave visible de un vistazo</li>
+                    <li>Menos "magico", mas informativo</li>
+                    <li>Bueno para quienes quieren datos rapidos</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- BOCETO 3 -->
+        <section class="boceto-section">
+            <h2 class="boceto-title">Boceto 3: Mistica Completa</h2>
+            <p class="boceto-desc">Diseno inmersivo con mas presencia visual. Evoca el mundo magico de los guardianes.</p>
+
+            <div class="boceto3">
+                <div class="header">
+                    <div class="especie-badge">LEPRECHAUN</div>
+                    <div class="nombre">Edward</div>
+                    <div class="titulo">GUARDIAN DE PROTECCION · SER UNICO</div>
+                </div>
+
+                <div class="main-content">
+                    <div class="col">
+                        <div class="field">
+                            <span class="field-label">Elemento</span>
+                            <span class="field-value">Tierra</span>
+                        </div>
+                        <div class="field">
+                            <span class="field-label">Cristal Favorito</span>
+                            <span class="field-value">Pirita dorada</span>
+                        </div>
+                        <div class="field">
+                            <span class="field-label">Flor Favorita</span>
+                            <span class="field-value">Trebol de cuatro hojas</span>
+                        </div>
+                        <div class="field">
+                            <span class="field-label">Color</span>
+                            <span class="field-value">Verde esmeralda</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="field">
+                            <span class="field-label">Lugar de la Casa</span>
+                            <span class="field-value">Junto a la puerta</span>
+                        </div>
+                        <div class="field">
+                            <span class="field-label">Momento del Dia</span>
+                            <span class="field-value">El amanecer</span>
+                        </div>
+                        <div class="field">
+                            <span class="field-label">Estacion</span>
+                            <span class="field-value">Otono</span>
+                        </div>
+                        <div class="field">
+                            <span class="field-label">Paseos</span>
+                            <span class="field-value">Si, le encanta</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="personality">
+                    <h4>PERSONALIDAD</h4>
+                    <div class="traits">
+                        <span class="trait">Protector</span>
+                        <span class="trait">Leal</span>
+                        <span class="trait">Jugueton</span>
+                    </div>
+                </div>
+
+                <div class="quote-section">
+                    <p class="quote">La fortuna no se busca, se construye un dia a la vez</p>
+                </div>
+
+                <div class="likes-section">
+                    <div class="likes-box">
+                        <h5>LO QUE LE GUSTA</h5>
+                        <ul>
+                            <li>Las monedas brillantes</li>
+                            <li>El olor a cafe recien hecho</li>
+                            <li>Que le cuenten como estuvo el dia</li>
+                        </ul>
+                    </div>
+                    <div class="likes-box">
+                        <h5>LO QUE NO LE GUSTA</h5>
+                        <ul>
+                            <li>El desorden en la entrada</li>
+                            <li>Que hablen mal de la plata</li>
+                            <li>Los ruidos muy fuertes de manana</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="curiosity">
+                    <div class="curiosity-label">DATO CURIOSO</div>
+                    <p class="curiosity-text">Si encontras una moneda tirada en cualquier lugar, el dice que fue el quien la puso ahi para vos. Dice que lo hace "para que te acuerdes que la abundancia siempre esta cerca".</p>
+                </div>
+            </div>
+
+            <div class="design-notes">
+                <h4>Notas de diseno:</h4>
+                <ul>
+                    <li>Mas inmersivo y visual</li>
+                    <li>Efecto de luz superior que da misticismo</li>
+                    <li>Comilla decorativa en la frase</li>
+                    <li>Mejor experiencia emocional, conecta mas con la magia</li>
+                    <li>Ocupa mas espacio pero transmite mas</li>
+                </ul>
+            </div>
+        </section>
+
+        <section style="text-align: center; padding: 40px; color: #666;">
+            <h3 style="color: #c9a962; margin-bottom: 15px;">Legibilidad del texto</h3>
+            <p style="margin-bottom: 20px;">En los tres bocetos el texto usa colores claros sobre fondo oscuro:</p>
+            <div style="display: inline-flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                <div style="padding: 15px 25px; background: #1a1a2e; border-radius: 8px;">
+                    <span style="color: #fff;">Texto principal: #fff</span>
+                </div>
+                <div style="padding: 15px 25px; background: #1a1a2e; border-radius: 8px;">
+                    <span style="color: #c9a962;">Acentos: #c9a962</span>
+                </div>
+                <div style="padding: 15px 25px; background: #1a1a2e; border-radius: 8px;">
+                    <span style="color: #888;">Labels: #888888</span>
+                </div>
+                <div style="padding: 15px 25px; background: #1a1a2e; border-radius: 8px;">
+                    <span style="color: #ccc;">Secundario: #cccccc</span>
+                </div>
+            </div>
+            <p style="margin-top: 20px; font-size: 14px;">Todas las combinaciones cumplen con WCAG AA para contraste.</p>
+        </section>
+    </div>
+</body>
+</html>
