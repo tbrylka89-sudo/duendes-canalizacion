@@ -18,7 +18,7 @@
     },
     {
       "path": "/api/cron/guardian-intelligence",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 10 * * *"
     }
   ]
 }

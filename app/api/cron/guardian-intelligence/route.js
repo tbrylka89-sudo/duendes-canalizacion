@@ -1,12 +1,12 @@
 /**
  * GUARDIAN INTELLIGENCE - CRON JOB
- * Se ejecuta cada 15 minutos para monitoreo 24/7
- * Configurado en vercel.json con schedule cada 15 minutos
+ * Se ejecuta una vez por día (7:00 AM Uruguay) para generar reporte diario
  */
 
 import { NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
-import { ejecutarMonitoreo, obtenerEstadoMonitor } from '@/lib/guardian-intelligence/monitor';
+import { ejecutarReporteDiario } from '@/lib/guardian-intelligence/daily-report';
+import { obtenerEstadoMonitor } from '@/lib/guardian-intelligence/monitor';
 
 export async function GET(request) {
   try {
@@ -21,33 +21,34 @@ export async function GET(request) {
       }
     }
 
-    // Verificar si el monitor está activo
-    const monitorActivo = await obtenerEstadoMonitor();
+    // Verificar si el reporte está activo
+    const reporteActivo = await obtenerEstadoMonitor();
 
-    if (!monitorActivo) {
+    if (!reporteActivo) {
       return NextResponse.json({
         success: true,
-        mensaje: 'Monitor 24/7 está desactivado',
+        mensaje: 'Reporte diario está desactivado',
         ejecutado: false
       });
     }
 
-    // Ejecutar monitoreo completo
-    const resultado = await ejecutarMonitoreo();
+    // Ejecutar reporte diario completo
+    const resultado = await ejecutarReporteDiario();
 
     // Registrar ejecución
     await kv.set('gi:cron:ultima_ejecucion', {
       fecha: new Date().toISOString(),
-      resultado: resultado.resumen
+      tipo: 'reporte_diario',
+      alertas: resultado.reporte.alertas.length,
+      emailEnviado: resultado.envio.success
     });
-
-    // Si hay problemas críticos, ya se enviaron alertas en ejecutarMonitoreo()
 
     return NextResponse.json({
       success: true,
       ejecutado: true,
-      resultado: resultado.resumen,
-      alertas: resultado.alertas.length,
+      resumen: resultado.reporte.resumen,
+      alertas: resultado.reporte.alertas.length,
+      emailEnviado: resultado.envio.success,
       timestamp: new Date().toISOString()
     });
 
