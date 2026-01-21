@@ -301,7 +301,11 @@ export default function CanalizacionDetalle() {
       {/* Header */}
       <header className="header">
         <div className="header-left">
-          <button type="button" onClick={() => router.back()} className="btn-back">
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push('/admin/canalizaciones'); }}
+            className="btn-back"
+          >
             &#8592;
           </button>
           <div className="header-info">
@@ -543,6 +547,8 @@ export default function CanalizacionDetalle() {
           align-items: center;
           justify-content: center;
           transition: all 0.2s;
+          position: relative;
+          z-index: 100;
         }
 
         .btn-back:hover {
