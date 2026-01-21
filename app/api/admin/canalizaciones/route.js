@@ -481,3 +481,55 @@ export async function PUT(request) {
     }, { status: 500, headers: corsHeaders });
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// DELETE - Eliminar canalización
+// ═══════════════════════════════════════════════════════════════
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return Response.json({
+        success: false,
+        error: 'ID requerido'
+      }, { status: 400, headers: corsHeaders });
+    }
+
+    const canalizacion = await kv.get(`canalizacion:${id}`);
+    if (!canalizacion) {
+      return Response.json({
+        success: false,
+        error: 'Canalización no encontrada'
+      }, { status: 404, headers: corsHeaders });
+    }
+
+    // Eliminar de todas las listas
+    const pendientes = await kv.get('canalizaciones:pendientes') || [];
+    const aprobadas = await kv.get('canalizaciones:aprobadas') || [];
+    const enviadas = await kv.get('canalizaciones:enviadas') || [];
+    const todas = await kv.get('canalizaciones:todas') || [];
+
+    await kv.set('canalizaciones:pendientes', pendientes.filter(pid => pid !== id));
+    await kv.set('canalizaciones:aprobadas', aprobadas.filter(aid => aid !== id));
+    await kv.set('canalizaciones:enviadas', enviadas.filter(eid => eid !== id));
+    await kv.set('canalizaciones:todas', todas.filter(tid => tid !== id));
+
+    // Eliminar la canalización
+    await kv.del(`canalizacion:${id}`);
+
+    return Response.json({
+      success: true,
+      message: 'Canalización eliminada'
+    }, { headers: corsHeaders });
+
+  } catch (error) {
+    console.error('Error eliminando canalización:', error);
+    return Response.json({
+      success: false,
+      error: error.message
+    }, { status: 500, headers: corsHeaders });
+  }
+}
