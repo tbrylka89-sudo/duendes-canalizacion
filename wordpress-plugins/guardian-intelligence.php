@@ -1079,7 +1079,14 @@ function gi_analyze_page() {
             const data = await res.json();
 
             if (data.success && data.analisis) {
-                giMostrarResultados(data.analisis);
+                // Convertir formato si es necesario
+                const analisis = data.analisis.productosAnalizados ? {
+                    productos: data.analisis.productosAnalizados || data.analisis.productos,
+                    total: data.analisis.totalProductos || data.analisis.total,
+                    puntajeGlobal: data.analisis.puntajeGlobal,
+                    resumen: data.analisis.resumen
+                } : data.analisis;
+                giMostrarResultados(analisis);
             }
         } catch (e) {
             console.error('Error cargando análisis:', e);
@@ -1117,7 +1124,14 @@ function gi_analyze_page() {
 
             if (data.success) {
                 text.textContent = '✅ Análisis completado';
-                giMostrarResultados(data.analisis || data);
+                // API devuelve resultado.productosAnalizados, convertir a formato esperado
+                const analisis = data.resultado ? {
+                    productos: data.resultado.productosAnalizados || data.resultado.productos,
+                    total: data.resultado.totalProductos || data.resultado.total,
+                    puntajeGlobal: data.resultado.puntajeGlobal,
+                    resumen: data.resultado.resumen
+                } : data.analisis || data;
+                giMostrarResultados(analisis);
             } else {
                 throw new Error(data.error || 'Error en el análisis');
             }
