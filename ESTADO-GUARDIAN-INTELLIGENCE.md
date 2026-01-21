@@ -1,8 +1,8 @@
 # 🧠 GUARDIAN INTELLIGENCE - ESTADO DEL DESARROLLO
 
-**Última actualización:** 2026-01-21 03:30 (Uruguay)
+**Última actualización:** 2026-01-21 04:00 (Uruguay)
 **Desarrollador:** Claude Code
-**Estado general:** LISTO PARA DEPLOY
+**Estado general:** EN PRUEBAS - Analizador y Generador v2 listos
 
 ---
 
@@ -16,6 +16,63 @@ Guardian Intelligence (GI) es el sistema de inteligencia artificial central de D
 - Gestiona promociones y banners
 - Implementa cross-selling inteligente
 - Aprende y mejora continuamente
+
+---
+
+## 🔥 ACTUALIZACIÓN 21 ENERO 2026 - 04:00 AM
+
+### Problema Detectado
+El analizador daba 92/100 a historias que claramente estaban mal (repetitivas, con estructura rígida de template, headers tipo formulario). Era "una mentira más grande que las de Pinocho".
+
+### Soluciones Implementadas
+
+#### 1. Analizador v2 (`analyzer.js`)
+Ahora detecta problemas REALES:
+- `intro_robotica`: "Esta es X. Tiene Y años..." (penaliza -15)
+- `estructura_rigida`: Headers como "QUÉ TE APORTA:", "CÓMO NACIÓ:" (penaliza -20)
+- `listas_prohibidas`: Bullets en contenido emocional (penaliza -10)
+- `frases_gastadas`: Frases repetidas entre productos (penaliza -5 c/u)
+- `sincrodestino_gastado`: Mariposas, flores floreciendo, pétalos... (penaliza -15)
+- `falta_mensaje_primera_persona`: Sin mensaje canalizado (penaliza -10)
+- `falta_voseo`: Sin español rioplatense (penaliza -5)
+- `falta_identificacion_cliente`: Sin "para quien" (penaliza -10)
+
+**Resultado:** Puntajes pasaron de 92/100 falso a 24/100 real (122 de 123 con problemas)
+
+#### 2. Generador v2 (`generator.js`)
+- 6 estilos narrativos diferentes (reflexión, sincrodestino, mensaje, cliente, sensorial, diario)
+- SIN headers rígidos - todo fluido
+- Evita sincrodestinos gastados automáticamente
+- Nueva función `corregirHistoria()` para arreglar historias existentes
+
+#### 3. API de Corrección (`/api/guardian-intelligence/corregir`)
+- POST con productId: corrige UN producto (modo preview o aplicar)
+- POST sin productId: corrige los peores puntajes en batch
+- GET: historial de correcciones
+
+#### 4. Base de Productos (`productos-base.json`)
+113 productos con datos REALES del PDF:
+- Nombre, género, categoría, tamaño (cm), accesorios específicos
+
+**Reglas de Unicidad:**
+- Pixies: SIEMPRE únicas (no importa tamaño)
+- Mini / Mini especial: Recreables
+- Mediano en adelante: ÚNICOS
+- Arquetipos históricos (Merlín, Morgana, Leprechaun, etc.): Recreables en cualquier tamaño, pero cada canalización es única
+
+**Tipos de Seres (NO hay hadas):**
+pixie, duende, duenda, leprechaun, bruja, brujo, vikingo, vikinga, elfo, chamán, sanadora, maestro, alma maestra, guerrero, guerrera, duende medicina
+
+**Diferenciador de Marca:**
+> "Cada guardián es canalizado de manera consciente y voluntaria. No es una artesanía - es un ser que elige nacer. Por eso elegimos este camino de canalización consciente hace 10 años."
+
+### Prueba de Corrección
+- Violeta (ID 4740): De 12 puntos → 77 puntos
+- Problemas resueltos: 5 de 7
+
+### Pendiente
+- Correr correcciones en batch para todos los productos < 50 puntos
+- Verificar que el generador use los datos reales de productos-base.json
 
 ---
 
@@ -62,6 +119,8 @@ Guardian Intelligence (GI) es el sistema de inteligencia artificial central de D
 | `/promotions` | POST | Crear, activar, eliminar promociones | ✅ |
 | `/cross-selling` | GET | Sugerencias de productos relacionados | ✅ |
 | `/cross-selling` | POST | Registrar interacciones de cross-selling | ✅ |
+| `/corregir` | POST | Corrige historias (individual o batch) | ✅ |
+| `/corregir` | GET | Historial de correcciones | ✅ |
 
 ### 4. CRON Job
 **Archivo:** `/app/api/cron/guardian-intelligence/route.js`
@@ -310,6 +369,7 @@ duendes-vercel/
 │       ├── monitor.js         # Monitor 24/7
 │       ├── promotions.js      # Sistema de promociones
 │       ├── cross-selling.js   # Sistema de cross-selling
+│       ├── productos-base.json # 113 productos con datos reales
 │       └── index.js           # Exportaciones
 │
 ├── app/api/guardian-intelligence/
