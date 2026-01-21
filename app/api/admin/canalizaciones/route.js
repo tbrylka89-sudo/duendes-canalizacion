@@ -252,6 +252,8 @@ ${tonoEdad}
 - "Vibraciones cósmicas..."
 - Cualquier frase de horóscopo genérico
 - Relleno poético vacío
+- Palabras que puedan ofender: "boluda/o", "pelotuda/o", "idiota", etc.
+  (Usá alternativas suaves: "no te hagas la distraída", "no te engañes")
 
 ✅ ASÍ SÍ:
 - Como un amigo que te quiere escribiéndote

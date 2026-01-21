@@ -263,6 +263,16 @@ No hay secciones rígidas. El guardián escribe como siente. Pero debe cubrir:
 ❌ Cualquier frase que podrías leer en otra canalización
 ```
 
+### Palabras a evitar (pueden ofender):
+
+```
+❌ "boluda/o", "pelotuda/o", "idiota", "tarada/o"
+✅ Alternativas: "no te hagas la distraída", "no te engañes", "no te confundas"
+
+El tono es cercano y rioplatense, pero NUNCA ofensivo.
+Que sea como un amigo que te quiere, no como un amigo maleducado.
+```
+
 ### Test final antes de aprobar:
 
 1. ¿Si cambio el nombre, funciona para otra persona? → Si sí, RECHAZAR
