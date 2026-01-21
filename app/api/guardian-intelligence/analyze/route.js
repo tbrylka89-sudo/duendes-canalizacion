@@ -47,15 +47,28 @@ async function obtenerProductosWoo() {
 }
 
 function extraerAccesorios(producto) {
-  // Intentar extraer de meta_data
-  const meta = producto.meta_data?.find(m => m.key === '_duendes_accesorios');
-  if (meta) return meta.value.split(',').map(a => a.trim());
+  try {
+    // Intentar extraer de meta_data
+    const meta = producto.meta_data?.find(m => m.key === '_duendes_accesorios');
+    if (meta && meta.value) {
+      if (typeof meta.value === 'string') {
+        return meta.value.split(',').map(a => a.trim());
+      }
+      if (Array.isArray(meta.value)) {
+        return meta.value;
+      }
+    }
 
-  // Intentar extraer de atributos
-  const attr = producto.attributes?.find(a => a.name.toLowerCase().includes('accesorio'));
-  if (attr) return attr.options || [];
+    // Intentar extraer de atributos
+    const attr = producto.attributes?.find(a =>
+      a.name && a.name.toLowerCase().includes('accesorio')
+    );
+    if (attr && attr.options) return attr.options;
 
-  return [];
+    return [];
+  } catch (e) {
+    return [];
+  }
 }
 
 export async function POST(request) {
