@@ -33,22 +33,37 @@ export default async function handler(req, res) {
     // Autenticación básica para WooCommerce API
     const auth = Buffer.from(`${WOO_KEY}:${WOO_SECRET}`).toString('base64');
 
-    // Traer productos publicados con stock
-    const response = await fetch(
-      `${WOO_URL}/wp-json/wc/v3/products?status=publish&per_page=100`,
-      {
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/json'
+    // Paginar para obtener TODOS los productos
+    let wooProductos = [];
+    let page = 1;
+    let hayMas = true;
+
+    while (hayMas) {
+      const response = await fetch(
+        `${WOO_URL}/wp-json/wc/v3/products?status=publish&per_page=100&page=${page}`,
+        {
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json'
+          }
         }
+      );
+
+      if (!response.ok) {
+        throw new Error(`WooCommerce error: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`WooCommerce error: ${response.status}`);
+      const productos = await response.json();
+
+      if (productos.length === 0) {
+        hayMas = false;
+      } else {
+        wooProductos = wooProductos.concat(productos);
+        page++;
+        // Seguridad: máximo 10 páginas (1000 productos)
+        if (page > 10) hayMas = false;
+      }
     }
-
-    const wooProductos = await response.json();
 
     // Formatear productos para el frontend
     const productos = wooProductos.map(p => ({
