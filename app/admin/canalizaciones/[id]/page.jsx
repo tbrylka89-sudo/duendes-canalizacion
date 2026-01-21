@@ -301,7 +301,7 @@ export default function CanalizacionDetalle() {
       {/* Header */}
       <header className="header">
         <div className="header-left">
-          <button onClick={() => router.push('/admin/canalizaciones')} className="btn-back">
+          <button type="button" onClick={() => router.back()} className="btn-back">
             &#8592;
           </button>
           <div className="header-info">

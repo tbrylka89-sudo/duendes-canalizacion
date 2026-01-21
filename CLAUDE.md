@@ -266,12 +266,20 @@ No hay secciones rígidas. El guardián escribe como siente. Pero debe cubrir:
 ### Palabras a evitar (pueden ofender):
 
 ```
-❌ "boluda/o", "pelotuda/o", "idiota", "tarada/o"
-✅ Alternativas: "no te hagas la distraída", "no te engañes", "no te confundas"
+❌ "boluda/o", "pelotuda/o", "jodida/o", "idiota", "tarada/o"
+✅ Alternativas: "no te hagas la distraída", "no te engañes", "época difícil"
 
 El tono es cercano y rioplatense, pero NUNCA ofensivo.
 Que sea como un amigo que te quiere, no como un amigo maleducado.
 ```
+
+### Perspectivas importantes:
+
+**Sobre familia:** La sangre NO hace la familia. La familia se construye con experiencias compartidas, unión y amor. NUNCA empujes a alguien a estar con personas que le hacen mal solo porque comparten ADN. Dejá espacio para que cada uno defina qué es familia para sí mismo.
+
+**Sobre otros guardianes:** No vendas. Compartí desde la magia de la comunidad: "Los duendes somos seres sociables, cuando habitamos juntos nos potenciamos... te dejo los elementales con los que resuena mi energía..."
+
+**Disclaimer suave (obligatorio en canalizaciones):** En algún lugar de la carta, incluí naturalmente: "Esto es mi forma de acompañarte, de escucharte. Creo en el poder de sentirnos escuchados en los momentos que importan. No soy terapeuta ni pretendo reemplazar eso - soy un compañero que cree en vos." Con las palabras del guardián, suave, no legal.
 
 ### Test final antes de aprobar:
 
