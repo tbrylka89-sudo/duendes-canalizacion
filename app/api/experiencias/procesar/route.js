@@ -203,7 +203,8 @@ export async function GET(request) {
 // ═══════════════════════════════════════════════════════════════
 
 async function generarContenidoExperiencia(anthropic, solicitud) {
-  const { tipo, formulario, pronombre, nombreUsuario, palabrasMinimas } = solicitud;
+  const { tipo, pronombre, nombreUsuario, palabrasMinimas } = solicitud;
+  const formulario = solicitud.formulario || {};
   
   let systemPrompt = '';
   let userPrompt = '';
