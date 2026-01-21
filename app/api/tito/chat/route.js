@@ -1,5 +1,6 @@
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
+import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -816,6 +817,22 @@ ${esAdmin ?
     }
 
     // ═══════════════════════════════════════════════════════════
+    // REGISTRAR EVENTO PARA REPORTE DIARIO
+    // ═══════════════════════════════════════════════════════════
+
+    if (!esAdmin) {
+      registrarEvento(TIPOS_EVENTO.CHAT_TITO, {
+        visitorId,
+        pais: paisNombre,
+        tieneProductosEnCarrito: contexto?.carrito > 0,
+        preguntaSobre: /precio|envío|envio|pago/i.test(message) ? 'logistica' :
+                       /protecci|abundancia|amor|sanaci/i.test(message) ? 'categoria' :
+                       /pedido|orden|tracking/i.test(message) ? 'pedido' : 'general',
+        esRetorno
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // RESPUESTA
     // ═══════════════════════════════════════════════════════════
 
@@ -830,8 +847,15 @@ ${esAdmin ?
     
   } catch (error) {
     console.error('Error Tito:', error);
-    return Response.json({ 
-      success: false, 
+
+    // Registrar error para reporte
+    registrarEvento(TIPOS_EVENTO.ERROR_API, {
+      endpoint: '/api/tito/chat',
+      error: error.message
+    });
+
+    return Response.json({
+      success: false,
       error: error.message,
       response: 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo? Si sigue, escribinos al WhatsApp: +598 98 690 629 💫'
     }, { status: 500, headers: CORS_HEADERS });

@@ -18,6 +18,7 @@ import {
   generarEmailPromocion,
   generarHTMLBanner
 } from '@/lib/guardian-intelligence/promotions';
+import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
 
 export async function GET(request) {
   try {
@@ -170,6 +171,15 @@ export async function POST(request) {
       }
 
       const promocion = await registrarEstadisticaPromo(id, tipo);
+
+      // Registrar para reporte diario si es un uso real
+      if (tipo === 'uso' || tipo === 'venta') {
+        registrarEvento(TIPOS_EVENTO.PROMOCION_USADA, {
+          promoId: id,
+          tipo,
+          titulo: promocion?.titulo
+        });
+      }
 
       return NextResponse.json({
         success: true,

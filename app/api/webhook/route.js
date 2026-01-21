@@ -1,4 +1,5 @@
 import { kv } from '@vercel/kv';
+import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
 
 export async function POST(request) {
   try {
@@ -87,6 +88,19 @@ export async function POST(request) {
 
     console.log('Pedido guardado:', orderId, '| Tipo:', tipo, '| Generar en:', new Date(generateAt).toISOString());
 
+    // Registrar venta para reporte diario
+    registrarEvento(TIPOS_EVENTO.VENTA, {
+      orderId,
+      total: body.total,
+      moneda: body.currency,
+      productos: body.line_items?.map(i => i.name).join(', '),
+      cantidadItems: body.line_items?.length || 0,
+      pais: body.billing?.country,
+      tipo,
+      esLectura,
+      tieneGuardianes
+    });
+
     // Si tiene guardianes, crear/actualizar elegido inmediatamente (para email de agradecimiento)
     if (tieneGuardianes) {
       try {
@@ -109,6 +123,12 @@ export async function POST(request) {
     
   } catch (error) {
     console.error('Webhook error:', error);
+
+    registrarEvento(TIPOS_EVENTO.ERROR_API, {
+      endpoint: '/api/webhook',
+      error: error.message
+    });
+
     return Response.json({ error: error.message }, { status: 500 });
   }
 }

@@ -13,6 +13,7 @@ import {
   obtenerEstadisticas,
   generarWidgetHTML
 } from '@/lib/guardian-intelligence/cross-selling';
+import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
 
 // Función helper para obtener catálogo de WooCommerce
 async function obtenerCatalogo() {
@@ -246,6 +247,16 @@ export async function POST(request) {
         tipo,
         valorCompra
       });
+
+      // Registrar para reporte diario si es compra
+      if (tipo === 'compra') {
+        registrarEvento(TIPOS_EVENTO.VENTA, {
+          tipo: 'cross-selling',
+          productoOrigen,
+          productoSugerido,
+          valorCompra
+        });
+      }
 
       return NextResponse.json({
         success: true,
