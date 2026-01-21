@@ -515,17 +515,31 @@ export default function CanalizacionDetalle() {
           flex-direction: column;
         }
 
+        .detalle-container *::before,
+        .detalle-container *::after {
+          background-image: none !important;
+        }
+
         /* Header */
         .header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 1rem 2rem;
-          background: rgba(15,15,15,0.95);
+          background: rgba(15,15,15,0.98);
           border-bottom: 1px solid rgba(212,175,55,0.1);
           position: sticky;
           top: 0;
-          z-index: 100;
+          z-index: 1000;
+          overflow: visible;
+        }
+
+        .header::before {
+          display: none !important;
+        }
+
+        .header * {
+          pointer-events: auto;
         }
 
         .header-left {
@@ -602,6 +616,8 @@ export default function CanalizacionDetalle() {
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s;
+          position: relative;
+          z-index: 100;
         }
 
         .btn-aprobar {
