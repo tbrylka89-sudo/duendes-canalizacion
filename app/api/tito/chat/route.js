@@ -1,6 +1,7 @@
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
+import { actualizarFichaPostChat } from '@/lib/ficha-cliente';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -809,6 +810,16 @@ ${esAdmin ?
         // Crear entrada en lista indexada para fácil acceso admin
         if (nuevaMemoria.nombre || nuevaMemoria.email || Object.keys(nuevaMemoria.infoPersonal).length > 2) {
           await kv.sadd('tito:perfiles:activos', visitorId);
+        }
+
+        // === GUARDAR EN FICHA DEL CLIENTE (si tenemos email) ===
+        const clienteEmail = email || nuevaMemoria.email;
+        if (clienteEmail) {
+          try {
+            await actualizarFichaPostChat(clienteEmail, message, textoRespuesta);
+          } catch (fichaError) {
+            console.error('Error actualizando ficha post-chat:', fichaError);
+          }
         }
 
       } catch (e) {

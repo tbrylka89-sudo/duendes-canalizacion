@@ -7,6 +7,10 @@ import {
   XP_ACCIONES,
   BADGES
 } from '@/lib/gamificacion/config';
+import {
+  obtenerMemoriaCompleta,
+  actualizarFichaPostLectura
+} from '@/lib/ficha-cliente';
 
 export const dynamic = 'force-dynamic';
 
@@ -236,6 +240,13 @@ export async function POST(request) {
         solicitud.estado = 'completado';
         solicitud.resultado = resultado;
         solicitud.fechaCompletado = new Date().toISOString();
+
+        // Actualizar ficha del cliente con la nueva lectura
+        await actualizarFichaPostLectura(userEmail, {
+          id: solicitudId,
+          nombre: lectura.nombre,
+          fecha: ahora.toISOString()
+        });
       } catch (iaError) {
         console.error('Error generando con IA:', iaError);
         solicitud.estado = 'error';
@@ -371,56 +382,8 @@ export async function POST(request) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SISTEMA DE MEMORIA - Obtener lecturas anteriores
-// ═══════════════════════════════════════════════════════════════
-
-async function obtenerMemoriaLecturas(email, limiteLecturas = 10) {
-  try {
-    // Obtener historial de lecturas
-    const historial = await kv.get(`lecturas:${email}`) || [];
-
-    if (historial.length === 0) return null;
-
-    // Obtener las últimas N lecturas completas
-    const lecturasCompletas = [];
-    for (const item of historial.slice(0, limiteLecturas)) {
-      const lecturaCompleta = await kv.get(`lectura:${item.id}`);
-      if (lecturaCompleta && lecturaCompleta.resultado) {
-        lecturasCompletas.push({
-          fecha: lecturaCompleta.fechaSolicitud,
-          tipo: lecturaCompleta.lecturaNombre,
-          pregunta: lecturaCompleta.pregunta || '',
-          contexto: lecturaCompleta.contexto || '',
-          // Resumen del resultado (primeros 500 caracteres)
-          resumen: lecturaCompleta.resultado.contenido?.slice(0, 500) + '...'
-        });
-      }
-    }
-
-    if (lecturasCompletas.length === 0) return null;
-
-    // Crear resumen para la IA
-    const memoriaTexto = lecturasCompletas.map((l, i) =>
-      `[Lectura ${i + 1} - ${new Date(l.fecha).toLocaleDateString('es-UY')}]
-Tipo: ${l.tipo}
-${l.pregunta ? `Pregunta: ${l.pregunta}` : ''}
-${l.contexto ? `Contexto: ${l.contexto}` : ''}
-Resumen: ${l.resumen}`
-    ).join('\n\n');
-
-    return {
-      cantidad: lecturasCompletas.length,
-      texto: memoriaTexto,
-      lecturas: lecturasCompletas
-    };
-  } catch (error) {
-    console.error('Error obteniendo memoria:', error);
-    return null;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GENERADOR DE LECTURAS CON IA + MEMORIA
+// GENERADOR DE LECTURAS CON IA + MEMORIA COMPLETA
+// (Usa obtenerMemoriaCompleta de ficha-cliente.js)
 // ═══════════════════════════════════════════════════════════════
 
 async function generarLecturaIA(solicitud, lectura) {
@@ -435,8 +398,15 @@ async function generarLecturaIA(solicitud, lectura) {
     fechaNacimiento
   } = solicitud;
 
-  // MEMORIA: Obtener lecturas anteriores del usuario
-  const memoria = await obtenerMemoriaLecturas(email);
+  // MEMORIA COMPLETA: Obtener ficha con todo el historial del cliente
+  const memoriaCompleta = await obtenerMemoriaCompleta(email);
+
+  // Para compatibilidad con el código existente
+  const memoria = memoriaCompleta ? {
+    cantidad: memoriaCompleta.lecturasAnteriores,
+    texto: memoriaCompleta.memoriaTexto,
+    ficha: memoriaCompleta.ficha
+  } : null;
 
   // Prompt base según categoría
   const promptsPorCategoria = {
@@ -502,23 +472,9 @@ Pronombre: ${pronombre}.`,
 
   // Construir sección de memoria si existe
   let seccionMemoria = '';
-  if (memoria && memoria.cantidad > 0) {
-    seccionMemoria = `
-═══════════════════════════════════════════════════════════════
-MEMORIA - LECTURAS ANTERIORES DE ${nombreUsuario.toUpperCase()}
-═══════════════════════════════════════════════════════════════
-${nombreUsuario} ya ha recibido ${memoria.cantidad} lecturas anteriores.
-USA ESTA INFORMACIÓN para:
-- NO repetir consejos ya dados
-- Hacer referencias a lo que ya trabajaron juntos
-- Notar su evolución y crecimiento
-- Profundizar en temas recurrentes
-- Personalizar basándote en su historial
-
-RESÚMENES DE LECTURAS ANTERIORES:
-${memoria.texto}
-═══════════════════════════════════════════════════════════════
-`;
+  if (memoria && memoria.texto) {
+    // Usar la memoria completa de la ficha
+    seccionMemoria = memoria.texto;
   }
 
   const systemPrompt = `${categoriaConfig.system}
@@ -531,7 +487,7 @@ REGLAS CRÍTICAS:
 - Español rioplatense natural (vos, tenés, podés)
 - Profundo, significativo y personalizado
 - ${categoriaConfig.instrucciones}
-${memoria ? `- IMPORTANTE: ${nombreUsuario} ya tiene ${memoria.cantidad} lecturas previas. Reconocé su camino y evolución. NO repitas consejos.` : `- Esta es posiblemente su primera lectura. Dale una bienvenida especial.`}
+${memoria?.cantidad > 0 ? `- IMPORTANTE: ${nombreUsuario} ya tiene ${memoria.cantidad} lecturas previas. Reconocé su camino y evolución. NO repitas consejos.` : `- Esta es posiblemente su primera lectura. Dale una bienvenida especial.`}
 - Firmá como parte de la familia Duendes del Uruguay`;
 
   // Usar promptBase de la lectura si existe, sino prompt genérico
