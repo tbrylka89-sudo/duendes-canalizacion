@@ -52,6 +52,23 @@ export async function POST(request) {
       });
     }
 
+    // Acción: aplicar historia a WooCommerce
+    if (accion === 'aplicar' && datos?.id && datos?.historia) {
+      const resultado = await aplicarHistoriaWooCommerce(datos.id, datos.historia);
+
+      if (resultado.success) {
+        // Incrementar contador de historias corregidas
+        await kv.incr('gi:stats:historias_corregidas');
+      }
+
+      return NextResponse.json({
+        success: resultado.success,
+        mensaje: resultado.mensaje,
+        productoId: datos.id,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     return NextResponse.json({
       success: false,
       error: 'Acción no válida o faltan parámetros'
@@ -63,6 +80,45 @@ export async function POST(request) {
       success: false,
       error: error.message
     }, { status: 500 });
+  }
+}
+
+/**
+ * Aplica una historia directamente a WooCommerce
+ */
+async function aplicarHistoriaWooCommerce(productoId, historia) {
+  try {
+    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
+    const auth = Buffer.from(
+      `${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`
+    ).toString('base64');
+
+    const response = await fetch(`${wpUrl}/wp-json/wc/v3/products/${productoId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        description: historia
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`WooCommerce respondió ${response.status}`);
+    }
+
+    return {
+      success: true,
+      mensaje: 'Historia aplicada correctamente'
+    };
+
+  } catch (error) {
+    console.error('[GI Generate] Error aplicando historia:', error);
+    return {
+      success: false,
+      mensaje: error.message
+    };
   }
 }
 
