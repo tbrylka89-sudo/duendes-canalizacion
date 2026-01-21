@@ -33,6 +33,7 @@ class DuendesFichaGuardian {
         add_action('woocommerce_single_product_summary', [$this, 'mostrar_subtitulo'], 6);
         add_action('wp_ajax_duendes_generar_ficha_ia', [$this, 'ajax_generar_ficha']);
         add_action('wp_ajax_duendes_auto_completar_ficha', [$this, 'ajax_auto_completar_ficha']);
+        add_action('wp_ajax_duendes_guardar_ficha', [$this, 'ajax_guardar_ficha']);
 
         // Limpiar metaboxes viejos que no se usan
         add_action('add_meta_boxes', [$this, 'limpiar_metaboxes_viejos'], 99);
@@ -504,6 +505,64 @@ class DuendesFichaGuardian {
                 }
             });
 
+            // Función para recoger todos los datos del formulario
+            function recogerDatosFormulario() {
+                var ficha = {
+                    genero: $('#df_genero').val(),
+                    especie: $('#df_especie').val(),
+                    familia: $('input[name="duendes_ficha[familia]"]').val(),
+                    categoria: $('#df_categoria').val(),
+                    subcategorias: $('#df_subcategorias').val() || [],
+                    tipo_tamano: $('#df_tipo_tamano').val(),
+                    tamano_cm: $('input[name="duendes_ficha[tamano_cm]"]').val(),
+                    es_unico: $('#df_es_unico').val(),
+                    accesorios: $('textarea[name="duendes_ficha[accesorios]"]').val(),
+                    flor_favorita: $('input[name="duendes_ficha[flor_favorita]"]').val(),
+                    piedra_favorita: $('input[name="duendes_ficha[piedra_favorita]"]').val(),
+                    color_favorito: $('input[name="duendes_ficha[color_favorito]"]').val(),
+                    espacio_casa: $('input[name="duendes_ficha[espacio_casa]"]').val(),
+                    elemento: $('select[name="duendes_ficha[elemento]"]').val(),
+                    estacion: $('select[name="duendes_ficha[estacion]"]').val(),
+                    momento_dia: $('input[name="duendes_ficha[momento_dia]"]').val(),
+                    le_gusta_pasear: $('select[name="duendes_ficha[le_gusta_pasear]"]').val(),
+                    le_gusta: $('textarea[name="duendes_ficha[le_gusta]"]').val(),
+                    no_le_gusta: $('textarea[name="duendes_ficha[no_le_gusta]"]').val(),
+                    frase_lema: $('input[name="duendes_ficha[frase_lema]"]').val(),
+                    dato_curioso: $('textarea[name="duendes_ficha[dato_curioso]"]').val()
+                };
+
+                // Recoger personalidades seleccionadas
+                var personalidades = [];
+                $('.duendes-checkbox-item.selected input').each(function() {
+                    personalidades.push($(this).val());
+                });
+                ficha.personalidad = personalidades;
+
+                return ficha;
+            }
+
+            // Función para guardar automáticamente
+            function guardarFichaAuto(callback) {
+                var ficha = recogerDatosFormulario();
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'duendes_guardar_ficha',
+                        post_id: <?php echo $post->ID; ?>,
+                        nonce: '<?php echo wp_create_nonce('duendes_guardar_ficha'); ?>',
+                        ficha: ficha
+                    },
+                    success: function(response) {
+                        if (callback) callback(response.success);
+                    },
+                    error: function() {
+                        if (callback) callback(false);
+                    }
+                });
+            }
+
             // Botón AUTO-COMPLETAR TODO
             $('#btn-auto-completar').click(function() {
                 var btn = $(this);
@@ -564,18 +623,27 @@ class DuendesFichaGuardian {
                                 $('textarea[name="duendes_ficha[dato_curioso]"]').val(f.dato_curioso || '');
                             }
 
-                            resultado.html('<strong>Encontrado: ' + (d.producto_db || 'OK') + '</strong><br>' +
-                                'Tamaño: ' + (d.datosBasicos?.tamano_cm || '?') + ' cm<br>' +
-                                '<span style="color: #4a9962;">Todos los campos completados. Revisá y guardá.</span>').show();
+                            // AUTO-GUARDAR
+                            btn.text('Guardando...');
+                            guardarFichaAuto(function(ok) {
+                                if (ok) {
+                                    resultado.html('<strong style="color: #4a9962;">✓ GUARDADO</strong><br>' +
+                                        'Producto: ' + (d.producto_db || 'OK') + '<br>' +
+                                        'Tamaño: ' + (d.datosBasicos?.tamano_cm || '?') + ' cm<br>' +
+                                        '<span style="color: #4a9962;">La ficha ya está visible en la página del producto.</span>').show();
+                                } else {
+                                    resultado.html('<span style="color: #c94a4a;">Error al guardar</span>').show();
+                                }
+                                btn.prop('disabled', false).text('🔄 Auto-completar TODO');
+                            });
 
                         } else {
                             resultado.html('<span style="color: #c94a4a;">No encontrado: ' + (response.data?.error || 'Error') + '</span>').show();
+                            btn.prop('disabled', false).text('🔄 Auto-completar TODO');
                         }
                     },
                     error: function() {
                         resultado.html('<span style="color: #c94a4a;">Error de conexión</span>').show();
-                    },
-                    complete: function() {
                         btn.prop('disabled', false).text('🔄 Auto-completar TODO');
                     }
                 });
@@ -584,6 +652,7 @@ class DuendesFichaGuardian {
             // Botón generar ficha con IA
             $('#btn-generar-ficha-ia').click(function() {
                 var btn = $(this);
+                var resultado = $('#auto-completar-resultado');
                 btn.prop('disabled', true).text('Generando...');
 
                 $.ajax({
@@ -604,22 +673,42 @@ class DuendesFichaGuardian {
                             $('select[name="duendes_ficha[elemento]"]').val(f.elemento || '');
                             $('select[name="duendes_ficha[estacion]"]').val(f.estacion || '');
                             $('input[name="duendes_ficha[momento_dia]"]').val(f.momento_dia || '');
-                            $('select[name="duendes_ficha[le_gusta_pasear]"]').val(f.le_gusta_pasear || '');
-                            $('textarea[name="duendes_ficha[le_gusta]"]').val(f.le_gusta || '');
-                            $('textarea[name="duendes_ficha[no_le_gusta]"]').val(f.no_le_gusta || '');
+
+                            // Mapear le_gusta_pasear
+                            var paseoMap = {
+                                'Sí, le encanta': 'si',
+                                'No, prefiere quedarse': 'no',
+                                'Que le pregunte primero': 'preguntar'
+                            };
+                            var paseoVal = paseoMap[f.le_gusta_pasear] || f.le_gusta_pasear || '';
+                            $('select[name="duendes_ficha[le_gusta_pasear]"]').val(paseoVal);
+
+                            var leGusta = Array.isArray(f.le_gusta) ? f.le_gusta.join(', ') : f.le_gusta;
+                            var noLeGusta = Array.isArray(f.no_le_gusta) ? f.no_le_gusta.join(', ') : f.no_le_gusta;
+                            $('textarea[name="duendes_ficha[le_gusta]"]').val(leGusta || '');
+                            $('textarea[name="duendes_ficha[no_le_gusta]"]').val(noLeGusta || '');
                             $('input[name="duendes_ficha[frase_lema]"]').val(f.frase_lema || '');
                             $('textarea[name="duendes_ficha[dato_curioso]"]').val(f.dato_curioso || '');
 
-                            alert('¡Ficha generada! Revisá los campos y modificá lo que quieras antes de guardar.');
+                            // AUTO-GUARDAR
+                            btn.text('Guardando...');
+                            guardarFichaAuto(function(ok) {
+                                if (ok) {
+                                    resultado.html('<strong style="color: #4a9962;">✓ FICHA REGENERADA Y GUARDADA</strong><br>' +
+                                        '<span style="color: #4a9962;">La nueva personalidad ya está visible en la página del producto.</span>').show();
+                                } else {
+                                    resultado.html('<span style="color: #c94a4a;">Error al guardar</span>').show();
+                                }
+                                btn.prop('disabled', false).text('✨ Solo Ficha IA');
+                            });
                         } else {
-                            alert('Error: ' + (response.data?.error || 'No se pudo generar'));
+                            resultado.html('<span style="color: #c94a4a;">Error: ' + (response.data?.error || 'No se pudo generar') + '</span>').show();
+                            btn.prop('disabled', false).text('✨ Solo Ficha IA');
                         }
                     },
                     error: function() {
-                        alert('Error de conexión');
-                    },
-                    complete: function() {
-                        btn.prop('disabled', false).text('✨ Generar Ficha con IA');
+                        resultado.html('<span style="color: #c94a4a;">Error de conexión</span>').show();
+                        btn.prop('disabled', false).text('✨ Solo Ficha IA');
                     }
                 });
             });
@@ -734,6 +823,36 @@ class DuendesFichaGuardian {
         } else {
             wp_send_json_error(['error' => $body['error'] ?? 'No se encontró el producto en la base de datos']);
         }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // AJAX: GUARDAR FICHA (auto-save)
+    // ═══════════════════════════════════════════════════════════════
+
+    public function ajax_guardar_ficha() {
+        check_ajax_referer('duendes_guardar_ficha', 'nonce');
+
+        $post_id = intval($_POST['post_id']);
+
+        if (!current_user_can('edit_post', $post_id)) {
+            wp_send_json_error(['error' => 'Sin permisos']);
+        }
+
+        $ficha = isset($_POST['ficha']) ? $_POST['ficha'] : [];
+
+        // Sanitizar todos los campos
+        $ficha_limpia = [];
+        foreach ($ficha as $key => $value) {
+            if (is_array($value)) {
+                $ficha_limpia[$key] = array_map('sanitize_text_field', $value);
+            } else {
+                $ficha_limpia[$key] = sanitize_text_field($value);
+            }
+        }
+
+        update_post_meta($post_id, '_duendes_ficha', $ficha_limpia);
+
+        wp_send_json_success(['message' => 'Ficha guardada correctamente']);
     }
 
     // ═══════════════════════════════════════════════════════════════
