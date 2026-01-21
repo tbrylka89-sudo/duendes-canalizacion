@@ -31,7 +31,7 @@ async function obtenerGuardianSemana() {
   return {
     id: 'finnian',
     nombre: 'Finnian',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/Finnian.jpg',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/Finnian.jpg',
     especialidad: 'protección y sabiduría ancestral'
   };
 }

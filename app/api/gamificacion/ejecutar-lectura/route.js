@@ -140,28 +140,39 @@ export async function POST(request) {
     // ─────────────────────────────────────────────────────────────
     // 6. CALCULAR PRECIO CON DESCUENTOS
     // ─────────────────────────────────────────────────────────────
-    let precioFinal = lectura.runas;
-    let descuentoAplicado = 0;
-
-    // Descuento por membresía del Círculo
     const esCirculo = usuario.circulo?.activo || false;
     const tipoMembresia = usuario.circulo?.plan || null;
 
-    if (esCirculo) {
-      if (tipoMembresia === 'anual') {
-        descuentoAplicado = 10;
-        precioFinal = Math.round(lectura.runas * 0.9);
-      } else if (tipoMembresia === 'semestral') {
-        descuentoAplicado = 5;
-        precioFinal = Math.round(lectura.runas * 0.95);
+    // Para lecturas de temporada (portales): gratis para anuales, precio especial para otros
+    let precioBase = lectura.runas;
+    if (lectura.runasSinMembresia !== undefined) {
+      // Es lectura de temporada
+      if (esCirculo && tipoMembresia === 'anual') {
+        precioBase = 0; // Gratis para miembros anuales
+      } else {
+        precioBase = lectura.runasSinMembresia; // 150 runas para no miembros
       }
     }
 
-    // Descuento por nivel
-    if (nivelUsuario.descuento > 0) {
+    let precioFinal = precioBase;
+    let descuentoAplicado = 0;
+
+    // Descuento por membresía del Círculo (solo si no es lectura de temporada gratuita)
+    if (precioBase > 0 && esCirculo) {
+      if (tipoMembresia === 'anual') {
+        descuentoAplicado = 10;
+        precioFinal = Math.round(precioBase * 0.9);
+      } else if (tipoMembresia === 'semestral') {
+        descuentoAplicado = 5;
+        precioFinal = Math.round(precioBase * 0.95);
+      }
+    }
+
+    // Descuento por nivel (solo si hay precio base > 0)
+    if (precioBase > 0 && nivelUsuario.descuento > 0) {
       const descuentoNivel = nivelUsuario.descuento;
       const descuentoTotal = Math.min(descuentoAplicado + descuentoNivel, 20); // Máximo 20%
-      precioFinal = Math.round(lectura.runas * (1 - descuentoTotal / 100));
+      precioFinal = Math.round(precioBase * (1 - descuentoTotal / 100));
       descuentoAplicado = descuentoTotal;
     }
 

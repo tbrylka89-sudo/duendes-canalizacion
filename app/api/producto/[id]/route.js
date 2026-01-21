@@ -48,7 +48,7 @@ function formatearPrecio(precioUSD, moneda) {
 
 // Obtener producto de WooCommerce
 async function obtenerProductoWoo(productId) {
-  const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+  const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
   const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
 
   try {
@@ -69,7 +69,7 @@ async function obtenerProductoWoo(productId) {
 async function obtenerRelacionados(ids) {
   if (!ids || ids.length === 0) return [];
 
-  const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+  const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
   const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
 
   try {

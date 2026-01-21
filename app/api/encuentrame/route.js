@@ -135,7 +135,7 @@ Analizá la situación y recomendá los guardianes más adecuados en formato JSO
           nombre: producto.nombre,
           precio: producto.precio,
           imagen: producto.imagen,
-          url: producto.url || `https://duendesuy.10web.cloud/producto/${producto.slug}/`,
+          url: producto.url || `https://duendesdeluruguay.com/producto/${producto.slug}/`,
           categorias: producto.categorias,
           porQueEsIdeal: rec.porQueEsIdeal
         };

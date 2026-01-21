@@ -893,7 +893,7 @@ async function verCirculo(filtro = 'activos') {
 // --- ORDENES WooCommerce ---
 
 async function buscarOrdenes(filtro = 'pendientes', limite = 20) {
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -942,7 +942,7 @@ async function buscarOrdenes(filtro = 'pendientes', limite = 20) {
 }
 
 async function verOrden(ordenId) {
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -993,7 +993,7 @@ ${o.customer_note ? `### Nota del cliente\n${o.customer_note}` : ''}`
 }
 
 async function actualizarOrden(ordenId, estado, nota) {
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -1031,7 +1031,7 @@ async function actualizarOrden(ordenId, estado, nota) {
 }
 
 async function ordenesDelDia() {
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -1164,7 +1164,7 @@ async function productosSinStock() {
 }
 
 async function sincronizarWoo() {
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -1226,7 +1226,7 @@ async function crearCupon(datos) {
     return { success: false, mensaje: 'Necesito al menos codigo y valor para crear el cupon.' };
   }
 
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -1290,7 +1290,7 @@ ${minimo ? `- Compra minima: $${minimo}` : ''}`
 }
 
 async function verCupones(estado = 'activos') {
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
@@ -1394,7 +1394,7 @@ async function statsGenerales() {
 
 async function statsVentas(periodo = 'mes', desde = null, hasta = null) {
   // Para stats reales necesitamos WooCommerce
-  const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+  const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 

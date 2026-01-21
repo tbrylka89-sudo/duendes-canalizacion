@@ -5,7 +5,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
 
-const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 
 function getWooAuth() {
   return Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
@@ -623,7 +623,7 @@ _El contenido completo esta disponible en la seccion de Contenido del admin._`
 
     case 'sincronizar_productos': {
       try {
-        const WOO_URL = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+        const WOO_URL = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesdeluruguay.com';
         const WOO_KEY = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
         const WOO_SECRET = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 

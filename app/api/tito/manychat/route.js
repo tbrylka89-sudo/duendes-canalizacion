@@ -18,7 +18,7 @@ const anthropic = new Anthropic({
 // CONEXIÓN DIRECTA A WOOCOMMERCE
 // ═══════════════════════════════════════════════════════════════
 
-const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 
 function getWooAuth() {
   const key = process.env.WC_CONSUMER_KEY;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 const API_BASE = '';
 
 // URLs centralizadas - cambiar aquí cuando migre el dominio
-const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+const WORDPRESS_URL = 'https://duendesdeluruguay.com';
 
 // Helper: Limpiar tags HTML que aparecen como texto (ej: <em>, <strong>)
 function limpiarTexto(texto) {

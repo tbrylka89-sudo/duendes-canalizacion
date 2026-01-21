@@ -143,7 +143,7 @@ function detectarCategoria(nombre, tipo, proposito, esVirtual = false, descripci
 
 // Actualizar categoría en WooCommerce
 async function actualizarCategoriaWoo(productId, categoriaId) {
-  const wcUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+  const wcUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
   const wcKey = process.env.WC_CONSUMER_KEY;
   const wcSecret = process.env.WC_CONSUMER_SECRET;
 

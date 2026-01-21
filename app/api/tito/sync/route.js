@@ -15,7 +15,7 @@ export async function GET(request) {
       }, { status: 500 });
     }
 
-    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
     const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
     
     // ═══════════════════════════════════════════════════════════

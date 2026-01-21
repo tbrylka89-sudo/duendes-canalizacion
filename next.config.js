@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'duendesuy.10web.cloud',
+        hostname: 'duendesdeluruguay.com',
       },
       {
         protocol: 'https',

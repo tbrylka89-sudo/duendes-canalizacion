@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // Gestiona snippets WPCode, caché, y más desde Vercel
 // ═══════════════════════════════════════════════════════════════
 
-const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 const WP_SECRET = process.env.WP_REMOTE_SECRET || 'duendes_vercel_2026_secretkey_XkJ9mN2pL5qR8sT1';
 
 // Headers para autenticación con WordPress

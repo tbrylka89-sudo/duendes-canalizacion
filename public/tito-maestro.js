@@ -21,7 +21,7 @@
 
   // Configuracion
   // URLs centralizadas - cambiar aqui cuando migre el dominio
-  const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+  const WORDPRESS_URL = 'https://duendesdeluruguay.com';
   const VERCEL_URL = 'https://duendes-vercel.vercel.app';
 
   const script = document.currentScript;

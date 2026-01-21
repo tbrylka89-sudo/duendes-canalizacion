@@ -80,7 +80,7 @@ export default async function handler(req, res) {
 }
 
 async function enviarEmailRecordatorio(elegido, dias) {
-  const renewUrl = 'https://duendesuy.10web.cloud/circulo-de-duendes.html';
+  const renewUrl = 'https://duendesdeluruguay.com/circulo-de-duendes.html';
   
   const mensajes = {
     7: {
@@ -149,7 +149,7 @@ async function enviarEmailRecordatorio(elegido, dias) {
 }
 
 async function enviarEmailVencido(elegido) {
-  const renewUrl = 'https://duendesuy.10web.cloud/circulo-de-duendes.html';
+  const renewUrl = 'https://duendesdeluruguay.com/circulo-de-duendes.html';
   
   try {
     await resend.emails.send({

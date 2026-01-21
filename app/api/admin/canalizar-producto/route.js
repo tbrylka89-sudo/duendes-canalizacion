@@ -511,7 +511,7 @@ async function getExistingProducts() {
         if (cached && Array.isArray(cached)) return cached;
 
         // Si no hay cache, obtener de WooCommerce
-        const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+        const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
         const WOO_KEY = process.env.WC_CONSUMER_KEY;
         const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
 
@@ -545,7 +545,7 @@ async function getExistingProducts() {
 
 async function getProductImages(productId) {
     try {
-        const WOO_URL = process.env.WOO_URL || 'https://duendesuy.10web.cloud';
+        const WOO_URL = process.env.WOO_URL || 'https://duendesdeluruguay.com';
         const WOO_KEY = process.env.WC_CONSUMER_KEY;
         const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
 

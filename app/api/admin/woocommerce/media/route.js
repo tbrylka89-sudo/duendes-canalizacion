@@ -7,7 +7,7 @@ import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 
-const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 const WP_USER = process.env.WP_USER || 'admin';
 const WP_APP_PASSWORD = process.env.WP_APP_PASSWORD;
 

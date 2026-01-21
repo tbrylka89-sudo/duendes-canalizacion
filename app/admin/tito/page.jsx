@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 // Chat con IA que puede ejecutar cualquier acción del sistema
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const LOGO_RECTANGULAR = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_artistic_portrait_photography_of_recrea_este_exacto_logo_con_color_negro_el_meda-1-scaled.jpg';
+const LOGO_RECTANGULAR = 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/gemini-image-2_artistic_portrait_photography_of_recrea_este_exacto_logo_con_color_negro_el_meda-1-scaled.jpg';
 
 const EJEMPLOS_COMANDOS = [
   { cat: '📜 Canalizaciones', cmds: [

@@ -49,23 +49,25 @@ export async function GET(request) {
       }
     }
 
-    // Construir catálogo
+    // Construir catálogo - usando las categorías reales de LECTURAS
     const catalogo = {
-      basicas: procesarLecturas(LECTURAS.basicas, nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
-      estandar: procesarLecturas(LECTURAS.estandar, nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
-      premium: procesarLecturas(LECTURAS.premium, nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
-      ultraPremium: procesarLecturas(LECTURAS.ultraPremium, nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
-      eventos: procesarLecturasEventos(LECTURAS.eventos, nivelUsuario),
-      temporada: procesarLecturasTemporada(LECTURAS.temporada, esCirculo, tipoMembresia)
+      duendes: procesarLecturas(LECTURAS.duendes || [], nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
+      clasicas: procesarLecturas(LECTURAS.clasicas || [], nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
+      estudios: procesarLecturas(LECTURAS.estudios || [], nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
+      rituales: procesarLecturas(LECTURAS.rituales || [], nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
+      especiales: procesarLecturas(LECTURAS.especiales || [], nivelUsuario, tieneGuardian, esCirculo, tipoMembresia),
+      eventos: procesarLecturasEventos(LECTURAS.eventos || [], nivelUsuario),
+      temporada: procesarLecturasTemporada(LECTURAS.temporada || [], esCirculo, tipoMembresia)
     };
 
     // Filtrar por categoría si se especifica
     if (categoria) {
       const todasLecturas = [
-        ...catalogo.basicas,
-        ...catalogo.estandar,
-        ...catalogo.premium,
-        ...catalogo.ultraPremium,
+        ...catalogo.duendes,
+        ...catalogo.clasicas,
+        ...catalogo.estudios,
+        ...catalogo.rituales,
+        ...catalogo.especiales,
         ...catalogo.eventos,
         ...catalogo.temporada
       ];
@@ -79,20 +81,22 @@ export async function GET(request) {
 
     // Filtrar solo disponibles si se especifica
     if (soloDisponibles) {
-      catalogo.basicas = catalogo.basicas.filter(l => l.disponible);
-      catalogo.estandar = catalogo.estandar.filter(l => l.disponible);
-      catalogo.premium = catalogo.premium.filter(l => l.disponible);
-      catalogo.ultraPremium = catalogo.ultraPremium.filter(l => l.disponible);
+      catalogo.duendes = catalogo.duendes.filter(l => l.disponible);
+      catalogo.clasicas = catalogo.clasicas.filter(l => l.disponible);
+      catalogo.estudios = catalogo.estudios.filter(l => l.disponible);
+      catalogo.rituales = catalogo.rituales.filter(l => l.disponible);
+      catalogo.especiales = catalogo.especiales.filter(l => l.disponible);
       catalogo.eventos = catalogo.eventos.filter(l => l.disponible);
       catalogo.temporada = catalogo.temporada.filter(l => l.disponible);
     }
 
     // Lecturas destacadas para mostrar primero
     const destacadas = [
-      ...catalogo.basicas.filter(l => l.popular),
-      ...catalogo.estandar.filter(l => l.popular),
-      ...catalogo.premium.filter(l => l.popular),
-      ...catalogo.ultraPremium.filter(l => l.popular || l.destacado)
+      ...catalogo.duendes.filter(l => l.popular),
+      ...catalogo.clasicas.filter(l => l.popular),
+      ...catalogo.estudios.filter(l => l.popular || l.destacado),
+      ...catalogo.rituales.filter(l => l.popular),
+      ...catalogo.especiales.filter(l => l.popular)
     ];
 
     return Response.json({
@@ -295,10 +299,11 @@ function verificarFechaPortal(fechaPortal, mes, dia) {
 
 function contarLecturas(catalogo) {
   return {
-    basicas: catalogo.basicas.length,
-    estandar: catalogo.estandar.length,
-    premium: catalogo.premium.length,
-    ultraPremium: catalogo.ultraPremium.length,
+    duendes: catalogo.duendes.length,
+    clasicas: catalogo.clasicas.length,
+    estudios: catalogo.estudios.length,
+    rituales: catalogo.rituales.length,
+    especiales: catalogo.especiales.length,
     eventos: catalogo.eventos.length,
     temporada: catalogo.temporada.length,
     total: Object.values(catalogo).reduce((sum, arr) => sum + arr.length, 0)

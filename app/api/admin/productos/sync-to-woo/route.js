@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // Actualiza productos en WooCommerce con datos enriquecidos
 // ═══════════════════════════════════════════════════════════════
 
-const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 
 function getWooAuth() {
   return Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');

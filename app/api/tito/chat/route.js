@@ -18,7 +18,7 @@ export async function OPTIONS() {
 
 async function consultarPedidosCliente(email) {
   try {
-    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
     const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
     
     const response = await fetch(
@@ -35,7 +35,7 @@ async function consultarPedidosCliente(email) {
 
 async function obtenerPedido(orderId) {
   try {
-    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
     const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
     
     const response = await fetch(
@@ -52,7 +52,7 @@ async function obtenerPedido(orderId) {
 
 async function obtenerEstadisticasAdmin() {
   try {
-    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+    const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
     const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
     
     const ordersRes = await fetch(
@@ -315,7 +315,7 @@ export async function POST(request) {
 
     let productos = [];
     try {
-      const wpUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+      const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
       const auth = Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString('base64');
 
       // Detectar intención para filtrar productos
@@ -642,7 +642,7 @@ ${esAdmin ?
 
     // FALLBACK: Si no hay productos pero detectamos intención, mostrar los primeros 4
     const tieneIntencion = /protecci[oó]n|abundancia|amor|sanaci[oó]n|duende|guardi[aá]n|qu[eé] ten[eé]s|mostrame|ver|busco/i.test(message);
-    const TITO_AVATAR = 'https://duendesuy.10web.cloud/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
+    const TITO_AVATAR = 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg';
 
     if (productosRecomendados.length === 0 && productos.length > 0 && tieneIntencion && !esAdmin) {
       // Tomar los primeros 4 productos disponibles (con o sin imagen)

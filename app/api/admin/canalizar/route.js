@@ -419,7 +419,7 @@ GENERA UN JSON COMPLETO con esta estructura exacta:
 
 // Actualizar producto en WooCommerce
 async function actualizarProductoWoo(productId, datos) {
-  const wcUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+  const wcUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
   const wcKey = process.env.WC_CONSUMER_KEY;
   const wcSecret = process.env.WC_CONSUMER_SECRET;
 
@@ -579,7 +579,7 @@ export async function POST(request) {
 
     // Agregar código y URL de Mi Magia
     contenido.codigo = codigoGuardian;
-    contenido.urlMiMagia = `https://duendesuy.10web.cloud/mi-magia/?codigo=${codigoGuardian}`;
+    contenido.urlMiMagia = `https://duendesdeluruguay.com/mi-magia/?codigo=${codigoGuardian}`;
     contenido.qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(contenido.urlMiMagia)}`;
 
     // Guardar en KV
@@ -620,7 +620,7 @@ export async function POST(request) {
 
 // GET: Obtener productos pendientes de canalizar
 export async function GET(request) {
-  const wcUrl = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+  const wcUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
   const wcKey = process.env.WC_CONSUMER_KEY;
   const wcSecret = process.env.WC_CONSUMER_SECRET;
 

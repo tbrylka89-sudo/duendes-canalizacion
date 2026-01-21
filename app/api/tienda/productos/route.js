@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
-    const WOO_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+    const WOO_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
     const WOO_KEY = process.env.WC_CONSUMER_KEY;
     const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
 

@@ -15,7 +15,7 @@ envContent.split('\n').forEach(line => {
   }
 });
 
-const WC_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+const WC_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 const WC_KEY = process.env.WC_CONSUMER_KEY;
 const WC_SECRET = process.env.WC_CONSUMER_SECRET;
 const KV_URL = process.env.KV_REST_API_URL;

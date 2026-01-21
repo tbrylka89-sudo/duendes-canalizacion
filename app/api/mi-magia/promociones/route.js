@@ -96,7 +96,7 @@ export async function GET(request) {
             urlBoton = promo.boton.url || '#';
             break;
           case 'cupon':
-            urlBoton = `https://duendesuy.10web.cloud/tienda/?coupon=${promo.boton.codigoCupon || ''}`;
+            urlBoton = `https://duendesdeluruguay.com/tienda/?coupon=${promo.boton.codigoCupon || ''}`;
             break;
           case 'circulo':
             urlBoton = '/mi-magia/circulo';

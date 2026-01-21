@@ -32,7 +32,7 @@ export async function POST(request) {
     const codigoQR = `DU${fecha.getFullYear().toString().slice(-2)}${(fecha.getMonth()+1).toString().padStart(2,'0')}-${guardian.id.toString().padStart(5,'0')}-${ordenId}`;
 
     // URL que contendrá el QR
-    const urlMiMagia = `https://duendesuy.10web.cloud/mi-magia?codigo=${codigoQR}&email=${encodeURIComponent(email)}`;
+    const urlMiMagia = `https://duendesdeluruguay.com/mi-magia?codigo=${codigoQR}&email=${encodeURIComponent(email)}`;
 
     // Guardar tarjeta en KV
     const tarjeta = {

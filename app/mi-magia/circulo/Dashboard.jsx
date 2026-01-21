@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // URLs centralizadas - cambiar aquí cuando migre el dominio
-const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+const WORDPRESS_URL = 'https://duendesdeluruguay.com';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENTE: INDICADORES DE COMUNIDAD EN VIVO

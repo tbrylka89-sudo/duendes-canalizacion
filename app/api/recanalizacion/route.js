@@ -138,7 +138,7 @@ export async function POST(request) {
         requierePago: true,
         precioRecanalizacion: 25,
         mensaje: 'Para solicitar una recanalización sin ser cliente, necesitás realizar el pago primero.',
-        urlPago: 'https://duendesuy.10web.cloud/recanalización/' // URL a página de pago
+        urlPago: 'https://duendesdeluruguay.com/recanalización/' // URL a página de pago
       }, { status: 402, headers: corsHeaders });
     }
 

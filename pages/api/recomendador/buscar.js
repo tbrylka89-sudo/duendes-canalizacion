@@ -39,8 +39,8 @@ export default async function handler(req, res) {
         categorias: ['Sabiduría', 'Protección'],
         cristales: ['Amatista', 'Cuarzo Cristal'],
         descripcion: 'Guardián anciano que porta la luz del conocimiento. Ideal para momentos de confusión, decisiones importantes y búsqueda de claridad.',
-        imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/eldrin.jpg',
-        url: 'https://duendesuy.10web.cloud/producto/eldrin-sabio'
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/eldrin.jpg',
+        url: 'https://duendesdeluruguay.com/producto/eldrin-sabio'
       },
       {
         id: 'aurora-corazon',
@@ -48,8 +48,8 @@ export default async function handler(req, res) {
         categorias: ['Amor', 'Sanación'],
         cristales: ['Cuarzo Rosa', 'Rodocrosita'],
         descripcion: 'Guardiana del amor incondicional. Para sanar heridas emocionales, atraer amor propio y relaciones sanas.',
-        imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/aurora.jpg',
-        url: 'https://duendesuy.10web.cloud/producto/aurora-corazon'
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/aurora.jpg',
+        url: 'https://duendesdeluruguay.com/producto/aurora-corazon'
       },
       {
         id: 'thor-guardian',
@@ -57,8 +57,8 @@ export default async function handler(req, res) {
         categorias: ['Protección', 'Fuerza'],
         cristales: ['Turmalina Negra', 'Obsidiana'],
         descripcion: 'Protector implacable contra energías negativas. Para quienes necesitan sentirse seguros, proteger su hogar y establecer límites.',
-        imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/thor.jpg',
-        url: 'https://duendesuy.10web.cloud/producto/thor-guardian'
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/thor.jpg',
+        url: 'https://duendesdeluruguay.com/producto/thor-guardian'
       },
       {
         id: 'fortuna-dorada',
@@ -66,8 +66,8 @@ export default async function handler(req, res) {
         categorias: ['Abundancia', 'Prosperidad'],
         cristales: ['Citrino', 'Pirita'],
         descripcion: 'Atrae prosperidad y nuevas oportunidades. Para emprendedoras, quienes buscan estabilidad económica o un nuevo comienzo.',
-        imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/fortuna.jpg',
-        url: 'https://duendesuy.10web.cloud/producto/fortuna-dorada'
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/fortuna.jpg',
+        url: 'https://duendesdeluruguay.com/producto/fortuna-dorada'
       },
       {
         id: 'luna-sanadora',
@@ -75,8 +75,8 @@ export default async function handler(req, res) {
         categorias: ['Salud', 'Sanación'],
         cristales: ['Selenita', 'Cuarzo Rosa'],
         descripcion: 'Guardiana de la salud física y emocional. Para procesos de recuperación, equilibrio energético y bienestar integral.',
-        imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/luna.jpg',
-        url: 'https://duendesuy.10web.cloud/producto/luna-sanadora'
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/luna.jpg',
+        url: 'https://duendesdeluruguay.com/producto/luna-sanadora'
       },
       {
         id: 'gaia-raices',
@@ -84,8 +84,8 @@ export default async function handler(req, res) {
         categorias: ['Tierra', 'Arraigo'],
         cristales: ['Jaspe Rojo', 'Ágata'],
         descripcion: 'Conexión profunda con la tierra. Para quienes se sienten desconectadas, ansiosas o necesitan estabilidad.',
-        imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/gaia.jpg',
-        url: 'https://duendesuy.10web.cloud/producto/gaia-raices'
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/gaia.jpg',
+        url: 'https://duendesdeluruguay.com/producto/gaia-raices'
       }
     ];
 

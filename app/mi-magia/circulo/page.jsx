@@ -10,7 +10,7 @@ import Onboarding from './Onboarding';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // URLs centralizadas - cambiar aquí cuando migre el dominio
-const WORDPRESS_URL = 'https://duendesuy.10web.cloud'; // Cambiar a duendesdeluruguay.com cuando 10Web arregle SSL
+const WORDPRESS_URL = 'https://duendesdeluruguay.com';
 
 const IMAGEN_TITO = `${WORDPRESS_URL}/wp-content/uploads/2026/01/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-1_53c2ddf7-82d8-47fa-823e-7b0f3af1398e-scaled.jpg`;
 

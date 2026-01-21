@@ -148,7 +148,7 @@ export async function POST(request) {
 
       case 'sincronizar-woo': {
         // Intentar obtener productos de WooCommerce
-        const WOO_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+        const WOO_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
         const WOO_KEY = process.env.WC_CONSUMER_KEY;
         const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
 

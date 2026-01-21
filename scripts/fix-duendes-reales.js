@@ -59,7 +59,7 @@ const DUENDES_REALES = [
     tematicas: ['protección', 'hogar', 'estabilidad', 'familia', 'arraigo'],
     cristales: ['Obsidiana', 'Jaspe Rojo', 'Turmalina Negra'],
     color: '#4A5D4A',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/duende-finnegan.jpg'
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2024/duende-finnegan.jpg'
   },
   {
     id: 'willow',
@@ -73,7 +73,7 @@ const DUENDES_REALES = [
     tematicas: ['sueños', 'intuición', 'emociones', 'luna', 'subconsciente'],
     cristales: ['Amatista', 'Labradorita', 'Piedra Luna'],
     color: '#6B8E9F',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/duende-willow.jpg'
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2024/duende-willow.jpg'
   },
   {
     id: 'bramble',
@@ -87,7 +87,7 @@ const DUENDES_REALES = [
     tematicas: ['misterios', 'conocimiento', 'símbolos', 'tarot', 'revelaciones'],
     cristales: ['Lapislázuli', 'Fluorita', 'Sodalita'],
     color: '#7B68A6',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/duende-bramble.jpg'
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2024/duende-bramble.jpg'
   },
   {
     id: 'ember',
@@ -101,7 +101,7 @@ const DUENDES_REALES = [
     tematicas: ['transformación', 'coraje', 'pasión', 'cambio', 'poder personal'],
     cristales: ['Cornalina', 'Ámbar', 'Ojo de Tigre'],
     color: '#C65D3B',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/duende-ember.jpg'
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2024/duende-ember.jpg'
   },
   {
     id: 'moss',
@@ -115,7 +115,7 @@ const DUENDES_REALES = [
     tematicas: ['sanación', 'hierbas', 'bienestar', 'descanso', 'nutrición del alma'],
     cristales: ['Cuarzo Rosa', 'Aventurina', 'Jade'],
     color: '#5D7A5D',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/duende-moss.jpg'
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2024/duende-moss.jpg'
   },
   {
     id: 'thornwick',
@@ -129,7 +129,7 @@ const DUENDES_REALES = [
     tematicas: ['protección', 'límites', 'energía', 'discernimiento', 'fuerza'],
     cristales: ['Turmalina Negra', 'Hematita', 'Ónix'],
     color: '#8B4513',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2024/duende-thornwick.jpg'
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2024/duende-thornwick.jpg'
   }
 ];
 

@@ -95,7 +95,7 @@ ${mensajePersonalizado}
               <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
                 <p style="color: #888; font-size: 12px;">
                   Duendes del Uruguay - Piriápolis, Uruguay<br>
-                  <a href="https://duendesuy.10web.cloud" style="color: #d4af37;">duendesdeluruguay.com</a>
+                  <a href="https://duendesdeluruguay.com" style="color: #d4af37;">duendesdeluruguay.com</a>
                 </p>
               </div>
             </div>

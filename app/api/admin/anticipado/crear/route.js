@@ -19,7 +19,7 @@ export async function POST(request) {
           from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
           to: user.email,
           subject: `🚀 Anticipado: ${nombre}`,
-          html: `<div style="font-family:Georgia,serif;padding:30px;"><h1 style="color:#d4af37;">Acceso Exclusivo</h1><h2>${nombre}</h2>${imagen?`<img src="${imagen}" style="max-width:100%;border-radius:12px;">`:''}<p style="font-size:24px;color:#d4af37;">$${precio}</p><p>${descripcion||''}</p><p><a href="https://duendesuy.10web.cloud/shop/" style="background:#d4af37;color:#1a1a1a;padding:15px 30px;border-radius:50px;text-decoration:none;display:inline-block;">Ver</a></p></div>`
+          html: `<div style="font-family:Georgia,serif;padding:30px;"><h1 style="color:#d4af37;">Acceso Exclusivo</h1><h2>${nombre}</h2>${imagen?`<img src="${imagen}" style="max-width:100%;border-radius:12px;">`:''}<p style="font-size:24px;color:#d4af37;">$${precio}</p><p>${descripcion||''}</p><p><a href="https://duendesdeluruguay.com/shop/" style="background:#d4af37;color:#1a1a1a;padding:15px 30px;border-radius:50px;text-decoration:none;display:inline-block;">Ver</a></p></div>`
         });
         enviados++;
       }

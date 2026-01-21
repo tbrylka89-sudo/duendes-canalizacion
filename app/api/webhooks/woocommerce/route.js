@@ -548,7 +548,7 @@ async function generarTarjetaQR(kv, ordenId, email, nombreCliente, guardian) {
   const codigoQR = `DU${fecha.getFullYear().toString().slice(-2)}${(fecha.getMonth()+1).toString().padStart(2,'0')}-${guardian.id.toString().padStart(5,'0')}`;
 
   // URL que contendrá el QR (incluye email para autocompletar)
-  const urlMiMagia = `https://duendesuy.10web.cloud/mi-magia?codigo=${codigoQR}&email=${encodeURIComponent(email)}`;
+  const urlMiMagia = `https://duendesdeluruguay.com/mi-magia?codigo=${codigoQR}&email=${encodeURIComponent(email)}`;
 
   // Guardar tarjeta en KV
   const tarjeta = {

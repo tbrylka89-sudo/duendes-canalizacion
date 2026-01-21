@@ -149,7 +149,7 @@ like a still from a mystical movie.`;
         const formData = new FormData();
         formData.append('file', imgBlob, `duende_${Date.now()}.png`);
 
-        const WP_URL = process.env.WORDPRESS_URL || 'https://duendesuy.10web.cloud';
+        const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
         const auth = Buffer.from(`${process.env.WP_USER || 'admin'}:${process.env.WP_APP_PASSWORD}`).toString('base64');
 
         const wpRes = await fetch(`${WP_URL}/wp-json/wp/v2/media`, {
