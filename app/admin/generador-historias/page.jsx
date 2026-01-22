@@ -577,19 +577,122 @@ Necesito conocer algunos datos. Empecemos:
   const [directoEspecializacion, setDirectoEspecializacion] = useState('');
   const [directoEspecializacionTexto, setDirectoEspecializacionTexto] = useState('');
 
-  // Especializaciones disponibles (chips rápidos) - IDs deben coincidir con especializaciones.js
-  const especializacionesRapidas = [
-    { id: 'fortuna', label: 'Fortuna/Suerte', descripcion: 'Atrae buena suerte y oportunidades' },
-    { id: 'proteccion', label: 'Protección', descripcion: 'Protege energía, hogar o persona' },
-    { id: 'amor_romantico', label: 'Amor', descripcion: 'Abre el corazón al amor' },
-    { id: 'amor_propio', label: 'Amor Propio', descripcion: 'Autoestima y valor personal' },
-    { id: 'sanacion', label: 'Sanación', descripcion: 'Sana heridas emocionales' },
-    { id: 'calma', label: 'Calma/Paz', descripcion: 'Trae serenidad y tranquilidad' },
-    { id: 'sabiduria', label: 'Sabiduría', descripcion: 'Claridad y guía en decisiones' },
-    { id: 'abundancia', label: 'Abundancia', descripcion: 'Prosperidad y flujo económico' },
-    { id: 'alegria', label: 'Alegría', descripcion: 'Liviandad y felicidad' },
-    { id: 'transformacion', label: 'Transformación', descripcion: 'Cambio y renacimiento' },
-  ];
+  // Especializaciones disponibles organizadas por grupo
+  const especializacionesGrupos = {
+    principales: {
+      titulo: '⭐ Más Pedidos',
+      chips: [
+        { id: 'fortuna', label: 'Fortuna/Suerte', descripcion: 'Atrae buena suerte y oportunidades' },
+        { id: 'proteccion', label: 'Protección', descripcion: 'Protege energía, hogar o persona' },
+        { id: 'abundancia', label: 'Abundancia', descripcion: 'Prosperidad y flujo económico' },
+        { id: 'sanacion', label: 'Sanación', descripcion: 'Sana heridas emocionales' },
+        { id: 'abrecaminos', label: 'Abrecaminos', descripcion: 'Abrir puertas, nuevos rumbos' },
+        { id: 'vigilante', label: 'Vigilante', descripcion: 'Vigila y protege 24/7' },
+      ]
+    },
+    amor: {
+      titulo: '💕 Amor y Vínculos',
+      chips: [
+        { id: 'amor_romantico', label: 'Amor Pareja', descripcion: 'Abre el corazón al amor romántico' },
+        { id: 'amor_propio', label: 'Amor Propio', descripcion: 'Autoestima y valor personal' },
+        { id: 'amor_hijos', label: 'Amor de Hijos', descripcion: 'Vínculo padres-hijos' },
+        { id: 'maternidad', label: 'Maternidad', descripcion: 'Ser madre, criar, acompañar' },
+        { id: 'fertilidad', label: 'Fertilidad', descripcion: 'Buscar embarazo, concepción' },
+        { id: 'familia', label: 'Familia', descripcion: 'Armonía familiar, lazos' },
+        { id: 'amistades', label: 'Amistades', descripcion: 'Vínculos de amistad' },
+        { id: 'reconciliacion', label: 'Reconciliación', descripcion: 'Volver a conectar, perdonar' },
+        { id: 'soledad', label: 'Soledad', descripcion: 'Superar el aislamiento' },
+      ]
+    },
+    sanacion: {
+      titulo: '🌿 Sanación',
+      chips: [
+        { id: 'sanacion_emocional', label: 'Emocional', descripcion: 'Heridas del corazón' },
+        { id: 'sanacion_transgeneracional', label: 'Transgeneracional', descripcion: 'Lo heredado de familia' },
+        { id: 'sanacion_fisica', label: 'Física', descripcion: 'Acompañar procesos del cuerpo' },
+        { id: 'sanacion_psicosomatica', label: 'Psicosomática', descripcion: 'Cuerpo que habla lo que mente calla' },
+        { id: 'duelos', label: 'Duelos', descripcion: 'Acompañar pérdidas y despedidas' },
+        { id: 'patrones', label: 'Patrones', descripcion: 'Romper ciclos que se repiten' },
+        { id: 'adicciones', label: 'Adicciones', descripcion: 'Superar dependencias' },
+        { id: 'traumas', label: 'Traumas', descripcion: 'Sanar heridas profundas' },
+      ]
+    },
+    proteccion: {
+      titulo: '🛡️ Protección',
+      chips: [
+        { id: 'proteccion_energetica', label: 'Energética', descripcion: 'Absorbo todo, me dreno' },
+        { id: 'proteccion_hogar', label: 'Del Hogar', descripcion: 'Casa, espacio, familia' },
+        { id: 'proteccion_ninos', label: 'De Niños', descripcion: 'Cuidar y proteger hijos' },
+        { id: 'proteccion_auto', label: 'Del Auto', descripcion: 'Protección de vehículos' },
+        { id: 'proteccion_viajes', label: 'De Viajes', descripcion: 'Protección al viajar' },
+        { id: 'proteccion_mascotas', label: 'De Mascotas', descripcion: 'Cuidar animales queridos' },
+        { id: 'limites', label: 'Límites', descripcion: 'No saber decir que no' },
+        { id: 'envidias', label: 'Envidias', descripcion: 'Proteger de malas energías ajenas' },
+      ]
+    },
+    trabajo: {
+      titulo: '💼 Trabajo y Dinero',
+      chips: [
+        { id: 'negocios', label: 'Negocios', descripcion: 'Emprendedores, comercio, ventas' },
+        { id: 'emprendimiento', label: 'Emprendimiento', descripcion: 'Arrancar algo propio' },
+        { id: 'buscar_trabajo', label: 'Buscar Trabajo', descripcion: 'Conseguir empleo' },
+        { id: 'entrevistas', label: 'Entrevistas', descripcion: 'Éxito en entrevistas laborales' },
+        { id: 'liderazgo', label: 'Liderazgo', descripcion: 'Liderar equipos, ser jefe' },
+        { id: 'creatividad', label: 'Creatividad', descripcion: 'Artistas, creativos, ideas' },
+        { id: 'deudas', label: 'Deudas', descripcion: 'Salir de deudas, ordenar finanzas' },
+        { id: 'clientes', label: 'Atraer Clientes', descripcion: 'Más clientes, más ventas' },
+      ]
+    },
+    estudio: {
+      titulo: '📚 Estudio y Mente',
+      chips: [
+        { id: 'estudio', label: 'Estudio', descripcion: 'Concentración, aprendizaje' },
+        { id: 'examenes', label: 'Exámenes', descripcion: 'Aprobar, rendir bien' },
+        { id: 'memoria', label: 'Memoria', descripcion: 'Recordar, retener información' },
+        { id: 'concentracion', label: 'Concentración', descripcion: 'Focus, no distraerse' },
+        { id: 'sabiduria', label: 'Sabiduría', descripcion: 'Claridad y guía en decisiones' },
+        { id: 'intuicion', label: 'Intuición', descripcion: 'Confiar en la voz interior' },
+        { id: 'claridad', label: 'Claridad Mental', descripcion: 'Pensar claro, decidir' },
+      ]
+    },
+    bienestar: {
+      titulo: '🧘 Bienestar',
+      chips: [
+        { id: 'calma', label: 'Calma/Paz', descripcion: 'Trae serenidad y tranquilidad' },
+        { id: 'ansiedad', label: 'Ansiedad', descripcion: 'Reducir la ansiedad' },
+        { id: 'insomnio', label: 'Insomnio', descripcion: 'Dormir mejor, descansar' },
+        { id: 'meditacion', label: 'Meditación/Zen', descripcion: 'Mindfulness, paz interior' },
+        { id: 'alegria', label: 'Alegría', descripcion: 'Liviandad y felicidad' },
+        { id: 'energia', label: 'Energía', descripcion: 'Vitalidad, fuerza, ganas' },
+        { id: 'confianza', label: 'Confianza', descripcion: 'Seguridad en uno mismo' },
+      ]
+    },
+    cambios: {
+      titulo: '🦋 Cambios y Etapas',
+      chips: [
+        { id: 'transformacion', label: 'Transformación', descripcion: 'Cambio y renacimiento' },
+        { id: 'nuevos_comienzos', label: 'Nuevos Comienzos', descripcion: 'Empezar de nuevo' },
+        { id: 'mudanza', label: 'Mudanza', descripcion: 'Nuevo hogar, nuevo espacio' },
+        { id: 'separacion', label: 'Separación', descripcion: 'Superar ruptura, divorcio' },
+        { id: 'jubilacion', label: 'Jubilación', descripcion: 'Nueva etapa de vida' },
+        { id: 'desapego', label: 'Desapego', descripcion: 'Soltar lo que ya no sirve' },
+        { id: 'miedos', label: 'Miedos', descripcion: 'Superar miedos y fobias' },
+      ]
+    },
+    espiritual: {
+      titulo: '✨ Espiritual',
+      chips: [
+        { id: 'conexion_espiritual', label: 'Conexión', descripcion: 'Conectar con lo sagrado' },
+        { id: 'deseos', label: 'Deseos', descripcion: 'Manifestar intenciones' },
+        { id: 'suenos', label: 'Sueños', descripcion: 'Recordar, interpretar sueños' },
+        { id: 'proposito', label: 'Propósito', descripcion: 'Encontrar sentido de vida' },
+        { id: 'gratitud', label: 'Gratitud', descripcion: 'Cultivar agradecimiento' },
+      ]
+    }
+  };
+
+  // Para compatibilidad, también como array plano
+  const especializacionesRapidas = Object.values(especializacionesGrupos).flatMap(g => g.chips);
 
   // Seleccionar guardián para modo directo (va al paso de especialización)
   const seleccionarParaDirecto = (guardian) => {
@@ -1257,19 +1360,26 @@ Necesito conocer algunos datos. Empecemos:
             <h2>¿De qué es {directoGuardian?.nombre}?</h2>
             <p className="instruccion-batch">Elegí qué hace este guardián o escribí algo específico.</p>
 
-            <div className="especializacion-chips">
-              {especializacionesRapidas.map(esp => (
-                <button
-                  key={esp.id}
-                  className={`chip-especializacion ${directoEspecializacion === esp.id ? 'activo' : ''}`}
-                  onClick={() => {
-                    setDirectoEspecializacion(esp.id);
-                    setDirectoEspecializacionTexto('');
-                  }}
-                  title={esp.descripcion}
-                >
-                  {esp.label}
-                </button>
+            <div className="especializacion-grupos">
+              {Object.entries(especializacionesGrupos).map(([grupoId, grupo]) => (
+                <div key={grupoId} className="especializacion-grupo">
+                  <h4 className="grupo-titulo">{grupo.titulo}</h4>
+                  <div className="especializacion-chips">
+                    {grupo.chips.map(esp => (
+                      <button
+                        key={esp.id}
+                        className={`chip-especializacion ${directoEspecializacion === esp.id ? 'activo' : ''}`}
+                        onClick={() => {
+                          setDirectoEspecializacion(esp.id);
+                          setDirectoEspecializacionTexto('');
+                        }}
+                        title={esp.descripcion}
+                      >
+                        {esp.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
 
@@ -2751,27 +2861,47 @@ Necesito conocer algunos datos. Empecemos:
 
         /* Paso de especialización */
         .paso-especializacion {
-          max-width: 600px;
+          max-width: 900px;
           margin: 0 auto;
+        }
+
+        .especializacion-grupos {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin: 1.5rem 0;
+        }
+
+        .especializacion-grupo {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 12px;
+          padding: 1rem;
+        }
+
+        .grupo-titulo {
+          font-size: 0.85rem;
+          color: rgba(255,255,255,0.6);
+          margin: 0 0 0.75rem 0;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .especializacion-chips {
           display: flex;
           flex-wrap: wrap;
-          gap: 0.75rem;
-          margin: 1.5rem 0;
-          justify-content: center;
+          gap: 0.5rem;
         }
 
         .chip-especializacion {
-          padding: 0.75rem 1.25rem;
-          border-radius: 20px;
-          border: 2px solid rgba(255,255,255,0.2);
+          padding: 0.5rem 0.9rem;
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.2);
           background: rgba(255,255,255,0.05);
           color: #fff;
           cursor: pointer;
           transition: all 0.2s;
-          font-size: 0.95rem;
+          font-size: 0.8rem;
         }
 
         .chip-especializacion:hover {
