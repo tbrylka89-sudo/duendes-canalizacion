@@ -153,6 +153,28 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ---
 
+## CHIPS DE ESPECIALIZACIÓN (UI)
+
+**Ubicación:** `/admin/generador-historias` → Paso 14
+
+**9 grupos con 70+ especialidades:**
+
+| Grupo | Chips |
+|-------|-------|
+| ⭐ Más Pedidos | Fortuna, Protección, Abundancia, Sanación, Abrecaminos, Vigilante |
+| 💕 Amor | Pareja, Propio, Hijos, Maternidad, Fertilidad, Familia, Amistades, Reconciliación, Soledad |
+| 🌿 Sanación | Emocional, Transgeneracional, Física, Psicosomática, Duelos, Patrones, Adicciones, Traumas |
+| 🛡️ Protección | Energética, Hogar, Niños, Auto, Viajes, Mascotas, Límites, Envidias |
+| 💼 Trabajo | Negocios, Emprendimiento, Buscar Trabajo, Entrevistas, Liderazgo, Creatividad, Deudas, Clientes |
+| 📚 Estudio | Estudio, Exámenes, Memoria, Concentración, Sabiduría, Intuición, Claridad |
+| 🧘 Bienestar | Calma, Ansiedad, Insomnio, Meditación, Alegría, Energía, Confianza |
+| 🦋 Cambios | Transformación, Nuevos Comienzos, Mudanza, Separación, Jubilación, Desapego, Miedos |
+| ✨ Espiritual | Conexión, Deseos, Sueños, Propósito, Gratitud |
+
+**Siempre hay campo de texto libre** para especialidades no listadas.
+
+---
+
 ## ÚLTIMAS SESIONES
 
 ### 2026-01-22 (sesión 2)
