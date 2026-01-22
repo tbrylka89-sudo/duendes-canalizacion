@@ -57,6 +57,14 @@ function GeneradorHistoriasContent() {
   const [filtroEspecie, setFiltroEspecie] = useState(null);
   const [filtroCategoria, setFiltroCategoria] = useState(null);
 
+  // Mini-encuesta al regenerar
+  const [showMiniEncuesta, setShowMiniEncuesta] = useState(false);
+  const [miniEncuesta, setMiniEncuesta] = useState({
+    problema: '',
+    categoriaOverride: '',
+    indicaciones: ''
+  });
+
   // Todas las especies disponibles
   const especiesDisponibles = [
     { id: 'duende', nombre: 'Duende', genero: 'M' },
@@ -406,7 +414,7 @@ Necesito conocer algunos datos. Empecemos:
   };
 
   // Generar historia para un guardián del batch
-  const generarHistoriaBatch = async (index) => {
+  const generarHistoriaBatch = async (index, feedbackRegeneracion = null) => {
     const guardian = batchSeleccion[index];
     if (!guardian) return;
 
@@ -418,6 +426,9 @@ Necesito conocer algunos datos. Empecemos:
       g.nombre.toLowerCase() === guardian.nombre.toLowerCase()
     );
 
+    // Si hay feedback de regeneración, usar la categoría override si existe
+    const categoriaFinal = feedbackRegeneracion?.categoriaOverride || datosCatalogo?.categoria || 'Protección';
+
     try {
       const res = await fetch('/api/admin/historias', {
         method: 'POST',
@@ -427,13 +438,18 @@ Necesito conocer algunos datos. Empecemos:
           nombre: datosCatalogo?.nombre || guardian.nombre,
           genero: datosCatalogo?.genero || 'M',
           especie: datosCatalogo?.especie || 'duende',
-          categoria: datosCatalogo?.categoria || 'Protección',
+          categoria: categoriaFinal,
           tamano: datosCatalogo?.tamano || 'mediano_especial',
           tamanoCm: datosCatalogo?.cm || 18,
           accesorios: datosCatalogo?.accesorios || '',
           esUnico: datosCatalogo?.especie === 'pixie' || datosCatalogo?.tamano !== 'mini',
           sincrodestinos_usados: sincrodestinos,
-          modoBatch: true
+          modoBatch: true,
+          // Feedback de regeneración para mejorar la historia
+          feedbackRegeneracion: feedbackRegeneracion ? {
+            problema: feedbackRegeneracion.problema,
+            indicaciones: feedbackRegeneracion.indicaciones
+          } : null
         })
       });
       const data = await res.json();
@@ -448,9 +464,16 @@ Necesito conocer algunos datos. Empecemos:
     setCargando(false);
   };
 
-  // Regenerar historia actual del batch
-  const regenerarBatch = async () => {
-    await generarHistoriaBatch(batchActual);
+  // Mostrar mini-encuesta antes de regenerar
+  const regenerarBatch = () => {
+    setShowMiniEncuesta(true);
+    setMiniEncuesta({ problema: '', categoriaOverride: '', indicaciones: '' });
+  };
+
+  // Regenerar con las respuestas de la mini-encuesta
+  const confirmarRegeneracion = async () => {
+    setShowMiniEncuesta(false);
+    await generarHistoriaBatch(batchActual, miniEncuesta);
   };
 
   // Rechazar y pasar al siguiente
@@ -849,6 +872,63 @@ Necesito conocer algunos datos. Empecemos:
                     Aprobar y {batchActual < batchSeleccion.length - 1 ? 'siguiente' : 'terminar'}
                   </button>
                 </div>
+
+                {/* Mini-encuesta al regenerar */}
+                {showMiniEncuesta && (
+                  <div className="mini-encuesta-overlay">
+                    <div className="mini-encuesta-dialog">
+                      <h3>¿Qué querés cambiar?</h3>
+
+                      <div className="mini-campo">
+                        <label>¿Qué no te gustó?</label>
+                        <select
+                          value={miniEncuesta.problema}
+                          onChange={(e) => setMiniEncuesta({...miniEncuesta, problema: e.target.value})}
+                        >
+                          <option value="">Seleccioná...</option>
+                          <option value="muy_generico">Muy genérico / suena a IA</option>
+                          <option value="muy_largo">Muy largo</option>
+                          <option value="muy_corto">Muy corto</option>
+                          <option value="categoria_incorrecta">Categoría incorrecta</option>
+                          <option value="no_refleja_personalidad">No refleja su personalidad</option>
+                          <option value="otro">Otro</option>
+                        </select>
+                      </div>
+
+                      <div className="mini-campo">
+                        <label>Cambiar categoría a:</label>
+                        <select
+                          value={miniEncuesta.categoriaOverride}
+                          onChange={(e) => setMiniEncuesta({...miniEncuesta, categoriaOverride: e.target.value})}
+                        >
+                          <option value="">Mantener actual</option>
+                          {catalogo.categorias?.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="mini-campo">
+                        <label>Indicaciones específicas:</label>
+                        <textarea
+                          value={miniEncuesta.indicaciones}
+                          onChange={(e) => setMiniEncuesta({...miniEncuesta, indicaciones: e.target.value})}
+                          placeholder="Ej: que hable de su conexión con las plantas, que sea más corta, que no mencione Irlanda..."
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="mini-acciones">
+                        <button className="btn-secondary" onClick={() => setShowMiniEncuesta(false)}>
+                          Cancelar
+                        </button>
+                        <button className="btn-primary" onClick={confirmarRegeneracion}>
+                          Regenerar con cambios
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             )}
 
@@ -1942,6 +2022,68 @@ Necesito conocer algunos datos. Empecemos:
 
         .batch-progress .dot.done {
           background: #4ade80;
+        }
+
+        /* Mini-encuesta regeneración */
+        .mini-encuesta-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+
+        .mini-encuesta-dialog {
+          background: #1a1a2e;
+          border: 1px solid rgba(139, 92, 246, 0.3);
+          border-radius: 16px;
+          padding: 2rem;
+          max-width: 500px;
+          width: 90%;
+        }
+
+        .mini-encuesta-dialog h3 {
+          margin: 0 0 1.5rem;
+          color: #fff;
+        }
+
+        .mini-campo {
+          margin-bottom: 1rem;
+        }
+
+        .mini-campo label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+          opacity: 0.9;
+        }
+
+        .mini-campo select,
+        .mini-campo textarea {
+          width: 100%;
+          padding: 0.75rem;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px;
+          color: #fff;
+          font-size: 0.95rem;
+        }
+
+        .mini-campo textarea {
+          resize: vertical;
+          min-height: 80px;
+        }
+
+        .mini-acciones {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+          margin-top: 1.5rem;
         }
 
         @media (max-width: 768px) {

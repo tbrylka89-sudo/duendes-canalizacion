@@ -10,108 +10,110 @@ const WC_URL = process.env.WORDPRESS_URL;
 const WC_KEY = process.env.WC_CONSUMER_KEY;
 const WC_SECRET = process.env.WC_CONSUMER_SECRET;
 
-// Leer la BIBLIA de historias
+// BIBLIA NEUROMARKETING - Crear deseo, no literatura
 const BIBLIA_PROMPT = `
-# REGLAS ABSOLUTAS PARA GENERAR HISTORIAS DE GUARDIANES
+# GENERA CONTENIDO QUE VENDA - NO LITERATURA
 
-## IDENTIDAD
-- Somos PIONEROS de la canalización consciente (10 años de experiencia)
-- Hablamos SIEMPRE como equipo ("nosotros", "canalizamos", "sentimos")
-- NUNCA nombres individuales (Gabriel, Thibisay)
+Tu objetivo: que quien lea esto SIENTA que lo necesita YA. No escribas poesía, escribí triggers emocionales.
 
-## ESPECIES (CRÍTICO)
-- Por defecto = DUENDE
-- Si dice "Pixie" en el nombre = PIXIE (NO hada)
-- Solo es ELFO si está explícitamente marcado
-- NUNCA inventar especies
+## PROHIBIDO ABSOLUTO (si aparece, la historia FALLA)
 
-## FRASES PROHIBIDAS (si aparece alguna, la historia FALLA)
-- "En lo profundo del bosque..."
-- "A través de las brumas..."
-- "Desde tiempos inmemoriales..."
-- "Las energías ancestrales..."
-- "El velo entre mundos..."
-- "Vibraciones cósmicas..."
-- "Campos energéticos..."
-- "Este ser feérico..."
-- Cualquier frase que suene a horóscopo genérico
+- Lugares inventados: "acantilados de Irlanda", "bosques ancestrales", "valles místicos"
+- Frases de IA: "desde tiempos inmemoriales", "forja caracteres", "tormentas de envidias"
+- Metáforas vacías: "su luz ilumina", "su poder es la fuerza del..."
+- Conceptos abstractos sin beneficio concreto
+- Párrafos largos que no dicen nada
 
-## ESTRUCTURA (orden VARIABLE - sorprender)
-1. Presentación (quién es)
-2. Historia/Origen (tercera persona)
-3. SINCRODESTINO (señal mágica durante canalización)
-4. Gustos y No Tolera
-5. Especialidad (una línea potente)
-6. QUÉ TE APORTA (beneficios concretos)
-7. CÓMO NACIÓ (proceso de canalización)
-8. Mensaje del Guardián (primera persona, al alma)
-9. Cierre (si resonó, actuar)
+## NEUROMARKETING APLICADO
 
-## VARIACIONES OBLIGATORIAS
+### 1. IDENTIFICACIÓN INMEDIATA
+Primera línea: que el lector piense "esto habla de MÍ"
+- "¿Sentís que das más de lo que recibís?"
+- "¿Cuántas veces dijiste que sí cuando querías decir que no?"
+- "¿Sabés que merecés más pero algo te frena?"
 
-### Inicios (ROTAR, nunca repetir el mismo)
-- "Este es [nombre]. Tiene X años y es un duende de..."
-- "Te presentamos a [nombre], el duende del dinero que..."
-- "[Nombre] llegó al taller una mañana de lluvia cuando..."
-- "Hay duendes que eligen. [Nombre] es uno de ellos..."
-- "Cuando canalizamos a [nombre], supimos que no era común..."
+### 2. DOLOR → SOLUCIÓN
+Nombrar el problema REAL que tiene la persona, luego presentar al guardián como la solución.
+- PROTECCIÓN: "Esa amiga que te drena. El jefe que te manipula. La familia que te culpa."
+- ABUNDANCIA: "El mes que no llega. Las deudas que asfixian. El trabajo que no paga lo que merecés."
+- AMOR: "La relación que no funciona. El amor propio olvidado. La soledad aunque estés acompañada."
+- SANACIÓN: "El duelo que no termina. El trauma que volvés a vivir. La angustia sin nombre."
+- SABIDURÍA: "Las decisiones que postergás. La intuición que ignorás. La claridad que perdiste."
 
-### Edades (VARIAR - NUNCA repetir 847)
-- Duendes: entre 200 y 2000 años
-- Pixies: entre 150 y 800 años
-- Elfos: entre 500 y 3000 años
+### 3. ESCASEZ REAL
+- "Pieza ÚNICA - cuando se adopte, desaparece para siempre"
+- "Solo canalizo X por mes"
+- "Este ser eligió nacer AHORA"
 
-### Cierres (ROTAR)
-- "Si esto te hizo algo, [nombre] ya te eligió."
-- "Si se te erizó la piel, el llamado se activó."
-- "Si sentiste algo al leer esto, no es casualidad."
-- "Si llegaste hasta acá, [nombre] tiene algo para decirte."
+### 4. URGENCIA EMOCIONAL
+- "Si llegaste hasta acá, no es casualidad"
+- "Tu cuerpo ya sabe lo que necesitás"
+- "La duda es el ego, la certeza es el alma"
 
-## SINCRODESTINO - Señales REALISTAS
-Cosas que REALMENTE pasan en un taller:
-- Una mariposa/polilla entró y se posó sobre los cristales
-- El perro se quedó quieto mirando fijo durante horas
-- Empezaron a crecer tréboles/hongos en el patio
-- Sueños recurrentes con el ser antes de crearlo
-- Las luces titilaron en un momento específico
-- Encontramos una pluma en un lugar imposible
-- Orbes en las fotos del proceso
-- Cambio de temperatura repentino
-- El viento movió algo específico
-- Música sonó "sola" o se cambió la canción justo
+### 5. VALIDACIÓN
+- "Es normal que se te ericen los pelos"
+- "Si te emocionaste, es la confirmación"
+- "Lo que sentís es el reconocimiento"
 
-TONO: Calma, amor, certeza. Sin miedo ni dramatismo.
+## PIXIES - VERDAD SOBRE ELLAS
 
-## QUÉ TE APORTA - IR DE LLENO
-- Si es ABUNDANCIA: PROMETER dinero, negocios, oportunidades
-- Si es PROTECCIÓN: PROMETER escudo, bloqueo, seguridad
-- Si es AMOR: PROMETER conexión, sanación, atracción
-- Si es SANACIÓN: PROMETER liberación, transmutación, paz
-- Sin tibiezas. Directo al grano.
+Son espíritus de plantas ESPECÍFICAS. No viajan, no "nacieron en Irlanda".
+- Azucena = espíritu de las azucenas (la flor)
+- Rosa = espíritu de los rosales
+- Canela = espíritu de la planta de canela
+- Cada una tiene la ENERGÍA de su planta
 
-## TIEMPOS DE CREACIÓN
-- Mini (10cm): 1-2 semanas
-- Especial (10cm detallado): 2-3 semanas
-- Mediano (18cm): 3-4 semanas
-- Grande (25cm): 1-2 meses
+## SINCRODESTINOS CREÍBLES
 
-## TIPOS DE PIEZAS
-- ÚNICAS: "Una vez adoptado, desaparece para siempre"
-- RECREABLES: "Pueden existir otros similares, pero cada rostro es único"
+Señales sutiles, no películas de fantasía:
+- "Mientras la modelaba, sonó una canción que no había escuchado en años"
+- "Se me cayó el cristal de la mano justo cuando pensaba en su nombre"
+- "Esa noche soñé con su color antes de elegirlo"
+- "El gato se sentó a mirar todo el proceso sin moverse"
+- "Empezó a llover exactamente cuando terminé de sellarla"
 
-## NEUROMARKETING A APLICAR
-- Escasez: "Una vez adoptado, desaparece para siempre"
-- Exclusividad: "Solo elige a personas que..."
-- Urgencia emocional: "Si sentiste algo, no lo dejes pasar"
-- Validación: "Es normal que te emociones, significa que..."
-- Psicología inversa: "No es para todos, [nombre] elige..."
+## ESTRUCTURA QUE VENDE
 
-## FORMATO DE SALIDA
-Escribí la historia completa en texto corrido con:
-- **Negritas** para títulos de secciones
-- *Cursivas* para el mensaje del guardián
-- Párrafos separados por doble salto de línea
-- NO uses listas con viñetas excepto en "Qué te aporta"
+1. **Hook** - Pregunta/afirmación que identifica al lector
+2. **Presentación** - Quién es, años, de qué planta/elemento
+3. **Para quién es** - Descripción de la persona que lo necesita
+4. **Qué hace por vos** - BENEFICIOS CONCRETOS (no poderes abstractos)
+5. **Sincrodestino** - Una señal creíble de su nacimiento
+6. **Su mensaje** - Primera persona, directo, sin rodeos
+7. **CTA emocional** - Si sentiste algo, actuá
+
+## BENEFICIOS CONCRETOS POR CATEGORÍA
+
+PROTECCIÓN:
+- Vas a poder decir que no sin culpa
+- La gente tóxica se va a alejar sola
+- Vas a sentir un escudo invisible en lugares pesados
+
+ABUNDANCIA:
+- Se van a abrir puertas que estaban trabadas
+- El dinero va a empezar a fluir de lugares inesperados
+- Vas a animarte a cobrar lo que valés
+
+AMOR:
+- Vas a mirarte al espejo con otros ojos
+- Las relaciones que no suman se van a ir
+- Vas a atraer lo que vibrás
+
+SANACIÓN:
+- Vas a poder soltar lo que te pesa
+- Los recuerdos van a doler menos
+- Vas a dormir mejor
+
+SABIDURÍA:
+- Las decisiones van a ser más claras
+- Tu intuición va a hablar más fuerte
+- Vas a confiar más en vos
+
+## FORMATO
+- Párrafos de 2-3 líneas máximo
+- **Negritas** para secciones
+- *Cursivas* para mensaje del guardián
+- NO usar listas en el cuerpo, solo al final en beneficios
 `;
 
 // POST - Generar historia
@@ -129,7 +131,8 @@ export async function POST(request) {
       analisisImagen,
       respuestasEncuesta,
       sincrodestino_custom,
-      sincrodestinos_usados
+      sincrodestinos_usados,
+      feedbackRegeneracion
     } = await request.json();
 
     // Construir prompt con contexto
@@ -166,7 +169,26 @@ export async function POST(request) {
       });
     }
 
-    prompt += `\n---\n\nGenerá la historia completa para ${nombre}. Recordá variar la estructura, usar una edad DIFERENTE a 847, y crear un sincrodestino ÚNICO que no esté en la lista de usados.`;
+    // Si hay feedback de regeneración, incluirlo
+    if (feedbackRegeneracion) {
+      prompt += `\n\n# FEEDBACK DE REGENERACIÓN - CORREGIR ESTO:\n`;
+      if (feedbackRegeneracion.problema) {
+        const problemas = {
+          'muy_generico': 'La historia anterior sonaba muy genérica/de IA. Hacela más personal, más directa, con triggers emocionales reales.',
+          'muy_largo': 'La historia anterior era muy larga. Hacela más corta y contundente.',
+          'muy_corto': 'La historia anterior era muy corta. Desarrollá más los beneficios concretos.',
+          'categoria_incorrecta': 'La categoría era incorrecta. Enfocate 100% en la nueva categoría.',
+          'no_refleja_personalidad': 'No reflejaba la personalidad del ser. Usá más los accesorios y características para crear personalidad única.',
+          'otro': 'Generá una versión completamente diferente.'
+        };
+        prompt += `**Problema detectado:** ${problemas[feedbackRegeneracion.problema] || feedbackRegeneracion.problema}\n`;
+      }
+      if (feedbackRegeneracion.indicaciones) {
+        prompt += `**Indicaciones específicas:** ${feedbackRegeneracion.indicaciones}\n`;
+      }
+    }
+
+    prompt += `\n---\n\nGenerá la historia completa para ${nombre}. Enfocate en crear DESEO y URGENCIA. Que quien lea esto sienta que lo necesita AHORA.`;
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
