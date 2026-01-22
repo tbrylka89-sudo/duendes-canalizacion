@@ -219,6 +219,9 @@ export const CATEGORIAS_FORO = [
 
 export const FAQS = [
   { p: '¿Qué es Mi Magia?', r: 'Es tu portal personal donde podés gestionar tus guardianes, acceder a experiencias mágicas, canjear beneficios y mucho más.' },
+  { p: '¿Qué es el certificado de canalización?', r: 'Es el documento oficial que acompaña a cada guardián. Incluye su nombre, la fecha en que fue canalizado, un mensaje único del guardián para vos, y la firma de Thibisay. Lo recibís por email 24 horas después de tu compra, y también queda disponible en la sección Mi Magia de tu cuenta.' },
+  { p: '¿Puedo comprar como regalo?', r: 'Sí, en el checkout tenés la opción "Es un regalo". Podés elegir si es sorpresa o no. Si no es sorpresa, el destinatario recibe un formulario para completar su información. Si es sorpresa, vos completás los datos sobre la persona que lo va a recibir.' },
+  { p: '¿Qué incluye la compra de un guardián?', r: 'Tu guardián llega con todo: la figura física articulada, el certificado de canalización personalizado con su mensaje único, acceso al portal Mi Magia donde gestionás tu colección, y runas de bienvenida para empezar a explorar las experiencias mágicas.' },
   { p: '¿Cómo consigo tréboles?', r: 'Los tréboles se ganan automáticamente con cada compra en la tienda. También hay misiones especiales y eventos donde podés ganar más.' },
   { p: '¿Para qué sirven las runas?', r: 'Las runas son la moneda para experiencias mágicas: tiradas de runas, tarot, numerología, rituales personalizados, etc.' },
   { p: '¿Qué es el Círculo de Duendes?', r: 'Es nuestra membresía premium. Los miembros reciben contenido exclusivo semanal, descuentos permanentes, runas gratis cada mes y acceso anticipado a nuevos guardianes.' },

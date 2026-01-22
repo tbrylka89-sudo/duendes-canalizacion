@@ -77,7 +77,7 @@ function duendes_tienda_styles_v2() {
 
     .hero-sub {
         font-family: "Cormorant Garamond", serif;
-        font-size: 20px;
+        font-size: clamp(16px, 4vw, 20px);
         color: rgba(255,255,255,0.6);
         font-style: italic;
         margin: 0 0 40px 0;
@@ -294,6 +294,31 @@ function duendes_tienda_styles_v2() {
             padding: 15px 15px 5px !important;
         }
     }
+
+    /* Tablet */
+    @media (max-width: 1024px) {
+        ul.products {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+    }
+
+    /* Móviles pequeños */
+    @media (max-width: 600px) {
+        ul.products {
+            grid-template-columns: 1fr !important;
+        }
+
+        ul.products li.product .button,
+        ul.products li.product .add_to_cart_button {
+            padding: 18px !important;
+            min-height: 48px !important;
+        }
+
+        .cat-pill {
+            padding: 12px 20px;
+            font-size: 13px;
+        }
+    }
     ';
 }
 
@@ -306,18 +331,40 @@ add_action('wp_footer', function() {
         // Sistema de sonidos mágicos - suaves como una caricia
         let audioContext = null;
 
+        // 1. Validar que AudioContext existe antes de usarlo
         function getAudioContext() {
             if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
             }
             return audioContext;
+        }
+
+        // 4. Detectar si es dispositivo tactil
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        // 3. Throttle para sonido de carrito (500ms)
+        let lastCartSound = 0;
+        function throttledCartSound() {
+            const now = Date.now();
+            if (now - lastCartSound > 500) {
+                lastCartSound = now;
+                playAddToCartSound();
+            }
         }
 
         // Sonido etéreo al hover - como brisa mágica, muy sutil
         function playSelectSound() {
             try {
                 const ctx = getAudioContext();
-                if (ctx.state === 'suspended') ctx.resume();
+                // 2. Si no hay AudioContext, salir
+                if (!ctx) return;
+
+                // 2. Manejar ctx.resume() como Promise
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
 
                 // Nota base muy suave y baja
                 const osc = ctx.createOscillator();
@@ -369,7 +416,13 @@ add_action('wp_footer', function() {
         function playAddToCartSound() {
             try {
                 const ctx = getAudioContext();
-                if (ctx.state === 'suspended') ctx.resume();
+                // 2. Si no hay AudioContext, salir
+                if (!ctx) return;
+
+                // 2. Manejar ctx.resume() como Promise
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
 
                 console.log('Playing add to cart sound');
 
@@ -404,21 +457,26 @@ add_action('wp_footer', function() {
 
                 // Shimmer final muy sutil
                 setTimeout(() => {
-                    const shimmer = ctx.createOscillator();
-                    const shimmerGain = ctx.createGain();
-                    const shimmerFilter = ctx.createBiquadFilter();
-                    shimmer.connect(shimmerFilter);
-                    shimmerFilter.connect(shimmerGain);
-                    shimmerGain.connect(ctx.destination);
-                    shimmerFilter.type = 'lowpass';
-                    shimmerFilter.frequency.setValueAtTime(2000, ctx.currentTime);
-                    shimmer.type = 'sine';
-                    shimmer.frequency.setValueAtTime(1567.98, ctx.currentTime); // Sol6
-                    shimmerGain.gain.setValueAtTime(0, ctx.currentTime);
-                    shimmerGain.gain.linearRampToValueAtTime(0.015, ctx.currentTime + 0.1);
-                    shimmerGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
-                    shimmer.start(ctx.currentTime);
-                    shimmer.stop(ctx.currentTime + 0.8);
+                    try {
+                        const currentCtx = getAudioContext();
+                        if (!currentCtx) return;
+
+                        const shimmer = currentCtx.createOscillator();
+                        const shimmerGain = currentCtx.createGain();
+                        const shimmerFilter = currentCtx.createBiquadFilter();
+                        shimmer.connect(shimmerFilter);
+                        shimmerFilter.connect(shimmerGain);
+                        shimmerGain.connect(currentCtx.destination);
+                        shimmerFilter.type = 'lowpass';
+                        shimmerFilter.frequency.setValueAtTime(2000, currentCtx.currentTime);
+                        shimmer.type = 'sine';
+                        shimmer.frequency.setValueAtTime(1567.98, currentCtx.currentTime); // Sol6
+                        shimmerGain.gain.setValueAtTime(0, currentCtx.currentTime);
+                        shimmerGain.gain.linearRampToValueAtTime(0.015, currentCtx.currentTime + 0.1);
+                        shimmerGain.gain.exponentialRampToValueAtTime(0.0001, currentCtx.currentTime + 0.8);
+                        shimmer.start(currentCtx.currentTime);
+                        shimmer.stop(currentCtx.currentTime + 0.8);
+                    } catch(e) { /* silenciar errores del shimmer */ }
                 }, 450);
 
             } catch(e) { console.log('Cart sound error:', e); }
@@ -438,12 +496,16 @@ add_action('wp_footer', function() {
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Duendes sounds initialized');
 
-            // Hover en productos
+            // 4. Para productos, usar click en movil en lugar de mouseenter
             document.querySelectorAll('ul.products li.product').forEach(function(product) {
-                product.addEventListener('mouseenter', throttledSelectSound);
+                if (isTouchDevice) {
+                    product.addEventListener('click', throttledSelectSound, { once: false, passive: true });
+                } else {
+                    product.addEventListener('mouseenter', throttledSelectSound);
+                }
             });
 
-            // Click en cualquier botón de agregar al carrito
+            // 3. Click en cualquier boton de agregar al carrito - usar throttledCartSound
             document.body.addEventListener('click', function(e) {
                 const btn = e.target.closest('button, a');
                 if (btn) {
@@ -458,16 +520,16 @@ add_action('wp_footer', function() {
                         text.includes('comprar') ||
                         text.includes('añadir')) {
                         console.log('Cart button clicked:', btn);
-                        playAddToCartSound();
+                        throttledCartSound();
                     }
                 }
             });
 
-            // Evento WooCommerce AJAX
+            // 3. Evento WooCommerce AJAX - usar throttledCartSound
             if (typeof jQuery !== 'undefined') {
                 jQuery(document.body).on('added_to_cart', function() {
                     console.log('WC added_to_cart event');
-                    playAddToCartSound();
+                    throttledCartSound();
                 });
                 jQuery(document.body).on('wc_fragments_refreshed', function() {
                     console.log('WC fragments refreshed');
@@ -478,7 +540,7 @@ add_action('wp_footer', function() {
         // Exponer globalmente
         window.duendesSounds = {
             select: throttledSelectSound,
-            addToCart: playAddToCartSound
+            addToCart: throttledCartSound
         };
     })();
     </script>

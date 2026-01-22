@@ -7366,6 +7366,23 @@ const FAQS = [
     ]
   },
   {
+    categoria: 'Tu Compra',
+    preguntas: [
+      {
+        q: '¿Qué es el certificado de canalización?',
+        a: 'Es el documento oficial que acompaña a cada guardián. Incluye el nombre del guardián, la fecha en que fue canalizado, un mensaje único que el guardián tiene para vos, y la firma de Thibisay. Lo recibís por email 24 horas después de tu compra, y también queda guardado acá en Mi Magia para que puedas verlo cuando quieras.'
+      },
+      {
+        q: '¿Puedo comprar como regalo?',
+        a: 'Sí, en el checkout tenés la opción "Es un regalo". Ahí elegís si es sorpresa o no. Si no es sorpresa, el destinatario recibe un formulario para completar su información y así la canalización se hace con sus datos. Si es sorpresa, vos completás lo que sabés sobre esa persona para que la canalización sea lo más personalizada posible.'
+      },
+      {
+        q: '¿Qué incluye la compra de un guardián?',
+        a: 'Tu guardián llega con todo: la figura física articulada hecha a mano, el certificado de canalización personalizado con su mensaje único, acceso al portal Mi Magia donde gestionás tu colección, y runas de bienvenida para que empieces a explorar las experiencias mágicas disponibles.'
+      }
+    ]
+  },
+  {
     categoria: 'Runas y Tréboles',
     preguntas: [
       {

@@ -699,9 +699,83 @@ export async function PUT(request) {
   }
 }
 
-// GET - Generar preguntas DINÁMICAS con IA
+// GET - Generar preguntas DINÁMICAS con IA o listar historias existentes
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
+  const accion = searchParams.get('accion');
+
+  // NUEVA ACCIÓN: Listar historias existentes para evitar repeticiones
+  if (accion === 'listar_existentes') {
+    try {
+      // Obtener productos de WooCommerce que tengan descripción (historia)
+      const response = await fetch(
+        `${WC_URL}/wp-json/wc/v3/products?per_page=100&status=publish`,
+        {
+          headers: {
+            'Authorization': 'Basic ' + Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64')
+          }
+        }
+      );
+
+      if (!response.ok) {
+        return NextResponse.json({
+          success: true,
+          hooks_usados: [],
+          sincrodestinos_usados: [],
+          guardianes_con_historia: []
+        });
+      }
+
+      const productos = await response.json();
+
+      // Extraer datos de productos con historia
+      const hooksUsados = [];
+      const sincrodestUsados = [];
+      const guardianesConHistoria = [];
+
+      for (const producto of productos) {
+        if (producto.description && producto.description.length > 200) {
+          guardianesConHistoria.push(producto.name);
+
+          // Extraer primera línea como posible hook
+          const primeraLinea = producto.description.replace(/<[^>]*>/g, '').split('\n')[0]?.trim();
+          if (primeraLinea && primeraLinea.length > 10 && primeraLinea.length < 150) {
+            hooksUsados.push(primeraLinea);
+          }
+
+          // Detectar sincrodestinos comunes
+          const desc = producto.description.toLowerCase();
+          if (desc.includes('mariposa')) sincrodestUsados.push('mariposa');
+          if (desc.includes('gorrión') || desc.includes('pájaro')) sincrodestUsados.push('pajaro');
+          if (desc.includes('lluvia') || desc.includes('llovió')) sincrodestUsados.push('lluvia');
+          if (desc.includes('gato')) sincrodestUsados.push('gato');
+          if (desc.includes('3:33') || desc.includes('11:11')) sincrodestUsados.push('hora_espejo');
+          if (desc.includes('barniz') || desc.includes('secado')) sincrodestUsados.push('material');
+          if (desc.includes('viento')) sincrodestUsados.push('viento');
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        hooks_usados: [...new Set(hooksUsados)], // Eliminar duplicados
+        sincrodestinos_usados: [...new Set(sincrodestUsados)],
+        guardianes_con_historia: guardianesConHistoria,
+        total_productos: productos.length
+      });
+
+    } catch (error) {
+      console.error('Error listando historias:', error);
+      return NextResponse.json({
+        success: true,
+        hooks_usados: [],
+        sincrodestinos_usados: [],
+        guardianes_con_historia: [],
+        error: error.message
+      });
+    }
+  }
+
+  // ACCIÓN ORIGINAL: Generar preguntas dinámicas
   const nombre = searchParams.get('nombre');
   const categoria = searchParams.get('categoria');
   const especie = searchParams.get('especie');

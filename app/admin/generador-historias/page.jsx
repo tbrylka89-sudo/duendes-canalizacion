@@ -101,6 +101,13 @@ function GeneradorHistoriasContent() {
   const [batchResultados, setBatchResultados] = useState([]); // historias generadas
   const [batchVistaPrevia, setBatchVistaPrevia] = useState(null); // historia seleccionada para ver
 
+  // === NUEVO FLUJO BATCH ===
+  const [batchCategoriaPrincipal, setBatchCategoriaPrincipal] = useState(null); // categoría elegida primero
+  const [batchModoAsignacion, setBatchModoAsignacion] = useState('auto'); // 'auto' o 'manual'
+  const [batchSubcategoriasManual, setBatchSubcategoriasManual] = useState({}); // {guardianNombre: subcategoriaId}
+  const [historiasExistentes, setHistoriasExistentes] = useState(null); // datos de historias ya generadas
+  const [cargandoHistorias, setCargandoHistorias] = useState(false);
+
   // Mini-encuesta al regenerar
   const [showMiniEncuesta, setShowMiniEncuesta] = useState(false);
   const [miniEncuesta, setMiniEncuesta] = useState({
@@ -479,6 +486,26 @@ Necesito conocer algunos datos. Empecemos:
     } catch (e) {
       console.error('Error cargando preguntas:', e);
     }
+  };
+
+  // Cargar historias existentes para evitar repeticiones
+  const cargarHistoriasExistentes = async () => {
+    setCargandoHistorias(true);
+    try {
+      const res = await fetch('/api/admin/historias?accion=listar_existentes');
+      const data = await res.json();
+      if (data.success) {
+        setHistoriasExistentes({
+          hooksUsados: data.hooks_usados || [],
+          sincrodestUsados: data.sincrodestinos_usados || [],
+          estructurasUsadas: data.estructuras_usadas || [],
+          guardianesConHistoria: data.guardianes_con_historia || []
+        });
+      }
+    } catch (e) {
+      console.error('Error cargando historias existentes:', e);
+    }
+    setCargandoHistorias(false);
   };
 
   // Generar historia
@@ -993,55 +1020,66 @@ Necesito conocer algunos datos. Empecemos:
 
   // Generar todas las historias de todos los grupos
   const generarTodosBatch = async () => {
-    if (batchGrupos.length === 0) return;
+    // Si no hay grupos, usar la selección actual con la categoría principal
+    let gruposAGenerar = batchGrupos;
+
+    if (gruposAGenerar.length === 0 && batchSeleccionados.length > 0 && batchCategoriaPrincipal) {
+      // Crear grupo desde la selección actual
+      gruposAGenerar = [{
+        id: `grupo-${Date.now()}`,
+        especializacion: batchCategoriaPrincipal,
+        categoriaPrincipal: batchCategoriaPrincipal,
+        modoAsignacion: batchModoAsignacion,
+        subcategoriasManual: { ...batchSubcategoriasManual },
+        guardianes: [...batchSeleccionados],
+        hooksUsados: historiasExistentes?.hooksUsados || [],
+        sincrodestUsados: historiasExistentes?.sincrodestUsados || []
+      }];
+      setBatchGrupos(gruposAGenerar);
+    }
+
+    if (gruposAGenerar.length === 0) return;
 
     setBatchGenerando(true);
     setBatchResultados([]);
 
-    const totalGuardianes = batchGrupos.reduce((acc, g) => acc + g.guardianes.length, 0);
+    const totalGuardianes = gruposAGenerar.reduce((acc, g) => acc + g.guardianes.length, 0);
     let contador = 0;
 
     const resultados = [];
 
     // Procesar cada grupo
-    for (const grupo of batchGrupos) {
-      const hooksUsados = [];
-      const sincrodestUsados = [];
+    for (const grupo of gruposAGenerar) {
+      // Iniciar con hooks/sincrodestinos ya usados (de historias existentes)
+      const hooksUsados = [...(grupo.hooksUsados || [])];
+      const sincrodestUsados = [...(grupo.sincrodestUsados || [])];
 
-      // Procesar cada guardián del grupo secuencialmente
-      // Definir subcategorías por categoría principal para rotación automática
-      const subcategoriasPorCategoria = {
-        amor: ['amor_propio', 'amor_pareja', 'amor_familia', 'fertilidad', 'encontrar_amor'],
-        proteccion: ['proteccion_energia', 'proteccion_hogar', 'proteccion_emocional', 'cortar_lazos', 'limites'],
-        abundancia: ['dinero', 'trabajo', 'desbloqueo', 'merecimiento'],
-        sanacion: ['sanacion_emocional', 'duelo', 'trauma', 'perdon', 'cuerpo'],
-        sabiduria: ['intuicion', 'claridad', 'decisiones', 'proposito', 'creatividad']
-      };
-
-      // Detectar categoría principal del grupo
-      const especLower = (grupo.especializacion || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      let categoriaBase = 'proteccion';
-      if (especLower.includes('amor') || especLower.includes('romantico')) categoriaBase = 'amor';
-      else if (especLower.includes('abundan') || especLower.includes('prosper') || especLower.includes('dinero')) categoriaBase = 'abundancia';
-      else if (especLower.includes('sana') || especLower.includes('heal')) categoriaBase = 'sanacion';
-      else if (especLower.includes('sabid') || especLower.includes('intui')) categoriaBase = 'sabiduria';
-      else if (especLower.includes('protec')) categoriaBase = 'proteccion';
-
-      const subsDisponibles = subcategoriasPorCategoria[categoriaBase] || [];
+      // Obtener subcategorías disponibles de especializacionesGrupos
+      const catPrincipal = grupo.categoriaPrincipal || grupo.especializacion;
+      const subcatsDisponibles = especializacionesGrupos[catPrincipal]?.chips?.map(c => c.id) || [];
 
       for (let i = 0; i < grupo.guardianes.length; i++) {
         const guardian = grupo.guardianes[i];
         contador++;
 
-        // Rotación automática de subcategorías
-        const subcategoriaActual = subsDisponibles.length > 0 ? subsDisponibles[i % subsDisponibles.length] : null;
+        // Determinar subcategoría según modo
+        let subcategoriaActual;
+        if (grupo.modoAsignacion === 'manual' && grupo.subcategoriasManual?.[guardian.nombre]) {
+          // Modo manual: usar la asignada
+          subcategoriaActual = grupo.subcategoriasManual[guardian.nombre];
+        } else {
+          // Modo auto: rotar entre subcategorías disponibles
+          subcategoriaActual = subcatsDisponibles.length > 0
+            ? subcatsDisponibles[i % subcatsDisponibles.length]
+            : catPrincipal;
+        }
 
         setBatchProgreso({
           actual: contador,
           total: totalGuardianes,
           guardian: guardian.nombre,
-          grupo: grupo.especializacion,
-          subcategoria: subcategoriaActual // Mostrar qué subcategoría se está usando
+          grupo: catPrincipal,
+          subcategoria: subcategoriaActual
         });
 
         try {
@@ -1055,9 +1093,9 @@ Necesito conocer algunos datos. Empecemos:
               tamanoCm: guardian.cm || 18,
               accesorios: guardian.accesorios || '',
               esUnico: guardian.especie === 'pixie' || (guardian.cm || 18) > 15,
-              especializacion: grupo.especializacion,
-              subcategoria: subcategoriaActual, // NUEVO: subcategoría rotada automáticamente
-              // CLAVE: pasar lo que ya se usó para evitar repeticiones
+              especializacion: catPrincipal,
+              subcategoria: subcategoriaActual,
+              // CLAVE: pasar todo lo ya usado (existentes + generados en este batch)
               hooks_usados: hooksUsados,
               sincrodestinos_usados: sincrodestUsados
             })
@@ -1066,28 +1104,32 @@ Necesito conocer algunos datos. Empecemos:
           const data = await res.json();
 
           if (data.success) {
-            // Trackear lo usado
+            // Trackear lo usado para evitar repetición en siguientes
             if (data.datos?.hookUsado) hooksUsados.push(data.datos.hookUsado);
             if (data.datos?.sincrodestinoUsado) sincrodestUsados.push(data.datos.sincrodestinoUsado);
 
             resultados.push({
               guardian,
-              grupo: grupo.especializacion,
+              grupo: catPrincipal,
               grupoId: grupo.id,
-              historia: corregirOrtografia(data.historia), // Auto-corrección
+              subcategoria: subcategoriaActual,
+              historia: corregirOrtografia(data.historia),
               score: data.score_conversion,
               arco: data.arco_emocional,
               cierres: data.cierres_por_perfil,
               aprobada: data.aprobada,
               advertencias: data.advertencias,
-              aprobado: false, // Para que el usuario apruebe
+              hookUsado: data.datos?.hookUsado,
+              sincrodestinoUsado: data.datos?.sincrodestinoUsado,
+              aprobado: false,
               guardadoWC: false
             });
           } else {
             resultados.push({
               guardian,
-              grupo: grupo.especializacion,
+              grupo: catPrincipal,
               grupoId: grupo.id,
+              subcategoria: subcategoriaActual,
               error: data.error,
               aprobado: false
             });
@@ -1095,8 +1137,9 @@ Necesito conocer algunos datos. Empecemos:
         } catch (e) {
           resultados.push({
             guardian,
-            grupo: grupo.especializacion,
+            grupo: catPrincipal,
             grupoId: grupo.id,
+            subcategoria: subcategoriaActual,
             error: e.message,
             aprobado: false
           });
@@ -1907,136 +1950,234 @@ Necesito conocer algunos datos. Empecemos:
           </div>
         )}
 
-        {/* PASO 15: Batch Inteligente - Selección y Agrupación */}
+        {/* PASO 15: Batch Inteligente - NUEVO FLUJO */}
         {paso === 15 && (
           <div className="paso-content batch-inteligente">
             <h2>🚀 Generación Batch Inteligente</h2>
-            <p className="subtitulo">Seleccioná guardianes, agrupalos por especialización y generá todas las historias de una vez.</p>
 
-            <div className="batch-layout">
-              {/* Panel izquierdo: Catálogo */}
-              <div className="batch-catalogo">
-                <h3>Catálogo ({catalogoFiltrado.length})</h3>
-                <input
-                  type="text"
-                  placeholder="Buscar guardián..."
-                  value={busquedaDirecto}
-                  onChange={(e) => setBusquedaDirecto(e.target.value)}
-                  className="busqueda-input"
-                />
-                <div className="batch-catalogo-grid">
-                  {catalogoFiltrado.map((guardian, idx) => {
-                    const seleccionado = batchSeleccionados.find(g => g.nombre === guardian.nombre);
-                    const enGrupo = batchGrupos.some(g => g.guardianes.find(gn => gn.nombre === guardian.nombre));
-                    return (
-                      <div
-                        key={idx}
-                        className={`batch-guardian-card ${seleccionado ? 'seleccionado' : ''} ${enGrupo ? 'en-grupo' : ''}`}
-                        onClick={() => !enGrupo && toggleSeleccionBatch(guardian)}
-                      >
-                        {guardian.imagen && (
-                          <img
-                            src={guardian.imagen}
-                            alt={guardian.nombre}
-                            className="guardian-thumb"
-                          />
-                        )}
-                        <div className="guardian-info">
-                          <span className="nombre">{guardian.nombre}</span>
-                          <span className="info">{guardian.especie || 'duende'} · {guardian.cm}cm</span>
-                        </div>
-                        {seleccionado && <span className="check">✓</span>}
-                        {enGrupo && <span className="en-grupo-badge">En grupo</span>}
-                      </div>
-                    );
-                  })}
+            {/* PASO 1: Elegir categoría principal SI no hay una seleccionada */}
+            {!batchCategoriaPrincipal && (
+              <div className="batch-elegir-categoria">
+                <p className="subtitulo">Primero elegí la categoría principal para este grupo:</p>
+                <div className="categorias-principales-grid">
+                  {Object.entries(especializacionesGrupos).map(([grupoKey, grupo]) => (
+                    <button
+                      key={grupoKey}
+                      className="categoria-principal-btn"
+                      onClick={() => {
+                        setBatchCategoriaPrincipal(grupoKey);
+                        setBatchSeleccionados([]);
+                        setBatchSubcategoriasManual({});
+                        // Cargar historias existentes al seleccionar categoría
+                        cargarHistoriasExistentes();
+                      }}
+                    >
+                      <span className="cat-titulo">{grupo.titulo}</span>
+                      <span className="cat-subs">{grupo.chips.length} subcategorías</span>
+                    </button>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Panel derecho: Selección y Grupos */}
-              <div className="batch-grupos-panel">
-                {/* Selección actual */}
-                {batchSeleccionados.length > 0 && (
-                  <div className="seleccion-actual">
-                    <h4>{batchSeleccionados.length} seleccionados</h4>
-                    <div className="seleccionados-chips">
-                      {batchSeleccionados.map((g, i) => (
-                        <span key={i} className="chip-seleccionado">
-                          {g.nombre}
-                          <button onClick={() => toggleSeleccionBatch(g)}>×</button>
-                        </span>
-                      ))}
-                    </div>
-                    <div className="asignar-grupo">
-                      <label>Asignar a especialización:</label>
-                      <div className="especializaciones-grupos-batch">
-                        {Object.entries(especializacionesGrupos).map(([grupoKey, grupo]) => (
-                          <div key={grupoKey} className="grupo-especializaciones">
-                            <span className="grupo-titulo">{grupo.titulo}</span>
-                            <div className="grupo-chips">
-                              {grupo.chips.map(chip => (
-                                <button
-                                  key={chip.id}
-                                  className="btn-esp"
-                                  onClick={() => agregarAGrupo(chip.id)}
-                                  title={chip.descripcion}
-                                >
-                                  {chip.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+            {/* PASO 2: Seleccionar guardianes + configurar subcategorías */}
+            {batchCategoriaPrincipal && !batchGenerando && batchResultados.length === 0 && (
+              <div className="batch-seleccion-guardianes">
+                <div className="batch-header-categoria">
+                  <h3>{especializacionesGrupos[batchCategoriaPrincipal]?.titulo}</h3>
+                  <button
+                    className="btn-cambiar-cat"
+                    onClick={() => {
+                      setBatchCategoriaPrincipal(null);
+                      setBatchSeleccionados([]);
+                      setBatchSubcategoriasManual({});
+                    }}
+                  >
+                    Cambiar categoría
+                  </button>
+                </div>
+
+                {cargandoHistorias && (
+                  <div className="cargando-historias">
+                    <span>Cargando historias existentes para evitar repeticiones...</span>
                   </div>
                 )}
 
-                {/* Grupos armados */}
-                <div className="grupos-armados">
-                  <h4>Grupos para generar ({batchGrupos.length})</h4>
-                  {batchGrupos.length === 0 ? (
-                    <p className="sin-grupos">Seleccioná guardianes y asignalos a una especialización</p>
-                  ) : (
-                    batchGrupos.map(grupo => (
-                      <div key={grupo.id} className="grupo-card">
-                        <div className="grupo-header">
-                          <span className="grupo-esp">
-                            {especializacionesRapidas.find(e => e.id === grupo.especializacion)?.label || grupo.especializacion.replace('_', ' ')}
-                          </span>
-                          <span className="grupo-count">{grupo.guardianes.length} guardianes</span>
-                          <button className="btn-eliminar-grupo" onClick={() => eliminarGrupo(grupo.id)}>🗑️</button>
-                        </div>
-                        <div className="grupo-guardianes">
-                          {grupo.guardianes.map((g, i) => (
-                            <span key={i} className="guardian-en-grupo">
-                              {g.nombre}
-                              <button onClick={() => quitarDeGrupo(grupo.id, g.nombre)}>×</button>
-                            </span>
-                          ))}
-                        </div>
+                {historiasExistentes && (
+                  <div className="info-historias-existentes">
+                    <span>✓ {historiasExistentes.hooksUsados?.length || 0} hooks ya usados</span>
+                    <span>✓ {historiasExistentes.guardianesConHistoria?.length || 0} guardianes con historia</span>
+                  </div>
+                )}
+
+                <div className="batch-layout">
+                  {/* Panel izquierdo: Catálogo */}
+                  <div className="batch-catalogo">
+                    <h4>Seleccioná guardianes ({batchSeleccionados.length} seleccionados)</h4>
+                    <input
+                      type="text"
+                      placeholder="Buscar guardián..."
+                      value={busquedaDirecto}
+                      onChange={(e) => setBusquedaDirecto(e.target.value)}
+                      className="busqueda-input"
+                    />
+                    <div className="batch-catalogo-grid">
+                      {catalogoFiltrado.map((guardian, idx) => {
+                        const seleccionado = batchSeleccionados.find(g => g.nombre === guardian.nombre);
+                        const tieneHistoria = historiasExistentes?.guardianesConHistoria?.includes(guardian.nombre);
+                        return (
+                          <div
+                            key={idx}
+                            className={`batch-guardian-card ${seleccionado ? 'seleccionado' : ''} ${tieneHistoria ? 'tiene-historia' : ''}`}
+                            onClick={() => toggleSeleccionBatch(guardian)}
+                          >
+                            {guardian.imagen && (
+                              <img src={guardian.imagen} alt={guardian.nombre} className="guardian-thumb" />
+                            )}
+                            <div className="guardian-info">
+                              <span className="nombre">{guardian.nombre}</span>
+                              <span className="info">{guardian.especie || 'duende'} · {guardian.cm}cm</span>
+                            </div>
+                            {seleccionado && <span className="check">✓</span>}
+                            {tieneHistoria && <span className="historia-badge">Ya tiene</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Panel derecho: Configuración de subcategorías */}
+                  <div className="batch-config-panel">
+                    {batchSeleccionados.length === 0 ? (
+                      <div className="sin-seleccion">
+                        <p>Seleccioná guardianes del catálogo</p>
+                        <p className="hint">Los que tienen ✓ verde ya tienen historia generada</p>
                       </div>
-                    ))
+                    ) : (
+                      <>
+                        <h4>Configurar subcategorías</h4>
+
+                        {/* Selector de modo */}
+                        <div className="modo-asignacion">
+                          <button
+                            className={`modo-btn ${batchModoAsignacion === 'auto' ? 'activo' : ''}`}
+                            onClick={() => setBatchModoAsignacion('auto')}
+                          >
+                            🎲 Auto-distribuir
+                          </button>
+                          <button
+                            className={`modo-btn ${batchModoAsignacion === 'manual' ? 'activo' : ''}`}
+                            onClick={() => setBatchModoAsignacion('manual')}
+                          >
+                            ✏️ Elegir manual
+                          </button>
+                        </div>
+
+                        {batchModoAsignacion === 'auto' && (
+                          <div className="modo-auto-info">
+                            <p>El sistema distribuirá automáticamente entre las subcategorías de <strong>{especializacionesGrupos[batchCategoriaPrincipal]?.titulo}</strong>, evitando repetir hooks y sincrodestinos.</p>
+                            <div className="subcats-preview">
+                              {especializacionesGrupos[batchCategoriaPrincipal]?.chips.map((chip, i) => (
+                                <span key={chip.id} className="subcat-chip">
+                                  {chip.label}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {batchModoAsignacion === 'manual' && (
+                          <div className="modo-manual-lista">
+                            {batchSeleccionados.map((guardian, idx) => (
+                              <div key={guardian.nombre} className="guardian-subcat-row">
+                                <span className="guardian-nombre">{guardian.nombre}</span>
+                                <select
+                                  value={batchSubcategoriasManual[guardian.nombre] || ''}
+                                  onChange={(e) => setBatchSubcategoriasManual(prev => ({
+                                    ...prev,
+                                    [guardian.nombre]: e.target.value
+                                  }))}
+                                >
+                                  <option value="">-- Auto --</option>
+                                  {especializacionesGrupos[batchCategoriaPrincipal]?.chips.map(chip => (
+                                    <option key={chip.id} value={chip.id}>{chip.label}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Guardianes seleccionados */}
+                        <div className="seleccionados-resumen">
+                          <h5>{batchSeleccionados.length} guardianes listos:</h5>
+                          <div className="seleccionados-chips">
+                            {batchSeleccionados.map((g, i) => (
+                              <span key={i} className="chip-seleccionado">
+                                {g.nombre}
+                                <button onClick={() => toggleSeleccionBatch(g)}>×</button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Botón generar */}
+                        <button
+                          className="btn-generar-todos"
+                          onClick={() => {
+                            // Crear grupo con la configuración
+                            const nuevoGrupo = {
+                              id: `grupo-${Date.now()}`,
+                              especializacion: batchCategoriaPrincipal,
+                              categoriaPrincipal: batchCategoriaPrincipal,
+                              modoAsignacion: batchModoAsignacion,
+                              subcategoriasManual: { ...batchSubcategoriasManual },
+                              guardianes: [...batchSeleccionados],
+                              historias: [],
+                              hooksUsados: historiasExistentes?.hooksUsados || [],
+                              sincrodestUsados: historiasExistentes?.sincrodestUsados || []
+                            };
+                            setBatchGrupos([nuevoGrupo]);
+                            generarTodosBatch();
+                          }}
+                          disabled={batchSeleccionados.length === 0}
+                        >
+                          🚀 Generar {batchSeleccionados.length} historias
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Progreso de generación */}
+            {batchGenerando && (
+              <div className="batch-progreso">
+                <div className="progreso-info">
+                  <span className="progreso-texto">
+                    Generando {batchProgreso.actual}/{batchProgreso.total}: <strong>{batchProgreso.guardian}</strong>
+                  </span>
+                  {batchProgreso.subcategoria && (
+                    <span className="progreso-subcat">Subcategoría: {batchProgreso.subcategoria}</span>
                   )}
                 </div>
-
-                {/* Botón generar */}
-                {batchGrupos.length > 0 && (
-                  <button
-                    className="btn-generar-todos"
-                    onClick={generarTodosBatch}
-                    disabled={batchGenerando}
-                  >
-                    {batchGenerando
-                      ? `Generando ${batchProgreso.actual}/${batchProgreso.total}: ${batchProgreso.guardian}...`
-                      : `🚀 Generar ${batchGrupos.reduce((acc, g) => acc + g.guardianes.length, 0)} historias`
-                    }
-                  </button>
-                )}
+                <div className="progreso-barra">
+                  <div
+                    className="progreso-fill"
+                    style={{ width: `${(batchProgreso.actual / batchProgreso.total) * 100}%` }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            <button className="btn-secondary volver" onClick={() => setPaso(1)}>
+            <button className="btn-secondary volver" onClick={() => {
+              setPaso(1);
+              setBatchCategoriaPrincipal(null);
+              setBatchSeleccionados([]);
+              setBatchResultados([]);
+              setBatchGrupos([]);
+            }}>
               ← Volver al inicio
             </button>
           </div>
@@ -2690,6 +2831,267 @@ Necesito conocer algunos datos. Empecemos:
         .batch-inteligente {
           padding: 1rem;
         }
+
+        /* NUEVO FLUJO BATCH */
+        .batch-elegir-categoria {
+          text-align: center;
+          padding: 2rem;
+        }
+        .categorias-principales-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 1rem;
+          max-width: 800px;
+          margin: 2rem auto;
+        }
+        .categoria-principal-btn {
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.1));
+          border: 2px solid rgba(139, 92, 246, 0.3);
+          border-radius: 12px;
+          padding: 1.5rem 1rem;
+          cursor: pointer;
+          transition: all 0.3s;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .categoria-principal-btn:hover {
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.2));
+          border-color: #8b5cf6;
+          transform: translateY(-3px);
+        }
+        .categoria-principal-btn .cat-titulo {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #fff;
+        }
+        .categoria-principal-btn .cat-subs {
+          font-size: 0.8rem;
+          color: rgba(255,255,255,0.5);
+        }
+
+        .batch-seleccion-guardianes {
+          padding: 1rem 0;
+        }
+        .batch-header-categoria {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .batch-header-categoria h3 {
+          margin: 0;
+          font-size: 1.5rem;
+        }
+        .btn-cambiar-cat {
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.7);
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.85rem;
+        }
+        .btn-cambiar-cat:hover {
+          background: rgba(255,255,255,0.1);
+        }
+
+        .cargando-historias {
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 8px;
+          padding: 0.75rem 1rem;
+          margin-bottom: 1rem;
+          text-align: center;
+          color: rgba(255,255,255,0.7);
+        }
+        .info-historias-existentes {
+          display: flex;
+          gap: 1.5rem;
+          margin-bottom: 1rem;
+          padding: 0.75rem 1rem;
+          background: rgba(34, 197, 94, 0.1);
+          border-radius: 8px;
+          font-size: 0.85rem;
+          color: #22c55e;
+        }
+
+        .batch-config-panel {
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          padding: 1.5rem;
+          max-height: 70vh;
+          overflow-y: auto;
+        }
+        .batch-config-panel h4 {
+          margin: 0 0 1rem 0;
+          color: #fff;
+        }
+        .sin-seleccion {
+          text-align: center;
+          padding: 3rem;
+          color: rgba(255,255,255,0.4);
+        }
+        .sin-seleccion .hint {
+          font-size: 0.85rem;
+          margin-top: 0.5rem;
+        }
+
+        .modo-asignacion {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 1.5rem;
+        }
+        .modo-btn {
+          flex: 1;
+          padding: 0.75rem 1rem;
+          border: 2px solid rgba(255,255,255,0.2);
+          background: transparent;
+          color: rgba(255,255,255,0.7);
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.9rem;
+        }
+        .modo-btn.activo {
+          background: rgba(139, 92, 246, 0.3);
+          border-color: #8b5cf6;
+          color: #fff;
+        }
+        .modo-btn:hover:not(.activo) {
+          background: rgba(255,255,255,0.05);
+        }
+
+        .modo-auto-info {
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+        }
+        .modo-auto-info p {
+          margin: 0 0 0.75rem 0;
+          font-size: 0.9rem;
+          color: rgba(255,255,255,0.8);
+        }
+        .subcats-preview {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem;
+        }
+        .subcat-chip {
+          background: rgba(255,255,255,0.1);
+          padding: 0.25rem 0.6rem;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          color: rgba(255,255,255,0.7);
+        }
+
+        .modo-manual-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          margin-bottom: 1.5rem;
+          max-height: 250px;
+          overflow-y: auto;
+        }
+        .guardian-subcat-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: rgba(255,255,255,0.05);
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+        }
+        .guardian-subcat-row .guardian-nombre {
+          font-weight: 500;
+          color: #fff;
+        }
+        .guardian-subcat-row select {
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: #fff;
+          padding: 0.4rem 0.75rem;
+          border-radius: 6px;
+          font-size: 0.85rem;
+        }
+
+        .seleccionados-resumen {
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .seleccionados-resumen h5 {
+          margin: 0 0 0.75rem 0;
+          color: rgba(255,255,255,0.7);
+          font-size: 0.85rem;
+        }
+
+        .batch-progreso {
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 12px;
+          padding: 2rem;
+          margin: 2rem 0;
+          text-align: center;
+        }
+        .progreso-info {
+          margin-bottom: 1.5rem;
+        }
+        .progreso-texto {
+          display: block;
+          font-size: 1.1rem;
+          color: #fff;
+          margin-bottom: 0.5rem;
+        }
+        .progreso-subcat {
+          display: block;
+          font-size: 0.9rem;
+          color: rgba(255,255,255,0.6);
+        }
+        .progreso-barra {
+          height: 8px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .progreso-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #8b5cf6, #ec4899);
+          border-radius: 4px;
+          transition: width 0.3s;
+        }
+
+        .batch-guardian-card.tiene-historia {
+          position: relative;
+        }
+        .batch-guardian-card.tiene-historia::before {
+          content: '✓';
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: #22c55e;
+          color: white;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          font-weight: bold;
+        }
+        .historia-badge {
+          position: absolute;
+          bottom: 4px;
+          right: 4px;
+          font-size: 0.6rem;
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
+          padding: 0.1rem 0.4rem;
+          border-radius: 4px;
+        }
+
         .batch-layout {
           display: grid;
           grid-template-columns: 1fr 1fr;
