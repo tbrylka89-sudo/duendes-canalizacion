@@ -1,0 +1,357 @@
+{
+  "descripcion": "Catálogo COMPLETO de guardianes - Fusión de datos más completos - NO INVENTAR ACCESORIOS",
+  "ultima_actualizacion": "2026-01-22",
+
+  "DIFERENCIADOR_MARCA": {
+    "canalizacion": "Cada guardián es canalizado de manera consciente y voluntaria. No es una artesanía - es un ser que elige nacer. Por eso elegimos este camino de canalización consciente hace 10 años.",
+    "trayectoria": "10 años canalizando guardianes"
+  },
+
+  "reglas_unicidad": {
+    "UNICOS_siempre": [
+      "pixie",
+      "mediano_especial",
+      "mediano_maestro_mistico",
+      "grande_especial",
+      "grande_maestro_mistico",
+      "gigante_especial",
+      "gigante_maestro_mistico"
+    ],
+    "RECREABLES": [
+      "mini",
+      "mini_especial"
+    ],
+    "ARQUETIPOS_historicos": {
+      "descripcion": "Seres PUNTUALES con nombre propio de la historia, mitología o literatura. Se pueden recrear en cualquier tamaño, pero cada versión es ÚNICA porque es NUESTRA CANALIZACIÓN de ese ser.",
+      "ejemplos": ["Leprechaun", "Merlín", "Gandalf", "Aradia", "Morgana"],
+      "importante": "Aunque el nombre sea conocido, la pieza es única porque es nuestra interpretación canalizada"
+    },
+    "notas": [
+      "Las PIXIES son SIEMPRE únicas - cada una tiene nombre propio y es creación nuestra",
+      "Seres con nombre propio nuestro (Violeta, Matheo, Brianna) = siguen reglas de tamaño",
+      "Arquetipos históricos (Merlín, Morgana, Leprechaun) = recreables pero cada canalización es única"
+    ]
+  },
+
+  "categorias_tamano": {
+    "mini": {
+      "cm": "~10",
+      "precio_usd": 70,
+      "precio_uyu": 2500,
+      "recreable": true,
+      "descripcion": "Guardián compacto, ideal para llevar"
+    },
+    "mini_especial": {
+      "cm": "~10",
+      "precio_usd": 150,
+      "precio_uyu": 5500,
+      "recreable": true,
+      "descripcion": "Mini con detalles y accesorios especiales"
+    },
+    "pixie": {
+      "cm": "10-13",
+      "precio_usd": 150,
+      "precio_uyu": 5500,
+      "recreable": false,
+      "siempre_unico": true,
+      "descripcion": "Siempre únicas, seres de la naturaleza"
+    },
+    "mediano_especial": {
+      "cm": "17-22",
+      "precio_usd": 200,
+      "precio_uyu": 8000,
+      "recreable": false,
+      "descripcion": "Pieza única con buenos detalles"
+    },
+    "mediano_maestro_mistico": {
+      "cm": "22-25",
+      "precio_usd_min": 450,
+      "precio_usd_max": 600,
+      "precio_uyu_min": 16000,
+      "precio_uyu_max": 20000,
+      "recreable": false,
+      "descripcion": "Pieza única de alta gama, gran poder y detalles excepcionales"
+    },
+    "grande_especial": {
+      "cm": "25-28",
+      "precio_usd": 450,
+      "precio_uyu": 16000,
+      "recreable": false,
+      "descripcion": "Pieza única grande con presencia imponente"
+    },
+    "grande_maestro_mistico": {
+      "cm": "27-30",
+      "precio_usd": 800,
+      "precio_uyu": 32000,
+      "recreable": false,
+      "descripcion": "Pieza única de colección, máximo poder"
+    },
+    "gigante_especial": {
+      "cm": "30+",
+      "precio_usd": 1050,
+      "precio_uyu": 40000,
+      "recreable": false,
+      "descripcion": "Pieza monumental única"
+    },
+    "gigante_maestro_mistico": {
+      "cm": "35+",
+      "precio_usd": 2000,
+      "precio_uyu": 80000,
+      "recreable": false,
+      "descripcion": "Obra maestra, la máxima expresión del arte canalizado"
+    }
+  },
+
+  "especies": {
+    "duende": {
+      "descripcion": "Guardianes tradicionales con diversos poderes según su especialidad",
+      "genero_default": "M"
+    },
+    "duenda": {
+      "descripcion": "Guardianas femeninas con diversos poderes según su especialidad",
+      "genero_default": "F"
+    },
+    "pixie": {
+      "descripcion": "Seres de la naturaleza, almas salvajes, tiernas y honestas. Eternas niñas tiernas de las plantas, hierbas y flores. Habitan en ellas. Cada una es ÚNICA con poderes diferentes.",
+      "genero_default": "F",
+      "siempre_unico": true,
+      "NO_son": "hadas"
+    },
+    "hada": {
+      "descripcion": "Seres alados de luz y magia (reservado para futuro)",
+      "genero_default": "F",
+      "estado": "futuro"
+    },
+    "elfo": {
+      "descripcion": "Seres del bosque con sabiduría ancestral y conexión profunda con la naturaleza",
+      "genero_default": "M"
+    },
+    "elfa": {
+      "descripcion": "Seres del bosque femeninas con sabiduría ancestral",
+      "genero_default": "F"
+    },
+    "leprechaun": {
+      "descripcion": "Duendes irlandeses asociados a la suerte y la abundancia",
+      "genero_default": "M",
+      "es_arquetipo": true
+    },
+    "bruja": {
+      "descripcion": "Practicantes de magia con conexión a elementos y energías",
+      "genero_default": "F"
+    },
+    "brujo": {
+      "descripcion": "Practicantes masculinos de magia con conexión a elementos y energías",
+      "genero_default": "M"
+    },
+    "vikingo": {
+      "descripcion": "Guerreros nórdicos con fuerza, valentía y protección",
+      "genero_default": "M"
+    },
+    "vikinga": {
+      "descripcion": "Guerreras nórdicas con fuerza, valentía y protección",
+      "genero_default": "F"
+    },
+    "chaman": {
+      "descripcion": "Sanadores espirituales con conexión a plantas, espíritus y medicina ancestral",
+      "genero_default": "M"
+    },
+    "chamana": {
+      "descripcion": "Sanadoras espirituales con conexión a plantas, espíritus y medicina ancestral",
+      "genero_default": "F"
+    },
+    "sanador": {
+      "descripcion": "Especialistas en sanación energética y emocional",
+      "genero_default": "M"
+    },
+    "sanadora": {
+      "descripcion": "Especialistas en sanación energética y emocional",
+      "genero_default": "F"
+    },
+    "maestro": {
+      "descripcion": "Seres de gran sabiduría y poder elevado, guías espirituales",
+      "genero_default": "M"
+    },
+    "maestra": {
+      "descripcion": "Seres de gran sabiduría y poder elevado, guías espirituales",
+      "genero_default": "F"
+    },
+    "alma_maestra": {
+      "descripcion": "Entidades de luz con conocimiento profundo y misión elevada",
+      "genero_default": "neutro"
+    },
+    "guerrero": {
+      "descripcion": "Protectores de gran fuerza y coraje",
+      "genero_default": "M"
+    },
+    "guerrera": {
+      "descripcion": "Protectoras de gran fuerza y coraje",
+      "genero_default": "F"
+    },
+    "mago": {
+      "descripcion": "Practicantes de artes arcanas con dominio de energías",
+      "genero_default": "M"
+    },
+    "maga": {
+      "descripcion": "Practicantes de artes arcanas con dominio de energías",
+      "genero_default": "F"
+    },
+    "gaucho": {
+      "descripcion": "Guardián típico uruguayo, protector de la tierra y las tradiciones",
+      "genero_default": "M"
+    },
+    "duende_medicina": {
+      "descripcion": "Especializado en sanación, bienestar y medicina natural",
+      "genero_default": "M"
+    },
+    "gnomo": {
+      "descripcion": "Guardianes de la tierra y los tesoros ocultos",
+      "genero_default": "M"
+    },
+    "ninfa": {
+      "descripcion": "Espíritus de la naturaleza vinculados a agua, bosques o flores",
+      "genero_default": "F"
+    },
+    "druida": {
+      "descripcion": "Sabios de la naturaleza con conocimiento de plantas y ciclos",
+      "genero_default": "M"
+    },
+    "druida_f": {
+      "descripcion": "Sabias de la naturaleza con conocimiento de plantas y ciclos",
+      "genero_default": "F"
+    },
+    "alquimista": {
+      "descripcion": "Transformadores de energías y creadores de cambio",
+      "genero_default": "M"
+    },
+    "oraculo": {
+      "descripcion": "Canalizadores de mensajes y visiones",
+      "genero_default": "neutro"
+    }
+  },
+
+  "categorias": [
+    "Protección",
+    "Abundancia",
+    "Amor",
+    "Sanación",
+    "Salud",
+    "Sabiduría"
+  ],
+
+  "guardianes": [
+    {"nombre": "Leprechaun", "genero": "M", "especie": "leprechaun", "categoria": "Protección", "tamano": "especial", "cm": 10, "accesorios": "una monedita y un dije de trebol"},
+    {"nombre": "Brianna", "genero": "F", "categoria": "Protección", "tamano": "mediano", "cm": 18, "accesorios": "cuarzo cristal"},
+    {"nombre": "Rahmus", "genero": "M", "categoria": "Protección", "tamano": "grande", "cm": 27, "accesorios": "dije de trebol de citrino y un baston"},
+    {"nombre": "Ruperto", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 25, "accesorios": "cetro con punta de amatista, un bolso con punta de amatista adentro, dos puntas de amatista en cada bolsillo, dos lavandas en el sombrero"},
+    {"nombre": "Zoe", "genero": "F", "categoria": "Protección", "tamano": "grande", "cm": 28, "accesorios": "geoda de amatista de 9 de alto por 5 de ancho cm"},
+    {"nombre": "Luke", "genero": "M", "categoria": "Protección", "tamano": "mini", "cm": 10, "accesorios": "cuerda para colgarlo en el retrovisor"},
+    {"nombre": "Iker", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "bolso de gamuza y cuero sintetico cosido a mano con dije de trebol, cetro con punta de amatista, citrino en el cuello, cinto hecho a mano, morral"},
+    {"nombre": "Silvano", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "bolsito con lavandas y romero seco, saco con 4 bolsillos y 3 picos de amatista"},
+    {"nombre": "Rosa Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 13, "accesorios": "galera tonos pastel, pelo rosa, ojos azules, tutu rosa de tul"},
+    {"nombre": "Edward", "genero": "M", "especie": "leprechaun", "categoria": "Protección", "tamano": "mediano", "cm": 23, "accesorios": "cetro de madera con citrino en la punta, trebol de 3 hojas en su mano, cinto de trebol de 4 hojas, ropa verde, galera verde"},
+    {"nombre": "Micelio", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "hongo celeste en su mano, trebol de 3 hojas en su otra mano, saco largo, botitas de tela"},
+    {"nombre": "Axel", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "mochilita de gamuza marron y cuero sintetico verde con trebol de 4 hojas de metal, dije de corazon de agata verde, cetro de madera, cuarzo que cambia de color, morral, cinto"},
+    {"nombre": "Rafael", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 24, "accesorios": "morral con fluorita adentro, cetro de madera con fluorita en la punta, fluoritas arcoiris, dije de arbol de la vida, saco mullido"},
+    {"nombre": "Sara", "genero": "F", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "pelo gris, vestido azul, morral tejido gris con amatista dentro, corset, botas de cuerina"},
+    {"nombre": "Teo", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 24, "accesorios": "cetro con citrino en la punta, citrino colgado en el cuello, gorro de gamuza cosido a mano, botas rojas con cuerina, cinto con hebilla"},
+    {"nombre": "Mario", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "corazon de cuarzo cherry en sus manos, botas peluditas"},
+    {"nombre": "Cintia Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "mini", "cm": 11, "accesorios": "pelo naranja, ropa azul petroleo/electrico, ramo de rosas verdes"},
+    {"nombre": "Stan", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 18, "accesorios": "turmalina negra en sus manos, capa negra, gorro negro"},
+    {"nombre": "Canela Pixie", "genero": "F", "especie": "pixie", "categoria": "Amor", "tamano": "mini", "cm": 11, "accesorios": "pluma en la cabeza, ojos grandes azul lila, cejas lila, pecas, pelo gris, trenza larga, muy tierna"},
+    {"nombre": "Heart", "genero": "M", "categoria": "Amor", "tamano": "mediano", "cm": 18, "accesorios": "gordito, dije de corazon con infinito en el medio, corazon de cuarzo cherry de 6 cm de ancho"},
+    {"nombre": "Valentina", "genero": "F", "categoria": "Amor", "tamano": "mediano", "cm": 20, "accesorios": "galera roja con rosa roja, estilo medio oeste como Lindsey Stirling, cuarzo cristal"},
+    {"nombre": "Lil", "genero": "M", "categoria": "Sanación", "tamano": "mini", "cm": 10, "accesorios": "amatista punta pequeña, es un duende maestro"},
+    {"nombre": "Sanación", "genero": "M", "categoria": "Sanación", "tamano": "mini", "cm": 10, "accesorios": "cuarzo rosa, abarca la sanacion transgeneracional"},
+    {"nombre": "Emilio", "genero": "M", "categoria": "Sanación", "tamano": "mediano", "cm": 18, "accesorios": "mate en sus manos, citrino en su bolsillo, botas verdes"},
+    {"nombre": "Dani", "genero": "M", "categoria": "Sanación", "tamano": "mini", "cm": 10, "accesorios": "sodalita en la mano, es el duende para la ansiedad"},
+    {"nombre": "Cash", "genero": "M", "categoria": "Abundancia", "tamano": "mini", "cm": 10, "accesorios": "citrino, es el duende del dinero"},
+    {"nombre": "Trévor", "genero": "M", "categoria": "Abundancia", "tamano": "mini", "cm": 10, "accesorios": "trebol de 3 hojas en su mano, es el duende de la suerte"},
+    {"nombre": "Susana Pixie", "genero": "F", "especie": "pixie", "categoria": "Abundancia", "tamano": "especial", "cm": 11, "accesorios": "nombre derivado de una flor, verde, trebol de 3 hojas en su mano"},
+    {"nombre": "Toto", "genero": "M", "categoria": "Abundancia", "tamano": "mediano", "cm": 22, "accesorios": "anciano, saco con dos bolsillos, citrino rolado y amatista rolada en cada bolsillo"},
+    {"nombre": "Björn", "genero": "M", "especie": "vikingo", "categoria": "Abundancia", "tamano": "mediano", "cm": 20, "accesorios": "drusa de amatista en sus manos, dos hachas de metal, capa marron claro peluda, rodete en cabello blanco"},
+    {"nombre": "Abraham", "genero": "M", "especie": "leprechaun", "categoria": "Abundancia", "tamano": "mediano", "cm": 26, "accesorios": "trebol de 3 hojas en sus manos, cinto de trebol de 4 hojas, una moneda, saco a rayas, romero seco, galera"},
+    {"nombre": "Flor Pixie", "genero": "F", "especie": "pixie", "categoria": "Abundancia", "tamano": "especial", "cm": 11, "accesorios": "pelo gris, flor blanca, ojos verdes, ropa verde peluda"},
+    {"nombre": "Roger", "genero": "M", "categoria": "Abundancia", "tamano": "mediano", "cm": 22, "accesorios": "cetro de madera con punta de amatista"},
+    {"nombre": "Fortunato", "genero": "M", "categoria": "Abundancia", "tamano": "mediano", "cm": 24, "accesorios": "galera negra, capa negra, trebol de metal con 3 hojas rellenas y una con solo el contorno, 2 llaves colgadas en su cinto, monedas en bolsillo, cetro de madera y citrino"},
+    {"nombre": "Chechu", "genero": "F", "categoria": "Abundancia", "tamano": "mediano", "cm": 19, "accesorios": "hongo lila de arcilla polimerica, bolso tejido violet con amatista rolada en su interior, pelo verdoso, botas rojas"},
+    {"nombre": "Rasiel", "genero": "M", "categoria": "Abundancia", "tamano": "mediano", "cm": 18, "accesorios": "ya fue adoptado", "disponible": false},
+    {"nombre": "Merlin", "genero": "M", "especie": "mago", "categoria": "Sabiduría", "tamano": "mediano", "cm": 24, "accesorios": "cetro con amatista en la punta, pendulo de amatista chevron"},
+    {"nombre": "Clavel Pixie", "genero": "F", "especie": "pixie", "categoria": "Sabiduría", "tamano": "especial", "cm": 11, "accesorios": "pelo rojo, ropa verde, piedrita verde"},
+    {"nombre": "Moonstone", "genero": "F", "especie": "bruja", "categoria": "Sabiduría", "tamano": "mediano", "cm": 24, "accesorios": "calabaza, amatista colgada en cuello, escoba limpiadora de energias, moño en pelo gris (rodete), 3 rosas blancas en peinado"},
+    {"nombre": "Azalea Pixie", "genero": "F", "especie": "pixie", "categoria": "Sabiduría", "tamano": "especial", "cm": 11, "accesorios": "pelo rosa, flor rosa de 4 petalos, ojos lila, vestimenta marron"},
+    {"nombre": "Emir", "genero": "M", "categoria": "Sabiduría", "tamano": "mediano", "cm": 24, "accesorios": "capa roja, cetro con punta de citrino, arbol de la vida en cinto, dije de citrino, rodete en cabello gris, botas negras"},
+    {"nombre": "Enzo", "genero": "M", "categoria": "Sabiduría", "tamano": "mediano", "cm": 24, "accesorios": "cetro con cuarzo rosa en la punta, citrino colgado en cuello, capa marron, botas marrones"},
+    {"nombre": "Santino", "genero": "M", "categoria": "Abundancia", "tamano": "mediano", "cm": 21, "accesorios": "dos citrinos, uno en cada bolsillo"},
+    {"nombre": "Yrvin", "genero": "M", "categoria": "Abundancia", "tamano": "mini", "cm": 10, "accesorios": "llave, es un abrecaminos, es un talisman"},
+    {"nombre": "Zahira Pixie", "genero": "F", "especie": "pixie", "categoria": "Abundancia", "tamano": "especial", "cm": 13, "accesorios": "brujita de gorro rojo, rosa en el gorro, ojos verdes, pelo negro, corazon de agata en sus manos, tutu rosa, corset negro"},
+    {"nombre": "Gaia", "genero": "F", "especie": "bruja", "categoria": "Salud", "tamano": "mediano", "cm": 19, "accesorios": "bruja verde que conecta con la tierra, rostro pintado con arcillas verdes, gorro de bruja, cuarzo verde"},
+    {"nombre": "Bruma", "genero": "F", "categoria": "Salud", "tamano": "mediano", "cm": 19, "accesorios": "pelo gris violaceo, ropa azul, luna entre medio de sus cejas, amatista oscura y profunda bajo sus brazos"},
+    {"nombre": "Moon", "genero": "M", "especie": "chaman", "categoria": "Salud", "tamano": "mediano", "cm": 25, "accesorios": "brujo chaman, rostro pintado, amatista colgada en cuello, tambor chamanico, morral con hierbas, cetro de madera con plumas y cristal, dos cuarzos rosa colgando, gorro de gamuza con pluma, trenza"},
+    {"nombre": "Ruth", "genero": "F", "categoria": "Salud", "tamano": "mediano", "cm": 21, "accesorios": "pelo naranja intenso, ojos celestes, ropa steampunk victoriano, galera marron, rosa blanca, trebol de 4 hojas con brillos negros, bolsillitos de cuerina, ropa agamuzada"},
+    {"nombre": "Jeremy", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "gorro rojo, pendulo de piedra de la luna original con manchas negras"},
+    {"nombre": "Americo", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 23, "accesorios": "duende del dinero y negocios, 4 citrinos: dos puntas una en cada bolsillo, uno colgado en cuello, citrino maestro en sus manos"},
+    {"nombre": "Estelar", "genero": "M", "categoria": "Sabiduría", "tamano": "mini", "cm": 10, "accesorios": "pirita, es el duende de los deseos"},
+    {"nombre": "Compañero", "genero": "M", "categoria": "Protección", "tamano": "mini", "cm": 10, "accesorios": "mate, es el duende compañero"},
+    {"nombre": "Monique", "genero": "F", "categoria": "Protección", "tamano": "mediano", "cm": 21, "accesorios": "pelo rosa, galera roja con rosa, vestimenta steampunk, cuero sintetico marron, gamuza marron, llaves metalicas en cadena, cetro de madera con estrella metalica"},
+    {"nombre": "Felix", "genero": "M", "especie": "gaucho", "categoria": "Protección", "tamano": "mediano", "cm": 23, "accesorios": "duende gaucho tipico de uruguay, boleadoras, cuerda de rodeo, herradura de la suerte colgada en cuello, bombachas, gorro de gaucho, cinto con hebilla"},
+    {"nombre": "Asher", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 17, "accesorios": "drusa de amatista"},
+    {"nombre": "Fiorella Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 10, "accesorios": "pelo rojo, vestida casi como caperucita roja, cuarzo rosa"},
+    {"nombre": "Amy", "genero": "F", "especie": "bruja", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "aspecto brujil, gorro negro, pelo natural, rosa roja, corset negro con amatista de calidad oscura, escoba"},
+    {"nombre": "Dalia Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 10, "accesorios": "pelo negro, ojos azules, ropa azul, flor celeste"},
+    {"nombre": "Azucena Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 11, "accesorios": "pelo naranja cobrizo, trebol de 3 hojas, ropa verde"},
+    {"nombre": "Juliette", "genero": "F", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "viajera del tiempo, pelo rojo, labios chocolate, ropa ajustada, corset marron, pollera verde de flores blancas, dije electro, morral de gamuza, ojos celestes"},
+    {"nombre": "Daisy Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 10, "accesorios": "color beige, ojos azules, labios verdes, rubia, citrino"},
+    {"nombre": "Laura Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 11, "accesorios": "pelo rojo, ropa roja, ojos celestes, rosa blanca"},
+    {"nombre": "Finnian", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 18, "accesorios": "vestimenta principalmente verde, trebol de agata verde, dije de metal de trebol de 4 hojas"},
+    {"nombre": "Groen", "genero": "M", "especie": "brujo", "categoria": "Protección", "tamano": "mediano", "cm": 24, "accesorios": "brujito verde, escoba, arbol de la vida en dije en cinto, labradorita en su mano, cuarzo cristal en cuello, trebol de 3 hojas en gorro"},
+    {"nombre": "Marcos", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "viajero, mochila de cuero sintetico marron y gamuza marron con dije de trebol de 4 hojas, cetro de madera con punta de citrino, lentes, trenza en barba, guantes, saco con dos bolsillos y dos citrinos"},
+    {"nombre": "Violeta", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 11, "accesorios": "pelo azul, rosa blanca, ropa negra y violeta, ojos celestes, cejas azules, pecas"},
+    {"nombre": "Tadeo", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "panzon, citrino que sostiene su capa roja, gorro verde de gamuza con mariquita, dos treboles, talisman de hongo con punta de amatista, guantes, botas marrones, colorido"},
+    {"nombre": "Crisanto", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "enorme amatista en punta sostenida con sus dos manos"},
+    {"nombre": "Ekris", "genero": "M", "especie": "vikingo", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "hacha, punta de flecha, cadena, rapado de piel, pelo largo rubio"},
+    {"nombre": "Astrid", "genero": "F", "especie": "vikinga", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "colorada de piel, runa en frente, hacha en la mano, cuarzo ahumado en la otra, escudo de metal a cada lado de hombros con cadena, pelo gris, ojos azules"},
+    {"nombre": "Vero", "genero": "F", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "pelo azul, ropa negra, bolso tejido con amatista aura dentro"},
+    {"nombre": "Milo", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "pendulo de cuarzo rosa"},
+    {"nombre": "Lena Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 12, "accesorios": "brujita verde, dije de corazon de arbol de la vida, pelo verde"},
+    {"nombre": "Idris", "genero": "M", "especie": "guerrero", "categoria": "Protección", "tamano": "mediano", "cm": 17, "accesorios": "guerrero de tribu, parece venir de la isla de pascua y conoce misterios, hacha, cinto de trebol de 4 hojas, cuarzo verde rolado, cara pintada de verde, un palo, trenza en la barba"},
+    {"nombre": "Daphne Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 12, "accesorios": "galera roja con rosa roja, llave en su mano, es abrecaminos, pelo rosa, remera a lunares"},
+    {"nombre": "Tulipa Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 10, "accesorios": "rosa blanca en su mano, ropa marron, pelo gris, ojos verdes"},
+    {"nombre": "Mürh", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "galera negra, ropa azul, dije de luna y estrella en pecho, cetro de madera con punta de amatista"},
+    {"nombre": "Maya", "genero": "F", "categoria": "Abundancia", "tamano": "mediano", "cm": 21, "accesorios": "gorro de amanita muscaria, cuarzo rosa en sus manos, tutu rosa o blanco"},
+    {"nombre": "Margarita Pixie", "genero": "F", "especie": "pixie", "categoria": "Abundancia", "tamano": "especial", "cm": 11, "accesorios": "pelo azul, rosas azules, ropa azul"},
+    {"nombre": "Bridget", "genero": "F", "especie": "leprechaun", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "leprechaun femenina, ropa irlandesa, galera verde, dije de corazon en cuello, trebol de 4 hojas en cinto, pelo rojo"},
+    {"nombre": "Mitch", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 24, "accesorios": "orejas de raton, galera azul, ropa en tonos azules, gran cristal en bolsillo, palo en mano"},
+    {"nombre": "Rubi", "genero": "F", "especie": "bruja", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "brujita del elemento tierra, colores beiges, marroncitos, arenitas, rojito y mostazita, bolso tejido naranja con citrino rolado adentro, palo, gorro de bruja"},
+    {"nombre": "Neil", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 21, "accesorios": "poderoso del bosque, gorro con parches de gamuza, citrino en cuello, capa marron con bolsillo naranja, talisman de hongo con amatista en punta, botas rojas"},
+    {"nombre": "Freydis", "genero": "F", "especie": "vikinga", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "costado de cabeza rapado con simbolo de runa redondo, guerrera, lanza, cuarzo rolado cristal, trenza y pelo suelto"},
+    {"nombre": "Altair", "genero": "M", "categoria": "Sabiduría", "tamano": "mediano", "cm": 18, "accesorios": "fue adoptado", "disponible": false},
+    {"nombre": "Liam", "genero": "M", "especie": "elfo", "categoria": "Sabiduría", "tamano": "mediano", "cm": 23, "accesorios": "elfo del bosque viajero, mochila de cuero sintetico negro y gamuza marron con dije de trebol de 4 hojas, cetro de madera con punta de amatista, piedra de amatista colgada, cinto con hebilla, morral"},
+    {"nombre": "Sennua", "genero": "F", "especie": "vikinga", "categoria": "Sabiduría", "tamano": "mediano", "cm": 20, "accesorios": "vikinga guerrera poderosa, capa de piel marron, tonos marrones, pelo naranja con trenzas y suelto, pintada, tatuada con runas en rostro, lanza con pluma, cuarzo ahumado rolado"},
+    {"nombre": "Matheo", "genero": "M", "categoria": "Protección", "tamano": "mini", "cm": 10, "accesorios": "citrino, es el duende del dinero y el materialismo, siempre quiere mas"},
+    {"nombre": "Morgana", "genero": "F", "especie": "bruja", "categoria": "Sabiduría", "tamano": "mediano", "cm": 22, "accesorios": "galera negra, pollera a rayas blanca y negra, ojos celestes, pelo negro, muy amena, corset negro, botas negras, cuarzo ahumado rolado"},
+    {"nombre": "Nano", "genero": "M", "categoria": "Salud", "tamano": "mediano", "cm": 20, "accesorios": "amatista aura, vestido celeste y azul, gorro marron"},
+    {"nombre": "Jazmín Pixie", "genero": "F", "especie": "pixie", "categoria": "Salud", "tamano": "mini", "cm": 10, "accesorios": "brujita del bosque celta, cinto de corazon con infinito en el medio, pelo blanco, gorro de bruja, ojos celestes"},
+    {"nombre": "Melisa Pixie", "genero": "F", "especie": "pixie", "categoria": "Salud", "tamano": "mini", "cm": 11, "accesorios": "toda rosita, pelo rosa con dos rodetes a los costados, ropa rosa, rosa en mano, cuarzo rosa rolado"},
+    {"nombre": "Naia", "genero": "F", "categoria": "Salud", "tamano": "mediano", "cm": 18, "accesorios": "hippie del bosque, peinado hippie con vincha en la frente, vestimenta de bosque con hojas, amazonita"},
+    {"nombre": "Noah", "genero": "M", "categoria": "Salud", "tamano": "mediano", "cm": 19, "accesorios": "mochilero, rodete de pelo blanco en cabeza, dije del simbolo de la paz, mochila con hacha y martillo y sobre de dormir"},
+    {"nombre": "Diana", "genero": "F", "especie": "bruja", "categoria": "Salud", "tamano": "mediano", "cm": 19, "accesorios": "bruja sin gorro, escoba, piedra de la luna en bruto, labios negros, pelo gris, vestido tejido a mano"},
+    {"nombre": "Salvia Pixie", "genero": "F", "especie": "pixie", "categoria": "Salud", "tamano": "mini", "cm": 11, "accesorios": "pelo negro, ropa verde, ojos verdes, flor verde azulada"},
+    {"nombre": "Tony", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 18, "accesorios": "protector del dinero, citrino en la mano, colorado peludo y gruñon"},
+    {"nombre": "Tomasín", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 23, "accesorios": "gorro negro con trebol de 3 hojas, 3 cuarzos rosas: uno en punta de cetro, uno colgado en cuello, uno en morral"},
+    {"nombre": "Serena", "genero": "F", "especie": "bruja", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "bruja estilo victoriana, ropa negra burlesque, capucha suelta, pelo negro, cuarzo ahumado rolado, escoba"},
+    {"nombre": "Zephyra Pixie", "genero": "F", "especie": "pixie", "categoria": "Salud", "tamano": "especial", "cm": 12, "accesorios": "brujita de pelo negro, tutu negro, escobita, pelo negro, ojos azules, lunita de metal en gorro"},
+    {"nombre": "Tareth", "genero": "M", "especie": "guerrero", "categoria": "Sabiduría", "tamano": "mediano", "cm": 16, "accesorios": "guerrero protector de isla de pascua, rostro pintado de negro y oro, orejas de raton, arbol de la vida en cinto, cetro con punta de amatista"},
+    {"nombre": "Sabrina Pixie", "genero": "F", "especie": "pixie", "categoria": "Sabiduría", "tamano": "especial", "cm": 13, "accesorios": "brujita con gorro de brujita, vestida de negro, pelo rojo, escobita, labios rosa, ojos celestes"},
+    {"nombre": "Anís Pixie", "genero": "F", "especie": "pixie", "categoria": "Sabiduría", "tamano": "especial", "cm": 11, "accesorios": "brujita celta, hoodie verde con capucha y bolsillo adelante con amatista en pico, pelo cobrizo, dos trenzas"},
+    {"nombre": "Edmund", "genero": "M", "especie": "mago", "categoria": "Sabiduría", "tamano": "mediano", "cm": 25, "accesorios": "mochilero señor de mundos, gorro de brujo de gamuza, mochila de cuero sintetico marron con gamuza marron y trebol de 4 hojas de metal, cetro de madera con punta de citrino, saco con dos bolsillos y dos puntas de citrino, lentes, botas rojas"},
+    {"nombre": "Erik", "genero": "M", "especie": "vikingo", "categoria": "Sabiduría", "tamano": "mediano", "cm": 22, "accesorios": "vikingo guerrero capitan con cargo, ojos pintados, runas, barba con gran trenza, pelo naranja, algunas canas, bolso, hacha, lanza, abrigo de piel"},
+    {"nombre": "Selene", "genero": "F", "especie": "bruja", "categoria": "Sabiduría", "tamano": "mediano", "cm": 23, "accesorios": "bruja de negro, gorro clasico de bruja muy clasica, dos largas trenzas, pecas, pelo naranja, pollera de tul, gorro negro hermoso, escoba"},
+    {"nombre": "Sepherine", "genero": "F", "especie": "bruja", "categoria": "Sabiduría", "tamano": "mediano", "cm": 21, "accesorios": "bruja gotica, amatista violeta que sostiene capa, pendulo de pirita, luna en cinto, ropa hermosa, dos decoraciones negras en cabello de flores que simulan murcielagos pero son hojitas negras"},
+    {"nombre": "Freya", "genero": "F", "especie": "bruja", "categoria": "Sabiduría", "tamano": "grande", "cm": 27, "accesorios": "bruja de clase alta joven, pendulo de piedra luna original con manchas negras, luna con estrella colgada en cuello, pelo naranja, ojos verdes, pecas, dos trenzas que acompañan moño del cabello, escoba, vestido negro"},
+    {"nombre": "Iris", "genero": "F", "categoria": "Sabiduría", "tamano": "mediano", "cm": 20, "accesorios": "rosa del desierto, es la duende de la adversidad teniendo en cuenta como se forman estas piedras, pelo naranja, ojos celestes, pecas, ropa color desierto"},
+    {"nombre": "Izara", "genero": "F", "especie": "vikinga", "categoria": "Abundancia", "tamano": "mediano", "cm": 20, "accesorios": "völva vikinga adivinadora, ojos pintados alrededor porque estan marcados por lo que ve, pelo blanco, aspecto poderoso, cuarzo ahumado, corset, trebol de 4 hojas de metal en corset"},
+    {"nombre": "Leo", "genero": "M", "categoria": "Abundancia", "tamano": "mini", "cm": 10, "accesorios": "el duende de los emprendedores, citrino, para todos aquellos que emprenden o piensan hacerlo, duplica ventas y da ideas originales"},
+    {"nombre": "Winter", "genero": "F", "especie": "bruja", "categoria": "Protección", "tamano": "mediano", "cm": 23, "accesorios": "bruja clasica con escoba, pelo luce como fuego rojo y naranja, hermosa, despierta el poder interior"},
+    {"nombre": "Andy", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "dije de estrella en pecho y esfera en punta de gorro, ambos de piedra lluvia de estrellas, vestimenta negra y gris, parece poderoso"}
+  ]
+}
