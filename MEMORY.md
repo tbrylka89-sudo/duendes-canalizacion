@@ -95,6 +95,34 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 | `transformacion` | Transformación | Querés cambiar pero no sabés cómo |
 | `alegria` | Alegría | Olvidaste cómo se siente la alegría |
 
+### SUB-ESPECIALIZACIONES (para futuro o texto libre)
+
+Cada categoría tiene CAPAS. No es genérico:
+
+**Sanación:**
+- Física (cuerpo, enfermedad)
+- Emocional (heridas del corazón)
+- Espiritual (vacío existencial)
+- Psicológica (traumas, patrones)
+- Transgeneracional (lo heredado de familia)
+- Patrones que se repiten (siempre lo mismo)
+- Psicosomática (cuerpo habla lo que mente calla)
+
+**Amor:**
+- Propio (no me quiero)
+- De pareja (buscar/sanar relación)
+- De hijos (ser madre/padre)
+- A la vida (ganas de vivir)
+- Duelos (pérdidas de amor)
+
+**Protección:**
+- Energética (absorbo todo)
+- Del hogar (mi casa, mi espacio)
+- De otros (cuido a mi familia)
+- Límites (no sé decir que no)
+
+**Cuando el usuario usa texto libre en el selector**, puede especificar estos matices. El sistema debe respetarlos.
+
 ---
 
 ## ÚLTIMAS SESIONES
