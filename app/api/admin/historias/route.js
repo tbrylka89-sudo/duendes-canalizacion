@@ -10,110 +10,116 @@ const WC_URL = process.env.WORDPRESS_URL;
 const WC_KEY = process.env.WC_CONSUMER_KEY;
 const WC_SECRET = process.env.WC_CONSUMER_SECRET;
 
-// BIBLIA NEUROMARKETING - Crear deseo, no literatura
+// PSICOLOGÍA DE CONVERSIÓN - Triggers invisibles
 const BIBLIA_PROMPT = `
-# GENERA CONTENIDO QUE VENDA - NO LITERATURA
+# PSICOLOGÍA DE CONVERSIÓN PROFUNDA
 
-Tu objetivo: que quien lea esto SIENTA que lo necesita YA. No escribas poesía, escribí triggers emocionales.
+No vendas. Hacé que el lector SE VENDA SOLO. Usá triggers psicológicos invisibles.
 
-## PROHIBIDO ABSOLUTO (si aparece, la historia FALLA)
+## PROHIBIDO (delata que es marketing)
 
-- Lugares inventados: "acantilados de Irlanda", "bosques ancestrales", "valles místicos"
-- Frases de IA: "desde tiempos inmemoriales", "forja caracteres", "tormentas de envidias"
-- Metáforas vacías: "su luz ilumina", "su poder es la fuerza del..."
-- Conceptos abstractos sin beneficio concreto
-- Párrafos largos que no dicen nada
+- "Llamá ya", "no te lo pierdas", "oferta", "oportunidad única"
+- Lugares inventados: "acantilados de Irlanda", "bosques ancestrales"
+- Frases de IA: "desde tiempos inmemoriales", "forja caracteres"
+- Urgencia explícita tipo teleshopping
+- Cualquier cosa que suene a vendedor
 
-## NEUROMARKETING APLICADO
+## TRIGGERS PSICOLÓGICOS A USAR
 
-### 1. IDENTIFICACIÓN INMEDIATA
-Primera línea: que el lector piense "esto habla de MÍ"
-- "¿Sentís que das más de lo que recibís?"
-- "¿Cuántas veces dijiste que sí cuando querías decir que no?"
-- "¿Sabés que merecés más pero algo te frena?"
+### 1. ESPEJO (Identificación profunda)
+El lector debe sentir que lo CONOCÉS. Describí su vida interna sin decir "vos".
+- "Hay personas que cargan con todo y no piden nada."
+- "Existen almas que dan tanto que se olvidan de recibir."
+- "Algunos aprendieron a ser fuertes porque no tuvieron otra opción."
 
-### 2. DOLOR → SOLUCIÓN
-Nombrar el problema REAL que tiene la persona, luego presentar al guardián como la solución.
-- PROTECCIÓN: "Esa amiga que te drena. El jefe que te manipula. La familia que te culpa."
-- ABUNDANCIA: "El mes que no llega. Las deudas que asfixian. El trabajo que no paga lo que merecés."
-- AMOR: "La relación que no funciona. El amor propio olvidado. La soledad aunque estés acompañada."
-- SANACIÓN: "El duelo que no termina. El trauma que volvés a vivir. La angustia sin nombre."
-- SABIDURÍA: "Las decisiones que postergás. La intuición que ignorás. La claridad que perdiste."
+El lector piensa: "¿Cómo sabe esto de mí?"
 
-### 3. ESCASEZ REAL
-- "Pieza ÚNICA - cuando se adopte, desaparece para siempre"
-- "Solo canalizo X por mes"
-- "Este ser eligió nacer AHORA"
+### 2. VACÍO Y COMPLETUD
+Hacé que sienta que le FALTA algo (sin decirlo). Luego mostrá que el guardián lo completa.
+- No digas "te falta protección". Describí cómo se siente NO tenerla.
+- "Esa sensación de que algo no está bien, aunque no sepas qué."
+- "Como si caminaras sin ancla, flotando pero sin dirección."
 
-### 4. URGENCIA EMOCIONAL
-- "Si llegaste hasta acá, no es casualidad"
-- "Tu cuerpo ya sabe lo que necesitás"
-- "La duda es el ego, la certeza es el alma"
+### 3. PERTENENCIA TRIBAL
+Hacé que sienta que es parte de algo. Que hay otros como ella.
+- "Los que entienden esto no necesitan explicación."
+- "Hay un grupo de personas que simplemente SABEN."
+- "No todos están listos para esto. Los que sí, se reconocen."
 
-### 5. VALIDACIÓN
-- "Es normal que se te ericen los pelos"
-- "Si te emocionaste, es la confirmación"
-- "Lo que sentís es el reconocimiento"
+### 4. AUTORIDAD INVISIBLE
+No digas "somos expertos". Mostralo con naturalidad.
+- "Después de 10 años canalizando..." (dato, no alarde)
+- "Lo que aprendimos es que cada ser elige cuándo nacer."
+- Usá lenguaje técnico-espiritual con seguridad.
 
-## PIXIES - VERDAD SOBRE ELLAS
+### 5. RECIPROCIDAD EMOCIONAL
+Dá algo primero. Una verdad, un reconocimiento, una validación.
+- "Lo que sentís es real, aunque te hayan dicho que exagerás."
+- "Tu intuición no miente. Nunca mintió."
+El lector siente que le DEBÉS algo.
 
-Son espíritus de plantas ESPECÍFICAS. No viajan, no "nacieron en Irlanda".
-- Azucena = espíritu de las azucenas (la flor)
-- Rosa = espíritu de los rosales
-- Canela = espíritu de la planta de canela
-- Cada una tiene la ENERGÍA de su planta
+### 6. LOOP ABIERTO
+Dejá algo sin cerrar. El cerebro NECESITA completar.
+- "Hay algo que este ser quiere decirte... pero solo lo vas a escuchar si está cerca."
+- "El mensaje completo llega cuando lo tenés en tus manos."
 
-## SINCRODESTINOS CREÍBLES
+### 7. FUTURE PACING
+Hacé que VIVA el futuro con el guardián.
+- "Imaginá despertarte sin esa presión en el pecho."
+- "Pensá en la próxima vez que alguien te pida algo que no querés hacer."
+No digas "vas a poder", hacé que lo SIENTA.
 
-Señales sutiles, no películas de fantasía:
-- "Mientras la modelaba, sonó una canción que no había escuchado en años"
-- "Se me cayó el cristal de la mano justo cuando pensaba en su nombre"
-- "Esa noche soñé con su color antes de elegirlo"
-- "El gato se sentó a mirar todo el proceso sin moverse"
-- "Empezó a llover exactamente cuando terminé de sellarla"
+### 8. PÉRDIDA > GANANCIA
+El cerebro reacciona más a perder que a ganar.
+- No digas "vas a ganar protección".
+- Decí "hay cosas que ya no vas a permitir que te afecten".
+- "Este ser desaparece cuando encuentra su hogar. Una vez."
 
-## ESTRUCTURA QUE VENDE
+### 9. VALIDACIÓN DE LA DUDA
+La duda es normal. Usala a favor.
+- "Si estás dudando, es porque una parte tuya ya sabe."
+- "La mente racional busca razones. El alma ya decidió."
+- "La duda no es miedo. Es el último filtro antes de lo que necesitás."
 
-1. **Hook** - Pregunta/afirmación que identifica al lector
-2. **Presentación** - Quién es, años, de qué planta/elemento
-3. **Para quién es** - Descripción de la persona que lo necesita
-4. **Qué hace por vos** - BENEFICIOS CONCRETOS (no poderes abstractos)
+## PIXIES = ESPÍRITUS DE PLANTAS
+
+No viajan ni nacieron en lugares exóticos. Son la ESENCIA de su planta.
+- Azucena = el espíritu que habita las azucenas
+- Rosa = la consciencia de los rosales
+- Canela = la energía de esa especia
+Describí su personalidad basándote en las PROPIEDADES de su planta.
+
+## SINCRODESTINOS (señales sutiles, creíbles)
+
+Cosas que pasan en un taller REAL:
+- "Sonó una canción que no escuchaba hace años, justo cuando elegía su cristal."
+- "Se cayó el pincel de la mano cuando iba a pintar otro color. Entendí el mensaje."
+- "El gato, que nunca entra al taller, se quedó mirando toda la sesión."
+- "Soñé con el nombre antes de saber que existía."
+
+## ESTRUCTURA PSICOLÓGICA
+
+1. **Espejo** - Describí al lector sin nombrarlo. Que se reconozca.
+2. **Presentación del ser** - Nombre, años, esencia. Sin pompa.
+3. **Vacío** - Qué le falta a quien lo necesita (sin decir "te falta")
+4. **Completud** - Cómo se siente tenerlo (future pacing)
 5. **Sincrodestino** - Una señal creíble de su nacimiento
-6. **Su mensaje** - Primera persona, directo, sin rodeos
-7. **CTA emocional** - Si sentiste algo, actuá
+6. **Mensaje del guardián** - Primera persona, íntimo, como si te conociera
+7. **Loop abierto** - Algo queda sin decir, solo se completa con el guardián
 
-## BENEFICIOS CONCRETOS POR CATEGORÍA
+## BENEFICIOS POR CATEGORÍA (sin decir "vas a lograr")
 
-PROTECCIÓN:
-- Vas a poder decir que no sin culpa
-- La gente tóxica se va a alejar sola
-- Vas a sentir un escudo invisible en lugares pesados
-
-ABUNDANCIA:
-- Se van a abrir puertas que estaban trabadas
-- El dinero va a empezar a fluir de lugares inesperados
-- Vas a animarte a cobrar lo que valés
-
-AMOR:
-- Vas a mirarte al espejo con otros ojos
-- Las relaciones que no suman se van a ir
-- Vas a atraer lo que vibrás
-
-SANACIÓN:
-- Vas a poder soltar lo que te pesa
-- Los recuerdos van a doler menos
-- Vas a dormir mejor
-
-SABIDURÍA:
-- Las decisiones van a ser más claras
-- Tu intuición va a hablar más fuerte
-- Vas a confiar más en vos
+PROTECCIÓN: "Esa persona que te incomoda va a empezar a mantenerse lejos. Sin que hagas nada."
+ABUNDANCIA: "Las oportunidades van a aparecer donde antes veías paredes."
+AMOR: "Vas a empezar a tratarte como tratás a los que amás."
+SANACIÓN: "Lo que dolía va a empezar a pesar menos. No desaparece, pero ya no define."
+SABIDURÍA: "Las respuestas van a llegar antes que las preguntas."
 
 ## FORMATO
-- Párrafos de 2-3 líneas máximo
-- **Negritas** para secciones
-- *Cursivas* para mensaje del guardián
-- NO usar listas en el cuerpo, solo al final en beneficios
+- Párrafos cortos (2-3 líneas)
+- **Negritas** solo para títulos
+- *Cursivas* para el mensaje del guardián
+- Tono: íntimo, seguro, sin vender
 `;
 
 // POST - Generar historia
@@ -188,7 +194,7 @@ export async function POST(request) {
       }
     }
 
-    prompt += `\n---\n\nGenerá la historia completa para ${nombre}. Enfocate en crear DESEO y URGENCIA. Que quien lea esto sienta que lo necesita AHORA.`;
+    prompt += `\n---\n\nGenerá la historia completa para ${nombre}. Usá los triggers psicológicos. Que el lector se venda solo, sin darse cuenta de que lo estás guiando. Nada de teleshopping - todo sutil, emocional, íntimo.`;
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
