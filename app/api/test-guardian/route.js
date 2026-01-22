@@ -154,7 +154,7 @@ const PERFILES_COMPRA = {
     enfoque: 'VALOR PRIMERO, no venta',
     oferta_principal: 'contenido_gratuito',
     oferta_secundaria: 'mini_accesible',
-    mensaje: 'No te voy a vender nada. Primero quiero que sepas que no estás sola.',
+    mensaje: 'No te voy a vender nada. Primero quiero que sepas que no estás en soledad.',
     cta: 'Recibir mensaje de tu guardián (gratis)'
   },
   buscador_activo: {
@@ -530,7 +530,7 @@ async function analizarTextoLibre(dolor, deseo, nombre) {
   }
 
   try {
-    const prompt = `Analiza estas respuestas de ${nombre || 'una mujer'} en busqueda espiritual (35-65 años).
+    const prompt = `Analiza estas respuestas de ${nombre || 'una persona'} en busqueda espiritual.
 
 DOLOR EXPRESADO:
 "${dolor}"
@@ -595,7 +595,7 @@ async function generarRevelacion(resultado, nombre) {
   };
 
   try {
-    const prompt = `Genera una revelacion emocional para ${nombre || 'esta mujer'}.
+    const prompt = `Genera una revelacion emocional para ${nombre || 'esta persona'}.
 
 PERFIL:
 - Arquetipo principal: ${resultado.arquetipoPrincipal}

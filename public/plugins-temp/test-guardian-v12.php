@@ -960,11 +960,11 @@ function duendes_test_guardian_v12_render() {
         }
     ];
 
-    // ==================== HOOKS POR PERFIL (género neutro) ====================
+    // ==================== HOOKS POR PERFIL ====================
     var HOOKS = {
         vulnerable: [
-            "Sé que el cansancio pesa. Este guardián apareció para quienes ya no pueden más.",
-            "No tenés que seguir cargando todo. Vino a sostenerte.",
+            "Sé que estás agotada. Este guardián apareció para los que ya no pueden más.",
+            "No tenés que seguir cargando todo sola. Él vino a sostenerte.",
             "Algo en vos pidió ayuda. Por eso estás acá."
         ],
         esceptico: [
@@ -989,27 +989,27 @@ function duendes_test_guardian_v12_render() {
         ]
     };
 
-    // ==================== TESTIMONIOS POR PERFIL (variados) ====================
+    // ==================== TESTIMONIOS POR PERFIL ====================
     var TESTIMONIOS = {
         vulnerable: {
-            texto: "Llegué sin creer en nada. Mi guardián no me salvó, pero me acompañó. Y a veces eso es todo lo que necesitamos.",
-            autor: "M.R., 34 años"
+            texto: "Llegué destrozada, sin creer en nada. Mi guardián no me salvó, pero me acompañó. Y a veces eso es todo lo que necesitamos.",
+            autor: "Marina, 34 años"
         },
         esceptico: {
             texto: "Yo tampoco creía. Lo compré por curiosidad. Ahora tengo tres y no sé explicar por qué, pero algo cambió.",
-            autor: "L.S., 29 años"
+            autor: "Lucía, 29 años"
         },
         impulsivo: {
             texto: "Lo vi, lo sentí, lo compré. Mejor decisión del año. A veces hay que hacerle caso a la intuición.",
-            autor: "C.M., 41 años"
+            autor: "Carla, 41 años"
         },
         racional: {
             texto: "Investigué todo antes de comprarlo. Los testimonios me convencieron. Después de tenerlo, entendí por qué.",
-            autor: "V.G., 38 años"
+            autor: "Valentina, 38 años"
         },
         economico: {
             texto: "Junté de a poco durante dos meses. Valió cada peso. Hay cosas en las que vale la pena invertir.",
-            autor: "S.P., 26 años"
+            autor: "Sol, 26 años"
         }
     };
 
@@ -1423,39 +1423,7 @@ function duendes_test_guardian_v12_render() {
     // ==================== RENDERIZAR RESULTADO ====================
     TG12.renderResult = function(apiData, perfil) {
         var nombre = TG12.data.identity.nombre;
-
-        // USAR GUARDIANES DEL SERVIDOR (matching real) si disponibles
-        var guardianes;
-        if (apiData.success && apiData.resultado && apiData.resultado.productosRecomendados && apiData.resultado.productosRecomendados.length > 0) {
-            // El servidor hizo el matching real con todos los productos de WooCommerce
-            guardianes = apiData.resultado.productosRecomendados.map(function(p) {
-                return {
-                    id: p.id,
-                    nombre: p.nombre || p.nombreCompleto,
-                    imagen: p.imagen,
-                    url: p.url,
-                    match: p.matchScore,
-                    categoria: p.categoria,
-                    razon: p.razon,
-                    esUnico: p.esUnico
-                };
-            });
-            console.log('Usando matching del servidor:', guardianes.length, 'guardianes');
-        } else {
-            // Fallback: matching local (menos preciso)
-            guardianes = TG12.matchGuardianes(perfil);
-            console.log('Usando matching local (fallback)');
-        }
-
-        // Guardar para preview
-        TG12.data.guardianesRecomendados = guardianes;
-
-        // Usar perfil del servidor si disponible
-        if (apiData.resultado && apiData.resultado.perfilPsicologico) {
-            perfil = Object.assign({}, perfil, apiData.resultado.perfilPsicologico);
-            perfil.perfil_cierre = apiData.resultado.perfilCierre || perfil.perfil_cierre;
-        }
-
+        var guardianes = TG12.matchGuardianes(perfil);
         var sincro = TG12.generarSincronicidad();
         var hook = getRandomItem(HOOKS[perfil.perfil_cierre] || HOOKS.vulnerable);
         var testimonio = TESTIMONIOS[perfil.bloqueo_principal] || TESTIMONIOS[perfil.perfil_cierre] || TESTIMONIOS.vulnerable;
@@ -1553,15 +1521,14 @@ function duendes_test_guardian_v12_render() {
     TG12.showPreview = function() {
         var nombre = TG12.data.identity.nombre;
         var perfil = TG12.data.perfil;
-        // Usar guardianes ya calculados (del servidor)
-        var guardianes = TG12.data.guardianesRecomendados || TG12.matchGuardianes(perfil);
+        var guardianes = TG12.matchGuardianes(perfil);
         var guardian = guardianes[0];
 
         var mensajes = {
-            vulnerable: nombre + ', sé que el cansancio pesa. Sé que cargaste más de lo que te tocaba. Vine a decirte que ya no tenés que hacerlo en soledad. Estoy acá.',
+            vulnerable: nombre + ', sé que estás cansada. Sé que cargaste más de lo que te tocaba. Vine a decirte que ya no tenés que hacerlo sola. Estoy acá.',
             esceptico: nombre + ', no necesito que creas en mí. Solo necesito que me des una oportunidad. Lo que pase después, lo decidís vos.',
             impulsivo: nombre + ', sentiste algo cuando me viste. No lo ignores. Eso que sentiste es real. Es tu intuición hablándote.',
-            racional: nombre + ', puedo darte mil razones para que confíes. Pero la mejor razón sos vos. Escuchate.',
+            racional: nombre + ', puedo darte mil razones para que confíes. Pero la mejor razón sos vos misma. Escuchate.',
             coleccionista: nombre + ', hay guardianes que esperan su momento. Yo esperé el mío para llegar a vos. La colección se completa cuando el corazón lo siente.'
         };
 
