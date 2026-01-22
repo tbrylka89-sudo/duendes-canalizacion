@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template: Magico Final - Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cat-primario: #4A6FA5;
+            --cat-claro: #E8F0FE;
+            --cat-oscuro: #1a2a4a;
+            --dorado: #C6A962;
+            --dorado-claro: #d4bc7a;
+            --negro: #0a0a0a;
+            --crema: #FAF8F5;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--crema);
+            color: #2a2a2a;
+            line-height: 1.6;
+        }
+
+        /* HEADER */
+        .header-magico {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(198,169,98,0.2);
+        }
+
+        .header-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: var(--dorado);
+            text-decoration: none;
+            letter-spacing: 3px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .header-nav a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .header-nav a:hover { color: var(--dorado); }
+
+        /* HERO */
+        .hero-producto {
+            min-height: 70vh;
+            background: linear-gradient(135deg, var(--negro) 0%, var(--cat-oscuro) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 40px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-producto::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, var(--cat-primario) 0%, transparent 70%);
+            opacity: 0.15;
+        }
+
+        .hero-producto::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(to top, var(--crema), transparent);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .hero-categoria {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--cat-primario);
+            color: #fff;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .hero-nombre {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(42px, 8vw, 72px);
+            color: #fff;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitulo {
+            font-size: 22px;
+            color: var(--dorado);
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .hero-specs {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .hero-spec {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hero-spec-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-spec-value {
+            font-size: 16px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        /* GALERIA */
+        .galeria {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .galeria-principal {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            border: 3px solid var(--cat-claro);
+        }
+
+        .galeria-principal img {
+            width: 100%;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+        }
+
+        .galeria-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--cat-primario);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .galeria-thumbs {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .galeria-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            background: #ddd;
+        }
+
+        .galeria-thumb:hover,
+        .galeria-thumb.active {
+            border-color: var(--cat-primario);
+            transform: translateY(-3px);
+        }
+
+        /* INFO PRODUCTO */
+        .info-producto {
+            padding-top: 20px;
+        }
+
+        .info-etiquetas {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .etiqueta {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .etiqueta-tipo {
+            background: var(--cat-claro);
+            color: var(--cat-primario);
+        }
+
+        .etiqueta-elemento {
+            background: rgba(198,169,98,0.15);
+            color: var(--dorado);
+        }
+
+        .etiqueta-unico {
+            background: #ff6b6b22;
+            color: #ff6b6b;
+        }
+
+        .info-descripcion {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .precio-box {
+            background: linear-gradient(135deg, var(--cat-claro), #fff);
+            border: 2px solid var(--cat-primario);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .precio-principal {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            color: var(--negro);
+            font-weight: 600;
+        }
+
+        .precio-moneda {
+            font-size: 20px;
+            color: #888;
+        }
+
+        .precio-alternativo {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .btn-comprar {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--cat-primario), #3a5a8a);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .btn-comprar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(74, 111, 165, 0.4);
+        }
+
+        .btn-sena {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid var(--cat-primario);
+            border-radius: 12px;
+            color: var(--cat-primario);
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-sena:hover {
+            background: var(--cat-claro);
+        }
+
+        .garantias-mini {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 12px;
+        }
+
+        .garantia-mini {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .garantia-mini span {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* SECCIONES */
+        .seccion {
+            padding: 80px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .seccion-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(28px, 5vw, 40px);
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+        }
+
+        .seccion-subtitulo {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+
+        /* Historia */
+        .seccion-historia {
+            background: linear-gradient(180deg, var(--cat-claro) 0%, var(--crema) 100%);
+        }
+
+        .seccion-historia .seccion-titulo {
+            color: var(--cat-primario);
+        }
+
+        .historia-texto {
+            font-size: 19px;
+            line-height: 2;
+            text-align: justify;
+            color: #444;
+        }
+
+        .historia-texto::first-letter {
+            font-size: 60px;
+            float: left;
+            line-height: 1;
+            padding-right: 15px;
+            color: var(--cat-primario);
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Mensaje del Guardian */
+        .seccion-mensaje {
+            background: var(--negro);
+            color: #fff;
+            max-width: 100%;
+            padding: 80px 40px;
+        }
+
+        .seccion-mensaje .seccion-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .seccion-mensaje .seccion-titulo {
+            color: var(--dorado);
+        }
+
+        .mensaje-contenido {
+            position: relative;
+            padding: 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(198,169,98,0.2);
+        }
+
+        .mensaje-contenido::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            font-size: 120px;
+            color: var(--cat-primario);
+            opacity: 0.3;
+            font-family: 'Cinzel', serif;
+            line-height: 1;
+        }
+
+        .mensaje-texto {
+            font-size: 22px;
+            line-height: 1.9;
+            font-style: italic;
+            color: rgba(255,255,255,0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        .mensaje-firma {
+            margin-top: 30px;
+            text-align: right;
+            color: var(--dorado);
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Dones */
+        .seccion-dones .seccion-titulo {
+            color: var(--cat-primario);
+        }
+
+        .dones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .don-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid transparent;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .don-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--cat-primario);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .don-card:hover {
+            border-color: var(--cat-primario);
+            transform: translateY(-5px);
+        }
+
+        .don-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .don-icono {
+            width: 50px;
+            height: 50px;
+            background: var(--cat-claro);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .don-nombre {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: var(--cat-primario);
+            margin-bottom: 10px;
+        }
+
+        .don-descripcion {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Ritual */
+        .seccion-ritual {
+            background: linear-gradient(180deg, var(--negro), var(--cat-oscuro));
+            color: #fff;
+            max-width: 100%;
+            padding: 80px 40px;
+        }
+
+        .seccion-ritual .seccion-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .seccion-ritual .seccion-titulo {
+            color: var(--dorado);
+        }
+
+        .ritual-pasos {
+            display: grid;
+            gap: 30px;
+        }
+
+        .ritual-paso {
+            display: grid;
+            grid-template-columns: 70px 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 70px;
+            height: 70px;
+            background: var(--cat-primario);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .paso-contenido h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            color: var(--dorado);
+            margin-bottom: 10px;
+        }
+
+        .paso-contenido p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+        }
+
+        /* CTA Final */
+        .cta-final {
+            background: var(--negro);
+            padding: 100px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-final::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, var(--cat-primario) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+
+        .cta-urgencia {
+            display: inline-block;
+            background: #ff6b6b22;
+            color: #ff6b6b;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(32px, 5vw, 48px);
+            color: #fff;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-nombre {
+            color: var(--cat-primario);
+        }
+
+        .cta-precio {
+            font-family: 'Cinzel', serif;
+            font-size: 56px;
+            color: var(--dorado);
+            margin: 30px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 22px 70px;
+            background: linear-gradient(135deg, var(--cat-primario), #3a5a8a);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 60px rgba(74, 111, 165, 0.5);
+        }
+
+        /* Footer */
+        .footer-producto {
+            background: #0a0a0a;
+            padding: 60px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(198,169,98,0.2);
+        }
+
+        .footer-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            color: var(--dorado);
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+        }
+
+        .footer-copy {
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .galeria {
+                position: relative;
+                top: 0;
+            }
+            .header-nav {
+                display: none;
+            }
+            .hero-producto {
+                min-height: 50vh;
+                padding: 100px 20px 60px;
+            }
+            .seccion {
+                padding: 60px 20px;
+            }
+            .ritual-paso {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .paso-numero {
+                margin: 0 auto 15px;
+            }
+            .garantias-mini {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Label */
+        .template-label {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--cat-primario);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="template-label">TEMPLATE: MAGICO FINAL</div>
+
+    <!-- HEADER -->
+    <header class="header-magico">
+        <a href="#" class="header-logo">DUENDES DEL URUGUAY</a>
+        <nav class="header-nav">
+            <a href="#">Tienda</a>
+            <a href="#">Nosotros</a>
+            <a href="#">Contacto</a>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero-producto">
+        <div class="hero-content">
+            <div class="hero-categoria">
+                <span>&#10022;</span>
+                Proteccion
+            </div>
+            <h1 class="hero-nombre">FINNEGAN</h1>
+            <p class="hero-subtitulo">Guardian de la Proteccion</p>
+            <div class="hero-specs">
+                <div class="hero-spec">
+                    <span class="hero-spec-label">Tipo</span>
+                    <span class="hero-spec-value">Duende</span>
+                </div>
+                <div class="hero-spec">
+                    <span class="hero-spec-label">Elemento</span>
+                    <span class="hero-spec-value">Tierra</span>
+                </div>
+                <div class="hero-spec">
+                    <span class="hero-spec-label">Proposito</span>
+                    <span class="hero-spec-value">Proteccion</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <!-- GALERIA -->
+        <div class="galeria">
+            <div class="galeria-principal">
+                <div class="galeria-badge">Pieza Unica</div>
+                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=750&fit=crop" alt="Finnegan">
+            </div>
+            <div class="galeria-thumbs">
+                <div class="galeria-thumb active"></div>
+                <div class="galeria-thumb"></div>
+                <div class="galeria-thumb"></div>
+                <div class="galeria-thumb"></div>
+            </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="info-producto">
+            <div class="info-etiquetas">
+                <span class="etiqueta etiqueta-tipo">Duende</span>
+                <span class="etiqueta etiqueta-elemento">Tierra</span>
+                <span class="etiqueta etiqueta-unico">Pieza Unica</span>
+            </div>
+
+            <p class="info-descripcion">
+                Finnegan es un guardian ancestral que ha protegido hogares durante mas de 500 anos. Su presencia trae paz y seguridad a quienes lo acogen...
+            </p>
+
+            <div class="precio-box">
+                <div class="precio-principal">
+                    $8.600 <span class="precio-moneda">UYU</span>
+                </div>
+                <div class="precio-alternativo">
+                    o USD $200
+                </div>
+            </div>
+
+            <a href="#" class="btn-comprar">
+                &#10022; Sellar el Pacto
+            </a>
+            <button class="btn-sena">
+                Reservar con sena $2.580 UYU
+            </button>
+
+            <div class="garantias-mini">
+                <div class="garantia-mini">
+                    <span>&#128737;</span>
+                    30 dias garantia
+                </div>
+                <div class="garantia-mini">
+                    <span>&#128230;</span>
+                    Envio seguro
+                </div>
+                <div class="garantia-mini">
+                    <span>&#10024;</span>
+                    Canalizacion incluida
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- HISTORIA -->
+    <section class="seccion seccion-historia">
+        <h2 class="seccion-titulo">Su Historia</h2>
+        <p class="seccion-subtitulo">El origen de Finnegan</p>
+        <div class="historia-texto">
+            Finnegan nacio en una noche de luna llena, cuando los vientos del este trajeron consigo el aroma de los bosques antiguos. Durante siglos, ha sido el guardian silencioso de aquellos que buscan proteccion y paz en sus hogares.
+
+            Su energia es firme pero gentil, como las raices de un roble milenario que sostienen la tierra sin perturbarla. Quienes lo han acogido cuentan que su presencia se siente como un abrazo calido en las noches frias, como una certeza de que todo estara bien.
+        </div>
+    </section>
+
+    <!-- MENSAJE DEL GUARDIAN -->
+    <section class="seccion-mensaje">
+        <div class="seccion-inner">
+            <h2 class="seccion-titulo">Su Mensaje Para Vos</h2>
+            <div class="mensaje-contenido">
+                <p class="mensaje-texto">Se que has cargado con mucho. Se que a veces sentis que tenes que proteger a todos mientras nadie te protege a vos. Vine para eso. Para que puedas descansar sabiendo que alguien cuida tu espalda. No tengas miedo de soltar un poco el control. Yo estoy aca.</p>
+                <p class="mensaje-firma">- Finnegan</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DONES -->
+    <section class="seccion seccion-dones">
+        <h2 class="seccion-titulo">Sus Dones</h2>
+        <p class="seccion-subtitulo">Lo que Finnegan puede aportar a tu vida</p>
+        <div class="dones-grid">
+            <div class="don-card">
+                <div class="don-icono">&#128737;</div>
+                <h3 class="don-nombre">Proteccion del Hogar</h3>
+                <p class="don-descripcion">Crea un escudo energetico que mantiene alejadas las energias densas y las malas intenciones.</p>
+            </div>
+            <div class="don-card">
+                <div class="don-icono">&#10024;</div>
+                <h3 class="don-nombre">Paz Interior</h3>
+                <p class="don-descripcion">Su presencia calma la ansiedad y ayuda a encontrar serenidad en momentos de caos.</p>
+            </div>
+            <div class="don-card">
+                <div class="don-icono">&#127793;</div>
+                <h3 class="don-nombre">Conexion con la Tierra</h3>
+                <p class="don-descripcion">Fortalece tu arraigo y te ayuda a mantenerte centrado ante las tormentas de la vida.</p>
+            </div>
+            <div class="don-card">
+                <div class="don-icono">&#128171;</div>
+                <h3 class="don-nombre">Guia Espiritual</h3>
+                <p class="don-descripcion">Te acompana en tu camino de crecimiento, ofreciendo sabiduria en momentos de duda.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- RITUAL -->
+    <section class="seccion-ritual">
+        <div class="seccion-inner">
+            <h2 class="seccion-titulo">Ritual de Bienvenida</h2>
+            <p class="seccion-subtitulo" style="color: rgba(255,255,255,0.6);">Como recibir a Finnegan en tu hogar</p>
+            <div class="ritual-pasos">
+                <div class="ritual-paso">
+                    <div class="paso-numero">1</div>
+                    <div class="paso-contenido">
+                        <h4>Prepara el espacio</h4>
+                        <p>Limpia el lugar donde vivira. Podes usar sahumerio, incienso o simplemente abrir las ventanas para renovar la energia.</p>
+                    </div>
+                </div>
+                <div class="ritual-paso">
+                    <div class="paso-numero">2</div>
+                    <div class="paso-contenido">
+                        <h4>Presentate</h4>
+                        <p>Cuando llegue, tomalo con ambas manos. Dile tu nombre y que estas feliz de recibirlo.</p>
+                    </div>
+                </div>
+                <div class="ritual-paso">
+                    <div class="paso-numero">3</div>
+                    <div class="paso-contenido">
+                        <h4>Ubicalo con intencion</h4>
+                        <p>Elegi un lugar especial donde pueda observar y proteger. Evita lugares muy transitados.</p>
+                    </div>
+                </div>
+                <div class="ritual-paso">
+                    <div class="paso-numero">4</div>
+                    <div class="paso-contenido">
+                        <h4>Ofrenda inicial</h4>
+                        <p>Un vaso de agua, una vela, o simplemente tu gratitud. Los guardianes aprecian los gestos sinceros.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="cta-final">
+        <div class="cta-urgencia">&#9889; Pieza unica - Cuando se va, desaparece para siempre</div>
+        <h2 class="cta-titulo"><span class="cta-nombre">Finnegan</span> te esta esperando</h2>
+        <div class="cta-precio">$8.600 UYU</div>
+        <a href="#" class="cta-btn">&#10022; Sellar el Pacto</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-producto">
+        <div class="footer-logo">DUENDES DEL URUGUAY</div>
+        <p class="footer-copy">&copy; 2026 Duendes del Uruguay. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

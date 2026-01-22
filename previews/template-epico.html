@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template: Epico - Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dorado: #C6A962;
+            --dorado-claro: #d4bc7a;
+            --negro: #0a0a0a;
+            --gris-oscuro: #1a1a1a;
+            --crema: #FAF8F5;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--crema);
+            color: #2a2a2a;
+            line-height: 1.6;
+        }
+
+        /* HERO BANNER */
+        .hero-banner {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            background: linear-gradient(180deg, var(--negro) 0%, #1a1510 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(198,169,98,0.1) 0%, transparent 60%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(198,169,98,0.15);
+            border: 1px solid var(--dorado);
+            padding: 8px 24px;
+            border-radius: 30px;
+            color: var(--dorado);
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-nombre {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(48px, 10vw, 80px);
+            color: #fff;
+            margin: 0 0 10px 0;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        .hero-subtitulo {
+            font-size: 20px;
+            color: var(--dorado);
+            font-style: italic;
+            margin: 0;
+        }
+
+        .hero-specs {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .hero-spec {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-spec span {
+            color: var(--dorado);
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        .contenido-principal {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        /* GALERIA */
+        .galeria {
+            position: sticky;
+            top: 30px;
+            height: fit-content;
+        }
+
+        .galeria-principal {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        }
+
+        .galeria-principal img {
+            width: 100%;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+        }
+
+        .galeria-thumbs {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .galeria-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            background: #ddd;
+        }
+
+        .galeria-thumb:hover, .galeria-thumb.active {
+            border-color: var(--dorado);
+        }
+
+        /* INFO PRODUCTO */
+        .info-producto {
+            padding-top: 20px;
+        }
+
+        .producto-precio {
+            margin-bottom: 30px;
+        }
+
+        .precio-principal {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            color: var(--negro);
+            font-weight: 600;
+        }
+
+        .precio-secundario {
+            color: #888;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .btn-sellar-pacto {
+            display: block;
+            width: 100%;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, var(--dorado), #a88a42);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-sellar-pacto:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(198,169,98,0.3);
+        }
+
+        .btn-sena {
+            display: block;
+            width: 100%;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid var(--dorado);
+            border-radius: 12px;
+            color: var(--dorado);
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-sena:hover {
+            background: rgba(198,169,98,0.1);
+        }
+
+        .garantias {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(198,169,98,0.05);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .garantia-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* SECCIONES */
+        .seccion {
+            padding: 80px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .seccion-oscura {
+            background: var(--negro);
+            color: #fff;
+            max-width: 100%;
+        }
+
+        .seccion-oscura .seccion-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .seccion-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(28px, 5vw, 42px);
+            color: var(--dorado);
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+
+        .seccion-texto {
+            font-size: 19px;
+            line-height: 1.9;
+            text-align: justify;
+            color: #444;
+        }
+
+        .seccion-oscura .seccion-texto {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* VIDA ANTERIOR */
+        .vida-anterior {
+            background: linear-gradient(180deg, var(--crema) 0%, #f0ebe4 100%);
+            position: relative;
+        }
+
+        .vida-anterior::before {
+            content: '"';
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif;
+            font-size: 200px;
+            color: rgba(198,169,98,0.1);
+            line-height: 1;
+        }
+
+        .vida-anterior .seccion-texto {
+            position: relative;
+            z-index: 1;
+            font-size: 21px;
+            font-style: italic;
+            text-align: center;
+        }
+
+        /* MENSAJE DIRECTO */
+        .mensaje-directo {
+            background: var(--negro);
+            color: #fff;
+            text-align: center;
+            padding: 100px 40px;
+        }
+
+        .mensaje-directo .mensaje-texto {
+            font-size: 24px;
+            font-style: italic;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .mensaje-firma {
+            margin-top: 30px;
+            color: var(--dorado);
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+        }
+
+        /* DONES */
+        .dones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .don-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(198,169,98,0.2);
+            transition: all 0.3s;
+        }
+
+        .don-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: var(--dorado);
+        }
+
+        .don-nombre {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: var(--dorado);
+            margin-bottom: 10px;
+        }
+
+        .don-descripcion {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* SENALES */
+        .senales-lista {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .senales-lista li {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(198,169,98,0.2);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .senales-lista li::before {
+            content: '✧';
+            color: var(--dorado);
+            font-size: 24px;
+        }
+
+        /* RITUAL */
+        .ritual-pasos {
+            display: grid;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .ritual-paso {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 60px;
+            height: 60px;
+            background: var(--dorado);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .paso-contenido h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            color: var(--dorado);
+            margin: 0 0 10px 0;
+        }
+
+        .paso-contenido p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* CUIDADOS */
+        .cuidados-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .cuidado-card {
+            background: rgba(198,169,98,0.05);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 3px solid var(--dorado);
+        }
+
+        .cuidado-card h4 {
+            font-family: 'Cinzel', serif;
+            color: var(--dorado);
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        .cuidado-card p {
+            margin: 0;
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* GARANTIA */
+        .garantia-magica {
+            background: linear-gradient(135deg, rgba(198,169,98,0.1), rgba(198,169,98,0.05));
+            border: 2px solid var(--dorado);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .garantia-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            color: var(--dorado);
+            margin-bottom: 20px;
+        }
+
+        .garantia-puntos {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .garantia-punto {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: #555;
+        }
+
+        .garantia-punto::before {
+            content: '✓';
+            color: var(--dorado);
+            font-weight: bold;
+        }
+
+        /* CTA FINAL */
+        .cta-final {
+            background: var(--negro);
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .cta-urgencia {
+            font-size: 16px;
+            color: #ff6b6b;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .cta-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .cta-precio {
+            font-family: 'Cinzel', serif;
+            font-size: 48px;
+            color: var(--dorado);
+            margin-bottom: 30px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 20px 60px;
+            background: linear-gradient(135deg, var(--dorado), #a88a42);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(198,169,98,0.4);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .contenido-principal {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+            }
+            .galeria {
+                position: relative;
+                top: 0;
+            }
+            .hero-banner {
+                height: 50vh;
+                min-height: 400px;
+            }
+            .seccion {
+                padding: 60px 20px;
+            }
+            .cuidados-grid {
+                grid-template-columns: 1fr;
+            }
+            .ritual-paso {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .paso-numero {
+                margin: 0 auto 15px;
+            }
+        }
+
+        /* Label */
+        .template-label {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--dorado), #a88a42);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            z-index: 9999;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="template-label">TEMPLATE: EPICO</div>
+
+    <!-- HERO BANNER -->
+    <section class="hero-banner">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">Pieza Unica</div>
+            <h1 class="hero-nombre">FINNEGAN</h1>
+            <p class="hero-subtitulo">Guardian de la Proteccion</p>
+            <div class="hero-specs">
+                <div class="hero-spec"><span>Duende</span></div>
+                <div class="hero-spec">&bull;</div>
+                <div class="hero-spec"><span>Tierra</span></div>
+                <div class="hero-spec">&bull;</div>
+                <div class="hero-spec"><span>Proteccion</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <section class="contenido-principal">
+        <!-- GALERIA -->
+        <div class="galeria">
+            <div class="galeria-principal">
+                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=750&fit=crop" alt="Finnegan">
+            </div>
+            <div class="galeria-thumbs">
+                <div class="galeria-thumb active"></div>
+                <div class="galeria-thumb"></div>
+                <div class="galeria-thumb"></div>
+                <div class="galeria-thumb"></div>
+            </div>
+        </div>
+
+        <!-- INFO PRODUCTO -->
+        <div class="info-producto">
+            <div class="producto-precio">
+                <div class="precio-principal">$8.600 UYU</div>
+                <div class="precio-secundario">o $200 USD</div>
+            </div>
+
+            <a href="#" class="btn-sellar-pacto">Sellar el Pacto</a>
+            <button class="btn-sena">Reservar con sena (30% = $2.580)</button>
+
+            <div class="garantias">
+                <div class="garantia-item">&#128274; Pago seguro</div>
+                <div class="garantia-item">&#10024; Pieza unica</div>
+                <div class="garantia-item">&#127757; Envio mundial</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIDA ANTERIOR -->
+    <section class="seccion vida-anterior">
+        <h2 class="seccion-titulo">Antes de encontrarte...</h2>
+        <div class="seccion-texto">
+            Finnegan vagaba por los bosques de Piriapolis desde hace mas de quinientos anos. Era el guardian silencioso de un claro secreto donde los animales del bosque iban a sanar. Los pajaros lo reconocian, los ciervos le hacian reverencias, y el viento susurraba su nombre entre las hojas.
+
+            Un dia, sintio un llamado. Alguien, en algun lugar del mundo, lo necesitaba. Y comenzo su viaje hacia vos.
+        </div>
+    </section>
+
+    <!-- MENSAJE DIRECTO -->
+    <section class="mensaje-directo">
+        <h2 class="seccion-titulo">Finnegan tiene algo que decirte</h2>
+        <div class="mensaje-texto">
+            "Se que has cargado con mucho. Se que a veces sentis que tenes que proteger a todos mientras nadie te protege a vos. Vine para eso. Para que puedas descansar sabiendo que alguien cuida tu espalda. No tengas miedo de soltar un poco el control. Yo estoy aca."
+        </div>
+        <div class="mensaje-firma">- Finnegan</div>
+    </section>
+
+    <!-- DONES -->
+    <section class="seccion">
+        <h2 class="seccion-titulo" style="color: var(--dorado);">Sus Dones</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 40px; font-size: 18px;">Lo que Finnegan puede aportar a tu vida</p>
+        <div class="dones-grid">
+            <div class="don-card">
+                <div class="don-nombre">Escudo Protector</div>
+                <div class="don-descripcion">Crea una barrera energetica alrededor de tu hogar que repele las energias densas y las malas intenciones.</div>
+            </div>
+            <div class="don-card">
+                <div class="don-nombre">Paz Interior</div>
+                <div class="don-descripcion">Su presencia calma la ansiedad y ayuda a encontrar serenidad incluso en los momentos mas caoticos.</div>
+            </div>
+            <div class="don-card">
+                <div class="don-nombre">Intuicion Aguda</div>
+                <div class="don-descripcion">Te ayuda a desarrollar tu sexto sentido para detectar situaciones o personas que no te convienen.</div>
+            </div>
+            <div class="don-card">
+                <div class="don-nombre">Suenos Reveladores</div>
+                <div class="don-descripcion">Trabaja contigo mientras dormis, enviando mensajes y advertencias a traves de suenos lucidos.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SENALES -->
+    <section class="seccion-oscura" style="padding: 80px 40px;">
+        <div class="seccion-inner">
+            <h2 class="seccion-titulo">Senales de que es para vos</h2>
+            <ul class="senales-lista">
+                <li>Sentis que necesitas proteccion pero no sabes de que</li>
+                <li>Tu hogar no se siente del todo "tuyo"</li>
+                <li>Cargas con la responsabilidad de proteger a otros</li>
+                <li>Buscas paz pero el ruido mental no para</li>
+                <li>Algo en esta pagina te hizo sentir algo inexplicable</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- RITUAL -->
+    <section class="seccion-oscura" style="padding: 80px 40px; background: linear-gradient(180deg, #0a0a0a, #1a1510);">
+        <div class="seccion-inner">
+            <h2 class="seccion-titulo">Ritual de Bienvenida</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.6); margin-bottom: 40px;">Como recibir a Finnegan en tu hogar</p>
+            <div class="ritual-pasos">
+                <div class="ritual-paso">
+                    <div class="paso-numero">1</div>
+                    <div class="paso-contenido">
+                        <h4>Prepara el espacio</h4>
+                        <p>Limpia el lugar donde vivira con sahumerio o simplemente abriendo las ventanas.</p>
+                    </div>
+                </div>
+                <div class="ritual-paso">
+                    <div class="paso-numero">2</div>
+                    <div class="paso-contenido">
+                        <h4>Presentate</h4>
+                        <p>Tomalo con ambas manos, dile tu nombre y que estas feliz de recibirlo.</p>
+                    </div>
+                </div>
+                <div class="ritual-paso">
+                    <div class="paso-numero">3</div>
+                    <div class="paso-contenido">
+                        <h4>Establece la intencion</h4>
+                        <p>Contale que necesitas de el y que esperas de esta relacion.</p>
+                    </div>
+                </div>
+                <div class="ritual-paso">
+                    <div class="paso-numero">4</div>
+                    <div class="paso-contenido">
+                        <h4>Ubicalo estrategicamente</h4>
+                        <p>Elegí un lugar donde pueda "ver" la entrada principal de tu hogar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CUIDADOS -->
+    <section class="seccion">
+        <h2 class="seccion-titulo" style="color: var(--dorado);">Como cuidar a Finnegan</h2>
+        <div class="cuidados-grid">
+            <div class="cuidado-card">
+                <h4>Ubicacion</h4>
+                <p>Lugar alto, donde pueda ver la entrada. Evita banos o lugares muy humedos.</p>
+            </div>
+            <div class="cuidado-card">
+                <h4>Limpieza Energetica</h4>
+                <p>Una vez al mes, pasale humo de sahumerio o dejalo bajo la luz de luna llena.</p>
+            </div>
+            <div class="cuidado-card">
+                <h4>Fechas Especiales</h4>
+                <p>El solsticio de invierno es su momento de mayor poder. Encendele una vela ese dia.</p>
+            </div>
+            <div class="cuidado-card">
+                <h4>Que Podes Sentir</h4>
+                <p>Hormigueo, sensacion de presencia, suenos vividos. Todo es normal.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- GARANTIA -->
+    <section class="seccion">
+        <div class="garantia-magica">
+            <h3 class="garantia-titulo">Nuestra Garantia Magica</h3>
+            <p style="font-size: 17px; color: #555; max-width: 600px; margin: 0 auto;">Si dentro de los primeros 30 dias sentis que Finnegan no era para vos, te devolvemos el dinero. Sin preguntas. La magia no se puede forzar.</p>
+            <div class="garantia-puntos">
+                <div class="garantia-punto">30 dias de prueba</div>
+                <div class="garantia-punto">Devolucion completa</div>
+                <div class="garantia-punto">Sin preguntas</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="cta-final">
+        <div class="cta-urgencia">Finnegan eligio manifestarse UNA sola vez</div>
+        <h2 class="cta-titulo">Finnegan te esta esperando</h2>
+        <div class="cta-precio">$8.600 UYU</div>
+        <a href="#" class="cta-btn">Sellar el Pacto</a>
+        <p style="color: rgba(255,255,255,0.5); margin-top: 30px; font-style: italic;">Si sentiste algo al leer esto, no es casualidad.</p>
+    </section>
+</body>
+</html>

@@ -1,0 +1,679 @@
+{
+  "subidos": [
+    {
+      "nombre": "Leprechaun",
+      "productId": 241,
+      "slug": "leprechaun-mini",
+      "fecha": "2026-01-22T01:14:17.839Z"
+    },
+    {
+      "nombre": "Brianna",
+      "productId": 231,
+      "slug": "brianna",
+      "fecha": "2026-01-22T01:14:18.947Z"
+    },
+    {
+      "nombre": "Rahmus",
+      "productId": 232,
+      "slug": "rahmus",
+      "fecha": "2026-01-22T01:14:19.912Z"
+    },
+    {
+      "nombre": "Ruperto",
+      "productId": 2992,
+      "slug": "ruperto",
+      "fecha": "2026-01-22T01:14:20.877Z"
+    },
+    {
+      "nombre": "Zoe",
+      "productId": 4536,
+      "slug": "zoe",
+      "fecha": "2026-01-22T01:14:21.867Z"
+    },
+    {
+      "nombre": "Luke",
+      "productId": 259,
+      "slug": "luke-el-duende-viajero-protector",
+      "fecha": "2026-01-22T01:14:22.920Z"
+    },
+    {
+      "nombre": "Iker",
+      "productId": 4207,
+      "slug": "iker",
+      "fecha": "2026-01-22T01:14:24.113Z"
+    },
+    {
+      "nombre": "Silvano",
+      "productId": 2969,
+      "slug": "silvano-verificar",
+      "fecha": "2026-01-22T01:14:25.203Z"
+    },
+    {
+      "nombre": "Rosa Pixie",
+      "productId": 4656,
+      "slug": "rosa-pixie",
+      "fecha": "2026-01-22T01:14:26.293Z"
+    },
+    {
+      "nombre": "Edward",
+      "productId": 4556,
+      "slug": "edward",
+      "fecha": "2026-01-22T01:14:27.315Z"
+    },
+    {
+      "nombre": "Micelio",
+      "productId": 4547,
+      "slug": "micelio",
+      "fecha": "2026-01-22T01:14:28.390Z"
+    },
+    {
+      "nombre": "Axel",
+      "productId": 4389,
+      "slug": "axel",
+      "fecha": "2026-01-22T01:14:29.408Z"
+    },
+    {
+      "nombre": "Rafael",
+      "productId": 4567,
+      "slug": "rafael",
+      "fecha": "2026-01-22T01:14:30.331Z"
+    },
+    {
+      "nombre": "Sara",
+      "productId": 195,
+      "slug": "sara",
+      "fecha": "2026-01-22T01:14:31.363Z"
+    },
+    {
+      "nombre": "Teo",
+      "productId": 4467,
+      "slug": "teo",
+      "fecha": "2026-01-22T01:14:32.425Z"
+    },
+    {
+      "nombre": "Mario",
+      "productId": 187,
+      "slug": "mario",
+      "fecha": "2026-01-22T01:14:33.707Z"
+    },
+    {
+      "nombre": "Cintia Pixie",
+      "productId": 4694,
+      "slug": "cintia-pixie",
+      "fecha": "2026-01-22T01:14:34.698Z"
+    },
+    {
+      "nombre": "Stan",
+      "productId": 4591,
+      "slug": "stan",
+      "fecha": "2026-01-22T01:14:35.673Z"
+    },
+    {
+      "nombre": "Canela Pixie",
+      "productId": 4697,
+      "slug": "canela-pixie",
+      "fecha": "2026-01-22T01:14:36.771Z"
+    },
+    {
+      "nombre": "Heart",
+      "productId": 182,
+      "slug": "heart",
+      "fecha": "2026-01-22T01:14:37.770Z"
+    },
+    {
+      "nombre": "Valentina",
+      "productId": 2990,
+      "slug": "valentina",
+      "fecha": "2026-01-22T01:14:38.939Z"
+    },
+    {
+      "nombre": "Lil",
+      "productId": 263,
+      "slug": "lil",
+      "fecha": "2026-01-22T01:14:39.939Z"
+    },
+    {
+      "nombre": "Sanación",
+      "productId": 262,
+      "slug": "duende-de-la-sanacion",
+      "fecha": "2026-01-22T01:14:40.919Z"
+    },
+    {
+      "nombre": "Emilio",
+      "productId": 188,
+      "slug": "emilio",
+      "fecha": "2026-01-22T01:14:41.882Z"
+    },
+    {
+      "nombre": "Dani",
+      "productId": 237,
+      "slug": "dani-para-los-dias-de-ansiedad",
+      "fecha": "2026-01-22T01:14:43.011Z"
+    },
+    {
+      "nombre": "Cash",
+      "productId": 264,
+      "slug": "cash",
+      "fecha": "2026-01-22T01:14:44.031Z"
+    },
+    {
+      "nombre": "Trévor",
+      "productId": 242,
+      "slug": "trevor-el-duende-de-la-suerte",
+      "fecha": "2026-01-22T01:14:44.992Z"
+    },
+    {
+      "nombre": "Susana Pixie",
+      "productId": 4662,
+      "slug": "susana-pixie",
+      "fecha": "2026-01-22T01:14:45.964Z"
+    },
+    {
+      "nombre": "Toto",
+      "productId": 4580,
+      "slug": "toto",
+      "fecha": "2026-01-22T01:14:46.976Z"
+    },
+    {
+      "nombre": "Björn",
+      "productId": 2989,
+      "slug": "bjorn",
+      "fecha": "2026-01-22T01:14:48.022Z"
+    },
+    {
+      "nombre": "Abraham",
+      "productId": 4572,
+      "slug": "abraham",
+      "fecha": "2026-01-22T01:14:48.998Z"
+    },
+    {
+      "nombre": "Flor Pixie",
+      "productId": 4704,
+      "slug": "flor-pixie",
+      "fecha": "2026-01-22T01:14:49.960Z"
+    },
+    {
+      "nombre": "Roger",
+      "productId": 191,
+      "slug": "roger",
+      "fecha": "2026-01-22T01:14:51.002Z"
+    },
+    {
+      "nombre": "Fortunato",
+      "productId": 4502,
+      "slug": "fortunato",
+      "fecha": "2026-01-22T01:14:52.135Z"
+    },
+    {
+      "nombre": "Chechu",
+      "productId": 192,
+      "slug": "chechu",
+      "fecha": "2026-01-22T01:14:53.217Z"
+    },
+    {
+      "nombre": "Merlin",
+      "productId": 4538,
+      "slug": "merlin",
+      "fecha": "2026-01-22T01:14:54.219Z"
+    },
+    {
+      "nombre": "Clavel Pixie",
+      "productId": 4673,
+      "slug": "clavel-pixie",
+      "fecha": "2026-01-22T01:14:55.221Z"
+    },
+    {
+      "nombre": "Moonstone",
+      "productId": 2986,
+      "slug": "agustina",
+      "fecha": "2026-01-22T01:14:56.205Z"
+    },
+    {
+      "nombre": "Azalea Pixie",
+      "productId": 4702,
+      "slug": "azalea-pixie",
+      "fecha": "2026-01-22T01:14:57.210Z"
+    },
+    {
+      "nombre": "Emir",
+      "productId": 4506,
+      "slug": "emir",
+      "fecha": "2026-01-22T01:14:58.250Z"
+    },
+    {
+      "nombre": "Enzo",
+      "productId": 4491,
+      "slug": "enzo",
+      "fecha": "2026-01-22T01:14:59.244Z"
+    },
+    {
+      "nombre": "Santino",
+      "productId": 178,
+      "slug": "santino",
+      "fecha": "2026-01-22T01:15:00.328Z"
+    },
+    {
+      "nombre": "Yrvin",
+      "productId": 261,
+      "slug": "yrvin-el-abrecaminos-de-la-abundancia",
+      "fecha": "2026-01-22T01:15:01.329Z"
+    },
+    {
+      "nombre": "Zahira Pixie",
+      "productId": 4658,
+      "slug": "zahira-pixie",
+      "fecha": "2026-01-22T01:15:02.469Z"
+    },
+    {
+      "nombre": "Gaia",
+      "productId": 2993,
+      "slug": "gaia-2",
+      "fecha": "2026-01-22T01:15:03.547Z"
+    },
+    {
+      "nombre": "Bruma",
+      "productId": 2982,
+      "slug": "bruma",
+      "fecha": "2026-01-22T01:15:13.993Z"
+    },
+    {
+      "nombre": "Moon",
+      "productId": 4500,
+      "slug": "moon",
+      "fecha": "2026-01-22T01:15:15.046Z"
+    },
+    {
+      "nombre": "Ruth",
+      "productId": 4516,
+      "slug": "ruth",
+      "fecha": "2026-01-22T01:15:16.128Z"
+    },
+    {
+      "nombre": "Jeremy",
+      "productId": 189,
+      "slug": "jeremy",
+      "fecha": "2026-01-22T01:15:17.113Z"
+    },
+    {
+      "nombre": "Americo",
+      "productId": 4544,
+      "slug": "americo",
+      "fecha": "2026-01-22T01:15:18.160Z"
+    },
+    {
+      "nombre": "Estelar",
+      "productId": 252,
+      "slug": "estelar-el-duende-de-los-deseos",
+      "fecha": "2026-01-22T01:15:19.210Z"
+    },
+    {
+      "nombre": "Compañero",
+      "productId": 260,
+      "slug": "duende-companero",
+      "fecha": "2026-01-22T01:15:20.208Z"
+    },
+    {
+      "nombre": "Monique",
+      "productId": 4518,
+      "slug": "monique",
+      "fecha": "2026-01-22T01:15:21.201Z"
+    },
+    {
+      "nombre": "Felix",
+      "productId": 4510,
+      "slug": "felix",
+      "fecha": "2026-01-22T01:15:22.214Z"
+    },
+    {
+      "nombre": "Asher",
+      "productId": 217,
+      "slug": "asher",
+      "fecha": "2026-01-22T01:15:23.253Z"
+    },
+    {
+      "nombre": "Fiorella Pixie",
+      "productId": 4677,
+      "slug": "fiorella-pixie",
+      "fecha": "2026-01-22T01:15:24.273Z"
+    },
+    {
+      "nombre": "Amy",
+      "productId": 4522,
+      "slug": "amy",
+      "fecha": "2026-01-22T01:15:25.262Z"
+    },
+    {
+      "nombre": "Dalia Pixie",
+      "productId": 4707,
+      "slug": "dalia-pixie",
+      "fecha": "2026-01-22T01:15:26.264Z"
+    },
+    {
+      "nombre": "Azucena Pixie",
+      "productId": 4732,
+      "slug": "azucena-pixie",
+      "fecha": "2026-01-22T01:15:27.465Z"
+    },
+    {
+      "nombre": "Juliette",
+      "productId": 4530,
+      "slug": "juliette",
+      "fecha": "2026-01-22T01:15:28.533Z"
+    },
+    {
+      "nombre": "Daisy Pixie",
+      "productId": 4683,
+      "slug": "daisy-pixie",
+      "fecha": "2026-01-22T01:15:29.504Z"
+    },
+    {
+      "nombre": "Laura Pixie",
+      "productId": 4691,
+      "slug": "laura-pixie",
+      "fecha": "2026-01-22T01:15:30.481Z"
+    },
+    {
+      "nombre": "Finnian",
+      "productId": 2998,
+      "slug": "finnian",
+      "fecha": "2026-01-22T01:15:31.533Z"
+    },
+    {
+      "nombre": "Groen",
+      "productId": 4512,
+      "slug": "groen",
+      "fecha": "2026-01-22T01:15:32.572Z"
+    },
+    {
+      "nombre": "Marcos",
+      "productId": 4244,
+      "slug": "marcos",
+      "fecha": "2026-01-22T01:15:33.519Z"
+    },
+    {
+      "nombre": "Violeta",
+      "productId": 4740,
+      "slug": "violeta-pixie",
+      "fecha": "2026-01-22T01:15:34.507Z"
+    },
+    {
+      "nombre": "Tadeo",
+      "productId": 4493,
+      "slug": "tadeo",
+      "fecha": "2026-01-22T01:15:35.511Z"
+    },
+    {
+      "nombre": "Crisanto",
+      "productId": 2987,
+      "slug": "crisanto",
+      "fecha": "2026-01-22T01:15:36.650Z"
+    },
+    {
+      "nombre": "Ekris",
+      "productId": 4582,
+      "slug": "ekris",
+      "fecha": "2026-01-22T01:15:37.601Z"
+    },
+    {
+      "nombre": "Astrid",
+      "productId": 247,
+      "slug": "astrid",
+      "fecha": "2026-01-22T01:15:38.581Z"
+    },
+    {
+      "nombre": "Vero",
+      "productId": 193,
+      "slug": "vero",
+      "fecha": "2026-01-22T01:15:39.795Z"
+    },
+    {
+      "nombre": "Milo",
+      "productId": 186,
+      "slug": "milo",
+      "fecha": "2026-01-22T01:15:40.906Z"
+    },
+    {
+      "nombre": "Lena Pixie",
+      "productId": 4681,
+      "slug": "anahi-pixie",
+      "fecha": "2026-01-22T01:15:42.074Z"
+    },
+    {
+      "nombre": "Idris",
+      "productId": 239,
+      "slug": "idris",
+      "fecha": "2026-01-22T01:15:43.350Z"
+    },
+    {
+      "nombre": "Daphne Pixie",
+      "productId": 4671,
+      "slug": "daphne-pixie",
+      "fecha": "2026-01-22T01:15:44.452Z"
+    },
+    {
+      "nombre": "Tulipa Pixie",
+      "productId": 4712,
+      "slug": "tulipa-pixie",
+      "fecha": "2026-01-22T01:15:45.485Z"
+    },
+    {
+      "nombre": "Mürh",
+      "productId": 183,
+      "slug": "murh",
+      "fecha": "2026-01-22T01:15:46.606Z"
+    },
+    {
+      "nombre": "Maya",
+      "productId": 244,
+      "slug": "maya",
+      "fecha": "2026-01-22T01:15:47.647Z"
+    },
+    {
+      "nombre": "Margarita Pixie",
+      "productId": 4722,
+      "slug": "margarita-pixie",
+      "fecha": "2026-01-22T01:15:48.663Z"
+    },
+    {
+      "nombre": "Bridget",
+      "productId": 4525,
+      "slug": "bridget",
+      "fecha": "2026-01-22T01:15:49.604Z"
+    },
+    {
+      "nombre": "Mitch",
+      "productId": 4542,
+      "slug": "mitch",
+      "fecha": "2026-01-22T01:15:50.548Z"
+    },
+    {
+      "nombre": "Rubi",
+      "productId": 194,
+      "slug": "rubi",
+      "fecha": "2026-01-22T01:15:51.530Z"
+    },
+    {
+      "nombre": "Neil",
+      "productId": 4495,
+      "slug": "neil",
+      "fecha": "2026-01-22T01:15:52.510Z"
+    },
+    {
+      "nombre": "Freydis",
+      "productId": 246,
+      "slug": "freydis",
+      "fecha": "2026-01-22T01:15:53.518Z"
+    },
+    {
+      "nombre": "Liam",
+      "productId": 4324,
+      "slug": "liam",
+      "fecha": "2026-01-22T01:15:56.645Z"
+    },
+    {
+      "nombre": "Sennua",
+      "productId": 248,
+      "slug": "sennua",
+      "fecha": "2026-01-22T01:15:57.697Z"
+    },
+    {
+      "nombre": "Matheo",
+      "productId": 255,
+      "slug": "matheo",
+      "fecha": "2026-01-22T01:15:58.761Z"
+    },
+    {
+      "nombre": "Morgana",
+      "productId": 2988,
+      "slug": "morgana",
+      "fecha": "2026-01-22T01:15:59.780Z"
+    },
+    {
+      "nombre": "Nano",
+      "productId": 185,
+      "slug": "nano",
+      "fecha": "2026-01-22T01:16:00.941Z"
+    },
+    {
+      "nombre": "Jazmín Pixie",
+      "productId": 4679,
+      "slug": "jazmin-pixie",
+      "fecha": "2026-01-22T01:16:02.308Z"
+    },
+    {
+      "nombre": "Melisa Pixie",
+      "productId": 4689,
+      "slug": "melisa-pixie",
+      "fecha": "2026-01-22T01:16:03.421Z"
+    },
+    {
+      "nombre": "Naia",
+      "productId": 202,
+      "slug": "naia",
+      "fecha": "2026-01-22T01:16:05.025Z"
+    },
+    {
+      "nombre": "Noah",
+      "productId": 4145,
+      "slug": "noah",
+      "fecha": "2026-01-22T01:16:06.388Z"
+    },
+    {
+      "nombre": "Diana",
+      "productId": 4603,
+      "slug": "diana",
+      "fecha": "2026-01-22T01:16:07.523Z"
+    },
+    {
+      "nombre": "Salvia Pixie",
+      "productId": 4660,
+      "slug": "salvia-pixie",
+      "fecha": "2026-01-22T01:16:08.885Z"
+    },
+    {
+      "nombre": "Tony",
+      "productId": 222,
+      "slug": "tony",
+      "fecha": "2026-01-22T01:16:10.226Z"
+    },
+    {
+      "nombre": "Tomasín",
+      "productId": 2981,
+      "slug": "tomasin",
+      "fecha": "2026-01-22T01:16:11.840Z"
+    },
+    {
+      "nombre": "Serena",
+      "productId": 2991,
+      "slug": "serena",
+      "fecha": "2026-01-22T01:16:12.995Z"
+    },
+    {
+      "nombre": "Zephyra Pixie",
+      "productId": 4685,
+      "slug": "zephyra-pixie",
+      "fecha": "2026-01-22T01:16:14.199Z"
+    },
+    {
+      "nombre": "Tareth",
+      "productId": 240,
+      "slug": "tareth",
+      "fecha": "2026-01-22T01:16:15.310Z"
+    },
+    {
+      "nombre": "Sabrina Pixie",
+      "productId": 4687,
+      "slug": "sabrina-pixie",
+      "fecha": "2026-01-22T01:16:16.331Z"
+    },
+    {
+      "nombre": "Anís Pixie",
+      "productId": 4675,
+      "slug": "anis-pixie",
+      "fecha": "2026-01-22T01:16:17.700Z"
+    },
+    {
+      "nombre": "Edmund",
+      "productId": 4508,
+      "slug": "edmund",
+      "fecha": "2026-01-22T01:16:18.974Z"
+    },
+    {
+      "nombre": "Erik",
+      "productId": 4497,
+      "slug": "erik",
+      "fecha": "2026-01-22T01:16:19.988Z"
+    },
+    {
+      "nombre": "Selene",
+      "productId": 4528,
+      "slug": "selene",
+      "fecha": "2026-01-22T01:16:20.957Z"
+    },
+    {
+      "nombre": "Sepherine",
+      "productId": 4532,
+      "slug": "morgana-2",
+      "fecha": "2026-01-22T01:16:22.049Z"
+    },
+    {
+      "nombre": "Freya",
+      "productId": 3004,
+      "slug": "freya",
+      "fecha": "2026-01-22T01:16:23.223Z"
+    },
+    {
+      "nombre": "Iris",
+      "productId": 4612,
+      "slug": "iris",
+      "fecha": "2026-01-22T01:16:24.239Z"
+    },
+    {
+      "nombre": "Izara",
+      "productId": 2994,
+      "slug": "izara",
+      "fecha": "2026-01-22T01:16:25.290Z"
+    },
+    {
+      "nombre": "Leo",
+      "productId": 253,
+      "slug": "leo-el-duende-del-emprendedor",
+      "fecha": "2026-01-22T01:16:26.297Z"
+    },
+    {
+      "nombre": "Winter",
+      "productId": 4520,
+      "slug": "winter",
+      "fecha": "2026-01-22T01:16:27.503Z"
+    },
+    {
+      "nombre": "Andy",
+      "productId": 4584,
+      "slug": "andy",
+      "fecha": "2026-01-22T01:16:28.539Z"
+    }
+  ],
+  "errores": [],
+  "noEncontrados": [],
+  "fecha": "2026-01-22T01:14:17.032Z"
+}

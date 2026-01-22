@@ -50,6 +50,13 @@ function GeneradorHistoriasContent() {
   const [inputChat, setInputChat] = useState('');
   const [encuestaCompleta, setEncuestaCompleta] = useState(false);
 
+  // Modo batch/rápido
+  const [batchSeleccion, setBatchSeleccion] = useState([]);
+  const [batchActual, setBatchActual] = useState(0);
+  const [batchHistoria, setBatchHistoria] = useState('');
+  const [filtroEspecie, setFiltroEspecie] = useState(null);
+  const [filtroCategoria, setFiltroCategoria] = useState(null);
+
   // Todas las especies disponibles
   const especiesDisponibles = [
     { id: 'duende', nombre: 'Duende', genero: 'M' },
@@ -152,17 +159,16 @@ function GeneradorHistoriasContent() {
     cargarDatosExistente(guardian.nombre);
   };
 
-  // Manejar cambio de tamaño
+  // Manejar cambio de tamaño (NUNCA sobreescribe cm - eso viene del catálogo)
   const handleTamanoChange = (tamanoId) => {
     const tamanoInfo = tamanosDisponibles.find(t => t.id === tamanoId);
     if (tamanoInfo) {
-      const especie = especiesDisponibles.find(e => e.id === datosGuardian.especie);
       const esPixie = datosGuardian.especie === 'pixie';
 
       setDatosGuardian(prev => ({
         ...prev,
         tamano: tamanoId,
-        tamanoCm: parseInt(tamanoInfo.cm) || 18,
+        // El cm NO se toca - viene del catálogo o lo pone el usuario
         esUnico: esPixie ? true : tamanoInfo.esUnico,
         precioUSD: tamanoInfo.precioUSD,
         precioUYU: tamanoInfo.precioUYU
@@ -390,10 +396,160 @@ Necesito conocer algunos datos. Empecemos:
     setCargando(false);
   };
 
+  // === FUNCIONES MODO BATCH ===
+
+  // Iniciar batch - genera la primera historia
+  const iniciarBatch = async () => {
+    setBatchActual(0);
+    setPaso(11);
+    await generarHistoriaBatch(0);
+  };
+
+  // Generar historia para un guardián del batch
+  const generarHistoriaBatch = async (index) => {
+    const guardian = batchSeleccion[index];
+    if (!guardian) return;
+
+    setCargando(true);
+    setBatchHistoria('');
+
+    // Buscar datos completos en el catálogo
+    const datosCatalogo = catalogo.guardianes.find(g =>
+      g.nombre.toLowerCase() === guardian.nombre.toLowerCase()
+    );
+
+    try {
+      const res = await fetch('/api/admin/historias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productoId: guardian.id,
+          nombre: datosCatalogo?.nombre || guardian.nombre,
+          genero: datosCatalogo?.genero || 'M',
+          especie: datosCatalogo?.especie || 'duende',
+          categoria: datosCatalogo?.categoria || 'Protección',
+          tamano: datosCatalogo?.tamano || 'mediano_especial',
+          tamanoCm: datosCatalogo?.cm || 18,
+          accesorios: datosCatalogo?.accesorios || '',
+          esUnico: datosCatalogo?.especie === 'pixie' || datosCatalogo?.tamano !== 'mini',
+          sincrodestinos_usados: sincrodestinos,
+          modoBatch: true
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBatchHistoria(data.historia);
+      } else {
+        setError(data.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    }
+    setCargando(false);
+  };
+
+  // Regenerar historia actual del batch
+  const regenerarBatch = async () => {
+    await generarHistoriaBatch(batchActual);
+  };
+
+  // Rechazar y pasar al siguiente
+  const rechazarBatch = async () => {
+    if (batchActual < batchSeleccion.length - 1) {
+      const next = batchActual + 1;
+      setBatchActual(next);
+      await generarHistoriaBatch(next);
+    } else {
+      // Terminamos
+      alert('Batch completado');
+      setPaso(1);
+      setModo(null);
+      setBatchSeleccion([]);
+      setBatchActual(0);
+    }
+  };
+
+  // Aprobar, guardar y pasar al siguiente
+  const aprobarBatch = async () => {
+    const guardian = batchSeleccion[batchActual];
+    const datosCatalogo = catalogo.guardianes.find(g =>
+      g.nombre.toLowerCase() === guardian.nombre.toLowerCase()
+    );
+
+    setCargando(true);
+    try {
+      const res = await fetch('/api/admin/historias', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productoId: guardian.id,
+          historia: batchHistoria,
+          datosGuardian: {
+            nombre: datosCatalogo?.nombre || guardian.nombre,
+            especie: datosCatalogo?.especie,
+            categoria: datosCatalogo?.categoria,
+            tamanoCm: datosCatalogo?.cm,
+            accesorios: datosCatalogo?.accesorios
+          }
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (batchActual < batchSeleccion.length - 1) {
+          const next = batchActual + 1;
+          setBatchActual(next);
+          await generarHistoriaBatch(next);
+        } else {
+          alert(`Batch completado. ${batchSeleccion.length} historias guardadas.`);
+          setPaso(1);
+          setModo(null);
+          setBatchSeleccion([]);
+          setBatchActual(0);
+        }
+      } else {
+        setError(data.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    }
+    setCargando(false);
+  };
+
   // Filtrar guardianes
   const guardianesFiltrados = guardianes.filter(g =>
     g.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
+
+  // Filtrar para batch (con filtros de especie y categoría)
+  const guardianesFiltradosBatch = guardianes.filter(g => {
+    // Filtro por nombre
+    if (!g.nombre.toLowerCase().includes(busqueda.toLowerCase())) return false;
+
+    // Filtro por especie (buscar en catálogo)
+    if (filtroEspecie) {
+      const datosCat = catalogo.guardianes.find(cg =>
+        cg.nombre.toLowerCase() === g.nombre.toLowerCase()
+      );
+      if (!datosCat || !datosCat.especie?.toLowerCase().includes(filtroEspecie.toLowerCase())) {
+        return false;
+      }
+    }
+
+    // Filtro por categoría
+    if (filtroCategoria) {
+      const datosCat = catalogo.guardianes.find(cg =>
+        cg.nombre.toLowerCase() === g.nombre.toLowerCase()
+      );
+      if (!datosCat || datosCat.categoria !== filtroCategoria) {
+        // También verificar en categorías del WooCommerce
+        if (!g.categorias?.includes(filtroCategoria)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  });
 
   return (
     <div className="generador-container">
@@ -435,6 +591,13 @@ Necesito conocer algunos datos. Empecemos:
                 <h3>Guardián Nuevo</h3>
                 <p>Registrar un nuevo guardián con encuesta inteligente</p>
                 <span className="badge">Claude te guía paso a paso</span>
+              </div>
+
+              <div className="modo-card rapido" onClick={() => { setModo('batch'); escanearHistorias(); }}>
+                <div className="icono">⚡</div>
+                <h3>Modo Rápido</h3>
+                <p>Generar historias directo desde el catálogo, sin encuesta</p>
+                <span className="badge">Solo aprobar/rechazar</span>
               </div>
             </div>
           </div>
@@ -500,6 +663,200 @@ Necesito conocer algunos datos. Empecemos:
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* PASO 2 BATCH: Selección múltiple para modo rápido */}
+        {paso === 2 && modo === 'batch' && (
+          <div className="paso-content">
+            <h2>Modo Rápido - Seleccioná guardianes</h2>
+            <p className="instruccion-batch">Hacé click en los guardianes para seleccionarlos. Luego generamos las historias directo.</p>
+
+            {escaneo && (
+              <div className="resumen-escaneo">
+                <div className="stats">
+                  <div className="stat">
+                    <span className="numero">{escaneo.sin_historia}</span>
+                    <span className="label">Sin Historia</span>
+                  </div>
+                  <div className="stat seleccionados">
+                    <span className="numero">{batchSeleccion.length}</span>
+                    <span className="label">Seleccionados</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="busqueda">
+              <input
+                type="text"
+                placeholder="Buscar por nombre..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+              <button
+                className="btn-secondary"
+                onClick={() => setBatchSeleccion(guardianesFiltradosBatch.filter(g => !g.tiene_historia))}
+              >
+                Seleccionar filtrados sin historia
+              </button>
+            </div>
+
+            <div className="filtros-batch">
+              <span style={{opacity: 0.7, marginRight: '0.5rem'}}>Especie:</span>
+              <button
+                className={`filtro-btn ${filtroEspecie === null ? 'activo' : ''}`}
+                onClick={() => setFiltroEspecie(null)}
+              >
+                Todas
+              </button>
+              <button
+                className={`filtro-btn ${filtroEspecie === 'pixie' ? 'activo' : ''}`}
+                onClick={() => setFiltroEspecie('pixie')}
+              >
+                Pixies
+              </button>
+              <button
+                className={`filtro-btn ${filtroEspecie === 'duende' ? 'activo' : ''}`}
+                onClick={() => setFiltroEspecie('duende')}
+              >
+                Duendes
+              </button>
+              <button
+                className={`filtro-btn ${filtroEspecie === 'bruja' ? 'activo' : ''}`}
+                onClick={() => setFiltroEspecie('bruja')}
+              >
+                Brujas
+              </button>
+              <button
+                className={`filtro-btn ${filtroEspecie === 'vikingo' ? 'activo' : ''}`}
+                onClick={() => setFiltroEspecie('vikingo')}
+              >
+                Vikingos
+              </button>
+              <button
+                className={`filtro-btn ${filtroEspecie === 'elfo' ? 'activo' : ''}`}
+                onClick={() => setFiltroEspecie('elfo')}
+              >
+                Elfos
+              </button>
+            </div>
+
+            <div className="filtros-batch">
+              <span style={{opacity: 0.7, marginRight: '0.5rem'}}>Categoría:</span>
+              <button
+                className={`filtro-btn ${filtroCategoria === null ? 'activo' : ''}`}
+                onClick={() => setFiltroCategoria(null)}
+              >
+                Todas
+              </button>
+              {catalogo.categorias?.map(cat => (
+                <button
+                  key={cat}
+                  className={`filtro-btn ${filtroCategoria === cat ? 'activo' : ''}`}
+                  onClick={() => setFiltroCategoria(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="guardianes-grid batch-grid">
+              {guardianesFiltradosBatch.map(g => (
+                <div
+                  key={g.id}
+                  className={`guardian-card ${batchSeleccion.some(s => s.id === g.id) ? 'seleccionado' : ''} ${g.tiene_historia ? 'tiene-historia' : ''}`}
+                  onClick={() => {
+                    if (batchSeleccion.some(s => s.id === g.id)) {
+                      setBatchSeleccion(batchSeleccion.filter(s => s.id !== g.id));
+                    } else {
+                      setBatchSeleccion([...batchSeleccion, g]);
+                    }
+                  }}
+                >
+                  {g.imagen && <img src={g.imagen} alt={g.nombre} />}
+                  <div className="info">
+                    <h4>{g.nombre}</h4>
+                    <span className="categoria">{g.categorias?.[0] || 'Sin categoría'}</span>
+                    {batchSeleccion.some(s => s.id === g.id) && <span className="check">✓</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {batchSeleccion.length > 0 && (
+              <div className="acciones-fijas">
+                <p><strong>{batchSeleccion.length}</strong> guardián(es) seleccionado(s)</p>
+                <div className="btns">
+                  <button className="btn-secondary" onClick={() => setBatchSeleccion([])}>
+                    Limpiar
+                  </button>
+                  <button className="btn-primary" onClick={iniciarBatch}>
+                    Generar {batchSeleccion.length} historia(s)
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PASO 11 BATCH: Generación y preview rápido */}
+        {paso === 11 && modo === 'batch' && (
+          <div className="paso-content paso-batch-preview">
+            <h2>
+              {batchActual + 1} de {batchSeleccion.length}: {batchSeleccion[batchActual]?.nombre}
+            </h2>
+
+            <div className="batch-info">
+              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.especie}</span>
+              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.categoria}</span>
+              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.cm}cm</span>
+              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.accesorios}</span>
+            </div>
+
+            {cargando ? (
+              <div className="generando">
+                <div className="spinner"></div>
+                <p>Generando historia para {batchSeleccion[batchActual]?.nombre}...</p>
+              </div>
+            ) : (
+              <>
+                <div className="preview-container">
+                  <div className="preview-historia">
+                    {batchHistoria.split('\n').map((linea, i) => {
+                      if (linea.startsWith('**') && linea.endsWith('**')) {
+                        return <h3 key={i}>{linea.replace(/\*\*/g, '')}</h3>;
+                      }
+                      if (linea.startsWith('*') && linea.endsWith('*')) {
+                        return <p key={i} className="mensaje-guardian"><em>{linea.replace(/\*/g, '')}</em></p>;
+                      }
+                      if (linea.trim()) {
+                        return <p key={i}>{linea}</p>;
+                      }
+                      return null;
+                    })}
+                  </div>
+                </div>
+
+                <div className="batch-acciones">
+                  <button className="btn-secondary" onClick={regenerarBatch}>
+                    Regenerar
+                  </button>
+                  <button className="btn-danger" onClick={rechazarBatch}>
+                    Rechazar y siguiente
+                  </button>
+                  <button className="btn-primary" onClick={aprobarBatch}>
+                    Aprobar y {batchActual < batchSeleccion.length - 1 ? 'siguiente' : 'terminar'}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <div className="batch-progress">
+              {batchSeleccion.map((g, i) => (
+                <span key={g.id} className={`dot ${i === batchActual ? 'actual' : ''} ${i < batchActual ? 'done' : ''}`}></span>
+              ))}
+            </div>
           </div>
         )}
 
@@ -1422,6 +1779,169 @@ Necesito conocer algunos datos. Empecemos:
 
         .volver-inicio {
           margin-top: 1rem;
+        }
+
+        /* Batch mode styles */
+        .modo-card.rapido {
+          border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .modo-card.rapido:hover {
+          border-color: rgba(251, 191, 36, 0.6);
+          background: rgba(251, 191, 36, 0.1);
+        }
+
+        .instruccion-batch {
+          opacity: 0.7;
+          margin-bottom: 1.5rem;
+        }
+
+        .stat.seleccionados .numero {
+          color: #fbbf24;
+        }
+
+        .busqueda {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .filtros-batch {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin: 1rem 0;
+        }
+
+        .filtro-btn {
+          padding: 0.4rem 0.8rem;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 16px;
+          color: #e0e0e0;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .filtro-btn:hover {
+          background: rgba(139, 92, 246, 0.2);
+          border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .filtro-btn.activo {
+          background: rgba(139, 92, 246, 0.3);
+          border-color: #8b5cf6;
+        }
+
+        .batch-grid .guardian-card .check {
+          position: absolute;
+          top: 0.5rem;
+          right: 0.5rem;
+          background: #8b5cf6;
+          color: white;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.8rem;
+        }
+
+        .batch-grid .guardian-card {
+          position: relative;
+        }
+
+        .batch-grid .guardian-card.tiene-historia {
+          opacity: 0.5;
+        }
+
+        .acciones-fijas .btns {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .paso-batch-preview {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .batch-info {
+          display: flex;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          margin-bottom: 1rem;
+        }
+
+        .batch-info span {
+          background: rgba(255,255,255,0.1);
+          padding: 0.25rem 0.75rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+        }
+
+        .generando {
+          text-align: center;
+          padding: 4rem 2rem;
+        }
+
+        .spinner {
+          width: 48px;
+          height: 48px;
+          border: 4px solid rgba(139, 92, 246, 0.2);
+          border-top-color: #8b5cf6;
+          border-radius: 50%;
+          margin: 0 auto 1rem;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .batch-acciones {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 1.5rem;
+        }
+
+        .btn-danger {
+          background: rgba(239, 68, 68, 0.2);
+          color: #fca5a5;
+          border: 1px solid rgba(239, 68, 68, 0.5);
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+
+        .btn-danger:hover {
+          background: rgba(239, 68, 68, 0.3);
+        }
+
+        .batch-progress {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          margin-top: 2rem;
+        }
+
+        .batch-progress .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.2);
+        }
+
+        .batch-progress .dot.actual {
+          background: #8b5cf6;
+          box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+        }
+
+        .batch-progress .dot.done {
+          background: #4ade80;
         }
 
         @media (max-width: 768px) {

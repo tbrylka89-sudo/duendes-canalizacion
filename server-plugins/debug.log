@@ -1,0 +1,29 @@
+[21-Jan-2026 17:34:45 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:35:08 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:35:10 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:35:19 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:35:21 UTC] PHP Fatal error:  Cannot declare class DuendesFichaGuardian, because the name is already in use in /home/wplive/web/wp-live/wp-content/plugins/duendes-ficha-guardian.php on line 15
+[21-Jan-2026 17:35:21 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:35:24 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:35:24 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:36:24 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:37:40 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:37:41 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:37:50 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:37:50 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:37:51 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:37:51 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:16 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:24 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:24 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:31 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:34 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:34 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/wplive/web/wp-live/wp-content/mu-plugins/10web-manager/includes/class-cache.php on line 484
+[21-Jan-2026 17:38:34 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/wplive/web/wp-live/wp-content/mu-plugins/10web-manager/includes/class-cache.php on line 502
+[21-Jan-2026 17:38:36 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:41 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:38:41 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:39:14 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:39:27 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:39:41 UTC] Duendes Remote Control: Plugin cargado correctamente
+[21-Jan-2026 17:39:41 UTC] Duendes Remote Control: Plugin cargado correctamente

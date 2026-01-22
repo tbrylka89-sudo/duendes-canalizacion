@@ -6,6 +6,25 @@ Este documento define CÓMO Claude debe escribir, pensar y crear contenido para 
 
 ---
 
+## DOCUMENTOS RELACIONADOS
+
+| Documento | Propósito |
+|-----------|-----------|
+| **CLAUDE.md** (este) | Reglas generales de escritura y canalizaciones |
+| **BIBLIA-HISTORIAS-GUARDIANES.md** | Sistema completo para generar historias de productos |
+| **ESTADO-PANEL-CANALIZACIONES.md** | Documentación del panel de aprobación |
+
+### Para Historias de Productos
+
+Usá el **Generador de Historias** en `/admin/generador-historias` que sigue las reglas de `BIBLIA-HISTORIAS-GUARDIANES.md`:
+- Escanea historias existentes para no repetir
+- Analiza imágenes de guardianes
+- Hace encuestas dinámicas
+- Genera con variación de estructura, edad, sincrodestinos
+- Publica directo a WooCommerce
+
+---
+
 ## 1. ESCRITURA EMOCIONAL - LA REGLA DE ORO
 
 ### LO QUE NUNCA DEBE HACER CLAUDE:

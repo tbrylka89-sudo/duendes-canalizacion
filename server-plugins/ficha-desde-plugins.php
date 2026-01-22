@@ -469,39 +469,6 @@ class DuendesFichaGuardian {
                 <div id="auto-completar-resultado" style="display: none; margin-top: 15px; padding: 15px; background: rgba(74,153,98,0.2); border-radius: 8px; border: 1px solid rgba(74,153,98,0.3);"></div>
             </div>
 
-            <!-- SECCIÓN: Generador de Historias Inteligente -->
-            <div class="duendes-ficha-section" style="background: linear-gradient(135deg, rgba(201,169,98,0.15), rgba(201,169,98,0.05)); border: 1px solid rgba(201,169,98,0.3);">
-                <h3>📖 Historia del Guardián</h3>
-                <p style="color: #aaa; margin-bottom: 15px; font-size: 14px;">
-                    Generá la historia para la página del producto usando el sistema inteligente.
-                    Analiza imagen, hace preguntas dinámicas, escanea historias existentes para no repetir.
-                </p>
-
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
-                    <a href="https://duendes-vercel.vercel.app/admin/generador-historias?producto=<?php echo $post->ID; ?>&nombre=<?php echo urlencode($post->post_title); ?>"
-                       target="_blank"
-                       class="duendes-btn-ia"
-                       style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <span style="font-size: 20px;">📝</span>
-                        Abrir Generador de Historias
-                    </a>
-                    <a href="https://duendes-vercel.vercel.app/admin/generador-historias"
-                       target="_blank"
-                       style="color: #c9a962; font-size: 13px; text-decoration: underline;">
-                        Ver todas las historias
-                    </a>
-                </div>
-
-                <div class="duendes-small" style="margin-top: 12px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
-                    <strong>El generador incluye:</strong><br>
-                    • Escaneo de historias existentes (no repite edades, sincrodestinos, frases)<br>
-                    • Análisis de imagen del guardián con IA<br>
-                    • Preguntas dinámicas generadas en el momento<br>
-                    • Estructura variable (sorprende, no es siempre igual)<br>
-                    • Guarda directo en WooCommerce
-                </div>
-            </div>
-
         </div>
 
         <script>
