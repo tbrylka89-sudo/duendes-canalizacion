@@ -25,6 +25,177 @@ Usá el **Generador de Historias** en `/admin/generador-historias` que sigue las
 
 ---
 
+## SISTEMA EXPERTO DE CONVERSIÓN
+
+### Ubicación: `/lib/conversion/`
+
+Sistema completo para generar historias que VENDEN, no solo que suenan bonitas.
+
+### Módulos
+
+| Módulo | Propósito |
+|--------|-----------|
+| `hooks.js` | Biblioteca de hooks de apertura por categoría |
+| `sincrodestinos.js` | Base de eventos "mágicos" creíbles durante creación |
+| `cierres.js` | Cierres personalizados según perfil psicológico |
+| `arco.js` | Estructura y validación del arco emocional |
+| `scoring.js` | Sistema de scoring de conversión (0-50 pts) |
+| `index.js` | Exporta todo + función `analizarHistoriaCompleta()` |
+
+### Hooks por Categoría
+
+Frases de apertura que enganchan según el tipo de guardián:
+
+```javascript
+// Ejemplo de hooks de Protección
+"Hay personas que cargan con más de lo que les corresponde."
+"¿Cuántas veces dijiste 'estoy bien' mientras te caías por dentro?"
+"Proteger a otros se convirtió en tu forma de existir."
+```
+
+**Categorías:** Protección, Abundancia, Amor, Sanación, Sabiduría
+
+### Sincrodestinos
+
+Eventos creíbles que pasaron "mientras se creaba el guardián":
+
+```javascript
+// Tipos disponibles
+- sensorial: "Un gorrión golpeó la ventana tres veces"
+- climático: "Empezó a llover exactamente cuando terminó la pintura"
+- temporal: "Se terminó justo a las 3:33 AM"
+- animal: "Una mariposa se posó en la mesa y no se movió"
+- material: "El barniz tardó el triple en secar"
+```
+
+**Regla:** Solo UNO por historia, bien ubicado, sin explicación excesiva.
+
+### Sistema de Scoring (0-50 puntos)
+
+5 dimensiones, cada una de 0-10:
+
+| Dimensión | Pregunta clave | Mínimo aceptable |
+|-----------|----------------|------------------|
+| **Identificación** | ¿El lector se reconoce? | 4/10 |
+| **Dolor** | ¿Toca heridas reales? | 4/10 |
+| **Solución** | ¿El guardián resuelve algo específico? | 5/10 |
+| **Urgencia** | ¿Hay razón para actuar ahora? | 3/10 |
+| **Confianza** | ¿Evita sonar a venta? | 4/10 |
+
+**Score mínimo aceptable: 30/50**
+
+### Arco Emocional (8 fases)
+
+Toda historia debe seguir este arco para convertir:
+
+| # | Fase | Objetivo | Ejemplo |
+|---|------|----------|---------|
+| 1 | **Espejo** | El lector se ve reflejado | "Hay personas que..." |
+| 2 | **Herida** | Tocar el dolor sin nombrarlo | "Esa carga que llevás..." |
+| 3 | **Validación** | "No estás loca" | "Lo que sentís es real" |
+| 4 | **Esperanza** | Posibilidad de cambio | "Pero hay otra forma..." |
+| 5 | **Solución** | El guardián como respuesta | "[Nombre] nació para..." |
+| 6 | **Prueba** | Evidencia tangible | Sincrodestino, detalle físico |
+| 7 | **Puente** | Conexión personal | "Vos específicamente..." |
+| 8 | **Decisión** | Llamado a acción sin presión | Cierre según perfil |
+
+**Score de arco: % de fases presentes. Mínimo: 75%**
+
+### Cierres por Perfil Psicológico
+
+El cierre cambia según quién lee:
+
+**Vulnerable:**
+```
+"Si algo de esto te tocó, no lo ignores. Eso que sentiste es tu intuición hablando.
+[Nombre] ya está acá, esperando. La decisión es tuya, pero no te apures a decir que no."
+```
+
+**Escéptico:**
+```
+"No te pido que creas en nada. Solo que notes qué sentiste al leer esto.
+Eso que notaste, sea lo que sea, es real. [Nombre] no necesita que creas - ya sabe."
+```
+
+**Impulsivo:**
+```
+"Mirá, esto no es para pensarlo mucho. O resuena o no.
+Si llegaste hasta acá, algo te trajo. [Nombre] es pieza única - cuando encuentre hogar, desaparece."
+```
+
+### Modo Directo en el Generador
+
+**Ubicación:** `/admin/generador-historias` → Modo Directo
+
+Click en guardián → historia generada con todo el sistema experto. Sin vueltas.
+
+El modo directo:
+1. Muestra catálogo filtrable
+2. Click en cualquier guardián
+3. Llama a `/api/admin/historias` con los datos
+4. Muestra historia + score + arco + evaluación
+5. Permite copiar o regenerar
+
+### API de Historias
+
+**Endpoint:** `POST /api/admin/historias`
+
+```javascript
+// Request
+{
+  "nombre": "Violeta",
+  "especie": "pixie",
+  "categoria": "Protección",
+  "tamanoCm": 11,
+  "accesorios": "pelo azul, rosa blanca",
+  "esUnico": true
+}
+
+// Response
+{
+  "success": true,
+  "historia": "...",
+  "datos": {
+    "categoria": "Protección",
+    "especie": "pixie",
+    "tamano": "11 cm",
+    "hooks": ["..."],
+    "sincrodestino": {...},
+    "cierres": {...},
+    "perfil": "vulnerable"
+  },
+  "conversion": {
+    "score": {...},
+    "evaluacion": {...}
+  },
+  "arco": {
+    "score": 100,
+    "completo": true,
+    "fases": [...]
+  }
+}
+```
+
+### Frases de IA Prohibidas (detectadas automáticamente)
+
+```
+❌ "Desde las profundidades..."
+❌ "Brumas ancestrales..."
+❌ "Velo entre mundos..."
+❌ "Tiempos inmemoriales..."
+❌ "Susurro del viento..."
+❌ "Danza de las hojas..."
+❌ "Vibraciones cósmicas..."
+❌ "Campo energético..."
+❌ "847 años" (número prohibido)
+❌ "Acantilados de Irlanda" (genérico)
+❌ "Bosques de Escocia" (genérico)
+```
+
+El sistema las detecta y penaliza el score automáticamente.
+
+---
+
 ## 1. ESCRITURA EMOCIONAL - LA REGLA DE ORO
 
 ### LO QUE NUNCA DEBE HACER CLAUDE:

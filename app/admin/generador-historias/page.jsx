@@ -65,6 +65,10 @@ function GeneradorHistoriasContent() {
     indicaciones: ''
   });
 
+  // Datos del sistema experto de conversión
+  const [datosConversion, setDatosConversion] = useState(null);
+  const [datosConversionBatch, setDatosConversionBatch] = useState(null);
+
   // Todas las especies disponibles
   const especiesDisponibles = [
     { id: 'duende', nombre: 'Duende', genero: 'M' },
@@ -363,6 +367,17 @@ Necesito conocer algunos datos. Empecemos:
       const data = await res.json();
       if (data.success) {
         setHistoriaGenerada(data.historia);
+        // Guardar datos del sistema experto
+        setDatosConversion({
+          score: data.score_conversion,
+          arco: data.arco_emocional,
+          cierres: data.cierres_por_perfil,
+          hooks: data.hooks_alternativos,
+          aprobada: data.aprobada,
+          advertencias: data.advertencias,
+          hookUsado: data.datos?.hookUsado,
+          sincrodestinoUsado: data.datos?.sincrodestinoUsado
+        });
         setPaso(6);
       } else {
         setError(data.error);
@@ -460,6 +475,17 @@ Necesito conocer algunos datos. Empecemos:
       const data = await res.json();
       if (data.success) {
         setBatchHistoria(data.historia);
+        // Guardar datos del sistema experto para batch
+        setDatosConversionBatch({
+          score: data.score_conversion,
+          arco: data.arco_emocional,
+          cierres: data.cierres_por_perfil,
+          hooks: data.hooks_alternativos,
+          aprobada: data.aprobada,
+          advertencias: data.advertencias,
+          hookUsado: data.datos?.hookUsado,
+          sincrodestinoUsado: data.datos?.sincrodestinoUsado
+        });
       } else {
         setError(data.error);
       }
@@ -542,6 +568,96 @@ Necesito conocer algunos datos. Empecemos:
     }
     setCargando(false);
   };
+
+  // === MODO DIRECTO ===
+  const [directoHistoria, setDirectoHistoria] = useState('');
+  const [directoGuardian, setDirectoGuardian] = useState(null);
+  const [directoConversion, setDirectoConversion] = useState(null);
+  const [busquedaDirecto, setBusquedaDirecto] = useState('');
+  const [directoEspecializacion, setDirectoEspecializacion] = useState('');
+  const [directoEspecializacionTexto, setDirectoEspecializacionTexto] = useState('');
+
+  // Especializaciones disponibles (chips rápidos) - IDs deben coincidir con especializaciones.js
+  const especializacionesRapidas = [
+    { id: 'fortuna', label: 'Fortuna/Suerte', descripcion: 'Atrae buena suerte y oportunidades' },
+    { id: 'proteccion', label: 'Protección', descripcion: 'Protege energía, hogar o persona' },
+    { id: 'amor_romantico', label: 'Amor', descripcion: 'Abre el corazón al amor' },
+    { id: 'amor_propio', label: 'Amor Propio', descripcion: 'Autoestima y valor personal' },
+    { id: 'sanacion', label: 'Sanación', descripcion: 'Sana heridas emocionales' },
+    { id: 'calma', label: 'Calma/Paz', descripcion: 'Trae serenidad y tranquilidad' },
+    { id: 'sabiduria', label: 'Sabiduría', descripcion: 'Claridad y guía en decisiones' },
+    { id: 'abundancia', label: 'Abundancia', descripcion: 'Prosperidad y flujo económico' },
+    { id: 'alegria', label: 'Alegría', descripcion: 'Liviandad y felicidad' },
+    { id: 'transformacion', label: 'Transformación', descripcion: 'Cambio y renacimiento' },
+  ];
+
+  // Seleccionar guardián para modo directo (va al paso de especialización)
+  const seleccionarParaDirecto = (guardian) => {
+    setDirectoGuardian(guardian);
+    setDirectoEspecializacion('');
+    setDirectoEspecializacionTexto('');
+    setPaso(14); // Paso de selección de especialización
+  };
+
+  // Generar historia directo desde catálogo local
+  const generarDirecto = async (especializacionOverride = null) => {
+    const guardian = directoGuardian;
+    if (!guardian) return;
+
+    // Determinar la especialización a usar
+    const especializacion = especializacionOverride || directoEspecializacionTexto || directoEspecializacion;
+
+    setDirectoHistoria('');
+    setDirectoConversion(null);
+    setCargando(true);
+    setPaso(13); // Paso de preview directo
+
+    try {
+      const res = await fetch('/api/admin/historias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: guardian.nombre,
+          especie: guardian.especie || 'duende',
+          categoria: guardian.categoria || 'Protección',
+          tamanoCm: guardian.cm || 18,
+          accesorios: guardian.accesorios || '',
+          // Recreables: mini y mini_especial, EXCEPTO pixies que siempre son únicas
+          esUnico: guardian.especie === 'pixie' || (guardian.tamano !== 'mini' && guardian.tamano !== 'mini_especial'),
+          // NUEVO: especialización elegida por el usuario
+          especializacion: especializacion
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDirectoHistoria(data.historia);
+        setDirectoConversion({
+          score: data.score_conversion,
+          arco: data.arco_emocional,
+          cierres: data.cierres_por_perfil,
+          hooks: data.hooks_alternativos,
+          aprobada: data.aprobada,
+          advertencias: data.advertencias,
+          hookUsado: data.datos?.hookUsado,
+          sincrodestinoUsado: data.datos?.sincrodestinoUsado,
+          especializacionUsada: especializacion
+        });
+      } else {
+        setError(data.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    }
+    setCargando(false);
+  };
+
+  // Filtrar catálogo para modo directo
+  const catalogoFiltrado = catalogo.guardianes.filter(g => {
+    if (!g.nombre.toLowerCase().includes(busquedaDirecto.toLowerCase())) return false;
+    if (filtroEspecie && g.especie !== filtroEspecie) return false;
+    if (filtroCategoria && g.categoria !== filtroCategoria) return false;
+    return true;
+  });
 
   // Filtrar guardianes
   const guardianesFiltrados = guardianes.filter(g =>
@@ -626,6 +742,13 @@ Necesito conocer algunos datos. Empecemos:
                 <h3>Modo Rápido</h3>
                 <p>Generar historias directo desde el catálogo, sin encuesta</p>
                 <span className="badge">Solo aprobar/rechazar</span>
+              </div>
+
+              <div className="modo-card directo" onClick={() => { setModo('directo'); setPaso(12); }}>
+                <div className="icono">🎯</div>
+                <h3>Modo Directo</h3>
+                <p>Click en guardián → historia generada. Sin vueltas.</p>
+                <span className="badge">1 click = 1 historia</span>
               </div>
             </div>
           </div>
@@ -860,6 +983,37 @@ Necesito conocer algunos datos. Empecemos:
               </div>
             ) : (
               <>
+                {/* Score de conversión batch */}
+                {datosConversionBatch && (
+                  <div className={`conversion-score compact ${datosConversionBatch.aprobada ? 'aprobada' : 'rechazada'}`}>
+                    <div className="score-header">
+                      <span className="score-total">
+                        {datosConversionBatch.aprobada ? '✅' : '⚠️'} Score: {datosConversionBatch.score?.total || 0}/50
+                      </span>
+                      <span className="arco-score">
+                        Arco: {datosConversionBatch.arco?.score || 0}%
+                      </span>
+                      <div className="score-mini">
+                        <span title="Identificación">I:{datosConversionBatch.score?.identificacion || 0}</span>
+                        <span title="Dolor">D:{datosConversionBatch.score?.dolor || 0}</span>
+                        <span title="Solución">S:{datosConversionBatch.score?.solucion || 0}</span>
+                        <span title="Urgencia">U:{datosConversionBatch.score?.urgencia || 0}</span>
+                        <span title="Confianza">C:{datosConversionBatch.score?.confianza || 0}</span>
+                      </div>
+                    </div>
+                    {datosConversionBatch.advertencias && datosConversionBatch.advertencias.length > 0 && (
+                      <div className="advertencias-mini">
+                        {datosConversionBatch.advertencias.slice(0, 3).map((adv, i) => (
+                          <span key={i} className="adv-tag">{adv}</span>
+                        ))}
+                        {datosConversionBatch.advertencias.length > 3 && (
+                          <span className="adv-more">+{datosConversionBatch.advertencias.length - 3} más</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="preview-container">
                   <div className="preview-historia">
                     {batchHistoria.split('\n').map((linea, i) => {
@@ -903,6 +1057,8 @@ Necesito conocer algunos datos. Empecemos:
                         >
                           <option value="">Seleccioná...</option>
                           <option value="muy_generico">Muy genérico / suena a IA</option>
+                          <option value="suena_ia">Tiene frases de IA prohibidas</option>
+                          <option value="falta_arco">Falta estructura emocional</option>
                           <option value="muy_largo">Muy largo</option>
                           <option value="muy_corto">Muy corto</option>
                           <option value="categoria_incorrecta">Categoría incorrecta</option>
@@ -952,6 +1108,194 @@ Necesito conocer algunos datos. Empecemos:
               {batchSeleccion.map((g, i) => (
                 <span key={g.id} className={`dot ${i === batchActual ? 'actual' : ''} ${i < batchActual ? 'done' : ''}`}></span>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* PASO 12: Modo Directo - Selección del catálogo */}
+        {paso === 12 && modo === 'directo' && (
+          <div className="paso-content">
+            <h2>Modo Directo - Click para generar</h2>
+            <p className="instruccion-batch">Hacé click en cualquier guardián y se genera la historia al instante.</p>
+
+            <div className="busqueda">
+              <input
+                type="text"
+                placeholder="Buscar por nombre..."
+                value={busquedaDirecto}
+                onChange={(e) => setBusquedaDirecto(e.target.value)}
+              />
+            </div>
+
+            <div className="filtros-batch">
+              <span style={{opacity: 0.7, marginRight: '0.5rem'}}>Especie:</span>
+              <button className={`filtro-btn ${filtroEspecie === null ? 'activo' : ''}`} onClick={() => setFiltroEspecie(null)}>Todas</button>
+              <button className={`filtro-btn ${filtroEspecie === 'pixie' ? 'activo' : ''}`} onClick={() => setFiltroEspecie('pixie')}>Pixies</button>
+              <button className={`filtro-btn ${filtroEspecie === 'duende' ? 'activo' : ''}`} onClick={() => setFiltroEspecie('duende')}>Duendes</button>
+              <button className={`filtro-btn ${filtroEspecie === 'duenda' ? 'activo' : ''}`} onClick={() => setFiltroEspecie('duenda')}>Duendas</button>
+              <button className={`filtro-btn ${filtroEspecie === 'bruja' ? 'activo' : ''}`} onClick={() => setFiltroEspecie('bruja')}>Brujas</button>
+              <button className={`filtro-btn ${filtroEspecie === 'vikingo' ? 'activo' : ''}`} onClick={() => setFiltroEspecie('vikingo')}>Vikingos</button>
+            </div>
+
+            <div className="filtros-batch">
+              <span style={{opacity: 0.7, marginRight: '0.5rem'}}>Categoría:</span>
+              <button className={`filtro-btn ${filtroCategoria === null ? 'activo' : ''}`} onClick={() => setFiltroCategoria(null)}>Todas</button>
+              {catalogo.categorias?.map(cat => (
+                <button key={cat} className={`filtro-btn ${filtroCategoria === cat ? 'activo' : ''}`} onClick={() => setFiltroCategoria(cat)}>{cat}</button>
+              ))}
+            </div>
+
+            <div className="catalogo-directo-grid">
+              {catalogoFiltrado.map(g => (
+                <div key={g.nombre} className="catalogo-card" onClick={() => seleccionarParaDirecto(g)}>
+                  <div className="catalogo-nombre">{g.nombre}</div>
+                  <div className="catalogo-meta">
+                    <span className="especie">{g.especie}</span>
+                    <span className="categoria">{g.categoria}</span>
+                    <span className="cm">{g.cm}cm</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="acciones" style={{marginTop: '2rem'}}>
+              <button className="btn-secondary" onClick={() => { setPaso(1); setModo(null); }}>Volver</button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 13: Modo Directo - Preview */}
+        {paso === 13 && modo === 'directo' && (
+          <div className="paso-content paso-preview">
+            <h2>{directoGuardian?.nombre}</h2>
+
+            <div className="preview-info">
+              <span>{directoGuardian?.especie}</span>
+              <span>{directoGuardian?.categoria}</span>
+              <span>{directoGuardian?.cm}cm</span>
+            </div>
+
+            {cargando ? (
+              <div className="generando">
+                <div className="spinner"></div>
+                <p>Generando historia...</p>
+              </div>
+            ) : (
+              <>
+                {/* Score de conversión */}
+                {directoConversion && (
+                  <div className={`conversion-score ${directoConversion.aprobada ? 'aprobada' : 'rechazada'}`}>
+                    <div className="score-header">
+                      <span className="score-total">
+                        {directoConversion.aprobada ? '✅' : '⚠️'} Score: {directoConversion.score?.total || 0}/50
+                      </span>
+                      <span className="arco-score">
+                        Arco: {directoConversion.arco?.score || 0}%
+                      </span>
+                    </div>
+
+                    <div className="score-desglose">
+                      <div className="score-item"><span className="label">Identificación</span><span className="valor">{directoConversion.score?.identificacion || 0}/10</span></div>
+                      <div className="score-item"><span className="label">Dolor</span><span className="valor">{directoConversion.score?.dolor || 0}/10</span></div>
+                      <div className="score-item"><span className="label">Solución</span><span className="valor">{directoConversion.score?.solucion || 0}/10</span></div>
+                      <div className="score-item"><span className="label">Urgencia</span><span className="valor">{directoConversion.score?.urgencia || 0}/10</span></div>
+                      <div className="score-item"><span className="label">Confianza</span><span className="valor">{directoConversion.score?.confianza || 0}/10</span></div>
+                    </div>
+
+                    {directoConversion.advertencias && directoConversion.advertencias.length > 0 && (
+                      <div className="advertencias">
+                        <strong>⚠️ Advertencias:</strong>
+                        <ul>{directoConversion.advertencias.map((adv, i) => <li key={i}>{adv}</li>)}</ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="preview-container">
+                  <div className="preview-historia">
+                    {directoHistoria.split('\n').map((linea, i) => {
+                      if (linea.startsWith('**') && linea.endsWith('**')) return <h3 key={i}>{linea.replace(/\*\*/g, '')}</h3>;
+                      if (linea.startsWith('*') && linea.endsWith('*')) return <p key={i} className="mensaje-guardian"><em>{linea.replace(/\*/g, '')}</em></p>;
+                      if (linea.trim()) return <p key={i}>{linea}</p>;
+                      return null;
+                    })}
+                  </div>
+                </div>
+
+                {/* Cierres alternativos */}
+                {directoConversion?.cierres && (
+                  <div className="cierres-alternativos">
+                    <h4>Cierres por perfil</h4>
+                    <div className="cierres-tabs">
+                      {Object.entries(directoConversion.cierres).map(([perfil, cierre]) => (
+                        <details key={perfil} className="cierre-detalle">
+                          <summary>{perfil.charAt(0).toUpperCase() + perfil.slice(1)}</summary>
+                          <p>{cierre}</p>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="acciones">
+                  <button className="btn-secondary" onClick={() => setPaso(12)}>Volver al catálogo</button>
+                  <button className="btn-secondary" onClick={() => setPaso(14)}>Cambiar especialización</button>
+                  <button className="btn-secondary" onClick={() => generarDirecto()}>Regenerar</button>
+                  <button className="btn-primary" onClick={() => {
+                    navigator.clipboard.writeText(directoHistoria);
+                    alert('Historia copiada al portapapeles');
+                  }}>Copiar historia</button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* PASO 14: Modo Directo - Selección de Especialización */}
+        {paso === 14 && modo === 'directo' && (
+          <div className="paso-content paso-especializacion">
+            <h2>¿De qué es {directoGuardian?.nombre}?</h2>
+            <p className="instruccion-batch">Elegí qué hace este guardián o escribí algo específico.</p>
+
+            <div className="especializacion-chips">
+              {especializacionesRapidas.map(esp => (
+                <button
+                  key={esp.id}
+                  className={`chip-especializacion ${directoEspecializacion === esp.id ? 'activo' : ''}`}
+                  onClick={() => {
+                    setDirectoEspecializacion(esp.id);
+                    setDirectoEspecializacionTexto('');
+                  }}
+                  title={esp.descripcion}
+                >
+                  {esp.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="especializacion-custom">
+              <label>O escribí específicamente qué hace:</label>
+              <input
+                type="text"
+                placeholder="ej: trae suerte en el amor, protege el hogar de energías negativas..."
+                value={directoEspecializacionTexto}
+                onChange={(e) => {
+                  setDirectoEspecializacionTexto(e.target.value);
+                  if (e.target.value) setDirectoEspecializacion('');
+                }}
+              />
+              <span className="hint">Si escribís algo acá, se usa esto en lugar del chip seleccionado.</span>
+            </div>
+
+            <div className="acciones">
+              <button className="btn-secondary" onClick={() => setPaso(12)}>Volver al catálogo</button>
+              <button
+                className="btn-primary"
+                onClick={() => generarDirecto()}
+                disabled={!directoEspecializacion && !directoEspecializacionTexto}
+              >
+                Generar Historia
+              </button>
             </div>
           </div>
         )}
@@ -1144,6 +1488,54 @@ Necesito conocer algunos datos. Empecemos:
               <span>${datosGuardian.precioUYU?.toLocaleString()}</span>
             </div>
 
+            {/* Score de conversión */}
+            {datosConversion && (
+              <div className={`conversion-score ${datosConversion.aprobada ? 'aprobada' : 'rechazada'}`}>
+                <div className="score-header">
+                  <span className="score-total">
+                    {datosConversion.aprobada ? '✅' : '⚠️'} Score: {datosConversion.score?.total || 0}/50
+                  </span>
+                  <span className="arco-score">
+                    Arco: {datosConversion.arco?.score || 0}%
+                  </span>
+                </div>
+
+                <div className="score-desglose">
+                  <div className="score-item">
+                    <span className="label">Identificación</span>
+                    <span className="valor">{datosConversion.score?.identificacion || 0}/10</span>
+                  </div>
+                  <div className="score-item">
+                    <span className="label">Dolor</span>
+                    <span className="valor">{datosConversion.score?.dolor || 0}/10</span>
+                  </div>
+                  <div className="score-item">
+                    <span className="label">Solución</span>
+                    <span className="valor">{datosConversion.score?.solucion || 0}/10</span>
+                  </div>
+                  <div className="score-item">
+                    <span className="label">Urgencia</span>
+                    <span className="valor">{datosConversion.score?.urgencia || 0}/10</span>
+                  </div>
+                  <div className="score-item">
+                    <span className="label">Confianza</span>
+                    <span className="valor">{datosConversion.score?.confianza || 0}/10</span>
+                  </div>
+                </div>
+
+                {datosConversion.advertencias && datosConversion.advertencias.length > 0 && (
+                  <div className="advertencias">
+                    <strong>⚠️ Advertencias:</strong>
+                    <ul>
+                      {datosConversion.advertencias.map((adv, i) => (
+                        <li key={i}>{adv}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="preview-container">
               <div className="preview-historia">
                 {historiaGenerada.split('\n').map((linea, i) => {
@@ -1163,6 +1555,21 @@ Necesito conocer algunos datos. Empecemos:
                 })}
               </div>
             </div>
+
+            {/* Cierres alternativos */}
+            {datosConversion?.cierres && (
+              <div className="cierres-alternativos">
+                <h4>Cierres por perfil (opcionales)</h4>
+                <div className="cierres-tabs">
+                  {Object.entries(datosConversion.cierres).map(([perfil, cierre]) => (
+                    <details key={perfil} className="cierre-detalle">
+                      <summary>{perfil.charAt(0).toUpperCase() + perfil.slice(1)}</summary>
+                      <p>{cierre}</p>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="acciones">
               <button className="btn-secondary" onClick={() => setPaso(4)}>Regenerar</button>
@@ -2102,6 +2509,316 @@ Necesito conocer algunos datos. Empecemos:
           margin-top: 1.5rem;
         }
 
+        /* Score de conversión */
+        .conversion-score {
+          background: rgba(0,0,0,0.3);
+          border-radius: 12px;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .conversion-score.aprobada {
+          border-color: rgba(34, 197, 94, 0.5);
+          background: rgba(34, 197, 94, 0.1);
+        }
+
+        .conversion-score.rechazada {
+          border-color: rgba(251, 191, 36, 0.5);
+          background: rgba(251, 191, 36, 0.1);
+        }
+
+        .score-header {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          flex-wrap: wrap;
+          margin-bottom: 0.75rem;
+        }
+
+        .score-total {
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .arco-score {
+          background: rgba(139, 92, 246, 0.3);
+          padding: 0.25rem 0.75rem;
+          border-radius: 12px;
+          font-size: 0.85rem;
+        }
+
+        .score-desglose {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .score-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: rgba(255,255,255,0.05);
+          padding: 0.5rem 0.75rem;
+          border-radius: 8px;
+          min-width: 70px;
+        }
+
+        .score-item .label {
+          font-size: 0.7rem;
+          opacity: 0.7;
+          text-transform: uppercase;
+        }
+
+        .score-item .valor {
+          font-weight: 600;
+          color: #8b5cf6;
+        }
+
+        .advertencias {
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .advertencias ul {
+          margin: 0.5rem 0 0;
+          padding-left: 1.25rem;
+        }
+
+        .advertencias li {
+          font-size: 0.85rem;
+          opacity: 0.9;
+          margin-bottom: 0.25rem;
+          color: #fbbf24;
+        }
+
+        /* Cierres alternativos */
+        .cierres-alternativos {
+          background: rgba(0,0,0,0.2);
+          border-radius: 8px;
+          padding: 1rem;
+          margin-top: 1rem;
+        }
+
+        .cierres-alternativos h4 {
+          margin: 0 0 0.75rem;
+          font-size: 0.9rem;
+          opacity: 0.8;
+        }
+
+        .cierres-tabs {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .cierre-detalle {
+          background: rgba(255,255,255,0.05);
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .cierre-detalle summary {
+          padding: 0.75rem 1rem;
+          cursor: pointer;
+          font-weight: 500;
+          color: #8b5cf6;
+        }
+
+        .cierre-detalle summary:hover {
+          background: rgba(255,255,255,0.05);
+        }
+
+        .cierre-detalle p {
+          padding: 0 1rem 1rem;
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.6;
+          color: #e0e0e0;
+        }
+
+        /* Score compacto para batch */
+        .conversion-score.compact {
+          padding: 0.75rem;
+        }
+
+        .conversion-score.compact .score-header {
+          margin-bottom: 0;
+        }
+
+        .score-mini {
+          display: flex;
+          gap: 0.5rem;
+          margin-left: auto;
+        }
+
+        .score-mini span {
+          background: rgba(255,255,255,0.1);
+          padding: 0.2rem 0.4rem;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          font-family: monospace;
+        }
+
+        .advertencias-mini {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin-top: 0.5rem;
+        }
+
+        .adv-tag {
+          background: rgba(251, 191, 36, 0.2);
+          color: #fbbf24;
+          padding: 0.2rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .adv-more {
+          color: #fbbf24;
+          font-size: 0.7rem;
+          opacity: 0.7;
+        }
+
+        /* Modo Directo */
+        .modo-card.directo {
+          border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .modo-card.directo:hover {
+          border-color: rgba(34, 197, 94, 0.6);
+          background: rgba(34, 197, 94, 0.1);
+        }
+
+        .catalogo-directo-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 0.75rem;
+          max-height: 500px;
+          overflow-y: auto;
+          padding: 0.5rem;
+        }
+
+        .catalogo-card {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
+          padding: 1rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .catalogo-card:hover {
+          background: rgba(34, 197, 94, 0.15);
+          border-color: rgba(34, 197, 94, 0.5);
+          transform: translateY(-2px);
+        }
+
+        .catalogo-nombre {
+          font-weight: 600;
+          color: #fff;
+          margin-bottom: 0.5rem;
+        }
+
+        .catalogo-meta {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .catalogo-meta span {
+          font-size: 0.75rem;
+          padding: 0.15rem 0.5rem;
+          border-radius: 4px;
+          background: rgba(255,255,255,0.1);
+        }
+
+        .catalogo-meta .especie {
+          background: rgba(139, 92, 246, 0.3);
+          color: #c4b5fd;
+        }
+
+        .catalogo-meta .categoria {
+          background: rgba(34, 197, 94, 0.3);
+          color: #86efac;
+        }
+
+        /* Paso de especialización */
+        .paso-especializacion {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .especializacion-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          margin: 1.5rem 0;
+          justify-content: center;
+        }
+
+        .chip-especializacion {
+          padding: 0.75rem 1.25rem;
+          border-radius: 20px;
+          border: 2px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.05);
+          color: #fff;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.95rem;
+        }
+
+        .chip-especializacion:hover {
+          border-color: rgba(34, 197, 94, 0.5);
+          background: rgba(34, 197, 94, 0.1);
+        }
+
+        .chip-especializacion.activo {
+          border-color: #22c55e;
+          background: rgba(34, 197, 94, 0.25);
+          color: #86efac;
+        }
+
+        .especializacion-custom {
+          margin-top: 2rem;
+          text-align: center;
+        }
+
+        .especializacion-custom label {
+          display: block;
+          margin-bottom: 0.75rem;
+          color: rgba(255,255,255,0.7);
+        }
+
+        .especializacion-custom input {
+          width: 100%;
+          max-width: 500px;
+          padding: 1rem;
+          border-radius: 8px;
+          border: 2px solid rgba(255,255,255,0.2);
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 1rem;
+        }
+
+        .especializacion-custom input:focus {
+          outline: none;
+          border-color: #22c55e;
+        }
+
+        .especializacion-custom .hint {
+          display: block;
+          margin-top: 0.5rem;
+          font-size: 0.8rem;
+          color: rgba(255,255,255,0.4);
+        }
+
         @media (max-width: 768px) {
           .campo-row {
             grid-template-columns: 1fr;
@@ -2113,6 +2830,15 @@ Necesito conocer algunos datos. Empecemos:
 
           .guardianes-grid {
             grid-template-columns: repeat(2, 1fr);
+          }
+
+          .score-desglose {
+            justify-content: center;
+          }
+
+          .score-mini {
+            margin-left: 0;
+            margin-top: 0.5rem;
           }
         }
       `}</style>
