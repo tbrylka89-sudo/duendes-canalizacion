@@ -88,17 +88,79 @@ ManyChat
 
 ### 🟠 PRIORIDAD ALTA
 
-#### 4. SISTEMA POST-COMPRA COMPLETO
-**Incluye:**
-- Certificado de canalización digital (diseño, generación, envío)
-- Secuencia de emails:
-  - Confirmación de compra
-  - "Tu guardián está siendo preparado"
-  - "Tu guardián está en camino"
-  - "Ritual de activación" (post-entrega)
-  - Seguimiento a la semana
-  - Cumpleaños (descuento + regalo de runas)
-- Integración con Mi Magia
+#### 4. SISTEMA POST-COMPRA COMPLETO (CRÍTICO)
+
+**A) CERTIFICADO DE CANALIZACIÓN ORIGINAL DIGITAL**
+- Diseño profesional y místico
+- Generación automática con datos del guardián
+- Envío automático post-compra
+- Descargable desde Mi Magia
+
+**B) ACOMPAÑAMIENTO COMPLETO (desde ANTES hasta DESPUÉS)**
+
+**ANTES de comprar:**
+- Emails de bienvenida si hizo el test
+- Recordatorios si vio productos
+- "El guardián que miraste sigue esperando"
+
+**CUANDO compra:**
+- Email de confirmación inmediato
+- "Tu guardián fue elegido, ahora comienza su preparación"
+- Acceso a Mi Magia
+
+**MIENTRAS espera:**
+- "Tu guardián está siendo canalizado"
+- "Tu guardián está recibiendo su energía"
+- "Tu guardián está listo para viajar"
+- "Tu guardián está en camino" (con tracking)
+
+**DESPUÉS de recibir:**
+- Ritual de activación (crea compromiso, justifica la compra)
+- Instrucciones de conexión
+- Invitación a comunidad
+
+**C) POST-VENTA QUE MULTIPLICA**
+
+1. **Ritual de activación**
+   - Guía paso a paso para "activar" el guardián
+   - Crea compromiso emocional
+   - Justifica la inversión
+
+2. **Diario de señales**
+   - Invitar a registrar "coincidencias"
+   - Activa confirmation bias
+   - Crea engagement continuo
+
+3. **Comunidad privada**
+   - Pertenencia al grupo
+   - Evangelización natural
+   - Testimonios orgánicos
+
+4. **Cross-sell espiritual**
+   - "Tu guardián quiere un compañero"
+   - "Estos guardianes complementan al tuyo"
+   - Lógica de tríadas, complementos
+
+5. **Testimonios**
+   - "Contanos tu experiencia"
+   - Solicitar reviews
+   - Usar en marketing
+
+**D) EMAILS DE TODO EL CICLO DE VIDA**
+- Test completado
+- Producto visto
+- Carrito abandonado
+- Compra realizada
+- Envío preparándose
+- Envío en camino
+- Entrega realizada
+- Seguimiento 1 semana
+- Seguimiento 1 mes
+- Cumpleaños
+- Fechas especiales
+- Nuevos productos relevantes
+- Invitaciones a El Círculo
+- TODOS orientados a conversión y retención
 
 #### 5. MANYCHAT - TITO RECONFIGURADO
 **Problema actual:** La gente lo usa de psicólogo gratis sin comprar
@@ -134,30 +196,79 @@ ManyChat
 **Qué hacer:** Analizar y optimizar para conversión
 
 #### 10. MI MAGIA - VERIFICAR Y MEJORAR
-**Qué verificar:**
-- Alineación con estrategia inteligente
-- Gamificación funcionando
-- Generación de contenido eficiente
-- Runas/moneda virtual
-- Estudios energéticos
+**Portal del cliente post-compra. Debe incluir:**
+- Canalizaciones de sus compras
+- Estudios energéticos (lectura de runas, etc.)
+- Runas/moneda virtual para canjear
+- Historial de compras
+- Mensajes de sus guardianes
+- Diario de señales
+- Acceso a comunidad
+
+**Verificar:**
+- ¿Está alineado con la estrategia inteligente?
+- ¿La generación de contenido es eficiente como el generador de historias?
+- ¿Qué falta agregar?
+- ¿Cómo mejorar la experiencia?
+
+**GAMIFICACIÓN:**
+- Sistema de puntos/runas
+- Niveles de usuario
+- Logros desbloqueables
+- Recompensas por engagement
+- Incentivos para volver
+- Badges especiales
 
 #### 11. EL CÍRCULO DE DUENDES
-**Qué verificar:**
-- Membresía funcionando
+**Membresía paga de suscripción. Debe incluir:**
 - Contenido exclusivo
-- Valor percibido
-- Estrategia de retención
+- Canalizaciones especiales
+- Acceso a Tito premium
+- Comunidad privada
+- Eventos especiales
+- Descuentos exclusivos
+
+**Verificar:**
+- ¿Valor percibido justifica el precio?
+- ¿Estrategia de retención funciona?
+- ¿Contenido se genera eficientemente?
+- ¿Está alineado con la estrategia de conversión?
+- ¿Cómo hacer que quieran quedarse?
 
 #### 12. FORMULARIO INTELIGENTE DE COMPRA
-**Qué hacer:** Revisar el formulario que llena el cliente al comprar
+**El formulario que llena el cliente al comprar el duende**
+- Revisar qué preguntas hace
+- ¿Recopila datos útiles para personalización?
+- ¿Alimenta el sistema de perfilado?
+- ¿Es amigable y no invasivo?
+- ¿Las respuestas se usan para la canalización?
+
+**Debe capturar:**
+- Datos personales básicos
+- Intención de la compra
+- Momento de vida
+- Para quién es (uno mismo, regalo, sorpresa)
+- Preguntas de conexión emocional
+- Foto (rostro + mano) para lectura de aura - SOLO MAYORES DE 18
 
 #### 13. SEO CON RANK MATH
 **Qué hacer:** Configuración automática al 100 puntos
 **Nota:** Usuario no tiene conocimiento de SEO, necesita ser automático
 
-#### 14. VARIABLES DE HISTORIAS
-**Pregunta del usuario:** Cuando genera historias y aprueba, ¿dónde van las variables que aparecen abajo?
-**Investigar:** Verificar si se guardan en WooCommerce correctamente
+#### 14. VARIABLES DE HISTORIAS - INVESTIGAR
+**Pregunta del usuario:** Cuando genera historias en el Batch Inteligente y aprueba, debajo de cada historia aparecen variables (hook usado, sincrodestino, score, etc.). ¿Dónde van a parar cuando se guarda en WooCommerce?
+
+**Investigar:**
+- ¿Se guardan como metadatos del producto?
+- ¿Se pierden?
+- ¿Dónde deberían guardarse?
+- ¿Se pueden ver en el admin de WooCommerce?
+- ¿Se usan para algo después?
+
+**Si no se guardan:** Implementar que se guarden para:
+- Trackear qué hooks convierten más
+- No repetir sincrodestinos
+- Analytics de conversión
 
 ### 🟢 SISTEMA INTELIGENTE COMPLETO (lo que Claude propuso)
 
