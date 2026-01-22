@@ -539,6 +539,21 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
     // === GENERAR CIERRES POR PERFIL ===
     const cierres = getCierresPrincipales(validacion.nombreLimpio, validacion.genero);
 
+    // === APLICAR CIERRE ESPECÍFICO SI SE INDICA PERFIL_OBJETIVO ===
+    let cierreAplicado = null;
+    if (perfil_objetivo && cierres[perfil_objetivo]) {
+      // Reemplazar el último párrafo de la historia con el cierre específico
+      const parrafos = historia.split('\n\n');
+      if (parrafos.length > 1) {
+        parrafos[parrafos.length - 1] = cierres[perfil_objetivo];
+        historia = parrafos.join('\n\n');
+      } else {
+        // Si solo hay un párrafo, agregar el cierre
+        historia = historia + '\n\n' + cierres[perfil_objetivo];
+      }
+      cierreAplicado = perfil_objetivo;
+    }
+
     // === CONSTRUIR ADVERTENCIAS ===
     const advertencias = [];
 
@@ -564,6 +579,7 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
       historia,
       hooks_alternativos: hooksAlternativos,
       cierres_por_perfil: cierres,
+      cierre_aplicado: cierreAplicado, // NUEVO: indica qué cierre se usó
       score_conversion: {
         identificacion: score.identificacion,
         dolor: score.dolor,
@@ -585,7 +601,8 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
         especie: validacion.especie,
         cm: validacion.cm,
         hookUsado: hookPrincipal,
-        sincrodestinoUsado: sincrodestino.texto
+        sincrodestinoUsado: sincrodestino.texto,
+        perfilObjetivo: perfil_objetivo || null // NUEVO: el perfil solicitado
       },
       aprobada: arcoValidacion.completo && evaluacionScore.aceptable && frasesIADetectadas.length === 0,
       advertencias: advertencias.length > 0 ? advertencias : undefined

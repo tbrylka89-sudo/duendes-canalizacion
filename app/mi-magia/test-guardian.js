@@ -11,6 +11,7 @@ export default function TestGuardian({ usuario, onComplete }) {
   const [mensajes, setMensajes] = useState([]);
   const [typing, setTyping] = useState(false);
   const [textoLibre, setTextoLibre] = useState('');
+  const [valorEscala, setValorEscala] = useState(5); // Para escala numérica
   const [resultado, setResultado] = useState(null);
   const chatRef = useRef(null);
 
@@ -151,6 +152,43 @@ export default function TestGuardian({ usuario, onComplete }) {
     }, 1000);
   };
 
+  // Responder escala numérica (1-10)
+  const responderEscalaNumerica = () => {
+    const pregunta = preguntas[preguntaActual];
+
+    // Guardar respuesta
+    const nuevasRespuestas = {
+      ...respuestas,
+      [pregunta.id]: { valor: valorEscala, tipo: 'escala_numerica' }
+    };
+    setRespuestas(nuevasRespuestas);
+
+    // Guardar en localStorage
+    localStorage.setItem('duendes_test_guardian', JSON.stringify({
+      estado: 'en_progreso',
+      ultimaPregunta: preguntaActual + 1,
+      respuestas: nuevasRespuestas
+    }));
+
+    // Mostrar respuesta
+    agregarMensajeUsuario(`${valorEscala}/10`);
+
+    // Reset para próxima pregunta
+    setValorEscala(5);
+
+    // Feedback
+    setTimeout(() => {
+      const feedbacks = valorEscala >= 7
+        ? ['Siento esa carga...', 'Entiendo...', 'Te escucho.']
+        : ['Ya veo...', 'Mmm...', 'Entiendo.'];
+      agregarMensajeTito(feedbacks[Math.floor(Math.random() * feedbacks.length)]);
+
+      setTimeout(() => {
+        mostrarPregunta(preguntaActual + 1);
+      }, 1000);
+    }, 800);
+  };
+
   const finalizarTest = async () => {
     setPaso('procesando');
     agregarMensajeTito('Dame un momento... estoy conectando con tu energia...');
@@ -271,6 +309,44 @@ export default function TestGuardian({ usuario, onComplete }) {
                 </div>
               )}
 
+              {pregunta.tipo === 'escala' && (
+                <div className="escala-container">
+                  {pregunta.opciones.map((op, i) => (
+                    <button
+                      key={i}
+                      className="escala-btn"
+                      onClick={() => responderSeleccion(op)}
+                    >
+                      {op.texto}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {pregunta.tipo === 'escala_numerica' && (
+                <div className="escala-numerica-container">
+                  <div className="escala-labels">
+                    <span>{pregunta.minLabel || '1'}</span>
+                    <span>{pregunta.maxLabel || '10'}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={pregunta.min || 1}
+                    max={pregunta.max || 10}
+                    value={valorEscala}
+                    onChange={(e) => setValorEscala(parseInt(e.target.value))}
+                    className="escala-slider"
+                  />
+                  <div className="escala-valor">{valorEscala}</div>
+                  <button
+                    className="btn-enviar"
+                    onClick={responderEscalaNumerica}
+                  >
+                    Confirmar →
+                  </button>
+                </div>
+              )}
+
               {pregunta.tipo === 'texto_libre' && (
                 <div className="texto-libre-container">
                   <textarea
@@ -322,6 +398,38 @@ export default function TestGuardian({ usuario, onComplete }) {
             <div className="resultado-ritual">
               <h4>✦ Ritual Sugerido</h4>
               <p>{resultado.revelacion.ritualSugerido}</p>
+            </div>
+          )}
+
+          {resultado.perfilPsicologico && (
+            <div className="resultado-perfil">
+              <h4>✦ Tu Perfil Energético</h4>
+              <div className="perfil-grid">
+                <div className="perfil-item">
+                  <span className="perfil-label">Vulnerabilidad</span>
+                  <span className={`perfil-value vuln-${resultado.perfilPsicologico.vulnerabilidad?.nivel}`}>
+                    {resultado.perfilPsicologico.vulnerabilidad?.nivel}
+                  </span>
+                </div>
+                <div className="perfil-item">
+                  <span className="perfil-label">Dolor principal</span>
+                  <span className="perfil-value">
+                    {resultado.perfilPsicologico.dolor_principal?.tipo}
+                  </span>
+                </div>
+                <div className="perfil-item">
+                  <span className="perfil-label">Estilo decisión</span>
+                  <span className="perfil-value">
+                    {resultado.perfilPsicologico.estilo_decision?.tipo}
+                  </span>
+                </div>
+                <div className="perfil-item">
+                  <span className="perfil-label">Creencias</span>
+                  <span className="perfil-value">
+                    {resultado.perfilPsicologico.creencias?.tipo}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
@@ -585,6 +693,75 @@ const estilosTestGuardian = `
     transform: translateY(-2px);
   }
 
+  /* ESCALA VISUAL (4 opciones horizontales) */
+  .escala-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .escala-btn {
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 14px 12px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+  .escala-btn:hover {
+    border-color: #d4af37;
+    background: #2a2a2a;
+  }
+
+  /* ESCALA NUMÉRICA (slider 1-10) */
+  .escala-numerica-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px 0;
+  }
+  .escala-labels {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+  }
+  .escala-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #56ab91, #d4af37, #e75480);
+    outline: none;
+  }
+  .escala-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #d4af37;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(212,175,55,0.4);
+  }
+  .escala-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #d4af37;
+    cursor: pointer;
+    border: 3px solid #fff;
+  }
+  .escala-valor {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+  }
+
   .procesando-container {
     padding: 40px;
     text-align: center;
@@ -742,4 +919,42 @@ const estilosTestGuardian = `
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(212,175,55,0.3);
   }
+
+  /* PERFIL PSICOLÓGICO */
+  .resultado-perfil {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(212,175,55,0.2);
+  }
+  .resultado-perfil h4 {
+    color: #d4af37;
+    margin: 0 0 15px;
+    font-size: 1rem;
+  }
+  .perfil-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .perfil-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .perfil-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .perfil-value {
+    color: #fff;
+    font-size: 0.95rem;
+    text-transform: capitalize;
+  }
+  .vuln-alta { color: #e75480; }
+  .vuln-media { color: #d4af37; }
+  .vuln-baja { color: #56ab91; }
 `;

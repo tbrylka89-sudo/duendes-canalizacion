@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-22
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-22 (sesión 6)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -11,9 +11,62 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 - **API:** `/api/admin/historias`
 - **Sistema de conversión:** `/lib/conversion/`
 
-### Panel de Canalizaciones: 🚧 EN DESARROLLO
-- **Plan:** `/.claude/plans/hazy-beaming-crystal.md`
-- **Pendiente:** Crear páginas en `/admin/canalizaciones/`
+### Panel de Canalizaciones: ✅ COMPLETADO
+- **Lista:** `/admin/canalizaciones` - Tabs: Pendientes/Aprobadas/Enviadas
+- **Detalle:** `/admin/canalizaciones/[id]` - Preview + Resumen IA + Chat Editor
+- **APIs:**
+  - `/api/admin/canalizaciones` - CRUD completo
+  - `/api/admin/canalizaciones/chat` - Chat inteligente para modificar
+  - `/api/admin/canalizaciones/resumen` - Resumen ejecutivo IA
+- **Flujo:** Compra → Genera auto → Pendiente → Aprobar → Enviar → Mi Magia
+
+### Test del Guardián: ⚠️ BÁSICO (necesita mejora)
+- **UI:** `/app/mi-magia/test-guardian.js` - Chat con Tito
+- **API:** `/api/test-guardian` - Preguntas y procesamiento
+- **Estado:** Funciona pero NO tiene perfilado psicológico avanzado
+
+---
+
+## VISIÓN EXPERTO: LO QUE FALTA PARA SISTEMA COMPLETO
+
+### Prioridad Alta (Impacto directo en conversión)
+
+| Feature | Estado | Descripción |
+|---------|--------|-------------|
+| **Perfilado del Comprador** | ❌ Pendiente | Test que clasifica: vulnerabilidad, dolor principal, estilo decisión, poder adquisitivo, creencias |
+| **Historias con Cierres Adaptativos** | ⚠️ Parcial | Historia fija + 3 cierres por perfil (vulnerable/escéptico/impulsivo) |
+| **Objeciones Preemptivas** | ❌ Pendiente | Responder "es solo un muñeco", "es caro", "no creo" dentro de la historia |
+| **Loop Abierto Obligatorio** | ❌ Pendiente | Cada historia debe tener algo incompleto que la compra cierra |
+
+### Prioridad Media (Optimización)
+
+| Feature | Estado | Descripción |
+|---------|--------|-------------|
+| **Motor Sincronicidad Personalizada** | ❌ Pendiente | Señales basadas en datos: día de la semana, hora, nombre, cumpleaños |
+| **Secuencia Micro-compromisos** | ❌ Pendiente | Test → Email → Preview → Seña → Compra (escalado gradual) |
+| **Sistema Escasez Real** | ⚠️ Parcial | "X personas mirando", "última vez disponible hace X días" |
+| **Hooks Rotativos con Tracking** | ⚠️ Parcial | Biblioteca de hooks + tracking de cuál convierte más |
+
+### Prioridad Baja (Post-MVP)
+
+| Feature | Estado | Descripción |
+|---------|--------|-------------|
+| **Post-compra que Multiplica** | ❌ Pendiente | Ritual activación, diario señales, comunidad, cross-sell espiritual |
+| **Recuperación Abandonos** | ❌ Pendiente | Emails: 1h, 24h, 72h, 1 semana con mensajes personalizados |
+| **Analytics Conversión Emocional** | ❌ Pendiente | Dashboard: qué historias/hooks convierten, dónde abandonan, A/B testing |
+| **Testimonios Estratégicos** | ❌ Pendiente | Por objeción: escéptico, sin plata, coleccionista, dudoso |
+
+### Regla Clave: Historia Fija, Contexto Adaptativo
+
+```
+FIJO (todos ven igual)          | ADAPTATIVO (privado, cada uno diferente)
+--------------------------------|------------------------------------------
+Historia del guardián           | Resultado del test
+Descripción del producto        | Emails de seguimiento
+Sincrodestino de creación       | "Señales" basadas en sus datos
+Su mensaje                      | Recomendaciones personalizadas
+Precio                          | Orden en que ve productos
+```
 
 ---
 
@@ -65,6 +118,15 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 | `/lib/conversion/sincrodestinos.js` | Eventos mágicos creíbles |
 | `/app/api/admin/historias/route.js` | API principal de generación |
 | `/app/admin/generador-historias/page.jsx` | UI del generador |
+| `/app/api/admin/corregir-producto/route.js` | API corrección ortográfica con Claude Haiku |
+| `/temp-plugin/duendes-corregir-ortografia.php` | Plugin WordPress para corrección in-product |
+| `/app/admin/corregir-productos/page.jsx` | UI alternativa para corregir productos (usa diccionario) |
+| `/app/admin/canalizaciones/page.jsx` | Lista de canalizaciones (tabs por estado) |
+| `/app/admin/canalizaciones/[id]/page.jsx` | Detalle: Preview + Resumen IA + Chat Editor |
+| `/app/api/admin/canalizaciones/route.js` | API CRUD canalizaciones |
+| `/app/api/admin/canalizaciones/chat/route.js` | Chat inteligente para editar canalizaciones |
+| `/app/api/admin/canalizaciones/resumen/route.js` | Genera resumen ejecutivo con IA |
+| `/app/mi-magia/test-guardian.js` | UI Test del Guardián (chat con Tito) |
 
 ---
 
@@ -180,6 +242,40 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 ---
 
 ## ÚLTIMAS SESIONES
+
+### 2026-01-22 (sesión 6) - COMPLETADA
+**Mejoras implementadas:**
+
+1. ✅ **CORRECCIÓN INTELIGENTE CON CLAUDE HAIKU**
+   - Reemplaza el diccionario manual que rompía palabras válidas
+   - API nueva: `/api/admin/corregir-producto/route.js`
+   - Usa Claude 3.5 Haiku (`claude-3-5-haiku-20241022`) para corregir
+   - Respeta español rioplatense (vos, tenés, podés son correctos)
+   - Solo corrige ortografía, no cambia contenido ni estilo
+
+2. ✅ **PLUGIN WORDPRESS PARA CORRECCIÓN**
+   - Botón "🔧 Corregir Ortografía" DENTRO del producto de WooCommerce
+   - Ubicación del plugin: `wp-content/mu-plugins/duendes-corregir-ortografia.php`
+   - Llama a la API de Vercel para corregir descripción
+   - CORS headers configurados para permitir llamadas cross-origin
+   - Archivo local: `/temp-plugin/duendes-corregir-ortografia.php`
+
+3. ✅ **FOTOS EN CATÁLOGO BATCH**
+   - Carga imágenes de productos desde WooCommerce al iniciar
+   - Muestra thumbnails (50x50px) en las cards de guardianes
+   - Facilita identificar visualmente qué guardián seleccionar
+
+4. ✅ **BOTÓN "NUEVO BATCH"**
+   - Después de generar historias, permite reiniciar sin recargar
+   - Limpia selección y vuelve al paso de catálogo
+
+**SFTP WordPress (para futuras actualizaciones del plugin):**
+- Host: 34.70.139.72
+- Puerto: 55309
+- Usuario: sftp_live_WfP6i
+- Ruta plugins: `web/wp-live/wp-content/mu-plugins/`
+
+---
 
 ### 2026-01-22 (sesión 5) - COMPLETADA
 **Mejoras implementadas:**

@@ -79,12 +79,70 @@ const PREGUNTAS = [
   {
     id: 7,
     tipo: 'seleccion',
-    mensaje: 'Última: ¿cómo preferís que te hablen?',
+    mensaje: '¿Cómo preferís que te hablen?',
     opciones: [
       { id: 'directo', texto: 'Directo, sin vueltas', estilo: 'directo' },
       { id: 'suave', texto: 'Suave y contenedor', estilo: 'suave' },
       { id: 'poetico', texto: 'Poético y profundo', estilo: 'mistico' },
       { id: 'practico', texto: 'Práctico, con acciones claras', estilo: 'practico' }
+    ]
+  },
+  // === PREGUNTA 8: BLOQUEO PRINCIPAL (detecta estilo de decisión) ===
+  {
+    id: 8,
+    tipo: 'seleccion',
+    mensaje: '¿Qué te frena más cuando algo te interesa?',
+    opciones: [
+      { id: 'que_diran', texto: 'El qué dirán / qué van a pensar', bloqueo: 'social', estilo_decision: 'emocional' },
+      { id: 'dinero', texto: 'No tener la plata en este momento', bloqueo: 'economico', estilo_decision: 'racional' },
+      { id: 'tiempo', texto: 'No tener tiempo para dedicarle', bloqueo: 'tiempo', estilo_decision: 'analitico' },
+      { id: 'funciona', texto: 'No saber si realmente funciona', bloqueo: 'escepticismo', estilo_decision: 'analitico' }
+    ]
+  },
+  // === PREGUNTA 9: ESTILO DE DECISIÓN ===
+  {
+    id: 9,
+    tipo: 'seleccion',
+    mensaje: 'Cuando algo te interesa de verdad, ¿qué hacés?',
+    opciones: [
+      { id: 'enseguida', texto: 'Lo compro/hago enseguida', decision: 'impulsivo', velocidad: 'rapido' },
+      { id: 'pienso_dias', texto: 'Lo pienso unos días', decision: 'analitico', velocidad: 'medio' },
+      { id: 'consulto', texto: 'Lo consulto con alguien', decision: 'emocional', velocidad: 'lento' },
+      { id: 'investigo', texto: 'Investigo todo antes', decision: 'analitico', velocidad: 'lento' }
+    ]
+  },
+  // === PREGUNTA 10: CREENCIAS (escala) ===
+  {
+    id: 10,
+    tipo: 'escala',
+    mensaje: '¿Creés en la energía de los objetos?',
+    opciones: [
+      { id: 'totalmente', texto: 'Totalmente', valor: 4, creencia: 'creyente', apertura: 90 },
+      { id: 'a_veces', texto: 'A veces sí, a veces no', valor: 3, creencia: 'buscador', apertura: 60 },
+      { id: 'no_mucho', texto: 'No mucho, pero algo hay', valor: 2, creencia: 'esceptico', apertura: 30 },
+      { id: 'para_nada', texto: 'Para nada', valor: 1, creencia: 'esceptico', apertura: 10 }
+    ]
+  },
+  // === PREGUNTA 11: NIVEL DE SUFRIMIENTO (escala 1-10) ===
+  {
+    id: 11,
+    tipo: 'escala_numerica',
+    mensaje: '¿Cuánto estás sufriendo ahora mismo?',
+    min: 1,
+    max: 10,
+    minLabel: 'Tranquila',
+    maxLabel: 'Mucho'
+  },
+  // === PREGUNTA 12: DURACIÓN DEL DOLOR ===
+  {
+    id: 12,
+    tipo: 'seleccion',
+    mensaje: 'Última: ¿hace cuánto te sentís así?',
+    opciones: [
+      { id: 'dias', texto: 'Hace días', duracion: 'dias', cronicidad: 0 },
+      { id: 'semanas', texto: 'Hace semanas', duracion: 'semanas', cronicidad: 1 },
+      { id: 'meses', texto: 'Hace meses', duracion: 'meses', cronicidad: 2 },
+      { id: 'anios', texto: 'Hace años', duracion: 'anios', cronicidad: 3 }
     ]
   }
 ];
@@ -149,12 +207,139 @@ const PERFILES_COMPRA = {
   }
 };
 
+// ===== ALGORITMO DE PERFILADO PSICOLÓGICO =====
+
+/**
+ * Detecta dolor principal del texto libre
+ */
+function detectarDolorDeTexto(texto) {
+  if (!texto) return 'proposito';
+  const t = texto.toLowerCase();
+
+  if (t.includes('solo') || t.includes('sola') || t.includes('nadie') || t.includes('abandonad')) return 'soledad';
+  if (t.includes('plata') || t.includes('dinero') || t.includes('trabajo') || t.includes('deuda')) return 'dinero';
+  if (t.includes('enferm') || t.includes('dolor') || t.includes('cuerpo') || t.includes('salud')) return 'salud';
+  if (t.includes('pareja') || t.includes('amor') || t.includes('relacion') || t.includes('familia')) return 'relaciones';
+  return 'proposito';
+}
+
+/**
+ * Calcula el perfil psicológico completo basado en las respuestas
+ */
+function calcularPerfilPsicologico(respuestas) {
+  // === VULNERABILIDAD ===
+  let vulnScore = 0;
+
+  // Pregunta 2: momento de vida
+  if (respuestas[2]?.momento === 'crisis') vulnScore += 40;
+  else if (respuestas[2]?.momento === 'transicion') vulnScore += 20;
+
+  // Pregunta 11: nivel de sufrimiento (1-10)
+  const sufrimiento = respuestas[11]?.valor || 5;
+  if (sufrimiento >= 8) vulnScore += 30;
+  else if (sufrimiento >= 6) vulnScore += 20;
+  else if (sufrimiento >= 4) vulnScore += 10;
+
+  // Pregunta 12: duración del dolor
+  const cronicidad = respuestas[12]?.cronicidad || 0;
+  vulnScore += cronicidad * 10; // 0, 10, 20, o 30
+
+  // Pregunta 5: texto libre - detectar palabras de aislamiento
+  const textoLibre = respuestas[5]?.texto || '';
+  if (textoLibre.toLowerCase().includes('solo') || textoLibre.toLowerCase().includes('nadie')) {
+    vulnScore += 10;
+  }
+
+  const vulnerabilidad = {
+    nivel: vulnScore > 70 ? 'alta' : vulnScore > 40 ? 'media' : 'baja',
+    score: Math.min(vulnScore, 100),
+    indicadores: []
+  };
+
+  if (respuestas[2]?.momento === 'crisis') vulnerabilidad.indicadores.push('crisis_actual');
+  if (sufrimiento >= 7) vulnerabilidad.indicadores.push('sufrimiento_alto');
+  if (cronicidad >= 2) vulnerabilidad.indicadores.push('dolor_cronico');
+
+  // === DOLOR PRINCIPAL ===
+  const dolorMap = {
+    'carga': 'relaciones',
+    'esquiva': 'soledad',
+    'vacio': 'proposito',
+    'estancada': 'dinero'
+  };
+
+  let tipoDolor = dolorMap[respuestas[1]?.id] || 'proposito';
+  // Si hay texto libre, puede override
+  const dolorTexto = detectarDolorDeTexto(textoLibre);
+  if (textoLibre.length > 20) {
+    tipoDolor = dolorTexto;
+  }
+
+  const dolor_principal = {
+    tipo: tipoDolor,
+    intensidad: sufrimiento * 10
+  };
+
+  // === ESTILO DE DECISIÓN ===
+  const estiloDecisionMap = {
+    'enseguida': 'impulsivo',
+    'pienso_dias': 'analitico',
+    'consulto': 'emocional',
+    'investigo': 'analitico'
+  };
+
+  const velocidadMap = {
+    'enseguida': 'rapido',
+    'pienso_dias': 'medio',
+    'consulto': 'lento',
+    'investigo': 'lento'
+  };
+
+  const respuestaDecision = respuestas[9]?.id || 'consulto';
+  const estilo_decision = {
+    tipo: estiloDecisionMap[respuestaDecision] || 'emocional',
+    velocidad: velocidadMap[respuestaDecision] || 'medio'
+  };
+
+  // Reforzar con pregunta 8 (bloqueos)
+  if (respuestas[8]?.bloqueo === 'escepticismo' && estilo_decision.tipo !== 'impulsivo') {
+    estilo_decision.tipo = 'analitico';
+  }
+
+  // === CREENCIAS ===
+  const creenciasDefaults = { tipo: 'buscador', apertura: 50 };
+  const creencias = respuestas[10] ? {
+    tipo: respuestas[10].creencia || 'buscador',
+    apertura: respuestas[10].apertura || 50
+  } : creenciasDefaults;
+
+  return {
+    vulnerabilidad,
+    dolor_principal,
+    estilo_decision,
+    creencias
+  };
+}
+
+/**
+ * Mapea perfil psicológico al tipo de cierre recomendado
+ */
+function perfilACierre(perfil) {
+  // Prioridad: vulnerabilidad > creencias > estilo
+  if (perfil.vulnerabilidad.nivel === 'alta') return 'vulnerable';
+  if (perfil.creencias.tipo === 'esceptico') return 'esceptico';
+  if (perfil.estilo_decision.tipo === 'impulsivo') return 'impulsivo';
+  if (perfil.estilo_decision.tipo === 'analitico') return 'racional';
+  if (perfil.creencias.tipo === 'creyente' && perfil.vulnerabilidad.nivel === 'baja') return 'coleccionista';
+  return 'vulnerable'; // default
+}
+
 // GET: Retorna las preguntas del test
 export async function GET() {
   return Response.json({
     success: true,
     preguntas: PREGUNTAS,
-    version: '1.0'
+    version: '2.0'
   });
 }
 
@@ -180,16 +365,20 @@ export async function POST(request) {
     // 3. Combinar analisis
     const resultado = combinarAnalisis(analisis, textoLibreAnalisis);
 
-    // 4. Generar revelacion emocional
+    // 4. NUEVO: Calcular perfil psicológico
+    const perfilPsicologico = calcularPerfilPsicologico(respuestas);
+    const perfilCierre = perfilACierre(perfilPsicologico);
+
+    // 5. Generar revelacion emocional
     const revelacion = await generarRevelacion(resultado, nombre);
 
-    // 5. Obtener recomendaciones de productos (simulado por ahora)
+    // 6. Obtener recomendaciones de productos (simulado por ahora)
     const productosRecomendados = generarRecomendaciones(resultado);
 
-    // 6. Construir resultado final
+    // 7. Construir resultado final
     const testGuardian = {
       fecha: new Date().toISOString(),
-      version: '1.0',
+      version: '2.0',
       arquetipoPrincipal: resultado.arquetipoPrincipal,
       arquetipoSecundario: resultado.arquetipoSecundario,
       arquetipoDetalle: resultado.arquetipoScores,
@@ -200,13 +389,19 @@ export async function POST(request) {
       deseosClave: textoLibreAnalisis.deseo_clave || [],
       estiloMensaje: resultado.estilo,
       productosRecomendados,
-      revelacion
+      revelacion,
+      // NUEVO: Perfil psicológico completo
+      perfilPsicologico,
+      perfilCierre
     };
 
-    // 7. Guardar en KV
+    // 8. Guardar en KV
     const userData = await kv.get(`user:${email}`) || await kv.get(`elegido:${email}`) || {};
     userData.testGuardian = testGuardian;
     userData.testGuardianRaw = respuestas;
+    // NUEVO: Guardar perfil psicológico y cierre recomendado a nivel superior para fácil acceso
+    userData.perfilPsicologico = perfilPsicologico;
+    userData.perfilCierre = perfilCierre;
 
     if (userData.email) {
       await kv.set(`user:${email}`, userData);
