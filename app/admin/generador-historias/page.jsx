@@ -2010,8 +2010,14 @@ Necesito conocer algunos datos. Empecemos:
             </div>
 
             <div className="batch-acciones-finales">
-              <button className="btn-secondary" onClick={() => setPaso(15)}>
-                ← Volver a selección
+              <button className="btn-nuevo-batch" onClick={() => {
+                setBatchResultados([]);
+                setBatchSeleccionados([]);
+                setBatchGrupos([]);
+                setBatchVistaPrevia(null);
+                setPaso(15);
+              }}>
+                🔄 Nuevo batch
               </button>
               <button
                 className="btn-corregir"
