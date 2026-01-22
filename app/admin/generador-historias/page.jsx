@@ -17,8 +17,43 @@ function GeneradorHistoriasContent() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
-  // Catálogo
-  const [catalogo] = useState(catalogoData);
+  // Catálogo - con imágenes de WooCommerce
+  const [catalogo, setCatalogo] = useState(catalogoData);
+  const [imagenesWC, setImagenesWC] = useState({});
+
+  // Cargar imágenes de WooCommerce al iniciar
+  useEffect(() => {
+    const cargarImagenes = async () => {
+      try {
+        const res = await fetch('/api/woo/productos?per_page=100');
+        const data = await res.json();
+        if (data.productos) {
+          // Crear mapa de nombre -> imagen
+          const mapa = {};
+          data.productos.forEach(p => {
+            const nombreBase = p.nombre.split(' - ')[0].trim().toLowerCase();
+            if (p.imagen) mapa[nombreBase] = p.imagen;
+          });
+          setImagenesWC(mapa);
+
+          // Actualizar catálogo con imágenes
+          setCatalogo(prev => ({
+            ...prev,
+            guardianes: prev.guardianes.map(g => {
+              const nombreBase = g.nombre.toLowerCase();
+              return {
+                ...g,
+                imagen: mapa[nombreBase] || null
+              };
+            })
+          }));
+        }
+      } catch (e) {
+        console.error('Error cargando imágenes WC:', e);
+      }
+    };
+    cargarImagenes();
+  }, []);
 
   // Datos
   const [escaneo, setEscaneo] = useState(null);
@@ -1859,8 +1894,17 @@ Necesito conocer algunos datos. Empecemos:
                         className={`batch-guardian-card ${seleccionado ? 'seleccionado' : ''} ${enGrupo ? 'en-grupo' : ''}`}
                         onClick={() => !enGrupo && toggleSeleccionBatch(guardian)}
                       >
-                        <span className="nombre">{guardian.nombre}</span>
-                        <span className="info">{guardian.especie || 'duende'} · {guardian.cm}cm</span>
+                        {guardian.imagen && (
+                          <img
+                            src={guardian.imagen}
+                            alt={guardian.nombre}
+                            className="guardian-thumb"
+                          />
+                        )}
+                        <div className="guardian-info">
+                          <span className="nombre">{guardian.nombre}</span>
+                          <span className="info">{guardian.especie || 'duende'} · {guardian.cm}cm</span>
+                        </div>
                         {seleccionado && <span className="check">✓</span>}
                         {enGrupo && <span className="en-grupo-badge">En grupo</span>}
                       </div>
@@ -2629,6 +2673,20 @@ Necesito conocer algunos datos. Empecemos:
           cursor: pointer;
           transition: all 0.2s;
           position: relative;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .batch-guardian-card .guardian-thumb {
+          width: 50px;
+          height: 50px;
+          border-radius: 6px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+        .batch-guardian-card .guardian-info {
+          flex: 1;
+          min-width: 0;
         }
         .batch-guardian-card:hover:not(.en-grupo) {
           background: rgba(139, 92, 246, 0.2);
