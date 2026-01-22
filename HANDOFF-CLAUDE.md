@@ -159,37 +159,152 @@ ManyChat
 **Pregunta del usuario:** Cuando genera historias y aprueba, ¿dónde van las variables que aparecen abajo?
 **Investigar:** Verificar si se guardan en WooCommerce correctamente
 
-### 🟢 PRIORIDAD BAJA (pero importante)
+### 🟢 SISTEMA INTELIGENTE COMPLETO (lo que Claude propuso)
 
-#### 15. ANALYTICS EN TIEMPO REAL
+#### 15. PERFILADO DEL COMPRADOR
+El test debe clasificar sin que lo noten:
+- Nivel de vulnerabilidad (alta/media/baja)
+- Dolor principal (soledad, dinero, salud, relaciones)
+- Estilo de decisión (impulsivo, analítico, emocional)
+- Poder adquisitivo (preguntas indirectas)
+- Creencias (escéptico, creyente, buscador)
+**Resultado:** cada persona ve contenido DIFERENTE según su perfil
+
+#### 16. MOTOR DE SINCRONICIDAD PERSONALIZADA
+Usar datos del usuario para crear "señales" que parezcan mágicas:
+- Día de la semana → "Los martes son días de Marte, de acción..."
+- Letras del nombre → "Tu nombre y el del guardián tienen la misma cantidad..."
+- Cumpleaños cerca → "Este mes es tu portal..."
+- Hora de visita → "Llegaste a las 3:33, los números hablan..."
+
+#### 17. SECUENCIA DE MICRO-COMPROMISOS
+No pedir compra directo. Escalar:
+1. "¿Querés saber qué guardián te corresponde?" → Test gratis
+2. "¿Querés que te avise si aparece uno para vos?" → Email
+3. "¿Querés ver el mensaje que tiene para vos?" → Preview
+4. "¿Querés reservarlo antes de que desaparezca?" → Seña
+5. Compra completa
+
+#### 18. OBJECIONES PREEMPTIVAS EN HISTORIAS
+Dentro de cada historia, responder dudas antes de que las piensen:
+- "Sé que una parte tuya está diciendo 'es solo un muñeco'..."
+- "El precio puede parecer alto. Pero ¿cuánto gastaste en cosas que no cambiaron nada?"
+- "Si pensás 'esto no es para mí', preguntate por qué seguís leyendo"
+
+#### 19. SISTEMA DE ESCASEZ REAL + PERCIBIDA
+En ficha del producto:
+- "3 personas mirando esto ahora" (real o simulado)
+- "Última vez que uno así estuvo disponible: hace 47 días"
+- "Este guardián solo se canaliza cuando él quiere"
+
+#### 20. TESTIMONIOS ESTRATÉGICOS POR OBJECIÓN
+No genéricos. Específicos:
+- Para escéptico: "Yo tampoco creía, hasta que..."
+- Para el que no tiene plata: "Junté de a poco, valió cada peso"
+- Para el que tiene muchos: "Tengo 7 y cada uno trabaja diferente"
+- Para el que duda: "Casi no lo compro. Fue el mejor error que no cometí"
+
+#### 21. ANALYTICS DE CONVERSIÓN EMOCIONAL
+Dashboard que muestre:
+- Qué historias convierten más
+- Qué hooks funcionan por perfil
+- Dónde abandonan (qué párrafo)
+- Qué palabras correlacionan con compra
+- A/B testing automático de variantes
+
+### 🔵 MANYCHAT COMPLETO
+
+#### 22. SPEECH DE TITO (no solo flujos)
+**Problema:** Lo usan de psicólogo gratis
+**Solución:**
+- Orientado a CONVERSIÓN, no terapia
+- Límites claros: guiar al Test → Productos
+- Detectar si va a comprar o no
+- Si solo quiere hablar: cortar amablemente y redirigir
+
+#### 23. FLUJOS COMPLETOS PARA:
+- Instagram (DM + comentarios)
+- Facebook (Messenger + comentarios)
+- WhatsApp Business (NÚMERO NUEVO - el original da error con API de FB)
+- Flujo de comentarios inteligente que convierta
+
+#### 24. TITO MODO UNIVERSO (para admin)
+- Acceso completo a todo
+- Fichas inteligentes del cliente
+- Ver historial de conversaciones
+- Estadísticas de conversión
+
+### 🟣 EMAILS ESPECÍFICOS
+
+#### 25. SECUENCIA DE CUMPLEAÑOS
+- Mail automático la semana del cumpleaños
+- Descuento especial
+- Regalo de runas o estudio energético
+- Pensado para ella específicamente
+
+#### 26. RECUPERACIÓN DE CARRITOS ABANDONADOS
+- Email 1 (1h): "El guardián que viste sigue disponible. Por ahora."
+- Email 2 (24h): "No todos están listos. Pero si volvés a pensar en él..."
+- Email 3 (72h): "Alguien más lo está mirando. Solo te aviso."
+- Email 4 (1 semana): "[Nombre del guardián] dejó un mensaje para vos antes de irse."
+
+### 🟤 INFRAESTRUCTURA
+
+#### 27. ANALYTICS EN TIEMPO REAL
 - Quién está conectado
 - De dónde es
 - Qué está mirando
 - Si agrega al carrito
 - Predicción de compra
 
-#### 16. RECUPERACIÓN DE CARRITOS ABANDONADOS
-Secuencia:
-- Email 1 (1h): "El guardián sigue disponible"
-- Email 2 (24h): "No todos están listos..."
-- Email 3 (72h): "Alguien más lo está mirando"
-- Email 4 (1 semana): "Dejó un mensaje para vos"
-
-#### 17. APP DE CONTENIDO PARA REDES
+#### 28. APP DE CONTENIDO PARA REDES SOCIALES
 **Nueva app integrada que:**
-- Analice estadísticas de IG, FB, TikTok, Pinterest
-- Sugiera contenido basado en lo que convierte
-- Cree estrategias de contenido
-- Genere ideas y posts
+- Se conecte a IG, FB, TikTok, Pinterest
+- Analice estadísticas de cada red
+- Vea qué contenido funciona mejor
+- Sugiera y genere contenido basado en conversión
+- Cree estrategias basadas en perfil de cliente objetivo
+- Aconseje qué tipo de contenido necesitamos
+- Sea experta en todo lo que ya sabemos del proyecto
 
-#### 18. HUB DE URLS ACTUALIZADO
-Actualizar con todas las URLs importantes (WordPress + Vercel)
+#### 29. HUB DE URLS ACTUALIZADO
+Todas las URLs importantes:
+- WordPress (páginas, productos, admin)
+- Vercel (Mi Magia, Círculo, admin)
+- ManyChat
+- APIs
+- Todo accesible de forma fácil e inteligente
 
-#### 19. DOCUMENTACIÓN MAESTRA
-Actualizar las escrituras maestras para poder reconstruir todo si algo falla
+#### 30. DOCUMENTACIÓN MAESTRA ACTUALIZADA
+Las "escrituras maestras" para poder reconstruir todo si algo falla:
+- Generador de historias
+- Sistema de conversión
+- Todo lo que se modificó
+- Actualizar con los últimos cambios
 
-#### 20. LIMPIEZA GENERAL
-Eliminar lo que no sirve, lo que ya no se usa
+#### 31. LIMPIEZA GENERAL
+- Eliminar lo que no sirve
+- Eliminar lo que ya no se usa
+- Código muerto
+- Páginas obsoletas
+
+#### 32. TODO CONECTADO Y FUNCIONANDO
+**CRÍTICO:** Verificar que:
+- Ningún flujo en la web falle
+- Mi Magia conecte correctamente
+- El Círculo conecte correctamente
+- WordPress ↔ Vercel funcione perfecto
+- ManyChat ↔ Todo lo demás funcione
+- No haya UN SOLO punto de falla
+- Todo funcione a la PERFECCIÓN
+
+#### 33. DECISIÓN PENDIENTE: ACCESO A MI MAGIA
+¿Cómo manejar el acceso queriendo CONVERTIR siempre?
+**Opciones:**
+- A) Visible pero blurreado hasta que compren (genera curiosidad)
+- B) Accesible solo cuando pagan (exclusividad)
+- C) Algunas secciones gratis, otras de pago
+**Definir con el usuario**
 
 ---
 
