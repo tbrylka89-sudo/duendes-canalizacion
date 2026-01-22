@@ -1,185 +1,288 @@
-# HANDOFF PARA NUEVA SESIÓN DE CLAUDE CODE
+# HANDOFF COMPLETO - DUENDES DEL URUGUAY
 
-**INSTRUCCIÓN INICIAL:** Leé este archivo completo. Después leé /CLAUDE.md y /lib/conversion/index.js. Esos 3 archivos te dan todo el contexto.
-
----
-
-## QUIÉN SOS EN ESTE PROYECTO
-
-Sos el experto técnico y estratega de conversión de **Duendes del Uruguay** - un e-commerce de guardianes canalizados (duendes, hadas, pixies, gnomos, chamanes, elfos). No es un negocio de muñecos - es un sistema de experiencias místicas personalizadas.
-
-**Tu rol combina:**
-- Desarrollador full-stack (Next.js, Vercel, WooCommerce API)
-- Experto en psicología de conversión y neuromarketing
-- Copywriter emocional (español rioplatense, tono cercano)
-- Arquitecto de sistemas de personalización
+**INSTRUCCIÓN INICIAL:** Leé este archivo COMPLETO antes de hacer cualquier cosa. Es la memoria del proyecto y la lista de TODO lo que falta.
 
 ---
 
-## ARCHIVOS QUE DEBÉS LEER PRIMERO
+## ARQUITECTURA DEL SISTEMA
 
 ```
-1. /CLAUDE.md                           → Biblia completa del proyecto (tono, reglas, prohibiciones)
-2. /lib/conversion/index.js             → Sistema experto de conversión (hooks, cierres, scoring)
-3. /PLAN-MAESTRO-CONVERSION.md          → Plan estratégico de todas las tareas
-4. /app/admin/generador-historias/page.jsx → Generador de historias (UI principal)
-5. /app/api/admin/historias/route.js    → API que genera historias con IA
-```
+duendesdeluruguay.com (WordPress/WooCommerce)
+├── Tienda principal (productos, checkout)
+├── Test del Guardián ← FALTA REHACER (fue borrado)
+├── Página Nosotros ← FALTA REHACER
+├── Página Cómo Funciona ← FALTA ANALIZAR
+├── Páginas de producto con CURCY ← FALTA MEJORAR
+├── Enlaces a Mi Magia / El Círculo
+└── Tito Chat (ManyChat widget)
 
----
+duendes-vercel.vercel.app (Next.js)
+├── /admin/generador-historias → Panel para crear historias (FUNCIONA)
+├── /mi-magia → Portal del cliente post-compra
+├── /mi-magia/circulo → Membresía paga
+├── APIs de soporte
+└── Sistema de conversión (/lib/conversion/)
 
-## EL CEREBRO: SISTEMA DE CONVERSIÓN
-
-Ubicación: `/lib/conversion/`
-
-| Módulo | Qué hace |
-|--------|----------|
-| `hooks.js` | Frases de apertura que enganchan por categoría + subcategorías específicas |
-| `sincrodestinos.js` | Eventos "mágicos" durante la creación del guardián |
-| `cierres.js` | Cierres adaptativos por perfil psicológico (vulnerable, escéptico, impulsivo, racional, coleccionista) |
-| `arco.js` | Estructura de 8 fases del arco emocional |
-| `scoring.js` | Sistema de puntuación 0-50 para evaluar historias |
-
-**Filosofía central:** Las historias NO son descripciones de producto. Son espejos emocionales que hacen que el lector piense "esto habla de MÍ" y sienta que el guardián lo eligió a él.
-
----
-
-## TAREAS COMPLETADAS (no rehacer)
-
-### Sistema de Conversión ✅
-- [x] Biblioteca de hooks por categoría y subcategoría
-- [x] Sistema de sincrodestinos
-- [x] Cierres adaptativos por perfil psicológico
-- [x] Arco emocional de 8 fases
-- [x] Sistema de scoring 0-50
-
-### Generador de Historias ✅
-- [x] Modo Directo (click en guardián → historia)
-- [x] Modo Batch Inteligente (múltiples guardianes)
-- [x] Integración con WooCommerce (guardar historias)
-- [x] Análisis de imágenes con IA
-- [x] Subcategorías visibles en UI (organizadas por grupos)
-- [x] Rotación automática de subcategorías en batch
-- [x] Fix: regenerarUno() pasa hooks_usados para evitar repetición
-- [x] Fix: mapeo de "amor_romantico" y todas las subcategorías
-
-### Emails y Certificados ✅
-- [x] Emails post-compra: `/api/emails/post-compra/route.js`
-- [x] Página de certificado: `/app/certificado/[id]/page.jsx`
-
-### Infraestructura ✅
-- [x] Sitemap dinámico funcionando
-- [x] Multi-moneda (USD/UYU) funcionando
-- [x] DHL Express configurado
-
----
-
-## TAREAS PENDIENTES
-
-### Prioridad Alta
-- [ ] **Test del Guardián con perfilado psicológico** - Agregar 5 preguntas nuevas que detecten vulnerabilidad, dolor principal, estilo de decisión, creencias (ver plan en `/PLAN-MAESTRO-CONVERSION.md`)
-- [ ] **Conectar perfil del test → cierres adaptativos** - Cuando alguien completa el test, guardar su perfil y usarlo para personalizar historias
-
-### Prioridad Media
-- [ ] API de certificados PDF (generar PDF descargable)
-- [ ] Tito ManyChat - Mejorar con gallery cards
-- [ ] Verificar DHL Express en checkout real
-
-### Prioridad Baja
-- [ ] Rank Math SEO (configuración manual en WordPress)
-- [ ] A/B testing de hooks
-
----
-
-## ARQUITECTURA CLAVE
-
-```
-/app
-  /admin
-    /generador-historias/page.jsx    → UI principal para generar historias
-    /canalizaciones/                 → Panel de aprobación de canalizaciones
-  /api
-    /admin/historias/route.js        → POST genera historia con Claude
-    /emails/post-compra/route.js     → Envía emails post-compra
-    /test-guardian/route.js          → Test para descubrir tu guardián
-  /certificado/[id]/page.jsx         → Página pública del certificado
-  /mi-magia/                         → Portal del cliente
-
-/lib
-  /conversion/                       → CEREBRO DEL SISTEMA
-    index.js                         → Exporta todo + analizarHistoriaCompleta()
-    hooks.js                         → Hooks de apertura por categoría/subcategoría
-    sincrodestinos.js                → Eventos mágicos
-    cierres.js                       → Cierres por perfil psicológico
-    arco.js                          → Estructura del arco emocional
-    scoring.js                       → Sistema de puntuación
+ManyChat
+├── Tito para IG/FB/WhatsApp
+└── Flujos de conversación ← FALTA RECONFIGURAR
 ```
 
 ---
 
-## REGLAS DE ESCRITURA (CRÍTICO)
+## ESTADO ACTUAL - QUÉ FUNCIONA Y QUÉ NO
 
-### PROHIBIDO (detectado automáticamente y penaliza score):
-```
-❌ "Desde las profundidades..."
-❌ "Brumas ancestrales..."
-❌ "Velo entre mundos..."
-❌ "Tiempos inmemoriales..."
-❌ "Susurro del viento..."
-❌ "Vibraciones cósmicas..."
-❌ "847 años" (número prohibido)
-❌ "Acantilados de Irlanda" (genérico)
-❌ Cualquier frase que suene a IA genérica
-```
+### ✅ FUNCIONA (en Vercel)
+- Generador de historias con sistema experto de conversión
+- Hooks por categoría/subcategoría
+- Cierres adaptativos por perfil psicológico
+- Scoring de conversión (0-50)
+- Arco emocional de 8 fases
+- Batch inteligente con auto-distribución
 
-### CORRECTO:
+### ❌ NO FUNCIONA / FALTA
+- **Test del Guardián en WordPress** - FUE BORRADO, hay que rehacerlo
+- **Integración WordPress ↔ Vercel** - No existe
+- **Sistema completo de emails** - Solo estructura, no configurado
+- **ManyChat optimizado** - Existe pero no convierte
+- **CURCY bien explicado** - Funciona pero confunde clientes
+- **DHL Express en checkout** - API conectada pero no aparece
+- **SEO automático** - Rank Math instalado pero no configurado
+- **Analytics en tiempo real** - No existe
+- **Recuperación de carritos** - No existe
+- **App de contenido para redes** - No existe
+
+---
+
+## LISTA COMPLETA DE TAREAS PENDIENTES
+
+### 🔴 PRIORIDAD CRÍTICA
+
+#### 1. TEST DEL GUARDIÁN EN WORDPRESS
+**Estado:** Fue borrado accidentalmente. La página existe pero está vacía.
+**Qué hacer:** Recrear desde cero en WordPress con las características del sistema inteligente:
+- Perfilado psicológico (vulnerabilidad, dolor, estilo decisión, creencias)
+- Preguntas que parecen espirituales pero clasifican
+- Resultado que guía hacia productos específicos
+- Guardar perfil para personalización futura
+**Ubicación:** Página en WordPress (no en Vercel)
+**IMPORTANTE:** Mantener el audio que ya existe en la página
+
+#### 2. CURCY - PRECIOS POR GEOLOCALIZACIÓN
+**Estado:** CURCY instalado pero confunde a los clientes
+**Qué hacer:**
+- Geolocalización automática
+- Uruguay → Precio en pesos uruguayos (fijo)
+- Otros países → Precio en USD + "(aproximadamente X en tu moneda)"
+- FAQ debajo de cada producto explicando claramente cómo funciona
+- Texto tipo: "No te preocupes, al momento de pagar tu banco convierte automáticamente"
+- Actualización de tasas 1x día
+**Ubicación:** WordPress/WooCommerce
+
+#### 3. CONECTAR WORDPRESS ↔ VERCEL
+**Qué hacer:**
+- Enlaces desde WordPress a Mi Magia y El Círculo
+- Autenticación compartida o flujo claro
+- Cuando compran → acceso a Mi Magia
+**Decisión pendiente:** ¿Mi Magia visible pero blurreado hasta que compren? ¿O solo accesible post-compra?
+
+### 🟠 PRIORIDAD ALTA
+
+#### 4. SISTEMA POST-COMPRA COMPLETO
+**Incluye:**
+- Certificado de canalización digital (diseño, generación, envío)
+- Secuencia de emails:
+  - Confirmación de compra
+  - "Tu guardián está siendo preparado"
+  - "Tu guardián está en camino"
+  - "Ritual de activación" (post-entrega)
+  - Seguimiento a la semana
+  - Cumpleaños (descuento + regalo de runas)
+- Integración con Mi Magia
+
+#### 5. MANYCHAT - TITO RECONFIGURADO
+**Problema actual:** La gente lo usa de psicólogo gratis sin comprar
+**Qué hacer:**
+- Speech orientado a CONVERSIÓN, no a terapia
+- Detectar tipo de cliente (va a comprar o no)
+- Límites claros en conversación
+- Guiar hacia el Test → Productos
+- Flujos para: IG, FB, WhatsApp Business (número nuevo porque el original da error)
+- Modo "Universo" para admin (acceso completo)
+- Fichas inteligentes del cliente
+**Ubicación:** ManyChat + integración con WordPress
+
+#### 6. EMAILS DE TODO EL SISTEMA
+- Emails de Mi Magia
+- Emails del Círculo
+- Emails de compras
+- Emails de mensajes enviados
+- Recuperación de carritos abandonados (secuencia de 4 emails)
+- TODOS deben seguir estrategia de conversión
+
+#### 7. DHL EXPRESS EN CHECKOUT
+**Estado:** API conectada pero no aparece como opción
+**Qué hacer:** Verificar configuración, hacer que aparezca, calcule correctamente
+
+### 🟡 PRIORIDAD MEDIA
+
+#### 8. PÁGINA "NOSOTROS"
+**Estado:** Existe en HTML
+**Qué hacer:** Rehacer con estructura inteligente de conversión
+
+#### 9. PÁGINA "CÓMO FUNCIONA"
+**Qué hacer:** Analizar y optimizar para conversión
+
+#### 10. MI MAGIA - VERIFICAR Y MEJORAR
+**Qué verificar:**
+- Alineación con estrategia inteligente
+- Gamificación funcionando
+- Generación de contenido eficiente
+- Runas/moneda virtual
+- Estudios energéticos
+
+#### 11. EL CÍRCULO DE DUENDES
+**Qué verificar:**
+- Membresía funcionando
+- Contenido exclusivo
+- Valor percibido
+- Estrategia de retención
+
+#### 12. FORMULARIO INTELIGENTE DE COMPRA
+**Qué hacer:** Revisar el formulario que llena el cliente al comprar
+
+#### 13. SEO CON RANK MATH
+**Qué hacer:** Configuración automática al 100 puntos
+**Nota:** Usuario no tiene conocimiento de SEO, necesita ser automático
+
+#### 14. VARIABLES DE HISTORIAS
+**Pregunta del usuario:** Cuando genera historias y aprueba, ¿dónde van las variables que aparecen abajo?
+**Investigar:** Verificar si se guardan en WooCommerce correctamente
+
+### 🟢 PRIORIDAD BAJA (pero importante)
+
+#### 15. ANALYTICS EN TIEMPO REAL
+- Quién está conectado
+- De dónde es
+- Qué está mirando
+- Si agrega al carrito
+- Predicción de compra
+
+#### 16. RECUPERACIÓN DE CARRITOS ABANDONADOS
+Secuencia:
+- Email 1 (1h): "El guardián sigue disponible"
+- Email 2 (24h): "No todos están listos..."
+- Email 3 (72h): "Alguien más lo está mirando"
+- Email 4 (1 semana): "Dejó un mensaje para vos"
+
+#### 17. APP DE CONTENIDO PARA REDES
+**Nueva app integrada que:**
+- Analice estadísticas de IG, FB, TikTok, Pinterest
+- Sugiera contenido basado en lo que convierte
+- Cree estrategias de contenido
+- Genere ideas y posts
+
+#### 18. HUB DE URLS ACTUALIZADO
+Actualizar con todas las URLs importantes (WordPress + Vercel)
+
+#### 19. DOCUMENTACIÓN MAESTRA
+Actualizar las escrituras maestras para poder reconstruir todo si algo falla
+
+#### 20. LIMPIEZA GENERAL
+Eliminar lo que no sirve, lo que ya no se usa
+
+---
+
+## FILOSOFÍA DEL SISTEMA INTELIGENTE
+
+Todo debe diseñarse para CONVERTIR. Esto incluye:
+
+### Perfilado del Comprador
+El test clasifica sin que lo noten:
+- Nivel de vulnerabilidad (alta/media/baja)
+- Dolor principal (soledad, dinero, salud, relaciones)
+- Estilo de decisión (impulsivo, analítico, emocional)
+- Creencias (escéptico, creyente, buscador)
+
+### Contenido Fijo vs Adaptativo
+| FIJO (todos ven igual) | ADAPTATIVO (privado) |
+|------------------------|----------------------|
+| Historia del guardián | Resultado del test |
+| Descripción producto | Emails de seguimiento |
+| Sincrodestino | Recomendaciones personalizadas |
+| Precio | Orden de productos |
+
+### Motor de Sincronicidad
+Usar datos del usuario para crear "señales" que parezcan mágicas:
+- Día de la semana → "Los martes son días de Marte..."
+- Letras del nombre → "Tu nombre y el del guardián tienen la misma cantidad..."
+- Cumpleaños cerca → "Este mes es tu portal..."
+
+### Secuencia de Micro-compromisos
+1. "¿Querés saber qué guardián te corresponde?" → Test
+2. "¿Querés que te avise si aparece uno?" → Email
+3. "¿Querés ver su mensaje?" → Preview
+4. "¿Querés reservarlo?" → Seña
+5. Compra completa
+
+---
+
+## ACCESOS DISPONIBLES
+
+### WordPress/WooCommerce
+- URL: https://duendesdeluruguay.com
+- WC API: Credenciales en .env.local (WC_CONSUMER_KEY, WC_CONSUMER_SECRET)
+
+### Vercel
+- URL: https://duendes-vercel.vercel.app
+- Repo: GitHub (auto-deploy en push a main)
+
+### ManyChat
+- Requiere acceso separado (preguntar credenciales)
+
+---
+
+## ARCHIVOS CLAVE EN VERCEL
+
 ```
-✅ Frases que tocan dolor real: "Amás a todos menos a vos"
-✅ Preguntas que desestabilizan: "¿Cuándo te vas a elegir a vos?"
-✅ Validación sin condescendencia: "Lo que sentís es real"
-✅ Español rioplatense: vos, tenés, podés
-✅ Tono cercano pero no infantil
+/CLAUDE.md                    → Biblia del proyecto (tono, reglas)
+/lib/conversion/              → Sistema experto de conversión
+  ├── hooks.js               → Hooks de apertura por categoría
+  ├── sincrodestinos.js      → Eventos mágicos
+  ├── cierres.js             → Cierres por perfil psicológico
+  ├── arco.js                → Estructura emocional
+  └── scoring.js             → Puntuación de conversión
+/app/admin/generador-historias/ → UI del generador
+/app/api/admin/historias/     → API que genera con Claude
+/app/mi-magia/                → Portal del cliente
 ```
 
 ---
 
-## ESPECIALIZACIONES/SUBCATEGORÍAS
+## CÓMO EMPEZAR
 
-El sistema tiene 9 grupos de especializaciones con ~50 subcategorías:
+1. **Si vas a trabajar en WordPress:** Necesitás acceso a wp-admin
+2. **Si vas a trabajar en Vercel:** Todo está en este repo
+3. **Si vas a trabajar en ManyChat:** Pedí credenciales
 
-| Grupo | Subcategorías |
-|-------|---------------|
-| Principales | fortuna, proteccion, abundancia, sanacion, abrecaminos, vigilante |
-| Amor | amor_romantico, amor_propio, amor_hijos, maternidad, fertilidad, familia, amistades, reconciliacion, soledad |
-| Sanación | sanacion_emocional, sanacion_transgeneracional, sanacion_fisica, duelos, patrones, adicciones, traumas |
-| Protección | proteccion_energetica, proteccion_hogar, proteccion_ninos, proteccion_auto, proteccion_viajes, limites, envidias |
-| Trabajo | negocios, emprendimiento, buscar_trabajo, entrevistas, liderazgo, creatividad, deudas, clientes |
-| Estudio | estudio, examenes, memoria, concentracion, sabiduria, intuicion, claridad |
-| Bienestar | calma, ansiedad, insomnio, meditacion, alegria, energia, confianza |
-| Cambios | transformacion, nuevos_comienzos, mudanza, separacion, jubilacion, desapego, miedos |
-| Espiritual | conexion_espiritual, deseos, suenos, proposito, gratitud |
-
-Cada subcategoría tiene hooks específicos en `/lib/conversion/hooks.js`.
+**Prioridad sugerida:**
+1. Test del Guardián (crítico - está roto)
+2. CURCY (clientes confundidos)
+3. Conexión WordPress ↔ Vercel
+4. Sistema de emails
+5. El resto en orden
 
 ---
 
-## CÓMO CONTINUAR
+## RECORDATORIO FINAL
 
-1. Leé los archivos listados arriba
-2. Verificá el estado actual del proyecto con `git status`
-3. Si hay tareas del plan pendientes, continuá desde donde quedó
-4. Ante cualquier duda sobre tono/estilo, consultá `/CLAUDE.md`
-
----
-
-## CONTEXTO DE NEGOCIO
-
-- **Dueña:** Thibisay (voz de marca, española rioplatense)
-- **Producto:** Guardianes canalizados (~$30-80 USD)
-- **Valor real:** La experiencia emocional, no el objeto físico
-- **Cliente típico:** Mujeres 25-55, momento de transición/crisis, buscan conexión espiritual
-- **Ética:** NUNCA explotar vulnerabilidad, siempre aportar valor genuino
+- La web principal es WordPress (duendesdeluruguay.com)
+- Mi Magia y El Círculo están en Vercel
+- El generador de historias es para ADMIN, no para clientes
+- Todo debe orientarse a CONVERSIÓN
+- El cliente típico: mujeres 25-55, momento de transición/crisis
+- NUNCA explotar vulnerabilidad, siempre aportar valor genuino
 
 ---
 
-*Este documento es tu memoria. Leelo completo antes de trabajar.*
+*Última actualización: 2026-01-22*
