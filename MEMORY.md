@@ -177,6 +177,22 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ## ÚLTIMAS SESIONES
 
+### 2026-01-22 (sesión 3) - EN CURSO
+**Tarea:** Rehacer Test del Guardián con enfoque de conversión
+
+**Mejoras a implementar:**
+1. ✅ Preguntas estratégicas tipo "espejo" (no tan directas)
+2. 🔄 Detección de perfil de compra (buscador activo, curioso, en crisis)
+3. 🔄 Ofertas personalizadas según perfil
+4. 🔄 Branding "Los Elegidos" en resultado
+5. 🔄 Recomendaciones del catálogo real
+
+**Archivos a modificar:**
+- `/app/api/test-guardian/route.js` - Preguntas y lógica
+- `/app/mi-magia/test-guardian.js` - UI (mantener chat con Tito y música)
+
+---
+
 ### 2026-01-22 (sesión 2)
 - Creado sistema de memoria persistente (MEMORY.md)
 - Agregados hooks específicos para FORTUNA/SUERTE

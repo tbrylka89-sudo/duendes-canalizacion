@@ -221,9 +221,10 @@ export async function POST(request) {
 
     // === SELECCIÓN DE ELEMENTOS DE CONVERSIÓN ===
 
-    // 1. Hook de apertura
-    const hookPrincipal = getRandomHook(categoria);
-    const hooksAlternativos = getHooksAlternativos(categoria, hookPrincipal);
+    // 1. Hook de apertura - USAR ESPECIALIZACIÓN si existe, sino categoría
+    const categoriaParaHook = especializacion || categoria;
+    const hookPrincipal = getRandomHook(categoriaParaHook);
+    const hooksAlternativos = getHooksAlternativos(categoriaParaHook, hookPrincipal);
 
     // 2. Sincrodestino
     const sincrodestino = sincrodestino_custom

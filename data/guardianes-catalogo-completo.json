@@ -239,7 +239,7 @@
   ],
 
   "guardianes": [
-    {"nombre": "Leprechaun", "genero": "M", "especie": "leprechaun", "categoria": "Protección", "tamano": "especial", "cm": 10, "accesorios": "una monedita y un dije de trebol"},
+    {"nombre": "Leprechaun", "genero": "M", "especie": "leprechaun", "categoria": "Fortuna", "tamano": "especial", "cm": 10, "accesorios": "una monedita y un dije de trebol"},
     {"nombre": "Brianna", "genero": "F", "categoria": "Protección", "tamano": "mediano", "cm": 18, "accesorios": "cuarzo cristal"},
     {"nombre": "Rahmus", "genero": "M", "categoria": "Protección", "tamano": "grande", "cm": 27, "accesorios": "dije de trebol de citrino y un baston"},
     {"nombre": "Ruperto", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 25, "accesorios": "cetro con punta de amatista, un bolso con punta de amatista adentro, dos puntas de amatista en cada bolsillo, dos lavandas en el sombrero"},
@@ -248,7 +248,7 @@
     {"nombre": "Iker", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "bolso de gamuza y cuero sintetico cosido a mano con dije de trebol, cetro con punta de amatista, citrino en el cuello, cinto hecho a mano, morral"},
     {"nombre": "Silvano", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "bolsito con lavandas y romero seco, saco con 4 bolsillos y 3 picos de amatista"},
     {"nombre": "Rosa Pixie", "genero": "F", "especie": "pixie", "categoria": "Protección", "tamano": "especial", "cm": 13, "accesorios": "galera tonos pastel, pelo rosa, ojos azules, tutu rosa de tul"},
-    {"nombre": "Edward", "genero": "M", "especie": "leprechaun", "categoria": "Protección", "tamano": "mediano", "cm": 23, "accesorios": "cetro de madera con citrino en la punta, trebol de 3 hojas en su mano, cinto de trebol de 4 hojas, ropa verde, galera verde"},
+    {"nombre": "Edward", "genero": "M", "especie": "leprechaun", "categoria": "Fortuna", "tamano": "mediano", "cm": 23, "accesorios": "cetro de madera con citrino en la punta, trebol de 3 hojas en su mano, cinto de trebol de 4 hojas, ropa verde, galera verde"},
     {"nombre": "Micelio", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "hongo celeste en su mano, trebol de 3 hojas en su otra mano, saco largo, botitas de tela"},
     {"nombre": "Axel", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "mochilita de gamuza marron y cuero sintetico verde con trebol de 4 hojas de metal, dije de corazon de agata verde, cetro de madera, cuarzo que cambia de color, morral, cinto"},
     {"nombre": "Rafael", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 24, "accesorios": "morral con fluorita adentro, cetro de madera con fluorita en la punta, fluoritas arcoiris, dije de arbol de la vida, saco mullido"},
@@ -319,7 +319,7 @@
     {"nombre": "Mürh", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 22, "accesorios": "galera negra, ropa azul, dije de luna y estrella en pecho, cetro de madera con punta de amatista"},
     {"nombre": "Maya", "genero": "F", "categoria": "Abundancia", "tamano": "mediano", "cm": 21, "accesorios": "gorro de amanita muscaria, cuarzo rosa en sus manos, tutu rosa o blanco"},
     {"nombre": "Margarita Pixie", "genero": "F", "especie": "pixie", "categoria": "Abundancia", "tamano": "especial", "cm": 11, "accesorios": "pelo azul, rosas azules, ropa azul"},
-    {"nombre": "Bridget", "genero": "F", "especie": "leprechaun", "categoria": "Protección", "tamano": "mediano", "cm": 20, "accesorios": "leprechaun femenina, ropa irlandesa, galera verde, dije de corazon en cuello, trebol de 4 hojas en cinto, pelo rojo"},
+    {"nombre": "Bridget", "genero": "F", "especie": "leprechaun", "categoria": "Fortuna", "tamano": "mediano", "cm": 20, "accesorios": "leprechaun femenina, ropa irlandesa, galera verde, dije de corazon en cuello, trebol de 4 hojas en cinto, pelo rojo"},
     {"nombre": "Mitch", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 24, "accesorios": "orejas de raton, galera azul, ropa en tonos azules, gran cristal en bolsillo, palo en mano"},
     {"nombre": "Rubi", "genero": "F", "especie": "bruja", "categoria": "Protección", "tamano": "mediano", "cm": 19, "accesorios": "brujita del elemento tierra, colores beiges, marroncitos, arenitas, rojito y mostazita, bolso tejido naranja con citrino rolado adentro, palo, gorro de bruja"},
     {"nombre": "Neil", "genero": "M", "categoria": "Protección", "tamano": "mediano", "cm": 21, "accesorios": "poderoso del bosque, gorro con parches de gamuza, citrino en cuello, capa marron con bolsillo naranja, talisman de hongo con amatista en punta, botas rojas"},

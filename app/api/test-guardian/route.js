@@ -3,79 +3,151 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// Preguntas del Test del Guardian Evolutivo
+// Preguntas del Test del Guardian - DISEÑO DE CONVERSIÓN
+// Cada pregunta tiene doble propósito: conectar emocionalmente + detectar perfil de compra
 const PREGUNTAS = [
+  // === PREGUNTA 1: ESPEJO INICIAL (detecta dolor sin preguntar directo) ===
   {
     id: 1,
     tipo: 'seleccion',
-    mensaje: '¿Que te trajo hasta aca hoy?',
+    mensaje: 'Hay personas que sienten que cargan con más de lo que les corresponde. Otras sienten que la vida les debe algo. ¿Cuál te suena más?',
     opciones: [
-      { id: 'proteccion', texto: 'Necesito sentirme protegida', arquetipo: 'victima', intencion: 'proteccion' },
-      { id: 'respuestas', texto: 'Busco respuestas sobre mi vida', arquetipo: 'buscadora', intencion: 'claridad' },
-      { id: 'ciclos', texto: 'Quiero romper patrones que se repiten', arquetipo: 'repite_patrones', intencion: 'transformacion' },
-      { id: 'sanar', texto: 'Estoy en proceso de sanacion', arquetipo: 'sanadora_herida', intencion: 'sanacion' },
-      { id: 'amor', texto: 'Quiero atraer mas amor a mi vida', arquetipo: 'busca_amor', intencion: 'amor' }
+      { id: 'carga', texto: 'Cargo con todo y nadie me cuida a mí', categoria: 'proteccion', dolor: 'carga_emocional', intensidad: 'alta' },
+      { id: 'esquiva', texto: 'Las cosas buenas siempre le pasan a otros', categoria: 'fortuna', dolor: 'mala_suerte', intensidad: 'media' },
+      { id: 'vacio', texto: 'Tengo todo pero siento un vacío', categoria: 'sanacion', dolor: 'vacio_existencial', intensidad: 'alta' },
+      { id: 'estancada', texto: 'Sé que puedo más pero algo me frena', categoria: 'transformacion', dolor: 'bloqueo', intensidad: 'media' }
     ]
   },
+  // === PREGUNTA 2: MOMENTO DE VIDA (detecta urgencia y disposición) ===
   {
     id: 2,
     tipo: 'seleccion',
-    mensaje: 'Cuando estas sola en casa de noche, ¿que sentis?',
+    mensaje: '¿En qué momento estás ahora?',
     opciones: [
-      { id: 'presencia', texto: 'Una presencia que me cuida', elemento: 'tierra' },
-      { id: 'pensamientos', texto: 'Pensamientos que no paran', elemento: 'aire' },
-      { id: 'emociones', texto: 'Emociones profundas que suben', elemento: 'agua' },
-      { id: 'energia', texto: 'Energia inquieta, ganas de hacer', elemento: 'fuego' }
+      { id: 'crisis', texto: 'Atravesando algo difícil', momento: 'crisis', urgencia: 'alta', perfil_compra: 'vulnerable' },
+      { id: 'transicion', texto: 'Cerrando un ciclo, abriendo otro', momento: 'transicion', urgencia: 'media', perfil_compra: 'buscador_activo' },
+      { id: 'busqueda', texto: 'Buscando algo más, no sé qué', momento: 'busqueda', urgencia: 'baja', perfil_compra: 'curioso' },
+      { id: 'estable', texto: 'Estable, pero quiero potenciar algo', momento: 'estable', urgencia: 'baja', perfil_compra: 'buscador_activo' }
     ]
   },
+  // === PREGUNTA 3: ESPEJO PROFUNDO (valida el dolor) ===
   {
     id: 3,
     tipo: 'seleccion',
-    mensaje: '¿Cual de estas frases te describe mejor ahora?',
+    mensaje: '¿Cuál de estas frases podrías haber dicho vos?',
     opciones: [
-      { id: 'cansada', texto: 'Estoy cansada de ser la fuerte', arquetipo: 'sanadora_herida' },
-      { id: 'sola', texto: 'Me siento sola aunque este acompanada', arquetipo: 'busca_amor' },
-      { id: 'atrapada', texto: 'Siento que algo me frena pero no se que', arquetipo: 'victima' },
-      { id: 'perdida', texto: 'Probe de todo pero nada me llena', arquetipo: 'buscadora' }
+      { id: 'fuerte', texto: '"Estoy cansada de ser la fuerte para todos"', arquetipo: 'protectora_agotada', categoria: 'proteccion' },
+      { id: 'merece', texto: '"A veces siento que no merezco cosas buenas"', arquetipo: 'autoestima_baja', categoria: 'amor_propio' },
+      { id: 'repite', texto: '"Siempre termino en el mismo lugar"', arquetipo: 'patron_repetido', categoria: 'sanacion' },
+      { id: 'tarde', texto: '"Siento que llego tarde a todo"', arquetipo: 'ansiosa', categoria: 'fortuna' }
     ]
   },
+  // === PREGUNTA 4: QUÉ BUSCA (detecta categoría principal) ===
   {
     id: 4,
     tipo: 'seleccion',
-    mensaje: 'Si pudieras elegir UN regalo del universo, ¿cual seria?',
+    mensaje: 'Si un ser mágico pudiera ayudarte con UNA cosa, ¿cuál elegirías?',
     opciones: [
-      { id: 'paz', texto: 'Paz interior profunda', categoria: 'sanacion' },
-      { id: 'seguridad', texto: 'Proteccion absoluta', categoria: 'proteccion' },
-      { id: 'abundancia', texto: 'Que el dinero fluya sin esfuerzo', categoria: 'abundancia' },
-      { id: 'amor_verdadero', texto: 'Amor verdadero y duradero', categoria: 'amor' }
+      { id: 'proteger', texto: 'Que me proteja y cuide mi energía', categoria: 'proteccion', intencion: 'proteccion' },
+      { id: 'suerte', texto: 'Que me traiga suerte y oportunidades', categoria: 'fortuna', intencion: 'abundancia' },
+      { id: 'sanar', texto: 'Que me ayude a soltar y sanar', categoria: 'sanacion', intencion: 'sanacion' },
+      { id: 'amor', texto: 'Que abra mi corazón al amor', categoria: 'amor', intencion: 'amor' },
+      { id: 'calma', texto: 'Que me traiga paz y calma', categoria: 'calma', intencion: 'bienestar' }
     ]
   },
+  // === PREGUNTA 5: TEXTO LIBRE - DOLOR (análisis con IA) ===
   {
     id: 5,
     tipo: 'texto_libre',
-    mensaje: 'Contame con tus palabras: ¿que es lo que MAS te duele en este momento de tu vida?',
-    placeholder: 'Escribi lo que sientas, no hay respuesta incorrecta...',
-    analisis: ['dolor', 'arquetipo']
+    mensaje: 'Si pudieras contarle a alguien lo que de verdad te pesa... ¿qué le dirías?',
+    placeholder: 'No hay respuesta incorrecta. Escribí lo que sientas...',
+    analisis: ['dolor', 'urgencia', 'categoria']
   },
+  // === PREGUNTA 6: EXPERIENCIA PREVIA (detecta familiaridad con el mundo místico) ===
   {
     id: 6,
-    tipo: 'texto_libre',
-    mensaje: 'Si pudieras pedirle algo al universo, algo que cambiaria todo... ¿que seria?',
-    placeholder: 'Tu deseo mas profundo...',
-    analisis: ['deseo', 'intencion']
+    tipo: 'seleccion',
+    mensaje: '¿Tenés experiencia con objetos o seres que te acompañen espiritualmente?',
+    opciones: [
+      { id: 'si_varios', texto: 'Sí, tengo varios y me encantan', experiencia: 'alta', perfil_compra: 'coleccionista' },
+      { id: 'si_uno', texto: 'Tengo algo pero quiero más', experiencia: 'media', perfil_compra: 'expansion' },
+      { id: 'no_pero', texto: 'No, pero siempre me llamó la atención', experiencia: 'baja', perfil_compra: 'primera_vez' },
+      { id: 'esceptica', texto: 'Soy escéptica pero algo me trajo acá', experiencia: 'ninguna', perfil_compra: 'esceptico_curioso' }
+    ]
   },
+  // === PREGUNTA 7: ESTILO DE MENSAJE ===
   {
     id: 7,
     tipo: 'seleccion',
-    mensaje: 'Ultima pregunta: ¿como preferis recibir mensajes?',
+    mensaje: 'Última: ¿cómo preferís que te hablen?',
     opciones: [
-      { id: 'directo', texto: 'Directo y claro, sin vueltas', estilo: 'directo' },
+      { id: 'directo', texto: 'Directo, sin vueltas', estilo: 'directo' },
       { id: 'suave', texto: 'Suave y contenedor', estilo: 'suave' },
-      { id: 'mistico', texto: 'Poetico y mistico', estilo: 'mistico' },
-      { id: 'practico', texto: 'Practico con acciones concretas', estilo: 'practico' }
+      { id: 'poetico', texto: 'Poético y profundo', estilo: 'mistico' },
+      { id: 'practico', texto: 'Práctico, con acciones claras', estilo: 'practico' }
     ]
   }
 ];
+
+// Perfiles de compra y qué ofrecerles
+const PERFILES_COMPRA = {
+  vulnerable: {
+    nombre: 'En momento sensible',
+    enfoque: 'VALOR PRIMERO, no venta',
+    oferta_principal: 'contenido_gratuito',
+    oferta_secundaria: 'mini_accesible',
+    mensaje: 'No te voy a vender nada. Primero quiero que sepas que no estás sola.',
+    cta: 'Recibir mensaje de tu guardián (gratis)'
+  },
+  buscador_activo: {
+    nombre: 'Lista para transformar',
+    enfoque: 'Mostrar opciones completas',
+    oferta_principal: 'guardian_canalizado',
+    oferta_secundaria: 'pack_proteccion',
+    mensaje: 'Estás lista. Tu guardián te está esperando.',
+    cta: 'Conocer guardianes disponibles'
+  },
+  curioso: {
+    nombre: 'Explorando',
+    enfoque: 'Educar y nutrir',
+    oferta_principal: 'mini_entrada',
+    oferta_secundaria: 'newsletter_valor',
+    mensaje: 'No tenés que decidir nada ahora. Solo escuchá lo que tu intuición dice.',
+    cta: 'Ver guardianes de entrada'
+  },
+  coleccionista: {
+    nombre: 'Ya conoce el mundo',
+    enfoque: 'Mostrar piezas especiales',
+    oferta_principal: 'pieza_unica',
+    oferta_secundaria: 'maestro_mistico',
+    mensaje: 'Tenemos piezas que no mostramos a todos. Vos ya sabés reconocerlas.',
+    cta: 'Ver piezas exclusivas'
+  },
+  expansion: {
+    nombre: 'Quiere crecer su familia',
+    enfoque: 'Complementar lo que tiene',
+    oferta_principal: 'guardian_complementario',
+    oferta_secundaria: 'pack_familia',
+    mensaje: 'Tu guardián actual va a estar feliz de tener compañía.',
+    cta: 'Ver guardianes que complementan'
+  },
+  primera_vez: {
+    nombre: 'Primera experiencia',
+    enfoque: 'Guiar con cariño',
+    oferta_principal: 'mini_especial',
+    oferta_secundaria: 'guia_cuidado',
+    mensaje: 'Tu primer guardián es especial. Te voy a ayudar a elegir el indicado.',
+    cta: 'Empezar con un mini especial'
+  },
+  esceptico_curioso: {
+    nombre: 'Escéptico pero abierto',
+    enfoque: 'Sin presión, dejar que sienta',
+    oferta_principal: 'contenido_valor',
+    oferta_secundaria: 'mini_sin_compromiso',
+    mensaje: 'No tenés que creer en nada. Solo notá qué sentiste al leer esto.',
+    cta: 'Seguir explorando sin compromiso'
+  }
+};
 
 // GET: Retorna las preguntas del test
 export async function GET() {
