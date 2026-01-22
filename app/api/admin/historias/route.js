@@ -217,7 +217,38 @@ export async function POST(request) {
       }
     }
 
-    prompt += `\n---\n\nGenerá la historia completa para ${nombre}. Usá los triggers psicológicos. Que el lector se venda solo, sin darse cuenta de que lo estás guiando. Nada de teleshopping - todo sutil, emocional, íntimo.`;
+    // VALIDACIÓN PRE-GENERACIÓN
+    const validacion = {
+      especie: especie || 'duende',
+      cm: tamanoCm || 18,
+      esPixie: (especie || '').toLowerCase() === 'pixie',
+      nombreLimpio: nombre?.split(' - ')[0] || nombre
+    };
+
+    // Si es pixie, forzar datos correctos
+    if (validacion.esPixie) {
+      if (validacion.cm > 15) validacion.cm = 11; // Pixies son pequeñas
+    }
+
+    prompt += `\n---\n\n# GENERA LA HISTORIA PARA: ${validacion.nombreLimpio}
+
+DATOS QUE DEBES USAR EXACTAMENTE:
+- Especie: ${validacion.especie.toUpperCase()} (NO uses otra)
+- Tamaño: ${validacion.cm} centímetros (NO inventes otro número)
+- Categoría: ${categoria}
+
+CHECKLIST ANTES DE ENTREGAR:
+□ ¿Usé la especie correcta? (${validacion.especie})
+□ ¿Usé los cm correctos? (${validacion.cm}cm)
+□ ¿Evité 847 años? (usar entre 150-600 para pixies, 200-1500 para duendes)
+□ ¿Revisé la ortografía? (estás, vine, etc)
+□ ¿El lector se reconoce en el primer párrafo?
+□ ¿Hay un loop abierto que solo se cierra con el guardián?
+□ ¿Usé future pacing para que viva el resultado?
+
+IMPORTANTE: Si es PIXIE, es pixie. NO la llames duende. Las pixies son espíritus de plantas.
+
+Generá la historia usando triggers psicológicos invisibles. El lector se vende solo.`;
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -230,17 +261,75 @@ export async function POST(request) {
       ]
     });
 
-    const historia = response.content[0].text;
+    let historia = response.content[0].text;
+
+    // === POST-VALIDACIÓN Y AUTO-CORRECCIÓN ===
+
+    // 1. Corregir errores de ortografía comunes
+    const correccionesOrtografia = {
+      'entás': 'estás',
+      'entas': 'estás',
+      'vim': 'vine',
+      'ví': 'vi',
+      'conciente': 'consciente',
+      'travez': 'través',
+      'atravez': 'a través',
+      'enseñarte a que': 'enseñarte que',
+      'a el ': 'al ',
+      'de el ': 'del '
+    };
+
+    Object.entries(correccionesOrtografia).forEach(([mal, bien]) => {
+      historia = historia.replace(new RegExp(mal, 'gi'), bien);
+    });
+
+    // 2. Si es pixie y dice "duende", corregir
+    if (validacion.esPixie) {
+      historia = historia.replace(/\bes un duende\b/gi, 'es una pixie');
+      historia = historia.replace(/\bel duende\b/gi, 'la pixie');
+      historia = historia.replace(/\bun duende\b/gi, 'una pixie');
+    }
+
+    // 3. Si tiene 847 años, cambiar a número aleatorio
+    if (historia.includes('847')) {
+      const edadAleatoria = validacion.esPixie
+        ? Math.floor(Math.random() * 450) + 150  // 150-600 para pixies
+        : Math.floor(Math.random() * 1300) + 200; // 200-1500 para duendes
+      historia = historia.replace(/847/g, edadAleatoria.toString());
+    }
+
+    // 4. Si menciona cm incorrecto para pixies, corregir
+    if (validacion.esPixie) {
+      // Buscar patrones como "18 centímetros" o "18cm"
+      historia = historia.replace(/\b(1[5-9]|[2-9]\d)\s*(centímetros|cm)\b/gi, `${validacion.cm} centímetros`);
+    }
+
+    // 5. Detectar advertencias (no auto-corregir, solo loguear)
+    const advertencias = [];
+    if (historia.toLowerCase().includes('acantilados')) advertencias.push('Menciona acantilados');
+    if (historia.toLowerCase().includes('irlanda') || historia.toLowerCase().includes('escocia')) {
+      advertencias.push('Menciona lugares genéricos');
+    }
+    if (historia.toLowerCase().includes('desde tiempos inmemoriales')) {
+      advertencias.push('Usa frase de IA prohibida');
+    }
+
+    if (advertencias.length > 0) {
+      console.warn('Advertencias en historia generada:', advertencias);
+    }
 
     return NextResponse.json({
       success: true,
       historia,
       datos: {
-        nombre,
+        nombre: validacion.nombreLimpio,
         categoria,
         tamano,
-        productoId
-      }
+        productoId,
+        especie: validacion.especie,
+        cm: validacion.cm
+      },
+      advertencias: advertencias.length > 0 ? advertencias : undefined
     });
 
   } catch (error) {
