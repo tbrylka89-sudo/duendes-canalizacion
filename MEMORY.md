@@ -125,6 +125,34 @@ Cada categoría tiene CAPAS. No es genérico:
 
 ---
 
+## DEMANDA REAL DEL MERCADO
+
+Lo que la gente PIDE (para tener en cuenta al generar historias):
+
+| Especialidad | Notas |
+|--------------|-------|
+| **Estudio** | Estudiantes, exámenes, concentración, memoria |
+| **Negocios** | Emprendedores, comercio, ventas, clientes |
+| **Protector del auto** | Luke mini es el ejemplo. Protección de vehículos |
+| **Protector de niños** | Muy pedido. Cuidar a los hijos |
+| **Vigilante** | MUY pedido. PERO: nosotros NO hacemos los de 2-3 caras (eso es molde horrible). Nuestros vigilantes son únicos, no necesitan caras múltiples |
+| **Deseos** | Duendes que ayudan a manifestar deseos |
+| **Abrecaminos** | TODO duende con LLAVE es abrecaminos (además de su otra especialidad) |
+| **Meditadores / Zen** | Calma, mindfulness, paz interior |
+| **Duelos** | Acompañar pérdidas, despedidas |
+
+### Reglas de combinación:
+- **Llave = Abrecaminos** automáticamente (además de lo que sea)
+- **Vigilante ≠ 3 caras** - eso es de moldes horribles, nosotros no
+- Un guardián puede tener MÚLTIPLES especialidades
+
+### Posición de marca:
+- No seguimos modas de moldes feos
+- Cada pieza es única, hecha a mano
+- Nuestros vigilantes son diferentes (y mejores) que los de 3 caras
+
+---
+
 ## ÚLTIMAS SESIONES
 
 ### 2026-01-22 (sesión 2)
