@@ -22,12 +22,14 @@ const WC_URL = process.env.WORDPRESS_URL;
 const WC_KEY = process.env.WC_CONSUMER_KEY;
 const WC_SECRET = process.env.WC_CONSUMER_SECRET;
 
-// Diccionario de correcciones
+// Diccionario de correcciones - orden importa (más específicos primero)
 const correcciones = {
-  // Palabras pegadas con "el"
-  'bloqueal ': 'bloquea el ',
-  'paral ': 'para el ',
+  // Palabras pegadas con "el" - TODAS las variaciones
+  'fueral momento': 'fuera el momento',
   'fueral ': 'fuera el ',
+  'bloqueal ': 'bloquea el ',
+  'paral otro': 'para el otro',
+  'paral ': 'para el ',
   'seral ': 'será el ',
   'eral ': 'era el ',
   'hayal ': 'haya el ',
@@ -49,7 +51,7 @@ const correcciones = {
   'investaste': 'inventaste',
   'herramiestás': 'herramientas',
   'herramiestas': 'herramientas',
-  // Conjugaciones incorrectas
+  // Conjugaciones incorrectas (la S final es error común)
   'llegastes': 'llegaste',
   'vistes': 'viste',
   'hicistes': 'hiciste',
@@ -58,14 +60,10 @@ const correcciones = {
   'quisistes': 'quisiste',
   'fuistes': 'fuiste',
   'tuvistes': 'tuviste',
-  // Tildes
+  // Tildes INCORRECTAS - solo palabras completas para no romper otras
+  // QUITADO: 'tí', 'ví', etc. porque matchean dentro de palabras como "sentís"
   'entás': 'estás',
   'entas': 'estás',
-  'ví': 'vi',
-  'tí': 'ti',
-  'fué': 'fue',
-  'dió': 'dio',
-  'vió': 'vio',
   // Ortografía general
   'vim': 'vine',
   'conciente': 'consciente',
