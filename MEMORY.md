@@ -31,10 +31,10 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 ### 3. Recreables vs Únicos
 **Decisión:**
-- **Únicos:** Pixies + tamaños grandes → usar "pieza única, desaparece"
-- **Recreables:** Mini + Mini Especial → usar "el guardián te elige a vos"
+- **Únicos:** Pixies + tamaños grandes (>15cm) → usar "pieza única, desaparece"
+- **Recreables:** Tamaños pequeños (≤15cm) excepto pixies → usar "el guardián te elige a vos"
 **Razón:** No mentir sobre escasez. Los mini se pueden recrear.
-**Implementación:** `esUnico = especie === 'pixie' || (tamano !== 'mini' && tamano !== 'mini_especial')`
+**Implementación:** `esUnico = especie === 'pixie' || cm > 15` (usa el tamaño en cm, no el string del tamaño)
 
 ### 4. Branding "Los Elegidos"
 **Decisión:**
@@ -181,15 +181,45 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ## ÚLTIMAS SESIONES
 
-### 2026-01-22 (sesión 3) - EN CURSO
-**Tarea:** Rehacer Test del Guardián con enfoque de conversión
+### 2026-01-22 (sesión 5) - COMPLETADA
+**Mejoras implementadas:**
+1. ✅ **FIX TYPOS DE CLAUDE** - Errores como "cargal don", "investáste", "fueral":
+   - Agregado `temperature: 0.5` a llamadas de Claude (era 1.0 default)
+   - Expandido diccionario de auto-correcciones de 8 a 60+ patrones
+   - Instrucciones de ortografía más explícitas en el prompt
+   - Incluye: palabras pegadas con "el", conjugaciones incorrectas, tildes, typos
 
-**Mejoras a implementar:**
-1. ✅ Preguntas estratégicas tipo "espejo" (no tan directas)
-2. 🔄 Detección de perfil de compra (buscador activo, curioso, en crisis)
-3. 🔄 Ofertas personalizadas según perfil
-4. 🔄 Branding "Los Elegidos" en resultado
-5. 🔄 Recomendaciones del catálogo real
+2. ✅ **CORRECCIÓN AUTOMÁTICA EN FRONTEND**:
+   - Función `corregirOrtografia()` con mismo diccionario que backend
+   - Se aplica automáticamente al recibir historias generadas
+   - Botón "🔧 Corregir ortografía" para corregir historias ya existentes sin regenerar
+   - Funciona tanto en generación inicial como en regeneración individual
+
+**Ubicación:**
+- Backend: `/app/api/admin/historias/route.js` líneas 405, 414-490
+- Frontend: `/app/admin/generador-historias/page.jsx` líneas 130-205
+
+---
+
+### 2026-01-22 (sesión 4) - COMPLETADA
+**Mejoras implementadas:**
+1. ✅ Corregido bug de recreables con tamaño "especial" (ahora usa cm > 15)
+2. ✅ Narrativa de recreables mejorada (equipo, no persona sola)
+3. ✅ Botón "Guardar en WooCommerce" en modo directo
+4. ✅ **BATCH INTELIGENTE** - Nueva funcionalidad completa:
+   - Selección múltiple de guardianes del catálogo
+   - Agrupación por especialización (fortuna, protección, etc.)
+   - Generación masiva con tracking de hooks/sincrodestinos usados
+   - NO repite hooks ni sincrodestinos dentro del mismo grupo
+   - Revisión con score, aprobación individual o masiva
+   - Guardado masivo en WooCommerce
+
+**Acceso:** `/admin/generador-historias` → "🚀 Batch Inteligente"
+
+---
+
+### 2026-01-22 (sesión 3)
+**Tarea:** Rehacer Test del Guardián con enfoque de conversión (pendiente)
 
 **Archivos a modificar:**
 - `/app/api/test-guardian/route.js` - Preguntas y lógica

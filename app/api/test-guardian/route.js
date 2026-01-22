@@ -225,59 +225,88 @@ export async function POST(request) {
   }
 }
 
-// Analizar respuestas de seleccion
+// Analizar respuestas de seleccion - NUEVO SISTEMA
 function analizarRespuestas(respuestas) {
-  const arquetipoScores = {
-    victima: 0,
-    buscadora: 0,
-    repite_patrones: 0,
-    sanadora_herida: 0,
-    busca_amor: 0
+  // Scores de categoría
+  const categoriaScores = {
+    proteccion: 0,
+    fortuna: 0,
+    sanacion: 0,
+    transformacion: 0,
+    amor: 0,
+    amor_propio: 0,
+    calma: 0
   };
 
-  const elementoScores = { tierra: 0, aire: 0, agua: 0, fuego: 0 };
-  let intencion = 'sanacion';
-  let categoria = 'sanacion';
+  // Datos del perfil
+  let perfilCompra = 'curioso';
+  let momento = 'busqueda';
+  let urgencia = 'baja';
+  let experiencia = 'baja';
   let estilo = 'suave';
+  let dolor = '';
+  let arquetipo = '';
+  let intensidad = 'media';
 
-  // Pregunta 1: arquetipo + intencion
-  if (respuestas[1]?.arquetipo) {
-    arquetipoScores[respuestas[1].arquetipo] += 30;
-    intencion = respuestas[1].intencion || intencion;
+  // Pregunta 1: Espejo inicial (categoria + dolor + intensidad)
+  if (respuestas[1]) {
+    const r1 = respuestas[1];
+    if (r1.categoria) categoriaScores[r1.categoria] += 30;
+    dolor = r1.dolor || dolor;
+    intensidad = r1.intensidad || intensidad;
   }
 
-  // Pregunta 2: elemento
-  if (respuestas[2]?.elemento) {
-    elementoScores[respuestas[2].elemento] += 40;
+  // Pregunta 2: Momento de vida (perfil de compra + urgencia)
+  if (respuestas[2]) {
+    const r2 = respuestas[2];
+    momento = r2.momento || momento;
+    urgencia = r2.urgencia || urgencia;
+    perfilCompra = r2.perfil_compra || perfilCompra;
   }
 
-  // Pregunta 3: arquetipo
-  if (respuestas[3]?.arquetipo) {
-    arquetipoScores[respuestas[3].arquetipo] += 25;
+  // Pregunta 3: Espejo profundo (arquetipo + categoria)
+  if (respuestas[3]) {
+    const r3 = respuestas[3];
+    arquetipo = r3.arquetipo || arquetipo;
+    if (r3.categoria) categoriaScores[r3.categoria] += 25;
   }
 
-  // Pregunta 4: categoria
-  if (respuestas[4]?.categoria) {
-    categoria = respuestas[4].categoria;
+  // Pregunta 4: Qué busca (categoria principal)
+  if (respuestas[4]) {
+    const r4 = respuestas[4];
+    if (r4.categoria) categoriaScores[r4.categoria] += 35;
   }
 
-  // Pregunta 7: estilo
-  if (respuestas[7]?.estilo) {
-    estilo = respuestas[7].estilo;
+  // Pregunta 6: Experiencia previa
+  if (respuestas[6]) {
+    const r6 = respuestas[6];
+    experiencia = r6.experiencia || experiencia;
+    // Ajustar perfil de compra si tiene más info
+    if (r6.perfil_compra) perfilCompra = r6.perfil_compra;
   }
 
-  // Determinar principales
-  const arquetiposSorted = Object.entries(arquetipoScores).sort((a, b) => b[1] - a[1]);
-  const elementosSorted = Object.entries(elementoScores).sort((a, b) => b[1] - a[1]);
+  // Pregunta 7: Estilo de mensaje
+  if (respuestas[7]) {
+    estilo = respuestas[7].estilo || estilo;
+  }
+
+  // Determinar categoría principal
+  const categoriasSorted = Object.entries(categoriaScores).sort((a, b) => b[1] - a[1]);
+  const categoriaPrincipal = categoriasSorted[0][0];
+  const categoriaSecundaria = categoriasSorted[1][0];
 
   return {
-    arquetipoPrincipal: arquetiposSorted[0][0],
-    arquetipoSecundario: arquetiposSorted[1][0],
-    arquetipoScores,
-    elemento: elementosSorted[0][0],
-    intencion,
-    categoria,
-    estilo
+    categoriaPrincipal,
+    categoriaSecundaria,
+    categoriaScores,
+    perfilCompra,
+    momento,
+    urgencia,
+    experiencia,
+    estilo,
+    dolor,
+    arquetipo,
+    intensidad
   };
 }
 

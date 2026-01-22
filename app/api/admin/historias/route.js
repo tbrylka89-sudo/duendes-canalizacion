@@ -64,9 +64,10 @@ Tu texto DEBE seguir esta estructura en este orden:
    NO: "Este duende es muy poderoso."
 
 6. **PRUEBA** (sincrodestino)
-   Algo que pasó durante la creación. Creíble, sutil.
-   Ejemplo: "Mientras la modelaba, el gato que nunca entra al taller se sentó a mirar."
+   Algo que pasó durante la creación. Creíble, sutil. VOZ PASIVA.
+   Ejemplo: "Mientras era modelado, el gato que nunca entra al taller se sentó a mirar."
    NO: "Este producto tiene energía especial."
+   NO: "Mientras lo modelaba/modelábamos" - SIEMPRE voz pasiva
 
 7. **PUENTE** (mensaje del guardián)
    Primera persona. Íntimo. Como si te conociera.
@@ -90,10 +91,15 @@ Tu texto DEBE seguir esta estructura en este orden:
    - Duendes: entre 200 y 1500 años
    - Elegí un número DIFERENTE cada vez
 
-3. **ORTOGRAFÍA PERFECTA:**
-   - "estás" NO "entás"
-   - "vine" NO "vim"
-   - "consciente" NO "conciente"
+3. **ORTOGRAFÍA PERFECTA (CRÍTICO):**
+   REVISÁ CADA PALABRA antes de escribirla. Errores comunes a EVITAR:
+   - "estás" NO "entás" / "cargando" NO "cargal don"
+   - "vine" NO "vim" / "invertiste" NO "investáste"
+   - "consciente" NO "conciente" / "ganar" NO "ganal"
+   - "llegaste" NO "llegastes" / "viste" NO "vistes"
+   - Verbos en pasado: terminan en -ASTE, -ISTE (sin S final)
+   - Tildes correctas: sí, más, qué, cómo, cuándo (interrogativos)
+   - Separaciones: "a veces" NO "aveces", "tal vez" NO "talvez"
 
 4. **PIXIES SON PIXIES:**
    - Son espíritus de plantas, NO duendes
@@ -102,7 +108,16 @@ Tu texto DEBE seguir esta estructura en este orden:
    - NUNCA las llames "duende"
    - Su personalidad viene de su PLANTA (Azucena = pureza, Rosa = amor, etc)
 
-5. **PROHIBIDO:**
+5. **VOZ PASIVA (OBLIGATORIO):**
+   NUNCA uses primera persona (yo/nosotros). Usá VOZ PASIVA:
+   - "mientras era modelado" NO "mientras lo modelaba/modelábamos"
+   - "cuando quedó terminado" NO "cuando lo terminé/terminamos"
+   - "mientras se pintaban sus ojos" NO "mientras pintaba/pintábamos"
+   - "se le daban los últimos detalles" NO "le daba/dábamos los detalles"
+   - "desaparece del taller" NO "desaparece de mi/nuestro taller"
+   - La magia está en el GUARDIÁN, no en quién lo hizo
+
+6. **PROHIBIDO:**
    - "Llamá ya", "no te lo pierdas", "oferta"
    - Lugares inventados: "acantilados de Irlanda", "bosques de Escocia"
    - Frases de IA: "desde tiempos inmemoriales", "el velo entre mundos", "brumas ancestrales"
@@ -200,6 +215,7 @@ export async function POST(request) {
       respuestasEncuesta,
       sincrodestino_custom,
       sincrodestinos_usados,
+      hooks_usados, // BATCH: hooks ya usados en el grupo
       feedbackRegeneracion,
       perfil_objetivo,
       especializacion // NUEVO: especialización elegida por el usuario
@@ -223,7 +239,13 @@ export async function POST(request) {
 
     // 1. Hook de apertura - USAR ESPECIALIZACIÓN si existe, sino categoría
     const categoriaParaHook = especializacion || categoria;
-    const hookPrincipal = getRandomHook(categoriaParaHook);
+    // Si hay hooks usados en batch, elegir uno que no se haya usado
+    let hookPrincipal = getRandomHook(categoriaParaHook);
+    if (hooks_usados && hooks_usados.length > 0) {
+      const hooksDisponibles = getHooksAlternativos(categoriaParaHook, null);
+      const hookNoUsado = hooksDisponibles.find(h => !hooks_usados.includes(h));
+      if (hookNoUsado) hookPrincipal = hookNoUsado;
+    }
     const hooksAlternativos = getHooksAlternativos(categoriaParaHook, hookPrincipal);
 
     // 2. Sincrodestino
@@ -290,27 +312,30 @@ Este guardián es IRREPETIBLE. Usá esto:
     } else {
       prompt += `
 ### URGENCIA (RECREABLE - HECHO A MANO)
-Este guardián se puede recrear, pero cada uno es ÚNICO porque está hecho a mano.
-La foto que ve el cliente es de ejemplo - recibirá UNO DE LOS QUE TENEMOS, no ese exacto.
 
-**NARRATIVA ESPECIAL - EL GUARDIÁN TE ELIGE:**
-Convertí "no sé cuál me toca" en anticipación mágica. Usá esto:
-- "No elegís vos al guardián. Él te elige a vos."
-- "Cada uno que hago es diferente, aunque sean del mismo tipo. El que llegue a tu casa es el que TENÍA que llegar."
+**CONTEXTO IMPORTANTE:**
+- Hay VARIOS de este tipo de guardián disponibles (hechos a mano, cada uno único)
+- La foto es de EJEMPLO - el cliente NO recibe ese exacto de la imagen
+- El cliente NO elige cuál le toca - uno de ellos lo elige a él/ella
+- Esto es POSITIVO: no es "a ver qué me toca", es "el que llegue es el que tenía que ser"
+
+**VOZ:** Somos un equipo. Usá "hacemos", "tenemos" - NUNCA "hago" o "mi taller" en singular.
+
+**NARRATIVA MÁGICA - EL GUARDIÁN TE ELIGE:**
+La magia está en que NO elegís vos. Convertí esto en algo especial:
+- "Hay varios esperando en nuestro taller. Pero no elegís vos cuál - uno de ellos ya sabe que sos vos."
+- "Cada uno que hacemos es diferente, aunque sean del mismo tipo. El que llegue a tu casa es el que TENÍA que llegar."
+- "No vas a recibir el de la foto. Vas a recibir el tuyo. Y eso es mejor."
 - "La magia no está en elegir cuál - está en dejarte elegir."
-- "¿Cuál te tocará? El que el universo sabe que necesitás."
-- "Están hechos a mano, uno por uno. Ninguno es exactamente igual al otro. El tuyo ya sabe que sos vos."
 
-**URGENCIA REAL (escasez de stock + tiempo de vida):**
-Cuando hay stock, hay. Pero cuando se agotan, pueden pasar SEMANAS O MESES para que vuelva a haber. Usá esto:
-- "Ahora hay disponibles. Pero cuando se van, no sé cuándo vuelvo a tener."
-- "No es infinito el stock. Los hago a mano, uno por uno."
-- "Si esperás, puede que no haya. Y no te puedo decir cuándo vuelven."
-- "La versión de vos que está leyendo esto, esa no vuelve. Y este guardián tampoco espera para siempre."
+**URGENCIA REAL:**
+- "Hay disponibles ahora. Pero están hechos a mano, no es infinito."
+- "Cuando se van, puede pasar tiempo hasta que volvamos a tener."
 - "Algo te trajo hasta acá. No lo ignores."
 
-PROHIBIDO decir: "pieza única irrepetible", "desaparece para siempre", "no hay otro igual", "irrepetible"
-SÍ podés decir: "ahora hay", "cuando se van no sé cuándo vuelven", "no es infinito"
+PROHIBIDO decir: "pieza única irrepetible", "desaparece para siempre", "este exacto", "este específico"
+PROHIBIDO decir: "hago", "mi taller", "vuelvo" (es EQUIPO)
+PROHIBIDO: cualquier cosa que implique que recibe el de la foto
 `;
     }
 
@@ -377,6 +402,7 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2500,
+      temperature: 0.5, // Reducido de 0.7 - todavía había errores tipo "paral", "bloqueal"
       messages: [{ role: 'user', content: prompt }]
     });
 
@@ -384,18 +410,94 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
 
     // === POST-VALIDACIÓN Y AUTO-CORRECCIÓN ===
 
-    // 1. Corregir ortografía
+    // 1. Corregir ortografía (expandido para evitar errores de temperature alta)
     const correccionesOrtografia = {
+      // Errores detectados en batch - palabras pegadas con "el"
+      'bloqueal ': 'bloquea el ',
+      'paral ': 'para el ',
+      'fueral ': 'fuera el ',
+      'seral ': 'será el ',
+      'eral ': 'era el ',
+      'hayal ': 'haya el ',
+      'tengal ': 'tenga el ',
+      'puedal ': 'pueda el ',
+      'veal ': 'vea el ',
+      'seal ': 'sea el ',
+      'estéal ': 'esté el ',
+      'cargal ': 'carga el ',
+      'ganal ': 'gana el ',
+      'tomal ': 'toma el ',
+      'llevál ': 'lleva el ',
+      'tienel ': 'tiene el ',
+      'vienel ': 'viene el ',
+      'hacerl ': 'hacer el ',
+      // Errores de palabras mal escritas
+      'investáste': 'inventaste',
+      'investaste': 'inventaste',
+      'invertáste': 'invertiste',
+      'herramiestás': 'herramientas',
+      'herramiestas': 'herramientas',
+      'importal ': 'importa ',
+      'nadal ': 'nada ',
+      'todal ': 'toda ',
+      'cadal ': 'cada ',
+      'algunal ': 'alguna ',
+      'ningunal ': 'ninguna ',
+      'mismol ': 'mismo ',
+      'mismal ': 'misma ',
+      'sentíste': 'sentiste',
+      'sentiste ': 'sentiste ',
+      'viniste ': 'viniste ',
+      // Errores comunes de conjugación
+      'llegastes': 'llegaste',
+      'vistes': 'viste',
+      'hicistes': 'hiciste',
+      'dijistes': 'dijiste',
+      'pudistes': 'pudiste',
+      'quisistes': 'quisiste',
+      'fuistes': 'fuiste',
+      'tuvistes': 'tuviste',
+      // Errores de tildes
       'entás': 'estás',
       'entas': 'estás',
-      'vim': 'vine',
       'ví': 'vi',
+      'tí': 'ti',
+      'fué': 'fue',
+      'dió': 'dio',
+      'vió': 'vio',
+      // Errores de ortografía
+      'vim': 'vine',
       'conciente': 'consciente',
       'travez': 'través',
       'atravez': 'a través',
+      'travéz': 'través',
+      'atravéz': 'a través',
       'enseñarte a que': 'enseñarte que',
       'a el ': 'al ',
-      'de el ': 'del '
+      'de el ': 'del ',
+      // Errores de duplicación/omisión
+      'poque': 'porque',
+      'porqe': 'porque',
+      'qe ': 'que ',
+      'qu ': 'que ',
+      'esá': 'está',
+      'esa ': 'está ',
+      ' q ': ' que ',
+      // Errores de separación
+      'nose ': 'no sé ',
+      'nosé ': 'no sé ',
+      'aveces': 'a veces',
+      'enserio': 'en serio',
+      'envez': 'en vez',
+      'talvez': 'tal vez',
+      'osea': 'o sea',
+      'ósea': 'o sea',
+      // Errores específicos del proyecto
+      'guradián': 'guardián',
+      'guaridan': 'guardián',
+      'pixe ': 'pixie ',
+      'duened': 'duende',
+      'duenede': 'duende'
     };
 
     Object.entries(correccionesOrtografia).forEach(([mal, bien]) => {
@@ -578,6 +680,7 @@ export async function GET(request) {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 800,
+      temperature: 0.7,
       messages: [
         {
           role: 'user',

@@ -6,6 +6,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const { search } = req.query;
+
   try {
     // Credenciales WooCommerce
     const WOO_URL = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesdeluruguay.com';
@@ -39,8 +41,10 @@ export default async function handler(req, res) {
     let hayMas = true;
 
     while (hayMas) {
+      // Si hay búsqueda, usar el parámetro search de WooCommerce
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
       const response = await fetch(
-        `${WOO_URL}/wp-json/wc/v3/products?status=publish&per_page=100&page=${page}`,
+        `${WOO_URL}/wp-json/wc/v3/products?status=publish&per_page=100&page=${page}${searchParam}`,
         {
           headers: {
             'Authorization': `Basic ${auth}`,
