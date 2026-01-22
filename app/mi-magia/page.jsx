@@ -2237,7 +2237,7 @@ const EXPERIENCIAS = [
     tiempo: '20-30 minutos', 
     intro: `Las runas son un antiguo alfabeto nórdico que trasciende la escritura. Cada símbolo guarda energía, sabiduría y mensajes del universo. Cuando hacemos una tirada, no es azar - es sincronicidad pura.
 
-Yo (Gabriel o Thibisay, dependiendo de quién esté canalizando ese día) me siento en silencio, conecto con tu energía a través de tu pregunta, y dejo que las runas hablen. A veces el mensaje es directo; otras veces es simbólico y requiere interpretación.`,
+Nosotros nos sentamos en silencio, conectamos con tu energía a través de tu pregunta, y dejamos que las runas hablen. A veces el mensaje es directo; otras veces es simbólico y requiere interpretación.`,
     queRecibis: ['Tirada de 3 runas con interpretación profunda', 'Mensaje canalizado específico para tu situación', 'Guía práctica de acción (qué hacer ahora)', 'Ritual opcional para potenciar el mensaje'],
     paraQuien: 'Ideal si tenés una pregunta concreta, necesitás claridad sobre una decisión, o simplemente querés saber qué energía te rodea en este momento.',
     campos: ['pregunta', 'contexto']
@@ -2613,7 +2613,7 @@ Francisco Piria, fundador de Piriápolis, era un alquimista iniciado. Eligió es
 
 La disposición de Piriápolis no es casualidad: el Castillo de Piria, el Argentino Hotel, la Rambla, la Virgen de los Pescadores... todo está ubicado siguiendo principios alquímicos de geometría sagrada. Es un gran círculo mágico trazado en la tierra.
 
-Es acá, en este vórtice energético, donde Gabriel canaliza a los guardianes. La energía del lugar facilita la conexión con el Reino Elemental, permitiendo que cada figura se convierta en un verdadero puente entre mundos.
+Es acá, en este vórtice energético, donde nuestro equipo canaliza a los guardianes. La energía del lugar facilita la conexión con el Reino Elemental, permitiendo que cada figura se convierta en un verdadero puente entre mundos.
 
 Cuando recibís un guardián canalizado en Piriápolis, no solo recibís un objeto hermoso. Recibís un fragmento de esta energía ancestral, un pedacito de este lugar mágico que ahora vivirá en tu hogar.`
   },
@@ -7370,7 +7370,7 @@ const FAQS = [
     preguntas: [
       {
         q: '¿Qué es el certificado de canalización?',
-        a: 'Es el documento oficial que acompaña a cada guardián. Incluye el nombre del guardián, la fecha en que fue canalizado, un mensaje único que el guardián tiene para vos, y la firma de Thibisay. Lo recibís por email 24 horas después de tu compra, y también queda guardado acá en Mi Magia para que puedas verlo cuando quieras.'
+        a: 'Es el documento digital oficial que acompaña a cada guardián. Incluye el nombre del guardián, la fecha en que fue canalizado y un mensaje único que el guardián tiene para vos. Es 100% digital: lo podés ver y descargar desde acá en Mi Magia, disponible 24 horas después de tu compra.'
       },
       {
         q: '¿Puedo comprar como regalo?',
@@ -7378,7 +7378,7 @@ const FAQS = [
       },
       {
         q: '¿Qué incluye la compra de un guardián?',
-        a: 'Tu guardián llega con todo: la figura física articulada hecha a mano, el certificado de canalización personalizado con su mensaje único, acceso al portal Mi Magia donde gestionás tu colección, y runas de bienvenida para que empieces a explorar las experiencias mágicas disponibles.'
+        a: 'Tu guardián llega con todo: la figura física articulada hecha a mano, acceso al certificado de canalización digital con su mensaje único desde Mi Magia, acceso al portal donde gestionás tu colección, y runas de bienvenida para que empieces a explorar las experiencias mágicas disponibles.'
       }
     ]
   },

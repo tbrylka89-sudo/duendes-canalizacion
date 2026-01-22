@@ -76,7 +76,7 @@ const POSTS_PREGENERADOS = [
   { tipo: 'pregunta', contenido: '¿Cómo limpian la energía de sus guardianes? Leí que hay que hacerlo con la luna pero no sé bien cómo', likes: 41, respuestas: 27 },
 
   // Agradecimientos y celebraciones
-  { tipo: 'agradecimiento', contenido: '¡3 meses en el Círculo y no puedo creer lo que cambió mi vida! Gracias Thibisay, gracias a esta comunidad hermosa 💜', likes: 112, respuestas: 19 },
+  { tipo: 'agradecimiento', contenido: '¡3 meses en el Círculo y no puedo creer lo que cambió mi vida! Gracias al equipo, gracias a esta comunidad hermosa 💜', likes: 112, respuestas: 19 },
   { tipo: 'agradecimiento', contenido: 'La lectura de registros akáshicos que hice la semana pasada me voló la cabeza. Nunca nadie me había dicho cosas tan precisas de mi infancia...', likes: 78, respuestas: 11 },
   { tipo: 'agradecimiento', contenido: 'Hoy adopté mi tercer guardián y estoy llorando de emoción. Siento que encontré mi tribu acá 🥹', likes: 95, respuestas: 16 },
 
@@ -86,7 +86,7 @@ const POSTS_PREGENERADOS = [
   { tipo: 'tip', contenido: 'Para las que recién empiezan: no fuercen la conexión. Dejen que su guardián les muestre el camino a su ritmo 💫', likes: 134, respuestas: 18 },
 
   // Rituales compartidos
-  { tipo: 'ritual', contenido: 'Hoy hice el ritual de abundancia que compartió Thibisay y encontré $500 en un bolsillo que no revisaba hace meses 😱', likes: 203, respuestas: 34 },
+  { tipo: 'ritual', contenido: 'Hoy hice el ritual de abundancia que compartieron en el Círculo y encontré $500 en un bolsillo que no revisaba hace meses 😱', likes: 203, respuestas: 34 },
   { tipo: 'ritual', contenido: 'Cada domingo limpio el espacio con salvia y pongo música suave. Mis guardianes brillan diferente después ✨', likes: 67, respuestas: 9 },
 
   // Sincronicidades

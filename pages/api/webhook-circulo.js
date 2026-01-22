@@ -371,7 +371,7 @@ async function enviarEmailBienvenidaCirculo(elegido) {
           
           <p style="font-size: 16px; line-height: 1.8; margin-top: 40px;">
             Con cariño desde Piriápolis,<br>
-            <strong style="color: #d4af37;">Gabriel, Thibisay y el equipo ✨</strong>
+            <strong style="color: #d4af37;">El equipo de Duendes del Uruguay ✨</strong>
           </p>
         </div>
       `
@@ -420,7 +420,7 @@ async function enviarEmailRunasAcreditadas(elegido) {
           
           <p style="font-size: 16px; line-height: 1.8;">
             La magia te espera.<br>
-            <strong style="color: #d4af37;">Gabriel, Thibisay y el equipo</strong>
+            <strong style="color: #d4af37;">El equipo de Duendes del Uruguay</strong>
           </p>
         </div>
       `
@@ -448,7 +448,7 @@ async function enviarEmailGraciasCompra(elegido) {
           </p>
           
           <p style="font-size: 16px; line-height: 1.8;">
-            En este momento, Gabriel, Thibisay y el equipo estamos preparando todo con cuidado. 
+            En este momento, El equipo de Duendes del Uruguay estamos preparando todo con cuidado. 
             Cada pieza es única, y la tuya está siendo envuelta con la misma intención con la que fue creada.
           </p>
           
@@ -467,7 +467,7 @@ async function enviarEmailGraciasCompra(elegido) {
           
           <p style="font-size: 16px; line-height: 1.8; margin-top: 40px;">
             Con cariño desde Piriápolis,<br>
-            <strong style="color: #d4af37;">Gabriel, Thibisay y el equipo ✨</strong>
+            <strong style="color: #d4af37;">El equipo de Duendes del Uruguay ✨</strong>
           </p>
         </div>
       `
@@ -515,7 +515,7 @@ async function enviarEmailSubioNivel(elegido) {
           
           <p style="font-size: 16px; line-height: 1.8;">
             Tu clan de guardianes celebra contigo.<br>
-            <strong style="color: #d4af37;">Gabriel, Thibisay y el equipo</strong>
+            <strong style="color: #d4af37;">El equipo de Duendes del Uruguay</strong>
           </p>
         </div>
       `

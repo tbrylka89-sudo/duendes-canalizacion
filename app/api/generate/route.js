@@ -64,7 +64,7 @@ export async function POST(request) {
 - NADA de: brumas misticas, oceano susurra, dimensiones superiores
 - USA emojis: 🏠 💎 ✨ 📍 💫 🌿 🔮 💌
 - USA bullets y listas
-- Somos Gabriel y Thibisay desde Piriapolis
+- Somos el equipo de Duendes del Uruguay desde Piriapolis
 - Duendes tienen 4 dedos
 - El duende ELIGE a la persona
 
@@ -102,7 +102,7 @@ GENERA JSON (sin markdown):
   "dudas_frecuentes": "❓ PREGUNTAS FRECUENTES\\n\\nQ: Puedo tener mas guardianes?\\nA: Si! Los guardianes AMAN tener companeros. Se potencian entre si y trabajan en equipo para vos.\\n\\nQ: Puedo tocarlo?\\nA: Claro! El contacto fortalece el vinculo.\\n\\nQ: Y si se cae?\\nA: Limpialo con amor y volvelo a su lugar. Los accidentes pasan.",
   ${cantidadProductos > 1 ? '"sinergia": "🤝 TUS GUARDIANES JUNTOS\\n\\nComo se potencian, donde va cada uno. 150 palabras.",' : ''}
   "cierre": "Mensaje final calido. Invitala a seguir en redes y ver mas guardianes. 50 palabras.",
-  "firma": "Con amor y magia desde Piriapolis,\\nGabriel, Thibisay y el equipo 🌿"
+  "firma": "Con amor y magia desde Piriapolis,\\nEl equipo de Duendes del Uruguay 🌿"
 }`;
 
     let content;

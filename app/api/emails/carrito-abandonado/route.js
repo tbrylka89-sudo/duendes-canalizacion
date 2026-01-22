@@ -45,7 +45,6 @@ ${cierre}
 Si algo de esto resuena, ${guardianNombre} sigue disponible: ${guardianUrl}
 
 Con cariño,
-Thibisay
 Duendes del Uruguay`
     },
 
@@ -66,7 +65,6 @@ Si ${guardianNombre} estaba resonando con vos, quizás sea momento de escuchar e
 Y si no era el tuyo, está perfecto también. A veces miramos varios antes de encontrar el indicado.
 
 Un abrazo grande,
-Thibisay
 Duendes del Uruguay`
     }
   };

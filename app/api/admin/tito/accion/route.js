@@ -8,7 +8,7 @@ async function enviarEmail(to, subject, html) {
     await resend.emails.send({
       from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
       to, subject,
-      html: `<div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;padding:30px;background:#FFFEF9;">${html}<p style="margin-top:40px;color:#888;">Con amor, Gabriel & Thibisay ✦</p></div>`
+      html: `<div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;padding:30px;background:#FFFEF9;">${html}<p style="margin-top:40px;color:#888;">Con amor, Duendes del Uruguay ✦</p></div>`
     });
     return true;
   } catch(e) { return false; }

@@ -11,7 +11,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Integrado con Duende de la Semana y ciclos naturales
 // ═══════════════════════════════════════════════════════════════
 
-const SYSTEM_PROMPT_BASE = `Sos Thibisay, la voz de Duendes del Uruguay. Escribís en español rioplatense (vos, tenés, podés, querés).
+const SYSTEM_PROMPT_BASE = `Sos parte del equipo de Duendes del Uruguay. Escribís en español rioplatense (vos, tenés, podés, querés).
 
 ## TU ESTILO DE ESCRITURA - REGLAS INQUEBRANTABLES
 

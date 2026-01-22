@@ -4,7 +4,7 @@ import { kv } from '@vercel/kv';
 /**
  * GENERADOR DE CERTIFICADOS DE CANALIZACIÓN
  *
- * Genera un certificado HTML optimizado para impresión/PDF
+ * Genera un certificado HTML digital que se accede online
  * con toda la información del guardián y su canalización.
  */
 
@@ -298,32 +298,9 @@ export async function GET(request) {
     .footer {
       margin-top: 40px;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
+      justify-content: center;
+      align-items: center;
       padding: 0 20px;
-    }
-
-    .firma {
-      text-align: center;
-    }
-
-    .firma-linea {
-      width: 150px;
-      height: 1px;
-      background: #1a1a1a;
-      margin-bottom: 8px;
-    }
-
-    .firma-nombre {
-      font-family: 'Cinzel', serif;
-      font-size: 14px;
-      color: #1a1a1a;
-    }
-
-    .firma-titulo {
-      font-size: 11px;
-      color: #666;
-      font-style: italic;
     }
 
     .qr-section {
@@ -352,7 +329,7 @@ export async function GET(request) {
       letter-spacing: 2px;
     }
 
-    /* Botón de impresión (no aparece al imprimir) */
+    /* Botón de guardar (no aparece al imprimir) */
     .no-print {
       position: fixed;
       bottom: 30px;
@@ -360,7 +337,7 @@ export async function GET(request) {
       z-index: 100;
     }
 
-    .btn-imprimir {
+    .btn-guardar {
       background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%);
       color: #1a1a1a;
       border: none;
@@ -374,7 +351,7 @@ export async function GET(request) {
       transition: all 0.3s;
     }
 
-    .btn-imprimir:hover {
+    .btn-guardar:hover {
       transform: translateY(-3px);
       box-shadow: 0 12px 35px rgba(198, 169, 98, 0.5);
     }
@@ -443,12 +420,6 @@ export async function GET(request) {
     </div>
 
     <div class="footer">
-      <div class="firma">
-        <div class="firma-linea"></div>
-        <p class="firma-nombre">Thibisay</p>
-        <p class="firma-titulo">Canalizadora & Creadora</p>
-      </div>
-
       <div class="qr-section">
         <img src="${qrUrl}" alt="QR Mi Magia" class="qr-code" />
         <p class="qr-texto">Escaneá para acceder<br>a tu portal Mi Magia</p>
@@ -459,8 +430,8 @@ export async function GET(request) {
   </div>
 
   <div class="no-print">
-    <button class="btn-imprimir" onclick="window.print()">
-      IMPRIMIR / GUARDAR PDF
+    <button class="btn-guardar" onclick="window.print()">
+      GUARDAR COMO PDF
     </button>
   </div>
 </body>

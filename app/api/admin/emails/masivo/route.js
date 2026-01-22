@@ -19,7 +19,7 @@ export async function POST(request) {
           from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
           to: user.email,
           subject: asunto.replace(/{nombre}/g, user.nombre||'amiga'),
-          html: `<div style="font-family:Georgia,serif;padding:30px;">${mensaje.replace(/{nombre}/g, user.nombre||'amiga').replace(/\n/g,'<br>')}<p style="margin-top:40px;color:#888;">Con amor, Gabriel & Thibisay ✦</p></div>`
+          html: `<div style="font-family:Georgia,serif;padding:30px;">${mensaje.replace(/{nombre}/g, user.nombre||'amiga').replace(/\n/g,'<br>')}<p style="margin-top:40px;color:#888;">Con amor, Duendes del Uruguay ✦</p></div>`
         });
         enviados++;
       }

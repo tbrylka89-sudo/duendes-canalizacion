@@ -771,7 +771,7 @@ async function enviarEmailCompraGuardian(resend, email, nombre, guardianes, treb
               <p style="margin: 0 0 15px; font-size: 14px;">En "Mi Magia" podrás ver tu guardián, su canalización cuando esté lista, y acceder a experiencias exclusivas.</p>
               <a href="${linkMiMagia}" style="display: inline-block; background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Ir a Mi Magia ✦</a>
             </div>
-            <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 30px; text-align: center;">Con amor mágico,<br>Gabriel y Thibisay</p>
+            <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 30px; text-align: center;">Con amor mágico,<br>Duendes del Uruguay</p>
           </div>
         </div>
       `

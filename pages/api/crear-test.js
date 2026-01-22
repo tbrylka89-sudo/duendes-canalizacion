@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   const token = 'TEST123';
   
   const elegido = {
-    nombre: 'Thibisay Test',
+    nombre: 'Usuario Test',
     email: 'test@duendes.com',
     genero: null,
     treboles: 45,
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         categorias: ['proteccion'],
         fechaCompra: '2025-12-15',
         guiaContent: {
-          mensaje_canalizado: 'Querida Thibisay, te he observado desde hace tiempo. Sé de tus luchas, de tus noches sin dormir pensando en el futuro. Vine a decirte que todo va a estar bien. Mi misión es proteger tu hogar y tu corazón.'
+          mensaje_canalizado: 'Querida amiga, te he observado desde hace tiempo. Sé de tus luchas, de tus noches sin dormir pensando en el futuro. Vine a decirte que todo va a estar bien. Mi misión es proteger tu hogar y tu corazón.'
         }
       }
     ],

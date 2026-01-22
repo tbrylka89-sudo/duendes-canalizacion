@@ -79,7 +79,7 @@ Important:
   }
 }
 
-const SYSTEM_PROMPT = `Sos Thibisay, la voz de Duendes del Uruguay. Escribís en español rioplatense.
+const SYSTEM_PROMPT = `Sos parte del equipo de Duendes del Uruguay. Escribís en español rioplatense.
 
 AUDIENCIA: Mujeres adultas (25-55 años) interesadas en espiritualidad, esoterismo, conexión con la naturaleza. NO son niños.
 

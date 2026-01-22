@@ -315,7 +315,25 @@ No genéricos. Específicos:
 - Para el que tiene muchos: "Tengo 7 y cada uno trabaja diferente"
 - Para el que duda: "Casi no lo compro. Fue el mejor error que no cometí"
 
-#### 21. ANALYTICS DE CONVERSIÓN EMOCIONAL
+#### 21. LOOP ABIERTO OBLIGATORIO EN HISTORIAS
+Cada historia DEBE tener algo incompleto que active el efecto Zeigarnik:
+- "Hay algo más que quiere decirte, pero solo lo vas a escuchar cuando esté cerca."
+- El cerebro NECESITA cerrar. La compra cierra.
+
+#### 22. INTEGRACIÓN CON DATOS DE CONVERSIÓN (FEEDBACK)
+El API debe recibir feedback para aprender:
+```
+POST /api/historias/feedback
+{
+  historia_id: "xxx",
+  resultado: "compra" | "abandono" | "volvio",
+  tiempo_lectura: 45, // segundos
+  scroll_depth: 0.85
+}
+```
+Usar esto para mejorar las siguientes generaciones.
+
+#### 23. ANALYTICS DE CONVERSIÓN EMOCIONAL
 Dashboard que muestre:
 - Qué historias convierten más
 - Qué hooks funcionan por perfil

@@ -39,7 +39,7 @@ De todos los guardianes que existen, de todas las personas que los miran cada d�
 
 No es una frase. Es lo que creemos profundamente: los guardianes encuentran a quienes los necesitan. Y ${articulo} encontró a vos.
 
-Tu pedido #${orderNumber} está confirmado. En los próximos días vas a recibir tu certificado de canalización, donde Thibisay te cuenta todo lo que ${guardianNombre} le transmitió durante su creación.
+Tu pedido #${orderNumber} está confirmado. En los próximos días vas a poder acceder a tu certificado de canalización desde Mi Magia, donde te contamos todo lo que ${guardianNombre} nos transmitió durante su creación.
 
 Mientras tanto, tu portal personal ya está activo: ${miMagiaUrl}
 
@@ -47,8 +47,7 @@ Ahí vas a encontrar todo sobre tu guardián, tus runas, y las herramientas para
 
 Bienvenida a la familia.
 
-Con emoción,
-Thibisay
+Con cariño,
 Duendes del Uruguay`
     },
 
@@ -58,11 +57,11 @@ Duendes del Uruguay`
       subject: `El certificado de ${guardianNombre} está listo`,
       body: `${nombre},
 
-Cada guardián que creamos viene con una historia. No una historia inventada, sino lo que Thibisay percibe durante el proceso de canalización.
+Cada guardián que creamos viene con una historia. No una historia inventada, sino lo que percibimos durante el proceso de canalización.
 
 ${articuloMay} tuyo ya tiene su certificado listo.
 
-Descargalo acá: ${certificadoUrl}
+Podés acceder a él desde tu portal Mi Magia: ${certificadoUrl}
 
 En él vas a encontrar:
 - El mensaje personal que ${guardianNombre} trae para vos
@@ -70,10 +69,10 @@ En él vas a encontrar:
 - Los elementos que confluyeron en su creación
 - El número único que lo identifica en el universo de guardianes
 
-Este certificado es tuyo. Guardalo, imprimilo, o simplemente sabé que existe.
+Este certificado es tuyo. Es digital, así que podés accederlo cuando quieras desde Mi Magia.
 
-Un abrazo,
-Thibisay`
+Con cariño,
+Duendes del Uruguay`
     },
 
     // Email 3: ENVÍO - El guardián viaja
@@ -118,7 +117,8 @@ Tu diario: ${miMagiaUrl}/diario
 
 ¿Cómo te está yendo?
 
-Thibisay`
+Con cariño,
+Duendes del Uruguay`
     },
 
     // Email 5: DÍA 7 - Pedir testimonio
@@ -129,13 +129,13 @@ Thibisay`
 
 Una semana juntas. ¿Cómo la sentís?
 
-Te escribo por dos motivos:
+Te escribimos por dos motivos:
 
-1. Para saber cómo estás. Genuinamente. Si querés contarme algo, respondé este email. Lo leo todo.
+1. Para saber cómo estás. Genuinamente. Si querés contarnos algo, respondé este email. Leemos todo.
 
 2. Para pedirte algo: si ${guardianNombre} significó algo para vos, aunque sea pequeño, ¿te animás a contarlo?
 
-Los testimonios de personas reales son lo que ayuda a otras a animarse. No necesito que digas que pasó algo mágico. Necesito que cuentes tu verdad, sea cual sea.
+Los testimonios de personas reales son lo que ayuda a otras a animarse. No necesitamos que digas que pasó algo mágico. Necesitamos que cuentes tu verdad, sea cual sea.
 
 Podés dejarlo acá: ${miMagiaUrl}/testimonio
 
@@ -143,7 +143,8 @@ Y si no pasó nada especial, también está bien contarlo. La honestidad es lo �
 
 Gracias por ser parte de esto.
 
-Thibisay`
+Con cariño,
+Duendes del Uruguay`
     },
 
     // Email 6: DÍA 14 - Cross-sell con contexto
@@ -159,14 +160,14 @@ Así como las personas, ellos también tienen afinidades. Guardianes que se comp
 ${guardianNombre} tiene resonancia especial con:
 ${guardianesSugeridos.map(g => `- ${g.nombre}: ${g.descripcion}`).join('\n')}
 
-No te digo esto para venderte nada. Te lo cuento porque es parte de cómo funciona este sistema. Los guardianes forman redes de protección.
+No te decimos esto para venderte nada. Te lo contamos porque es parte de cómo funciona este sistema. Los guardianes forman redes de protección.
 
 ${cierre}
 
 Si querés conocerlos: ${miMagiaUrl}/guardianes-afines
 
-Un abrazo,
-Thibisay`
+Con cariño,
+Duendes del Uruguay`
     },
 
     // Email 7: DÍA 30 - Invitación al Círculo
@@ -184,7 +185,7 @@ Pero hay otras que quieren ir más profundo. Que quieren entender más. Que sien
 Para ellas creamos el Círculo.
 
 Es un espacio donde:
-- Thibisay comparte canalizaciones exclusivas cada semana
+- Compartimos canalizaciones exclusivas cada semana
 - Accedés a rituales y meditaciones guiadas
 - Conectás con otras personas como vos
 - Tus runas rinden más (bonus del 25%)
@@ -197,7 +198,7 @@ Si querés saber más: ${miMagiaUrl}/circulo
 Y si no es para vos, no pasa nada. ${guardianNombre} sigue siendo tuyo igual.
 
 Con cariño,
-Thibisay
+Duendes del Uruguay
 
 PD: Como ya sos parte de la familia, tenés 30 días gratis para probar el Círculo. Sin compromiso, sin tarjeta. Solo para que veas si resuena.`
     }

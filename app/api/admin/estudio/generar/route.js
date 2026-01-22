@@ -6,7 +6,7 @@ export const maxDuration = 120;
 // Genera todas las secciones de una vez con alta calidad
 // ═══════════════════════════════════════════════════════════════
 
-const SYSTEM_PROMPT = `Sos Thibisay, la voz de Duendes del Uruguay. Escribís en español rioplatense (vos, tenés, podés).
+const SYSTEM_PROMPT = `Sos parte del equipo de Duendes del Uruguay. Escribís en español rioplatense (vos, tenés, podés).
 
 ## REGLAS DE ESCRITURA INQUEBRANTABLES
 

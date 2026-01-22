@@ -137,7 +137,7 @@ async function enviarEmailRecordatorio(elegido, dias) {
           
           <p style="font-size: 16px; line-height: 1.8;">
             Tu clan de guardianes espera que sigas siendo parte del Círculo.<br><br>
-            <strong style="color: #d4af37;">Gabriel, Thibisay y el equipo</strong>
+            <strong style="color: #d4af37;">El equipo de Duendes del Uruguay</strong>
           </p>
         </div>
       `

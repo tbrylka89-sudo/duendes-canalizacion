@@ -883,7 +883,7 @@ _Podes ver los productos en la seccion Productos del admin._`
       }
 
       try {
-        // Voces personalizadas de Thibisay (Duendes del Uruguay)
+        // Voces personalizadas (Duendes del Uruguay)
         const VOCES = {
           'thibisay': process.env.ELEVENLABS_VOZ_THIBISAY || 'EXAVITQu4vr4xnSDxMaL',
           'thibisay-rapido': process.env.ELEVENLABS_VOZ_THIBISAY_RAPIDO || 'EXAVITQu4vr4xnSDxMaL',
@@ -998,7 +998,7 @@ ${red === 'instagram' ? '4. Hashtags' : ''}`;
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1500,
           messages: [{ role: 'user', content: promptRedes }],
-          system: 'Sos Thibisay, la voz de Duendes del Uruguay. Creás contenido mágico y espiritual para redes sociales. Usás español rioplatense (vos, tenés). Tono cálido, místico pero accesible.'
+          system: 'Sos el equipo de Duendes del Uruguay. Creás contenido mágico y espiritual para redes sociales. Usás español rioplatense (vos, tenés). Tono cálido, místico pero accesible.'
         });
 
         const contenido = response.content[0]?.text || '';
@@ -1054,7 +1054,7 @@ ESTRUCTURA:
           model: 'claude-sonnet-4-20250514',
           max_tokens: 2000,
           messages: [{ role: 'user', content: promptEmail }],
-          system: 'Sos Thibisay de Duendes del Uruguay. Escribís emails de marketing mágicos y efectivos. Español rioplatense. Creás conexión emocional con las lectoras.'
+          system: 'Sos el equipo de Duendes del Uruguay. Escribís emails de marketing mágicos y efectivos. Español rioplatense. Creás conexión emocional con las lectoras.'
         });
 
         const contenido = response.content[0]?.text || '';
