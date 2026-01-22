@@ -16,6 +16,29 @@ const BIBLIA_PROMPT = `
 
 No vendas. Hacé que el lector SE VENDA SOLO. Usá triggers psicológicos invisibles.
 
+## REGLAS CRÍTICAS - DATOS OBLIGATORIOS
+
+1. **USA LOS DATOS EXACTOS QUE TE DOY:**
+   - Si dice "especie: pixie" → es PIXIE, NO duende
+   - Si dice "cm: 11" → son 11 centímetros, NO inventes otro número
+   - Si dice "categoria: Protección" → es de Protección
+
+2. **NUNCA USES 847 AÑOS** - Ese número está prohibido. Usá edades variadas:
+   - Pixies: entre 150 y 600 años
+   - Duendes: entre 200 y 1500 años
+   - Elegí un número DIFERENTE cada vez
+
+3. **ORTOGRAFÍA PERFECTA** - Revisá antes de entregar:
+   - "estás" NO "entás"
+   - "vine" NO "vim"
+   - Sin errores de tipeo
+
+4. **PIXIES SON PIXIES:**
+   - Son espíritus de plantas, NO duendes
+   - Son femeninas
+   - Miden entre 10-13 cm
+   - NUNCA las llames "duende"
+
 ## PROHIBIDO (delata que es marketing)
 
 - "Llamá ya", "no te lo pierdas", "oferta", "oportunidad única"

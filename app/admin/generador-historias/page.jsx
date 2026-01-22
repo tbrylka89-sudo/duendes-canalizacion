@@ -421,10 +421,15 @@ Necesito conocer algunos datos. Empecemos:
     setCargando(true);
     setBatchHistoria('');
 
-    // Buscar datos completos en el catálogo
+    // Buscar datos completos en el catálogo (buscar por nombre parcial porque WooCommerce tiene nombres largos)
+    const nombreBusqueda = guardian.nombre.split(' - ')[0].split(' ')[0].toLowerCase();
     const datosCatalogo = catalogo.guardianes.find(g =>
-      g.nombre.toLowerCase() === guardian.nombre.toLowerCase()
+      g.nombre.toLowerCase() === nombreBusqueda ||
+      g.nombre.toLowerCase().startsWith(nombreBusqueda) ||
+      guardian.nombre.toLowerCase().includes(g.nombre.toLowerCase())
     );
+
+    console.log('Buscando:', nombreBusqueda, 'Encontrado:', datosCatalogo?.nombre, 'CM:', datosCatalogo?.cm, 'Especie:', datosCatalogo?.especie);
 
     // Si hay feedback de regeneración, usar la categoría override si existe
     const categoriaFinal = feedbackRegeneracion?.categoriaOverride || datosCatalogo?.categoria || 'Protección';
@@ -830,12 +835,23 @@ Necesito conocer algunos datos. Empecemos:
               {batchActual + 1} de {batchSeleccion.length}: {batchSeleccion[batchActual]?.nombre}
             </h2>
 
-            <div className="batch-info">
-              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.especie}</span>
-              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.categoria}</span>
-              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.cm}cm</span>
-              <span>{catalogo.guardianes.find(g => g.nombre === batchSeleccion[batchActual]?.nombre)?.accesorios}</span>
-            </div>
+            {(() => {
+              const nombreGuardian = batchSeleccion[batchActual]?.nombre || '';
+              const nombreBusqueda = nombreGuardian.split(' - ')[0].split(' ')[0].toLowerCase();
+              const datosG = catalogo.guardianes.find(g =>
+                g.nombre.toLowerCase() === nombreBusqueda ||
+                g.nombre.toLowerCase().startsWith(nombreBusqueda) ||
+                nombreGuardian.toLowerCase().includes(g.nombre.toLowerCase())
+              );
+              return (
+                <div className="batch-info">
+                  <span>{datosG?.especie || 'sin datos'}</span>
+                  <span>{datosG?.categoria || '-'}</span>
+                  <span>{datosG?.cm ? `${datosG.cm}cm` : '-'}</span>
+                  <span className="accesorios-preview">{datosG?.accesorios || '-'}</span>
+                </div>
+              );
+            })()}
 
             {cargando ? (
               <div className="generando">
