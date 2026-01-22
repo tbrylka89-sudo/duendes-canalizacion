@@ -70,13 +70,13 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 ## BUGS CONOCIDOS / PENDIENTES
 
-### 1. Urgencia en Recreables
+### ~~1. Urgencia en Recreables~~ ✅ RESUELTO
 **Problema:** Score de urgencia da 0 porque no pueden usar "pieza única".
-**Solución pendiente:** Agregar keywords de urgencia alternativas para recreables.
+**Solución:** Agregadas keywords de urgencia para recreables + urgencia real de stock ("cuando se van pueden pasar semanas").
 
-### 2. Hook no siempre relevante
+### ~~2. Hook no siempre relevante~~ ✅ RESUELTO
 **Problema:** A veces el hook de apertura no matchea con la especialización elegida.
-**Solución pendiente:** Crear hooks específicos por especialización.
+**Solución:** Creados hooks específicos para FORTUNA + mapeo completo de categorías.
 
 ---
 
@@ -99,12 +99,18 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 ## ÚLTIMAS SESIONES
 
-### 2026-01-22
+### 2026-01-22 (sesión 2)
+- Creado sistema de memoria persistente (MEMORY.md)
+- Agregados hooks específicos para FORTUNA/SUERTE
+- Corregida urgencia de recreables: ahora usa escasez real de stock
+- Score de Finnegan (fortuna, mini): 30/50 ✅ aprobada
+- Historia ahora usa dolor correcto según especialización
+
+### 2026-01-22 (sesión 1)
 - Creado sistema completo de especializaciones
 - Implementado branding "Los Elegidos" y "Guardianes"
 - Corregido bug de recreables diciendo "pieza única"
 - Creado prompt de configuración para nuevas sesiones
-- Configurado memoria persistente del proyecto
 
 ---
 
