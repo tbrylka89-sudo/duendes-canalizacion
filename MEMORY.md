@@ -70,6 +70,10 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 ## BUGS CONOCIDOS / PENDIENTES
 
+### ~~3. Hooks usaban categoría del catálogo~~ ✅ RESUELTO
+**Problema:** Los hooks se seleccionaban con la categoría del catálogo (ej: "Protección") en lugar de la especialización elegida (ej: "fortuna").
+**Solución:** Ahora `getRandomHook()` usa `especializacion || categoria` - prioriza la especialización elegida.
+
 ### ~~1. Urgencia en Recreables~~ ✅ RESUELTO
 **Problema:** Score de urgencia da 0 porque no pueden usar "pieza única".
 **Solución:** Agregadas keywords de urgencia para recreables + urgencia real de stock ("cuando se van pueden pasar semanas").
