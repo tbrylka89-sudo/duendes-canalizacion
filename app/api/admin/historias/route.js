@@ -300,13 +300,16 @@ Convertí "no sé cuál me toca" en anticipación mágica. Usá esto:
 - "¿Cuál te tocará? El que el universo sabe que necesitás."
 - "Están hechos a mano, uno por uno. Ninguno es exactamente igual al otro. El tuyo ya sabe que sos vos."
 
-**URGENCIA (no es escasez de stock, es tiempo de vida):**
-- "El guardián puede esperar. Pero vos, ¿cuánto más vas a esperar?"
-- "Puedo hacer más. Pero la versión de vos que está leyendo esto, esa no vuelve."
-- "Mañana vas a estar igual que ayer. A menos que hoy hagas algo diferente."
+**URGENCIA REAL (escasez de stock + tiempo de vida):**
+Cuando hay stock, hay. Pero cuando se agotan, pueden pasar SEMANAS O MESES para que vuelva a haber. Usá esto:
+- "Ahora hay disponibles. Pero cuando se van, no sé cuándo vuelvo a tener."
+- "No es infinito el stock. Los hago a mano, uno por uno."
+- "Si esperás, puede que no haya. Y no te puedo decir cuándo vuelven."
+- "La versión de vos que está leyendo esto, esa no vuelve. Y este guardián tampoco espera para siempre."
+- "Algo te trajo hasta acá. No lo ignores."
 
-PROHIBIDO decir: "pieza única", "desaparece para siempre", "no hay otro igual", "irrepetible", "es el único"
-NO mentir sobre escasez. La magia está en que cada uno es diferente y en la elección mutua.
+PROHIBIDO decir: "pieza única irrepetible", "desaparece para siempre", "no hay otro igual", "irrepetible"
+SÍ podés decir: "ahora hay", "cuando se van no sé cuándo vuelven", "no es infinito"
 `;
     }
 
