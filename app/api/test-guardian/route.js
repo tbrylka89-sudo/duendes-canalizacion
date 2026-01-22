@@ -313,11 +313,29 @@ function calcularPerfilPsicologico(respuestas) {
     apertura: respuestas[10].apertura || 50
   } : creenciasDefaults;
 
+  // === CATEGORÍA PRINCIPAL ===
+  const categoriaScores = {
+    proteccion: 0,
+    abundancia: 0,
+    sanacion: 0,
+    amor: 0,
+    transformacion: 0
+  };
+
+  // Sumar scores de las respuestas
+  if (respuestas[1]?.categoria) categoriaScores[respuestas[1].categoria] = (categoriaScores[respuestas[1].categoria] || 0) + 30;
+  if (respuestas[3]?.categoria) categoriaScores[respuestas[3].categoria] = (categoriaScores[respuestas[3].categoria] || 0) + 25;
+  if (respuestas[4]?.categoria) categoriaScores[respuestas[4].categoria] = (categoriaScores[respuestas[4].categoria] || 0) + 40;
+
+  const categoriaPrincipal = Object.entries(categoriaScores)
+    .sort((a, b) => b[1] - a[1])[0][0];
+
   return {
     vulnerabilidad,
     dolor_principal,
     estilo_decision,
-    creencias
+    creencias,
+    categoriaPrincipal
   };
 }
 
@@ -372,8 +390,8 @@ export async function POST(request) {
     // 5. Generar revelacion emocional
     const revelacion = await generarRevelacion(resultado, nombre);
 
-    // 6. Obtener recomendaciones de productos (simulado por ahora)
-    const productosRecomendados = generarRecomendaciones(resultado);
+    // 6. Obtener recomendaciones REALES de productos (escaneo de WooCommerce)
+    const productosRecomendados = await generarRecomendacionesReales(perfilPsicologico, respuestas);
 
     // 7. Construir resultado final
     const testGuardian = {
@@ -634,26 +652,239 @@ function getColorByElemento(elemento) {
   return colores[elemento] || '#d4af37';
 }
 
-// Generar recomendaciones (placeholder - se puede conectar a WooCommerce)
-function generarRecomendaciones(resultado) {
-  const recomendaciones = {
+/**
+ * SISTEMA DE MATCHING REAL CON PRODUCTOS DE WOOCOMMERCE
+ * Escanea todos los guardianes disponibles y calcula compatibilidad real
+ */
+async function generarRecomendacionesReales(perfil, respuestas) {
+  try {
+    // 1. Obtener todos los productos disponibles
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'https://duendes-vercel.vercel.app';
+
+    const response = await fetch(`${baseUrl}/api/test-guardian/products`, {
+      next: { revalidate: 60 }
+    });
+
+    if (!response.ok) {
+      console.error('Error fetching products for matching');
+      return generarRecomendacionesFallback(perfil);
+    }
+
+    const data = await response.json();
+    const productos = data.products || [];
+
+    if (productos.length === 0) {
+      return generarRecomendacionesFallback(perfil);
+    }
+
+    // 2. Extraer datos del perfil para matching
+    const categoriasPreferidas = extraerCategoriasPreferidas(respuestas);
+    const dolorPrincipal = perfil.dolor_principal?.tipo || 'proposito';
+    const intensidadDolor = perfil.vulnerabilidad?.score || 50;
+
+    // 3. Calcular score de matching para cada producto
+    const productosScored = productos.map(producto => {
+      let score = 0;
+      const razones = [];
+
+      // A) Match por categoría principal (hasta 40 puntos)
+      if (categoriasPreferidas[0] === producto.categoria) {
+        score += 40;
+        razones.push(`Especialista en ${producto.categoria}`);
+      } else if (categoriasPreferidas[1] === producto.categoria) {
+        score += 25;
+        razones.push(`Trabaja con ${producto.categoria}`);
+      } else if (categoriasPreferidas.includes(producto.categoria)) {
+        score += 15;
+      }
+
+      // B) Match por dolor target (hasta 30 puntos)
+      const doloresProducto = producto.doloresTarget || [];
+      if (doloresProducto.includes(dolorPrincipal)) {
+        score += 30;
+        razones.push(`Ayuda con ${formatearDolor(dolorPrincipal)}`);
+      } else if (doloresProducto.some(d => categoriasPreferidas.includes(mapearDolorACategoria(d)))) {
+        score += 15;
+      }
+
+      // C) Match por especialidades (hasta 20 puntos)
+      const especialidadesProducto = producto.especialidades || [];
+      const especialidadesRelevantes = mapearDolorAEspecialidades(dolorPrincipal);
+      const matchEspecialidades = especialidadesProducto.filter(e => especialidadesRelevantes.includes(e));
+      if (matchEspecialidades.length > 0) {
+        score += Math.min(20, matchEspecialidades.length * 10);
+        if (!razones.length) {
+          razones.push(`Especialista en ${matchEspecialidades[0].replace('_', ' ')}`);
+        }
+      }
+
+      // D) Boost por urgencia/vulnerabilidad (hasta 10 puntos)
+      if (intensidadDolor > 70 && producto.categoria === 'proteccion') {
+        score += 10;
+      }
+
+      // E) Variación mínima para no tener empates exactos
+      score += Math.random() * 3;
+
+      // Normalizar a 0-100
+      const matchPercent = Math.min(98, Math.max(55, Math.round(score + 40)));
+
+      return {
+        ...producto,
+        matchScore: matchPercent,
+        razon: razones[0] || `Guardián de ${producto.categoria || 'protección'}`,
+        razones: razones
+      };
+    });
+
+    // 4. Ordenar por score y devolver top 3
+    productosScored.sort((a, b) => b.matchScore - a.matchScore);
+
+    return productosScored.slice(0, 3).map(p => ({
+      id: p.id,
+      nombre: p.nombre,
+      nombreCompleto: p.nombreCompleto,
+      imagen: p.imagen,
+      url: p.url,
+      precio: p.precio,
+      categoria: p.categoria,
+      matchScore: p.matchScore,
+      razon: p.razon,
+      esUnico: p.esUnico,
+      descripcionCorta: p.descripcionCorta
+    }));
+
+  } catch (error) {
+    console.error('Error en matching real:', error);
+    return generarRecomendacionesFallback(perfil);
+  }
+}
+
+/**
+ * Extrae categorías preferidas del usuario ordenadas por peso
+ */
+function extraerCategoriasPreferidas(respuestas) {
+  const scores = {
+    proteccion: 0,
+    abundancia: 0,
+    sanacion: 0,
+    amor: 0,
+    transformacion: 0,
+    sabiduria: 0
+  };
+
+  // Pregunta 1
+  if (respuestas[1]?.categoria) scores[respuestas[1].categoria] = (scores[respuestas[1].categoria] || 0) + 30;
+
+  // Pregunta 3
+  if (respuestas[3]?.categoria) scores[respuestas[3].categoria] = (scores[respuestas[3].categoria] || 0) + 25;
+
+  // Pregunta 4 (más peso, pregunta directa)
+  if (respuestas[4]?.categoria) scores[respuestas[4].categoria] = (scores[respuestas[4].categoria] || 0) + 40;
+  if (respuestas[4]?.intencion) {
+    const mapIntencion = {
+      'proteccion': 'proteccion',
+      'abundancia': 'abundancia',
+      'sanacion': 'sanacion',
+      'amor': 'amor',
+      'bienestar': 'sanacion'
+    };
+    const cat = mapIntencion[respuestas[4].intencion];
+    if (cat) scores[cat] = (scores[cat] || 0) + 20;
+  }
+
+  // Ordenar y devolver
+  return Object.entries(scores)
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat]) => cat);
+}
+
+/**
+ * Mapea dolor a categoría
+ */
+function mapearDolorACategoria(dolor) {
+  const map = {
+    'carga_emocional': 'proteccion',
+    'mala_suerte': 'abundancia',
+    'vacio_existencial': 'sanacion',
+    'bloqueo': 'transformacion',
+    'soledad': 'amor',
+    'relaciones': 'amor',
+    'dinero': 'abundancia'
+  };
+  return map[dolor] || 'proteccion';
+}
+
+/**
+ * Mapea dolor a especialidades relevantes
+ */
+function mapearDolorAEspecialidades(dolor) {
+  const map = {
+    'relaciones': ['relaciones', 'autoestima', 'soledad'],
+    'soledad': ['soledad', 'autoestima', 'relaciones'],
+    'proposito': ['creatividad', 'autoestima'],
+    'dinero': ['dinero', 'autoestima', 'ansiedad'],
+    'salud': ['salud', 'ansiedad'],
+    'carga_emocional': ['ansiedad', 'energia_negativa', 'autoestima'],
+    'mala_suerte': ['dinero', 'ansiedad'],
+    'vacio_existencial': ['autoestima', 'creatividad', 'duelo'],
+    'bloqueo': ['ansiedad', 'creatividad', 'autoestima']
+  };
+  return map[dolor] || ['autoestima', 'ansiedad'];
+}
+
+/**
+ * Formatea el nombre del dolor para mostrar
+ */
+function formatearDolor(dolor) {
+  const map = {
+    'carga_emocional': 'la carga emocional',
+    'mala_suerte': 'los bloqueos de abundancia',
+    'vacio_existencial': 'el vacío interior',
+    'bloqueo': 'los bloqueos',
+    'soledad': 'la soledad',
+    'relaciones': 'las relaciones',
+    'dinero': 'la abundancia',
+    'proposito': 'encontrar tu propósito'
+  };
+  return map[dolor] || dolor.replace('_', ' ');
+}
+
+/**
+ * Fallback si no hay productos disponibles
+ */
+function generarRecomendacionesFallback(perfil) {
+  const categoria = perfil?.categoriaPrincipal || 'proteccion';
+
+  const fallbacks = {
     proteccion: [
-      { nombre: 'Guardian de la Proteccion', matchScore: 95, razon: 'Especialista en crear escudos energeticos' },
-      { nombre: 'Duende del Hogar Seguro', matchScore: 88, razon: 'Protege tu espacio sagrado' }
+      { nombre: 'Guardián de Protección', matchScore: 92, razon: 'Especialista en crear escudos energéticos', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián del Hogar', matchScore: 85, razon: 'Protege tu espacio sagrado', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián Guerrero', matchScore: 78, razon: 'Fuerza y protección activa', url: 'https://duendesdeluruguay.com/shop/' }
     ],
     abundancia: [
-      { nombre: 'Guardian de la Abundancia', matchScore: 95, razon: 'Desbloquea el flujo de prosperidad' },
-      { nombre: 'Hada del Oro Interior', matchScore: 85, razon: 'Trabaja con tu merecimiento' }
+      { nombre: 'Guardián de Abundancia', matchScore: 94, razon: 'Desbloquea el flujo de prosperidad', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián de la Fortuna', matchScore: 86, razon: 'Atrae oportunidades', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián del Oro', matchScore: 79, razon: 'Trabaja con tu merecimiento', url: 'https://duendesdeluruguay.com/shop/' }
     ],
     amor: [
-      { nombre: 'Guardian del Amor', matchScore: 95, razon: 'Abre el corazon a dar y recibir' },
-      { nombre: 'Duende del Vinculo Sagrado', matchScore: 87, razon: 'Sana heridas de relaciones pasadas' }
+      { nombre: 'Guardián del Amor', matchScore: 93, razon: 'Abre el corazón a dar y recibir', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián del Vínculo', matchScore: 87, razon: 'Sana heridas de relaciones', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián del Corazón', matchScore: 80, razon: 'Amor propio y autoestima', url: 'https://duendesdeluruguay.com/shop/' }
     ],
     sanacion: [
-      { nombre: 'Guardian Sanador', matchScore: 95, razon: 'Especialista en sanar heridas emocionales' },
-      { nombre: 'Hada de la Paz Interior', matchScore: 90, razon: 'Trae calma a tu alma cansada' }
+      { nombre: 'Guardián Sanador', matchScore: 95, razon: 'Especialista en sanar heridas emocionales', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián de la Paz', matchScore: 88, razon: 'Trae calma a tu alma', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián del Equilibrio', matchScore: 81, razon: 'Restaura tu balance interior', url: 'https://duendesdeluruguay.com/shop/' }
+    ],
+    transformacion: [
+      { nombre: 'Guardián del Cambio', matchScore: 91, razon: 'Acompaña tu transformación', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián del Renacimiento', matchScore: 84, razon: 'Cierra ciclos, abre nuevos', url: 'https://duendesdeluruguay.com/shop/' },
+      { nombre: 'Guardián de la Evolución', matchScore: 77, razon: 'Impulsa tu crecimiento', url: 'https://duendesdeluruguay.com/shop/' }
     ]
   };
 
-  return recomendaciones[resultado.categoria] || recomendaciones.sanacion;
+  return fallbacks[categoria] || fallbacks.sanacion;
 }
