@@ -1009,13 +1009,39 @@ Necesito conocer algunos datos. Empecemos:
       const sincrodestUsados = [];
 
       // Procesar cada guardián del grupo secuencialmente
-      for (const guardian of grupo.guardianes) {
+      // Definir subcategorías por categoría principal para rotación automática
+      const subcategoriasPorCategoria = {
+        amor: ['amor_propio', 'amor_pareja', 'amor_familia', 'fertilidad', 'encontrar_amor'],
+        proteccion: ['proteccion_energia', 'proteccion_hogar', 'proteccion_emocional', 'cortar_lazos', 'limites'],
+        abundancia: ['dinero', 'trabajo', 'desbloqueo', 'merecimiento'],
+        sanacion: ['sanacion_emocional', 'duelo', 'trauma', 'perdon', 'cuerpo'],
+        sabiduria: ['intuicion', 'claridad', 'decisiones', 'proposito', 'creatividad']
+      };
+
+      // Detectar categoría principal del grupo
+      const especLower = (grupo.especializacion || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      let categoriaBase = 'proteccion';
+      if (especLower.includes('amor') || especLower.includes('romantico')) categoriaBase = 'amor';
+      else if (especLower.includes('abundan') || especLower.includes('prosper') || especLower.includes('dinero')) categoriaBase = 'abundancia';
+      else if (especLower.includes('sana') || especLower.includes('heal')) categoriaBase = 'sanacion';
+      else if (especLower.includes('sabid') || especLower.includes('intui')) categoriaBase = 'sabiduria';
+      else if (especLower.includes('protec')) categoriaBase = 'proteccion';
+
+      const subsDisponibles = subcategoriasPorCategoria[categoriaBase] || [];
+
+      for (let i = 0; i < grupo.guardianes.length; i++) {
+        const guardian = grupo.guardianes[i];
         contador++;
+
+        // Rotación automática de subcategorías
+        const subcategoriaActual = subsDisponibles.length > 0 ? subsDisponibles[i % subsDisponibles.length] : null;
+
         setBatchProgreso({
           actual: contador,
           total: totalGuardianes,
           guardian: guardian.nombre,
-          grupo: grupo.especializacion
+          grupo: grupo.especializacion,
+          subcategoria: subcategoriaActual // Mostrar qué subcategoría se está usando
         });
 
         try {
@@ -1030,6 +1056,7 @@ Necesito conocer algunos datos. Empecemos:
               accesorios: guardian.accesorios || '',
               esUnico: guardian.especie === 'pixie' || (guardian.cm || 18) > 15,
               especializacion: grupo.especializacion,
+              subcategoria: subcategoriaActual, // NUEVO: subcategoría rotada automáticamente
               // CLAVE: pasar lo que ya se usó para evitar repeticiones
               hooks_usados: hooksUsados,
               sincrodestinos_usados: sincrodestUsados
@@ -1094,12 +1121,22 @@ Necesito conocer algunos datos. Empecemos:
     const resultado = batchResultados[index];
     if (!resultado) return;
 
-    // Obtener hooks y sincrodestinos ya usados en el mismo grupo
-    const usadosEnGrupo = batchResultados
-      .filter(r => r.grupoId === resultado.grupoId && r.historia)
-      .map(r => ({
-        hook: r.historia?.match(/^[^\n]+/)?.[0] || '',
-      }));
+    // Obtener hooks y sincrodestinos ya usados en el mismo grupo (EXCEPTO el actual)
+    const otrosDelGrupo = batchResultados
+      .filter((r, i) => r.grupoId === resultado.grupoId && r.historia && i !== index);
+
+    const hooksUsadosEnGrupo = otrosDelGrupo
+      .map(r => r.historia?.match(/^[^\n]+/)?.[0] || '')
+      .filter(h => h);
+
+    // También extraer sincrodestinos usados (buscar patrones típicos)
+    const sincrodestUsadosEnGrupo = otrosDelGrupo
+      .map(r => {
+        // Buscar frases que empiecen con "Mientras" o "Cuando" que son sincrodestinos
+        const match = r.historia?.match(/Mientras[^.]+\.|Cuando[^.]+terminad[oa][^.]+\./i);
+        return match ? match[0] : '';
+      })
+      .filter(s => s);
 
     setBatchResultados(prev => prev.map((r, i) =>
       i === index ? { ...r, regenerando: true } : r
@@ -1116,7 +1153,10 @@ Necesito conocer algunos datos. Empecemos:
           tamanoCm: resultado.guardian.cm || 18,
           accesorios: resultado.guardian.accesorios || '',
           esUnico: resultado.guardian.especie === 'pixie' || (resultado.guardian.cm || 18) > 15,
-          especializacion: resultado.grupo
+          especializacion: resultado.grupo,
+          // FIX: Pasar hooks y sincrodestinos usados para evitar repeticiones
+          hooks_usados: hooksUsadosEnGrupo,
+          sincrodestinos_usados: sincrodestUsadosEnGrupo
         })
       });
 
@@ -1929,15 +1969,23 @@ Necesito conocer algunos datos. Empecemos:
                     </div>
                     <div className="asignar-grupo">
                       <label>Asignar a especialización:</label>
-                      <div className="especializacion-rapida">
-                        {['fortuna', 'proteccion', 'abundancia', 'sanacion', 'amor_romantico', 'calma', 'sabiduria'].map(esp => (
-                          <button
-                            key={esp}
-                            className="btn-esp"
-                            onClick={() => agregarAGrupo(esp)}
-                          >
-                            {esp === 'fortuna' ? '🍀' : esp === 'proteccion' ? '🛡️' : esp === 'abundancia' ? '💰' : esp === 'sanacion' ? '💚' : esp === 'amor_romantico' ? '💕' : esp === 'calma' ? '🧘' : '📚'} {esp.replace('_', ' ')}
-                          </button>
+                      <div className="especializaciones-grupos-batch">
+                        {Object.entries(especializacionesGrupos).map(([grupoKey, grupo]) => (
+                          <div key={grupoKey} className="grupo-especializaciones">
+                            <span className="grupo-titulo">{grupo.titulo}</span>
+                            <div className="grupo-chips">
+                              {grupo.chips.map(chip => (
+                                <button
+                                  key={chip.id}
+                                  className="btn-esp"
+                                  onClick={() => agregarAGrupo(chip.id)}
+                                  title={chip.descripcion}
+                                >
+                                  {chip.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -1954,7 +2002,7 @@ Necesito conocer algunos datos. Empecemos:
                       <div key={grupo.id} className="grupo-card">
                         <div className="grupo-header">
                           <span className="grupo-esp">
-                            {grupo.especializacion === 'fortuna' ? '🍀' : grupo.especializacion === 'proteccion' ? '🛡️' : grupo.especializacion === 'abundancia' ? '💰' : grupo.especializacion === 'sanacion' ? '💚' : grupo.especializacion === 'amor_romantico' ? '💕' : grupo.especializacion === 'calma' ? '🧘' : '📚'} {grupo.especializacion.replace('_', ' ').toUpperCase()}
+                            {especializacionesRapidas.find(e => e.id === grupo.especializacion)?.label || grupo.especializacion.replace('_', ' ')}
                           </span>
                           <span className="grupo-count">{grupo.guardianes.length} guardianes</span>
                           <button className="btn-eliminar-grupo" onClick={() => eliminarGrupo(grupo.id)}>🗑️</button>
@@ -2774,6 +2822,38 @@ Necesito conocer algunos datos. Empecemos:
           display: flex;
           flex-wrap: wrap;
           gap: 0.5rem;
+        }
+        .especializaciones-grupos-batch {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          max-height: 300px;
+          overflow-y: auto;
+          padding-right: 0.5rem;
+        }
+        .especializaciones-grupos-batch::-webkit-scrollbar {
+          width: 6px;
+        }
+        .especializaciones-grupos-batch::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.4);
+          border-radius: 3px;
+        }
+        .grupo-especializaciones {
+          background: rgba(255,255,255,0.03);
+          border-radius: 8px;
+          padding: 0.5rem;
+        }
+        .grupo-especializaciones .grupo-titulo {
+          display: block;
+          font-size: 0.75rem;
+          color: rgba(255,255,255,0.5);
+          margin-bottom: 0.4rem;
+          font-weight: 500;
+        }
+        .grupo-especializaciones .grupo-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.3rem;
         }
         .btn-esp {
           background: rgba(255,255,255,0.1);
@@ -3679,7 +3759,30 @@ Necesito conocer algunos datos. Empecemos:
         }
 
         .batch-grid .guardian-card.tiene-historia {
-          opacity: 0.5;
+          opacity: 0.7;
+        }
+
+        .batch-grid .guardian-card.tiene-historia::before {
+          content: '✓';
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: #22c55e;
+          color: white;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: bold;
+          z-index: 10;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .batch-grid .guardian-card.tiene-historia:hover {
+          opacity: 1;
         }
 
         .acciones-fijas .btns {

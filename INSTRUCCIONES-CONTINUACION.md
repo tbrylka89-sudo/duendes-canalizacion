@@ -1,329 +1,232 @@
 # INSTRUCCIONES PARA CONTINUAR EL TRABAJO - CLAUDE CODE
 
-**Fecha:** 22 Enero 2026, 15:25
-**Para:** Cualquier sesión nueva de Claude Code que retome este proyecto
+**Última actualización:** 22 Enero 2026, 19:30
+**Estado:** EN PROGRESO - Terminal principal trabajando
 
 ---
 
-# CONTEXTO COMPLETO (LEÉ TODO ESTO PRIMERO)
+# FILOSOFÍA DE CONVERSIÓN (LEER PRIMERO)
 
-## ¿Qué es este proyecto?
+**Todo el sistema está diseñado para CONVERTIR, no solo para ser bonito.**
 
-**Duendes del Uruguay** es un e-commerce de "guardianes canalizados" - figuras artesanales únicas con experiencias digitales personalizadas.
+## Sistema de Perfilado Psicológico (YA IMPLEMENTADO)
 
-- **Público:** Mujeres 35-65 años, buscadoras de protección/amor/cambio
-- **Tono:** Español rioplatense (vos, tenés), místico pero con los pies en la tierra
-- **Concepto central:** "El guardián te elige a vos" (no al revés)
+El Test del Guardián detecta 4 dimensiones:
+1. **Vulnerabilidad** (alta/media/baja) - basado en crisis, sufrimiento, cronicidad
+2. **Dolor principal** (soledad/dinero/salud/relaciones/proposito)
+3. **Estilo de decisión** (impulsivo/analitico/emocional)
+4. **Creencias** (creyente/buscador/esceptico)
 
-## Stack Técnico
+## 5 Cierres Adaptativos (YA IMPLEMENTADOS)
 
-```
-WORDPRESS (10Web)                    VERCEL (Next.js)
-├── Tienda WooCommerce              ├── Mi Magia (portal cliente)
-├── Productos/Guardianes            ├── APIs de gamificación
-├── Checkout                        ├── Test del Guardián API
-├── Plugins MU personalizados       ├── Webhooks WooCommerce
-└── Test del Guardián (frontend)    └── Sistema de conversión
-```
+Cada historia/email termina diferente según perfil:
+- **vulnerable**: "Sé que estás cansada... permiso para recibir"
+- **esceptico**: "No te pido que creas... observá qué sentiste"
+- **impulsivo**: "Los guardianes únicos desaparecen cuando encuentran hogar"
+- **coleccionista**: "Los guardianes se potencian entre sí"
+- **racional**: "La psicología lo llama anclaje. Funciona."
 
-## Filosofía de Conversión
+## Archivos Clave del Sistema de Conversión
 
-```
-FIJO (público, todos ven igual)     ADAPTATIVO (privado, personalizado)
-─────────────────────────────────   ────────────────────────────────────
-Historia del guardián               Emails según perfil psicológico
-Precio                              Cierres adaptativos en canalizaciones
-Descripción producto                "Señales mágicas" basadas en datos
-Sincrodestino de creación           Recomendaciones personalizadas
-```
-
-**Regla de oro:** Si dos personas comparan la web, ven lo mismo. La magia está en lo que cada una recibe EN PRIVADO (emails, canalizaciones).
-
-## Sistema de Perfilado Psicológico
-
-El Test del Guardián (12 preguntas) detecta:
-- **Vulnerabilidad:** alta/media/baja (qué tan en crisis está)
-- **Dolor principal:** soledad/dinero/salud/relaciones/propósito
-- **Estilo de decisión:** impulsivo/analítico/emocional
-- **Creencias:** escéptico/creyente/buscador
-
-Esto mapea a 5 tipos de cierre:
-1. **Vulnerable:** "Sé que estás cansada..."
-2. **Escéptico:** "No te pido que creas..."
-3. **Impulsivo:** "El cuerpo sabe antes que la mente..."
-4. **Coleccionista:** "Los guardianes se potencian..."
-5. **Racional:** "No es magia, es neurociencia..."
+| Archivo | Función |
+|---------|---------|
+| `/lib/conversion/cierres.js` | 5 cierres con variaciones |
+| `/lib/conversion/hooks.js` | Frases de apertura por categoría |
+| `/lib/conversion/sincrodestinos.js` | Eventos mágicos creíbles |
+| `/lib/conversion/arco.js` | 8 fases del arco emocional |
+| `/lib/conversion/scoring.js` | Scoring de conversión 0-50 pts |
+| `/app/api/test-guardian/route.js:229` | `calcularPerfilPsicologico()` |
+| `/app/api/test-guardian/route.js:327` | `perfilACierre()` |
 
 ---
 
-# ESTADO ACTUAL DEL PROYECTO
+# ⚠️ ESTADO EN TIEMPO REAL
 
-## ✅ YA ESTÁ HECHO
-- Test del Guardián con 12 preguntas y perfilado (archivo creado, falta subir)
-- APIs de gamificación (runas, niveles, cofre diario, lecturas)
-- Sistema de cierres adaptativos (5 perfiles con variaciones)
-- Generador de historias con arco emocional
-- Documento maestro unificado (PLAN-MAESTRO-CONVERSION.md)
-- DNS configurado apuntando a 10Web
+## TERMINAL PRINCIPAL (activa)
+Trabajando en: Coordinación general y documentación
 
-## 🔴 PENDIENTE - HACER EN PARALELO
-1. Subir test-guardian-v11.php a WordPress
-2. Crear motor de sincronicidad (/lib/sincronicidad.js)
-3. Activar dominio Make Primary en 10Web (manual)
-4. Configurar emails carrito abandonado
-5. Verificar DHL Express funciona
-6. Configurar SEO con Rank Math (manual)
-7. Crear productos de runas en WooCommerce (manual)
+## TAREAS COMPLETADAS ✅
+
+| Tarea | Estado | Detalle |
+|-------|--------|---------|
+| Test Guardian v11 WordPress | ✅ | 12 preguntas + perfilado |
+| Test Guardian Mi Magia | ✅ | UI completa + slider 1-10 |
+| Motor de sincronicidad | ✅ | `/api/sincronicidad` |
+| Emails carrito abandonado | ✅ | `/api/emails/carrito-abandonado` |
+| **Emails post-compra** | ✅ | `/api/emails/post-compra` - 7 emails con cierres |
+| Sistema cierres adaptativos | ✅ | 5 perfiles + variaciones |
+| Algoritmo perfilado psicológico | ✅ | En route.js |
+| **Certificado página web** | ✅ | `/certificado/[id]` - ver e imprimir |
+| Deploy Vercel | ✅ | Funcionando |
+| WordPress live | ✅ | HTTP 200 |
+
+## TAREAS A y B - ESTADO REAL
+- **TAREA A**: ✅ COMPLETADA - `/api/emails/post-compra/route.js` funcional
+- **TAREA B**: ⚠️ PARCIAL - Existe página `/certificado/[id]` para ver/imprimir
+  - Falta: API `/api/certificado` que genere PDF programático (para emails)
 
 ---
 
-# CÓMO LANZAR AGENTES EN PARALELO
+# TAREAS PENDIENTES PARA NUEVOS TERMINALES
 
-## Paso 1: Leer el documento maestro
+## PRIORIDAD ALTA - Puede hacer otra terminal
+
+### TAREA A: Crear secuencia completa de emails post-compra
 ```
-Lee el archivo /Users/usuario/Desktop/duendes-vercel/PLAN-MAESTRO-CONVERSION.md completo para entender el proyecto.
-```
-
-## Paso 2: Lanzar agentes simultáneos
-
-Usá la herramienta **Task** con múltiples invocaciones en un solo mensaje para que corran en paralelo.
-
-### AGENTES A LANZAR:
-
-```
-AGENTE 1: Subir Test a WordPress
-──────────────────────────────────
-Tipo: Bash
-Tarea: Subir el archivo test-guardian-v11.php a WordPress via SFTP y verificar que funciona.
-
-Prompt para el agente:
-"Subí el archivo /Users/usuario/Desktop/duendes-vercel/wordpress-plugins/test-guardian-v11.php
-a WordPress via SFTP.
-
-Credenciales SFTP:
-- Host: 34.70.139.72
-- Puerto: 55309
-- Usuario: sftp_live_WfP6i
-- Password: JzflrSheUnj4itUE27Aqr0SgD3cG5LXhCR
-- Ruta destino: web/wp-live/wp-content/mu-plugins/
-
-Después de subir:
-1. Limpiar caché: curl -X POST 'https://duendesuy.10web.cloud/wp-json/duendes/v1/cache' -H 'X-Duendes-Secret: duendes_vercel_2026_secretkey_XkJ9mN2pL5qR8sT1'
-2. Verificar que funciona: curl -s 'https://duendesuy.10web.cloud/descubri-que-duende-te-elige/' | grep -o 'tg-portal'"
-```
-
-```
-AGENTE 2: Crear Motor de Sincronicidad
-──────────────────────────────────────
 Tipo: general-purpose
-Tarea: Crear el sistema que genera "señales mágicas" personalizadas basadas en datos del usuario.
+Prompt: "Creá el sistema de emails post-compra para Duendes del Uruguay.
 
-Prompt para el agente:
-"Creá el motor de sincronicidad para Duendes del Uruguay.
+IMPORTANTE: Leé primero:
+- /Users/usuario/Desktop/duendes-vercel/CLAUDE.md (guía de escritura)
+- /Users/usuario/Desktop/duendes-vercel/lib/conversion/cierres.js (sistema de cierres)
 
-CONTEXTO: Sistema que genera 'coincidencias mágicas' basadas en datos del usuario para que sienta que el universo le habla.
+El sistema usa perfilado psicológico. Cada usuario tiene un perfilCierre guardado
+en KV (vulnerable/esceptico/impulsivo/coleccionista/racional).
 
-CREAR DOS ARCHIVOS:
+CREAR: /Users/usuario/Desktop/duendes-vercel/app/api/emails/post-compra/route.js
 
-1. /Users/usuario/Desktop/duendes-vercel/lib/sincronicidad.js
-   - Función generarSincronicidad(datos) que recibe: nombre, fechaNacimiento, guardian, diaSemana, hora, volvioAPagina
-   - Genera frases tipo:
-     * Por día: 'Los martes son días de Marte, de acción. No es casualidad que estés acá hoy.'
-     * Por nombre: 'Tu nombre y el de [guardian] tienen X letras. Los números no mienten.'
-     * Por cumpleaños: 'Este mes es tu portal. Los guardianes que aparecen cerca de tu cumpleaños vienen con mensajes especiales.'
-     * Por comportamiento: 'Volviste. Algo te trajo de nuevo. Eso tiene un nombre: reconocimiento.'
-   - Exportar función
+SECUENCIA CON CIERRES ADAPTATIVOS:
+- INMEDIATO: 'Tu guardián te eligió' → cierre según perfil
+- 24 HORAS: Certificado de canalización → cierre reforzando confianza
+- ENVÍO: 'Tu guardián comenzó su viaje' + tracking
+- DÍA 3: '¿Ya notaste algo diferente?' + diario de señales
+- DÍA 7: 'Una semana juntos' + pedir testimonio
+- DÍA 14: 'Tu guardián quiere presentarte a alguien' → cross-sell con cierre
+- DÍA 30: Invitación al Círculo
 
-2. /Users/usuario/Desktop/duendes-vercel/app/api/sincronicidad/route.js
-   - GET que recibe query params: nombre, fecha_nacimiento, guardian
-   - Devuelve JSON con la sincronicidad generada
-   - Usar la función de lib/sincronicidad.js
+import { getCierre } from '@/lib/conversion/cierres';
+// Ejemplo: getCierre('Violeta', 'vulnerable', 'f')
 
-TONO: Místico pero creíble. No exagerar. Una sola sincronicidad por llamada, la más relevante."
+Resend ya configurado. NO usar frases genéricas de IA (ver CLAUDE.md)."
 ```
 
+### TAREA B: Crear API generadora de PDF (PARCIAL - falta solo esto)
 ```
-AGENTE 3: Crear Sistema de Emails Carrito Abandonado
-────────────────────────────────────────────────────
-Tipo: general-purpose
-Tarea: Crear el endpoint que maneja emails de carrito abandonado con cierres adaptativos.
+YA EXISTE: /app/certificado/[id]/page.jsx (página HTML para ver/imprimir)
 
-Prompt para el agente:
-"Creá el sistema de emails de carrito abandonado para Duendes del Uruguay.
+FALTA CREAR: /Users/usuario/Desktop/duendes-vercel/app/api/certificado/route.js
 
-CONTEXTO: Cuando alguien abandona el carrito, enviamos emails personalizados según su perfil psicológico.
+Este endpoint debe generar PDF programáticamente para enviar por email.
+La página ya tiene todo el diseño - solo hay que convertirlo a PDF.
 
-CREAR:
-/Users/usuario/Desktop/duendes-vercel/app/api/emails/carrito-abandonado/route.js
+Usar @react-pdf/renderer o similar.
+GET /api/certificado?order=123 → devuelve PDF como stream/blob
 
-FUNCIONALIDAD:
-- POST recibe: email, nombre, guardian_nombre, perfil (opcional)
-- Si tiene perfil en KV, usar ese cierre
-- Si no tiene perfil, usar cierre 'vulnerable' (default)
-
-SECUENCIA DE EMAILS:
-- 1 hora: 'Tu guardián sigue esperándote' (informativo)
-- 24 horas: '[Nombre], [guardian] tiene algo que decirte' + cierre según perfil
-- 72 horas: 'Alguien más está mirando a [guardian]' (escasez social)
-
-Los cierres están en /Users/usuario/Desktop/duendes-vercel/lib/conversion/cierres.js
-Usar la función getCierre(nombreGuardian, perfil)
-
-Integrar con Resend para enviar emails (ya está configurado en el proyecto)."
+El email de certificado (día 2 de post-compra) necesita este endpoint
+para adjuntar el PDF automáticamente.
 ```
 
+### TAREA C: Verificar y configurar DHL Express
 ```
-AGENTE 4: Verificar Todo el Sistema
-───────────────────────────────────
 Tipo: Bash
-Tarea: Ejecutar tests de verificación de todos los endpoints y servicios.
+Prompt: "Verificá el estado de DHL Express en WooCommerce.
 
-Prompt para el agente:
-"Verificá que todo el sistema de Duendes del Uruguay funciona correctamente.
+1. Revisar si el plugin está activo:
+curl -s 'https://duendesuy.10web.cloud/wp-json/wc/v3/shipping/zones' (necesita auth)
 
-EJECUTAR ESTOS TESTS:
+2. Verificar en checkout si aparece DHL como opción
 
-1. WordPress:
-curl -s -o /dev/null -w 'WordPress Homepage: %{http_code}\n' 'https://duendesuy.10web.cloud/'
-curl -s -o /dev/null -w 'WordPress Tienda: %{http_code}\n' 'https://duendesuy.10web.cloud/shop/'
-curl -s -o /dev/null -w 'WordPress Test: %{http_code}\n' 'https://duendesuy.10web.cloud/descubri-que-duende-te-elige/'
-
-2. Vercel APIs:
-curl -s -o /dev/null -w 'Mi Magia: %{http_code}\n' 'https://duendes-vercel.vercel.app/mi-magia'
-curl -s 'https://duendes-vercel.vercel.app/api/gamificacion/lecturas?email=test@test.com' | head -100
-
-3. DNS:
-dig +short duendesdeluruguay.com A
-
-Reportar qué funciona y qué falla."
-```
-
-## Paso 3: Ejemplo de cómo invocar los agentes
-
-En tu mensaje, escribí algo como:
-
-```
-Voy a lanzar 4 agentes en paralelo para avanzar con el proyecto Duendes del Uruguay.
-
-[Luego usás la herramienta Task 4 veces en el mismo mensaje, una para cada agente]
+3. Documentar qué configuración falta"
 ```
 
 ---
 
-# CREDENCIALES COMPLETAS
+# TAREAS MANUALES COMPLETADAS ✅
+
+- ✅ Activar Dominio Make Primary en 10Web - **YA HECHO**
+- ✅ Crear Productos de Runas en WooCommerce - **YA HECHO**
+
+# TAREAS MANUALES PENDIENTES (BROWSER)
+
+## Configurar Rank Math SEO
+WordPress Admin → Rank Math → Títulos y Meta
+- Productos: `%title% | Guardián Canalizado | Duendes del Uruguay`
+
+---
+
+# SISTEMA FUNCIONANDO ACTUALMENTE
+
+```
+✅ WordPress Homepage: HTTP 200
+✅ WordPress Tienda: HTTP 200
+✅ Test Guardian WordPress: HTTP 200 (v11 activo)
+✅ Mi Magia (Vercel): HTTP 200
+✅ API Sincronicidad: Funcionando
+✅ API Carrito Abandonado: Creada
+✅ API Gamificación: Funcionando
+✅ DNS: 34.70.139.72
+```
+
+---
+
+# ARCHIVOS CREADOS HOY
+
+```
+✅ /lib/sincronicidad.js - Motor de señales mágicas
+✅ /app/api/sincronicidad/route.js - Endpoint GET
+✅ /app/api/emails/carrito-abandonado/route.js - Emails adaptativos
+✅ test-guardian-v11.php subido a WordPress mu-plugins
+```
+
+---
+
+# CONTEXTO RÁPIDO DEL PROYECTO
+
+**Duendes del Uruguay** = E-commerce de guardianes canalizados
+- **WordPress** = Tienda, productos, checkout
+- **Vercel** = Mi Magia (portal cliente), APIs
+
+**Dos tests del guardián:**
+- WordPress (visitantes nuevos) → test-guardian-v11.php ✅ FUNCIONANDO
+- Mi Magia (clientes) → /app/mi-magia/test-guardian.js ✅ YA ESTABA
+
+**Sistema de perfilado:**
+- 12 preguntas → detecta perfil psicológico
+- 5 cierres adaptativos: vulnerable, esceptico, impulsivo, coleccionista, racional
+
+---
+
+# CREDENCIALES
 
 ## WordPress/SFTP
 ```
-Host: 34.70.139.72
-Puerto: 55309
+Host: 34.70.139.72 | Puerto: 55309
 Usuario: sftp_live_WfP6i
 Password: JzflrSheUnj4itUE27Aqr0SgD3cG5LXhCR
-Ruta MU-Plugins: web/wp-live/wp-content/mu-plugins/
-URL Admin: https://duendesuy.10web.cloud/wp-admin
-```
-
-## Base de Datos WordPress
-```
-Host: mysql.10web.site
-Usuario: live_user_7O9A8
-Password: tNsQGgf2PFHRNv9hAZ7TPjmHXHkTnPXKQI
-DB: live_7O9A8
-```
-
-## Vercel
-```
-Proyecto: duendes-vercel
-URL: https://duendes-vercel.vercel.app/
-Deploy: vercel --prod (desde /Users/usuario/Desktop/duendes-vercel)
+Ruta: web/wp-live/wp-content/mu-plugins/
 ```
 
 ## API Keys
 ```
 DUENDES_REMOTE_SECRET: duendes_vercel_2026_secretkey_XkJ9mN2pL5qR8sT1
-INSIGHTS_API_KEY: duendes-insights-2024
 ```
 
 ## 10Web Panel
 ```
-URL: https://my.10web.io/websites/1453202/domains
-(para activar Make Primary y SSL)
+https://my.10web.io/websites/1453202/domains
 ```
 
 ---
 
-# ARCHIVOS CLAVE DEL PROYECTO
+# PARA OTRA TERMINAL
 
-| Archivo | Qué contiene |
-|---------|--------------|
-| `PLAN-MAESTRO-CONVERSION.md` | TODO el proyecto documentado (19 partes) |
-| `CLAUDE.md` | Guía de voz, tono, frases prohibidas |
-| `wordpress-plugins/test-guardian-v11.php` | Test con 12 preguntas + perfilado |
-| `lib/conversion/cierres.js` | 5 cierres adaptativos con variaciones |
-| `lib/conversion/hooks.js` | Frases de apertura por categoría |
-| `lib/conversion/sincrodestinos.js` | Eventos mágicos durante creación |
-| `lib/gamificacion/config.js` | Runas, niveles, lecturas, rachas |
-| `app/api/test-guardian/route.js` | API del test (GET preguntas, POST respuestas) |
-| `app/api/gamificacion/` | Todas las APIs de gamificación |
+**Contexto que debe entender:**
+1. Este proyecto usa CONVERSIÓN INTELIGENTE (no solo diseño bonito)
+2. Cada usuario tiene un `perfilCierre` (vulnerable/esceptico/impulsivo/coleccionista/racional)
+3. Todos los textos deben adaptarse al perfil usando `/lib/conversion/cierres.js`
+4. NUNCA usar frases genéricas de IA (ver lista prohibida en CLAUDE.md)
 
----
+**Decile:**
+"Leé CLAUDE.md y luego elegí TAREA A (emails post-compra) o TAREA B (certificados PDF).
+El sistema de conversión ya está implementado - solo tenés que usarlo con getCierre()."
 
-# TAREAS MANUALES (BROWSER)
-
-Estas NO se pueden automatizar, hay que hacerlas en el navegador:
-
-## 1. Activar Dominio Principal
-1. Ir a https://my.10web.io/websites/1453202/domains
-2. En duendesdeluruguay.com → 3 puntitos → Make Primary
-3. Después: Tools → SSL → Generate Free SSL
-
-## 2. Configurar Rank Math SEO
-1. En WordPress Admin → Rank Math → Títulos y Meta
-2. Productos: `%title% | Guardián Canalizado | Duendes del Uruguay`
-3. Habilitar Schema para productos
-
-## 3. Crear Productos de Runas
-1. En WordPress Admin → Productos → Añadir nuevo
-2. Crear 5 productos virtuales:
-   - Chispa (30 runas) - $5 - SKU: RUNAS-30
-   - Destello (80 runas) - $10 - SKU: RUNAS-80
-   - Resplandor (200 runas) - $20 - SKU: RUNAS-200
-   - Fulgor (550 runas) - $50 - SKU: RUNAS-550
-   - Aurora (1200 runas) - $100 - SKU: RUNAS-1200
+**Si pregunta qué está funcionando:**
+- Test del Guardián: WordPress y Mi Magia ✅
+- Perfilado psicológico: 12 preguntas → 5 perfiles ✅
+- APIs: sincronicidad, carrito-abandonado, gamificación ✅
+- Cierres adaptativos: /lib/conversion/cierres.js ✅
 
 ---
 
-# CHECKLIST DE VERIFICACIÓN FINAL
-
-Cuando todo esté hecho, verificar:
-
-```bash
-# WordPress funciona
-curl -s -o /dev/null -w "%{http_code}" "https://duendesuy.10web.cloud/" # debe ser 200
-
-# Test del Guardián carga
-curl -s "https://duendesuy.10web.cloud/descubri-que-duende-te-elige/" | grep -o "tg-portal" # debe aparecer
-
-# APIs Vercel funcionan
-curl -s "https://duendes-vercel.vercel.app/api/gamificacion/lecturas?email=test@test.com" | grep "success" # debe aparecer
-
-# Sincronicidad funciona (después de crearla)
-curl -s "https://duendes-vercel.vercel.app/api/sincronicidad?nombre=Maria&guardian=Thornwood"
-
-# DNS correcto
-dig +short duendesdeluruguay.com A # debe mostrar 34.70.139.72
-```
-
----
-
-# RESUMEN PARA EMPEZAR RÁPIDO
-
-1. **Leé** `PLAN-MAESTRO-CONVERSION.md` para contexto completo
-2. **Lanzá** los 4 agentes en paralelo (copiar prompts de arriba)
-3. **Hacé** las tareas manuales en browser mientras los agentes trabajan
-4. **Verificá** con el checklist que todo funciona
-5. **Actualizá** este archivo marcando qué se completó
-
----
-
-*Última actualización: 22 Enero 2026, 15:25*
-*Si esta sesión se llenó, otra puede retomar leyendo este archivo primero.*
+*Última actualización: 22 Enero 2026, 19:30*
+*Terminal principal coordinando*

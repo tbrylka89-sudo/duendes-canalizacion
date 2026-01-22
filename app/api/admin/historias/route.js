@@ -9,7 +9,8 @@ import {
   calcularScore,
   evaluarScore,
   detectarFrasesIA,
-  getArcoParaPrompt
+  getArcoParaPrompt,
+  getHookPorSubcategoria
 } from '@/lib/conversion/index.js';
 import { getInstruccionesEspecie } from '@/lib/conversion/especies.js';
 import { getInstruccionesEspecializacion, especializaciones } from '@/lib/conversion/especializaciones.js';
@@ -218,7 +219,8 @@ export async function POST(request) {
       hooks_usados, // BATCH: hooks ya usados en el grupo
       feedbackRegeneracion,
       perfil_objetivo,
-      especializacion // NUEVO: especialización elegida por el usuario
+      especializacion, // especialización elegida por el usuario
+      subcategoria // NUEVO: subcategoría específica (amor_propio, proteccion_hogar, etc)
     } = await request.json();
 
     // === VALIDACIÓN PRE-GENERACIÓN ===
@@ -237,16 +239,27 @@ export async function POST(request) {
 
     // === SELECCIÓN DE ELEMENTOS DE CONVERSIÓN ===
 
-    // 1. Hook de apertura - USAR ESPECIALIZACIÓN si existe, sino categoría
+    // 1. Hook de apertura - Prioridad: subcategoria > especializacion > categoria
+    let hookPrincipal;
     const categoriaParaHook = especializacion || categoria;
-    // Si hay hooks usados en batch, elegir uno que no se haya usado
-    let hookPrincipal = getRandomHook(categoriaParaHook);
-    if (hooks_usados && hooks_usados.length > 0) {
-      const hooksDisponibles = getHooksAlternativos(categoriaParaHook, null);
-      const hookNoUsado = hooksDisponibles.find(h => !hooks_usados.includes(h));
-      if (hookNoUsado) hookPrincipal = hookNoUsado;
+
+    // Si hay subcategoría específica (distribución automática), usarla
+    if (subcategoria) {
+      hookPrincipal = getHookPorSubcategoria(subcategoria);
+    } else {
+      hookPrincipal = getRandomHook(categoriaParaHook);
     }
-    const hooksAlternativos = getHooksAlternativos(categoriaParaHook, hookPrincipal);
+
+    // Si hay hooks usados en batch, elegir uno diferente
+    if (hooks_usados && hooks_usados.length > 0) {
+      // Verificar si el hook ya se usó
+      if (hooks_usados.includes(hookPrincipal)) {
+        const hooksDisponibles = getHooksAlternativos(subcategoria || categoriaParaHook, null);
+        const hookNoUsado = hooksDisponibles.find(h => !hooks_usados.includes(h));
+        if (hookNoUsado) hookPrincipal = hookNoUsado;
+      }
+    }
+    const hooksAlternativos = getHooksAlternativos(subcategoria || categoriaParaHook, hookPrincipal);
 
     // 2. Sincrodestino
     const sincrodestino = sincrodestino_custom
@@ -602,7 +615,9 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
         cm: validacion.cm,
         hookUsado: hookPrincipal,
         sincrodestinoUsado: sincrodestino.texto,
-        perfilObjetivo: perfil_objetivo || null // NUEVO: el perfil solicitado
+        perfilObjetivo: perfil_objetivo || null,
+        subcategoriaUsada: subcategoria || null, // NUEVO: subcategoría usada
+        especializacionUsada: especializacion || null
       },
       aprobada: arcoValidacion.completo && evaluacionScore.aceptable && frasesIADetectadas.length === 0,
       advertencias: advertencias.length > 0 ? advertencias : undefined
