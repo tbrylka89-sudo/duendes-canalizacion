@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 9 - COMPLETADA)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 10 - COMPLETADA)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -276,7 +276,36 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ## ÚLTIMAS SESIONES
 
-### 2026-01-23 22:30 (sesión 9) - EN CURSO
+### 2026-01-24 (sesión 10) - COMPLETADA
+
+**🔧 CONFIGURACIÓN DE APIs Y VERIFICACIONES**
+
+1. **GEMINI_API_KEY agregada a Vercel** ✅
+   - Encontrada en `.env.local`
+   - Agregada a producción, preview y development
+   - Modelo funcionando: `gemini-2.0-flash-exp`
+
+2. **Verificación completa de conexiones** ✅
+   - Claude: ✅ claude-sonnet-4
+   - OpenAI/DALL-E: ✅ dall-e-3
+   - Replicate: ✅ 20+ modelos
+   - Gemini: ✅ gemini-2.0-flash-exp
+   - Vercel KV: ✅ Upstash
+   - WordPress: ✅ WooCommerce 10.3.7
+
+3. **Documentación de integraciones de IA** ✅
+   - Endpoints de generación de imágenes documentados
+   - API de cursos documentada
+   - Panel Maestro del Círculo documentado
+
+**Commits:**
+- `Sync Admin and User APIs for Círculo content lookup`
+- `Document AI integrations in MEMORY.md`
+- `Update MEMORY: Gemini API now configured ✅`
+
+---
+
+### 2026-01-23 22:30 (sesión 9) - COMPLETADA
 
 **🎯 TAREA COMPLETADA: REFACTORIZAR MI MAGIA**
 
