@@ -252,6 +252,16 @@ export async function POST(request) {
           body: JSON.stringify(producto)
         });
         const nuevo = await res.json();
+
+        // Verificar si WooCommerce devolvió un error
+        if (!res.ok || nuevo.code) {
+          return Response.json({
+            success: false,
+            error: nuevo.message || nuevo.code || `Error de WooCommerce: ${res.status}`,
+            detalles: nuevo
+          }, { status: res.status });
+        }
+
         return Response.json({
           success: true,
           producto: transformarProducto(nuevo)
@@ -268,6 +278,16 @@ export async function POST(request) {
           body: JSON.stringify(producto)
         });
         const actualizado = await res.json();
+
+        // Verificar si WooCommerce devolvió un error
+        if (!res.ok || actualizado.code) {
+          return Response.json({
+            success: false,
+            error: actualizado.message || actualizado.code || `Error de WooCommerce: ${res.status}`,
+            detalles: actualizado
+          }, { status: res.status });
+        }
+
         return Response.json({
           success: true,
           producto: transformarProducto(actualizado)
