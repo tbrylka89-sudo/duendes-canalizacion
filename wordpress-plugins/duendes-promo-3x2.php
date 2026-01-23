@@ -428,7 +428,39 @@ function duendes_guardar_mini_gratis_orden($item, $cart_item_key, $values, $orde
 // BANNER PROMOCIONAL PARA LA TIENDA
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════
+// UBICACIONES DEL BANNER
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 1. Tienda (página de productos)
 add_action('woocommerce_before_shop_loop', 'duendes_banner_promo_3x2', 5);
+
+// 2. Página de producto individual (arriba de productos relacionados)
+add_action('woocommerce_after_single_product_summary', 'duendes_banner_promo_3x2_producto', 15);
+
+function duendes_banner_promo_3x2_producto() {
+    // Solo mostrar si NO es un mini (no tiene sentido en la página del mini)
+    global $product;
+    if ($product && has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product->get_id())) {
+        return;
+    }
+    duendes_banner_promo_3x2();
+}
+
+// 3. Homepage (si usa widgets o shortcode)
+add_shortcode('duendes_promo_3x2', function() {
+    if (!DUENDES_PROMO_3X2_ACTIVA) return '';
+    ob_start();
+    duendes_banner_promo_3x2();
+    return ob_get_clean();
+});
+
+// 4. Widget para Elementor/Homepage
+add_action('woocommerce_before_main_content', function() {
+    if (is_front_page() || is_home()) {
+        duendes_banner_promo_3x2();
+    }
+}, 5);
 
 function duendes_banner_promo_3x2() {
     if (!DUENDES_PROMO_3X2_ACTIVA) return;
@@ -586,21 +618,38 @@ function duendes_banner_promo_3x2() {
             object-fit: cover;
         }
 
-        /* Badge de regalo */
+        /* Badge de regalo - PROMINENTE */
         .dfb-3x2-gift {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: linear-gradient(135deg, #C6A962, #a88a42);
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #C6A962 0%, #d4b86a 50%, #C6A962 100%);
+            background-size: 200% 200%;
             color: #0a0a10;
             font-family: 'Cinzel', serif;
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 1px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            padding: 6px 12px;
-            border-radius: 20px;
-            animation: dfb-pulse-soft 2s ease-in-out infinite;
+            padding: 15px 20px;
+            border-radius: 8px;
+            animation: dfb-pulse-soft 2s ease-in-out infinite, dfb-gradient-shift 3s ease infinite;
+            box-shadow: 0 4px 20px rgba(198,169,98,0.4), 0 0 30px rgba(198,169,98,0.2);
+        }
+        @keyframes dfb-gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Sin minis - mostrar texto */
+        .dfb-3x2-no-minis {
+            color: rgba(255,255,255,0.5);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
         }
 
         @media (max-width: 700px) {
@@ -636,6 +685,7 @@ function duendes_banner_promo_3x2() {
         </div>
 
         <div class="dfb-3x2-visual">
+            <?php if (!empty($minis)): ?>
             <div class="dfb-3x2-minis">
                 <?php foreach ($minis as $mini):
                     $img = wp_get_attachment_image_url($mini->get_image_id(), 'thumbnail');
@@ -646,23 +696,14 @@ function duendes_banner_promo_3x2() {
                 </div>
                 <?php endforeach; ?>
             </div>
+            <?php else: ?>
+            <p class="dfb-3x2-no-minis">Elegí tu mini<br>favorito</p>
+            <?php endif; ?>
             <span class="dfb-3x2-gift">Regalo</span>
         </div>
     </div>
     <?php
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SHORTCODE PARA BANNER
-// ═══════════════════════════════════════════════════════════════════════════
-
-add_shortcode('duendes_promo_3x2', function() {
-    if (!DUENDES_PROMO_3X2_ACTIVA) return '';
-
-    ob_start();
-    duendes_banner_promo_3x2();
-    return ob_get_clean();
-});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PANEL DE ADMIN SIMPLE
