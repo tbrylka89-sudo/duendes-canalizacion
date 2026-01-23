@@ -180,6 +180,9 @@ class DuendesHubControl {
 
             <!-- ACCESOS RÁPIDOS -->
             <div class="quick-access">
+                <a href="<?php echo $url; ?>/admin/modo-dios" target="_blank" class="quick-btn" style="background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%); color: #1a1a1a;">
+                    ⚡ MODO DIOS
+                </a>
                 <a href="<?php echo $url; ?>/admin/circulo" target="_blank" class="quick-btn">
                     🏠 Hub Admin Principal
                 </a>
@@ -195,6 +198,58 @@ class DuendesHubControl {
                 <a href="<?php echo $url; ?>/admin/inteligencia" target="_blank" class="quick-btn secondary">
                     📊 Analytics
                 </a>
+            </div>
+
+            <!-- MODO DIOS - CONTROL TOTAL -->
+            <div class="hub-section" style="border: 2px solid #d4af37; background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(244, 208, 63, 0.05));">
+                <h2>⚡ MODO DIOS - Control Total <span class="badge" style="background: #d4af37; color: #1a1a1a;">NUEVO</span></h2>
+                <div class="hub-grid">
+
+                    <a href="<?php echo $url; ?>/admin/modo-dios" target="_blank" class="hub-card" style="border-color: #d4af37; background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));">
+                        <div class="hub-card-title" style="color: #b8860b;">⚡ Panel Modo Dios</div>
+                        <div class="hub-card-url">/admin/modo-dios</div>
+                        <div class="hub-card-desc">
+                            Control TOTAL de Mi Magia y El Círculo en un solo lugar. Generar contenido, gestionar usuarios, regalar runas, crear cursos.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Usalo para:</strong> TODO. Es el panel maestro que controla toda la plataforma.
+                        </div>
+                    </a>
+
+                    <a href="<?php echo $url; ?>/admin/modo-dios#contenido" target="_blank" class="hub-card">
+                        <div class="hub-card-title">✨ Generar Contenido Pro</div>
+                        <div class="hub-card-url">/admin/modo-dios → Contenido</div>
+                        <div class="hub-card-desc">
+                            Generador profesional con Claude + DALL-E. Crea contenido para día, semana o mes completo con imágenes únicas.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Usalo para:</strong> Generar mensajes del guardián con imágenes personalizadas automáticamente.
+                        </div>
+                    </a>
+
+                    <a href="<?php echo $url; ?>/admin/modo-dios#usuarios" target="_blank" class="hub-card">
+                        <div class="hub-card-title">👥 Gestión de Usuarios</div>
+                        <div class="hub-card-url">/admin/modo-dios → Usuarios</div>
+                        <div class="hub-card-desc">
+                            Buscar usuarios, ver su perfil, regalar runas/tréboles, activar círculo, crear cuentas nuevas.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Usalo para:</strong> Administrar usuarios, dar regalos, activar membresías.
+                        </div>
+                    </a>
+
+                    <a href="<?php echo $url; ?>/admin/modo-dios#regalos" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🎁 Sistema de Regalos</div>
+                        <div class="hub-card-url">/admin/modo-dios → Regalos</div>
+                        <div class="hub-card-desc">
+                            Regalar runas, tréboles o lecturas a usuarios individuales o a todos los del círculo.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Usalo para:</strong> Sorprender a usuarios, premiar participación, hacer promociones.
+                        </div>
+                    </a>
+
+                </div>
             </div>
 
             <!-- ADMIN: CÍRCULO -->
@@ -443,6 +498,28 @@ class DuendesHubControl {
                 <h2>👤 Área de Usuario (Mi Magia) <span class="badge badge-user">USUARIO</span></h2>
                 <div class="hub-grid">
 
+                    <a href="<?php echo $url; ?>/mi-magia/login" target="_blank" class="hub-card" style="border-color: #d4af37; background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.02));">
+                        <div class="hub-card-title" style="color: #b8860b;">🔐 Login con Magic Link</div>
+                        <div class="hub-card-url">/mi-magia/login</div>
+                        <div class="hub-card-desc">
+                            Acceso sin contraseña. El usuario pone su email y recibe un enlace mágico. Si no existe, se crea cuenta automáticamente.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Función:</strong> Login/registro unificado, anti-duplicados, zero fricción.
+                        </div>
+                    </a>
+
+                    <a href="<?php echo $url; ?>/mi-magia/perfilado" target="_blank" class="hub-card" style="border-color: #9370DB; background: linear-gradient(135deg, rgba(147, 112, 219, 0.1), rgba(147, 112, 219, 0.02));">
+                        <div class="hub-card-title" style="color: #6B4E9F;">📊 Test de Perfilado</div>
+                        <div class="hub-card-url">/mi-magia/perfilado</div>
+                        <div class="hub-card-desc">
+                            Test de 6 preguntas que clasifica usuarios por: vulnerabilidad, dolor principal, estilo de decisión, poder adquisitivo, creencias.
+                        </div>
+                        <div class="hub-card-uso">
+                            <strong>Función:</strong> Personalizar experiencia según perfil psicológico del usuario.
+                        </div>
+                    </a>
+
                     <a href="<?php echo $url; ?>/mi-magia" target="_blank" class="hub-card">
                         <div class="hub-card-title">✨ Mi Magia - Dashboard</div>
                         <div class="hub-card-url">/mi-magia</div>
@@ -647,8 +724,32 @@ class DuendesHubControl {
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/circulo/duende-semana</code></td>
                     </tr>
                     <tr style="background: white;">
-                        <td style="padding: 10px;">Ver cómo se ve el círculo para usuarios</td>
-                        <td style="padding: 10px;"><code>/circulo</code></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver cómo se ve el círculo para usuarios</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/circulo</code></td>
+                    </tr>
+                    <tr style="background: #fff8dc;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Control total de TODA la plataforma</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> ⚡</td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Generar contenido con IA + imágenes</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> → pestaña Contenido</td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Crear usuario nuevo / enviar magic link</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> → pestaña Usuarios</td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Regalar runas a todos los del círculo</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> → pestaña Regalos</td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver perfil psicológico de usuarios</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/mi-magia/perfilado?email=xxx</code></td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td style="padding: 10px;">Login sin contraseña para usuarios</td>
+                        <td style="padding: 10px;"><code>/mi-magia/login</code></td>
                     </tr>
                 </table>
             </div>
