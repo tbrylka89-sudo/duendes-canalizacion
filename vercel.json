@@ -19,6 +19,39 @@
     {
       "path": "/api/cron/guardian-intelligence",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/actividad-diaria",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/duende-semana-rotacion",
+      "schedule": "0 0 * * 1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/wordpress/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://duendesdeluruguay.com" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Requested-With" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+      ]
+    },
+    {
+      "source": "/api/circulo/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/circulo",
+      "destination": "/circulo/landing"
     }
   ]
 }

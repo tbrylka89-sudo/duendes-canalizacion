@@ -8,6 +8,8 @@ import Referidos from './referidos';
 import { DashboardGamificacion, ColeccionBadges, MisionesPanel, HistorialLecturas, LeaderboardRachas, ToastProvider } from './gamificacion-components';
 import { ExperienciasMagicas } from './experiencias-magicas';
 import { estilos } from './components/styles';
+import { AccesoRestringido, BadgeNivelAcceso, BannerUpgrade } from './components/AccesoRestringido';
+import { BannerPromociones } from './components/BannerPromociones';
 
 const API_BASE = '';
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
@@ -4337,6 +4339,7 @@ function Inicio({ usuario, ir, token, setUsuario }) {
             <span className="rango-nombre">{rango.nombre}</span>
             <span className="rango-ben">{rango.beneficio}</span>
           </div>
+          <BadgeNivelAcceso usuario={usuario} />
         </div>
         <h1 className="hero-title">{usuario?.nombrePreferido}, te estaba esperando.</h1>
         <p className="hero-validation">{fraseValidacion}</p>
@@ -4347,6 +4350,24 @@ function Inicio({ usuario, ir, token, setUsuario }) {
           </div>
         )}
       </div>
+
+      {/* ══════ BANNER DE PROMOCIONES ══════ */}
+      <BannerPromociones usuario={usuario} ubicacion="mi-magia-inicio" />
+
+      {/* ══════ BANNER DE UPGRADE (si no es Círculo) ══════ */}
+      <BannerUpgrade
+        usuario={usuario}
+        onActivarTrial={(data) => {
+          if (setUsuario && data.usuario) {
+            setUsuario(prev => ({
+              ...prev,
+              esCirculo: data.usuario.esCirculo,
+              circuloExpira: data.usuario.circuloExpira,
+              runas: data.usuario.runas
+            }));
+          }
+        }}
+      />
 
       {/* SEÑAL DEL DÍA */}
       <SenalDelDia usuario={usuario} />

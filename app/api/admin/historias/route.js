@@ -220,7 +220,8 @@ export async function POST(request) {
       feedbackRegeneracion,
       perfil_objetivo,
       especializacion, // especialización elegida por el usuario
-      subcategoria // NUEVO: subcategoría específica (amor_propio, proteccion_hogar, etc)
+      subcategoria, // NUEVO: subcategoría específica (amor_propio, proteccion_hogar, etc)
+      temaLibre // NUEVO: tema escrito libremente por el usuario (ej: "fortuna y dinero", "proteger el hogar")
     } = await request.json();
 
     // === VALIDACIÓN PRE-GENERACIÓN ===
@@ -276,9 +277,35 @@ export async function POST(request) {
     });
 
     // Agregar instrucciones de especialización
-    // Si el usuario eligió una especialización, usar el sistema completo
+    // Prioridad: temaLibre > especializacion > detección automática
     let instruccionesEspecie;
-    if (especializacion) {
+
+    if (temaLibre) {
+      // TEMA LIBRE: El usuario escribió algo como "fortuna y dinero", "proteger el hogar de energías"
+      // Crear instrucciones creativas basadas en ese tema
+      instruccionesEspecie = `
+## TEMA ESPECÍFICO ELEGIDO POR EL USUARIO (OBLIGATORIO)
+
+**Este guardián tiene que ser sobre: "${temaLibre}"**
+
+El usuario eligió este tema específico. La historia DEBE estar 100% enfocada en "${temaLibre}".
+
+INSTRUCCIONES CREATIVAS:
+- Interpretá "${temaLibre}" de forma creativa pero fiel al concepto
+- El dolor/problema del cliente DEBE estar relacionado con "${temaLibre}"
+- El guardián DEBE resolver algo concreto relacionado con este tema
+- Variá el enfoque dentro del tema para que cada historia sea única
+- NO uses dolores genéricos que no tengan que ver con "${temaLibre}"
+- El guardián debe HACER algo tangible, no solo "enseñar" o "mostrar"
+
+Ejemplos de variación dentro del tema:
+- Si es "fortuna y dinero": puede ser flujo de dinero, oportunidades laborales, desbloquear abundancia, atraer clientes, etc.
+- Si es "amor": puede ser amor propio, encontrar pareja, sanar el corazón, fortalecer vínculos, etc.
+- Si es "protección": puede ser del hogar, de energías, de envidias, de uno mismo, de la familia, etc.
+
+USÁESTO COMO GUÍA CREATIVA, NO COMO LÍMITE.
+`;
+    } else if (especializacion) {
       // Buscar si es un ID conocido o texto libre
       const instruccionesCompletas = getInstruccionesEspecializacion(especializacion);
 
@@ -353,7 +380,41 @@ PROHIBIDO: cualquier cosa que implique que recibe el de la foto
     }
 
     if (accesorios) {
-      prompt += `**Accesorios/Cristales:** ${accesorios}\n`;
+      prompt += `\n### ACCESORIOS Y CRISTALES (OBLIGATORIO MENCIONAR)\n`;
+      prompt += `**Este guardián incluye:** ${accesorios}\n\n`;
+      prompt += `**INSTRUCCIONES SOBRE ACCESORIOS:**
+1. DEBÉS mencionar los accesorios físicos en la historia
+2. Explicá qué HACE cada cristal o elemento (ver guía abajo)
+3. Conectá los accesorios con el propósito del guardián
+4. El cliente debe entender QUÉ RECIBE y PARA QUÉ SIRVE
+
+**GUÍA DE CRISTALES Y SUS PODERES:**
+- **Amatista**: Protección espiritual, calma mental, intuición, transmuta energías negativas
+- **Citrino**: Abundancia, prosperidad, energía solar, atrae dinero y oportunidades
+- **Cuarzo rosa**: Amor incondicional, sanación emocional, autoestima, relaciones
+- **Cuarzo cristal/blanco**: Amplificador universal, claridad, limpieza energética
+- **Turmalina negra**: Escudo contra energías negativas, protección absoluta, conexión a tierra
+- **Fluorita**: Claridad mental, concentración, orden en el caos, estudios
+- **Sodalita**: Calma la ansiedad, comunicación, verdad interior
+- **Pirita**: Abundancia, manifestación, voluntad, protección
+- **Piedra luna**: Intuición femenina, ciclos, fertilidad, emociones
+- **Ágata**: Estabilidad, equilibrio, fuerza interior, protección del hogar
+- **Cuarzo cherry/fresa**: Amor, vitalidad, alegría, pasión
+
+**OTROS ELEMENTOS Y SUS SIGNIFICADOS:**
+- **Trébol 3 hojas**: Suerte natural, conexión con la tierra
+- **Trébol 4 hojas**: Suerte extraordinaria, manifestación de deseos
+- **Llaves**: Abren caminos, desbloquean oportunidades
+- **Monedas**: Prosperidad, flujo de dinero
+- **Lavanda/Romero**: Limpieza energética, protección, calma
+- **Escoba**: Barre energías estancadas, limpieza del hogar
+- **Cetro**: Canaliza y dirige la energía del cristal en la punta
+- **Herradura**: Protección y buena suerte
+
+**EJEMPLO DE CÓMO MENCIONARLO EN LA HISTORIA:**
+"...lleva en sus manos una drusa de amatista que absorbe las energías densas de tu espacio. No es decoración - es su herramienta de trabajo."
+"El citrino que cuelga de su cuello no es casualidad. Es el cristal que atrae abundancia, y él sabe exactamente cómo activarlo para vos."
+`;
     }
 
     if (analisisImagen) {
@@ -408,6 +469,8 @@ CHECKLIST OBLIGATORIO:
 □ OBLIGATORIO: Usar al menos 2 palabras de dolor (carga, peso, vacío, agota, sola)
 □ OBLIGATORIO: Usar "guardián" al menos una vez (además de duende)
 □ OBLIGATORIO: Generar sensación de "ser elegido/a" (no es casualidad que llegaste acá)
+□ OBLIGATORIO: Mencionar los ACCESORIOS/CRISTALES que incluye y explicar QUÉ HACEN
+□ OBLIGATORIO: Explicar cómo los cristales/accesorios POTENCIAN al guardián
 
 IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sienta que NECESITA este guardián sin que le hayas vendido nada.`;
 
@@ -632,10 +695,10 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
   }
 }
 
-// PUT - Guardar historia en WooCommerce
+// PUT - Guardar historia en WooCommerce (con cierres para perfiles)
 export async function PUT(request) {
   try {
-    const { productoId, historia } = await request.json();
+    const { productoId, historia, cierres } = await request.json();
 
     if (!productoId || !historia) {
       return NextResponse.json({
@@ -663,6 +726,36 @@ export async function PUT(request) {
 
     historiaHtml = historiaHtml.replace(/<\/ul>\s*<ul>/g, '');
 
+    // Agregar marcador invisible para identificar historias generadas por el sistema
+    // Esto permite distinguir historias del generador vs historias viejas manuales
+    const MARCADOR_GENERADOR = '<!-- historia-generador-duendes-v1 -->';
+    if (!historiaHtml.includes(MARCADOR_GENERADOR)) {
+      historiaHtml = MARCADOR_GENERADOR + '\n' + historiaHtml;
+    }
+
+    // Preparar meta_data con los cierres para TODOS los perfiles psicológicos (6 perfiles)
+    const metaData = [];
+    if (cierres) {
+      // Guardar cada cierre como meta field individual
+      const perfiles = ['vulnerable', 'esceptico', 'impulsivo', 'coleccionista', 'racional', 'default'];
+      for (const perfil of perfiles) {
+        if (cierres[perfil]) {
+          metaData.push({ key: `_cierre_${perfil}`, value: cierres[perfil] });
+        }
+      }
+      // También guardar como JSON para fácil acceso (todos juntos)
+      metaData.push({ key: '_cierres_json', value: JSON.stringify(cierres) });
+    }
+
+    const updateData = {
+      description: historiaHtml
+    };
+
+    // Solo agregar meta_data si hay cierres
+    if (metaData.length > 0) {
+      updateData.meta_data = metaData;
+    }
+
     const response = await fetch(
       `${WC_URL}/wp-json/wc/v3/products/${productoId}`,
       {
@@ -671,9 +764,7 @@ export async function PUT(request) {
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          description: historiaHtml
-        })
+        body: JSON.stringify(updateData)
       }
     );
 
@@ -686,8 +777,9 @@ export async function PUT(request) {
 
     return NextResponse.json({
       success: true,
-      mensaje: `Historia guardada para ${producto.name}`,
-      productoId: producto.id
+      mensaje: `Historia guardada para ${producto.name}${cierres ? ' (con cierres dinámicos)' : ''}`,
+      productoId: producto.id,
+      cierresGuardados: !!cierres
     });
 
   } catch (error) {
@@ -728,13 +820,20 @@ export async function GET(request) {
 
       const productos = await response.json();
 
-      // Extraer datos de productos con historia
+      // Extraer datos de productos con historia GENERADA POR EL SISTEMA
+      // Solo cuenta como "con historia" si tiene el marcador del generador
+      // Las historias viejas (sin marcador) NO se consideran como "ya hechas"
+      const MARCADOR_GENERADOR = '<!-- historia-generador-duendes-v1 -->';
       const hooksUsados = [];
       const sincrodestUsados = [];
       const guardianesConHistoria = [];
 
       for (const producto of productos) {
-        if (producto.description && producto.description.length > 200) {
+        // Solo marcar como "con historia" si fue generada por el sistema
+        const tieneHistoriaGenerada = producto.description &&
+          producto.description.includes(MARCADOR_GENERADOR);
+
+        if (tieneHistoriaGenerada) {
           guardianesConHistoria.push(producto.name);
 
           // Extraer primera línea como posible hook

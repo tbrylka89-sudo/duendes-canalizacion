@@ -215,7 +215,7 @@ export async function POST(request) {
     // ═══════════════════════════════════════════════════════════
     // PROCESAR MEMBRESÍAS DEL CÍRCULO
     // ═══════════════════════════════════════════════════════════
-    
+
     if (membresias.length > 0) {
       for (const membresia of membresias) {
         const membresiaConfig = membresia.config;
@@ -242,14 +242,48 @@ export async function POST(request) {
         circulo.descuentoTienda = membresiaConfig?.descuentoTienda || 0;
         circulo.runasMensuales = membresiaConfig?.runasMensuales || 0;
 
+        // ═══════════════════════════════════════════════════════════
+        // SINCRONIZACIÓN COMPLETA: Guardar en los 3 lugares
+        // ═══════════════════════════════════════════════════════════
+
+        // 1. Guardar en circulo:${email}
         await kv.set(`circulo:${email}`, circulo);
 
-        // También guardar en el elegido para fácil acceso
+        // 2. También guardar en el elegido para fácil acceso
         elegido.circulo = {
           activo: true,
           plan: circulo.plan,
           expira: circulo.expira
         };
+        elegido.esCirculo = true;
+        elegido.circuloPlan = circulo.plan;
+        elegido.circuloExpira = circulo.expira;
+
+        // 3. Guardar/actualizar user:${email} con datos del Círculo
+        let userData = await kv.get(`user:${email}`) || {
+          email,
+          nombre,
+          createdAt: new Date().toISOString()
+        };
+        userData.esCirculo = true;
+        userData.circuloPlan = circulo.plan;
+        userData.circuloPlanNombre = circulo.planNombre;
+        userData.circuloExpira = circulo.expira;
+        userData.circuloUltimaCompra = new Date().toISOString();
+        userData.nombre = userData.nombre || nombre;
+        await kv.set(`user:${email}`, userData);
+
+        // 4. Crear/actualizar mapeo token:${token} -> {email, nombre}
+        // (El token ya se generó arriba si no existía)
+        if (elegido.token) {
+          await kv.set(`token:${elegido.token}`, {
+            email,
+            nombre,
+            esCirculo: true,
+            circuloPlan: circulo.plan,
+            circuloExpira: circulo.expira
+          }, { ex: 365 * 24 * 60 * 60 }); // 1 año
+        }
 
         // Dar runas de bienvenida si tiene config
         if (membresiaConfig?.runasBienvenida > 0) {
@@ -258,6 +292,7 @@ export async function POST(request) {
         }
 
         console.log(`Membresía ${circulo.planNombre || membresia.sku} activada para ${email} hasta ${nuevaExpiracion}`);
+        console.log(`Sincronizado en: circulo:${email}, elegido:${email}, user:${email}, token:${elegido.token}`);
 
         // Enviar email de bienvenida al Círculo
         await enviarEmailCirculo(resend, email, nombre, circulo.planNombre || membresia.sku, nuevaExpiracion, membresiaConfig?.runasBienvenida || 0, elegido.token);
@@ -295,30 +330,76 @@ export async function POST(request) {
     // ═══════════════════════════════════════════════════════════
     // BONOS DE PRIMERA COMPRA
     // ═══════════════════════════════════════════════════════════
-    
+
     if (esPrimeraCompra) {
       elegido.primeraCompra = new Date().toISOString();
-      
+
       // 20 runas gratis en primera compra
       elegido.runas = (elegido.runas || 0) + 20;
-      
+
       // 15 días de Círculo gratis
       let circulo = await kv.get(`circulo:${email}`) || { activo: false };
       if (!circulo.activo) {
         const expiraPrueba = new Date();
         expiraPrueba.setDate(expiraPrueba.getDate() + 15);
-        
+
         circulo.activo = true;
         circulo.plan = 'prueba-gratis';
+        circulo.planNombre = 'Prueba Gratuita';
         circulo.expira = expiraPrueba.toISOString();
         circulo.esPrueba = true;
-        
+
+        // ═══════════════════════════════════════════════════════════
+        // SINCRONIZACIÓN COMPLETA para prueba gratis también
+        // ═══════════════════════════════════════════════════════════
+
+        // 1. Guardar en circulo:${email}
         await kv.set(`circulo:${email}`, circulo);
-        
+
+        // 2. Actualizar elegido
+        elegido.circulo = {
+          activo: true,
+          plan: 'prueba-gratis',
+          expira: expiraPrueba.toISOString(),
+          esPrueba: true
+        };
+        elegido.esCirculo = true;
+        elegido.circuloPlan = 'prueba-gratis';
+        elegido.circuloExpira = expiraPrueba.toISOString();
+        elegido.circuloPrueba = true;
+
+        // 3. Guardar/actualizar user:${email}
+        let userData = await kv.get(`user:${email}`) || {
+          email,
+          nombre,
+          createdAt: new Date().toISOString()
+        };
+        userData.esCirculo = true;
+        userData.circuloPlan = 'prueba-gratis';
+        userData.circuloPlanNombre = 'Prueba Gratuita';
+        userData.circuloExpira = expiraPrueba.toISOString();
+        userData.circuloPrueba = true;
+        userData.nombre = userData.nombre || nombre;
+        await kv.set(`user:${email}`, userData);
+
+        // 4. Actualizar mapeo token con info de prueba
+        if (elegido.token) {
+          await kv.set(`token:${elegido.token}`, {
+            email,
+            nombre,
+            esCirculo: true,
+            circuloPlan: 'prueba-gratis',
+            circuloExpira: expiraPrueba.toISOString(),
+            circuloPrueba: true
+          }, { ex: 365 * 24 * 60 * 60 });
+        }
+
         // Programar emails de conversión
         await programarEmailsConversion(kv, email, nombre, expiraPrueba);
+
+        console.log(`Prueba gratis del Círculo sincronizada en todos los lugares para ${email}`);
       }
-      
+
       console.log(`Bonos de primera compra aplicados a ${email}: 20 runas + 15 días Círculo`);
     }
     
@@ -703,13 +784,20 @@ async function enviarEmailRunas(resend, email, nombre, runasAgregadas, bonusRuna
 
 async function enviarEmailCirculo(resend, email, nombre, plan, expira, runasBienvenida, token) {
   const fechaExpira = new Date(expira).toLocaleDateString('es-UY');
+
+  // Link principal al Círculo con token
+  const linkCirculo = token
+    ? `https://duendes-vercel.vercel.app/circulo?token=${token}`
+    : 'https://duendes-vercel.vercel.app/circulo';
+
+  // Link secundario a Mi Magia
   const linkMiMagia = token
     ? `https://duendes-vercel.vercel.app/mi-magia?token=${token}`
     : 'https://duendes-vercel.vercel.app/mi-magia';
 
   const runasMsg = runasBienvenida > 0
     ? `<div style="background: rgba(46,204,113,0.15); border: 1px solid rgba(46,204,113,0.3); border-radius: 10px; padding: 15px; text-align: center; margin: 20px 0;">
-        <p style="margin: 0; color: #2ecc71; font-size: 16px;">🎁 ¡Regalo de bienvenida!</p>
+        <p style="margin: 0; color: #2ecc71; font-size: 16px;">🎁 Regalo de bienvenida</p>
         <p style="margin: 5px 0 0; color: #d4af37; font-size: 24px; font-weight: bold;">${runasBienvenida} ᚱ Runas</p>
       </div>`
     : '';
@@ -718,30 +806,62 @@ async function enviarEmailCirculo(resend, email, nombre, plan, expira, runasBien
     await resend.emails.send({
       from: 'Duendes del Uruguay <magia@duendesdeluruguay.com>',
       to: email,
-      subject: '⭐ Bienvenida al Círculo de Duendes',
+      subject: `✦ Bienvenida al Círculo de Duendes, ${nombre}`,
       html: `
-        <div style="font-family: Georgia; background: #0a0a0a; color: #f5f5f5; padding: 40px;">
-          <div style="max-width: 500px; margin: 0 auto; background: #141420; padding: 40px; border-radius: 15px; border: 1px solid rgba(212,175,55,0.2);">
-            <h1 style="color: #d4af37; text-align: center;">⭐ Círculo de Duendes</h1>
-            <p>Bienvenida al Santuario, ${nombre}.</p>
-            <p>Tu membresía <strong style="color: #d4af37;">${plan}</strong> está activa hasta el <strong style="color: #d4af37;">${fechaExpira}</strong>.</p>
-            ${runasMsg}
-            <p>Ahora tenés acceso a:</p>
-            <ul style="line-height: 1.8;">
-              <li>Contenido exclusivo semanal</li>
-              <li>Foro privado de la comunidad</li>
-              <li>Acceso anticipado a nuevos guardianes</li>
-              <li>Descuentos permanentes en la tienda</li>
-              <li>Runas mensuales de regalo</li>
+        <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #f5f5f5; padding: 40px;">
+          <h1 style="color: #d4af37; font-size: 28px; text-align: center;">✦ Bienvenida al Círculo ✦</h1>
+
+          <p style="font-size: 18px; line-height: 1.8;">
+            ${nombre},
+          </p>
+
+          <p style="font-size: 16px; line-height: 1.8;">
+            Acabás de entrar al santuario secreto. A partir de ahora, tenés acceso a contenido exclusivo,
+            experiencias mágicas, y privilegios que solo los miembros del Círculo conocen.
+          </p>
+
+          <div style="background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; padding: 25px; margin: 30px 0;">
+            <h3 style="color: #d4af37; margin-top: 0;">Tu Plan: ${plan}</h3>
+            <p style="margin: 0; color: #888;">Activo hasta: <strong style="color: #f5f5f5;">${fechaExpira}</strong></p>
+            <ul style="list-style: none; padding: 0; line-height: 2; margin-top: 15px;">
+              <li>✦ Contenido semanal exclusivo</li>
+              <li>✦ Tiradas de runas gratis cada mes</li>
+              <li>✦ Acceso anticipado a nuevos guardianes</li>
+              <li>✦ Descuentos permanentes en la tienda</li>
+              <li>✦ Runas de regalo mensuales</li>
             </ul>
-            <p style="text-align: center; margin-top: 30px;">
-              <a href="${linkMiMagia}" style="background: #d4af37; color: #0a0a0a; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">Entrar al Círculo ✦</a>
-            </p>
-            <p style="color: rgba(255,255,255,0.4); font-size: 12px; text-align: center; margin-top: 25px;">El Santuario te espera. No sos una más. Sos parte de la familia.</p>
           </div>
+
+          ${runasMsg}
+
+          <div style="text-align: center; margin: 40px 0;">
+            <a href="${linkCirculo}" style="display: inline-block; background: #d4af37; color: #0a0a0a; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 50px; font-size: 16px;">
+              Acceder al Círculo ✦
+            </a>
+          </div>
+
+          <div style="background: rgba(212,175,55,0.1); border-radius: 10px; padding: 20px; margin: 30px 0;">
+            <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.7);">
+              <strong>Tu enlace personal:</strong><br>
+              <a href="${linkCirculo}" style="color: #d4af37; word-break: break-all;">${linkCirculo}</a>
+            </p>
+            <p style="margin: 10px 0 0; font-size: 12px; color: rgba(255,255,255,0.5);">
+              Guardá este email. Este enlace es tuyo y te da acceso directo al Círculo.
+            </p>
+          </div>
+
+          <p style="font-size: 14px; color: #888; text-align: center;">
+            También podés acceder a tu portal personal en <a href="${linkMiMagia}" style="color: #d4af37;">Mi Magia</a>
+          </p>
+
+          <p style="font-size: 16px; line-height: 1.8; margin-top: 40px;">
+            Con cariño desde Piriápolis,<br>
+            <strong style="color: #d4af37;">El equipo de Duendes del Uruguay</strong>
+          </p>
         </div>
       `
     });
+    console.log(`[EMAIL] Bienvenida Círculo enviado a ${email}`);
   } catch (error) {
     console.error('Error enviando email de círculo:', error);
   }

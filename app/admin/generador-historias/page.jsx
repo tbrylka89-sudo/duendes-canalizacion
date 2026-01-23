@@ -108,6 +108,17 @@ function GeneradorHistoriasContent() {
   const [historiasExistentes, setHistoriasExistentes] = useState(null); // datos de historias ya generadas
   const [cargandoHistorias, setCargandoHistorias] = useState(false);
 
+  // === MODO PLANIFICADOR VISUAL ===
+  // Permite ver todos los guardianes y asignarles categorías antes de generar
+  const [planificador, setPlanificador] = useState({
+    activo: false,
+    asignaciones: {}, // {nombreGuardian: 'amor'} o {nombreGuardian: 'fortuna y dinero'} - texto libre
+    seleccionActual: [], // guardianes seleccionados temporalmente para asignar
+    categoriaParaAsignar: null, // categoría que se va a asignar a los seleccionados
+    busqueda: '', // filtro de búsqueda
+    textoLibre: '' // texto libre para asignar
+  });
+
   // Mini-encuesta al regenerar
   const [showMiniEncuesta, setShowMiniEncuesta] = useState(false);
   const [miniEncuesta, setMiniEncuesta] = useState({
@@ -1251,13 +1262,14 @@ Necesito conocer algunos datos. Empecemos:
           continue;
         }
 
-        // Guardar historia
+        // Guardar historia CON CIERRES para perfiles psicológicos
         const saveRes = await fetch('/api/admin/historias', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             productoId: producto.id,
-            historia: resultado.historia
+            historia: resultado.historia,
+            cierres: resultado.cierres // Guardamos los 3 cierres (vulnerable, esceptico, impulsivo)
           })
         });
 
@@ -1385,6 +1397,18 @@ Necesito conocer algunos datos. Empecemos:
                 <h3>Batch Inteligente</h3>
                 <p>Seleccioná varios, agrupalos por especialización, generá todos de una vez</p>
                 <span className="badge destacado">Sin repetir hooks ni sincrodestinos</span>
+              </div>
+
+              <div className="modo-card planificador" onClick={() => {
+                setModo('planificador');
+                setPaso(17);
+                setPlanificador({ activo: true, asignaciones: {}, seleccionActual: [], categoriaParaAsignar: null, busqueda: '', textoLibre: '' });
+                cargarHistoriasExistentes();
+              }}>
+                <div className="icono">🎨</div>
+                <h3>Planificador Visual</h3>
+                <p>Ves todas las fotos, marcás categorías (pueden ser varias), y generás todo de una</p>
+                <span className="badge destacado">EL MÁS POTENTE</span>
               </div>
             </div>
           </div>
@@ -2021,6 +2045,35 @@ Necesito conocer algunos datos. Empecemos:
                       onChange={(e) => setBusquedaDirecto(e.target.value)}
                       className="busqueda-input"
                     />
+
+                    {/* BOTONES DE SELECCIÓN MASIVA */}
+                    <div className="batch-seleccion-masiva">
+                      <button
+                        className="btn-seleccion-masiva"
+                        onClick={() => {
+                          // Seleccionar TODOS los filtrados que NO tienen historia
+                          const sinHistoria = catalogoFiltrado.filter(g =>
+                            !historiasExistentes?.guardianesConHistoria?.includes(g.nombre)
+                          );
+                          setBatchSeleccionados(sinHistoria);
+                        }}
+                      >
+                        ⚡ Todos sin historia ({catalogoFiltrado.filter(g => !historiasExistentes?.guardianesConHistoria?.includes(g.nombre)).length})
+                      </button>
+                      <button
+                        className="btn-seleccion-masiva"
+                        onClick={() => setBatchSeleccionados([...catalogoFiltrado])}
+                      >
+                        📦 Todos los filtrados ({catalogoFiltrado.length})
+                      </button>
+                      <button
+                        className="btn-seleccion-masiva secundario"
+                        onClick={() => setBatchSeleccionados([])}
+                      >
+                        🗑️ Limpiar selección
+                      </button>
+                    </div>
+
                     <div className="batch-catalogo-grid">
                       {catalogoFiltrado.map((guardian, idx) => {
                         const seleccionado = batchSeleccionados.find(g => g.nombre === guardian.nombre);
@@ -2248,9 +2301,15 @@ Necesito conocer algunos datos. Empecemos:
                 setBatchSeleccionados([]);
                 setBatchGrupos([]);
                 setBatchVistaPrevia(null);
-                setPaso(15);
+                // Volver al modo correcto: planificador (17) o batch inteligente (15)
+                if (modo === 'planificador') {
+                  setPlanificador(prev => ({ ...prev, asignaciones: {}, seleccionActual: [] }));
+                  setPaso(17);
+                } else {
+                  setPaso(15);
+                }
               }}>
-                🔄 Nuevo batch
+                🔄 {modo === 'planificador' ? 'Nuevo plan' : 'Nuevo batch'}
               </button>
               <button
                 className="btn-corregir"
@@ -2313,6 +2372,400 @@ Necesito conocer algunos datos. Empecemos:
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* PASO 17: PLANIFICADOR VISUAL */}
+        {paso === 17 && modo === 'planificador' && (
+          <div className="paso-content planificador-visual">
+            <h2>🎨 Planificador Visual</h2>
+            <p className="subtitulo">
+              Marcá guardianes → asigná categorías → generá todo de una vez
+            </p>
+
+            {cargandoHistorias && (
+              <div className="cargando-historias">
+                <span>Cargando datos...</span>
+              </div>
+            )}
+
+            {/* Barra de categorías para asignar */}
+            <div className="planificador-toolbar">
+              <div className="seleccion-info">
+                <span className="count">{planificador.seleccionActual.length}</span> seleccionados
+              </div>
+
+              {/* Input libre para escribir cualquier especialización */}
+              <div className="asignar-libre">
+                <input
+                  type="text"
+                  placeholder="Escribí: fortuna, dinero, amor de pareja, protección del hogar..."
+                  value={planificador.textoLibre || ''}
+                  onChange={(e) => setPlanificador(prev => ({ ...prev, textoLibre: e.target.value }))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && planificador.seleccionActual.length > 0 && planificador.textoLibre?.trim()) {
+                      const texto = planificador.textoLibre.trim();
+                      setPlanificador(prev => {
+                        const nuevasAsignaciones = { ...prev.asignaciones };
+                        prev.seleccionActual.forEach(nombre => {
+                          nuevasAsignaciones[nombre] = texto;
+                        });
+                        return {
+                          ...prev,
+                          asignaciones: nuevasAsignaciones,
+                          seleccionActual: [],
+                          textoLibre: ''
+                        };
+                      });
+                    }
+                  }}
+                  className="input-especializacion-libre"
+                />
+                <button
+                  className="btn-asignar-libre"
+                  onClick={() => {
+                    if (planificador.seleccionActual.length > 0 && planificador.textoLibre?.trim()) {
+                      const texto = planificador.textoLibre.trim();
+                      setPlanificador(prev => {
+                        const nuevasAsignaciones = { ...prev.asignaciones };
+                        prev.seleccionActual.forEach(nombre => {
+                          nuevasAsignaciones[nombre] = texto;
+                        });
+                        return {
+                          ...prev,
+                          asignaciones: nuevasAsignaciones,
+                          seleccionActual: [],
+                          textoLibre: ''
+                        };
+                      });
+                    }
+                  }}
+                  disabled={planificador.seleccionActual.length === 0 || !planificador.textoLibre?.trim()}
+                >
+                  Asignar
+                </button>
+              </div>
+
+              <button
+                className="btn-limpiar-seleccion"
+                onClick={() => setPlanificador(prev => ({ ...prev, seleccionActual: [] }))}
+                disabled={planificador.seleccionActual.length === 0}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Buscador y resumen */}
+            <div className="planificador-busqueda-resumen">
+              <div className="planificador-busqueda">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar guardián..."
+                  value={planificador.busqueda}
+                  onChange={(e) => setPlanificador(prev => ({ ...prev, busqueda: e.target.value }))}
+                  className="busqueda-input"
+                />
+                <span className="contador-filtro">
+                  {catalogo.guardianes.filter(g =>
+                    !planificador.busqueda ||
+                    g.nombre.toLowerCase().includes(planificador.busqueda.toLowerCase()) ||
+                    (g.especie && g.especie.toLowerCase().includes(planificador.busqueda.toLowerCase())) ||
+                    (g.categoria && g.categoria.toLowerCase().includes(planificador.busqueda.toLowerCase()))
+                  ).length} de {catalogo.guardianes.length}
+                </span>
+              </div>
+
+              {/* Resumen de asignaciones agrupado por tema */}
+              <div className="planificador-resumen">
+                {(() => {
+                  // Agrupar por tema asignado
+                  const porTema = {};
+                  Object.entries(planificador.asignaciones).forEach(([nombre, tema]) => {
+                    if (!porTema[tema]) porTema[tema] = [];
+                    porTema[tema].push(nombre);
+                  });
+                  return Object.entries(porTema).map(([tema, guardianes]) => (
+                    <span key={tema} className="resumen-cat" title={guardianes.join(', ')}>
+                      {tema}: <strong>{guardianes.length}</strong>
+                    </span>
+                  ));
+                })()}
+                <span className="resumen-total">
+                  Total: <strong>{Object.keys(planificador.asignaciones).length}</strong>
+                </span>
+              </div>
+            </div>
+
+            {/* Grid de guardianes con fotos */}
+            <div className="planificador-grid">
+              {catalogo.guardianes
+                .filter(g =>
+                  !planificador.busqueda ||
+                  g.nombre.toLowerCase().includes(planificador.busqueda.toLowerCase()) ||
+                  (g.especie && g.especie.toLowerCase().includes(planificador.busqueda.toLowerCase())) ||
+                  (g.categoria && g.categoria.toLowerCase().includes(planificador.busqueda.toLowerCase()))
+                )
+                .map((guardian, idx) => {
+                const nombreKey = guardian.nombre;
+                const estaSeleccionado = planificador.seleccionActual.includes(nombreKey);
+                const temaAsignado = planificador.asignaciones[nombreKey] || null; // ahora es string, no array
+                const tieneHistoria = historiasExistentes?.guardianesConHistoria?.includes(nombreKey);
+                // Buscar imagen con múltiples variantes del nombre
+                const nombreLower = guardian.nombre.toLowerCase();
+                const nombreBase = nombreLower.split(' - ')[0].trim();
+                const nombreSinPixie = nombreBase.replace(' pixie', '').trim();
+                const imagenWC = imagenesWC[nombreLower] || imagenesWC[nombreBase] || imagenesWC[nombreSinPixie] ||
+                  Object.entries(imagenesWC).find(([k]) => k.includes(nombreSinPixie) || nombreSinPixie.includes(k))?.[1];
+
+                return (
+                  <div
+                    key={idx}
+                    className={`planificador-card ${estaSeleccionado ? 'seleccionado' : ''} ${temaAsignado ? 'asignado' : ''} ${tieneHistoria ? 'tiene-historia' : ''}`}
+                    onClick={() => {
+                      // Toggle selección
+                      setPlanificador(prev => ({
+                        ...prev,
+                        seleccionActual: prev.seleccionActual.includes(nombreKey)
+                          ? prev.seleccionActual.filter(n => n !== nombreKey)
+                          : [...prev.seleccionActual, nombreKey]
+                      }));
+                    }}
+                  >
+                    {/* Foto */}
+                    <div className="card-imagen">
+                      {imagenWC ? (
+                        <img src={imagenWC} alt={guardian.nombre} />
+                      ) : (
+                        <div className="sin-foto">{guardian.nombre[0]}</div>
+                      )}
+                      {tieneHistoria && <span className="badge-historia">✓</span>}
+                    </div>
+
+                    {/* Info */}
+                    <div className="card-info">
+                      <span className="nombre">{guardian.nombre}</span>
+                      <span className="meta">{guardian.especie || 'duende'} · {guardian.cm}cm</span>
+                    </div>
+
+                    {/* Tema asignado */}
+                    {temaAsignado && (
+                      <div className="tema-asignado">
+                        <span
+                          className="tema-badge"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Quitar asignación
+                            setPlanificador(prev => {
+                              const nuevasAsignaciones = { ...prev.asignaciones };
+                              delete nuevasAsignaciones[nombreKey];
+                              return { ...prev, asignaciones: nuevasAsignaciones };
+                            });
+                          }}
+                          title="Click para quitar"
+                        >
+                          {temaAsignado}
+                          <span className="quitar">×</span>
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Check de selección */}
+                    {estaSeleccionado && <span className="check-seleccion">✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Acciones finales */}
+            <div className="planificador-acciones">
+              <button
+                className="btn-secondary"
+                onClick={() => {
+                  setPaso(1);
+                  setModo(null);
+                  setPlanificador({ activo: false, asignaciones: {}, seleccionActual: [], categoriaParaAsignar: null, busqueda: '', textoLibre: '' });
+                }}
+              >
+                ← Volver
+              </button>
+
+              <button
+                className="btn-secondary"
+                onClick={() => setPlanificador(prev => ({ ...prev, asignaciones: {}, seleccionActual: [] }))}
+              >
+                🗑️ Limpiar todo
+              </button>
+
+              <button
+                className="btn-generar-planificador"
+                onClick={async () => {
+                  // Generar todas las historias basándose en las asignaciones
+                  const asignaciones = planificador.asignaciones;
+                  if (Object.keys(asignaciones).length === 0) {
+                    alert('Primero asigná temas a algunos guardianes');
+                    return;
+                  }
+
+                  setBatchGenerando(true);
+                  setBatchResultados([]);
+
+                  const resultados = [];
+                  const totalGuardianes = Object.keys(asignaciones).length;
+                  let contador = 0;
+
+                  // Agrupar por tema para distribuir subcategorías
+                  const porTema = {};
+                  for (const [nombre, tema] of Object.entries(asignaciones)) {
+                    if (!porTema[tema]) porTema[tema] = [];
+                    porTema[tema].push(nombre);
+                  }
+
+                  // Mapeo de palabras clave a categorías conocidas
+                  const mapeoCategoria = {
+                    'amor': 'amor',
+                    'love': 'amor',
+                    'pareja': 'amor',
+                    'sanacion': 'sanacion',
+                    'sanación': 'sanacion',
+                    'salud': 'sanacion',
+                    'proteccion': 'proteccion',
+                    'protección': 'proteccion',
+                    'trabajo': 'trabajo',
+                    'dinero': 'trabajo',
+                    'abundancia': 'trabajo',
+                    'fortuna': 'principales',
+                    'suerte': 'principales',
+                    'bienestar': 'bienestar',
+                    'ansiedad': 'bienestar',
+                    'cambios': 'cambios',
+                    'transformacion': 'cambios',
+                    'espiritual': 'espiritual',
+                    'estudio': 'estudio',
+                    'sabiduria': 'estudio',
+                    'sabiduría': 'estudio'
+                  };
+
+                  // Función para detectar categoría conocida desde el tema
+                  const detectarCategoria = (tema) => {
+                    const temaLower = tema.toLowerCase();
+                    for (const [palabra, categoria] of Object.entries(mapeoCategoria)) {
+                      if (temaLower.includes(palabra)) {
+                        return categoria;
+                      }
+                    }
+                    return null; // tema libre, no es categoría conocida
+                  };
+
+                  // Trackear hooks y sincrodestinos usados
+                  const hooksUsados = [...(historiasExistentes?.hooksUsados || [])];
+                  const sincrodestUsados = [...(historiasExistentes?.sincrodestUsados || [])];
+
+                  // Procesar cada guardián
+                  for (const [nombre, tema] of Object.entries(asignaciones)) {
+                    contador++;
+                    const guardian = catalogo.guardianes.find(g => g.nombre === nombre);
+                    if (!guardian) continue;
+
+                    // Detectar si es categoría conocida
+                    const categoriaDetectada = detectarCategoria(tema);
+                    let especializacion = tema;
+                    let subcategoria = tema;
+
+                    if (categoriaDetectada && especializacionesGrupos[categoriaDetectada]) {
+                      // Es categoría conocida - distribuir entre subcategorías
+                      const subcatsDisponibles = especializacionesGrupos[categoriaDetectada].chips?.map(c => c.id) || [];
+                      const indiceEnTema = porTema[tema].indexOf(nombre);
+
+                      especializacion = categoriaDetectada;
+                      subcategoria = subcatsDisponibles.length > 0
+                        ? subcatsDisponibles[indiceEnTema % subcatsDisponibles.length]
+                        : categoriaDetectada;
+                    }
+                    // Si no es categoría conocida, especializacion y subcategoria quedan como el tema libre
+
+                    setBatchProgreso({
+                      actual: contador,
+                      total: totalGuardianes,
+                      guardian: nombre,
+                      grupo: tema,
+                      subcategoria: subcategoria
+                    });
+
+                    try {
+                      const res = await fetch('/api/admin/historias', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          nombre: guardian.nombre,
+                          especie: guardian.especie || 'duende',
+                          categoria: guardian.categoria || 'Protección',
+                          tamanoCm: guardian.cm || 18,
+                          accesorios: guardian.accesorios || '',
+                          esUnico: guardian.especie === 'pixie' || (guardian.cm || 18) > 15,
+                          especializacion: especializacion,
+                          subcategoria: subcategoria,
+                          temaLibre: categoriaDetectada ? null : tema, // si es tema libre, pasarlo
+                          hooks_usados: hooksUsados,
+                          sincrodestinos_usados: sincrodestUsados
+                        })
+                      });
+
+                      const data = await res.json();
+
+                      if (data.success) {
+                        if (data.datos?.hookUsado) hooksUsados.push(data.datos.hookUsado);
+                        if (data.datos?.sincrodestinoUsado) sincrodestUsados.push(data.datos.sincrodestinoUsado);
+
+                        resultados.push({
+                          guardian,
+                          grupo: tema,
+                          subcategoria: subcategoria,
+                          temaAsignado: tema,
+                          historia: corregirOrtografia(data.historia),
+                          score: data.score_conversion,
+                          arco: data.arco_emocional,
+                          cierres: data.cierres_por_perfil,
+                          aprobada: data.aprobada,
+                          advertencias: data.advertencias,
+                          hookUsado: data.datos?.hookUsado,
+                          sincrodestinoUsado: data.datos?.sincrodestinoUsado,
+                          aprobado: false,
+                          guardadoWC: false
+                        });
+                      } else {
+                        resultados.push({
+                          guardian,
+                          grupo: tema,
+                          subcategoria: subcategoria,
+                          temaAsignado: tema,
+                          error: data.error,
+                          aprobado: false
+                        });
+                      }
+                    } catch (e) {
+                      resultados.push({
+                        guardian,
+                        grupo: tema,
+                        subcategoria: subcategoria,
+                        temaAsignado: tema,
+                        error: e.message,
+                        aprobado: false
+                      });
+                    }
+                  }
+
+                  setBatchResultados(resultados);
+                  setBatchGenerando(false);
+                  setPaso(16); // Ir a revisión
+                }}
+                disabled={Object.keys(planificador.asignaciones).length === 0 || batchGenerando}
+              >
+                {batchGenerando
+                  ? `Generando ${batchProgreso.actual}/${batchProgreso.total}...`
+                  : `🚀 Generar ${Object.keys(planificador.asignaciones).length} historias`
+                }
+              </button>
+            </div>
           </div>
         )}
 
@@ -2828,8 +3281,330 @@ Necesito conocer algunos datos. Empecemos:
           background: linear-gradient(135deg, #ec4899, #8b5cf6) !important;
         }
 
+        .modo-card.planificador {
+          border: 2px solid rgba(16, 185, 129, 0.3);
+          background: rgba(16, 185, 129, 0.1);
+        }
+        .modo-card.planificador:hover {
+          border-color: rgba(16, 185, 129, 0.6);
+          box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
         .batch-inteligente {
           padding: 1rem;
+        }
+
+        /* PLANIFICADOR VISUAL */
+        .planificador-visual {
+          padding: 1rem;
+        }
+        .planificador-toolbar {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          background: rgba(0,0,0,0.3);
+          border-radius: 12px;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .planificador-toolbar .seleccion-info {
+          background: rgba(139, 92, 246, 0.2);
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          font-size: 0.9rem;
+        }
+        .planificador-toolbar .seleccion-info .count {
+          font-weight: 700;
+          font-size: 1.2rem;
+          color: #8b5cf6;
+        }
+        .categorias-asignar {
+          display: flex;
+          gap: 0.4rem;
+          flex-wrap: wrap;
+          flex: 1;
+        }
+        .btn-categoria-asignar {
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: #fff;
+          padding: 0.5rem 0.8rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          transition: all 0.2s;
+        }
+        .btn-categoria-asignar:hover:not(:disabled) {
+          background: rgba(139, 92, 246, 0.3);
+          border-color: #8b5cf6;
+        }
+        .btn-categoria-asignar:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        .btn-limpiar-seleccion {
+          background: rgba(239, 68, 68, 0.2);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          color: #ef4444;
+          padding: 0.5rem 0.75rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 600;
+        }
+        .btn-limpiar-seleccion:disabled {
+          opacity: 0.3;
+        }
+
+        .asignar-libre {
+          display: flex;
+          gap: 0.5rem;
+          flex: 1;
+          min-width: 300px;
+        }
+        .input-especializacion-libre {
+          flex: 1;
+          padding: 0.6rem 1rem;
+          border-radius: 8px;
+          border: 2px solid rgba(139, 92, 246, 0.3);
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 0.9rem;
+        }
+        .input-especializacion-libre:focus {
+          outline: none;
+          border-color: #8b5cf6;
+          background: rgba(139, 92, 246, 0.1);
+        }
+        .input-especializacion-libre::placeholder {
+          color: rgba(255,255,255,0.4);
+        }
+        .btn-asignar-libre {
+          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+          color: white;
+          border: none;
+          padding: 0.6rem 1.2rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .btn-asignar-libre:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        .btn-asignar-libre:hover:not(:disabled) {
+          transform: translateY(-1px);
+        }
+
+        .planificador-busqueda-resumen {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+        }
+        .planificador-busqueda {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex: 1;
+          min-width: 250px;
+        }
+        .planificador-busqueda .busqueda-input {
+          flex: 1;
+          padding: 0.6rem 1rem;
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 0.9rem;
+        }
+        .planificador-busqueda .busqueda-input:focus {
+          outline: none;
+          border-color: #8b5cf6;
+        }
+        .planificador-busqueda .contador-filtro {
+          font-size: 0.8rem;
+          color: rgba(255,255,255,0.6);
+          white-space: nowrap;
+        }
+        .planificador-resumen {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          padding: 0.5rem 0.75rem;
+          background: rgba(16, 185, 129, 0.1);
+          border-radius: 8px;
+          font-size: 0.8rem;
+        }
+        .planificador-resumen .resumen-cat {
+          background: rgba(255,255,255,0.1);
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+        }
+        .planificador-resumen .resumen-total {
+          color: #10b981;
+          font-weight: 600;
+        }
+
+        .planificador-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 0.75rem;
+          max-height: 60vh;
+          overflow-y: auto;
+          padding: 0.5rem;
+        }
+        .planificador-card {
+          background: rgba(255,255,255,0.05);
+          border: 2px solid rgba(255,255,255,0.1);
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+          overflow: hidden;
+        }
+        .planificador-card:hover {
+          border-color: rgba(139, 92, 246, 0.5);
+          transform: translateY(-2px);
+        }
+        .planificador-card.seleccionado {
+          border-color: #8b5cf6;
+          background: rgba(139, 92, 246, 0.2);
+          box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        }
+        .planificador-card.asignado {
+          border-color: #10b981;
+        }
+        .planificador-card.tiene-historia {
+          opacity: 0.5;
+        }
+        .planificador-card .card-imagen {
+          height: 100px;
+          background: rgba(0,0,0,0.3);
+          position: relative;
+        }
+        .planificador-card .card-imagen img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .planificador-card .card-imagen .sin-foto {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2rem;
+          color: rgba(255,255,255,0.3);
+          font-weight: 700;
+        }
+        .planificador-card .badge-historia {
+          position: absolute;
+          top: 0.3rem;
+          right: 0.3rem;
+          background: #10b981;
+          color: white;
+          font-size: 0.7rem;
+          padding: 0.2rem 0.4rem;
+          border-radius: 4px;
+        }
+        .planificador-card .card-info {
+          padding: 0.5rem;
+        }
+        .planificador-card .card-info .nombre {
+          display: block;
+          font-weight: 600;
+          font-size: 0.85rem;
+          color: #fff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .planificador-card .card-info .meta {
+          display: block;
+          font-size: 0.7rem;
+          color: rgba(255,255,255,0.5);
+        }
+        .planificador-card .tema-asignado {
+          padding: 0 0.5rem 0.5rem;
+        }
+        .planificador-card .tema-badge {
+          font-size: 0.7rem;
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(236, 72, 153, 0.4));
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          cursor: pointer;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .planificador-card .tema-badge .quitar {
+          opacity: 0.6;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+        .planificador-card .tema-badge:hover {
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(239, 68, 68, 0.4));
+        }
+        .planificador-card .tema-badge:hover .quitar {
+          opacity: 1;
+        }
+
+        .planificador-card .check-seleccion {
+          position: absolute;
+          top: 0.5rem;
+          left: 0.5rem;
+          background: #8b5cf6;
+          color: white;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.9rem;
+          font-weight: 700;
+        }
+
+        .planificador-acciones {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 1.5rem;
+          padding: 1rem;
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          position: sticky;
+          bottom: 0;
+        }
+        .btn-generar-planificador {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          border: none;
+          padding: 1rem 2rem;
+          border-radius: 10px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-generar-planificador:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        .btn-generar-planificador:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         /* NUEVO FLUJO BATCH */
@@ -3114,6 +3889,42 @@ Necesito conocer algunos datos. Empecemos:
           grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
           gap: 0.75rem;
           margin-top: 1rem;
+        }
+        .batch-seleccion-masiva {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin-top: 0.75rem;
+          padding: 0.75rem;
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 8px;
+          border: 1px dashed rgba(139, 92, 246, 0.3);
+        }
+        .btn-seleccion-masiva {
+          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+          color: white;
+          border: none;
+          padding: 0.6rem 1rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-weight: 500;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+        .btn-seleccion-masiva:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+        .btn-seleccion-masiva.secundario {
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-seleccion-masiva.secundario:hover {
+          background: rgba(255,255,255,0.2);
+          box-shadow: none;
         }
         .batch-guardian-card {
           background: rgba(255,255,255,0.05);

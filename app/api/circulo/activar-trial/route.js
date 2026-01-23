@@ -1,14 +1,18 @@
 import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
+import { calcularPerfil, guardarPerfil } from '@/lib/circulo/perfilado';
+import { generarMensajeActivacionTrial, generarSincronicidad } from '@/lib/circulo/sincronicidad';
+import { incrementarMiembros } from '@/lib/circulo/escasez';
 
 // ═══════════════════════════════════════════════════════════════
 // ACTIVAR TRIAL DE 15 DÍAS DEL CÍRCULO
+// Integrado con sistema de conversion inteligente
 // Solo se puede usar UNA vez por email
 // ═══════════════════════════════════════════════════════════════
 
 export async function POST(request) {
   try {
-    const { email, nombre } = await request.json();
+    const { email, nombre, cumpleanos } = await request.json();
 
     if (!email) {
       return NextResponse.json({
@@ -84,16 +88,47 @@ export async function POST(request) {
     const token = generarToken();
     await kv.set(`token:${token}`, emailNormalizado, { ex: 60 * 60 * 24 * 16 }); // 16 días
 
+    // ===== SISTEMA DE CONVERSION INTELIGENTE =====
+
+    // Calcular y guardar perfil si hay datos del test
+    let perfil = null;
+    if (elegido?.testGuardianRaw) {
+      perfil = calcularPerfil(elegido.testGuardianRaw);
+      await guardarPerfil(emailNormalizado, perfil);
+    }
+
+    // Generar mensaje de sincronicidad personalizado
+    const sincronicidad = generarMensajeActivacionTrial({
+      nombre: nombre || elegido?.nombre || '',
+      cumpleanos,
+      fechaVisita: hoy
+    });
+
+    // Incrementar contador de miembros (para escasez real)
+    await incrementarMiembros();
+
+    // ===== FIN SISTEMA DE CONVERSION =====
+
     return NextResponse.json({
       success: true,
-      mensaje: '¡Bienvenido/a al Círculo!',
+      mensaje: sincronicidad.mensaje || '¡Bienvenido/a al Círculo!',
       trial: {
         inicio: hoy.toISOString(),
         fin: finTrial.toISOString(),
         diasRestantes: 15
       },
       token,
-      runas: nuevoElegido.runas
+      runas: nuevoElegido.runas,
+      // Datos adicionales del sistema de conversion
+      sincronicidad: {
+        mensaje: sincronicidad.sincronicidad?.mensajePrincipal,
+        momento: sincronicidad.sincronicidad?.momento
+      },
+      perfil: perfil ? {
+        vulnerabilidad: perfil.vulnerabilidad?.nivel,
+        dolor: perfil.dolor?.tipo,
+        cierreRecomendado: perfil.conversion?.cierreRecomendado
+      } : null
     });
 
   } catch (error) {

@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // VERIFICAR ACCESO AL CÍRCULO DE DUENDES
+// Busca en 3 lugares: circulo:${email}, elegido:${email}, user:${email}
+// Soporta autenticación por: token, email, o token mapeado
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export async function POST(request) {
@@ -18,55 +20,117 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    let usuarioEmail = email;
+    let usuarioEmail = email?.toLowerCase();
+    let tokenData = null;
 
-    // Si hay token, decodificarlo (formato simple: base64 del email)
-    if (token) {
-      try {
-        // El token puede ser el email directamente o base64
-        if (token.includes('@')) {
-          usuarioEmail = token.toLowerCase();
-        } else {
-          usuarioEmail = Buffer.from(token, 'base64').toString('utf-8').toLowerCase();
-        }
-      } catch {
-        // Si falla el decode, usar el token como está
+    // ═══════════════════════════════════════════════════════════
+    // RESOLVER EMAIL DESDE TOKEN (múltiples formatos)
+    // ═══════════════════════════════════════════════════════════
+
+    if (token && !usuarioEmail) {
+      // 1. Si el token contiene @, es directamente un email
+      if (token.includes('@')) {
         usuarioEmail = token.toLowerCase();
+      }
+      // 2. Buscar en mapeo token:${token} -> {email, nombre}
+      else {
+        tokenData = await kv.get(`token:${token}`);
+        if (tokenData) {
+          // El mapeo puede ser string (email) u objeto {email, nombre}
+          if (typeof tokenData === 'string') {
+            usuarioEmail = tokenData.toLowerCase();
+          } else if (tokenData.email) {
+            usuarioEmail = tokenData.email.toLowerCase();
+          }
+        }
+        // 3. Fallback: intentar decodificar base64
+        if (!usuarioEmail) {
+          try {
+            const decoded = Buffer.from(token, 'base64').toString('utf-8');
+            if (decoded.includes('@')) {
+              usuarioEmail = decoded.toLowerCase();
+            }
+          } catch {
+            // Ignorar error de decodificación
+          }
+        }
       }
     }
 
-    // Verificar en múltiples lugares
+    if (!usuarioEmail) {
+      return Response.json({
+        success: false,
+        acceso: false,
+        error: 'No se pudo identificar el usuario'
+      }, { status: 400 });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // VERIFICAR ACCESO EN LOS 3 LUGARES
+    // ═══════════════════════════════════════════════════════════
+
     let tieneAcceso = false;
     let datosUsuario = null;
     let planInfo = null;
+    let fuenteAcceso = null;
 
-    // 1. Verificar en clave específica del círculo
+    // 1. Verificar en circulo:${email} (fuente principal)
     const circuloData = await kv.get(`circulo:${usuarioEmail}`);
-    if (circuloData) {
-      // Verificar que esté activo y no expirado
-      if (circuloData.activo) {
-        const expira = circuloData.expira ? new Date(circuloData.expira) : null;
-        if (!expira || expira > new Date()) {
-          tieneAcceso = true;
-          planInfo = {
-            plan: circuloData.plan,
-            expira: circuloData.expira,
-            esPrueba: circuloData.esPrueba || false
-          };
+    if (circuloData?.activo) {
+      const expira = circuloData.expira ? new Date(circuloData.expira) : null;
+      if (!expira || expira > new Date()) {
+        tieneAcceso = true;
+        fuenteAcceso = 'circulo';
+        planInfo = {
+          plan: circuloData.plan,
+          planNombre: circuloData.planNombre || circuloData.plan,
+          expira: circuloData.expira,
+          esPrueba: circuloData.esPrueba || false,
+          descuentoTienda: circuloData.descuentoTienda || 0,
+          runasMensuales: circuloData.runasMensuales || 0
+        };
+      }
+    }
+
+    // 2. Verificar en elegido:${email}.circulo
+    if (!tieneAcceso) {
+      const elegidoData = await kv.get(`elegido:${usuarioEmail}`);
+      if (elegidoData) {
+        datosUsuario = elegidoData;
+
+        // Puede estar en elegido.circulo.activo o elegido.esCirculo
+        const circuloElegido = elegidoData.circulo || {};
+        const esCirculo = elegidoData.esCirculo || circuloElegido.activo;
+        const expiraStr = elegidoData.circuloExpira || circuloElegido.expira;
+
+        if (esCirculo) {
+          const expira = expiraStr ? new Date(expiraStr) : null;
+          if (!expira || expira > new Date()) {
+            tieneAcceso = true;
+            fuenteAcceso = 'elegido';
+            planInfo = {
+              plan: elegidoData.circuloPlan || circuloElegido.plan,
+              planNombre: elegidoData.circuloPlanNombre || circuloElegido.planNombre || elegidoData.circuloPlan,
+              expira: expiraStr,
+              esPrueba: elegidoData.circuloPrueba || circuloElegido.esPrueba || false
+            };
+          }
         }
       }
     }
 
-    // 2. Verificar en datos del usuario
+    // 3. Verificar en user:${email}.esCirculo
     if (!tieneAcceso) {
       const userData = await kv.get(`user:${usuarioEmail}`);
       if (userData?.esCirculo) {
         const expira = userData.circuloExpira ? new Date(userData.circuloExpira) : null;
         if (!expira || expira > new Date()) {
           tieneAcceso = true;
+          fuenteAcceso = 'user';
           datosUsuario = userData;
           planInfo = {
             plan: userData.circuloPlan,
+            planNombre: userData.circuloPlanNombre || userData.circuloPlan,
             expira: userData.circuloExpira,
             esPrueba: userData.circuloPrueba || false
           };
@@ -74,36 +138,27 @@ export async function POST(request) {
       }
     }
 
-    // 3. Verificar en elegidos
-    if (!tieneAcceso) {
-      const elegidoData = await kv.get(`elegido:${usuarioEmail}`);
-      if (elegidoData?.esCirculo) {
-        const expira = elegidoData.circuloExpira ? new Date(elegidoData.circuloExpira) : null;
-        if (!expira || expira > new Date()) {
-          tieneAcceso = true;
-          datosUsuario = elegidoData;
-          planInfo = {
-            plan: elegidoData.circuloPlan,
-            expira: elegidoData.circuloExpira,
-            esPrueba: elegidoData.circuloPrueba || false
-          };
-        }
-      }
-    }
+    // ═══════════════════════════════════════════════════════════
+    // CONSTRUIR RESPUESTA
+    // ═══════════════════════════════════════════════════════════
 
-    // Si tiene acceso, obtener/actualizar datos del usuario
     if (tieneAcceso) {
+      // Obtener datos completos del usuario si no los tenemos
       if (!datosUsuario) {
-        datosUsuario = await kv.get(`user:${usuarioEmail}`) ||
-                       await kv.get(`elegido:${usuarioEmail}`) ||
+        datosUsuario = await kv.get(`elegido:${usuarioEmail}`) ||
+                       await kv.get(`user:${usuarioEmail}`) ||
                        {};
       }
 
-      // Registrar última visita
+      // Registrar última visita al Círculo
+      const visitaActual = await kv.get(`circulo:visita:${usuarioEmail}`);
       await kv.set(`circulo:visita:${usuarioEmail}`, {
         ultima: new Date().toISOString(),
-        contador: (await kv.get(`circulo:visita:${usuarioEmail}`))?.contador + 1 || 1
+        contador: (visitaActual?.contador || 0) + 1
       });
+
+      // Obtener token del usuario si no lo tenemos
+      const tokenUsuario = datosUsuario.token || tokenData?.token || token;
 
       return Response.json({
         success: true,
@@ -111,21 +166,33 @@ export async function POST(request) {
         usuario: {
           email: usuarioEmail,
           nombre: datosUsuario.nombre || datosUsuario.nombrePreferido || usuarioEmail.split('@')[0],
-          nombrePreferido: datosUsuario.nombrePreferido
+          nombrePreferido: datosUsuario.nombrePreferido,
+          token: tokenUsuario
         },
-        plan: planInfo
+        plan: planInfo,
+        debug: {
+          fuente: fuenteAcceso,
+          verificadoEn: new Date().toISOString()
+        }
       });
     }
 
-    // Sin acceso
+    // Sin acceso - pero podemos dar info útil
     return Response.json({
       success: true,
       acceso: false,
-      error: 'No tenés acceso activo al Círculo de Duendes'
+      usuario: {
+        email: usuarioEmail
+      },
+      error: 'No tenés acceso activo al Círculo de Duendes',
+      info: {
+        mensaje: 'Tu membresía puede haber expirado o no tenés una membresía activa.',
+        accion: 'Visitá nuestra tienda para activar tu acceso al Círculo.'
+      }
     });
 
   } catch (error) {
-    console.error('Error verificando acceso:', error);
+    console.error('Error verificando acceso al Círculo:', error);
     return Response.json({
       success: false,
       acceso: false,
@@ -143,11 +210,12 @@ export async function GET(request) {
   if (!token && !email) {
     return Response.json({
       success: false,
-      error: 'Token o email requerido'
+      acceso: false,
+      error: 'Token o email requerido como query param'
     }, { status: 400 });
   }
 
-  // Redirigir al POST
+  // Crear request simulado para POST
   const fakeRequest = {
     json: async () => ({ token, email })
   };

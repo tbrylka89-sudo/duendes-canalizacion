@@ -64,13 +64,19 @@ export async function GET(request) {
     // Cargar lecturas completadas
     const lecturasCompletadas = await kv.get(`lecturas:${email}`) || [];
     
+    // Calcular nivel de acceso
+    const nivelAcceso = calcularNivelAcceso(elegido, circulo);
+
     // Construir objeto de usuario
     const usuario = {
       email: email,
       nombre: elegido.nombre || tokenData.nombre || 'Elegida',
       nombrePreferido: elegido.nombrePreferido || elegido.nombre || tokenData.nombre,
       pronombre: elegido.pronombre || 'ella',
-      
+
+      // Nivel de acceso (gratis/compro/circulo)
+      nivelAcceso: nivelAcceso,
+
       // Onboarding, Tour y Perfil
       onboardingCompleto: elegido.onboardingCompleto || false,
       tourVisto: elegido.tourVisto || false,
@@ -85,36 +91,37 @@ export async function GET(request) {
       tieneGuardianesFisicos: elegido.tieneGuardianesFisicos,
       guardianesFisicos: elegido.guardianesFisicos,
       comoNosConociste: elegido.comoNosConociste,
-      
+
       // Monedas
       treboles: elegido.treboles || 0,
       runas: elegido.runas || 0,
-      
+
       // Compras
       guardianes: elegido.guardianes || [],
       talismanes: elegido.talismanes || [],
       varas: elegido.varas || [],
       libros: elegido.libros || [],
       obsequios: elegido.obsequios || [],
-      
+
       // Stats
       totalCompras: elegido.totalCompras || 0,
       nivel: elegido.nivel || 1,
       tituloNivel: calcularTituloNivel(elegido.totalCompras || 0, elegido.pronombre || 'ella'),
-      
+
       // Círculo
       esCirculo: !!circulo && circulo.activo,
       circuloPlan: circulo?.plan,
       circuloExpira: circulo?.expira,
-      
+      circuloPruebaUsada: elegido.circuloPruebaUsada || false,
+
       // Lecturas
       lecturas: lecturasCompletadas,
       lecturasPendientes: lecturasPendientes,
-      
+
       // Fechas
       primeraCompra: elegido.primeraCompra,
       ultimaCompra: elegido.ultimaCompra,
-      
+
       // Metadata
       pais: elegido.pais,
       fechaNacimiento: elegido.fechaNacimiento
@@ -197,11 +204,63 @@ export async function POST(request) {
 
 function calcularTituloNivel(totalCompras, pronombre) {
   const sufijo = pronombre === 'ella' ? 'a' : pronombre === 'él' ? 'o' : 'e';
-  
+
   if (totalCompras >= 1000) return `Elegid${sufijo} del Santuario`;
   if (totalCompras >= 500) return `Guardián${sufijo} del Círculo`;
   if (totalCompras >= 300) return `Raíz Ancestral`;
   if (totalCompras >= 150) return `Trébol de Oro`;
   if (totalCompras >= 50) return `Brote Mágico`;
   return `Semilla Despierta`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULAR NIVEL DE ACCESO (gratis/compro/circulo)
+// ═══════════════════════════════════════════════════════════════
+
+function calcularNivelAcceso(elegido, circulo) {
+  // Nivel 3: Círculo - Miembro activo del Círculo
+  if (circulo && circulo.activo) {
+    const expira = circulo.expira ? new Date(circulo.expira) : null;
+    if (!expira || expira > new Date()) {
+      return {
+        nivel: 'circulo',
+        codigo: 3,
+        nombre: 'Círculo de Duendes',
+        descripcion: 'Acceso completo a todo el contenido exclusivo',
+        esPrueba: circulo.esPrueba || circulo.plan === 'prueba-gratis',
+        expira: circulo.expira
+      };
+    }
+  }
+
+  // Nivel 2: Compró - Ha comprado al menos un guardián u otro producto
+  const tieneCompras = (
+    (elegido.guardianes && elegido.guardianes.length > 0) ||
+    (elegido.talismanes && elegido.talismanes.length > 0) ||
+    (elegido.varas && elegido.varas.length > 0) ||
+    (elegido.libros && elegido.libros.length > 0) ||
+    (elegido.totalCompras && elegido.totalCompras > 0)
+  );
+
+  if (tieneCompras) {
+    return {
+      nivel: 'compro',
+      codigo: 2,
+      nombre: 'Guardián Adoptado',
+      descripcion: 'Acceso completo a las funciones estándar',
+      esPrueba: false,
+      expira: null
+    };
+  }
+
+  // Nivel 1: Gratis - Solo registrado, sin compras
+  return {
+    nivel: 'gratis',
+    codigo: 1,
+    nombre: 'Explorador',
+    descripcion: 'Acceso limitado - algunas funciones están bloqueadas',
+    esPrueba: false,
+    expira: null,
+    puedeProbarCirculo: !elegido.circuloPruebaUsada
+  };
 }

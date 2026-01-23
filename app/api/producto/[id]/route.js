@@ -97,6 +97,7 @@ export async function GET(request, { params }) {
   const productId = params.id;
   const { searchParams } = new URL(request.url);
   const pais = searchParams.get('pais')?.toUpperCase() || 'UY';
+  const campos = searchParams.get('campos'); // 'cierres' para solo cierres
 
   try {
     // 1. Intentar obtener datos enriquecidos de KV
@@ -110,6 +111,43 @@ export async function GET(request, { params }) {
         success: false,
         error: 'Producto no encontrado'
       }, { status: 404, headers: CORS_HEADERS });
+    }
+
+    // 2.5 Extraer CIERRES DINÁMICOS de meta_data (6 perfiles)
+    let cierresDinamicos = null;
+    if (productoWoo.meta_data) {
+      const cierres = {};
+      const perfiles = ['vulnerable', 'esceptico', 'impulsivo', 'coleccionista', 'racional', 'default'];
+
+      for (const meta of productoWoo.meta_data) {
+        // Buscar cada perfil
+        for (const perfil of perfiles) {
+          if (meta.key === `_cierre_${perfil}`) {
+            cierres[perfil] = meta.value;
+          }
+        }
+        // También buscar el JSON completo
+        if (meta.key === '_cierres_json') {
+          try {
+            cierresDinamicos = JSON.parse(meta.value);
+          } catch (e) {
+            // Ignorar error de parsing
+          }
+        }
+      }
+      // Si no hay JSON pero hay cierres individuales, usarlos
+      if (!cierresDinamicos && Object.keys(cierres).length > 0) {
+        cierresDinamicos = cierres;
+      }
+    }
+
+    // Si solo piden cierres (para el detector de perfil), devolver solo eso
+    if (campos === 'cierres') {
+      return Response.json({
+        success: true,
+        productoId: productoWoo.id,
+        cierres: cierresDinamicos
+      }, { headers: CORS_HEADERS });
     }
 
     // 3. Determinar moneda según país
@@ -299,7 +337,12 @@ export async function GET(request, { params }) {
         version: '1.0',
         paisDetectado: pais,
         monedaUsada: moneda
-      }
+      },
+
+      // CIERRES DINÁMICOS por perfil psicológico
+      // Usados por detector-perfil-guardian.js para mostrar cierre personalizado
+      cierresDinamicos: cierresDinamicos,
+      tieneCierresDinamicos: !!cierresDinamicos
     };
 
     return Response.json(respuesta, { headers: CORS_HEADERS });
