@@ -1,12 +1,30 @@
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import { Resend } from 'resend';
+import crypto from 'crypto';
 import { PAQUETES_RUNAS, MEMBRESIAS, XP_ACCIONES, obtenerNivel } from '@/lib/gamificacion/config';
+import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
+
+export const dynamic = 'force-dynamic';
 
 // ═══════════════════════════════════════════════════════════════
-// WEBHOOK DE WOOCOMMERCE - COMPRA COMPLETADA
-// Maneja: Guardianes, Runas de Poder, Membresías del Círculo
+// WEBHOOK UNIFICADO DE WOOCOMMERCE
+// Maneja: Guardianes, Runas de Poder, Membresías del Círculo,
+// Lecturas Ancestrales, Verificación de firma, Reporte diario
 // ═══════════════════════════════════════════════════════════════
+
+// Verificar firma del webhook de WooCommerce
+function verificarFirma(payload, signature, secret) {
+  if (!secret) return true; // Si no hay secret configurado, aceptar todo (dev)
+  if (!signature) return false;
+
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('base64');
+
+  return signature === expectedSignature;
+}
 
 // Mapa de paquetes de runas por SKU y slug para lookup rápido
 const RUNAS_POR_SKU = {};
@@ -31,20 +49,45 @@ for (const [key, membresia] of Object.entries(MEMBRESIAS)) {
 export async function POST(request) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const resend = new Resend(process.env.RESEND_API_KEY);
-  
+
   try {
-    const orden = await request.json();
-    
+    // ═══════════════════════════════════════════════════════════
+    // VERIFICACIÓN DE FIRMA Y PARSING
+    // ═══════════════════════════════════════════════════════════
+
+    const webhookSecret = process.env.WOOCOMMERCE_WEBHOOK_SECRET;
+    const signature = request.headers.get('x-wc-webhook-signature');
+    const rawBody = await request.text();
+
+    // Verificar firma si hay secret configurado
+    if (webhookSecret && !verificarFirma(rawBody, signature, webhookSecret)) {
+      console.log('[WEBHOOK-WOO] Firma inválida');
+      return Response.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const orden = JSON.parse(rawBody);
+
     // Verificar que es una orden válida
     if (!orden || !orden.id || !orden.billing?.email) {
       return Response.json({ success: false, error: 'Orden inválida' }, { status: 400 });
     }
-    
+
     const email = orden.billing.email.toLowerCase();
     const nombre = orden.billing.first_name || 'Amiga';
     const ordenId = orden.id;
     const total = parseFloat(orden.total) || 0;
-    
+
+    // ═══════════════════════════════════════════════════════════
+    // VERIFICAR DUPLICADOS
+    // ═══════════════════════════════════════════════════════════
+
+    const ordenKey = `orden:procesada:${ordenId}`;
+    const yaProc = await kv.get(ordenKey);
+    if (yaProc) {
+      console.log(`[WEBHOOK-WOO] Orden ${ordenId} ya procesada anteriormente`);
+      return Response.json({ success: true, ignored: true, reason: 'already_processed' });
+    }
+
     console.log(`Procesando orden #${ordenId} de ${email}`);
     
     // Cargar o crear datos del elegido
@@ -406,31 +449,151 @@ export async function POST(request) {
     // ═══════════════════════════════════════════════════════════
     // ACTUALIZAR STATS GENERALES
     // ═══════════════════════════════════════════════════════════
-    
+
     elegido.totalCompras = (elegido.totalCompras || 0) + total;
     elegido.ultimaCompra = new Date().toISOString();
     elegido.ordenes = [...(elegido.ordenes || []), ordenId];
     elegido.nivel = calcularNivel(elegido.totalCompras);
-    
+
     // Guardar elegido actualizado
     await kv.set(`elegido:${email}`, elegido);
-    
-    return Response.json({ 
-      success: true, 
-      mensaje: 'Orden procesada correctamente',
+
+    // ═══════════════════════════════════════════════════════════
+    // DETECTAR LECTURAS ANCESTRALES Y PROGRAMAR GENERACIÓN
+    // ═══════════════════════════════════════════════════════════
+
+    let esLectura = false;
+    let tieneGuardianes = guardianes.length > 0;
+
+    for (const item of items) {
+      const nombreItem = item.name?.toLowerCase() || '';
+      const skuItem = item.sku?.toLowerCase() || '';
+      if (nombreItem.includes('lectura ancestral') || skuItem.includes('lectura-ancestral')) {
+        esLectura = true;
+      }
+    }
+
+    // Programar generación de contenido según horario
+    if (esLectura || tieneGuardianes) {
+      const ahora = new Date();
+      const hora = ahora.getHours();
+      let generateAt;
+
+      if (esLectura && !tieneGuardianes) {
+        // Lectura ancestral sola: 20 minutos
+        generateAt = Date.now() + (20 * 60 * 1000);
+      } else if (hora >= 6 && hora < 18) {
+        // 06:00 - 17:59: esperar 4 horas
+        generateAt = Date.now() + (4 * 60 * 60 * 1000);
+      } else if (hora >= 18 && hora < 22) {
+        // 18:00 - 21:59: esperar hasta las 08:00 del día siguiente
+        const manana = new Date(ahora);
+        manana.setDate(manana.getDate() + 1);
+        manana.setHours(8, 0, 0, 0);
+        generateAt = manana.getTime();
+      } else {
+        // 22:00 - 05:59: esperar hasta las 10:00
+        const objetivo = new Date(ahora);
+        if (hora >= 22) objetivo.setDate(objetivo.getDate() + 1);
+        objetivo.setHours(10, 0, 0, 0);
+        generateAt = objetivo.getTime();
+      }
+
+      // Guardar orden pendiente de generación
+      const tipoPendiente = esLectura && tieneGuardianes ? 'ambos' : esLectura ? 'lectura' : 'portal';
+      await kv.set(`pending:${ordenId}`, {
+        orderId: ordenId,
+        orderData: orden,
+        createdAt: Date.now(),
+        generateAt,
+        status: 'pending',
+        tipo: tipoPendiente,
+        esLectura,
+        tieneGuardianes
+      });
+
+      // Agregar a lista de pendientes
+      const pendingOrders = await kv.get('pending_orders') || [];
+      if (!pendingOrders.includes(ordenId.toString())) {
+        pendingOrders.push(ordenId.toString());
+        await kv.set('pending_orders', pendingOrders);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // REGISTRAR EVENTO PARA REPORTE DIARIO
+    // ═══════════════════════════════════════════════════════════
+
+    registrarEvento(TIPOS_EVENTO.VENTA, {
+      orderId: ordenId,
+      total,
+      moneda: orden.currency,
+      productos: items.map(i => i.name).join(', '),
+      cantidadItems: items.length,
+      pais: orden.billing?.country,
+      tipo: esLectura ? (tieneGuardianes ? 'ambos' : 'lectura') : 'guardian',
+      esLectura,
+      tieneGuardianes,
       guardianes: guardianes.length,
       runas: runasCompradas.reduce((s, r) => s + r.cantidad, 0),
       membresias: membresias.length,
       esPrimeraCompra
     });
-    
+
+    // ═══════════════════════════════════════════════════════════
+    // MARCAR ORDEN COMO PROCESADA (anti-duplicados)
+    // ═══════════════════════════════════════════════════════════
+
+    await kv.set(ordenKey, {
+      email,
+      procesado: new Date().toISOString(),
+      guardianes: guardianes.length,
+      runas: runasCompradas.reduce((s, r) => s + r.cantidad, 0),
+      membresias: membresias.length
+    }, { ex: 30 * 24 * 60 * 60 }); // Expira en 30 días
+
+    return Response.json({
+      success: true,
+      mensaje: 'Orden procesada correctamente',
+      guardianes: guardianes.length,
+      runas: runasCompradas.reduce((s, r) => s + r.cantidad, 0),
+      membresias: membresias.length,
+      esPrimeraCompra,
+      esLectura,
+      tieneGuardianes
+    });
+
   } catch (error) {
     console.error('Error en webhook:', error);
-    return Response.json({ 
-      success: false, 
-      error: error.message 
+
+    // Registrar error para reporte
+    registrarEvento(TIPOS_EVENTO.ERROR_API, {
+      endpoint: '/api/webhooks/woocommerce',
+      error: error.message
+    });
+
+    return Response.json({
+      success: false,
+      error: error.message
     }, { status: 500 });
   }
+}
+
+// GET para verificar que el webhook está activo
+export async function GET() {
+  return Response.json({
+    status: 'active',
+    endpoint: '/api/webhooks/woocommerce',
+    message: 'Webhook unificado de WooCommerce. Maneja: Guardianes, Runas, Membresías, Lecturas.',
+    features: [
+      'Verificación de firma',
+      'Protección anti-duplicados',
+      'Gamificación automática',
+      'Emails transaccionales',
+      'Programación de canalizaciones',
+      'Registro para reporte diario'
+    ]
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
