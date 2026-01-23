@@ -22,8 +22,54 @@ export async function GET(request) {
     const incluirContenido = url.searchParams.get('contenido') !== '0';
     const generarMensaje = url.searchParams.get('mensaje') === '1';
 
-    // Obtener duende actual
-    const duendeActual = await kv.get('duende-semana:actual');
+    // Obtener duende actual - buscar en múltiples formatos
+    let duendeActual = await kv.get('duende-semana:actual');
+
+    // Si no existe, buscar en formato nuevo (circulo:duende-semana:año:mes:semana)
+    if (!duendeActual) {
+      const ahora = new Date();
+      const año = ahora.getFullYear();
+      const mes = ahora.getMonth() + 1;
+      const dia = ahora.getDate();
+
+      // Determinar número de semana del mes
+      let semanaNum = 1;
+      if (dia >= 22) semanaNum = 4;
+      else if (dia >= 15) semanaNum = 3;
+      else if (dia >= 8) semanaNum = 2;
+
+      const semanaKey = `circulo:duende-semana:${año}:${mes}:${semanaNum}`;
+      const semanaData = await kv.get(semanaKey);
+
+      if (semanaData) {
+        // También cargar guardianes maestros para datos completos
+        const guardianes = await kv.get('circulo:guardianes-maestros');
+        const guardianInfo = guardianes?.[semanaData.guardianId] || {};
+
+        duendeActual = {
+          nombre: semanaData.guardianNombre || guardianInfo.nombre,
+          nombreCompleto: guardianInfo.nombreCompleto,
+          imagen: guardianInfo.imagen,
+          categoria: guardianInfo.categoria,
+          descripcion: semanaData.descripcion,
+          proposito: semanaData.tema,
+          elemento: guardianInfo.elemento,
+          cristales: guardianInfo.cristales,
+          personalidadGenerada: {
+            manera_de_hablar: guardianInfo.personalidad,
+            tono_emocional: guardianInfo.personalidad?.split(',')[0] || 'cálido',
+            como_da_consejos: guardianInfo.personalidad?.split('.')[1] || 'con amor',
+            frase_caracteristica: guardianInfo.frasesTipicas?.[0] || '',
+            forma_de_despedirse: guardianInfo.despedida,
+            temas_favoritos: guardianInfo.temas
+          },
+          fechaInicio: semanaData.inicio,
+          fechaFin: semanaData.fin,
+          color: guardianInfo.color,
+          saludo: guardianInfo.saludo
+        };
+      }
+    }
 
     if (!duendeActual) {
       return Response.json({
