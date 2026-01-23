@@ -301,16 +301,20 @@ El archivo `/app/mi-magia/page.jsx` fue refactorizado de 8000 líneas a módulos
 - Generación de contenido con Claude funciona (ANTHROPIC_API_KEY activa)
 - El contenido existente (días 1-26 de enero) se muestra correctamente
 
-**⚠️ ISSUE PENDIENTE:**
-- El contenido NUEVO generado con `generar-contenido-pro` no se guarda en KV
-- La API devuelve `success: true` y el contenido, pero al consultar no existe
-- KV_REST_API_URL y KV_REST_API_TOKEN están configurados en Vercel
-- Posibles causas: permisos de escritura, token de otro proyecto, rate limit
+4. **Admin API y User API no sincronizadas** ✅
+   - **Causa:** Admin API solo buscaba en formato `circulo:contenido:año:mes:dia` pero User API buscaba en AMBOS formatos (`circulo:contenido:` Y `contenido:YYYY-MM-DD`)
+   - **Archivo:** `/api/admin/circulo/contenidos/route.js`
+   - **Fix:**
+     - Agregada función helper `obtenerContenido()` (igual que User API)
+     - Admin API ahora busca en ambos formatos de key
+     - Soporte para parámetro `ano` (sin ñ) además de `año`
+   - **Resultado:** Ambas APIs ahora devuelven los mismos resultados
 
 **Commits de esta sesión:**
 1. `Fix token parsing in cofre-diario API`
 2. `Fix Círculo Dashboard to support all content formats`
 3. `Add support for DALL-E generated images in Círculo Dashboard`
+4. `Sync Admin and User APIs to search both content key formats`
 
 ---
 

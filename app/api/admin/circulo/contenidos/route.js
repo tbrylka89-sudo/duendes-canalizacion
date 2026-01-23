@@ -6,18 +6,31 @@ export const dynamic = 'force-dynamic';
 // LISTAR CONTENIDOS DE EL CÍRCULO POR MES
 // ═══════════════════════════════════════════════════════════════
 
+// Helper para buscar contenido en ambos formatos de key (igual que la API de usuario)
+async function obtenerContenido(año, mes, dia) {
+  // Formato 1: circulo:contenido:año:mes:dia
+  let contenido = await kv.get(`circulo:contenido:${año}:${mes}:${dia}`);
+  if (contenido) return contenido;
+
+  // Formato 2: contenido:YYYY-MM-DD
+  const fechaFormateada = `${año}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  contenido = await kv.get(`contenido:${fechaFormateada}`);
+  return contenido;
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const mes = parseInt(searchParams.get('mes')) || (new Date().getMonth() + 1);
-    const año = parseInt(searchParams.get('año')) || new Date().getFullYear();
+    // Aceptar tanto "año" como "ano" para compatibilidad con encoding
+    const año = parseInt(searchParams.get('año') || searchParams.get('ano')) || new Date().getFullYear();
 
-    // Buscar todos los contenidos del mes
+    // Buscar todos los contenidos del mes en ambos formatos
     const contenidos = [];
     const diasEnMes = new Date(año, mes, 0).getDate();
 
     for (let dia = 1; dia <= diasEnMes; dia++) {
-      const contenido = await kv.get(`circulo:contenido:${año}:${mes}:${dia}`);
+      const contenido = await obtenerContenido(año, mes, dia);
       if (contenido) {
         contenidos.push(contenido);
       }
