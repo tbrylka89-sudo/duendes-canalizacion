@@ -111,7 +111,7 @@ Precio                          | Orden en que ve productos
 | **Claude** | `ANTHROPIC_API_KEY` | ✅ | Historias, contenido Círculo, cursos |
 | **OpenAI/DALL-E** | `OPENAI_API_KEY` | ✅ | Imágenes para contenido y cursos |
 | **Replicate** | `REPLICATE_API_TOKEN` | ✅ | Flux, SDXL, video (Minimax, Luma, Kling) |
-| **Gemini** | `GEMINI_API_KEY` | ❌ | Cursos alternativos, imágenes Nano Banana |
+| **Gemini** | `GEMINI_API_KEY` | ✅ | Cursos alternativos, imágenes Nano Banana |
 | **WP Media** | `WP_APP_PASSWORD` | ❌ | Subir archivos a WordPress |
 
 ### Endpoints de generación de imágenes:
