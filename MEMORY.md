@@ -163,6 +163,7 @@ Precio                          | Orden en que ve productos
 | `/app/api/admin/circulo/seed-enero/route.js` | API para poblar KV con contenido de enero |
 | `/app/mi-magia/circulo/Dashboard.jsx` | Dashboard del Círculo con guardián de la semana |
 | `/app/api/comunidad/bots/route.js` | Sistema de bots del foro (50 perfiles, 62+ posts) |
+| `/wordpress-plugins/duendes-hub-control.php` | Plugin WP Hub v3.0 - Panel central con todas las URLs |
 
 ---
 
@@ -281,6 +282,107 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ## ÚLTIMAS SESIONES
 
+### 2026-01-24 (sesión 12) - COMPLETADA
+
+**🚀 SISTEMA SEO COMPLETO IMPLEMENTADO**
+
+Sistema SEO profesional para visibilidad óptima en buscadores.
+
+**1. ROBOTS.TXT** ✅
+- **Archivo:** `/public/robots.txt`
+- Permite: /, /tienda
+- Bloquea: /mi-magia/*, /lectura/*, /guardian/*, /certificado/*, /portal/*, /api/*, /admin/*
+- Incluye referencia a sitemap
+
+**2. SITEMAP.XML DINÁMICO** ✅
+- **Archivo:** `/app/sitemap.js`
+- Genera sitemap dinámicamente con productos de WooCommerce
+- Prioridades: home (1.0), tienda (0.9), productos (0.8)
+- Change frequency configurada
+- URL: https://duendes-vercel.vercel.app/sitemap.xml
+
+**3. METADATA SEO COMPLETO** ✅
+- **Archivo:** `/lib/seo/metadata.js`
+- Funciones: generateProductMetadata(), generatePageMetadata(), generatePrivateMetadata()
+- OpenGraph completo (title, description, images, locale es_UY)
+- Twitter Cards (summary_large_image)
+- Canonical URLs
+- Keywords optimizadas (16+ keywords)
+- noindex/nofollow para páginas privadas
+
+**4. SCHEMA MARKUP JSON-LD** ✅
+- **Archivo:** `/lib/seo/schema.js`
+- Organization schema (fundadora, dirección, logo)
+- LocalBusiness/ArtStore schema (Piriápolis, geo coords)
+- WebSite schema con SearchAction
+- Product schema para productos
+- BreadcrumbList schema
+- ItemList/CollectionPage para tienda
+- Componente: `/app/components/SchemaMarkup.jsx`
+
+**5. RANKMATH 100/100 OPTIMIZATION** ✅
+- **Archivo:** `/lib/seo/rankmath.js`
+- generateRankMathMeta() - metadata completa para RankMath
+- analyzeRankMathScore() - análisis 0-100 con sugerencias
+- generateLSIKeywords() - keywords semánticamente relacionadas
+- generateAltText() - alt text para imágenes
+- generateInternalLinks() - enlaces internos sugeridos
+
+**6. APIs SEO** ✅
+- `/api/seo/analyze` - GET: Analiza SEO de producto, POST: Análisis masivo
+- `/api/seo/bulk-update` - Actualización masiva de SEO en WooCommerce
+
+**7. PÁGINAS DE PRODUCTO SEO** ✅
+- **Archivo:** `/app/producto/[slug]/page.jsx`
+- Server Component con generateMetadata() dinámico
+- generateStaticParams() para pre-renderizar productos populares
+- Schema JSON-LD de producto
+- Breadcrumbs, imagen, precio, descripción, relacionados
+- Helper: `/lib/woocommerce/api.js`
+
+**8. CONFIGURACIÓN NEXT.JS** ✅
+- **Archivo:** `next.config.js` actualizado
+- Headers de seguridad (X-DNS-Prefetch-Control, X-Content-Type-Options, Referrer-Policy)
+- poweredByHeader: false
+- compress: true
+- trailingSlash: false
+
+**9. PWA MANIFEST** ✅
+- **Archivo:** `/public/site.webmanifest`
+- Nombre, descripción, colores de marca
+- Iconos configurados
+
+**Archivos creados:**
+| Archivo | Descripción |
+|---------|-------------|
+| `/public/robots.txt` | Reglas para crawlers |
+| `/public/site.webmanifest` | PWA manifest |
+| `/app/sitemap.js` | Sitemap dinámico |
+| `/lib/seo/metadata.js` | Funciones de metadata |
+| `/lib/seo/schema.js` | Generadores JSON-LD |
+| `/lib/seo/rankmath.js` | Optimización RankMath |
+| `/lib/seo/index.js` | Exportaciones centralizadas |
+| `/lib/woocommerce/api.js` | Helper API WooCommerce |
+| `/app/components/SchemaMarkup.jsx` | Componente JSON-LD |
+| `/app/producto/[slug]/page.jsx` | Página de producto |
+| `/app/tienda/layout.js` | SEO tienda |
+| `/app/mi-magia/layout.js` | noindex páginas privadas |
+| `/app/api/seo/analyze/route.js` | API análisis SEO |
+| `/app/api/seo/bulk-update/route.js` | API actualización masiva |
+
+**Verificaciones:**
+- ✅ robots.txt accesible
+- ✅ sitemap.xml generando productos
+- ✅ OpenGraph tags en todas las páginas
+- ✅ Twitter Cards funcionando
+- ✅ JSON-LD inyectado (Organization, WebSite, LocalBusiness)
+- ✅ PWA manifest accesible
+- ✅ Canonical URLs configuradas
+
+**Commit:** `Complete SEO system for optimal search engine visibility`
+
+---
+
 ### 2026-01-24 (sesión 11) - COMPLETADA
 
 **🎯 CÍRCULO DE DUENDES: SISTEMA COMPLETO ENERO 2026**
@@ -345,6 +447,14 @@ Sistema completo del Círculo de Duendes con contenido pre-generado para todo en
 | `/app/api/admin/circulo/seed-enero/route.js` | NUEVO | API para poblar KV con contenido |
 | `/app/mi-magia/circulo/Dashboard.jsx` | MODIFICADO | Muestra guardián de la semana |
 | `/app/api/comunidad/bots/route.js` | MODIFICADO | 50 bots + 62 posts |
+| `/wordpress-plugins/duendes-hub-control.php` | ACTUALIZADO | Hub v3.0 con URLs del Círculo |
+
+**7. PLUGIN HUB ACTUALIZADO v3.0** ✅
+- Nueva sección: Guardianes Maestros del Círculo
+- Nueva sección: APIs del Círculo (contenido, bots, cursos)
+- Tabla de integraciones IA (Claude, DALL-E, Gemini, Replicate)
+- Badges de guardianes con colores
+- Referencia rápida actualizada para enero 2026
 
 ---
 
