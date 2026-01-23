@@ -2,6 +2,7 @@ import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
 import { actualizarFichaPostChat } from '@/lib/ficha-cliente';
+import { obtenerPerfil, NIVELES_VULNERABILIDAD, TIPOS_DOLOR, ESTILOS_DECISION, TIPOS_CREENCIAS } from '@/lib/circulo/perfilado';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -408,9 +409,23 @@ ${pedido.meta_data?.find(m => m.key === '_tracking_number')?.value ?
     }
 
     // ═══════════════════════════════════════════════════════════
+    // CARGAR PERFIL PSICOLÓGICO (si existe)
+    // ═══════════════════════════════════════════════════════════
+
+    let perfilPsicologico = null;
+    const clienteEmail = email || memoriaVisitante?.email;
+    if (clienteEmail) {
+      try {
+        perfilPsicologico = await obtenerPerfil(clienteEmail);
+      } catch (e) {
+        console.error('Error cargando perfil psicológico:', e);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // DETECTAR SI VOLVIÓ (RETARGETING)
     // ═══════════════════════════════════════════════════════════
-    
+
     let esRetorno = false;
     let mensajeRetorno = '';
     
@@ -509,6 +524,72 @@ ${pedido.meta_data?.find(m => m.key === '_tracking_number')?.value ?
       }
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // CONTEXTO DE PERFIL PSICOLÓGICO
+    // ═══════════════════════════════════════════════════════════
+
+    let perfilTexto = '';
+    if (perfilPsicologico && !esAdmin) {
+      const vuln = perfilPsicologico.vulnerabilidad;
+      const dolor = perfilPsicologico.dolor;
+      const estilo = perfilPsicologico.estilo;
+      const creencias = perfilPsicologico.creencias;
+      const conversion = perfilPsicologico.conversion;
+
+      perfilTexto = `
+=== 🎯 PERFIL PSICOLÓGICO DE ESTA PERSONA ===
+⚠️ INFORMACIÓN CONFIDENCIAL - USA ESTO PARA ADAPTAR TU COMUNICACIÓN
+
+**VULNERABILIDAD: ${vuln?.nivel?.toUpperCase() || 'MEDIA'}**
+${vuln?.nivel === 'alta' ? `
+🚨 ALTA VULNERABILIDAD - MODO CONTENCIÓN
+- NO presiones NI uses urgencia
+- Escuchá más de lo que hablás
+- Validá sus emociones primero
+- Si menciona crisis, derivá a profesionales
+- Enfoque: EMPATÍA PRIMERO, venta después (o nunca)
+` : vuln?.nivel === 'media' ? `
+⚡ VULNERABILIDAD MEDIA - MODO EQUILIBRADO
+- Podés mencionar productos pero con tacto
+- Escuchá su situación antes de recomendar
+- Usá testimoniomios de personas similares
+- Enfoque: VALOR GRADUAL
+` : `
+✅ VULNERABILIDAD BAJA - MODO ACTIVO
+- Podés ser más directo con ofertas
+- Usá urgencia real (escasez, tiempo)
+- Enfoque: OFERTA DIRECTA pero elegante
+`}
+
+**DOLOR PRINCIPAL: ${dolor?.tipo?.toUpperCase() || 'PROPÓSITO'}**
+${dolor?.tipo === 'soledad' ? '💔 Busca CONEXIÓN y sentirse acompañada' : ''}
+${dolor?.tipo === 'dinero' ? '💰 Preocupada por ABUNDANCIA/DINERO - cuidado con presión económica' : ''}
+${dolor?.tipo === 'salud' ? '🏥 Tema de SALUD - sé delicado, no prometas curas' : ''}
+${dolor?.tipo === 'relaciones' ? '👥 Problemas de RELACIONES - escuchá sin juzgar' : ''}
+${dolor?.tipo === 'proposito' ? '🧭 Busca PROPÓSITO/DIRECCIÓN - guiala hacia claridad' : ''}
+Mensajes que resuenan: ${dolor?.mensajes?.slice(0, 2).join(' | ') || 'No disponible'}
+
+**ESTILO DE DECISIÓN: ${estilo?.tipo?.toUpperCase() || 'EMOCIONAL'}**
+${estilo?.tipo === 'impulsivo' ? '⚡ IMPULSIVA - Decide rápido. Usá: escasez real, acción inmediata, "este es el momento"' : ''}
+${estilo?.tipo === 'analitico' ? '🧠 ANALÍTICA - Necesita datos. Usá: beneficios claros, comparativas, garantías, tiempo para pensar' : ''}
+${estilo?.tipo === 'emocional' ? '💝 EMOCIONAL - Decide con el corazón. Usá: historias, testimonios, conexión personal' : ''}
+
+**CREENCIAS: ${creencias?.tipo?.toUpperCase() || 'BUSCADOR'}**
+${creencias?.tipo === 'creyente' ? '✨ CREYENTE - Podés usar lenguaje místico completo (energía, ritual, portal, guardián)' : ''}
+${creencias?.tipo === 'buscador' ? '🔍 BUSCADORA - Lenguaje mixto (conexión, bienestar, comunidad, crecimiento)' : ''}
+${creencias?.tipo === 'esceptico' ? '🤔 ESCÉPTICA - Lenguaje práctico (bienestar, comunidad, contenido, herramientas). Evitá lo "místico"' : ''}
+
+**CIERRE RECOMENDADO: ${conversion?.cierreRecomendado?.toUpperCase() || 'VULNERABLE'}**
+${conversion?.cierreRecomendado === 'vulnerable' ? 'Suave, sin presión: "Cuando sientas que es el momento, acá estoy"' : ''}
+${conversion?.cierreRecomendado === 'impulsivo' ? 'Directo con urgencia: "Este guardián es único, si lo querés, es ahora"' : ''}
+${conversion?.cierreRecomendado === 'racional' ? 'Con datos: "Te paso los beneficios concretos para que decidas tranquila"' : ''}
+${conversion?.cierreRecomendado === 'esceptico' ? 'Sin magia: "Es una comunidad de mujeres que se apoyan, probá 15 días gratis"' : ''}
+${conversion?.cierreRecomendado === 'coleccionista' ? 'Exclusividad: "Este guardián es edición única, solo hay uno en el mundo"' : ''}
+
+Score conversión: ${conversion?.score || 50}/100 (${conversion?.probabilidad || 'media'})
+`;
+    }
+
     let adminTexto = '';
     if (esAdmin && statsAdmin) {
       adminTexto = `
@@ -579,6 +660,7 @@ ${productosTexto}
 ${contextoTexto}
 ${socialProof}
 ${memoriaTexto}
+${perfilTexto}
 ${mensajeRetorno}
 ${closerTexto}
 ${infoCliente}
@@ -804,6 +886,63 @@ ${esAdmin ?
           nuevaMemoria.infoPersonal.codigoPais = codigoPais;
         }
 
+        // === ACTUALIZAR PERFIL PSICOLÓGICO DESDE CONVERSACIÓN ===
+        // Si tenemos email y hay suficiente info, actualizar/crear perfil
+        const emailParaPerfil = email || nuevaMemoria.email;
+        if (emailParaPerfil && Object.keys(nuevaMemoria.infoPersonal).length >= 3) {
+          try {
+            const perfilExistente = await obtenerPerfil(emailParaPerfil);
+
+            // Construir actualizaciones desde la conversación
+            const actualizacionesPerfil = {};
+
+            // Detectar vulnerabilidad desde conversación
+            if (nuevaMemoria.infoPersonal.atravesandoMomentoDificil) {
+              actualizacionesPerfil.vulnerabilidadDetectada = 'alta';
+            }
+
+            // Detectar dolor desde motivoPrincipal
+            const mapaDolorMotivo = {
+              'protección': 'relaciones',
+              'abundancia': 'dinero',
+              'amor': 'relaciones',
+              'sanación': 'salud'
+            };
+            if (nuevaMemoria.infoPersonal.motivoPrincipal) {
+              actualizacionesPerfil.dolorDetectado = mapaDolorMotivo[nuevaMemoria.infoPersonal.motivoPrincipal] || 'proposito';
+            }
+
+            // Detectar estilo desde comportamiento
+            if (nuevaMemoria.interacciones <= 2 && contexto?.carrito > 0) {
+              actualizacionesPerfil.estiloDetectado = 'impulsivo';
+            } else if (nuevaMemoria.interacciones > 5) {
+              actualizacionesPerfil.estiloDetectado = 'analitico';
+            }
+
+            // Detectar creencias desde intereses
+            if (nuevaMemoria.infoPersonal.interesesEspirituales?.length >= 3) {
+              actualizacionesPerfil.creenciasDetectadas = 'creyente';
+            } else if (nuevaMemoria.infoPersonal.interesesEspirituales?.length >= 1) {
+              actualizacionesPerfil.creenciasDetectadas = 'buscador';
+            }
+
+            // Guardar actualizaciones en perfil
+            if (Object.keys(actualizacionesPerfil).length > 0) {
+              const perfilActualizado = {
+                ...(perfilExistente || {}),
+                actualizacionesDesdeChat: {
+                  ...(perfilExistente?.actualizacionesDesdeChat || {}),
+                  ...actualizacionesPerfil,
+                  ultimaActualizacion: new Date().toISOString()
+                }
+              };
+              await kv.set(`perfil:${emailParaPerfil.toLowerCase().trim()}`, perfilActualizado);
+            }
+          } catch (perfilError) {
+            console.error('Error actualizando perfil desde chat:', perfilError);
+          }
+        }
+
         await kv.set(`tito:visitante:${visitorId}`, nuevaMemoria, { ex: 60 * 24 * 60 * 60 });
 
         // === GUARDAR EN LISTA DE PERFILES PARA ADMIN ===
@@ -853,7 +992,14 @@ ${esAdmin ?
       respuesta: textoRespuesta,
       productos: productosRecomendados,
       esAdmin,
-      esRetorno
+      esRetorno,
+      // Info de perfilado (sin exponer datos sensibles)
+      perfil: perfilPsicologico ? {
+        tienePerfil: true,
+        vulnerabilidad: perfilPsicologico.vulnerabilidad?.nivel,
+        estiloDecision: perfilPsicologico.estilo?.tipo,
+        cierreRecomendado: perfilPsicologico.conversion?.cierreRecomendado
+      } : { tienePerfil: false }
     }, { headers: CORS_HEADERS });
     
   } catch (error) {
