@@ -207,8 +207,8 @@ export async function POST(request) {
     if (usuario) {
       const usuarioActualizado = {
         ...usuario,
-        perfil: perfilCompleto,
-        perfilCompletado: true,
+        perfilPsicologico: perfilCompleto,  // El test psicológico completo
+        perfiladoCompletado: true,           // Flag para no mostrar de nuevo
         genero: datosAdicionales?.genero || usuario.genero,
         fechaNacimiento: datosAdicionales?.fechaNacimiento || usuario.fechaNacimiento
       };

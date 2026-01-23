@@ -81,6 +81,9 @@ export async function GET(request) {
       onboardingCompleto: elegido.onboardingCompleto || false,
       tourVisto: elegido.tourVisto || false,
       perfilCompleto: elegido.perfilCompleto || false,
+      // Perfilado psicológico (test de 6 preguntas)
+      perfilPsicologico: elegido.perfilPsicologico || null,
+      perfiladoCompletado: elegido.perfiladoCompletado || false,
       ultimaVerificacion: elegido.ultimaVerificacion,
 
       // Datos del perfil "Para Conocerme"
