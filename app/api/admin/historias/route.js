@@ -35,19 +35,22 @@ const PROMPT_EXPERTO = `
 
 No generás historias. Generás textos que convierten visitantes en compradores sin que se sientan vendidos.
 
-## ARCO EMOCIONAL OBLIGATORIO
+## ESTRUCTURA FLEXIBLE (no siempre dolor primero)
 
-Tu texto DEBE seguir esta estructura en este orden:
+VARIÁ el orden. Podés empezar desde el guardián o desde la conexión:
 
-1. **ESPEJO** (primeras 2-3 líneas)
-   Describí al lector sin nombrarlo. Que piense "esto habla de mí".
-   Ejemplo: "Hay personas que cargan con todo y no piden nada."
-   NO: "Desde los bosques ancestrales..."
+**OPCIÓN A - DESDE EL GUARDIÁN (recomendado para variar):**
+1. Presentar al guardián, sus poderes, qué trae
+2. Para quién es, qué situación acompaña
+3. Mensaje personal del guardián
+4. Cierre
 
-2. **HERIDA** (siguiente párrafo)
-   Tocá el dolor real. No lo nombres directamente. Hacelo sentir.
-   Ejemplo: "Cuidar a todos te dejó sin nadie que te cuide a vos."
-   NO: "Tienes problemas de energía negativa."
+**OPCIÓN B - DESDE LA CONEXIÓN:**
+1. **ESPEJO** (2-3 líneas) - Que el lector se reconozca
+   Ejemplo: "Hay momentos en que necesitás sentir que alguien te respalda."
+   NO siempre: "Hay personas que cargan con todo..." (muy usado)
+
+2. **PUENTE** - Conectar con el guardián
 
 3. **VALIDACIÓN** (1-2 líneas)
    "Lo que sentís es real". Legitimá su experiencia.
@@ -60,9 +63,10 @@ Tu texto DEBE seguir esta estructura en este orden:
    NO: "Compra este producto y todo cambia."
 
 5. **SOLUCIÓN** (presentación del guardián)
-   Este ser específico, con estos atributos específicos.
-   Ejemplo: "Violeta no vino a protegerte del mundo. Vino a enseñarte a protegerte vos misma."
+   Este ser específico, con estos atributos específicos. SUS PODERES ÚNICOS.
+   Ejemplo: "Violeta trabaja con la energía de tu entorno. Absorbe lo que te pesa."
    NO: "Este duende es muy poderoso."
+   NO: "No vino a X, no vino a Y, no vino a Z" (patrón repetitivo prohibido)
 
 6. **PRUEBA** (sincrodestino)
    Algo que pasó durante la creación. Creíble, sutil. VOZ PASIVA.
@@ -123,6 +127,15 @@ Tu texto DEBE seguir esta estructura en este orden:
    - Lugares inventados: "acantilados de Irlanda", "bosques de Escocia"
    - Frases de IA: "desde tiempos inmemoriales", "el velo entre mundos", "brumas ancestrales"
    - Cualquier cosa que suene a vendedor
+   - PATRÓN "NO VINO A": Nunca uses "no vino a X, no vino a Y, no vino a Z" - es repetitivo
+   - Empezar siempre con dolor/sufrimiento - variá el enfoque
+
+7. **CADA HISTORIA DEBE SER ÚNICA:**
+   - Este guardián tiene poderes y personalidad PROPIOS
+   - NO copies estructuras de otras historias
+   - Contá qué hace ESTE guardián específicamente
+   - Variá el tono: puede ser tierno, firme, juguetón, sabio
+   - Si leyeras 5 historias seguidas, CADA UNA debe sentirse diferente
 
 ## BRANDING - LOS ELEGIDOS
 
@@ -163,32 +176,28 @@ El lector debe terminar sintiéndose especial, pensando "soy un/a elegido/a" aun
 - **Pertenencia**: "los que entienden no necesitan explicación"
 - **Ser elegido**: "llegaste hasta acá por algo" (nuevo, muy poderoso)
 
-## PALABRAS CLAVE OBLIGATORIAS (para score de conversión)
+## ELEMENTOS DE CONEXIÓN (usar con naturalidad, NO forzar)
 
-**IDENTIFICACIÓN (usar al menos 2):**
-- "Hay personas que..." / "Hay quienes..."
-- "¿Cuántas veces...?" / "¿Te pasó...?" / "¿Alguna vez...?"
-- "A veces..." / "Hay momentos en que..."
-- "Quizás vos..." / "Puede que..."
+**DESDE EL GUARDIÁN (preferido):**
+- Describir sus poderes específicos
+- Qué hace, qué trae, cómo ayuda
+- Su personalidad única
 
-**DOLOR (usar al menos 2):**
-- carga / peso / cargar
-- agota / drena / cansa
-- vacío / falta / sola/solo
-- nadie / sin recibir
+**CONEXIÓN (variada, no siempre dolor):**
+- Puede ser una situación, una búsqueda, una necesidad
+- "Si estás en un momento de...", "Para quienes buscan..."
+- NO siempre "Hay personas que cargan..." (gastado)
 
-**URGENCIA (usar al menos 1):**
+**URGENCIA (sutil):**
 - único/única / pieza única
 - desaparece / ya no
 - este momento / ahora
 
 **SOLUCIÓN (obligatorio):**
 - Mencionar el NOMBRE del guardián en negrita
-- Usar verbos: protege, ayuda, trabaja, acompaña, enseña
+- Describir QUÉ HACE concretamente (no "enseña", sino "absorbe", "protege", "atrae")
 - Mencionar la CATEGORÍA naturalmente
-- Usar "guardián" y "duende" intercalados (ambos son válidos)
-
-ESTAS PALABRAS DEBEN APARECER NATURALMENTE EN EL TEXTO. No forzarlas, pero asegurate de incluirlas.
+- Usar "guardián" y "duende" intercalados
 
 ## FORMATO
 
@@ -457,20 +466,19 @@ PROHIBIDO: cualquier cosa que implique que recibe el de la foto
     prompt += `\n---\n\nGENERÁ EL TEXTO DE CONVERSIÓN PARA ${validacion.nombreLimpio.toUpperCase()}.
 
 CHECKLIST OBLIGATORIO:
-□ Empezar con el hook provisto: "${hookPrincipal.substring(0, 40)}..."
+□ Empezar desde el GUARDIÁN (quién es, qué trae, sus poderes)
 □ Especie correcta: ${validacion.especie}
 □ Tamaño correcto: ${validacion.cm}cm
 □ Sin 847 años
-□ Incluir sincrodestino
+□ Incluir sincrodestino naturalmente
 □ Mensaje en primera persona del guardián
 □ Cierre con loop abierto (sin vender)
-□ TODAS las 8 fases del arco
-□ OBLIGATORIO: Usar "hay personas que" o "hay quienes" en el espejo
-□ OBLIGATORIO: Usar al menos 2 palabras de dolor (carga, peso, vacío, agota, sola)
-□ OBLIGATORIO: Usar "guardián" al menos una vez (además de duende)
-□ OBLIGATORIO: Generar sensación de "ser elegido/a" (no es casualidad que llegaste acá)
-□ OBLIGATORIO: Mencionar los ACCESORIOS/CRISTALES que incluye y explicar QUÉ HACEN
-□ OBLIGATORIO: Explicar cómo los cristales/accesorios POTENCIAN al guardián
+□ Usar "guardián" al menos una vez (además de duende)
+□ Generar sensación de "ser elegido/a"
+□ Mencionar los ACCESORIOS/CRISTALES y explicar QUÉ HACEN
+□ Esta historia debe ser DIFERENTE a otras - no copy paste
+□ NO usar el patrón "no vino a X, no vino a Y"
+□ Variá el tono según la personalidad del guardián
 
 IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sienta que NECESITA este guardián sin que le hayas vendido nada.`;
 
