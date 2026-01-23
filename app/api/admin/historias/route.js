@@ -230,7 +230,9 @@ export async function POST(request) {
       perfil_objetivo,
       especializacion, // especialización elegida por el usuario
       subcategoria, // NUEVO: subcategoría específica (amor_propio, proteccion_hogar, etc)
-      temaLibre // NUEVO: tema escrito libremente por el usuario (ej: "fortuna y dinero", "proteger el hogar")
+      temaLibre, // NUEVO: tema escrito libremente por el usuario (ej: "fortuna y dinero", "proteger el hogar")
+      scoreAnterior, // PROTECCIÓN: score de la historia anterior (para regeneración)
+      intentoActual = 1 // Contador de intentos de regeneración
     } = await request.json();
 
     // === VALIDACIÓN PRE-GENERACIÓN ===
@@ -616,6 +618,28 @@ IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sient
       categoria
     });
     const evaluacionScore = evaluarScore(score);
+
+    // === PROTECCIÓN DE SCORE EN REGENERACIÓN ===
+    // Si hay un score anterior y el nuevo es MENOR, regenerar automáticamente (máx 3 intentos)
+    if (scoreAnterior && score.total < scoreAnterior && intentoActual < 3) {
+      console.log(`[Historias] Score nuevo (${score.total}) menor que anterior (${scoreAnterior}), regenerando... (intento ${intentoActual + 1})`);
+
+      // Hacer llamada recursiva con nuevo intento
+      const nuevoRequest = new Request(request.url, {
+        method: 'POST',
+        headers: request.headers,
+        body: JSON.stringify({
+          productoId, nombre, categoria, tamano, tamanoCm, accesorios, especie, esUnico,
+          analisisImagen, respuestasEncuesta, sincrodestino_custom, sincrodestinos_usados,
+          hooks_usados, feedbackRegeneracion, perfil_objetivo, especializacion, subcategoria, temaLibre,
+          scoreAnterior, // Mantener el score original a superar
+          intentoActual: intentoActual + 1
+        })
+      });
+
+      // Llamar recursivamente
+      return POST(nuevoRequest);
+    }
 
     // === DETECTAR FRASES DE IA ===
     const frasesIADetectadas = detectarFrasesIA(historia);

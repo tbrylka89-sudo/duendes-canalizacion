@@ -1363,12 +1363,17 @@ Necesito conocer algunos datos. Empecemos:
   };
 
   // Generar historia directo desde catálogo local
-  const generarDirecto = async (especializacionOverride = null) => {
+  const generarDirecto = async (especializacionOverride = null, esRegeneracion = false) => {
     const guardian = directoGuardian;
     if (!guardian) return;
 
     // Determinar la especialización a usar
     const especializacion = especializacionOverride || directoEspecializacionTexto || directoEspecializacion;
+
+    // Guardar score anterior si es regeneración (para protección de score)
+    const scoreAnteriorParaProteccion = esRegeneracion && directoConversion?.score?.total
+      ? directoConversion.score.total
+      : null;
 
     setDirectoHistoria('');
     setDirectoConversion(null);
@@ -1388,7 +1393,9 @@ Necesito conocer algunos datos. Empecemos:
           // Recreables: tamaños pequeños (≤15cm) EXCEPTO pixies que siempre son únicas
           esUnico: guardian.especie === 'pixie' || (guardian.cm || 18) > 15,
           // NUEVO: especialización elegida por el usuario
-          especializacion: especializacion
+          especializacion: especializacion,
+          // PROTECCIÓN: score anterior para que no baje al regenerar
+          scoreAnterior: scoreAnteriorParaProteccion
         })
       });
       const data = await res.json();
@@ -1696,7 +1703,9 @@ Necesito conocer algunos datos. Empecemos:
           especializacion: resultado.grupo,
           // FIX: Pasar hooks y sincrodestinos usados para evitar repeticiones
           hooks_usados: hooksUsadosEnGrupo,
-          sincrodestinos_usados: sincrodestUsadosEnGrupo
+          sincrodestinos_usados: sincrodestUsadosEnGrupo,
+          // PROTECCIÓN: score anterior para que no baje al regenerar
+          scoreAnterior: resultado.score?.total || null
         })
       });
 
@@ -2428,7 +2437,7 @@ Necesito conocer algunos datos. Empecemos:
                 <div className="acciones">
                   <button className="btn-secondary" onClick={() => setPaso(12)}>Volver al catálogo</button>
                   <button className="btn-secondary" onClick={() => setPaso(14)}>Cambiar especialización</button>
-                  <button className="btn-secondary" onClick={() => generarDirecto()}>Regenerar</button>
+                  <button className="btn-secondary" onClick={() => generarDirecto(null, true)}>Regenerar</button>
                   <button className="btn-primary" onClick={() => {
                     navigator.clipboard.writeText(directoHistoria);
                     alert('Historia copiada al portapapeles');
