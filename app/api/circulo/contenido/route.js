@@ -4,8 +4,20 @@ import { kv } from '@vercel/kv';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: Contenido del Círculo
-// Obtiene contenido diario guardado en circulo:contenido:año:mes:dia
+// Busca en ambos formatos: circulo:contenido:año:mes:dia Y contenido:YYYY-MM-DD
 // ═══════════════════════════════════════════════════════════════════════════════
+
+// Helper para obtener contenido de cualquier formato de key
+async function obtenerContenido(año, mes, dia) {
+  // Formato 1: circulo:contenido:año:mes:dia
+  let contenido = await kv.get(`circulo:contenido:${año}:${mes}:${dia}`);
+  if (contenido) return contenido;
+
+  // Formato 2: contenido:YYYY-MM-DD
+  const fechaFormateada = `${año}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  contenido = await kv.get(`contenido:${fechaFormateada}`);
+  return contenido;
+}
 
 export async function GET(request) {
   try {
@@ -14,6 +26,7 @@ export async function GET(request) {
     const dia = searchParams.get('dia'); // día específico (1-31)
     const mes = searchParams.get('mes'); // mes específico (1-12)
     const año = searchParams.get('año') || searchParams.get('ano');
+    const fecha = searchParams.get('fecha'); // formato YYYY-MM-DD
     const tipo = searchParams.get('tipo'); // 'hoy', 'semana', 'mes', 'archivo'
 
     // Verificar membresía si hay email
@@ -35,15 +48,24 @@ export async function GET(request) {
       }
     }
 
-    const ahora = new Date();
-    const añoActual = año ? parseInt(año) : ahora.getFullYear();
-    const mesActual = mes ? parseInt(mes) : ahora.getMonth() + 1;
-    const diaActual = dia ? parseInt(dia) : ahora.getDate();
+    // Si viene fecha en formato YYYY-MM-DD, parsearla
+    let añoActual, mesActual, diaActual;
+    if (fecha) {
+      const [y, m, d] = fecha.split('-').map(Number);
+      añoActual = y;
+      mesActual = m;
+      diaActual = d;
+    } else {
+      const ahora = new Date();
+      añoActual = año ? parseInt(año) : ahora.getFullYear();
+      mesActual = mes ? parseInt(mes) : ahora.getMonth() + 1;
+      diaActual = dia ? parseInt(dia) : ahora.getDate();
+    }
 
     // Según el tipo de petición
-    if (tipo === 'hoy' || (!tipo && !dia && !mes)) {
+    if (tipo === 'hoy' || (!tipo && !dia && !mes && !fecha)) {
       // Contenido de HOY
-      const contenidoHoy = await kv.get(`circulo:contenido:${añoActual}:${mesActual}:${diaActual}`);
+      const contenidoHoy = await obtenerContenido(añoActual, mesActual, diaActual);
 
       return Response.json({
         success: true,
@@ -57,18 +79,22 @@ export async function GET(request) {
     if (tipo === 'semana') {
       // Contenido de la semana actual (últimos 7 días)
       const contenidos = [];
+      const hoy = new Date();
       for (let i = 0; i < 7; i++) {
-        const fecha = new Date(ahora);
-        fecha.setDate(fecha.getDate() - i);
-        const key = `circulo:contenido:${fecha.getFullYear()}:${fecha.getMonth() + 1}:${fecha.getDate()}`;
-        const contenido = await kv.get(key);
+        const fechaCheck = new Date(hoy);
+        fechaCheck.setDate(fechaCheck.getDate() - i);
+        const contenido = await obtenerContenido(
+          fechaCheck.getFullYear(),
+          fechaCheck.getMonth() + 1,
+          fechaCheck.getDate()
+        );
         if (contenido) {
           contenidos.push({
             fecha: {
-              año: fecha.getFullYear(),
-              mes: fecha.getMonth() + 1,
-              dia: fecha.getDate(),
-              diaSemana: fecha.toLocaleDateString('es-ES', { weekday: 'long' })
+              año: fechaCheck.getFullYear(),
+              mes: fechaCheck.getMonth() + 1,
+              dia: fechaCheck.getDate(),
+              diaSemana: fechaCheck.toLocaleDateString('es-ES', { weekday: 'long' })
             },
             ...contenido
           });
@@ -83,14 +109,13 @@ export async function GET(request) {
       });
     }
 
-    if (tipo === 'mes' || mes) {
+    if (tipo === 'mes' || (mes && !fecha)) {
       // Contenido del mes especificado
       const contenidos = [];
       const diasEnMes = new Date(añoActual, mesActual, 0).getDate();
 
       for (let d = 1; d <= diasEnMes; d++) {
-        const key = `circulo:contenido:${añoActual}:${mesActual}:${d}`;
-        const contenido = await kv.get(key);
+        const contenido = await obtenerContenido(añoActual, mesActual, d);
         if (contenido) {
           contenidos.push({
             fecha: { año: añoActual, mes: mesActual, dia: d },
@@ -112,19 +137,20 @@ export async function GET(request) {
     if (tipo === 'archivo') {
       // Archivo: meses anteriores con contenido
       const mesesConContenido = [];
+      const hoy = new Date();
 
       // Revisar últimos 6 meses
       for (let i = 0; i < 6; i++) {
-        const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
-        const añoCheck = fecha.getFullYear();
-        const mesCheck = fecha.getMonth() + 1;
+        const fechaCheck = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+        const añoCheck = fechaCheck.getFullYear();
+        const mesCheck = fechaCheck.getMonth() + 1;
 
         // Contar contenidos del mes
         let conteo = 0;
         const diasEnMes = new Date(añoCheck, mesCheck, 0).getDate();
 
         for (let d = 1; d <= Math.min(diasEnMes, 31); d++) {
-          const contenido = await kv.get(`circulo:contenido:${añoCheck}:${mesCheck}:${d}`);
+          const contenido = await obtenerContenido(añoCheck, mesCheck, d);
           if (contenido) conteo++;
         }
 
@@ -132,7 +158,7 @@ export async function GET(request) {
           mesesConContenido.push({
             año: añoCheck,
             mes: mesCheck,
-            nombreMes: fecha.toLocaleDateString('es-ES', { month: 'long' }),
+            nombreMes: fechaCheck.toLocaleDateString('es-ES', { month: 'long' }),
             totalContenidos: conteo
           });
         }
@@ -145,9 +171,9 @@ export async function GET(request) {
       });
     }
 
-    // Día específico
-    if (dia) {
-      const contenido = await kv.get(`circulo:contenido:${añoActual}:${mesActual}:${diaActual}`);
+    // Día específico o fecha específica
+    if (dia || fecha) {
+      const contenido = await obtenerContenido(añoActual, mesActual, diaActual);
 
       return Response.json({
         success: true,

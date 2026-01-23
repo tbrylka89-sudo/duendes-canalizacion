@@ -1099,6 +1099,256 @@ function duendes_emails_extras_admin_page() {
     <?php
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 9. EMAIL: RECORDATORIO RENOVACIÓN MANUAL (no auto-renueva)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Se dispara X días antes de que venza para que renueven manualmente
+ * Hook: duendes_circulo_recordatorio_renovar
+ * Uso: do_action('duendes_circulo_recordatorio_renovar', $user_id, $dias_restantes);
+ */
+add_action('duendes_circulo_recordatorio_renovar', function($user_id, $dias_restantes = 7) {
+    $user = get_user_by('ID', $user_id);
+    if (!$user) return;
+
+    $email = $user->user_email;
+    $nombre = $user->first_name ?: 'Alma Mágica';
+
+    $fecha_fin = date('d/m/Y', strtotime("+{$dias_restantes} days"));
+
+    // Obtener meses como miembro
+    $meses_miembro = (int) get_user_meta($user_id, 'duendes_circulo_meses', true);
+
+    $contenido = '
+        <p style="font-size:22px;color:#C6A962;margin-bottom:20px;">' . esc_html($nombre) . ', tu membresía vence pronto.</p>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;">
+            Te escribimos porque tu acceso al Círculo de Duendes termina el <strong style="color:#C6A962;">' . esc_html($fecha_fin) . '</strong>.
+        </p>
+
+        <div style="background:rgba(198,169,98,0.1);padding:25px;border-radius:15px;margin:25px 0;border:1px solid rgba(198,169,98,0.25);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 5px 0;">Tu membresía vence en</p>
+                    <p style="color:#C6A962;font-size:32px;margin:0;font-weight:600;">' . esc_html($dias_restantes) . ' días</p>
+                </div>
+                <div style="text-align:right;">
+                    <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 5px 0;">Tiempo como miembro</p>
+                    <p style="color:#C6A962;font-size:24px;margin:0;font-weight:600;">' . esc_html($meses_miembro) . ' meses</p>
+                </div>
+            </div>
+        </div>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;">
+            No queremos que pierdas tu lugar. El Círculo no se renueva automáticamente
+            porque preferimos que sea una decisión consciente cada vez.
+        </p>
+
+        <div style="background:rgba(255,200,100,0.08);padding:20px;border-radius:12px;margin:25px 0;border:1px solid rgba(255,200,100,0.2);">
+            <p style="color:rgba(255,220,150,0.9);font-size:15px;margin:0 0 12px 0;">Si no renovás, perdés:</p>
+            <p style="color:rgba(255,255,255,0.8);line-height:1.9;margin:0;">
+                <span style="color:#C6A962;">•</span> Acceso a Tito Premium<br>
+                <span style="color:#C6A962;">•</span> Las canalizaciones mensuales exclusivas<br>
+                <span style="color:#C6A962;">•</span> La comunidad privada<br>
+                <span style="color:#C6A962;">•</span> Los descuentos de miembro (15%)<br>
+                <span style="color:#C6A962;">•</span> Todo el contenido exclusivo
+            </p>
+        </div>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;">
+            Renovar es simple y toma menos de un minuto. Si necesitás hacer una pausa,
+            lo entendemos, pero no queremos que te quedes afuera sin querer.
+        </p>
+
+        <p style="text-align:center;margin:30px 0;">
+            <a href="https://mi-magia.duendesdeluruguay.com/circulo/renovar" style="display:inline-block;padding:16px 35px;background:linear-gradient(135deg,#C6A962,#a88a42);color:#000;text-decoration:none;border-radius:25px;font-weight:600;font-size:16px;">
+                Renovar mi membresía
+            </a>
+        </p>
+
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;text-align:center;">
+            ¿Tenés algún problema o consulta? Respondé a este email.
+        </p>
+
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:35px;text-align:center;">
+            Con cariño,<br>
+            Thibisay & Gabriel
+        </p>
+    ';
+
+    duendes_enviar_email($email, 'Tu membresía del Círculo vence en ' . $dias_restantes . ' días', $contenido, 'Recordatorio', 'Tu membresía vence pronto');
+}, 10, 2);
+
+// Segundo recordatorio - 3 días antes
+add_action('duendes_circulo_recordatorio_urgente', function($user_id) {
+    $user = get_user_by('ID', $user_id);
+    if (!$user) return;
+
+    $email = $user->user_email;
+    $nombre = $user->first_name ?: 'Alma Mágica';
+
+    $fecha_fin = date('d/m/Y', strtotime('+3 days'));
+
+    $contenido = '
+        <p style="font-size:22px;color:#C6A962;margin-bottom:20px;">' . esc_html($nombre) . ', quedan 3 días.</p>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;">
+            Es el último aviso. Tu acceso al Círculo termina el <strong style="color:#C6A962;">' . esc_html($fecha_fin) . '</strong>.
+        </p>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;margin-top:15px;">
+            Si querés seguir siendo parte, este es el momento de renovar.
+            Después del ' . esc_html($fecha_fin) . ', el acceso se cierra automáticamente.
+        </p>
+
+        <div style="background:rgba(255,100,100,0.1);padding:20px;border-radius:12px;margin:25px 0;border:1px solid rgba(255,100,100,0.25);text-align:center;">
+            <p style="color:rgba(255,150,150,0.9);font-size:14px;margin:0 0 5px 0;">Tiempo restante</p>
+            <p style="color:#ff9999;font-size:36px;margin:0;font-weight:600;">3 días</p>
+        </div>
+
+        <p style="text-align:center;margin:30px 0;">
+            <a href="https://mi-magia.duendesdeluruguay.com/circulo/renovar" style="display:inline-block;padding:16px 35px;background:linear-gradient(135deg,#C6A962,#a88a42);color:#000;text-decoration:none;border-radius:25px;font-weight:600;font-size:16px;">
+                Renovar ahora
+            </a>
+        </p>
+
+        <p style="color:rgba(255,255,255,0.6);font-size:14px;text-align:center;font-style:italic;">
+            Si decidiste no renovar, gracias por haber sido parte.
+        </p>
+
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:35px;text-align:center;">
+            Thibisay & Gabriel
+        </p>
+    ';
+
+    duendes_enviar_email($email, '⏰ Último aviso: tu membresía vence en 3 días', $contenido, 'Último Aviso', 'Quedan 3 días');
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 10. EMAIL: POCAS RUNAS (moneda virtual)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Se dispara cuando el usuario tiene pocas runas
+ * Hook: duendes_runas_bajas
+ * Uso: do_action('duendes_runas_bajas', $user_id, $runas_actuales, $runas_minimo);
+ */
+add_action('duendes_runas_bajas', function($user_id, $runas_actuales = 0, $runas_minimo = 50) {
+    $user = get_user_by('ID', $user_id);
+    if (!$user) return;
+
+    // No enviar si ya enviamos en los últimos 7 días
+    $ultimo_aviso = get_user_meta($user_id, 'duendes_ultimo_aviso_runas', true);
+    if ($ultimo_aviso && (time() - $ultimo_aviso) < 7 * DAY_IN_SECONDS) {
+        return;
+    }
+    update_user_meta($user_id, 'duendes_ultimo_aviso_runas', time());
+
+    $email = $user->user_email;
+    $nombre = $user->first_name ?: 'Alma Mágica';
+
+    $contenido = '
+        <p style="font-size:22px;color:#C6A962;margin-bottom:20px;">' . esc_html($nombre) . ', tus runas están bajando.</p>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;">
+            Notamos que te quedan pocas runas en Mi Magia. No es urgente, pero queríamos avisarte.
+        </p>
+
+        <div style="background:rgba(198,169,98,0.1);padding:25px;border-radius:15px;margin:25px 0;border:1px solid rgba(198,169,98,0.25);text-align:center;">
+            <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 8px 0;">Tus runas actuales</p>
+            <p style="color:#C6A962;font-size:42px;margin:0;font-weight:600;">☘️ ' . esc_html($runas_actuales) . '</p>
+        </div>
+
+        <div style="background:rgba(100,180,100,0.08);padding:20px;border-radius:12px;margin:25px 0;border:1px solid rgba(100,180,100,0.15);">
+            <p style="color:#8fbc8f;font-size:15px;margin:0 0 12px 0;">Formas de ganar más runas:</p>
+            <p style="color:rgba(255,255,255,0.8);line-height:1.9;margin:0;">
+                <span style="color:#C6A962;">☘️</span> <strong>Visitá Mi Magia cada día</strong> - Runas por racha diaria<br>
+                <span style="color:#C6A962;">☘️</span> <strong>Abrí tu Cofre Diario</strong> - Runas sorpresa<br>
+                <span style="color:#C6A962;">☘️</span> <strong>Completá experiencias</strong> - Runas por participación<br>
+                <span style="color:#C6A962;">☘️</span> <strong>Comprá un guardián</strong> - Runas bonus por compra<br>
+                <span style="color:#C6A962;">☘️</span> <strong>Referí a alguien</strong> - Runas cuando compran
+            </p>
+        </div>
+
+        <p style="color:rgba(255,255,255,0.85);line-height:1.8;">
+            Las runas sirven para desbloquear descuentos, experiencias especiales y beneficios
+            exclusivos. Cuantas más tengas, más opciones tenés.
+        </p>
+
+        <p style="text-align:center;margin:30px 0;">
+            <a href="https://mi-magia.duendesdeluruguay.com" style="display:inline-block;padding:16px 35px;background:linear-gradient(135deg,#C6A962,#a88a42);color:#000;text-decoration:none;border-radius:25px;font-weight:600;font-size:16px;">
+                Ir a Mi Magia
+            </a>
+        </p>
+
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;text-align:center;font-style:italic;">
+            Este aviso se envía una vez por semana como máximo.
+        </p>
+
+        <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:35px;text-align:center;">
+            Thibisay & Gabriel
+        </p>
+    ';
+
+    duendes_enviar_email($email, '☘️ Tus runas están bajando', $contenido, 'Runas Bajas', 'Un aviso de Mi Magia');
+}, 10, 3);
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CRON: Verificar membresías por vencer y runas bajas
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Programar cron diario
+add_action('init', function() {
+    if (!wp_next_scheduled('duendes_verificar_membresias_diario')) {
+        wp_schedule_event(time(), 'daily', 'duendes_verificar_membresias_diario');
+    }
+    if (!wp_next_scheduled('duendes_verificar_runas_diario')) {
+        wp_schedule_event(time(), 'daily', 'duendes_verificar_runas_diario');
+    }
+});
+
+// Verificar membresías por vencer
+add_action('duendes_verificar_membresias_diario', function() {
+    $miembros = get_users([
+        'meta_key' => 'duendes_circulo_membresia_activa',
+        'meta_value' => '1',
+    ]);
+
+    foreach ($miembros as $miembro) {
+        $fecha_vencimiento = get_user_meta($miembro->ID, 'duendes_circulo_fecha_vencimiento', true);
+        if (!$fecha_vencimiento) continue;
+
+        $dias_restantes = (strtotime($fecha_vencimiento) - time()) / DAY_IN_SECONDS;
+
+        if ($dias_restantes <= 3 && $dias_restantes > 0) {
+            do_action('duendes_circulo_recordatorio_urgente', $miembro->ID);
+        } elseif ($dias_restantes <= 7 && $dias_restantes > 3) {
+            do_action('duendes_circulo_recordatorio_renovar', $miembro->ID, ceil($dias_restantes));
+        }
+    }
+});
+
+// Verificar runas bajas
+add_action('duendes_verificar_runas_diario', function() {
+    $usuarios_con_runas = get_users([
+        'meta_key' => 'duendes_runas',
+        'meta_compare' => 'EXISTS',
+    ]);
+
+    $minimo_runas = 50; // Umbral para aviso
+
+    foreach ($usuarios_con_runas as $usuario) {
+        $runas = (int) get_user_meta($usuario->ID, 'duendes_runas', true);
+        if ($runas > 0 && $runas < $minimo_runas) {
+            do_action('duendes_runas_bajas', $usuario->ID, $runas, $minimo_runas);
+        }
+    }
+});
+
+
 // Procesar envío de pruebas
 add_action('admin_init', function() {
     if (!isset($_POST['test_email_type']) || !check_admin_referer('duendes_test_email')) {
