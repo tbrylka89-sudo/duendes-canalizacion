@@ -321,6 +321,75 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ---
 
+## 🚨 TAREA LISTA PARA EJECUTAR: REFACTORIZAR MI MAGIA
+
+**Archivo a refactorizar:** `/app/mi-magia/page.jsx` (7966 líneas, 347KB)
+
+### El problema:
+- Un solo archivo con TODO: secciones, componentes, estados, funciones
+- Difícil de mantener y debuggear
+- Vercel tarda en compilar
+
+### Objetivo:
+Separar en módulos manteniendo la funcionalidad exacta.
+
+### Estructura propuesta:
+
+```
+/app/mi-magia/
+├── page.jsx                    # Solo wrapper con Suspense + importa MiMagiaContent
+├── components/
+│   ├── MiMagiaContent.jsx      # Componente principal (estados + router de secciones)
+│   ├── SeccionInicio.jsx       # Sección de inicio/bienvenida
+│   ├── SeccionGuardianes.jsx   # Lista de guardianes del usuario
+│   ├── SeccionLecturas.jsx     # Historial de lecturas
+│   ├── SeccionExperiencias.jsx # Experiencias mágicas
+│   ├── SeccionRegalos.jsx      # Regalos recibidos
+│   ├── SeccionElegidos.jsx     # Sección elegidos
+│   ├── SeccionCirculo.jsx      # Contenido del Círculo
+│   ├── SeccionPerfil.jsx       # Perfil del usuario
+│   ├── Navegacion.jsx          # Menú lateral/navegación
+│   ├── HeaderMiMagia.jsx       # Header con nombre y tréboles
+│   └── Tito.jsx                # Componente del chatbot (ya existe como función)
+├── hooks/
+│   ├── useElegido.js           # Hook para cargar datos del elegido
+│   ├── useCirculo.js           # Hook para estado del círculo
+│   └── useSecciones.js         # Hook para navegación entre secciones
+└── utils/
+    └── constants.js            # Constantes, colores, configuración
+```
+
+### Pasos para ejecutar:
+
+1. **Leer el archivo completo** para entender la estructura actual
+2. **Identificar las secciones** (buscar `seccion ===` o `activeSection`)
+3. **Extraer constantes** primero (colores, textos fijos)
+4. **Extraer componentes** uno por uno, empezando por los más independientes
+5. **Crear hooks** para lógica reutilizable
+6. **Testear cada paso** antes de continuar
+7. **NO ROMPER FUNCIONALIDAD** - El sitio debe seguir funcionando igual
+
+### Comandos útiles:
+```bash
+# Ver estructura actual
+wc -l /app/mi-magia/page.jsx
+
+# Buscar secciones
+grep -n "seccion ===" app/mi-magia/page.jsx | head -20
+
+# Buscar funciones principales
+grep -n "^  function\|^  const.*= (" app/mi-magia/page.jsx | head -30
+```
+
+### IMPORTANTE:
+- El archivo ya tiene `<Suspense>` wrapper (lo agregamos hoy)
+- Hay una función `Tito()` al final que es el chatbot
+- Usar `'use client'` en cada componente que use hooks de React
+- Mantener los estilos inline (no crear CSS separado por ahora)
+- Hacer commits incrementales después de cada componente extraído
+
+---
+
 ### 2026-01-23 (sesión 7) - COMPLETADA
 **Funcionalidades nuevas implementadas:**
 
