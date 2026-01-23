@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { SenalDelDia, TestElemental, CosmosMes, GuiaCristales, CatalogoExperiencias, estilosNuevos } from './nuevas-funciones';
 import TestGuardian from './test-guardian';
 import { personalizarTexto, saludoPersonalizado } from '@/lib/personalizacion';
@@ -3864,11 +3865,14 @@ function TourMiMagia({ usuario, onFinish }) {
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 
-export default function MiMagia() {
+function MiMagiaContent() {
+  const searchParams = useSearchParams();
+  const seccionInicial = searchParams.get('seccion') || 'inicio';
+
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [necesitaLogin, setNecesitaLogin] = useState(false);
-  const [seccion, setSeccion] = useState('inicio');
+  const [seccion, setSeccion] = useState(seccionInicial);
   const [onboarding, setOnboarding] = useState(false);
   const [mostrandoTour, setMostrandoTour] = useState(false);
   const [mostrandoPerfil, setMostrandoPerfil] = useState(false);
@@ -3891,6 +3895,14 @@ export default function MiMagia() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Actualizar sección cuando cambia la URL
+  useEffect(() => {
+    const seccionURL = searchParams.get('seccion');
+    if (seccionURL && seccionURL !== seccion) {
+      setSeccion(seccionURL);
+    }
+  }, [searchParams]);
 
   const detectarPais = async () => {
     try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); setPais(data.country_code || 'UY'); } catch(e) { setPais('UY'); }
@@ -7952,3 +7964,25 @@ Mensaje actual: ${m}`;
   );
 }
 
+// ═══════════════════════════════════════════════════════════════
+// EXPORT CON SUSPENSE BOUNDARY
+// ═══════════════════════════════════════════════════════════════
+
+export default function MiMagiaPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        background: '#0a0a0a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#C6A962'
+      }}>
+        <p>Cargando Mi Magia...</p>
+      </div>
+    }>
+      <MiMagiaContent />
+    </Suspense>
+  );
+}
