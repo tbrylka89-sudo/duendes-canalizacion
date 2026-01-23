@@ -165,6 +165,98 @@ El lector debe terminar sintiéndose especial, pensando "soy un/a elegido/a" aun
 - "Si sentís algo leyendo esto, ya sabés por qué."
 - "No viniste a buscar un duende. Viniste porque uno te llamó."
 
+## PATRONES QUE FUNCIONARON (MICELIO, RUPERTO, SILVANO)
+
+### 1. APERTURA DESDE EL GUARDIÁN + SU RASGO DISTINTIVO (OBLIGATORIO)
+
+NO empezar con el dolor de la persona. Empezar con algo ÚNICO del guardián que lo defina.
+
+**EJEMPLOS BUENOS:**
+- "Micelio nació donde las raíces se encuentran"
+- "Ruperto carga amatistas como otros cargan cicatrices"
+- "Silvano huele a lavanda y romero antes de que lo veas"
+
+**EJEMPLOS MALOS (NO HACER):**
+- "Hay personas que cargan con todo..."
+- "¿Alguna vez sentiste que...?"
+- Empezar describiendo el dolor del cliente
+
+### 2. ACCESORIOS CON SIGNIFICADO (NO COMO LISTA)
+
+NO decir "tiene un hongo celeste". DECIR por qué lo tiene y qué significa.
+Los accesorios deben CONTAR algo sobre el guardián y su propósito.
+
+**EJEMPLO BUENO:**
+"Las lavandas en su sombrero no son adorno. Son recordatorio: la calma no se fuerza, se cultiva."
+
+**EJEMPLO MALO:**
+"Tiene lavandas en su sombrero y un cristal de cuarzo."
+
+### 3. MENSAJE EN PRIMERA PERSONA QUE PROMETE ALGO ESPECÍFICO
+
+**PROHIBIDO:** El patrón "no vino a X, no vino a Y, no vino a Z"
+**OBLIGATORIO:** Usar promesas concretas, íntimas, directas.
+
+**EJEMPLO BUENO:**
+"Te prometo que cada día vas a estar un poco más entera"
+"Voy a quedarme hasta que puedas respirar sin que duela"
+
+**EJEMPLO MALO:**
+"No vine a salvarte, no vine a curarte, no vine a enseñarte..."
+
+### 4. ESTRUCTURA EXITOSA (seguir este orden)
+
+1. **Apertura impactante desde el guardián** (quién es, qué lo hace único)
+2. **Explicación del significado de sus accesorios** (no lista, sino propósito)
+3. **Conexión con el dolor/necesidad** (pero NO empezar con esto)
+4. **Mensaje en primera persona** (promesa específica)
+5. **Cierre abierto** (sin vender, dejando que el lector decida)
+
+### 5. EJEMPLOS DE ELFOS VIAJEROS (IKER, AXEL, LIAM)
+
+**NUEVOS PATRONES - Acciones/objetos que definen al personaje:**
+- "Iker cosió su propio bolso" - acción que define al personaje
+- "Axel lleva un cuarzo que cambia de color" - objeto con significado metafórico
+- "Liam es elfo de bosque, pero no se quedó en ninguno" - contradicción que intriga
+
+**TÉCNICA: dar significado a cada accesorio por separado:**
+- "El citrino en su cuello no cuelga por azar. Está ahí para que la claridad viaje siempre a la altura del corazón."
+- "Su trébol no es de cuatro hojas por suerte. Es por búsqueda."
+- "La mochila combina negro y marrón. Noche y tierra."
+
+Usar esta técnica: NO listar accesorios, explicar el POR QUÉ de cada uno individualmente.
+
+### 6. PATRONES DE ABUNDANCIA/NEGOCIOS (FORTUNATO, TONY, SANTINO, TADEO)
+
+**APERTURAS - misterio + función:**
+- "Fortunato lleva dos llaves en el cinto y ninguna abre puertas normales"
+- "Tony es colorado, peludo y gruñón" - personalidad directa sin rodeos
+- "Santino lleva dos citrinos y nada más" - minimalismo como filosofía
+- "Tadeo tiene panza de próspero y corazón de generoso" - característica física con significado
+
+**TÉCNICA: contradicción que intriga:**
+- "No es contradicción —es equilibrio"
+- "La panza no es descuido —es abundancia acumulada"
+- "Su minimalismo no es pobreza. Es claridad."
+
+Usar esta técnica: presentar algo que PARECE contradictorio y explicar por qué NO lo es.
+
+### 7. CIERRES ADAPTATIVOS = MENSAJES DEL GUARDIÁN EN PRIMERA PERSONA
+
+Los cierres varían según el perfil del lector, pero SIEMPRE son del guardián hablando:
+
+**Para VULNERABLE:** Empático, contenedor
+- "No tenés que hacer nada. Solo dejarme estar."
+- "Cuando estés lista, vamos a dar el primer paso juntos."
+
+**Para ESCÉPTICO:** Práctico, sin promesas exageradas
+- "No te pido que creas. Solo que notes qué sentiste leyendo esto."
+- "Si no resuena, seguí tu camino. Si algo quedó, ya sabés."
+
+**Para IMPULSIVO:** Directo, con sentido de oportunidad
+- "Algo te trajo hasta acá. ¿Vas a ignorarlo?"
+- "Este momento no se repite. Yo tampoco."
+
 ## TRIGGERS PSICOLÓGICOS A USAR
 
 - **Espejo**: describir sin nombrar, que el lector se reconozca
@@ -831,17 +923,29 @@ export async function GET(request) {
   // NUEVA ACCIÓN: Listar historias existentes para evitar repeticiones
   if (accion === 'listar_existentes') {
     try {
-      // Obtener productos de WooCommerce que tengan descripción (historia)
-      const response = await fetch(
-        `${WC_URL}/wp-json/wc/v3/products?per_page=100&status=publish`,
-        {
-          headers: {
-            'Authorization': 'Basic ' + Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64')
-          }
-        }
-      );
+      // Obtener TODOS los productos de WooCommerce con paginación
+      const auth = Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64');
+      const productos = [];
 
-      if (!response.ok) {
+      for (let page = 1; page <= 5; page++) {
+        const response = await fetch(
+          `${WC_URL}/wp-json/wc/v3/products?per_page=100&page=${page}&status=publish`,
+          {
+            headers: {
+              'Authorization': `Basic ${auth}`
+            },
+            cache: 'no-store'
+          }
+        );
+
+        if (!response.ok) break;
+
+        const data = await response.json();
+        if (data.length === 0) break;
+        productos.push(...data);
+      }
+
+      if (productos.length === 0) {
         return NextResponse.json({
           success: true,
           hooks_usados: [],
@@ -849,8 +953,6 @@ export async function GET(request) {
           guardianes_con_historia: []
         });
       }
-
-      const productos = await response.json();
 
       // Extraer datos de productos con historia GENERADA POR EL SISTEMA
       // Solo cuenta como "con historia" si tiene el marcador del generador
