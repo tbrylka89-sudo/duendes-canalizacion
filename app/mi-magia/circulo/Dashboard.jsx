@@ -2413,11 +2413,70 @@ function SeccionContenido() {
                 <div className="separador-linea"></div>
               </div>
 
-              {/* Cuerpo del contenido */}
+              {/* Cuerpo del contenido - soporta todos los formatos */}
               <div className="contenido-cuerpo">
-                {contenidoActivo.cuerpo?.split('\n\n').map((parrafo, i) => (
+                {/* Formato 1: cuerpo (generar-contenido-pro) */}
+                {contenidoActivo.cuerpo && contenidoActivo.cuerpo.split('\n\n').map((parrafo, i) => (
                   <p key={i} className="contenido-parrafo">{parrafo}</p>
                 ))}
+
+                {/* Formato 2: secciones (regenerar-contenido) */}
+                {!contenidoActivo.cuerpo && contenidoActivo.secciones && (
+                  <>
+                    {contenidoActivo.secciones.intro && (
+                      <div className="contenido-intro">
+                        <p className="contenido-parrafo">{contenidoActivo.secciones.intro}</p>
+                      </div>
+                    )}
+                    {contenidoActivo.secciones.desarrollo && (
+                      <div className="contenido-desarrollo">
+                        {contenidoActivo.secciones.desarrollo.split('\n\n').map((parrafo, i) => (
+                          <p key={i} className="contenido-parrafo">{parrafo}</p>
+                        ))}
+                      </div>
+                    )}
+                    {contenidoActivo.secciones.practica && (
+                      <div className="contenido-practica-sec">
+                        <span className="practica-label">🌿 Práctica</span>
+                        <p className="contenido-parrafo">{contenidoActivo.secciones.practica}</p>
+                      </div>
+                    )}
+                    {contenidoActivo.secciones.cierre && (
+                      <div className="contenido-cierre-sec">
+                        <p className="contenido-parrafo contenido-cierre-texto">{contenidoActivo.secciones.cierre}</p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Formato 3: mensaje + enseñanza + práctica + reflexión (legacy) */}
+                {!contenidoActivo.cuerpo && !contenidoActivo.secciones && contenidoActivo.mensaje && (
+                  <>
+                    <p className="contenido-parrafo contenido-mensaje">{contenidoActivo.mensaje}</p>
+                    {contenidoActivo.ensenanza && (
+                      <div className="contenido-ensenanza">
+                        <span className="ensenanza-label">✨ Enseñanza</span>
+                        <p>{contenidoActivo.ensenanza}</p>
+                      </div>
+                    )}
+                    {contenidoActivo.practica && (
+                      <div className="contenido-practica">
+                        <span className="practica-label">🌿 Práctica del día</span>
+                        <p>{contenidoActivo.practica}</p>
+                      </div>
+                    )}
+                    {contenidoActivo.reflexion && (
+                      <p className="contenido-reflexion">"{contenidoActivo.reflexion}"</p>
+                    )}
+                  </>
+                )}
+
+                {/* Si no hay contenido en ningún formato */}
+                {!contenidoActivo.cuerpo && !contenidoActivo.secciones && !contenidoActivo.mensaje && (
+                  <div className="contenido-vacio">
+                    <p>Este contenido está siendo preparado...</p>
+                  </div>
+                )}
               </div>
 
               {/* Si es ritual, mostrar pasos */}
@@ -2880,6 +2939,55 @@ function SeccionContenido() {
           line-height: 1.9;
           color: rgba(255, 255, 255, 0.85);
           margin: 0 0 20px;
+        }
+
+        /* Formato secciones - regenerar-contenido */
+        .contenido-intro {
+          margin-bottom: 25px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        }
+
+        .contenido-desarrollo {
+          margin-bottom: 30px;
+        }
+
+        .contenido-practica-sec {
+          background: linear-gradient(135deg, rgba(57, 255, 20, 0.08), rgba(30, 150, 10, 0.05));
+          border: 1px solid rgba(57, 255, 20, 0.2);
+          border-radius: 15px;
+          padding: 25px;
+          margin: 30px 0;
+        }
+
+        .contenido-practica-sec .practica-label {
+          display: block;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          color: var(--neon-green, #39ff14);
+          margin-bottom: 15px;
+          text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+        }
+
+        .contenido-cierre-sec {
+          background: linear-gradient(135deg, rgba(255, 0, 255, 0.08), rgba(150, 0, 150, 0.05));
+          border: 1px solid rgba(255, 0, 255, 0.2);
+          border-radius: 15px;
+          padding: 25px;
+          margin-top: 30px;
+          text-align: center;
+        }
+
+        .contenido-cierre-texto {
+          font-style: italic;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .contenido-vacio {
+          text-align: center;
+          padding: 60px 30px;
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
         }
 
         /* Ritual */
