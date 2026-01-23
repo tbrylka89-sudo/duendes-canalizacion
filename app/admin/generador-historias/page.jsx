@@ -53,6 +53,21 @@ function GeneradorHistoriasContent() {
       }
     };
     cargarImagenes();
+
+    // Cargar temas aprendidos al iniciar
+    const cargarTemasInicial = async () => {
+      try {
+        const res = await fetch('/api/admin/historias/temas-aprendidos');
+        const data = await res.json();
+        if (data.success && data.temas) {
+          setTemasAprendidos(data.temas);
+          console.log('[AUTO-APRENDIZAJE] Temas cargados:', Object.keys(data.temas).length);
+        }
+      } catch (e) {
+        console.error('Error cargando temas aprendidos:', e);
+      }
+    };
+    cargarTemasInicial();
   }, []);
 
   // Datos
@@ -118,6 +133,9 @@ function GeneradorHistoriasContent() {
     busqueda: '', // filtro de búsqueda
     textoLibre: '' // texto libre para asignar
   });
+
+  // === TEMAS APRENDIDOS (auto-aprendizaje) ===
+  const [temasAprendidos, setTemasAprendidos] = useState({});
 
   // Mini-encuesta al regenerar
   const [showMiniEncuesta, setShowMiniEncuesta] = useState(false);
@@ -517,6 +535,35 @@ Necesito conocer algunos datos. Empecemos:
       console.error('Error cargando historias existentes:', e);
     }
     setCargandoHistorias(false);
+  };
+
+  // Cargar temas aprendidos (auto-aprendizaje del sistema)
+  const cargarTemasAprendidos = async () => {
+    try {
+      const res = await fetch('/api/admin/historias/temas-aprendidos');
+      const data = await res.json();
+      if (data.success) {
+        setTemasAprendidos(data.temas || {});
+        console.log('[TEMAS APRENDIDOS] Cargados:', Object.keys(data.temas || {}).length);
+      }
+    } catch (e) {
+      console.error('Error cargando temas aprendidos:', e);
+    }
+  };
+
+  // Registrar un tema aprendido cuando una generación es exitosa
+  const registrarTemaAprendido = async (tema, categoria, subcategoria) => {
+    try {
+      await fetch('/api/admin/historias/temas-aprendidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tema, categoria, subcategoria })
+      });
+      // Recargar temas aprendidos
+      await cargarTemasAprendidos();
+    } catch (e) {
+      console.error('Error registrando tema aprendido:', e);
+    }
   };
 
   // Generar historia
@@ -2643,36 +2690,224 @@ Necesito conocer algunos datos. Empecemos:
                     porTema[tema].push(nombre);
                   }
 
-                  // Mapeo de palabras clave a categorías conocidas
+                  // Mapeo COMPLETO de palabras clave a categorías conocidas
+                  // El sistema detecta estas palabras y distribuye entre subcategorías automáticamente
                   const mapeoCategoria = {
+                    // === PRINCIPALES ===
+                    'fortuna': 'principales',
+                    'suerte': 'principales',
+                    'lucky': 'principales',
+                    'abrecaminos': 'principales',
+                    'vigilante': 'principales',
+
+                    // === AMOR ===
                     'amor': 'amor',
                     'love': 'amor',
                     'pareja': 'amor',
+                    'romantico': 'amor',
+                    'romántico': 'amor',
+                    'corazon': 'amor',
+                    'corazón': 'amor',
+                    'autoestima': 'amor',
+                    'fertilidad': 'amor',
+                    'maternidad': 'amor',
+                    'familia': 'amor',
+                    'hijo': 'amor',
+                    'soledad': 'amor',
+                    'reconcilia': 'amor',
+
+                    // === SANACIÓN ===
                     'sanacion': 'sanacion',
                     'sanación': 'sanacion',
+                    'sanar': 'sanacion',
                     'salud': 'sanacion',
+                    'curar': 'sanacion',
+                    'trauma': 'sanacion',
+                    'duelo': 'sanacion',
+                    'herida': 'sanacion',
+                    'transgeneracional': 'sanacion',
+                    'patron': 'sanacion',
+                    'patrón': 'sanacion',
+                    'adiccion': 'sanacion',
+                    'adicción': 'sanacion',
+
+                    // === PROTECCIÓN ===
                     'proteccion': 'proteccion',
                     'protección': 'proteccion',
+                    'proteger': 'proteccion',
+                    'escudo': 'proteccion',
+                    'guardian': 'proteccion',
+                    'guardián': 'proteccion',
+                    'defensor': 'proteccion',
+                    'limite': 'proteccion',
+                    'límite': 'proteccion',
+                    'envidia': 'proteccion',
+                    'energia negativa': 'proteccion',
+                    'energía negativa': 'proteccion',
+                    'hogar': 'proteccion',
+                    'casa': 'proteccion',
+                    'vikingo': 'proteccion',
+                    'guerrero': 'proteccion',
+
+                    // === TRABAJO Y DINERO ===
                     'trabajo': 'trabajo',
                     'dinero': 'trabajo',
                     'abundancia': 'trabajo',
-                    'fortuna': 'principales',
-                    'suerte': 'principales',
-                    'bienestar': 'bienestar',
-                    'ansiedad': 'bienestar',
-                    'cambios': 'cambios',
-                    'transformacion': 'cambios',
-                    'espiritual': 'espiritual',
+                    'prosperidad': 'trabajo',
+                    'negocio': 'trabajo',
+                    'emprendimiento': 'trabajo',
+                    'emprender': 'trabajo',
+                    'cliente': 'trabajo',
+                    'venta': 'trabajo',
+                    'deuda': 'trabajo',
+                    'empleo': 'trabajo',
+                    'entrevista': 'trabajo',
+                    'liderazgo': 'trabajo',
+                    'gnomo': 'trabajo',
+                    'leprechaun': 'trabajo',
+
+                    // === ESTUDIO Y MENTE ===
                     'estudio': 'estudio',
+                    'estudiar': 'estudio',
+                    'examen': 'estudio',
+                    'memoria': 'estudio',
+                    'concentracion': 'estudio',
+                    'concentración': 'estudio',
                     'sabiduria': 'estudio',
-                    'sabiduría': 'estudio'
+                    'sabiduría': 'estudio',
+                    'claridad': 'estudio',
+                    'intuicion': 'estudio',
+                    'intuición': 'estudio',
+                    'decision': 'estudio',
+                    'decisión': 'estudio',
+                    'mago': 'estudio',
+                    'brujo': 'estudio',
+                    'bruja': 'estudio',
+
+                    // === BIENESTAR ===
+                    'bienestar': 'bienestar',
+                    'calma': 'bienestar',
+                    'paz': 'bienestar',
+                    'serenidad': 'bienestar',
+                    'ansiedad': 'bienestar',
+                    'insomnio': 'bienestar',
+                    'dormir': 'bienestar',
+                    'meditacion': 'bienestar',
+                    'meditación': 'bienestar',
+                    'zen': 'bienestar',
+                    'alegria': 'bienestar',
+                    'alegría': 'bienestar',
+                    'energia vital': 'bienestar',
+                    'energía vital': 'bienestar',
+                    'confianza': 'bienestar',
+
+                    // === CAMBIOS Y ETAPAS ===
+                    'cambio': 'cambios',
+                    'transformacion': 'cambios',
+                    'transformación': 'cambios',
+                    'nuevo comienzo': 'cambios',
+                    'empezar de nuevo': 'cambios',
+                    'mudanza': 'cambios',
+                    'separacion': 'cambios',
+                    'separación': 'cambios',
+                    'divorcio': 'cambios',
+                    'jubilacion': 'cambios',
+                    'jubilación': 'cambios',
+                    'desapego': 'cambios',
+                    'soltar': 'cambios',
+                    'miedo': 'cambios',
+                    'fobia': 'cambios',
+                    'mariposa': 'cambios',
+                    'fenix': 'cambios',
+                    'fénix': 'cambios',
+
+                    // === ESPIRITUAL ===
+                    'espiritual': 'espiritual',
+                    'conexion': 'espiritual',
+                    'conexión': 'espiritual',
+                    'deseo': 'espiritual',
+                    'manifestar': 'espiritual',
+                    'sueño': 'espiritual',
+                    'proposito': 'espiritual',
+                    'propósito': 'espiritual',
+                    'gratitud': 'espiritual',
+                    'sagrado': 'espiritual',
+
+                    // === VIAJEROS (NUEVO) ===
+                    'viajero': 'viajeros',
+                    'viaje': 'viajeros',
+                    'viajar': 'viajeros',
+                    'mochila': 'viajeros',
+                    'camino': 'viajeros',
+                    'rumbo': 'viajeros',
+                    'aventura': 'viajeros',
+                    'explorar': 'viajeros',
+                    'explorador': 'viajeros',
+                    'nomade': 'viajeros',
+                    'nómade': 'viajeros',
+                    'peregrino': 'viajeros',
+                    'caminante': 'viajeros',
+                    'horizonte': 'viajeros',
+                    'despegar': 'viajeros',
+                    'volar': 'viajeros',
+                    'reinventar': 'viajeros',
+                    'reinvención': 'viajeros',
+                    'nuevo rumbo': 'viajeros',
+                    'cambio de rumbo': 'viajeros',
+
+                    // === BOSQUE / NATURALEZA (NUEVO) ===
+                    'bosque': 'naturaleza',
+                    'naturaleza': 'naturaleza',
+                    'natural': 'naturaleza',
+                    'hongo': 'naturaleza',
+                    'hongos': 'naturaleza',
+                    'micelio': 'naturaleza',
+                    'micelios': 'naturaleza',
+                    'yuyo': 'naturaleza',
+                    'yuyos': 'naturaleza',
+                    'hierba': 'naturaleza',
+                    'hierbas': 'naturaleza',
+                    'planta': 'naturaleza',
+                    'plantas': 'naturaleza',
+                    'raiz': 'naturaleza',
+                    'raíz': 'naturaleza',
+                    'raices': 'naturaleza',
+                    'raíces': 'naturaleza',
+                    'tierra': 'naturaleza',
+                    'verde': 'naturaleza',
+                    'musgo': 'naturaleza',
+                    'druida': 'naturaleza',
+                    'chaman': 'naturaleza',
+                    'chamán': 'naturaleza',
+                    'ancestral': 'naturaleza',
+                    'equilibrio natural': 'naturaleza',
+                    'sanacion natural': 'naturaleza',
+                    'sanación natural': 'naturaleza'
                   };
 
-                  // Función para detectar categoría conocida desde el tema
+                  // Función para detectar categoría conocida desde el tema (busca primero frases largas)
+                  // INCLUYE AUTO-APRENDIZAJE: usa temas aprendidos de generaciones anteriores
                   const detectarCategoria = (tema) => {
-                    const temaLower = tema.toLowerCase();
-                    for (const [palabra, categoria] of Object.entries(mapeoCategoria)) {
-                      if (temaLower.includes(palabra)) {
+                    const temaLower = tema.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+                    // 1. PRIMERO: buscar en temas aprendidos (tienen prioridad)
+                    if (temasAprendidos && Object.keys(temasAprendidos).length > 0) {
+                      for (const [temaAprendido, datos] of Object.entries(temasAprendidos)) {
+                        if (temaLower.includes(temaAprendido) && datos.categoria) {
+                          console.log(`[AUTO-APRENDIZAJE] Tema "${tema}" → categoría "${datos.categoria}" (aprendido)`);
+                          return datos.categoria;
+                        }
+                      }
+                    }
+
+                    // 2. SEGUNDO: buscar en mapeo estático
+                    // Ordenar por longitud descendente para que frases largas matcheen primero
+                    const palabrasOrdenadas = Object.entries(mapeoCategoria)
+                      .sort((a, b) => b[0].length - a[0].length);
+
+                    for (const [palabra, categoria] of palabrasOrdenadas) {
+                      const palabraNorm = palabra.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                      if (temaLower.includes(palabraNorm)) {
                         return categoria;
                       }
                     }
@@ -2738,6 +2973,11 @@ Necesito conocer algunos datos. Empecemos:
                       if (data.success) {
                         if (data.datos?.hookUsado) hooksUsados.push(data.datos.hookUsado);
                         if (data.datos?.sincrodestinoUsado) sincrodestUsados.push(data.datos.sincrodestinoUsado);
+
+                        // Auto-aprendizaje: registrar tema exitoso
+                        if (tema && categoriaDetectada) {
+                          registrarTemaAprendido(tema, categoriaDetectada, subcategoria);
+                        }
 
                         resultados.push({
                           guardian,
