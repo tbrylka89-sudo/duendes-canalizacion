@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 10 - COMPLETADA)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 11 - COMPLETADA)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -158,6 +158,11 @@ Precio                          | Orden en que ve productos
 | `/app/api/webhooks/woocommerce/route.js` | Webhook UNIFICADO de WooCommerce |
 | `/app/api/cron/duende-semana-rotacion/route.js` | CRON rotación duende de la semana |
 | `/app/api/emails/micro-compromisos/route.js` | API secuencia micro-compromisos |
+| `/lib/circulo/duendes-semanales-2026.js` | 6 guardianes maestros con historias y rotación semanal |
+| `/scripts/generar-contenido-enero-2026.js` | 23 días de contenido pre-generado enero 2026 |
+| `/app/api/admin/circulo/seed-enero/route.js` | API para poblar KV con contenido de enero |
+| `/app/mi-magia/circulo/Dashboard.jsx` | Dashboard del Círculo con guardián de la semana |
+| `/app/api/comunidad/bots/route.js` | Sistema de bots del foro (50 perfiles, 62+ posts) |
 
 ---
 
@@ -275,6 +280,73 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 ---
 
 ## ÚLTIMAS SESIONES
+
+### 2026-01-24 (sesión 11) - COMPLETADA
+
+**🎯 CÍRCULO DE DUENDES: SISTEMA COMPLETO ENERO 2026**
+
+Sistema completo del Círculo de Duendes con contenido pre-generado para todo enero 2026.
+
+**1. GUARDIANES MAESTROS** ✅
+- **Archivo:** `/lib/circulo/duendes-semanales-2026.js`
+- 6 Guardianes con historias completas, personalidades, cristales, colores, frases típicas:
+  - **Dorado** - Abundancia (Semana 1: 1-7 enero)
+  - **Obsidiana** - Protección (Semana 2: 8-14 enero)
+  - **Índigo** - Sabiduría (Semana 3: 15-21 enero)
+  - **Jade** - Sanación (Semana 4: 22-31 enero)
+  - **Coral** - Amor (futuro)
+  - **Aurora** - Intuición (futuro)
+- Funciones exportadas: `obtenerGuardianPorFecha()`, `obtenerSemanaActual()`
+- Cada guardián tiene: historia, personalidad, temas, cristales, imagen, color, saludo, despedida, frases típicas, productoWooCommerce
+
+**2. CONTENIDO PRE-GENERADO: 23 DÍAS** ✅
+- **Archivo:** `/scripts/generar-contenido-enero-2026.js`
+- 23 días completos (1-23 enero 2026)
+- Cada día tiene: titulo, subtitulo, cuerpo, afirmacion, cierre, imagen, cristalDelDia
+- Contenido escrito desde la perspectiva/personalidad de cada guardián
+- Tipos de contenido: presentacion, afirmacion, ensenanza, ejercicio, ritual, reflexion, cierre
+
+**3. SEED API** ✅
+- **Archivo:** `/app/api/admin/circulo/seed-enero/route.js`
+- Endpoint POST que guarda todo el contenido en Vercel KV
+- Guarda en doble formato de keys para compatibilidad:
+  - `circulo:contenido:2026:1:DIA`
+  - `contenido:2026-01-DD`
+- Guarda rotación semanal: `circulo:duende-semana:2026:1:SEMANA`
+- Guarda guardianes maestros: `circulo:guardianes-maestros`
+- **Ejecutado exitosamente:** 23 días, 4 semanas, 6 guardianes, 0 errores
+
+**4. DASHBOARD ACTUALIZADO** ✅
+- **Archivo:** `/app/mi-magia/circulo/Dashboard.jsx`
+- Muestra guardián de la semana con imagen grande (280x280px)
+- Cada contenido muestra autor guardián con foto y badge de tipo
+- Botón sutil "Conocé más sobre [nombre]" que linkea a tienda
+- Soporte para 3 formatos de contenido (cuerpo, secciones, mensaje)
+
+**5. SISTEMA DE BOTS MEJORADO** ✅
+- **Archivo:** `/app/api/comunidad/bots/route.js`
+- 50 perfiles de bots con nombres latinoamericanos
+- 62+ posts sobre los guardianes de enero
+- Endpoints: stats, actividad, feed, posts
+- Timestamps realistas con distribución exponencial
+
+**6. DEPLOY Y VERIFICACIÓN** ✅
+- Commit: `Complete Círculo de Duendes system for January 2026`
+- Push a main: exitoso
+- Deploy a Vercel: exitoso (https://duendes-vercel.vercel.app)
+- Seed ejecutado: 23 días guardados
+- APIs verificadas: contenidos (27 items), bots (348 miembros, 7 posts hoy)
+
+**Archivos creados/modificados:**
+| Archivo | Acción | Descripción |
+|---------|--------|-------------|
+| `/lib/circulo/duendes-semanales-2026.js` | NUEVO | 6 guardianes maestros con historias completas |
+| `/scripts/generar-contenido-enero-2026.js` | NUEVO | 23 días de contenido pre-generado |
+| `/app/api/admin/circulo/seed-enero/route.js` | NUEVO | API para poblar KV con contenido |
+| `/app/mi-magia/circulo/Dashboard.jsx` | MODIFICADO | Muestra guardián de la semana |
+| `/app/api/comunidad/bots/route.js` | MODIFICADO | 50 bots + 62 posts |
+
+---
 
 ### 2026-01-24 (sesión 10) - COMPLETADA
 
