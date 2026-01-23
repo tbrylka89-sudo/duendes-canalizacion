@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-23 18:20 (sesión 8 - COMPLETA)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-23 22:30 (sesión 9 - EN CURSO)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -253,6 +253,67 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ## ÚLTIMAS SESIONES
 
+### 2026-01-23 22:30 (sesión 9) - EN CURSO
+
+**🎯 TAREA COMPLETADA: REFACTORIZAR MI MAGIA**
+
+El archivo `/app/mi-magia/page.jsx` fue refactorizado de 8000 líneas a módulos separados.
+
+**Componentes creados en `/app/mi-magia/components/`:**
+| Archivo | Descripción | Líneas |
+|---------|-------------|--------|
+| `Tito.jsx` | Chatbot Tito + TitoBurbuja | ~200 |
+| `SeccionInicio.jsx` | Dashboard principal con gamificación | ~400 |
+| `SeccionCanalizaciones.jsx` | Guardianes, talismanes, libros, lecturas | ~655 |
+| `SeccionRegalos.jsx` | Sistema de regalos con runas | ~300 |
+| `SeccionGrimorio.jsx` | Diario mágico con calendario lunar | ~310 |
+| `SeccionCirculo.jsx` | Membresía del Círculo | ~130 |
+| `CofreDiario.jsx` | Cofre de runas diario | existente |
+| `constants.js` | Constantes y configuración | ~100 |
+| `styles.js` | Estilos compartidos | ~50 |
+| `index.js` | Exportaciones centralizadas | ~25 |
+
+**🐛 BUGS ARREGLADOS:**
+
+1. **Cofre de Runas no funcionaba** ✅
+   - **Causa:** Token en KV se guardaba como objeto `{email, nombre, creado}` pero el API lo trataba como string
+   - **Archivo:** `/api/gamificacion/cofre-diario/route.js`
+   - **Fix:** Agregado `typeof tokenData === 'string' ? tokenData : tokenData.email`
+   - **Commit:** `Fix token parsing in cofre-diario API`
+
+2. **Contenido del Círculo aparecía vacío** ✅
+   - **Causa:** Dashboard solo soportaba 2 formatos de contenido, pero existía contenido en formato `secciones`
+   - **Archivo:** `/app/mi-magia/circulo/Dashboard.jsx`
+   - **Fix:** Agregado soporte para 3 formatos:
+     1. `cuerpo` (generar-contenido-pro)
+     2. `secciones.intro/desarrollo/practica/cierre` (regenerar-contenido)
+     3. `mensaje/ensenanza/practica/reflexion` (legacy)
+   - **Commit:** `Fix Círculo Dashboard to support all content formats`
+
+3. **Imágenes del Círculo no se mostraban** ✅
+   - **Causa:** Dashboard mostraba placeholder estático en lugar de imágenes DALL-E
+   - **Archivo:** `/app/mi-magia/circulo/Dashboard.jsx`
+   - **Fix:** Mostrar `imagen` real cuando existe, fallback a placeholder con icono
+   - **Commit:** `Add support for DALL-E generated images in Círculo Dashboard`
+
+**✅ VERIFICADO:**
+- Generación de imágenes con DALL-E funciona (OPENAI_API_KEY activa)
+- Generación de contenido con Claude funciona (ANTHROPIC_API_KEY activa)
+- El contenido existente (días 1-26 de enero) se muestra correctamente
+
+**⚠️ ISSUE PENDIENTE:**
+- El contenido NUEVO generado con `generar-contenido-pro` no se guarda en KV
+- La API devuelve `success: true` y el contenido, pero al consultar no existe
+- KV_REST_API_URL y KV_REST_API_TOKEN están configurados en Vercel
+- Posibles causas: permisos de escritura, token de otro proyecto, rate limit
+
+**Commits de esta sesión:**
+1. `Fix token parsing in cofre-diario API`
+2. `Fix Círculo Dashboard to support all content formats`
+3. `Add support for DALL-E generated images in Círculo Dashboard`
+
+---
+
 ### 2026-01-23 18:20 (sesión 8) - COMPLETADA
 
 **🔥 PARTE 1: Rotación de Patrones (ya documentado antes)**
@@ -321,72 +382,30 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ---
 
-## 🚨 TAREA LISTA PARA EJECUTAR: REFACTORIZAR MI MAGIA
+## ✅ REFACTORIZACIÓN COMPLETADA: MI MAGIA
 
-**Archivo a refactorizar:** `/app/mi-magia/page.jsx` (7966 líneas, 347KB)
+**Estado:** COMPLETADO en sesión 9
 
-### El problema:
-- Un solo archivo con TODO: secciones, componentes, estados, funciones
-- Difícil de mantener y debuggear
-- Vercel tarda en compilar
-
-### Objetivo:
-Separar en módulos manteniendo la funcionalidad exacta.
-
-### Estructura propuesta:
-
+**Estructura actual de `/app/mi-magia/`:**
 ```
 /app/mi-magia/
-├── page.jsx                    # Solo wrapper con Suspense + importa MiMagiaContent
+├── page.jsx                    # Wrapper con Suspense (~4400 líneas reducidas)
 ├── components/
-│   ├── MiMagiaContent.jsx      # Componente principal (estados + router de secciones)
-│   ├── SeccionInicio.jsx       # Sección de inicio/bienvenida
-│   ├── SeccionGuardianes.jsx   # Lista de guardianes del usuario
-│   ├── SeccionLecturas.jsx     # Historial de lecturas
-│   ├── SeccionExperiencias.jsx # Experiencias mágicas
-│   ├── SeccionRegalos.jsx      # Regalos recibidos
-│   ├── SeccionElegidos.jsx     # Sección elegidos
-│   ├── SeccionCirculo.jsx      # Contenido del Círculo
-│   ├── SeccionPerfil.jsx       # Perfil del usuario
-│   ├── Navegacion.jsx          # Menú lateral/navegación
-│   ├── HeaderMiMagia.jsx       # Header con nombre y tréboles
-│   └── Tito.jsx                # Componente del chatbot (ya existe como función)
-├── hooks/
-│   ├── useElegido.js           # Hook para cargar datos del elegido
-│   ├── useCirculo.js           # Hook para estado del círculo
-│   └── useSecciones.js         # Hook para navegación entre secciones
-└── utils/
-    └── constants.js            # Constantes, colores, configuración
+│   ├── Tito.jsx                # Chatbot Tito + TitoBurbuja
+│   ├── SeccionInicio.jsx       # Dashboard con gamificación
+│   ├── SeccionCanalizaciones.jsx # Guardianes, talismanes, lecturas
+│   ├── SeccionRegalos.jsx      # Sistema de regalos
+│   ├── SeccionGrimorio.jsx     # Diario mágico + calendario lunar
+│   ├── SeccionCirculo.jsx      # Membresía del Círculo
+│   ├── CofreDiario.jsx         # Cofre de runas diario
+│   ├── AccesoRestringido.jsx   # Badges y banners de upgrade
+│   ├── BannerPromociones.jsx   # Banners promocionales
+│   ├── constants.js            # Constantes compartidas
+│   ├── styles.js               # Estilos compartidos
+│   └── index.js                # Exportaciones centralizadas
+└── circulo/
+    └── Dashboard.jsx           # Dashboard del Círculo (actualizado)
 ```
-
-### Pasos para ejecutar:
-
-1. **Leer el archivo completo** para entender la estructura actual
-2. **Identificar las secciones** (buscar `seccion ===` o `activeSection`)
-3. **Extraer constantes** primero (colores, textos fijos)
-4. **Extraer componentes** uno por uno, empezando por los más independientes
-5. **Crear hooks** para lógica reutilizable
-6. **Testear cada paso** antes de continuar
-7. **NO ROMPER FUNCIONALIDAD** - El sitio debe seguir funcionando igual
-
-### Comandos útiles:
-```bash
-# Ver estructura actual
-wc -l /app/mi-magia/page.jsx
-
-# Buscar secciones
-grep -n "seccion ===" app/mi-magia/page.jsx | head -20
-
-# Buscar funciones principales
-grep -n "^  function\|^  const.*= (" app/mi-magia/page.jsx | head -30
-```
-
-### IMPORTANTE:
-- El archivo ya tiene `<Suspense>` wrapper (lo agregamos hoy)
-- Hay una función `Tito()` al final que es el chatbot
-- Usar `'use client'` en cada componente que use hooks de React
-- Mantener los estilos inline (no crear CSS separado por ahora)
-- Hacer commits incrementales después de cada componente extraído
 
 ---
 
@@ -547,4 +566,95 @@ vercel logs
 curl -X POST http://localhost:3000/api/admin/historias \
   -H "Content-Type: application/json" \
   -d '{"nombre":"Test","especie":"duende","categoria":"Fortuna","especializacion":"fortuna"}'
+```
+
+---
+
+## 🔥 TRABAJO EN CURSO - CONTINUAR AQUÍ
+
+### Generación Manual de Historias (100 guardianes)
+
+**Guardianes completados: 43/100**
+
+**Sanación/Herbolarios (3):**
+1. Micelio ✅
+2. Ruperto ✅
+3. Silvano ✅
+
+**Viajeros (3):**
+4. Marcos ✅
+5. Noah ✅
+6. Edmund ✅
+
+**Elfos Viajeros (3):**
+7. Iker ✅
+8. Axel ✅
+9. Liam ✅
+
+**Abundancia/Dinero/Negocios (10):**
+10. Fortunato ✅
+11. Emir ✅
+12. Americo ✅
+13. Thomas (ex Mitch - PENDIENTE cambiar nombre en WP ID 4542) ✅
+14. Tony ✅
+15. Iris ✅
+16. Rubi ✅
+17. Tadeo ✅
+18. Neil ✅
+19. Santino ✅
+
+**Amor (6):**
+20. Mario ✅
+21. Heart ✅
+22. Rosa Pixie ✅
+23. Valentina ✅
+24. Monique ✅
+25. Zahira Pixie ✅
+
+**Brujas femeninas (10):**
+26. Moonstone (Sabiduría) - intuición, ciclos lunares ✅
+27. Gaia (Salud) - cuerpo, conexión tierra ✅
+28. Amy (Protección) - límites, rosa con espinas ✅
+29. Morgana (Sabiduría) - sombra, integración ✅
+30. Diana (Salud) - emocional-físico, piedra luna ✅
+31. Zephyra Pixie (Salud) - ciclos, regulación ✅
+32. Sabrina Pixie (Sabiduría) - práctica sobre teoría ✅
+33. Selene (Sabiduría) - linaje, ancestras ✅
+34. Winter (Protección) - fuego interior, pasión ✅
+35. Izara (Abundancia) - völva vikinga, clarividencia ✅
+
+**Brujos masculinos (4):**
+36. Groen (Protección) - brujo verde, regeneración ✅
+37. Merlin (Sabiduría) - maestro de maestros ✅
+38. Moon (Salud) - chamán, medicina ancestral ✅
+39. Rahmus (Sabiduría) - brujo verde, ritmos naturales ✅
+
+**PENDIENTES:**
+- Cambiar nombre "Mitch" a "Thomas" en WooCommerce (producto ID 4542)
+- Marcar Silvano y todos los nuevos como completados en el generador
+
+**Cómo continuar:**
+1. Usuario dice: "[Nombre], [Nombre], [Nombre]: [descripción de categoría y características]"
+2. Buscar datos en `/lib/guardian-intelligence/productos-base.json`
+3. Generar historia siguiendo patrones del prompt (apertura desde guardián, accesorios con significado)
+4. Mostrar historia + generar cierres adaptativos (vulnerable/escéptico/impulsivo)
+5. Si aprueba → guardar en WooCommerce con PUT a `/api/admin/historias`
+6. Actualizar prompt si hay nuevos patrones exitosos
+
+**Patrones que funcionan:**
+- Apertura: "[Nombre] + acción/rasgo distintivo" (no empezar con dolor)
+- Accesorios: explicar el POR QUÉ de cada uno, no listarlos
+- Mensaje: promesa específica en primera persona, NO "no vino a X"
+- Cierres: 3 versiones del mensaje del guardián (vulnerable, escéptico, impulsivo)
+
+**API para guardar:**
+```bash
+curl -X PUT "https://duendes-vercel.vercel.app/api/admin/historias" \
+  -H "Content-Type: application/json" \
+  -d '{"productoId": ID, "historia": "...", "cierres": {"vulnerable": "...", "esceptico": "...", "impulsivo": "..."}}'
+```
+
+**API para buscar producto:**
+```bash
+curl "https://duendes-vercel.vercel.app/api/woo/productos?search=NOMBRE"
 ```

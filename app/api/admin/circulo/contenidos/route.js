@@ -48,7 +48,10 @@ export async function GET(request) {
 // POST - Crear o actualizar un contenido específico
 export async function POST(request) {
   try {
-    const { dia, mes, año, contenido } = await request.json();
+    const body = await request.json();
+    const { dia, mes, contenido } = body;
+    // Aceptar tanto "año" como "ano" para compatibilidad con encoding
+    const año = body.año || body.ano;
 
     if (!dia || !mes || !año) {
       return Response.json({ success: false, error: 'Día, mes y año requeridos' }, { status: 400 });
@@ -95,7 +98,9 @@ export async function POST(request) {
 // PATCH - Cambiar estado de un contenido (publicar/despublicar)
 export async function PATCH(request) {
   try {
-    const { dia, mes, año, estado } = await request.json();
+    const body = await request.json();
+    const { dia, mes, estado } = body;
+    const año = body.año || body.ano;
 
     if (!dia || !mes || !año || !estado) {
       return Response.json({ success: false, error: 'Parámetros incompletos' }, { status: 400 });
