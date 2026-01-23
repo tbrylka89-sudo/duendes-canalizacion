@@ -233,7 +233,12 @@
   // Crear el contenedor del cierre
   function crearContenedor() {
     // Buscar el mejor lugar para insertar el cierre
+    // Primero buscar selectores específicos de Duendes, luego WooCommerce estándar
     const insertPoints = [
+      '.prod-mensaje',              // Después de "Su mensaje para vos"
+      '.prod-cuidados-tabs',        // Después de la sección de cuidados
+      '.prod-garantia',             // Después de garantía
+      '.duendes-producto-page .elementor-section:last-of-type',
       '.woocommerce-product-details__short-description',
       '.product-short-description',
       '.summary.entry-summary',
