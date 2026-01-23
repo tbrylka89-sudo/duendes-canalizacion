@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Duendes Hub de Control
  * Description: Centro de control con todos los accesos a la app de Vercel
- * Version: 3.0
+ * Version: 3.1
  * Author: Duendes del Uruguay
  */
 
@@ -86,6 +86,7 @@ class DuendesHubControl {
                 <a href="<?php echo $url; ?>/admin/circulo" target="_blank" class="quick-btn">🏠 Hub Círculo</a>
                 <a href="<?php echo $url; ?>/admin/circulo/maestro" target="_blank" class="quick-btn jade">🎓 Panel Maestro</a>
                 <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="quick-btn purple">📜 Canalizaciones</a>
+                <a href="<?php echo $url; ?>/sitemap.xml" target="_blank" class="quick-btn" style="background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);">🔍 SEO/Sitemap</a>
                 <a href="<?php echo $url; ?>/admin/gamificacion" target="_blank" class="quick-btn secondary">🎮 Gamificación</a>
             </div>
 
@@ -252,6 +253,75 @@ class DuendesHubControl {
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
+            <!-- SISTEMA SEO - NUEVO -->
+            <!-- ═══════════════════════════════════════════════════════════════════════ -->
+            <div class="hub-section" style="border: 2px solid #e91e63; background: linear-gradient(135deg, rgba(233,30,99,0.1), rgba(156,39,176,0.05));">
+                <h2>🔍 Sistema SEO Completo <span class="badge badge-new">NUEVO v3.1</span></h2>
+                <p style="margin-bottom: 20px; color: #555;">Sistema profesional de SEO para máxima visibilidad en buscadores.</p>
+
+                <div class="hub-grid">
+                    <a href="<?php echo $url; ?>/robots.txt" target="_blank" class="hub-card" style="border-color: #e91e63;">
+                        <div class="hub-card-title" style="color: #e91e63;">🤖 robots.txt</div>
+                        <div class="hub-card-url">/robots.txt</div>
+                        <div class="hub-card-desc">Reglas para crawlers. Permite públicas, bloquea privadas y APIs.</div>
+                        <div class="hub-card-uso"><strong>Bloquea:</strong> /mi-magia/*, /lectura/*, /guardian/*, /api/*, /admin/*</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/sitemap.xml" target="_blank" class="hub-card" style="border-color: #e91e63;">
+                        <div class="hub-card-title" style="color: #e91e63;">🗺️ sitemap.xml</div>
+                        <div class="hub-card-url">/sitemap.xml</div>
+                        <div class="hub-card-desc">Sitemap dinámico con productos de WooCommerce.</div>
+                        <div class="hub-card-uso"><strong>Prioridades:</strong> Home 1.0, Tienda 0.9, Productos 0.8</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/site.webmanifest" target="_blank" class="hub-card">
+                        <div class="hub-card-title">📱 PWA Manifest</div>
+                        <div class="hub-card-url">/site.webmanifest</div>
+                        <div class="hub-card-desc">Configuración de Progressive Web App.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/api/seo/analyze?productId=4542" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🔬 API Analizar SEO</div>
+                        <div class="hub-card-url">/api/seo/analyze</div>
+                        <div class="hub-card-desc">GET: Analiza SEO de producto con score 0-100 y sugerencias.</div>
+                        <div class="hub-card-uso"><strong>Params:</strong> productId=X (GET), productIds=[...] (POST masivo)</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/api/seo/bulk-update" target="_blank" class="hub-card">
+                        <div class="hub-card-title">📤 API Actualizar SEO</div>
+                        <div class="hub-card-url">/api/seo/bulk-update</div>
+                        <div class="hub-card-desc">POST: Actualiza SEO de múltiples productos en WooCommerce.</div>
+                        <div class="hub-card-uso"><strong>Body:</strong> {productIds: [...], dryRun: false, batchSize: 10}</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/producto/finnian" target="_blank" class="hub-card">
+                        <div class="hub-card-title">📦 Páginas de Producto</div>
+                        <div class="hub-card-url">/producto/[slug]</div>
+                        <div class="hub-card-desc">Páginas de producto con SEO completo, Schema JSON-LD, OpenGraph.</div>
+                        <div class="hub-card-uso"><strong>Incluye:</strong> Breadcrumbs, Twitter Cards, productos relacionados</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/tienda" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🏪 Tienda SEO</div>
+                        <div class="hub-card-url">/tienda</div>
+                        <div class="hub-card-desc">Tienda con metadata optimizada y Schema de colección.</div>
+                    </a>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <h4 style="margin: 0 0 10px 0; color: #e91e63;">📊 Funcionalidades SEO Implementadas</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; font-size: 12px;">
+                        <span>✅ OpenGraph Tags</span>
+                        <span>✅ Twitter Cards</span>
+                        <span>✅ Canonical URLs</span>
+                        <span>✅ Schema Organization</span>
+                        <span>✅ Schema LocalBusiness</span>
+                        <span>✅ Schema Product</span>
+                        <span>✅ Schema WebSite</span>
+                        <span>✅ Schema BreadcrumbList</span>
+                        <span>✅ noindex páginas privadas</span>
+                        <span>✅ RankMath 100/100</span>
+                        <span>✅ LSI Keywords</span>
+                        <span>✅ Alt text automático</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <!-- CANALIZACIONES -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="border-left: 4px solid #9370DB;">
@@ -395,8 +465,20 @@ class DuendesHubControl {
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/comunidad/bots?tipo=stats</code></td>
                     </tr>
                     <tr style="background: white;">
-                        <td style="padding: 10px;">Ver calendario programado</td>
-                        <td style="padding: 10px;"><code>/admin/circulo/calendario</code></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver calendario programado</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/circulo/calendario</code></td>
+                    </tr>
+                    <tr style="background: #fce4ec;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Ver sitemap de productos</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/sitemap.xml</code> 🔍</td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Analizar SEO de producto</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/seo/analyze?productId=X</code></td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td style="padding: 10px;">Actualizar SEO masivo</td>
+                        <td style="padding: 10px;"><code>/api/seo/bulk-update</code> (POST)</td>
                     </tr>
                 </table>
             </div>
@@ -437,7 +519,7 @@ class DuendesHubControl {
 
             <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
                 URL base: <strong><?php echo $url; ?></strong><br>
-                Hub v3.0 - Sistema Círculo de Duendes Completo - Enero 2026
+                Hub v3.1 - Sistema SEO Completo + Círculo de Duendes - Enero 2026
             </div>
 
         </div>
