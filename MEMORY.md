@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-22 (sesión 6)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-23 18:20 (sesión 8 - COMPLETA)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -20,10 +20,11 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
   - `/api/admin/canalizaciones/resumen` - Resumen ejecutivo IA
 - **Flujo:** Compra → Genera auto → Pendiente → Aprobar → Enviar → Mi Magia
 
-### Test del Guardián: ⚠️ BÁSICO (necesita mejora)
+### Test del Guardián: ✅ CON PERFILADO PSICOLÓGICO
 - **UI:** `/app/mi-magia/test-guardian.js` - Chat con Tito
 - **API:** `/api/test-guardian` - Preguntas y procesamiento
-- **Estado:** Funciona pero NO tiene perfilado psicológico avanzado
+- **Perfilado:** `/lib/circulo/perfilado.js` - Calcula vulnerabilidad, dolor, estilo decisión, creencias
+- **Integración Tito:** El chat de Tito ahora adapta sus respuestas según el perfil psicológico del usuario
 
 ---
 
@@ -33,7 +34,7 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 | Feature | Estado | Descripción |
 |---------|--------|-------------|
-| **Perfilado del Comprador** | ❌ Pendiente | Test que clasifica: vulnerabilidad, dolor principal, estilo decisión, poder adquisitivo, creencias |
+| **Perfilado del Comprador** | ✅ COMPLETADO | `/lib/circulo/perfilado.js` - Clasifica: vulnerabilidad (alta/media/baja), dolor (soledad/dinero/salud/relaciones/proposito), estilo decisión (impulsivo/analitico/emocional), creencias (creyente/buscador/esceptico). Integrado en Tito. |
 | **Historias con Cierres Adaptativos** | ⚠️ Parcial | Historia fija + 3 cierres por perfil (vulnerable/escéptico/impulsivo) |
 | **Objeciones Preemptivas** | ❌ Pendiente | Responder "es solo un muñeco", "es caro", "no creo" dentro de la historia |
 | **Loop Abierto Obligatorio** | ❌ Pendiente | Cada historia debe tener algo incompleto que la compra cierra |
@@ -119,6 +120,8 @@ Precio                          | Orden en que ve productos
 | `/app/api/admin/historias/route.js` | API principal de generación |
 | `/app/admin/generador-historias/page.jsx` | UI del generador |
 | `/app/api/admin/corregir-producto/route.js` | API corrección ortográfica con Claude Haiku |
+| `/lib/parsers/texto-producto.js` | Parser inteligente de texto libre para productos |
+| `/app/api/admin/historias/temas-aprendidos/route.js` | API de auto-aprendizaje de temas |
 | `/temp-plugin/duendes-corregir-ortografia.php` | Plugin WordPress para corrección in-product |
 | `/app/admin/corregir-productos/page.jsx` | UI alternativa para corregir productos (usa diccionario) |
 | `/app/admin/canalizaciones/page.jsx` | Lista de canalizaciones (tabs por estado) |
@@ -127,6 +130,11 @@ Precio                          | Orden en que ve productos
 | `/app/api/admin/canalizaciones/chat/route.js` | Chat inteligente para editar canalizaciones |
 | `/app/api/admin/canalizaciones/resumen/route.js` | Genera resumen ejecutivo con IA |
 | `/app/mi-magia/test-guardian.js` | UI Test del Guardián (chat con Tito) |
+| `/lib/circulo/perfilado.js` | Sistema de perfilado psicológico completo |
+| `/app/api/tito/chat/route.js` | Chat Tito CON perfilado psicológico integrado |
+| `/app/api/webhooks/woocommerce/route.js` | Webhook UNIFICADO de WooCommerce |
+| `/app/api/cron/duende-semana-rotacion/route.js` | CRON rotación duende de la semana |
+| `/app/api/emails/micro-compromisos/route.js` | API secuencia micro-compromisos |
 
 ---
 
@@ -160,6 +168,8 @@ Precio                          | Orden en que ve productos
 | `sabiduria` | Sabiduría | No sabés qué decisión tomar |
 | `transformacion` | Transformación | Querés cambiar pero no sabés cómo |
 | `alegria` | Alegría | Olvidaste cómo se siente la alegría |
+| `viajeros` | Viajeros | Necesitás cambio de dirección, nuevos horizontes |
+| `bosque` | Bosque/Naturaleza | Reconexión con la tierra, equilibrio natural |
 
 ### SUB-ESPECIALIZACIONES (para futuro o texto libre)
 
@@ -242,6 +252,114 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 ---
 
 ## ÚLTIMAS SESIONES
+
+### 2026-01-23 18:20 (sesión 8) - COMPLETADA
+
+**🔥 PARTE 1: Rotación de Patrones (ya documentado antes)**
+- Sistema de rotación de patrones v3
+- Hooks desde el guardián
+- Score protection para regeneración
+
+**✅ PARTE 2: DEPLOYS Y NUEVAS FUNCIONALIDADES**
+
+1. **FIX SUSPENSE BOUNDARY (VERCEL)**
+   - Error: `useSearchParams()` sin Suspense en Next.js 14
+   - Archivos corregidos:
+     - `/app/mi-magia/page.jsx` - 8000 líneas, envuelto en Suspense
+     - `/app/mi-magia/elegidos/page.jsx`
+     - `/app/mi-magia/lecturas/page.jsx`
+     - `/app/mi-magia/experiencias/page.jsx`
+     - `/app/mi-magia/regalos/page.jsx`
+
+2. **PERFILADO PSICOLÓGICO EN TITO** ✅
+   - Tito ahora carga el perfil psicológico del usuario (si existe)
+   - Adapta comunicación según:
+     - **Vulnerabilidad:** alta (empatía primero), media (valor gradual), baja (oferta directa)
+     - **Dolor:** soledad, dinero, salud, relaciones, propósito
+     - **Estilo decisión:** impulsivo, analítico, emocional
+     - **Creencias:** creyente (lenguaje místico), buscador (mixto), escéptico (práctico)
+   - Actualiza perfil dinámicamente desde la conversación
+   - Archivo: `/app/api/tito/chat/route.js` (+148 líneas)
+
+3. **WEBHOOKS WOOCOMMERCE UNIFICADOS** ✅
+   - Había 3 endpoints duplicados:
+     - `/api/webhooks/woocommerce` (plural) - completo
+     - `/api/webhook/woocommerce` (singular) - básico
+     - `/api/webhook` (general) - scheduling
+   - **SOLUCIÓN:** Un solo webhook unificado en `/api/webhooks/woocommerce`
+   - Features del webhook unificado:
+     - Verificación de firma
+     - Protección anti-duplicados
+     - Guardianes, Runas, Membresías
+     - Lecturas Ancestrales scheduling
+     - Gamificación automática
+     - Emails transaccionales
+     - Registro para reporte diario
+   - Endpoints deprecated redirigen al unificado
+
+4. **WORDPRESS: TEST GUARDIAN v12** ✅
+   - Plugin subido via SFTP a `mu-plugins/`
+   - CSS fix aplicado
+
+**📦 DEPLOYS VERIFICADOS:**
+| Endpoint | Status | Notas |
+|----------|--------|-------|
+| `/mi-magia` | ✅ 200 | Suspense fix |
+| `/api/tito/chat` | ✅ 200 | Con perfilado |
+| `/api/webhooks/woocommerce` | ✅ active | Unificado |
+| `/api/cron/duende-semana-rotacion` | ✅ 401 | Protegido CRON_SECRET |
+| `/api/emails/micro-compromisos` | ✅ 200 | Listo |
+| Test Guardian WordPress | ✅ 200 | v12 subido |
+
+**Commits de esta sesión:**
+1. `Fix useSearchParams Suspense boundary errors`
+2. `Integrate psychological profiling into Tito chatbot`
+3. `Unify WooCommerce webhooks into single endpoint`
+
+**⏳ PENDIENTE PARA PRÓXIMA SESIÓN:**
+- #7 Refactorizar Mi Magia (8000 líneas → módulos)
+
+---
+
+### 2026-01-23 (sesión 7) - COMPLETADA
+**Funcionalidades nuevas implementadas:**
+
+1. ✅ **CREADOR INTELIGENTE DE PRODUCTOS**
+   - Nuevo modo en `/admin/generador-historias`
+   - Flujo completo: Subir fotos → Analizar con Claude Vision → Parsear texto libre → Generar historia → Publicar a WooCommerce
+   - Pasos 18-23 en el generador
+   - Drag & drop de múltiples fotos con preview
+   - Parseo inteligente de texto libre (detecta nombre, tamaño, categoría, cristales)
+   - Publicación directa: sube fotos a WP Media Library + crea producto
+
+2. ✅ **SISTEMA DE AUTO-APRENDIZAJE DE TEMAS**
+   - El Planificador Visual ahora detecta categorías con 100+ keywords
+   - Aprende de generaciones exitosas y las almacena en Vercel KV
+   - Temas aprendidos tienen prioridad sobre mapeo estático
+   - API: `/api/admin/historias/temas-aprendidos`
+
+3. ✅ **NUEVAS ESPECIALIZACIONES**
+   - **Viajeros**: Duendes con mochilas, cambio de dirección, nuevos horizontes
+     - Subcategorías: aventura, sabiduría, reinvención, horizontes, despegue
+   - **Bosque/Naturaleza**: Duendes con hierbas, hongos, conexión con la tierra
+     - Subcategorías: sanación, raíces, micelios, hierbas, hongos, equilibrio
+
+4. ✅ **HUB DE WORDPRESS v2.0**
+   - Plugin `duendes-hub-control.php` actualizado con todas las rutas de Vercel
+   - Incluye: MODO DIOS, Generador Historias, Mi Magia, Círculo, Elegidos, Lecturas, etc.
+
+5. ✅ **MEJORAS TÉCNICAS**
+   - API de WooCommerce con mejor manejo de errores en crear/actualizar
+   - API de análisis de imagen acepta base64 además de URLs
+   - Parser de texto libre: `/lib/parsers/texto-producto.js`
+
+**Archivos nuevos/modificados:**
+- `/lib/parsers/texto-producto.js` - NUEVO: Parser inteligente de texto
+- `/app/admin/generador-historias/page.jsx` - +1885 líneas para creador
+- `/app/api/admin/historias/analizar-imagen/route.js` - Acepta base64
+- `/app/api/admin/woocommerce/productos/route.js` - Mejor manejo errores
+
+---
 
 ### 2026-01-22 (sesión 6) - COMPLETADA
 **Mejoras implementadas:**
