@@ -1,8 +1,8 @@
 # 🧠 GUARDIAN INTELLIGENCE - ESTADO DEL DESARROLLO
 
-**Última actualización:** 2026-01-21 04:00 (Uruguay)
+**Última actualización:** 2026-01-23 (Uruguay)
 **Desarrollador:** Claude Code
-**Estado general:** EN PRUEBAS - Analizador y Generador v2 listos
+**Estado general:** EN PRODUCCIÓN - Sistema de generación v3 con rotación de patrones
 
 ---
 
@@ -11,6 +11,8 @@
 Guardian Intelligence (GI) es el sistema de inteligencia artificial central de Duendes del Uruguay. Funciona como el "cerebro" que:
 - Analiza y corrige historias de guardianes
 - Genera contenido único y SEO optimizado
+- **Rota patrones de apertura** para evitar repetición entre historias
+- **Empieza desde el guardián**, no siempre desde el dolor
 - Monitorea 24/7 que todo funcione
 - Alerta cuando hay problemas
 - Gestiona promociones y banners
@@ -19,14 +21,152 @@ Guardian Intelligence (GI) es el sistema de inteligencia artificial central de D
 
 ---
 
-## 🔥 ACTUALIZACIÓN 21 ENERO 2026 - 04:00 AM
+## 🔥 ACTUALIZACIÓN 23 ENERO 2026 - SISTEMA DE ROTACIÓN v3
 
 ### Problema Detectado
-El analizador daba 92/100 a historias que claramente estaban mal (repetitivas, con estructura rígida de template, headers tipo formulario). Era "una mentira más grande que las de Pinocho".
+Las historias generadas:
+1. Empezaban SIEMPRE desde el dolor ("hay quienes cargan con...", "hay personas que...")
+2. Usaban el patrón repetitivo "no vino a darte consejos, no vino a X, no vino a Y"
+3. Se sentían como copy-paste con diferentes nombres
+4. Faltaba variedad y unicidad
 
 ### Soluciones Implementadas
 
-#### 1. Analizador v2 (`analyzer.js`)
+#### 1. Sistema de Rotación de Patrones (`config.js`)
+**No prohibición, ROTACIÓN.** Un patrón puede reutilizarse después de ~15 historias.
+
+```javascript
+// Patrones que rotan (no se pueden usar hasta que pasen 15 historias)
+export const PATRONES_APERTURA = {
+  // DESDE EL GUARDIÁN (prioritarios)
+  guardian_presentacion: ['nació con', 'llegó con', 'es un guardián', 'es una guardiana'],
+  guardian_mision: ['viene a', 'vino a', 'su misión', 'está acá para'],
+  guardian_energia: ['su energía', 'transmite', 'se siente', 'irradia'],
+
+  // DESDE LA CONEXIÓN
+  busqueda: ['si estás buscando', 'si estás en', 'cuando uno busca'],
+  momento_vida: ['hay momentos', 'hay etapas', 'a veces la vida'],
+
+  // DESDE EL DOLOR (usar con menos frecuencia)
+  dolor_sutil: ['hay quienes', 'algunas personas', 'no siempre es fácil'],
+  pregunta: ['¿alguna vez', '¿te pasó', '¿sentiste'],
+  afirmacion: ['esto es para', 'llegaste acá', 'no es casualidad'],
+  secreto: ['hay algo que', 'existe un', 'pocas personas saben'],
+  contraste: ['mientras todos', 'cuando el mundo', 'en un mundo donde'],
+  cuerpo: ['tu cuerpo sabe', 'algo en vos', 'esa sensación']
+};
+```
+
+#### 2. Hooks de Apertura por Categoría (`config.js`)
+Hooks específicos que empiezan DESDE EL GUARDIÁN:
+
+```javascript
+export const HOOKS_APERTURA = {
+  proteccion: [
+    // Desde el guardián (prioritarios)
+    '{nombre} nació con una misión clara: ser escudo.',
+    '{nombre} no llegó por casualidad. Los guardianes de protección eligen a quién acompañar.',
+    'Hay guardianes que nacen para cuidar. {nombre} es uno de ellos.',
+    // Desde la conexión (secundarios)
+    'Si estás buscando sentirte segura, {nombre} ya te encontró.',
+    ...
+  ],
+  abundancia: [...],
+  amor: [...],
+  salud: [...],
+  sabiduria: [...],
+  sanacion: [...]
+};
+```
+
+#### 3. Aperturas Prohibidas SIEMPRE (`config.js`)
+Frases cliché que NUNCA deben usarse:
+
+```javascript
+export const APERTURAS_PROHIBIDAS_SIEMPRE = [
+  'en lo profundo del bosque',
+  'las brumas del',
+  'desde tiempos inmemoriales',
+  'el velo entre mundos',
+  'érase una vez',
+  'había una vez',
+  'hace mucho mucho tiempo',
+  'en tierras lejanas'
+];
+```
+
+#### 4. Prompt Actualizado (`/api/admin/historias/route.js`)
+- **Prohibido:** "no vino a X, no vino a Y" (patrón repetitivo)
+- **Estructura flexible:** Opción A desde el guardián, Opción B desde la conexión
+- **Unicidad obligatoria:** Cada historia debe ser única como cada humano
+- **Temperatura:** 0.85 (balance creatividad/consistencia)
+
+#### 5. Score Protection para Regeneración
+Al regenerar una historia, el sistema:
+1. Guarda el score anterior
+2. Genera nueva historia
+3. Si el score nuevo es MENOR → regenera automáticamente (máx 3 intentos)
+4. Nunca entrega una historia peor que la anterior
+
+```javascript
+// En frontend
+const generarDirecto = async (especializacionOverride, esRegeneracion = false) => {
+  const scoreAnteriorParaProteccion = esRegeneracion && directoConversion?.score?.total
+    ? directoConversion.score.total
+    : null;
+  // ...
+};
+
+// En API
+if (scoreAnterior && score.total < scoreAnterior && intentoActual < 3) {
+  console.log(`Score nuevo (${score.total}) menor que anterior (${scoreAnterior}), regenerando...`);
+  return POST(nuevoRequest); // Recursivo
+}
+```
+
+### Vercel KV para Tracking Global
+
+```
+gi:patrones:apertura     # Hash de patrones usados con timestamps
+gi:hooks:usados          # Lista de hooks ya utilizados
+gi:ultimas:15:aperturas  # Últimas 15 aperturas para comparar
+```
+
+---
+
+## 🎯 TRABAJO MANUAL: PRIMEROS 100 GUARDIANES
+
+### Flujo de Trabajo
+1. Usuario indica: **"[Nombre] - [Categoría]"**
+2. Claude genera historia con todas las reglas
+3. Muestra historia + score + evaluación
+4. Si aprueba → Click "Guardar en WooCommerce"
+5. Si no → Ajustar y regenerar
+
+### Categorías Disponibles
+- Protección
+- Abundancia
+- Sabiduría
+- Salud
+- Amor
+- Sanación
+
+### Guardado Automático a WooCommerce
+El sistema:
+1. Busca producto por nombre exacto en WooCommerce
+2. Actualiza la descripción con la historia generada
+3. Convierte markdown a HTML automáticamente
+
+---
+
+## 📅 HISTORIAL DE ACTUALIZACIONES
+
+### 21 Enero 2026 - Analizador v2
+El analizador daba 92/100 a historias que claramente estaban mal (repetitivas, con estructura rígida de template, headers tipo formulario). Era "una mentira más grande que las de Pinocho".
+
+#### Soluciones Implementadas
+
+**Analizador v2 (`analyzer.js`)**
 Ahora detecta problemas REALES:
 - `intro_robotica`: "Esta es X. Tiene Y años..." (penaliza -15)
 - `estructura_rigida`: Headers como "QUÉ TE APORTA:", "CÓMO NACIÓ:" (penaliza -20)
@@ -39,18 +179,18 @@ Ahora detecta problemas REALES:
 
 **Resultado:** Puntajes pasaron de 92/100 falso a 24/100 real (122 de 123 con problemas)
 
-#### 2. Generador v2 (`generator.js`)
+**Generador v2 (`generator.js`)**
 - 6 estilos narrativos diferentes (reflexión, sincrodestino, mensaje, cliente, sensorial, diario)
 - SIN headers rígidos - todo fluido
 - Evita sincrodestinos gastados automáticamente
 - Nueva función `corregirHistoria()` para arreglar historias existentes
 
-#### 3. API de Corrección (`/api/guardian-intelligence/corregir`)
+**API de Corrección (`/api/guardian-intelligence/corregir`)**
 - POST con productId: corrige UN producto (modo preview o aplicar)
 - POST sin productId: corrige los peores puntajes en batch
 - GET: historial de correcciones
 
-#### 4. Base de Productos (`productos-base.json`)
+### Base de Productos (`productos-base.json`)
 113 productos con datos REALES del PDF:
 - Nombre, género, categoría, tamaño (cm), accesorios específicos
 
@@ -65,14 +205,6 @@ pixie, duende, duenda, leprechaun, bruja, brujo, vikingo, vikinga, elfo, chamán
 
 **Diferenciador de Marca:**
 > "Cada guardián es canalizado de manera consciente y voluntaria. No es una artesanía - es un ser que elige nacer. Por eso elegimos este camino de canalización consciente hace 10 años."
-
-### Prueba de Corrección
-- Violeta (ID 4740): De 12 puntos → 77 puntos
-- Problemas resueltos: 5 de 7
-
-### Pendiente
-- Correr correcciones en batch para todos los productos < 50 puntos
-- Verificar que el generador use los datos reales de productos-base.json
 
 ---
 

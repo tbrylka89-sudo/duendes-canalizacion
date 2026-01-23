@@ -304,6 +304,16 @@ Los cierres varían según el perfil del lector, pero SIEMPRE son del guardián 
 // POST - Generar historia con sistema experto
 export async function POST(request) {
   try {
+    const body = await request.json();
+
+    // Si es una llamada de acción (no generación), devolver error informativo
+    if (body.action) {
+      return NextResponse.json({
+        success: false,
+        error: `La acción "${body.action}" debe usar GET, no POST. Usá: GET /api/admin/historias?accion=${body.action}`
+      }, { status: 400 });
+    }
+
     const {
       productoId,
       nombre,
@@ -325,7 +335,15 @@ export async function POST(request) {
       temaLibre, // NUEVO: tema escrito libremente por el usuario (ej: "fortuna y dinero", "proteger el hogar")
       scoreAnterior, // PROTECCIÓN: score de la historia anterior (para regeneración)
       intentoActual = 1 // Contador de intentos de regeneración
-    } = await request.json();
+    } = body;
+
+    // Validar datos requeridos para generación
+    if (!nombre) {
+      return NextResponse.json({
+        success: false,
+        error: 'Se requiere el nombre del guardián para generar historia'
+      }, { status: 400 });
+    }
 
     // === VALIDACIÓN PRE-GENERACIÓN ===
     const validacion = {

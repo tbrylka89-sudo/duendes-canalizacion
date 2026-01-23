@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { obtenerGuardianPorFecha, obtenerSemanaActual, GUARDIANES_MAESTROS } from '@/lib/circulo/duendes-semanales-2026';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DASHBOARD DEL CÍRCULO DE DUENDES
@@ -1215,8 +1216,18 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
   const [infoVisita, setInfoVisita] = useState(null);
   const [mensajeVisible, setMensajeVisible] = useState(true);
 
+  // Guardian de la semana desde la configuracion local
+  const [guardianLocal, setGuardianLocal] = useState(null);
+  const [semanaActual, setSemanaActual] = useState(null);
+
   useEffect(() => {
     cargarInfoVisita();
+    // Obtener guardian de la semana desde la configuracion local
+    const hoy = new Date();
+    const guardian = obtenerGuardianPorFecha(hoy);
+    const semana = obtenerSemanaActual(hoy);
+    setGuardianLocal(guardian);
+    setSemanaActual(semana);
   }, [usuario]);
 
   // Registrar visita y determinar qué mensaje mostrar
@@ -1369,80 +1380,138 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
       </div>
 
       {/* Guardián de la semana - Diseño destacado */}
-      {(guardianSemana || consejo?.guardian) && (
-        <div className="guardian-destacado">
-          <div className="guardian-glow"></div>
-          <div className="guardian-contenedor">
-            {/* Banner decorativo */}
-            <div className="guardian-banner">
-              <div className="banner-patron"></div>
-              <span className="banner-estrella izq">✦</span>
-              <span className="banner-titulo">✧ Guardián de la Semana ✧</span>
-              <span className="banner-estrella der">✦</span>
-            </div>
+      {(guardianLocal || guardianSemana || consejo?.guardian) && (() => {
+        // Priorizar el guardian local (del archivo de configuracion), luego API, luego consejo
+        const guardian = guardianLocal || guardianSemana || consejo?.guardian;
+        const tieneProducto = guardian?.productoWooCommerce;
 
-            {/* Contenido principal */}
-            <div className="guardian-cuerpo">
-              {/* Imagen circular destacada */}
-              <div className="guardian-foto-contenedor">
-                <div className="foto-aureola"></div>
-                <div className="foto-marco">
-                  <img
-                    src={consejo?.guardian?.imagen || guardianSemana?.imagen}
-                    alt={consejo?.guardian?.nombre || guardianSemana?.nombre}
-                    className="guardian-foto"
-                  />
+        return (
+          <div className="guardian-destacado">
+            <div className="guardian-glow"></div>
+            <div className="guardian-contenedor">
+              {/* Banner decorativo con info de la semana */}
+              <div className="guardian-banner">
+                <div className="banner-patron"></div>
+                <span className="banner-estrella izq">✦</span>
+                <div className="banner-titulo-wrap">
+                  <span className="banner-titulo">✧ Guardián de la Semana ✧</span>
+                  {semanaActual && (
+                    <span className="banner-tema">{semanaActual.tema}</span>
+                  )}
                 </div>
-                <div className="foto-brillo"></div>
+                <span className="banner-estrella der">✦</span>
               </div>
 
-              {/* Info del guardián */}
-              <div className="guardian-datos">
-                <span className="guardian-especie">
-                  {consejo?.guardian?.tipo_ser_nombre || guardianSemana?.tipo_ser_nombre || 'Guardián'}
-                </span>
-                <h3 className="guardian-nombre-grande">
-                  {consejo?.guardian?.nombre || guardianSemana?.nombre}
-                </h3>
-                <span className="guardian-proposito">
-                  {consejo?.guardian?.categoria || guardianSemana?.categoria}
-                </span>
-                <p className="guardian-arquetipo-desc">
-                  {consejo?.guardian?.arquetipo || guardianSemana?.arquetipo || 'Guardián ancestral de la magia'}
-                </p>
-
-                {/* Cristales y elemento */}
-                <div className="guardian-atributos">
-                  {(consejo?.guardian?.cristales || guardianSemana?.cristales) && (
-                    <span className="atributo">
-                      <span className="atributo-icono">💎</span>
-                      {Array.isArray(consejo?.guardian?.cristales || guardianSemana?.cristales)
-                        ? (consejo?.guardian?.cristales || guardianSemana?.cristales).join(', ')
-                        : (consejo?.guardian?.cristales || guardianSemana?.cristales)}
-                    </span>
-                  )}
-                  {(consejo?.guardian?.elemento || guardianSemana?.elemento) && (
-                    <span className="atributo">
-                      <span className="atributo-icono">🌿</span>
-                      {consejo?.guardian?.elemento || guardianSemana?.elemento}
-                    </span>
+              {/* Contenido principal */}
+              <div className="guardian-cuerpo">
+                {/* Imagen circular destacada - MAS GRANDE */}
+                <div className="guardian-foto-contenedor grande">
+                  <div className="foto-aureola"></div>
+                  <div className="foto-marco">
+                    <img
+                      src={guardian?.imagen || '/images/guardian-default.jpg'}
+                      alt={guardian?.nombre}
+                      className="guardian-foto"
+                    />
+                  </div>
+                  <div className="foto-brillo"></div>
+                  {/* Color del guardian */}
+                  {guardian?.color && (
+                    <div
+                      className="foto-color-accent"
+                      style={{ background: guardian.color }}
+                    ></div>
                   )}
                 </div>
 
-                <a
-                  href={consejo?.guardian?.url_tienda || guardianSemana?.url_tienda}
-                  target="_blank"
-                  rel="noopener"
-                  className="guardian-btn-tienda"
-                >
-                  <span>Conocer a {consejo?.guardian?.nombre || guardianSemana?.nombre}</span>
-                  <span className="btn-flecha">→</span>
-                </a>
+                {/* Info del guardián */}
+                <div className="guardian-datos">
+                  <span className="guardian-especie">
+                    {guardian?.categoria || 'Guardián Ancestral'}
+                  </span>
+                  <h3 className="guardian-nombre-grande">
+                    {guardian?.nombre}
+                  </h3>
+                  <span className="guardian-titulo-completo">
+                    {guardian?.nombreCompleto || guardian?.nombre}
+                  </span>
+
+                  {/* Mensaje de saludo del guardian */}
+                  {guardian?.saludo && (
+                    <p className="guardian-saludo">
+                      "{guardian.saludo}"
+                    </p>
+                  )}
+
+                  <p className="guardian-arquetipo-desc">
+                    {guardian?.personalidad?.substring(0, 150) || guardian?.arquetipo || 'Guardián ancestral de la magia'}
+                    {guardian?.personalidad?.length > 150 ? '...' : ''}
+                  </p>
+
+                  {/* Cristales y elemento */}
+                  <div className="guardian-atributos">
+                    {guardian?.cristales && (
+                      <span className="atributo">
+                        <span className="atributo-icono">💎</span>
+                        {Array.isArray(guardian.cristales)
+                          ? guardian.cristales.join(', ')
+                          : guardian.cristales}
+                      </span>
+                    )}
+                    {guardian?.elemento && (
+                      <span className="atributo">
+                        <span className="atributo-icono">🌿</span>
+                        {guardian.elemento}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Frases tipicas */}
+                  {guardian?.frasesTipicas && guardian.frasesTipicas.length > 0 && (
+                    <div className="guardian-frase-tipica">
+                      <span className="frase-etiqueta">Una de sus frases:</span>
+                      <p className="frase-texto">"{guardian.frasesTipicas[Math.floor(Math.random() * guardian.frasesTipicas.length)]}"</p>
+                    </div>
+                  )}
+
+                  {/* Botones de accion */}
+                  <div className="guardian-acciones">
+                    {tieneProducto && (
+                      <a
+                        href={`${WORDPRESS_URL}/?p=${guardian.productoWooCommerce}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="guardian-btn-tienda"
+                      >
+                        <span>Conoce mas sobre {guardian.nombre}</span>
+                        <span className="btn-flecha">→</span>
+                      </a>
+                    )}
+                    {!tieneProducto && guardian?.url_tienda && (
+                      <a
+                        href={guardian.url_tienda}
+                        target="_blank"
+                        rel="noopener"
+                        className="guardian-btn-tienda"
+                      >
+                        <span>Conocer a {guardian.nombre}</span>
+                        <span className="btn-flecha">→</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {/* Descripcion de la semana */}
+              {semanaActual?.descripcion && (
+                <div className="guardian-semana-descripcion">
+                  <p>{semanaActual.descripcion}</p>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Grid de accesos rápidos */}
       <div className="accesos-grid">
@@ -1831,6 +1900,113 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           transform: translateX(5px);
         }
 
+        /* Banner titulo wrap para tema de semana */
+        .banner-titulo-wrap {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .banner-tema {
+          font-size: 11px;
+          color: var(--neon-magenta);
+          font-style: italic;
+          text-shadow: 0 0 10px var(--neon-magenta-glow);
+        }
+
+        /* Foto contenedor grande */
+        .guardian-foto-contenedor.grande .foto-marco {
+          width: 280px;
+          height: 280px;
+        }
+
+        .foto-color-accent {
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 60%;
+          height: 4px;
+          border-radius: 2px;
+          opacity: 0.8;
+          box-shadow: 0 0 15px currentColor;
+        }
+
+        /* Titulo completo del guardian */
+        .guardian-titulo-completo {
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--neon-blue);
+          display: block;
+          margin-bottom: 15px;
+          text-shadow: 0 0 10px var(--neon-blue-glow);
+        }
+
+        /* Saludo del guardian */
+        .guardian-saludo {
+          font-size: 20px;
+          font-style: italic;
+          color: var(--neon-green);
+          text-shadow: 0 0 15px var(--neon-green-glow);
+          margin: 0 0 15px;
+          padding: 15px 20px;
+          background: rgba(57, 255, 20, 0.05);
+          border-left: 3px solid var(--neon-green);
+          border-radius: 0 10px 10px 0;
+        }
+
+        /* Frase tipica del guardian */
+        .guardian-frase-tipica {
+          margin-bottom: 20px;
+          padding: 12px 16px;
+          background: rgba(0, 240, 255, 0.05);
+          border-radius: 12px;
+          border: 1px solid rgba(0, 240, 255, 0.15);
+        }
+
+        .frase-etiqueta {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: rgba(255, 255, 255, 0.5);
+          display: block;
+          margin-bottom: 6px;
+        }
+
+        .frase-texto {
+          font-size: 15px;
+          font-style: italic;
+          color: rgba(255, 255, 255, 0.85);
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        /* Acciones del guardian */
+        .guardian-acciones {
+          display: flex;
+          gap: 15px;
+          flex-wrap: wrap;
+        }
+
+        /* Descripcion de la semana */
+        .guardian-semana-descripcion {
+          padding: 20px 30px;
+          background: rgba(0, 240, 255, 0.03);
+          border-top: 1px solid rgba(0, 240, 255, 0.15);
+          text-align: center;
+        }
+
+        .guardian-semana-descripcion p {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.75);
+          margin: 0;
+          font-style: italic;
+          line-height: 1.6;
+        }
+
         @media (max-width: 900px) {
           .guardian-cuerpo {
             flex-direction: column;
@@ -1844,11 +2020,26 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
             height: 180px;
           }
 
+          .guardian-foto-contenedor.grande .foto-marco {
+            width: 220px;
+            height: 220px;
+          }
+
           .guardian-nombre-grande {
             font-size: 54px;
           }
 
           .guardian-atributos {
+            justify-content: center;
+          }
+
+          .guardian-saludo {
+            border-left: none;
+            border-top: 3px solid var(--neon-green);
+            border-radius: 10px 10px 0 0;
+          }
+
+          .guardian-acciones {
             justify-content: center;
           }
         }
@@ -2190,11 +2381,98 @@ function SeccionContenido() {
     return `${dia.charAt(0).toUpperCase() + dia.slice(1)} ${num}`;
   }
 
-  // Obtener imagen del duende desde WooCommerce
-  function obtenerImagenDuende(nombreDuende) {
+  // Obtener guardian del archivo de configuracion por nombre
+  function obtenerGuardianLocalPorNombre(nombreDuende) {
+    if (!nombreDuende) return null;
+    const nombreLower = nombreDuende.toLowerCase();
+    // Buscar en GUARDIANES_MAESTROS
+    for (const key in GUARDIANES_MAESTROS) {
+      if (GUARDIANES_MAESTROS[key].nombre.toLowerCase() === nombreLower) {
+        return GUARDIANES_MAESTROS[key];
+      }
+    }
+    return null;
+  }
+
+  // Obtener guardian por fecha del contenido
+  function obtenerGuardianPorFechaContenido(fecha) {
+    if (!fecha) return null;
+    let fechaObj;
+    if (typeof fecha === 'string') {
+      fechaObj = new Date(fecha);
+    } else if (fecha?.año) {
+      fechaObj = new Date(fecha.año, fecha.mes - 1, fecha.dia);
+    } else {
+      return null;
+    }
+    return obtenerGuardianPorFecha(fechaObj);
+  }
+
+  // Obtener imagen del duende - prioriza archivo local, luego WooCommerce
+  function obtenerImagenDuende(nombreDuende, fechaContenido) {
+    // Primero intentar desde el archivo de configuracion local
+    const guardianLocal = obtenerGuardianLocalPorNombre(nombreDuende);
+    if (guardianLocal?.imagen) {
+      return guardianLocal.imagen;
+    }
+
+    // Si no hay nombre pero hay fecha, obtener guardian de esa fecha
+    if (!nombreDuende && fechaContenido) {
+      const guardianFecha = obtenerGuardianPorFechaContenido(fechaContenido);
+      if (guardianFecha?.imagen) {
+        return guardianFecha.imagen;
+      }
+    }
+
+    // Fallback a WooCommerce
     if (!nombreDuende) return null;
     const duende = guardianesWoo[nombreDuende.toLowerCase()];
     return duende?.imagen || duende?.imagenPrincipal || null;
+  }
+
+  // Obtener info completa del guardian para mostrar en contenido
+  function obtenerInfoGuardian(nombreDuende, fechaContenido) {
+    // Prioridad 1: Guardian local por nombre
+    const guardianLocal = obtenerGuardianLocalPorNombre(nombreDuende);
+    if (guardianLocal) {
+      return {
+        nombre: guardianLocal.nombre,
+        nombreCompleto: guardianLocal.nombreCompleto,
+        imagen: guardianLocal.imagen,
+        categoria: guardianLocal.categoria,
+        productoWooCommerce: guardianLocal.productoWooCommerce
+      };
+    }
+
+    // Prioridad 2: Guardian por fecha
+    if (fechaContenido) {
+      const guardianFecha = obtenerGuardianPorFechaContenido(fechaContenido);
+      if (guardianFecha) {
+        return {
+          nombre: guardianFecha.nombre,
+          nombreCompleto: guardianFecha.nombreCompleto,
+          imagen: guardianFecha.imagen,
+          categoria: guardianFecha.categoria,
+          productoWooCommerce: guardianFecha.productoWooCommerce
+        };
+      }
+    }
+
+    // Prioridad 3: WooCommerce
+    if (nombreDuende) {
+      const duende = guardianesWoo[nombreDuende.toLowerCase()];
+      if (duende) {
+        return {
+          nombre: duende.nombre,
+          nombreCompleto: duende.nombre,
+          imagen: duende.imagen || duende.imagenPrincipal,
+          categoria: duende.categoria,
+          productoWooCommerce: null
+        };
+      }
+    }
+
+    return null;
   }
 
   // Configuración de tipos de contenido - NEÓN
@@ -2334,6 +2612,7 @@ function SeccionContenido() {
             <div className="sidebar-lista">
               {contenidos.map((item, idx) => {
                 const config = getTipoConfig(item.tipo);
+                const guardianInfo = obtenerInfoGuardian(item.duendeNombre, item.fecha);
                 return (
                   <button
                     key={item.fecha || idx}
@@ -2341,13 +2620,21 @@ function SeccionContenido() {
                     onClick={() => setContenidoActivo(item)}
                     style={{ '--tipo-color': config.color }}
                   >
-                    <span className="sidebar-icono">{config.icono}</span>
+                    {/* Imagen mini del guardian */}
+                    <div className="sidebar-guardian-mini">
+                      <img
+                        src={guardianInfo?.imagen || obtenerImagenDuende(item.duendeNombre, item.fecha) || duendeSemana?.imagen || '/images/guardian-default.jpg'}
+                        alt={guardianInfo?.nombre || item.duendeNombre || 'Guardian'}
+                        className="sidebar-guardian-img"
+                      />
+                    </div>
                     <div className="sidebar-info">
                       <div className="sidebar-meta">
                         <span className="sidebar-tipo">{config.label}</span>
                         <span className="sidebar-fecha-corta">{formatearFechaCorta(item.fecha)}</span>
                       </div>
-                      <span className="sidebar-titulo-item">{item.titulo?.substring(0, 35)}{item.titulo?.length > 35 ? '...' : ''}</span>
+                      <span className="sidebar-titulo-item">{item.titulo?.substring(0, 30)}{item.titulo?.length > 30 ? '...' : ''}</span>
+                      <span className="sidebar-guardian-nombre">{guardianInfo?.nombre || item.duendeNombre || 'Guardian'}</span>
                     </div>
                     <span className="sidebar-indicador"></span>
                   </button>
@@ -2377,24 +2664,51 @@ function SeccionContenido() {
               </div>
 
               {/* Cabecera con foto del duende */}
-              <div className="contenido-header-estetico">
-                {/* Foto circular del duende autor */}
-                <div className="autor-foto-wrap">
-                  <div className="autor-foto-glow" style={{ background: getTipoConfig(contenidoActivo.tipo).color }}></div>
-                  <div className="autor-foto-marco">
-                    <img
-                      src={obtenerImagenDuende(contenidoActivo.duendeNombre) || duendeSemana?.imagen || '/images/guardian-default.jpg'}
-                      alt={contenidoActivo.duendeNombre || 'Guardián'}
-                      className="autor-foto"
-                    />
-                  </div>
-                </div>
+              {(() => {
+                const guardianInfo = obtenerInfoGuardian(contenidoActivo.duendeNombre, contenidoActivo.fecha);
+                const tipoConfig = getTipoConfig(contenidoActivo.tipo);
+                return (
+                  <div className="contenido-header-estetico">
+                    {/* Foto circular del duende autor */}
+                    <div className="autor-foto-wrap">
+                      <div className="autor-foto-glow" style={{ background: tipoConfig.color }}></div>
+                      <div className="autor-foto-marco">
+                        <img
+                          src={guardianInfo?.imagen || obtenerImagenDuende(contenidoActivo.duendeNombre, contenidoActivo.fecha) || duendeSemana?.imagen || '/images/guardian-default.jpg'}
+                          alt={guardianInfo?.nombre || contenidoActivo.duendeNombre || 'Guardian'}
+                          className="autor-foto"
+                        />
+                      </div>
+                    </div>
 
-                <div className="contenido-meta">
-                  <span className="contenido-por">Transmitido por</span>
-                  <h4 className="contenido-autor-nombre">{contenidoActivo.duendeNombre || 'Un Guardián'}</h4>
-                </div>
-              </div>
+                    <div className="contenido-meta">
+                      <span className="contenido-por">Transmitido por</span>
+                      <h4 className="contenido-autor-nombre">{guardianInfo?.nombre || contenidoActivo.duendeNombre || 'Un Guardian'}</h4>
+                      {guardianInfo?.categoria && (
+                        <span className="contenido-guardian-categoria">{guardianInfo.categoria}</span>
+                      )}
+                    </div>
+
+                    {/* Tipo de contenido badge */}
+                    <div className="contenido-tipo-badge" style={{ borderColor: tipoConfig.color, color: tipoConfig.color }}>
+                      <span className="tipo-icono">{tipoConfig.icono}</span>
+                      <span className="tipo-label">{tipoConfig.label}</span>
+                    </div>
+
+                    {/* Boton sutil a la tienda si tiene producto */}
+                    {guardianInfo?.productoWooCommerce && (
+                      <a
+                        href={`${WORDPRESS_URL}/?p=${guardianInfo.productoWooCommerce}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="contenido-btn-guardian"
+                      >
+                        Conoce mas sobre {guardianInfo.nombre}
+                      </a>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Título y subtítulo */}
               <div className="contenido-titulos">
@@ -2716,6 +3030,35 @@ function SeccionContenido() {
           flex-shrink: 0;
         }
 
+        /* Imagen mini del guardian en sidebar */
+        .sidebar-guardian-mini {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          overflow: hidden;
+          flex-shrink: 0;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          transition: border-color 0.3s ease;
+        }
+
+        .sidebar-item:hover .sidebar-guardian-mini,
+        .sidebar-item.activo .sidebar-guardian-mini {
+          border-color: var(--tipo-color, var(--neon-blue));
+          box-shadow: 0 0 10px var(--tipo-color, var(--neon-blue-glow));
+        }
+
+        .sidebar-guardian-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .sidebar-guardian-nombre {
+          font-size: 10px;
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
+        }
+
         .sidebar-info {
           flex: 1;
           display: flex;
@@ -2823,9 +3166,20 @@ function SeccionContenido() {
         .contenido-header-estetico {
           display: flex;
           align-items: center;
-          gap: 20px;
+          gap: 15px;
           padding: 25px 30px;
           border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+          flex-wrap: wrap;
+        }
+
+        @media (max-width: 700px) {
+          .contenido-header-estetico {
+            flex-direction: column;
+            text-align: center;
+          }
+          .contenido-tipo-badge {
+            margin-left: 0;
+          }
         }
 
         .autor-foto-wrap {
@@ -2880,7 +3234,56 @@ function SeccionContenido() {
           margin: 0;
         }
 
-        /* Títulos */
+        .contenido-guardian-categoria {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--neon-green);
+          display: block;
+          margin-top: 4px;
+        }
+
+        /* Badge de tipo de contenido en header */
+        .contenido-tipo-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 14px;
+          border: 1px solid;
+          border-radius: 20px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          background: rgba(0, 0, 0, 0.3);
+          margin-left: auto;
+        }
+
+        .tipo-icono {
+          font-size: 14px;
+        }
+
+        /* Boton sutil para conocer al guardian */
+        .contenido-btn-guardian {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 1px;
+          color: var(--neon-orange);
+          text-decoration: none;
+          padding: 8px 16px;
+          border: 1px solid rgba(255, 107, 0, 0.3);
+          border-radius: 20px;
+          background: rgba(255, 107, 0, 0.08);
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .contenido-btn-guardian:hover {
+          background: rgba(255, 107, 0, 0.15);
+          border-color: var(--neon-orange);
+          box-shadow: 0 0 15px var(--neon-orange-glow);
+        }
+
+        /* Titulos */
         .contenido-titulos {
           padding: 30px 30px 20px;
         }

@@ -457,12 +457,58 @@ add_shortcode('duendes_promo_3x2', function() {
     return ob_get_clean();
 });
 
-// 4. Widget para Elementor/Homepage
-add_action('woocommerce_before_main_content', function() {
-    if (is_front_page() || is_home()) {
-        duendes_banner_promo_3x2();
-    }
-}, 5);
+// 4. Homepage - inyectar via JavaScript porque Elementor no usa hooks estándar
+add_action('wp_footer', function() {
+    if (!is_front_page() && !is_home()) return;
+    if (!DUENDES_PROMO_3X2_ACTIVA) return;
+
+    // Capturar el HTML del banner
+    ob_start();
+    duendes_banner_promo_3x2();
+    $banner_html = ob_get_clean();
+    $banner_js = json_encode($banner_html);
+    ?>
+    <script>
+    (function() {
+        var banner = <?php echo $banner_js; ?>;
+
+        function insertarBanner() {
+            // Buscar el hero o primera sección después del header
+            var targets = [
+                document.querySelector('.hero'),
+                document.querySelector('.elementor-section-wrap > .elementor-section:first-child'),
+                document.querySelector('.elementor-element.elementor-section:first-of-type'),
+                document.querySelector('main'),
+                document.querySelector('#content')
+            ];
+
+            var target = null;
+            for (var i = 0; i < targets.length; i++) {
+                if (targets[i]) {
+                    target = targets[i];
+                    break;
+                }
+            }
+
+            if (target && !document.querySelector('.duendes-banner-3x2')) {
+                var div = document.createElement('div');
+                div.innerHTML = banner;
+                div.style.padding = '0 20px';
+                div.style.maxWidth = '1200px';
+                div.style.margin = '20px auto';
+                target.parentNode.insertBefore(div, target.nextSibling);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', insertarBanner);
+        } else {
+            insertarBanner();
+        }
+    })();
+    </script>
+    <?php
+}, 99);
 
 function duendes_banner_promo_3x2() {
     if (!DUENDES_PROMO_3X2_ACTIVA) return;

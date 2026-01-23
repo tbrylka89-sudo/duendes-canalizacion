@@ -1,7 +1,7 @@
 # INSTRUCCIONES PARA CONTINUAR EL TRABAJO - CLAUDE CODE
 
-**Última actualización:** 22 Enero 2026, 19:30
-**Estado:** EN PROGRESO - Terminal principal trabajando
+**Última actualización:** 23 Enero 2026, 16:45
+**Estado:** ACTUALIZADO - Sesión 7 completada
 
 ---
 
@@ -59,11 +59,22 @@ Trabajando en: Coordinación general y documentación
 | **Certificado página web** | ✅ | `/certificado/[id]` - ver e imprimir |
 | Deploy Vercel | ✅ | Funcionando |
 | WordPress live | ✅ | HTTP 200 |
+| **Creador Inteligente Productos** | ✅ | Fotos → Vision → Historia → WooCommerce (23/01) |
+| **Auto-aprendizaje temas** | ✅ | Detecta y aprende categorías (23/01) |
+| **Especializaciones nuevas** | ✅ | Viajeros + Bosque/Naturaleza (23/01) |
+| **Hub WordPress v2.0** | ✅ | Plugin con todas las rutas (23/01) |
+| **Parser texto libre** | ✅ | `/lib/parsers/texto-producto.js` (23/01) |
 
 ## TAREAS A y B - ESTADO REAL
 - **TAREA A**: ✅ COMPLETADA - `/api/emails/post-compra/route.js` funcional
 - **TAREA B**: ⚠️ PARCIAL - Existe página `/certificado/[id]` para ver/imprimir
   - Falta: API `/api/certificado` que genere PDF programático (para emails)
+
+## NUEVAS TAREAS IDENTIFICADAS (23/01)
+- **Test del Guardián WP**: ❌ Error 404 - La página fue borrada, hay que rehacerla
+- **Rutas Mi Magia 404**: ⚠️ URLs como /mi-magia/elegidos dan 404 (arquitectura SPA)
+- **Reportes Gamificación**: ⚠️ 6 botones sin implementar (solo alerts)
+- **El Grimorio (Blog)**: ❌ Deliberadamente oculto con CSS display:none
 
 ---
 
@@ -228,5 +239,5 @@ El sistema de conversión ya está implementado - solo tenés que usarlo con get
 
 ---
 
-*Última actualización: 22 Enero 2026, 19:30*
-*Terminal principal coordinando*
+*Última actualización: 23 Enero 2026, 16:45*
+*Sesión 7 completada - Documentación actualizada*

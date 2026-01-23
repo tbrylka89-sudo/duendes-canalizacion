@@ -39,6 +39,14 @@ ManyChat
 - Scoring de conversión (0-50)
 - Arco emocional de 8 fases
 - Batch inteligente con auto-distribución
+- **NUEVO (23/01):** Creador Inteligente de Productos (subir fotos → analizar → generar → publicar a WC)
+- **NUEVO (23/01):** Sistema de auto-aprendizaje de temas libres
+- **NUEVO (23/01):** Especializaciones Viajeros y Bosque/Naturaleza
+- **NUEVO (23/01):** Hub de WordPress v2.0 con todas las rutas
+- **NUEVO (23/01 18:00):** Sistema de ROTACIÓN de patrones de apertura (no prohibición)
+- **NUEVO (23/01 18:00):** Hooks desde el GUARDIÁN (no siempre desde el dolor)
+- **NUEVO (23/01 18:00):** Score protection para regeneración (nunca baja el score)
+- **NUEVO (23/01 18:00):** Guardado automático a WooCommerce por nombre
 
 ### ❌ NO FUNCIONA / FALTA
 - **Test del Guardián en WordPress** - FUE BORRADO, hay que rehacerlo
@@ -529,4 +537,74 @@ Usar datos del usuario para crear "señales" que parezcan mágicas:
 
 ---
 
-*Última actualización: 2026-01-22*
+*Última actualización: 2026-01-23 18:10*
+
+---
+
+## 🔥 TRABAJO EN CURSO (23 ENERO 2026 18:10)
+
+### Generación Manual de Historias - Primeros 100 Guardianes
+
+**Estado:** EN PROGRESO - Trabajando con Claude para evaluar cada historia
+
+**Flujo de trabajo:**
+1. Usuario indica: **"[Nombre del guardián] - [Categoría]"**
+2. Claude genera historia usando el sistema con todas las reglas nuevas
+3. Muestra historia + score + evaluación
+4. Si aprueba → Click "Guardar en WooCommerce"
+5. Si no → Ajustar y regenerar
+
+**Categorías disponibles:**
+- Protección
+- Abundancia
+- Sabiduría
+- Salud
+- Amor
+- Sanación
+
+**Las categorías se definen a medida que se generan** (no están pre-asignadas en productos-base.json)
+
+### Sistema de Rotación de Patrones v3
+
+**Problema resuelto:** Las historias empezaban SIEMPRE desde el dolor y usaban patrones repetitivos.
+
+**Solución implementada:**
+
+1. **Rotación, no prohibición:** Un patrón puede reutilizarse después de ~15 historias
+2. **Hooks desde el guardián:** Prioridad a aperturas como:
+   - "{nombre} nació con una misión clara: ser escudo."
+   - "{nombre} no llegó por casualidad."
+   - "Hay guardianes que nacen para cuidar. {nombre} es uno de ellos."
+3. **Patrón prohibido:** "no vino a X, no vino a Y, no vino a Z" (muy repetitivo)
+4. **Score protection:** Al regenerar, si el score nuevo es menor → regenera automáticamente (máx 3 intentos)
+5. **Temperatura:** 0.85 (balance creatividad/consistencia)
+
+**Archivos modificados:**
+- `/lib/guardian-intelligence/config.js` - PATRONES_APERTURA, HOOKS_APERTURA, APERTURAS_PROHIBIDAS_SIEMPRE
+- `/lib/guardian-intelligence/generator.js` - Prompt actualizado, temperatura 0.85
+- `/app/api/admin/historias/route.js` - Prompt con estructura flexible, score protection
+- `/app/admin/generador-historias/page.jsx` - Score protection en frontend
+
+**Guardado a WooCommerce:**
+- Busca producto por nombre exacto
+- Actualiza descripción automáticamente
+- Convierte markdown a HTML
+
+### Aperturas Prohibidas SIEMPRE
+```javascript
+const APERTURAS_PROHIBIDAS_SIEMPRE = [
+  'en lo profundo del bosque',
+  'las brumas del',
+  'desde tiempos inmemoriales',
+  'el velo entre mundos',
+  'érase una vez',
+  'había una vez',
+  'hace mucho mucho tiempo',
+  'en tierras lejanas'
+];
+```
+
+### Base de Productos
+- **Archivo:** `/lib/guardian-intelligence/productos-base.json`
+- **Total:** 113 guardianes con nombre, género, tamaño (cm), accesorios
+- **Categorías:** Se definen durante la generación (no pre-asignadas)

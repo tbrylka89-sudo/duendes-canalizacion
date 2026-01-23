@@ -61,151 +61,424 @@ const PERFILES_BOT = [
 
 // Posts pregenerados sobre experiencias con guardianes
 const POSTS_PREGENERADOS = [
-  // Experiencias con guardianes específicos
-  { tipo: 'experiencia', guardian: 'Rowan', contenido: 'Desde que llegó Rowan a mi casa, siento que las cosas fluyen diferente. Ayer me llamaron para una oportunidad de trabajo que había olvidado. ¡Gracias universo! ✨', likes: 45, respuestas: 8 },
-  { tipo: 'experiencia', guardian: 'Luna', contenido: 'Luna me acompañó toda la semana de luna llena. Mis sueños fueron tan vívidos y reveladores... Desperté con claridad sobre algo que me venía preocupando hace meses 🌙', likes: 67, respuestas: 12 },
-  { tipo: 'experiencia', guardian: 'Frost', contenido: 'Necesitaba protección energética en el trabajo y Frost llegó en el momento justo. Desde entonces, los ambientes pesados ya no me afectan como antes 🛡️', likes: 38, respuestas: 6 },
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // EXPERIENCIAS CON GUARDIANES DE ENERO (Dorado, Obsidiana, Índigo, Jade)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'experiencia', guardian: 'Dorado', contenido: 'Dorado llegó a mi vida en el momento exacto. Estaba atravesando una crisis económica tremenda y desde que lo tengo empezaron a abrirse puertas que ni sabía que existían. La abundancia es real 💛', likes: 89, respuestas: 15 },
+  { tipo: 'experiencia', guardian: 'Dorado', contenido: 'Mi Dorado brilla diferente cuando medito con él. Ayer le pedí claridad sobre un negocio y a las 2 horas me llamaron para cerrar el trato. No es casualidad 🌟', likes: 112, respuestas: 23 },
+  { tipo: 'experiencia', guardian: 'Obsidiana', contenido: 'Obsidiana me está ayudando a poner límites que nunca pude. Es como tener un escudo invisible. Las personas que me drenaban ya no se me acercan tanto 🖤', likes: 134, respuestas: 28 },
+  { tipo: 'experiencia', guardian: 'Obsidiana', contenido: 'Desde que tengo a Obsidiana duermo tranquila por primera vez en años. Las pesadillas pararon. Me siento protegida de verdad 🛡️', likes: 98, respuestas: 17 },
+  { tipo: 'experiencia', guardian: 'Índigo', contenido: 'Índigo despertó mi intuición de una manera que no esperaba. Ahora sé cosas antes de que pasen. Es raro pero hermoso 💙', likes: 156, respuestas: 31 },
+  { tipo: 'experiencia', guardian: 'Índigo', contenido: 'Mi tercer ojo está más activo desde que adopté a Índigo. Los sueños lúcidos aumentaron y estoy canalizando información que me sirve en el día a día ✨', likes: 87, respuestas: 19 },
+  { tipo: 'experiencia', guardian: 'Jade', contenido: 'Jade me trajo una paz que no conocía. Mi corazón estaba tan cerrado después de lo que viví, y él me está enseñando a amar otra vez 💚', likes: 203, respuestas: 42 },
+  { tipo: 'experiencia', guardian: 'Jade', contenido: 'Desde que Jade está conmigo, mis relaciones mejoraron. Es como si irradiara armonía. Hasta mi familia está más unida 🌿', likes: 145, respuestas: 26 },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // TESTIMONIOS DE ADOPCIÓN DE GUARDIANES
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'testimonio', guardian: 'Dorado', contenido: 'Cuando vi a Dorado en la página, sentí que me llamaba. No lo pensé dos veces. Mejor decisión de enero 💛', likes: 67, respuestas: 12 },
+  { tipo: 'testimonio', guardian: 'Obsidiana', contenido: 'Obsidiana me eligió. Yo quería otro guardián pero algo me llevó a él. Ahora entiendo por qué: necesitaba protección urgente 🖤', likes: 78, respuestas: 14 },
+  { tipo: 'testimonio', guardian: 'Índigo', contenido: 'Dudé mucho en adoptar a Índigo porque no me sentía "lista" para desarrollar mi intuición. Él me demostró que ya estaba lista, solo necesitaba compañía 💙', likes: 92, respuestas: 18 },
+  { tipo: 'testimonio', guardian: 'Jade', contenido: 'Jade llegó como regalo de mi hermana. Lloramos juntas cuando leímos su canalización. Entendió exactamente lo que necesitaba escuchar 💚', likes: 167, respuestas: 35 },
+  { tipo: 'testimonio', contenido: 'Hoy recibí mi primer guardián y no puedo parar de mirarlo. Es como si me conociera de siempre. La canalización me destrozó (en el mejor sentido)', likes: 189, respuestas: 38 },
+  { tipo: 'testimonio', contenido: 'Acabo de adoptar mi quinto guardián. Cada uno llegó en el momento exacto. El Círculo de Duendes cambió mi vida', likes: 134, respuestas: 22 },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // EXPERIENCIAS CON CONTENIDO DEL DÍA
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'contenido_dia', contenido: 'El mensaje de hoy del Círculo me llegó en el momento justo. Estaba por tomar una decisión importante y fue como una señal 🙏', likes: 78, respuestas: 15 },
+  { tipo: 'contenido_dia', contenido: 'Cada mañana lo primero que hago es leer el contenido del día. Es mi ritual matutino sagrado ☀️', likes: 56, respuestas: 11 },
+  { tipo: 'contenido_dia', contenido: 'El ritual de hoy fue PODEROSO. Lo hice con mi Obsidiana y sentí un antes y después. Gracias Thibisay 🖤', likes: 123, respuestas: 27 },
+  { tipo: 'contenido_dia', contenido: 'Las tiradas de runas de los lunes me encantan. Siempre dan en el clavo con lo que estoy viviendo esa semana', likes: 89, respuestas: 16 },
+  { tipo: 'contenido_dia', contenido: 'El audio de meditación de hoy me hizo llorar. Necesitaba soltar y el universo me lo permitió 💜', likes: 145, respuestas: 29 },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // EXPERIENCIAS CON OTROS GUARDIANES
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'experiencia', guardian: 'Rowan', contenido: 'Desde que llegó Rowan a mi casa, siento que las cosas fluyen diferente. Ayer me llamaron para una oportunidad de trabajo que había olvidado. Gracias universo!', likes: 45, respuestas: 8 },
+  { tipo: 'experiencia', guardian: 'Luna', contenido: 'Luna me acompañó toda la semana de luna llena. Mis sueños fueron tan vívidos y reveladores... Desperté con claridad sobre algo que me venía preocupando hace meses', likes: 67, respuestas: 12 },
+  { tipo: 'experiencia', guardian: 'Frost', contenido: 'Necesitaba protección energética en el trabajo y Frost llegó en el momento justo. Desde entonces, los ambientes pesados ya no me afectan como antes', likes: 38, respuestas: 6 },
   { tipo: 'experiencia', guardian: 'Sage', contenido: 'Sage me ayudó a soltar algo que venía cargando hace años. Una noche mientras meditaba con él, lloré todo lo que tenía guardado. Hoy me siento liviana 💚', likes: 89, respuestas: 15 },
-  { tipo: 'experiencia', guardian: 'Aurora', contenido: 'Aurora llegó justo cuando empezaba un nuevo capítulo en mi vida. Su energía de nuevos comienzos me da fuerzas cada mañana ☀️', likes: 52, respuestas: 9 },
+  { tipo: 'experiencia', guardian: 'Aurora', contenido: 'Aurora llegó justo cuando empezaba un nuevo capítulo en mi vida. Su energía de nuevos comienzos me da fuerzas cada mañana', likes: 52, respuestas: 9 },
   { tipo: 'experiencia', guardian: 'Ember', contenido: 'No creía mucho al principio, pero Ember despertó algo en mí. Mi creatividad explotó esta semana, no paraba de tener ideas 🔥', likes: 43, respuestas: 7 },
 
-  // Preguntas y dudas
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PREGUNTAS SOBRE RITUALES
+  // ═══════════════════════════════════════════════════════════════════════════════
   { tipo: 'pregunta', contenido: '¿Alguien más siente que su guardián "habla" a través de coincidencias? Me pasan cosas muy locas desde que llegó...', likes: 34, respuestas: 23 },
-  { tipo: 'pregunta', contenido: 'Primera vez en el Círculo 🙈 ¿Por dónde me recomiendan empezar? Siento que necesito protección pero también abundancia...', likes: 28, respuestas: 31 },
-  { tipo: 'pregunta', contenido: '¿Cada cuánto hacen las tiradas de runas? ¿Una vez al mes o cuando sienten que lo necesitan?', likes: 19, respuestas: 14 },
+  { tipo: 'pregunta', contenido: 'Primera vez en el Círculo. Por dónde me recomiendan empezar? Siento que necesito protección pero también abundancia...', likes: 28, respuestas: 31 },
+  { tipo: 'pregunta', contenido: '¿Cada cuánto hacen las tiradas de runas? Una vez al mes o cuando sienten que lo necesitan?', likes: 19, respuestas: 14 },
   { tipo: 'pregunta', contenido: '¿Cómo limpian la energía de sus guardianes? Leí que hay que hacerlo con la luna pero no sé bien cómo', likes: 41, respuestas: 27 },
+  { tipo: 'pregunta', contenido: '¿Los guardianes de enero (Dorado, Obsidiana, Índigo, Jade) se pueden combinar? Quiero adoptarlos a los 4 pero no sé si es mucho', likes: 56, respuestas: 33 },
+  { tipo: 'pregunta', contenido: '¿Alguien tiene a Índigo y Obsidiana juntos? Me pregunto cómo interactúan sus energías', likes: 34, respuestas: 21 },
+  { tipo: 'pregunta', contenido: 'Pregunta para las que tienen a Dorado: ¿dónde lo ubican en su casa? Leí que tiene que estar cerca de la entrada pero no sé', likes: 45, respuestas: 28 },
+  { tipo: 'pregunta', contenido: '¿El ritual de abundancia funciona mejor con luna creciente o llena? Quiero hacerlo con mi Dorado', likes: 38, respuestas: 19 },
 
-  // Agradecimientos y celebraciones
-  { tipo: 'agradecimiento', contenido: '¡3 meses en el Círculo y no puedo creer lo que cambió mi vida! Gracias al equipo, gracias a esta comunidad hermosa 💜', likes: 112, respuestas: 19 },
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AGRADECIMIENTOS Y CELEBRACIONES
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'agradecimiento', contenido: '3 meses en el Círculo y no puedo creer lo que cambió mi vida! Gracias al equipo, gracias a esta comunidad hermosa 💜', likes: 112, respuestas: 19 },
   { tipo: 'agradecimiento', contenido: 'La lectura de registros akáshicos que hice la semana pasada me voló la cabeza. Nunca nadie me había dicho cosas tan precisas de mi infancia...', likes: 78, respuestas: 11 },
-  { tipo: 'agradecimiento', contenido: 'Hoy adopté mi tercer guardián y estoy llorando de emoción. Siento que encontré mi tribu acá 🥹', likes: 95, respuestas: 16 },
+  { tipo: 'agradecimiento', contenido: 'Hoy adopté mi tercer guardián y estoy llorando de emoción. Siento que encontré mi tribu acá', likes: 95, respuestas: 16 },
+  { tipo: 'agradecimiento', contenido: 'Gracias Thibisay por crear este espacio. Me salvó en un momento muy oscuro de mi vida', likes: 234, respuestas: 45 },
+  { tipo: 'agradecimiento', contenido: 'Mis 4 guardianes de enero llegaron hoy. La familia está completa. Gracias Círculo por existir 💛🖤💙💚', likes: 178, respuestas: 37 },
 
-  // Tips y consejos
-  { tipo: 'tip', contenido: 'TIP: Pongan a su guardián cerca de una ventana durante las noches de luna llena. La energía que absorbe es increíble 🌕', likes: 156, respuestas: 22 },
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // TIPS Y CONSEJOS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'tip', contenido: 'TIP: Pongan a su guardián cerca de una ventana durante las noches de luna llena. La energía que absorbe es increíble', likes: 156, respuestas: 22 },
   { tipo: 'tip', contenido: 'Algo que me funciona: antes de dormir le cuento a mi guardián lo que me preocupa. A la mañana siguiente siempre tengo más claridad', likes: 87, respuestas: 13 },
   { tipo: 'tip', contenido: 'Para las que recién empiezan: no fuercen la conexión. Dejen que su guardián les muestre el camino a su ritmo 💫', likes: 134, respuestas: 18 },
+  { tipo: 'tip', contenido: 'TIP para las que tienen a Dorado: ponganlo en el sector de abundancia de su casa (esquina izquierda del fondo). Funciona!', likes: 98, respuestas: 24 },
+  { tipo: 'tip', contenido: 'Obsidiana trabaja mejor si lo limpian con sal negra una vez por semana. Es un guardián que absorbe MUCHA energía densa', likes: 112, respuestas: 27 },
+  { tipo: 'tip', contenido: 'Índigo necesita silencio para comunicarse. Si sienten que no conectan, intenten meditar en un espacio sin ruido', likes: 78, respuestas: 16 },
+  { tipo: 'tip', contenido: 'Jade ama las plantas. Ponganlo cerca de sus plantas y van a ver cómo todo florece (literal y metafóricamente)', likes: 145, respuestas: 31 },
+  { tipo: 'tip', contenido: 'Si tienen varios guardianes, presentenselos entre sí. Suena loco pero funciona. Mis 3 ahora trabajan en equipo', likes: 167, respuestas: 34 },
 
-  // Rituales compartidos
-  { tipo: 'ritual', contenido: 'Hoy hice el ritual de abundancia que compartieron en el Círculo y encontré $500 en un bolsillo que no revisaba hace meses 😱', likes: 203, respuestas: 34 },
-  { tipo: 'ritual', contenido: 'Cada domingo limpio el espacio con salvia y pongo música suave. Mis guardianes brillan diferente después ✨', likes: 67, respuestas: 9 },
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // RITUALES COMPARTIDOS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'ritual', contenido: 'Hoy hice el ritual de abundancia que compartieron en el Círculo y encontré $500 en un bolsillo que no revisaba hace meses', likes: 203, respuestas: 34 },
+  { tipo: 'ritual', contenido: 'Cada domingo limpio el espacio con salvia y pongo música suave. Mis guardianes brillan diferente después', likes: 67, respuestas: 9 },
+  { tipo: 'ritual', contenido: 'Ritual de protección con Obsidiana: lo pongo en agua con sal negra bajo la luna nueva. Queda recargadísimo', likes: 89, respuestas: 18 },
+  { tipo: 'ritual', contenido: 'Hice el ritual del espejo con Índigo y vi cosas que no esperaba. Muy revelador pero hay que estar preparada', likes: 112, respuestas: 25 },
+  { tipo: 'ritual', contenido: 'Ritual de los 4 guardianes de enero: los puse en forma de rombo con una vela en el centro. La energía que se generó fue increíble 💛🖤💙💚', likes: 234, respuestas: 48 },
 
-  // Sincronicidades
-  { tipo: 'sincronicidad', contenido: 'No me van a creer: estaba pensando en mi abuela (que ya no está) y en ese momento Rowan se cayó solo del estante. Sentí que era ella saludándome 🥺', likes: 178, respuestas: 28 },
-  { tipo: 'sincronicidad', contenido: 'Soñé con un número, lo jugué al otro día y gané! Mi guardián me lo mostró, no tengo dudas 🎰', likes: 145, respuestas: 21 }
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SINCRONICIDADES COMPARTIDAS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'sincronicidad', contenido: 'No me van a creer: estaba pensando en mi abuela (que ya no está) y en ese momento Rowan se cayó solo del estante. Sentí que era ella saludándome', likes: 178, respuestas: 28 },
+  { tipo: 'sincronicidad', contenido: 'Soñé con un número, lo jugué al otro día y gané! Mi guardián me lo mostró, no tengo dudas', likes: 145, respuestas: 21 },
+  { tipo: 'sincronicidad', contenido: 'Pedí una señal a Dorado sobre un negocio. A los 5 minutos me llegó un mensaje de un cliente que había perdido contacto hace 2 años', likes: 167, respuestas: 32 },
+  { tipo: 'sincronicidad', contenido: 'Estaba dudando de mi intuición y en ese momento Índigo brilló con la luz del sol. Era mi confirmación', likes: 89, respuestas: 17 },
+  { tipo: 'sincronicidad', contenido: 'Me desperté pensando en alguien que no veía hace años. A las 2 horas me escribió. Jade me había preparado para ese reencuentro', likes: 134, respuestas: 26 },
+  { tipo: 'sincronicidad', contenido: 'Ayer puse a mis 4 guardianes de enero juntos por primera vez. En ese momento empezó a llover (llevábamos semanas de sequía). Coincidencia? No lo creo', likes: 201, respuestas: 41 },
+  { tipo: 'sincronicidad', contenido: 'Obsidiana me alertó de una persona que me estaba haciendo daño. Sentí un frío raro cada vez que esa persona me escribía. Corté el vínculo y el frío desapareció', likes: 156, respuestas: 33 },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // REFLEXIONES Y COMPARTIRES
+  // ═══════════════════════════════════════════════════════════════════════════════
+  { tipo: 'reflexion', contenido: 'Hace un año no creía en nada de esto. Hoy tengo 4 guardianes y mi vida es completamente diferente. A veces el universo te sorprende', likes: 189, respuestas: 36 },
+  { tipo: 'reflexion', contenido: 'Los guardianes no hacen magia por nosotras. Nos acompañan mientras hacemos nuestra propia magia. Eso lo entendí con el tiempo', likes: 234, respuestas: 47 },
+  { tipo: 'reflexion', contenido: 'Enero es mi mes favorito en el Círculo. Los guardianes de este mes (Dorado, Obsidiana, Índigo, Jade) cubren todo lo que una necesita', likes: 145, respuestas: 29 },
+  { tipo: 'reflexion', contenido: 'Aprendí que cada guardián llega cuando estás lista, no cuando querés. Confíen en el timing', likes: 112, respuestas: 22 }
 ];
 
 // Respuestas pregeneradas para los posts
 const RESPUESTAS_PREGENERADAS = [
-  '¡Me pasa lo mismo! No estás sola en esto 💜',
+  // Respuestas generales de apoyo
+  'Me pasa lo mismo! No estás sola en esto 💜',
   'Hermoso lo que compartís. Gracias por abrir tu corazón',
-  '¡Qué lindo! Los guardianes siempre encuentran la forma de comunicarse',
+  'Qué lindo! Los guardianes siempre encuentran la forma de comunicarse',
   'Esto me dio escalofríos, es muy real lo que decís',
-  'Te mando un abrazo enorme. El Círculo es un espacio seguro 🤗',
+  'Te mando un abrazo enorme. El Círculo es un espacio seguro',
   'Justo necesitaba leer esto hoy. Gracias universo',
-  '¡Bienvenida! Vas a amar este camino',
+  'Bienvenida! Vas a amar este camino',
   'Mi guardián también hace esas cosas. Son increíbles',
   'Qué bueno que lo compartís, ayuda a todas a sentirnos menos locas jaja',
-  '✨✨✨ Pura magia',
+  'Pura magia',
   'Me emociona leer esto. Estamos todas conectadas',
   'Anotado el tip! Lo voy a probar esta semana',
   'Amo esta comunidad, de verdad',
-  'Que siga fluyendo todo hermoso 🌸',
+  'Que siga fluyendo todo hermoso',
   'Tu energía se siente desde acá. Gracias por compartir',
-  '¡Felicitaciones! Los guardianes eligen bien a quién acompañar',
+  'Felicitaciones! Los guardianes eligen bien a quién acompañar',
   'Esto es lo que necesitaba leer hoy. No es casualidad',
-  'El universo siempre responde cuando estamos listas para escuchar'
+  'El universo siempre responde cuando estamos listas para escuchar',
+
+  // Respuestas sobre guardianes de enero
+  'Mi Dorado me ayudó igual con la abundancia. Son tan poderosos 💛',
+  'Obsidiana es el mejor para protección. Lo amo',
+  'Índigo cambió mi vida. Mi intuición está en otro nivel',
+  'Jade es tan sanador. Me hace llorar de lo que me conecta con mis emociones',
+  'Los 4 guardianes de enero juntos son imparables',
+  'Yo también tengo a Dorado! Son como hermanas de guardián jaja',
+  'Obsidiana me salvó de una relación tóxica. Para siempre agradecida',
+  'Índigo me muestra cosas en sueños que después pasan. Es increíble',
+  'Jade y las plantas... es real! Las mías nunca estuvieron mejor',
+
+  // Respuestas a experiencias
+  'Me emocioné leyendo esto. Gracias por compartir',
+  'Qué hermoso testimonio. Me da esperanza',
+  'Justo estoy pasando por algo similar. Me ayudó leerte',
+  'Los guardianes nunca se equivocan al elegir',
+  'Tu historia me tocó el corazón',
+
+  // Respuestas a preguntas
+  'A mí me funciona hacerlo en luna llena, pero cada una encuentra su ritmo',
+  'Yo empecé con uno solo y ahora tengo 4. Ve de a poco',
+  'Te recomiendo que sigas tu intuición. Si te llamó ese guardián, es por algo',
+  'Preguntale a tu guardián, ellos guían',
+  'Yo tuve la misma duda! Lo que hice fue...',
+
+  // Respuestas a tips
+  'Gracias por el tip! Lo voy a probar',
+  'Funciona! Yo hago lo mismo',
+  'Anotadísimo para esta semana',
+  'Qué buen consejo, nunca lo había pensado así',
+
+  // Respuestas a rituales
+  'Ese ritual es poderoso! A mí también me funcionó',
+  'Me encanta ese ritual. Lo hago todos los domingos',
+  'Voy a probarlo con mi guardián esta luna llena',
+
+  // Respuestas a sincronicidades
+  'Las sincronicidades son la forma en que el universo nos confirma que vamos bien',
+  'Eso no es casualidad! Tu guardián te habló claro',
+  'Me pasó algo parecido la semana pasada. Estamos conectadas',
+  'Los guardianes siempre encuentran la forma de hacerse escuchar'
 ];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FUNCIONES AUXILIARES PARA TIMESTAMPS REALISTAS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Genera un timestamp realista basado en minutos atrás
+function generarTimestampRealista(minutosAtras) {
+  const ahora = Date.now();
+  return new Date(ahora - minutosAtras * 60 * 1000);
+}
+
+// Convierte minutos a formato legible
+function formatearTiempoHace(minutosAtras) {
+  if (minutosAtras < 1) return 'hace un momento';
+  if (minutosAtras < 60) return `hace ${minutosAtras} min`;
+  const horas = Math.floor(minutosAtras / 60);
+  if (horas < 24) return `hace ${horas}h`;
+  const dias = Math.floor(horas / 24);
+  if (dias === 1) return 'hace 1 día';
+  return `hace ${dias} días`;
+}
+
+// Genera distribución realista de tiempos (más posts recientes)
+function generarDistribucionTemporal(cantidad) {
+  const tiempos = [];
+  for (let i = 0; i < cantidad; i++) {
+    // Distribución exponencial: más posts recientes
+    const random = Math.random();
+    let minutosAtras;
+    if (random < 0.3) {
+      // 30% en la última hora
+      minutosAtras = Math.floor(Math.random() * 60);
+    } else if (random < 0.6) {
+      // 30% entre 1-6 horas
+      minutosAtras = 60 + Math.floor(Math.random() * 300);
+    } else if (random < 0.85) {
+      // 25% entre 6-24 horas
+      minutosAtras = 360 + Math.floor(Math.random() * 1080);
+    } else {
+      // 15% entre 1-3 días
+      minutosAtras = 1440 + Math.floor(Math.random() * 2880);
+    }
+    tiempos.push(minutosAtras);
+  }
+  return tiempos.sort((a, b) => a - b); // Ordenar de más reciente a más antiguo
+}
 
 // GET: Obtener posts y actividad de la comunidad
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const tipo = searchParams.get('tipo'); // posts, actividad, stats
+    const tipo = searchParams.get('tipo'); // posts, actividad, stats, feed
     const limite = parseInt(searchParams.get('limite') || '10');
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TIPO: stats - Estadísticas de la comunidad
+    // ═══════════════════════════════════════════════════════════════════════════
     if (tipo === 'stats') {
-      // Estadísticas de la comunidad (fijas + algo de variación)
       const hora = new Date().getHours();
-      const variacion = Math.floor(Math.sin(hora) * 15);
+      // Variación basada en hora del día (más actividad entre 10-22h)
+      const esHoraPico = hora >= 10 && hora <= 22;
+      const baseActivos = esHoraPico ? 52 : 28;
+      const variacion = Math.floor(Math.random() * 15);
 
       return Response.json({
         success: true,
         stats: {
-          totalMiembros: 324 + Math.floor(Math.random() * 12),
-          miembrosActivos: 47 + variacion,
-          postsHoy: 3 + Math.floor(Math.random() * 2),
-          guardianesCirulo: 892
+          totalMiembros: 347 + Math.floor(Math.random() * 8),
+          miembrosActivos: baseActivos + variacion,
+          postsHoy: 5 + Math.floor(Math.random() * 4),
+          postsEstaSemana: 34 + Math.floor(Math.random() * 8),
+          guardianesCirulo: 1247,
+          guardianesAdoptadosHoy: 2 + Math.floor(Math.random() * 3),
+          guardianesPopulares: ['Dorado', 'Jade', 'Obsidiana', 'Índigo'].slice(0, 2 + Math.floor(Math.random() * 2))
         }
       });
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TIPO: actividad - Actividad en tiempo real
+    // ═══════════════════════════════════════════════════════════════════════════
     if (tipo === 'actividad') {
-      // "X personas viendo ahora"
-      const viendoAhora = 8 + Math.floor(Math.random() * 15);
+      const hora = new Date().getHours();
+      const esHoraPico = hora >= 10 && hora <= 22;
+      const viendoAhora = esHoraPico ? 12 + Math.floor(Math.random() * 18) : 5 + Math.floor(Math.random() * 8);
 
       // Obtener historial reciente para evitar repeticiones
       let historialReciente = await kv.get('comunidad:historial_actividad') || { personas: [], guardianes: [] };
 
-      // Filtrar personas que no se mostraron recientemente (últimas 10)
+      // Filtrar personas que no se mostraron recientemente
       const personasRecientes = new Set(historialReciente.personas || []);
       const personasDisponibles = PERFILES_BOT.filter(p => !personasRecientes.has(p.id));
       const ultimaCompra = personasDisponibles.length > 0
         ? personasDisponibles[Math.floor(Math.random() * personasDisponibles.length)]
         : PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
 
-      // Guardianes con variedad (más opciones, evitar recientes)
-      const todosGuardianes = ['Rowan', 'Luna', 'Sage', 'Frost', 'Aurora', 'Ember', 'Dorado', 'Obsidiana', 'Índigo', 'Jade', 'Willow', 'Coral', 'Phoenix', 'Ivy', 'Maple'];
+      // Guardianes de enero tienen prioridad
+      const guardianesEnero = ['Dorado', 'Obsidiana', 'Índigo', 'Jade'];
+      const otrosGuardianes = ['Rowan', 'Luna', 'Sage', 'Frost', 'Aurora', 'Ember', 'Willow', 'Coral', 'Phoenix', 'Ivy', 'Maple'];
+      // 70% de probabilidad de que sea un guardián de enero
+      const todosGuardianes = Math.random() < 0.7 ? guardianesEnero : [...guardianesEnero, ...otrosGuardianes];
+
       const guardianesRecientes = new Set(historialReciente.guardianes || []);
       const guardianesDisponibles = todosGuardianes.filter(g => !guardianesRecientes.has(g));
       const guardianComprado = guardianesDisponibles.length > 0
         ? guardianesDisponibles[Math.floor(Math.random() * guardianesDisponibles.length)]
         : todosGuardianes[Math.floor(Math.random() * todosGuardianes.length)];
 
-      // Actualizar historial (mantener últimos 10)
+      // Actualizar historial
       historialReciente.personas = [...(historialReciente.personas || []), ultimaCompra.id].slice(-10);
-      historialReciente.guardianes = [...(historialReciente.guardianes || []), guardianComprado].slice(-8);
-      await kv.set('comunidad:historial_actividad', historialReciente, { ex: 3600 }); // expira en 1 hora
+      historialReciente.guardianes = [...(historialReciente.guardianes || []), guardianComprado].slice(-6);
+      await kv.set('comunidad:historial_actividad', historialReciente, { ex: 3600 });
 
-      // Tiempo aleatorio "hace X minutos"
-      const minutosAtras = 2 + Math.floor(Math.random() * 25);
+      // Timestamps realistas
+      const minutosCompra = 1 + Math.floor(Math.random() * 15);
+      const minutosPost = 3 + Math.floor(Math.random() * 20);
 
-      // Escribiendo: persona diferente a la compra
-      let escribiendo = null;
-      if (Math.random() > 0.6) {
+      // Múltiples personas escribiendo
+      let escribiendo = [];
+      if (Math.random() > 0.4) {
+        const numEscribiendo = 1 + Math.floor(Math.random() * 2);
         const otrasPersonas = PERFILES_BOT.filter(p => p.id !== ultimaCompra.id);
-        escribiendo = otrasPersonas[Math.floor(Math.random() * otrasPersonas.length)].nombre;
+        for (let i = 0; i < numEscribiendo; i++) {
+          const persona = otrasPersonas[Math.floor(Math.random() * otrasPersonas.length)];
+          if (!escribiendo.find(e => e.id === persona.id)) {
+            escribiendo.push({ nombre: persona.nombre, pais: persona.pais });
+          }
+        }
       }
+
+      // Último post (diferente a la compra)
+      const autorUltimoPost = PERFILES_BOT.filter(p => p.id !== ultimaCompra.id)[Math.floor(Math.random() * 40)];
+      const tiposPost = ['experiencia', 'pregunta', 'testimonio', 'sincronicidad'];
+      const tipoUltimoPost = tiposPost[Math.floor(Math.random() * tiposPost.length)];
 
       return Response.json({
         success: true,
         actividad: {
           viendoAhora,
+          conectadasAhora: viendoAhora - 2 - Math.floor(Math.random() * 3),
           ultimaCompra: {
             nombre: ultimaCompra.nombre,
             pais: ultimaCompra.pais,
+            avatar: ultimaCompra.avatar,
             guardian: guardianComprado,
-            hace: `${minutosAtras} min`
+            hace: formatearTiempoHace(minutosCompra),
+            timestamp: generarTimestampRealista(minutosCompra).toISOString()
           },
-          escribiendo
+          ultimoPost: {
+            autor: autorUltimoPost.nombre,
+            pais: autorUltimoPost.pais,
+            tipo: tipoUltimoPost,
+            hace: formatearTiempoHace(minutosPost),
+            timestamp: generarTimestampRealista(minutosPost).toISOString()
+          },
+          escribiendo: escribiendo.length > 0 ? escribiendo : null
         }
       });
     }
 
-    // Posts de la comunidad (mezcla de pregenerados con fechas aleatorias)
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TIPO: feed - Feed completo para Dashboard
+    // ═══════════════════════════════════════════════════════════════════════════
+    if (tipo === 'feed') {
+      const tiempos = generarDistribucionTemporal(POSTS_PREGENERADOS.length);
+
+      // Crear feed con timestamps realistas
+      const feed = POSTS_PREGENERADOS.map((post, i) => {
+        const autor = PERFILES_BOT[i % PERFILES_BOT.length];
+        const minutosAtras = tiempos[i];
+        const fecha = generarTimestampRealista(minutosAtras);
+
+        // Generar respuestas con timestamps coherentes
+        const numRespuestas = Math.min(post.respuestas, 4);
+        const respuestas = [];
+        for (let j = 0; j < numRespuestas; j++) {
+          const autorResp = PERFILES_BOT[(i + j + 10) % PERFILES_BOT.length];
+          // Respuestas son más recientes que el post original
+          const minutosRespuesta = Math.max(1, Math.floor(minutosAtras * (0.2 + Math.random() * 0.6)));
+          respuestas.push({
+            id: `resp_${i}_${j}`,
+            autor: autorResp,
+            contenido: RESPUESTAS_PREGENERADAS[Math.floor(Math.random() * RESPUESTAS_PREGENERADAS.length)],
+            hace: formatearTiempoHace(minutosRespuesta),
+            timestamp: generarTimestampRealista(minutosRespuesta).toISOString()
+          });
+        }
+
+        return {
+          id: `post_${i}`,
+          autor: {
+            id: autor.id,
+            nombre: autor.nombre,
+            pais: autor.pais,
+            avatar: autor.avatar,
+            nivel: autor.nivel,
+            guardianes: autor.guardianes
+          },
+          tipo: post.tipo,
+          guardian: post.guardian || null,
+          contenido: post.contenido,
+          likes: post.likes + Math.floor(Math.random() * 10),
+          totalRespuestas: post.respuestas,
+          fecha: fecha.toISOString(),
+          hace: formatearTiempoHace(minutosAtras),
+          respuestasPreview: respuestas,
+          destacado: post.likes > 150
+        };
+      });
+
+      // Ordenar por fecha (más reciente primero)
+      feed.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+      // Obtener estadísticas para incluir en feed
+      const hora = new Date().getHours();
+      const esHoraPico = hora >= 10 && hora <= 22;
+
+      return Response.json({
+        success: true,
+        feed: feed.slice(0, limite),
+        total: POSTS_PREGENERADOS.length,
+        hayMas: limite < POSTS_PREGENERADOS.length,
+        meta: {
+          ultimaActualizacion: new Date().toISOString(),
+          activas: esHoraPico ? 35 + Math.floor(Math.random() * 20) : 15 + Math.floor(Math.random() * 10),
+          postsHoy: 5 + Math.floor(Math.random() * 4)
+        }
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TIPO: posts (default) - Posts de la comunidad
+    // ═══════════════════════════════════════════════════════════════════════════
+    const tiempos = generarDistribucionTemporal(POSTS_PREGENERADOS.length);
+
     const postsConAutor = POSTS_PREGENERADOS.map((post, i) => {
       const autor = PERFILES_BOT[i % PERFILES_BOT.length];
-      const horasAtras = Math.floor(Math.random() * 72); // últimas 72 horas
-      const fecha = new Date(Date.now() - horasAtras * 60 * 60 * 1000);
+      const minutosAtras = tiempos[i];
+      const fecha = generarTimestampRealista(minutosAtras);
 
       // Generar respuestas aleatorias
       const numRespuestas = Math.min(post.respuestas, 5);
       const respuestas = [];
       for (let j = 0; j < numRespuestas; j++) {
         const autorResp = PERFILES_BOT[(i + j + 10) % PERFILES_BOT.length];
+        const minutosRespuesta = Math.max(1, Math.floor(minutosAtras * (0.3 + Math.random() * 0.5)));
         respuestas.push({
           autor: autorResp,
           contenido: RESPUESTAS_PREGENERADAS[Math.floor(Math.random() * RESPUESTAS_PREGENERADAS.length)],
-          hace: `${Math.floor(Math.random() * horasAtras)}h`
+          hace: formatearTiempoHace(minutosRespuesta),
+          timestamp: generarTimestampRealista(minutosRespuesta).toISOString()
         });
       }
 
@@ -214,9 +487,7 @@ export async function GET(request) {
         autor,
         ...post,
         fecha: fecha.toISOString(),
-        hace: horasAtras < 1 ? 'hace un momento' :
-              horasAtras < 24 ? `hace ${horasAtras}h` :
-              `hace ${Math.floor(horasAtras / 24)} días`,
+        hace: formatearTiempoHace(minutosAtras),
         respuestasPreview: respuestas
       };
     });
@@ -240,36 +511,85 @@ export async function GET(request) {
 // Respuestas de bots a posts reales (más variadas y contextuales)
 const RESPUESTAS_A_USUARIOS = {
   experiencia: [
-    '¡Qué hermoso lo que compartís! Me emociona leer esto 💜',
-    'Gracias por abrir tu corazón. Este es un espacio seguro para todas 🤗',
+    'Qué hermoso lo que compartís! Me emociona leer esto 💜',
+    'Gracias por abrir tu corazón. Este es un espacio seguro para todas',
     'Me pasó algo similar con mi guardián. Son increíbles',
-    'Esto me da escalofríos de lo real que es. ¡Gracias por compartir!',
+    'Esto me da escalofríos de lo real que es. Gracias por compartir!',
     'Justo necesitaba leer algo así hoy. El universo no se equivoca',
-    'Tu experiencia me inspira a seguir confiando en el proceso ✨',
-    '¡Qué lindo! Los guardianes siempre encuentran la forma de comunicarse'
+    'Tu experiencia me inspira a seguir confiando en el proceso',
+    'Qué lindo! Los guardianes siempre encuentran la forma de comunicarse',
+    'Mi Dorado también me sorprende así. La abundancia es real 💛',
+    'Obsidiana me protegió igual cuando más lo necesitaba',
+    'Índigo es así, te muestra cosas que después confirmas. Increíble',
+    'Jade me sanó igual. Son tan especiales los guardianes de enero'
   ],
   pregunta: [
-    '¡Buena pregunta! A mí me funciona [respuesta], pero cada una encuentra su camino',
+    'Buena pregunta! A mí me funciona hacerlo en luna llena, pero cada una encuentra su camino',
     'Yo también tuve esa duda al principio. Con el tiempo vas encontrando tu ritmo',
-    '¡Qué bueno que preguntes! Acá todas aprendemos juntas',
+    'Qué bueno que preguntes! Acá todas aprendemos juntas',
     'Te recomiendo empezar por lo que más te llame. Tu intuición sabe',
-    'Me pasó lo mismo cuando empecé. Dale tiempo y vas a ver que fluye 💫'
+    'Me pasó lo mismo cuando empecé. Dale tiempo y vas a ver que fluye',
+    'Los guardianes de enero (Dorado, Obsidiana, Índigo, Jade) son perfectos para empezar',
+    'Yo empecé con Jade y ahora tengo los 4 de enero. Son complementarios',
+    'Preguntale a tu guardián en meditación. Ellos responden'
+  ],
+  testimonio: [
+    'Felicitaciones por tu adopción! Qué emoción',
+    'Los guardianes eligen bien a quién acompañar. Te eligió!',
+    'Me emocioné leyendo esto. Los comienzos son mágicos',
+    'Bienvenida al Círculo! Vas a amar este camino',
+    'Ese guardián te va a cambiar la vida. Ya vas a ver'
+  ],
+  tip: [
+    'Gracias por el tip! Lo voy a probar esta semana',
+    'Funciona! Yo hago lo mismo con mi guardián',
+    'Anotadísimo. Me encanta aprender de ustedes',
+    'Qué buen consejo! Nunca lo había pensado así'
+  ],
+  ritual: [
+    'Ese ritual es poderoso! A mí también me funcionó',
+    'Me encanta ese ritual. Lo hago cada luna llena',
+    'Voy a probarlo con mi Obsidiana esta semana',
+    'Los rituales con los guardianes de enero son muy potentes'
+  ],
+  sincronicidad: [
+    'Las sincronicidades son la forma en que el universo confirma que vamos bien',
+    'Eso no es casualidad! Tu guardián te habló claro',
+    'Me pasó algo parecido la semana pasada. Estamos conectadas',
+    'Los guardianes siempre encuentran la forma de hacerse escuchar',
+    'Increíble! El universo habla, hay que saber escuchar'
   ],
   general: [
-    '¡Me encanta leer esto! 💜',
+    'Me encanta leer esto! 💜',
     'Qué bueno que lo compartas con nosotras',
-    'Anotado! Gracias por el aporte ✨',
+    'Anotado! Gracias por el aporte',
     'Esto es oro. Gracias por compartir',
     'Amo esta comunidad, de verdad',
-    '¡Qué hermoso! 🌟',
-    'Tu energía se siente desde acá'
+    'Qué hermoso!',
+    'Tu energía se siente desde acá',
+    'El Círculo de Duendes es un lugar mágico. Gracias por ser parte'
   ]
 };
 
 // Función para generar respuesta contextual de bot
 function generarRespuestaBot(post) {
   const tipoPost = post.tipo || 'general';
-  const respuestas = RESPUESTAS_A_USUARIOS[tipoPost] || RESPUESTAS_A_USUARIOS.general;
+  let respuestas = RESPUESTAS_A_USUARIOS[tipoPost] || RESPUESTAS_A_USUARIOS.general;
+
+  // Si el post menciona un guardián de enero, mezclar con respuestas generales
+  if (post.contenido) {
+    const guardianesEnero = ['dorado', 'obsidiana', 'índigo', 'indigo', 'jade'];
+    const mencionaGuardianEnero = guardianesEnero.some(g =>
+      post.contenido.toLowerCase().includes(g)
+    );
+    if (mencionaGuardianEnero) {
+      // Agregar algunas respuestas específicas de guardianes de enero
+      respuestas = [...respuestas, ...RESPUESTAS_A_USUARIOS.experiencia.filter(r =>
+        guardianesEnero.some(g => r.toLowerCase().includes(g))
+      )];
+    }
+  }
+
   return respuestas[Math.floor(Math.random() * respuestas.length)];
 }
 

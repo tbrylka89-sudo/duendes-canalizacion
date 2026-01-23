@@ -22,6 +22,10 @@ export default function GamificacionAdmin() {
   const [cantidadRunas, setCantidadRunas] = useState(50);
   const [motivoRunas, setMotivoRunas] = useState('regalo_admin');
 
+  // Reportes
+  const [reporteActual, setReporteActual] = useState(null);
+  const [generandoReporte, setGenerandoReporte] = useState(false);
+
   // Cargar datos
   useEffect(() => {
     cargarMetricas();
@@ -97,6 +101,23 @@ export default function GamificacionAdmin() {
     } catch (err) {
       setError(err.message);
     }
+  }
+
+  async function generarReporte(tipo) {
+    setGenerandoReporte(true);
+    setReporteActual(null);
+    try {
+      const res = await fetch(`/api/admin/gamificacion/reportes?tipo=${tipo}`);
+      const data = await res.json();
+      if (data.success) {
+        setReporteActual({ tipo, ...data });
+      } else {
+        setError(data.error || 'Error generando reporte');
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+    setGenerandoReporte(false);
   }
 
   async function ajustarRunasUsuario(email, cantidad, operacion) {
@@ -449,64 +470,163 @@ export default function GamificacionAdmin() {
               <div className="reporte-card">
                 <h3>💰 Economía de Runas</h3>
                 <p>Runas generadas, gastadas y balance por período</p>
-                <button onClick={() => {
-                  // TODO: Generar reporte
-                  alert('Generando reporte de economía...');
-                }}>
-                  Generar Reporte
+                <button onClick={() => generarReporte('economia')} disabled={generandoReporte}>
+                  {generandoReporte ? 'Generando...' : 'Generar Reporte'}
                 </button>
               </div>
 
               <div className="reporte-card">
                 <h3>🔮 Lecturas Populares</h3>
                 <p>Ranking de lecturas más solicitadas</p>
-                <button onClick={() => {
-                  alert('Generando reporte de lecturas...');
-                }}>
-                  Generar Reporte
+                <button onClick={() => generarReporte('lecturas')} disabled={generandoReporte}>
+                  {generandoReporte ? 'Generando...' : 'Generar Reporte'}
                 </button>
               </div>
 
               <div className="reporte-card">
                 <h3>📅 Actividad Diaria</h3>
                 <p>Logins, cofres, lecturas por día</p>
-                <button onClick={() => {
-                  alert('Generando reporte de actividad...');
-                }}>
-                  Generar Reporte
+                <button onClick={() => generarReporte('actividad')} disabled={generandoReporte}>
+                  {generandoReporte ? 'Generando...' : 'Generar Reporte'}
                 </button>
               </div>
 
               <div className="reporte-card">
                 <h3>👥 Retención</h3>
                 <p>Usuarios que vuelven vs nuevos</p>
-                <button onClick={() => {
-                  alert('Generando reporte de retención...');
-                }}>
-                  Generar Reporte
+                <button onClick={() => generarReporte('retencion')} disabled={generandoReporte}>
+                  {generandoReporte ? 'Generando...' : 'Generar Reporte'}
                 </button>
               </div>
 
               <div className="reporte-card">
                 <h3>🎯 Referidos</h3>
                 <p>Top referidores y conversiones</p>
-                <button onClick={() => {
-                  alert('Generando reporte de referidos...');
-                }}>
-                  Generar Reporte
+                <button onClick={() => generarReporte('referidos')} disabled={generandoReporte}>
+                  {generandoReporte ? 'Generando...' : 'Generar Reporte'}
                 </button>
               </div>
 
               <div className="reporte-card">
                 <h3>🏆 Logros</h3>
                 <p>Badges más obtenidos y niveles alcanzados</p>
-                <button onClick={() => {
-                  alert('Generando reporte de logros...');
-                }}>
-                  Generar Reporte
+                <button onClick={() => generarReporte('logros')} disabled={generandoReporte}>
+                  {generandoReporte ? 'Generando...' : 'Generar Reporte'}
                 </button>
               </div>
             </div>
+
+            {/* Resultado del reporte */}
+            {reporteActual && (
+              <div className="reporte-resultado">
+                <div className="reporte-header">
+                  <h3>
+                    {reporteActual.tipo === 'economia' && '💰 Reporte de Economía de Runas'}
+                    {reporteActual.tipo === 'lecturas' && '🔮 Reporte de Lecturas Populares'}
+                    {reporteActual.tipo === 'actividad' && '📅 Reporte de Actividad Diaria'}
+                    {reporteActual.tipo === 'retencion' && '👥 Reporte de Retención'}
+                    {reporteActual.tipo === 'referidos' && '🎯 Reporte de Referidos'}
+                    {reporteActual.tipo === 'logros' && '🏆 Reporte de Logros'}
+                  </h3>
+                  <button onClick={() => setReporteActual(null)} className="btn-cerrar">✕</button>
+                </div>
+
+                {/* Resumen */}
+                {reporteActual.reporte?.resumen && (
+                  <div className="reporte-resumen">
+                    {Object.entries(reporteActual.reporte.resumen).map(([key, value]) => (
+                      <div key={key} className="resumen-item">
+                        <span className="resumen-label">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="resumen-valor">{typeof value === 'number' ? value.toLocaleString() : value}{key.includes('tasa') || key.includes('porcentaje') ? '%' : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Tablas de datos */}
+                {reporteActual.reporte?.topUsuarios && (
+                  <div className="reporte-tabla">
+                    <h4>Top Usuarios</h4>
+                    <table>
+                      <thead>
+                        <tr><th>Usuario</th><th>Runas</th><th>Nivel</th></tr>
+                      </thead>
+                      <tbody>
+                        {reporteActual.reporte.topUsuarios.map((u, i) => (
+                          <tr key={i}><td>{u.email}</td><td>{u.runas}</td><td>{u.nivel}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {reporteActual.reporte?.ranking && (
+                  <div className="reporte-tabla">
+                    <h4>Ranking</h4>
+                    <table>
+                      <thead>
+                        <tr><th>Tipo</th><th>Cantidad</th><th>%</th></tr>
+                      </thead>
+                      <tbody>
+                        {reporteActual.reporte.ranking.map((r, i) => (
+                          <tr key={i}><td>{r.tipo}</td><td>{r.cantidad}</td><td>{r.porcentaje}%</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {reporteActual.reporte?.distribucionNiveles && (
+                  <div className="reporte-tabla">
+                    <h4>Distribución por Niveles</h4>
+                    <table>
+                      <thead>
+                        <tr><th>Nivel</th><th>Usuarios</th></tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(reporteActual.reporte.distribucionNiveles).map(([nivel, cantidad]) => (
+                          <tr key={nivel}><td>{nivel}</td><td>{cantidad}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {reporteActual.reporte?.topReferidores && (
+                  <div className="reporte-tabla">
+                    <h4>Top Referidores</h4>
+                    <table>
+                      <thead>
+                        <tr><th>Código</th><th>Referidos</th><th>Convertidos</th></tr>
+                      </thead>
+                      <tbody>
+                        {reporteActual.reporte.topReferidores.map((r, i) => (
+                          <tr key={i}><td>{r.codigo}</td><td>{r.totalReferidos}</td><td>{r.convertidos}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {reporteActual.reporte?.badgesMasObtenidos && (
+                  <div className="reporte-tabla">
+                    <h4>Badges Más Obtenidos</h4>
+                    <table>
+                      <thead>
+                        <tr><th>Badge</th><th>Veces Otorgado</th></tr>
+                      </thead>
+                      <tbody>
+                        {reporteActual.reporte.badgesMasObtenidos.map((b, i) => (
+                          <tr key={i}><td>{b.nombre}</td><td>{b.cantidad}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <p className="reporte-fecha">Generado: {new Date(reporteActual.generadoEn).toLocaleString('es-UY')}</p>
+              </div>
+            )}
           </div>
         )}
       </main>
