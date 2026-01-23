@@ -30,17 +30,57 @@ export async function GET(request) {
         return Response.json({ success: false, error: 'Curso no encontrado' }, { status: 404 });
       }
 
+      // Transformar estructura de módulos para compatibilidad con frontend
+      // El frontend espera modulo.lecciones[], pero tenemos modulo.contenido.{intro, leccion, ejercicio}
+      const cursoTransformado = {
+        ...curso,
+        titulo: curso.nombre, // Alias para compatibilidad
+        modulos: curso.modulos?.map(modulo => {
+          // Si ya tiene lecciones como array, mantenerlas
+          if (modulo.lecciones && Array.isArray(modulo.lecciones)) {
+            return modulo;
+          }
+
+          // Si tiene contenido en formato viejo, transformar a lecciones
+          if (modulo.contenido) {
+            return {
+              ...modulo,
+              lecciones: [
+                {
+                  numero: 1,
+                  titulo: 'Introducción',
+                  duracion_minutos: 5,
+                  contenido: modulo.contenido.introduccion || '',
+                  ejercicio_practico: null,
+                  reflexion: null
+                },
+                {
+                  numero: 2,
+                  titulo: modulo.titulo || 'Lección Principal',
+                  duracion_minutos: 15,
+                  contenido: modulo.contenido.leccion || '',
+                  ejercicio_practico: modulo.contenido.ejercicio || '',
+                  reflexion: modulo.contenido.reflexion || ''
+                }
+              ]
+            };
+          }
+
+          return modulo;
+        }) || []
+      };
+
       // Para público, enriquecer con info del duende actual de la semana
       if (tipo === 'publico') {
         const duendeSemana = await kv.get('duende-semana-actual');
         return Response.json({
           success: true,
-          curso,
+          curso: cursoTransformado,
           duendeSemanaActual: duendeSemana
         });
       }
 
-      return Response.json({ success: true, curso });
+      return Response.json({ success: true, curso: cursoTransformado });
     }
 
     // Listar todos los cursos
@@ -56,9 +96,16 @@ export async function GET(request) {
 
         // Para listado público, solo datos básicos
         if (tipo === 'publico') {
+          // Calcular total de lecciones real
+          let totalLecciones = 0;
+          curso.modulos?.forEach(m => {
+            totalLecciones += m.lecciones?.length || 1;
+          });
+
           cursos.push({
             id: curso.id,
             nombre: curso.nombre,
+            titulo: curso.nombre, // Alias para compatibilidad con frontend
             descripcion: curso.descripcion,
             mes: curso.mes,
             año: curso.año,
@@ -67,9 +114,10 @@ export async function GET(request) {
             nivel: curso.nivel || 'todos',
             imagen: curso.imagen,
             totalModulos: curso.modulos?.length || 0,
-            totalLecciones: curso.modulos?.length || 0, // 1 lección por módulo
+            totalLecciones: totalLecciones,
             badge: curso.badge,
             estado: curso.estado,
+            modulos: curso.modulos, // Incluir módulos para el detalle
             // Resumen de duendes que enseñan
             duendes: curso.modulos?.map(m => ({
               nombre: m.duende?.nombre,

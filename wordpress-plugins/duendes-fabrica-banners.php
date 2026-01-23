@@ -2061,3 +2061,87 @@ function duendes_get_banners($ubicacion, $limite = 5) {
     $plugin = Duendes_Fabrica_Banners::instance();
     return $plugin->get_active_banners($ubicacion, $limite);
 }
+
+// =====================================================
+// AUTO-INYECCIÓN DE BANNERS EN UBICACIONES
+// =====================================================
+
+// TIENDA: Banner antes de los productos
+add_action('woocommerce_before_shop_loop', function() {
+    duendes_mostrar_banners('tienda', 1);
+}, 15);
+
+// PRODUCTO: Banner en página de producto
+add_action('woocommerce_before_single_product', function() {
+    duendes_mostrar_banners('producto', 1);
+}, 5);
+
+// CARRITO: Banner antes del carrito
+add_action('woocommerce_before_cart', function() {
+    duendes_mostrar_banners('carrito', 1);
+}, 5);
+
+// CHECKOUT: Banner antes del checkout
+add_action('woocommerce_before_checkout_form', function() {
+    duendes_mostrar_banners('checkout', 1);
+}, 5);
+
+// HOMEPAGE: Banner en el footer (se inyecta en todas las páginas pero solo muestra si es front_page)
+add_action('wp_footer', function() {
+    if (is_front_page() || is_home()) {
+        echo '<div id="dfb-homepage-banners" style="position:fixed;bottom:20px;left:20px;right:20px;z-index:9998;pointer-events:none;">';
+        echo '<div style="max-width:600px;margin:0 auto;pointer-events:auto;">';
+        duendes_mostrar_banners('homepage', 1);
+        echo '</div></div>';
+    }
+});
+
+// POPUP GLOBAL: Se muestra en cualquier página
+add_action('wp_footer', function() {
+    if (is_admin()) return;
+
+    $plugin = Duendes_Fabrica_Banners::instance();
+    $popups = $plugin->get_active_banners('popup', 1);
+
+    foreach ($popups as $popup) {
+        $plugin->render_popup($popup);
+    }
+});
+
+// MI MAGIA: Shortcode especial que se puede usar en Vercel o WordPress
+add_shortcode('duendes_banners_mi_magia', function() {
+    ob_start();
+    duendes_mostrar_banners('mi-magia', 2);
+    return ob_get_clean();
+});
+
+// API REST para obtener banners desde Vercel/Mi Magia
+add_action('rest_api_init', function() {
+    register_rest_route('duendes/v1', '/banners/(?P<ubicacion>[a-zA-Z0-9_-]+)', [
+        'methods' => 'GET',
+        'callback' => function($request) {
+            $ubicacion = $request['ubicacion'];
+            $limite = $request->get_param('limite') ?: 3;
+
+            $plugin = Duendes_Fabrica_Banners::instance();
+            $banners = $plugin->get_active_banners($ubicacion, $limite);
+
+            $result = [];
+            foreach ($banners as $banner) {
+                $result[] = [
+                    'id' => $banner->id,
+                    'titulo' => $banner->titulo,
+                    'subtitulo' => $banner->subtitulo,
+                    'tipo' => $banner->tipo,
+                    'cta_texto' => $banner->cta_texto,
+                    'cta_url' => $banner->cta_url,
+                    'imagen_url' => $banner->imagen_url,
+                    'codigo_descuento' => $banner->codigo_descuento,
+                ];
+            }
+
+            return rest_ensure_response($result);
+        },
+        'permission_callback' => '__return_true',
+    ]);
+});
