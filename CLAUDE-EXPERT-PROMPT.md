@@ -92,6 +92,89 @@ E-commerce de guardianes mágicos hechos a mano. NO es un proyecto de juguete - 
 - Español rioplatense (vos, tenés, podés)
 - Urgencia real, no falsa escasez
 
+---
+
+### SISTEMA DE ROTACIÓN DE APERTURAS (CRÍTICO)
+
+**Ubicación:** `/lib/guardian-intelligence/config.js`
+
+Los patrones de apertura ROTAN globalmente, no están prohibidos:
+
+| Patrón | Ejemplos | Rotación |
+|--------|----------|----------|
+| pregunta_cuantas | "¿Cuántas veces...?", "¿Cuándo fue la última vez...?" | 15 historias |
+| hay_quienes | "Hay personas que...", "Algunas personas..." | 15 historias |
+| afirmacion_directa | "Lo sabés", "Ya lo sentiste", "La verdad es" | 15 historias |
+| secreto | "Hay algo que...", "Nadie sabe que...", "No le contás a nadie" | 15 historias |
+| verdad_incomoda | "Nadie te lo dice", "Seamos honestos" | 15 historias |
+| contraste | "Todos ven...", "Por fuera parece...", "Aparentás" | 15 historias |
+| cuerpo | "El cuerpo habla", "Tu cuerpo sabe", "El cansancio" | 15 historias |
+
+**IMPORTANTE:** Un patrón puede volver a usarse después de ~15 historias GLOBALES (todas las categorías, todos los días).
+
+**Esto SÍ está PROHIBIDO siempre (frases genéricas/clichés):**
+- "En lo profundo del bosque..."
+- "Las brumas del..."
+- "Desde tiempos inmemoriales..."
+- "El velo entre mundos..."
+- "Érase una vez..." / "Había una vez..."
+- "Hace mucho mucho tiempo..."
+- "En tierras lejanas..."
+
+---
+
+### HOOKS DE APERTURA POR CATEGORÍA
+
+Cada categoría tiene 9 hooks únicos que se rotan globalmente.
+
+**Tracking:** Vercel KV guarda los últimos 20 hooks usados (`gi:hooks:usados`) y los últimos 15 patrones (`gi:patrones:apertura`)
+
+El sistema selecciona automáticamente un hook no usado recientemente, verificando contra TODAS las categorías y días anteriores.
+
+---
+
+### REGLA DE REGENERACIÓN
+
+Una regeneración NUNCA puede producir un score menor:
+- Si score nuevo < score anterior → regenerar automáticamente
+- Máximo 3 intentos
+- Si todos fallan → usar el mejor de los 3
+
+---
+
+### VERIFICACIÓN GLOBAL ENTRE CATEGORÍAS Y DÍAS
+
+El sistema consulta Vercel KV antes de generar:
+- `gi:patrones:apertura` → últimos 15 patrones usados (TODAS las categorías)
+- `gi:hooks:usados` → últimos 20 hooks usados
+- `gi:estructuras:recientes` → últimas 10 estructuras
+
+**Esto asegura que:**
+- Una historia de Protección NO empiece igual que una de Abundancia generada ayer
+- Los patrones rotan genuinamente a nivel GLOBAL, no por categoría aislada
+
+---
+
+### VERIFICAR FUNCIONAMIENTO DEL SISTEMA
+
+**Endpoint:** `GET /api/guardian-intelligence/generate`
+
+Devuelve estadísticas de rotación:
+```json
+{
+  "stats": {
+    "frasesUsadas": 45,
+    "sincrodestinosUsados": 12,
+    "patronesRecientes": ["hay_quienes", "pregunta_cuantas", "afirmacion_directa"],
+    "hooksRecientes": ["Hay personas que...", "El cansancio de..."]
+  }
+}
+```
+
+Usá esto para verificar que los patrones están rotando correctamente.
+
+---
+
 **Archivos clave:**
 - /CLAUDE.md - Biblia del proyecto
 - /CODIGO-MAESTRO.md - Sistema experto de conversión

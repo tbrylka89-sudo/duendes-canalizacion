@@ -14,16 +14,22 @@ export async function POST(request) {
 
     // Acción: generar historia nueva
     if (accion === 'generar' && datos) {
-      // Obtener contexto (frases ya usadas, etc.)
+      // Obtener contexto GLOBAL (de TODAS las categorías, días anteriores incluidos)
       const frasesUsadas = await kv.lrange('gi:frases:usadas', 0, 99) || [];
       const sincrodestinosUsados = await kv.lrange('gi:sincrodestinos:usados', 0, 49) || [];
       const estructurasRecientes = await kv.lrange('gi:estructuras:recientes', 0, 9) || [];
+      const patronesRecientes = await kv.lrange('gi:patrones:apertura', 0, 14) || []; // Últimos 15 patrones
+      const hooksUsados = await kv.lrange('gi:hooks:usados', 0, 19) || []; // Últimos 20 hooks
 
       const contexto = {
         frasesUsadas,
         sincrodestinosUsados,
-        estructurasRecientes
+        estructurasRecientes,
+        patronesRecientes,  // NUEVO: patrones de apertura usados globalmente
+        hooksUsados         // NUEVO: hooks específicos usados
       };
+
+      console.log(`[GI] Contexto cargado - Patrones recientes: ${patronesRecientes.length}, Hooks: ${hooksUsados.length}`);
 
       const resultado = await generarHistoriaUnica(datos, contexto);
 
@@ -31,6 +37,19 @@ export async function POST(request) {
       if (resultado.metadata?.estructuraUsada) {
         await kv.lpush('gi:estructuras:recientes', resultado.metadata.estructuraUsada);
         await kv.ltrim('gi:estructuras:recientes', 0, 9);
+      }
+
+      // NUEVO: Guardar el patrón de apertura usado (para rotación global)
+      if (resultado.metadata?.patronApertura) {
+        await kv.lpush('gi:patrones:apertura', resultado.metadata.patronApertura);
+        await kv.ltrim('gi:patrones:apertura', 0, 14); // Mantener últimos 15
+        console.log(`[GI] Patrón guardado: ${resultado.metadata.patronApertura}`);
+      }
+
+      // NUEVO: Guardar el hook usado
+      if (resultado.metadata?.hookUsado) {
+        await kv.lpush('gi:hooks:usados', resultado.metadata.hookUsado);
+        await kv.ltrim('gi:hooks:usados', 0, 19); // Mantener últimos 20
       }
 
       return NextResponse.json({
@@ -128,7 +147,9 @@ export async function GET() {
     const stats = {
       frasesUsadas: await kv.llen('gi:frases:usadas') || 0,
       sincrodestinosUsados: await kv.llen('gi:sincrodestinos:usados') || 0,
-      historiasGeneradas: await kv.get('gi:stats:historias_generadas') || 0
+      historiasGeneradas: await kv.get('gi:stats:historias_generadas') || 0,
+      patronesRecientes: await kv.lrange('gi:patrones:apertura', 0, 14) || [],
+      hooksRecientes: await kv.lrange('gi:hooks:usados', 0, 9) || []
     };
 
     return NextResponse.json({
