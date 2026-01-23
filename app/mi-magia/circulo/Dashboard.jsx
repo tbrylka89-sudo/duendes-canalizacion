@@ -120,10 +120,10 @@ function ComunidadIndicadores() {
           justify-content: center;
           gap: 30px;
           padding: 10px 20px;
-          background: rgba(212, 175, 55, 0.05);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+          background: rgba(0, 240, 255, 0.03);
+          border-bottom: 1px solid rgba(0, 240, 255, 0.1);
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(255, 255, 255, 0.8);
           flex-wrap: wrap;
         }
 
@@ -141,13 +141,13 @@ function ComunidadIndicadores() {
         }
 
         .stat-dot.verde {
-          background: #4ade80;
-          box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+          background: var(--neon-green, #39ff14);
+          box-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
         }
 
         @keyframes pulse-dot {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+          0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(57, 255, 20, 0.6); }
+          50% { opacity: 0.6; box-shadow: 0 0 20px rgba(57, 255, 20, 0.8); }
         }
 
         .stat-icon {
@@ -163,19 +163,19 @@ function ComunidadIndicadores() {
           50% { opacity: 1; }
         }
 
-        /* Toast de compra */
+        /* Toast de compra - NEÓN */
         .toast-compra {
           position: fixed;
           bottom: 30px;
           left: 30px;
-          background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
-          border: 1px solid rgba(212, 175, 55, 0.4);
+          background: linear-gradient(135deg, #0a0a15, #101020);
+          border: 1px solid var(--neon-orange, #ff6b00);
           border-radius: 15px;
           padding: 15px 20px;
           display: flex;
           align-items: center;
           gap: 15px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 107, 0, 0.2);
           z-index: 1000;
           animation: slideInUp 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
         }
@@ -205,12 +205,12 @@ function ComunidadIndicadores() {
         }
 
         .toast-info span {
-          color: rgba(255, 255, 255, 0.7);
+          color: var(--neon-orange, #ff6b00);
           font-size: 13px;
         }
 
         .toast-info small {
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.5);
           font-size: 11px;
           margin-top: 3px;
         }
@@ -350,20 +350,20 @@ function TourCirculo({ onFinish }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(5, 5, 8, 0.95);
+          background: rgba(5, 5, 8, 0.97);
           padding: 20px;
           font-family: 'Cormorant Garamond', serif;
         }
 
         .tour-circulo-card {
-          background: linear-gradient(135deg, #111 0%, #0a0a0a 100%);
+          background: linear-gradient(135deg, #0a0a15 0%, #050510 100%);
           border-radius: 20px;
           padding: 2.5rem;
           max-width: 500px;
           width: 100%;
           text-align: center;
-          border: 1px solid rgba(212, 175, 55, 0.2);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(212, 175, 55, 0.1);
+          border: 1px solid rgba(0, 240, 255, 0.3);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 60px rgba(0, 240, 255, 0.1);
         }
 
         .tour-progress {
@@ -377,18 +377,19 @@ function TourCirculo({ onFinish }) {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #333;
+          background: #222;
           transition: all 0.3s;
         }
 
         .tour-dot.activo {
-          background: #d4af37;
+          background: var(--neon-magenta, #ff00ff);
           transform: scale(1.3);
-          box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+          box-shadow: 0 0 15px rgba(255, 0, 255, 0.6);
         }
 
         .tour-dot.completado {
-          background: rgba(212, 175, 55, 0.5);
+          background: var(--neon-blue, #00f0ff);
+          box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
         }
 
         .tour-content {
@@ -399,18 +400,20 @@ function TourCirculo({ onFinish }) {
           font-size: 4rem;
           display: block;
           margin-bottom: 1rem;
-          filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+          filter: drop-shadow(0 0 25px rgba(255, 0, 255, 0.5));
         }
 
         .tour-circulo-card h1 {
           font-family: 'Tangerine', cursive;
           font-size: 2.5rem;
-          color: #fff;
+          background: linear-gradient(135deg, #fff, var(--neon-blue, #00f0ff));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           margin: 0 0 1rem;
         }
 
         .tour-mensaje {
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(255, 255, 255, 0.9);
           font-size: 1.1rem;
           line-height: 1.7;
           margin: 0;
@@ -423,10 +426,11 @@ function TourCirculo({ onFinish }) {
           gap: 8px;
           margin-top: 1.5rem;
           padding: 12px 20px;
-          background: rgba(212, 175, 55, 0.1);
+          background: rgba(57, 255, 20, 0.08);
+          border: 1px solid rgba(57, 255, 20, 0.2);
           border-radius: 10px;
           font-size: 0.9rem;
-          color: #d4af37;
+          color: var(--neon-green, #39ff14);
         }
 
         .tour-nav {
@@ -437,8 +441,8 @@ function TourCirculo({ onFinish }) {
         }
 
         .tour-btn-primary {
-          background: linear-gradient(135deg, #d4af37, #b8972e);
-          color: #0a0a0a;
+          background: linear-gradient(135deg, var(--neon-magenta, #ff00ff), #cc00cc);
+          color: #fff;
           border: none;
           padding: 14px 30px;
           border-radius: 50px;
@@ -447,17 +451,18 @@ function TourCirculo({ onFinish }) {
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s;
+          box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
         }
 
         .tour-btn-primary:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+          box-shadow: 0 10px 35px rgba(255, 0, 255, 0.5);
         }
 
         .tour-btn-sec {
           background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: rgba(255, 255, 255, 0.7);
+          border: 1px solid rgba(0, 240, 255, 0.4);
+          color: var(--neon-blue, #00f0ff);
           padding: 14px 25px;
           border-radius: 50px;
           font-family: 'Cinzel', serif;
@@ -467,25 +472,25 @@ function TourCirculo({ onFinish }) {
         }
 
         .tour-btn-sec:hover {
-          border-color: rgba(255, 255, 255, 0.4);
-          color: #fff;
+          border-color: var(--neon-blue, #00f0ff);
+          box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
         }
 
         .tour-btn-skip {
           background: none;
           border: none;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.5);
           font-size: 13px;
           cursor: pointer;
           padding: 10px;
         }
 
         .tour-btn-skip:hover {
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(255, 255, 255, 0.8);
         }
 
         .tour-counter {
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(255, 255, 255, 0.4);
           font-size: 12px;
         }
       `}</style>
@@ -754,6 +759,12 @@ export default function CirculoDashboard({ usuario }) {
             Contenido
           </button>
           <button
+            onClick={() => setSeccion('cursos')}
+            className={`nav-btn ${seccion === 'cursos' ? 'active' : ''}`}
+          >
+            Cursos
+          </button>
+          <button
             onClick={() => setSeccion('foro')}
             className={`nav-btn ${seccion === 'foro' ? 'active' : ''}`}
           >
@@ -791,16 +802,28 @@ export default function CirculoDashboard({ usuario }) {
           />
         )}
         {seccion === 'contenido' && <SeccionContenido />}
+        {seccion === 'cursos' && <SeccionCursos usuario={usuario} />}
         {seccion === 'foro' && <SeccionForo usuario={usuario} />}
         {seccion === 'archivo' && <SeccionArchivo />}
       </main>
 
       <style jsx>{`
+        /* ═══════════════════════════════════════════════════════════════════════════
+           PALETA NEÓN PREMIUM - El Círculo
+           ═══════════════════════════════════════════════════════════════════════════ */
         .circulo-dashboard {
           min-height: 100vh;
-          background: #000000;
+          background: #050508;
           color: #ffffff;
           font-family: 'Cormorant Garamond', Georgia, serif;
+          --neon-magenta: #ff00ff;
+          --neon-blue: #00f0ff;
+          --neon-green: #39ff14;
+          --neon-orange: #ff6b00;
+          --neon-magenta-glow: rgba(255, 0, 255, 0.4);
+          --neon-blue-glow: rgba(0, 240, 255, 0.4);
+          --neon-green-glow: rgba(57, 255, 20, 0.4);
+          --neon-orange-glow: rgba(255, 107, 0, 0.4);
         }
 
         /* Banner de Temporada - Ambos Hemisferios */
@@ -1009,12 +1032,12 @@ export default function CirculoDashboard({ usuario }) {
           align-items: center;
           justify-content: space-between;
           padding: 20px 40px;
-          background: rgba(0, 0, 0, 0.5);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+          background: rgba(5, 5, 8, 0.95);
+          border-bottom: 1px solid rgba(0, 240, 255, 0.15);
           position: sticky;
           top: 0;
           z-index: 100;
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(20px);
         }
 
         .header-left {
@@ -1027,9 +1050,10 @@ export default function CirculoDashboard({ usuario }) {
           font-family: 'Tangerine', cursive;
           font-size: 36px;
           font-weight: 700;
-          background: linear-gradient(135deg, #d4af37, #e8d5a3);
+          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-blue));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          text-shadow: 0 0 30px var(--neon-magenta-glow);
           margin: 0;
         }
 
@@ -1038,11 +1062,12 @@ export default function CirculoDashboard({ usuario }) {
           font-size: 10px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          color: #d4af37;
-          background: rgba(212, 175, 55, 0.1);
+          color: var(--neon-green);
+          background: rgba(57, 255, 20, 0.08);
           padding: 6px 15px;
           border-radius: 20px;
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          border: 1px solid rgba(57, 255, 20, 0.3);
+          text-shadow: 0 0 10px var(--neon-green-glow);
         }
 
         .circulo-nav {
@@ -1052,8 +1077,8 @@ export default function CirculoDashboard({ usuario }) {
 
         .nav-btn {
           background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: rgba(255, 255, 255, 0.7);
           font-family: 'Cinzel', serif;
           font-size: 12px;
           letter-spacing: 2px;
@@ -1065,14 +1090,16 @@ export default function CirculoDashboard({ usuario }) {
         }
 
         .nav-btn:hover {
-          border-color: rgba(212, 175, 55, 0.5);
-          color: rgba(255, 255, 255, 0.9);
+          border-color: var(--neon-blue);
+          color: #ffffff;
+          box-shadow: 0 0 15px var(--neon-blue-glow);
         }
 
         .nav-btn.active {
-          background: rgba(212, 175, 55, 0.15);
-          border-color: #d4af37;
-          color: #d4af37;
+          background: rgba(0, 240, 255, 0.1);
+          border-color: var(--neon-blue);
+          color: var(--neon-blue);
+          box-shadow: 0 0 20px var(--neon-blue-glow);
         }
 
         .header-right {
@@ -1084,7 +1111,7 @@ export default function CirculoDashboard({ usuario }) {
         .user-name {
           font-family: 'Cinzel', serif;
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.7);
+          color: #ffffff;
         }
 
         .nav-links-externos {
@@ -1098,38 +1125,40 @@ export default function CirculoDashboard({ usuario }) {
           font-size: 11px;
           letter-spacing: 1px;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
           text-decoration: none;
           padding: 6px 12px;
           border-radius: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: 1px solid rgba(255, 255, 255, 0.2);
           transition: all 0.3s ease;
         }
 
         .link-externo:hover {
           color: #fff;
-          border-color: rgba(212, 175, 55, 0.5);
-          background: rgba(212, 175, 55, 0.1);
+          border-color: var(--neon-magenta);
+          background: rgba(255, 0, 255, 0.1);
+          box-shadow: 0 0 15px var(--neon-magenta-glow);
         }
 
         .link-externo.link-tienda {
-          border-color: rgba(212, 175, 55, 0.3);
-          color: rgba(212, 175, 55, 0.8);
+          border-color: var(--neon-orange);
+          color: var(--neon-orange);
         }
 
         .link-externo.link-tienda:hover {
-          background: rgba(212, 175, 55, 0.15);
-          color: #d4af37;
-          border-color: #d4af37;
+          background: rgba(255, 107, 0, 0.15);
+          color: var(--neon-orange);
+          border-color: var(--neon-orange);
+          box-shadow: 0 0 15px var(--neon-orange-glow);
         }
 
         .btn-tour-mini {
           width: 28px;
           height: 28px;
           border-radius: 50%;
-          background: rgba(212, 175, 55, 0.1);
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          color: #d4af37;
+          background: rgba(255, 0, 255, 0.1);
+          border: 1px solid rgba(255, 0, 255, 0.4);
+          color: var(--neon-magenta);
           font-family: 'Cinzel', serif;
           font-size: 14px;
           font-weight: 600;
@@ -1138,8 +1167,9 @@ export default function CirculoDashboard({ usuario }) {
         }
 
         .btn-tour-mini:hover {
-          background: rgba(212, 175, 55, 0.2);
-          border-color: #d4af37;
+          background: rgba(255, 0, 255, 0.2);
+          border-color: var(--neon-magenta);
+          box-shadow: 0 0 15px var(--neon-magenta-glow);
         }
 
         /* Main */
@@ -1338,23 +1368,77 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
         )}
       </div>
 
-      {/* Guardián de la semana */}
+      {/* Guardián de la semana - Diseño destacado */}
       {(guardianSemana || consejo?.guardian) && (
-        <div className="guardian-semana-card">
-          <div className="guardian-semana-header">
-            <span className="etiqueta">Guardián de la Semana</span>
-          </div>
-          <div className="guardian-semana-content">
-            <div className="guardian-imagen-wrap">
-              <img src={consejo?.guardian?.imagen || guardianSemana?.imagen} alt={consejo?.guardian?.nombre || guardianSemana?.nombre} />
+        <div className="guardian-destacado">
+          <div className="guardian-glow"></div>
+          <div className="guardian-contenedor">
+            {/* Banner decorativo */}
+            <div className="guardian-banner">
+              <div className="banner-patron"></div>
+              <span className="banner-estrella izq">✦</span>
+              <span className="banner-titulo">✧ Guardián de la Semana ✧</span>
+              <span className="banner-estrella der">✦</span>
             </div>
-            <div className="guardian-info">
-              <span className="guardian-categoria">{consejo?.guardian?.tipo_ser_nombre || guardianSemana?.tipo_ser_nombre} de {consejo?.guardian?.categoria || guardianSemana?.categoria}</span>
-              <h3 className="guardian-nombre">{consejo?.guardian?.nombre || guardianSemana?.nombre}</h3>
-              <p className="guardian-arquetipo">{consejo?.guardian?.arquetipo || guardianSemana?.arquetipo}</p>
-              <a href={consejo?.guardian?.url_tienda || guardianSemana?.url_tienda} target="_blank" className="ver-en-tienda">
-                Ver en la tienda →
-              </a>
+
+            {/* Contenido principal */}
+            <div className="guardian-cuerpo">
+              {/* Imagen circular destacada */}
+              <div className="guardian-foto-contenedor">
+                <div className="foto-aureola"></div>
+                <div className="foto-marco">
+                  <img
+                    src={consejo?.guardian?.imagen || guardianSemana?.imagen}
+                    alt={consejo?.guardian?.nombre || guardianSemana?.nombre}
+                    className="guardian-foto"
+                  />
+                </div>
+                <div className="foto-brillo"></div>
+              </div>
+
+              {/* Info del guardián */}
+              <div className="guardian-datos">
+                <span className="guardian-especie">
+                  {consejo?.guardian?.tipo_ser_nombre || guardianSemana?.tipo_ser_nombre || 'Guardián'}
+                </span>
+                <h3 className="guardian-nombre-grande">
+                  {consejo?.guardian?.nombre || guardianSemana?.nombre}
+                </h3>
+                <span className="guardian-proposito">
+                  {consejo?.guardian?.categoria || guardianSemana?.categoria}
+                </span>
+                <p className="guardian-arquetipo-desc">
+                  {consejo?.guardian?.arquetipo || guardianSemana?.arquetipo || 'Guardián ancestral de la magia'}
+                </p>
+
+                {/* Cristales y elemento */}
+                <div className="guardian-atributos">
+                  {(consejo?.guardian?.cristales || guardianSemana?.cristales) && (
+                    <span className="atributo">
+                      <span className="atributo-icono">💎</span>
+                      {Array.isArray(consejo?.guardian?.cristales || guardianSemana?.cristales)
+                        ? (consejo?.guardian?.cristales || guardianSemana?.cristales).join(', ')
+                        : (consejo?.guardian?.cristales || guardianSemana?.cristales)}
+                    </span>
+                  )}
+                  {(consejo?.guardian?.elemento || guardianSemana?.elemento) && (
+                    <span className="atributo">
+                      <span className="atributo-icono">🌿</span>
+                      {consejo?.guardian?.elemento || guardianSemana?.elemento}
+                    </span>
+                  )}
+                </div>
+
+                <a
+                  href={consejo?.guardian?.url_tienda || guardianSemana?.url_tienda}
+                  target="_blank"
+                  rel="noopener"
+                  className="guardian-btn-tienda"
+                >
+                  <span>Conocer a {consejo?.guardian?.nombre || guardianSemana?.nombre}</span>
+                  <span className="btn-flecha">→</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -1403,13 +1487,16 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           font-family: 'Tangerine', cursive;
           font-size: 48px;
           font-weight: 700;
-          color: #ffffff;
+          background: linear-gradient(135deg, #ffffff, var(--neon-blue));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 0 0 30px var(--neon-blue-glow);
           margin-bottom: 10px;
         }
 
         .bienvenida p {
           font-size: 18px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255, 255, 255, 0.7);
           font-style: italic;
         }
 
@@ -1419,25 +1506,26 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           font-size: 11px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          color: rgba(212, 175, 55, 0.5);
-          background: rgba(212, 175, 55, 0.05);
+          color: var(--neon-green);
+          background: rgba(57, 255, 20, 0.08);
           padding: 4px 12px;
           border-radius: 12px;
+          border: 1px solid rgba(57, 255, 20, 0.2);
         }
 
-        /* Toast de visitas */
+        /* Toast de visitas - NEÓN */
         .mensaje-visita-toast {
           position: fixed;
           top: 100px;
           right: 20px;
-          background: linear-gradient(135deg, #1a1a25 0%, #252535 100%);
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          background: linear-gradient(135deg, #0a0a15 0%, #151525 100%);
+          border: 1px solid var(--neon-blue);
           border-radius: 16px;
           padding: 20px 45px 20px 25px;
           max-width: 350px;
           z-index: 1000;
-          animation: slideInRight 0.4s ease, glow 2s ease infinite;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+          animation: slideInRight 0.4s ease, glowNeon 2s ease infinite;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--neon-blue-glow);
         }
 
         @keyframes slideInRight {
@@ -1451,9 +1539,9 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           }
         }
 
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.1); }
-          50% { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 175, 55, 0.2); }
+        @keyframes glowNeon {
+          0%, 100% { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--neon-blue-glow); }
+          50% { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 35px var(--neon-blue-glow); }
         }
 
         .mensaje-visita-toast.oculto {
@@ -1468,11 +1556,13 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
         }
 
         .mensaje-visita-toast.segunda_visita {
-          border-color: rgba(100, 200, 255, 0.3);
+          border-color: var(--neon-green);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--neon-green-glow);
         }
 
         .mensaje-visita-toast.tercera_visita {
-          border-color: rgba(180, 100, 255, 0.3);
+          border-color: var(--neon-magenta);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--neon-magenta-glow);
         }
 
         .toast-contenido {
@@ -1512,91 +1602,258 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           color: rgba(255, 255, 255, 0.8);
         }
 
-        /* Guardián de la semana */
-        .guardian-semana-card {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(107, 33, 168, 0.1));
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          border-radius: 30px;
-          overflow: hidden;
+        /* Guardián de la semana - Diseño destacado NEÓN */
+        .guardian-destacado {
+          position: relative;
           margin-bottom: 50px;
+          border-radius: 24px;
+          overflow: hidden;
         }
 
-        .guardian-semana-header {
-          background: rgba(212, 175, 55, 0.1);
-          padding: 15px 30px;
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        .guardian-glow {
+          position: absolute;
+          inset: -2px;
+          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-blue), var(--neon-green), var(--neon-orange));
+          background-size: 400% 400%;
+          animation: borderGlowNeon 6s ease infinite;
+          border-radius: 26px;
+          z-index: -1;
         }
 
-        .etiqueta {
-          font-family: 'Cinzel', serif;
-          font-size: 12px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: #d4af37;
+        @keyframes borderGlowNeon {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
 
-        .guardian-semana-content {
+        .guardian-contenedor {
+          background: linear-gradient(135deg, #080810 0%, #0a0a15 50%, #050508 100%);
+          border-radius: 24px;
+          overflow: hidden;
+        }
+
+        .guardian-banner {
+          position: relative;
+          padding: 18px 30px;
+          background: linear-gradient(90deg, rgba(255, 0, 255, 0.08), rgba(0, 240, 255, 0.12), rgba(255, 0, 255, 0.08));
           display: flex;
           align-items: center;
-          gap: 40px;
-          padding: 40px;
+          justify-content: center;
+          gap: 15px;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.2);
         }
 
-        .guardian-imagen-wrap {
+        .banner-patron {
+          position: absolute;
+          inset: 0;
+          background-image:
+            repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0, 240, 255, 0.03) 20px, rgba(0, 240, 255, 0.03) 21px);
+          pointer-events: none;
+        }
+
+        .banner-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          color: var(--neon-blue);
+          text-shadow: 0 0 20px var(--neon-blue-glow);
+        }
+
+        .banner-estrella {
+          font-size: 20px;
+          color: var(--neon-magenta);
+          animation: starPulseNeon 2s ease-in-out infinite;
+          text-shadow: 0 0 15px var(--neon-magenta-glow);
+        }
+
+        .banner-estrella.izq { animation-delay: 0s; }
+        .banner-estrella.der { animation-delay: 1s; }
+
+        @keyframes starPulseNeon {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); text-shadow: 0 0 25px var(--neon-magenta-glow); }
+        }
+
+        .guardian-cuerpo {
+          display: flex;
+          align-items: center;
+          gap: 50px;
+          padding: 50px;
+        }
+
+        .guardian-foto-contenedor {
+          position: relative;
           flex-shrink: 0;
         }
 
-        .guardian-imagen-wrap img {
-          width: 200px;
-          height: 200px;
-          object-fit: cover;
+        .foto-aureola {
+          position: absolute;
+          inset: -20px;
           border-radius: 50%;
-          border: 3px solid rgba(212, 175, 55, 0.5);
-          box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+          background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, rgba(255, 0, 255, 0.1) 50%, transparent 70%);
+          animation: aureolaPulseNeon 3s ease-in-out infinite;
         }
 
-        .guardian-info {
+        @keyframes aureolaPulseNeon {
+          0%, 100% { transform: scale(1); opacity: 0.5; }
+          50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .foto-marco {
+          position: relative;
+          width: 220px;
+          height: 220px;
+          border-radius: 50%;
+          padding: 4px;
+          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-blue), var(--neon-magenta));
+          box-shadow:
+            0 0 30px var(--neon-magenta-glow),
+            0 0 60px var(--neon-blue-glow),
+            inset 0 0 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .guardian-foto {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+          display: block;
+        }
+
+        .foto-brillo {
+          position: absolute;
+          top: 10%;
+          left: 15%;
+          width: 30%;
+          height: 20%;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+          border-radius: 50%;
+          filter: blur(5px);
+          pointer-events: none;
+        }
+
+        .guardian-datos {
           flex: 1;
         }
 
-        .guardian-categoria {
-          font-family: 'Cinzel', serif;
-          font-size: 11px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: rgba(212, 175, 55, 0.8);
-        }
-
-        .guardian-nombre {
-          font-family: 'Tangerine', cursive;
-          font-size: 60px;
-          font-weight: 700;
-          color: #ffffff;
-          margin: 10px 0;
-        }
-
-        .guardian-arquetipo {
-          font-size: 18px;
-          font-style: italic;
-          color: rgba(255, 255, 255, 0.6);
-          margin-bottom: 20px;
-        }
-
-        .ver-en-tienda {
+        .guardian-especie {
           display: inline-block;
           font-family: 'Cinzel', serif;
-          font-size: 12px;
+          font-size: 11px;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: var(--neon-green);
+          background: rgba(57, 255, 20, 0.08);
+          padding: 6px 16px;
+          border-radius: 20px;
+          border: 1px solid rgba(57, 255, 20, 0.3);
+          margin-bottom: 12px;
+          text-shadow: 0 0 10px var(--neon-green-glow);
+        }
+
+        .guardian-nombre-grande {
+          font-family: 'Tangerine', cursive;
+          font-size: 72px;
+          font-weight: 700;
+          color: #ffffff;
+          margin: 0 0 5px;
+          line-height: 1;
+          text-shadow: 0 0 40px var(--neon-magenta-glow);
+        }
+
+        .guardian-proposito {
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
           letter-spacing: 2px;
-          color: #d4af37;
+          text-transform: uppercase;
+          color: var(--neon-blue);
+          display: block;
+          margin-bottom: 15px;
+          text-shadow: 0 0 10px var(--neon-blue-glow);
+        }
+
+        .guardian-arquetipo-desc {
+          font-size: 17px;
+          font-style: italic;
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 20px;
+          line-height: 1.6;
+        }
+
+        .guardian-atributos {
+          display: flex;
+          gap: 20px;
+          margin-bottom: 25px;
+          flex-wrap: wrap;
+        }
+
+        .atributo {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .atributo-icono {
+          font-size: 16px;
+        }
+
+        .guardian-btn-tienda {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          background: linear-gradient(135deg, var(--neon-orange), #ff8c00);
+          color: #000;
+          font-family: 'Cinzel', serif;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 1px;
           text-decoration: none;
+          padding: 16px 30px;
+          border-radius: 50px;
           transition: all 0.3s ease;
+          box-shadow: 0 4px 20px var(--neon-orange-glow);
         }
 
-        .ver-en-tienda:hover {
-          color: #e8d5a3;
+        .guardian-btn-tienda:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 35px var(--neon-orange-glow), 0 0 25px var(--neon-orange-glow);
         }
 
-        /* Grid de accesos */
+        .btn-flecha {
+          font-size: 18px;
+          transition: transform 0.3s ease;
+        }
+
+        .guardian-btn-tienda:hover .btn-flecha {
+          transform: translateX(5px);
+        }
+
+        @media (max-width: 900px) {
+          .guardian-cuerpo {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px;
+            gap: 30px;
+          }
+
+          .foto-marco {
+            width: 180px;
+            height: 180px;
+          }
+
+          .guardian-nombre-grande {
+            font-size: 54px;
+          }
+
+          .guardian-atributos {
+            justify-content: center;
+          }
+        }
+
+        /* Grid de accesos - NEÓN */
         .accesos-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -1604,7 +1861,7 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
         }
 
         .acceso-card {
-          background: rgba(255, 255, 255, 0.03);
+          background: rgba(10, 10, 20, 0.8);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 20px;
           padding: 30px 25px;
@@ -1613,11 +1870,37 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           transition: all 0.4s ease;
         }
 
-        .acceso-card:hover {
-          background: rgba(212, 175, 55, 0.08);
-          border-color: rgba(212, 175, 55, 0.4);
+        .acceso-card:nth-child(1):hover {
+          background: rgba(255, 0, 255, 0.08);
+          border-color: var(--neon-magenta);
+          box-shadow: 0 0 25px var(--neon-magenta-glow);
           transform: translateY(-5px);
         }
+        .acceso-card:nth-child(1):hover h4 { color: var(--neon-magenta); }
+
+        .acceso-card:nth-child(2):hover {
+          background: rgba(0, 240, 255, 0.08);
+          border-color: var(--neon-blue);
+          box-shadow: 0 0 25px var(--neon-blue-glow);
+          transform: translateY(-5px);
+        }
+        .acceso-card:nth-child(2):hover h4 { color: var(--neon-blue); }
+
+        .acceso-card:nth-child(3):hover {
+          background: rgba(57, 255, 20, 0.08);
+          border-color: var(--neon-green);
+          box-shadow: 0 0 25px var(--neon-green-glow);
+          transform: translateY(-5px);
+        }
+        .acceso-card:nth-child(3):hover h4 { color: var(--neon-green); }
+
+        .acceso-card:nth-child(4):hover {
+          background: rgba(255, 107, 0, 0.08);
+          border-color: var(--neon-orange);
+          box-shadow: 0 0 25px var(--neon-orange-glow);
+          transform: translateY(-5px);
+        }
+        .acceso-card:nth-child(4):hover h4 { color: var(--neon-orange); }
 
         .acceso-icono {
           font-size: 36px;
@@ -1630,11 +1913,12 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           font-size: 15px;
           color: #ffffff;
           margin-bottom: 8px;
+          transition: color 0.3s;
         }
 
         .acceso-card p {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
         }
 
         @media (max-width: 900px) {
@@ -1659,15 +1943,15 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           }
         }
 
-        /* Consejo del Día */
+        /* Consejo del Día - NEÓN */
         .consejo-del-dia-card {
-          background: linear-gradient(135deg, rgba(139, 90, 43, 0.15), rgba(212, 175, 55, 0.1));
-          border: 1px solid rgba(212, 175, 55, 0.4);
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(255, 0, 255, 0.05));
+          border: 1px solid rgba(0, 240, 255, 0.3);
           border-radius: 25px;
           padding: 0;
           margin-bottom: 40px;
           overflow: hidden;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.1);
         }
 
         .consejo-header {
@@ -1675,8 +1959,8 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           align-items: center;
           gap: 15px;
           padding: 20px 25px;
-          background: rgba(212, 175, 55, 0.1);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+          background: rgba(0, 240, 255, 0.08);
+          border-bottom: 1px solid rgba(0, 240, 255, 0.15);
         }
 
         .consejo-guardian-mini {
@@ -1688,7 +1972,8 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           height: 55px;
           border-radius: 50%;
           object-fit: cover;
-          border: 2px solid rgba(212, 175, 55, 0.5);
+          border: 2px solid var(--neon-blue);
+          box-shadow: 0 0 15px var(--neon-blue-glow);
         }
 
         .consejo-titulo-wrap {
@@ -1700,7 +1985,8 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           font-size: 10px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          color: rgba(212, 175, 55, 0.8);
+          color: var(--neon-green);
+          text-shadow: 0 0 10px var(--neon-green-glow);
           display: block;
           margin-bottom: 4px;
         }
@@ -1717,9 +2003,9 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background: rgba(212, 175, 55, 0.2);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          color: #d4af37;
+          background: rgba(255, 0, 255, 0.15);
+          border: 1px solid rgba(255, 0, 255, 0.4);
+          color: var(--neon-magenta);
           font-size: 18px;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -1729,8 +2015,9 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
         }
 
         .btn-regenerar:hover:not(:disabled) {
-          background: rgba(212, 175, 55, 0.3);
+          background: rgba(255, 0, 255, 0.25);
           transform: rotate(180deg);
+          box-shadow: 0 0 20px var(--neon-magenta-glow);
         }
 
         .btn-regenerar:disabled {
@@ -1752,15 +2039,16 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
         .consejo-reflexion {
           font-size: 16px !important;
           font-style: italic !important;
-          color: #d4af37 !important;
+          color: var(--neon-blue) !important;
           padding-left: 20px !important;
-          border-left: 2px solid rgba(212, 175, 55, 0.4) !important;
+          border-left: 2px solid var(--neon-blue) !important;
           margin: 0 !important;
+          text-shadow: 0 0 10px var(--neon-blue-glow);
         }
 
         .consejo-footer {
           padding: 15px 30px !important;
-          background: rgba(0, 0, 0, 0.2) !important;
+          background: rgba(0, 0, 0, 0.3) !important;
           border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
           font-size: 12px !important;
           color: rgba(255, 255, 255, 0.6) !important;
@@ -1813,19 +2101,39 @@ function SeccionContenido() {
   const [contenidoActivo, setContenidoActivo] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [duendeSemana, setDuendeSemana] = useState(null);
+  const [guardianesWoo, setGuardianesWoo] = useState({});
 
   useEffect(() => {
     cargarContenido();
+    cargarGuardianesWoo();
   }, []);
+
+  // Cargar fotos de producto de WooCommerce
+  async function cargarGuardianesWoo() {
+    try {
+      const res = await fetch('/api/admin/circulo/duendes-reales');
+      const data = await res.json();
+      if (data.success && data.duendes) {
+        // Crear mapa por nombre para búsqueda rápida
+        const mapa = {};
+        data.duendes.forEach(d => {
+          mapa[d.nombre?.toLowerCase()] = d;
+        });
+        setGuardianesWoo(mapa);
+      }
+    } catch (error) {
+      console.error('Error cargando guardianes WooCommerce:', error);
+    }
+  }
 
   async function cargarContenido() {
     setCargando(true);
     try {
       // Cargar duende de la semana
-      const resDuende = await fetch('/api/circulo/duende-semana');
+      const resDuende = await fetch('/api/circulo/duende-del-dia');
       const dataDuende = await resDuende.json();
       if (dataDuende.success) {
-        setDuendeSemana(dataDuende.duende);
+        setDuendeSemana(dataDuende.guardian);
       }
 
       // Cargar contenido del mes actual
@@ -1866,30 +2174,103 @@ function SeccionContenido() {
     });
   }
 
-  function getTipoIcon(tipo) {
-    switch (tipo) {
-      case 'presentacion': return '👋';
-      case 'ensenanza': return '📖';
-      case 'ritual': return '🕯️';
-      case 'cierre': return '🌙';
-      default: return '✨';
+  // Formato corto para sidebar: "Lun 13"
+  function formatearFechaCorta(fecha) {
+    let date;
+    if (typeof fecha === 'string') {
+      const [year, month, day] = fecha.split('-');
+      date = new Date(year, month - 1, day);
+    } else if (fecha?.año) {
+      date = new Date(fecha.año, fecha.mes - 1, fecha.dia);
+    } else {
+      return '';
     }
+    const dia = date.toLocaleDateString('es-ES', { weekday: 'short' });
+    const num = date.getDate();
+    return `${dia.charAt(0).toUpperCase() + dia.slice(1)} ${num}`;
   }
 
-  function getTipoLabel(tipo) {
-    switch (tipo) {
-      case 'presentacion': return 'Presentación';
-      case 'ensenanza': return 'Enseñanza';
-      case 'ritual': return 'Ritual';
-      case 'cierre': return 'Cierre de Semana';
-      default: return 'Contenido';
+  // Obtener imagen del duende desde WooCommerce
+  function obtenerImagenDuende(nombreDuende) {
+    if (!nombreDuende) return null;
+    const duende = guardianesWoo[nombreDuende.toLowerCase()];
+    return duende?.imagen || duende?.imagenPrincipal || null;
+  }
+
+  // Configuración de tipos de contenido - NEÓN
+  const TIPOS_CONTENIDO = {
+    presentacion: {
+      icono: '🌟',
+      label: 'Presentación',
+      color: '#ff00ff', // magenta neón
+      banner: 'linear-gradient(135deg, rgba(255, 0, 255, 0.12), rgba(150, 0, 150, 0.08))'
+    },
+    ensenanza: {
+      icono: '📚',
+      label: 'Enseñanza',
+      color: '#00f0ff', // azul neón
+      banner: 'linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(0, 120, 150, 0.08))'
+    },
+    ritual: {
+      icono: '🕯️',
+      label: 'Ritual',
+      color: '#ff00ff', // magenta neón
+      banner: 'linear-gradient(135deg, rgba(255, 0, 255, 0.12), rgba(150, 0, 150, 0.08))'
+    },
+    meditacion: {
+      icono: '🧘',
+      label: 'Meditación',
+      color: '#00f0ff', // azul neón
+      banner: 'linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(0, 120, 150, 0.08))'
+    },
+    diy: {
+      icono: '✂️',
+      label: 'Hazlo tú misma',
+      color: '#ff6b00', // naranja neón
+      banner: 'linear-gradient(135deg, rgba(255, 107, 0, 0.12), rgba(150, 60, 0, 0.08))'
+    },
+    reflexion: {
+      icono: '💭',
+      label: 'Reflexión',
+      color: '#39ff14', // verde neón
+      banner: 'linear-gradient(135deg, rgba(57, 255, 20, 0.12), rgba(30, 150, 10, 0.08))'
+    },
+    ejercicio: {
+      icono: '⚡',
+      label: 'Ejercicio',
+      color: '#ff6b00', // naranja neón
+      banner: 'linear-gradient(135deg, rgba(255, 107, 0, 0.12), rgba(150, 60, 0, 0.08))'
+    },
+    quiz: {
+      icono: '❓',
+      label: 'Quiz',
+      color: '#39ff14', // verde neón
+      banner: 'linear-gradient(135deg, rgba(57, 255, 20, 0.12), rgba(30, 150, 10, 0.08))'
+    },
+    cierre: {
+      icono: '🌙',
+      label: 'Cierre de Semana',
+      color: '#ff00ff', // magenta neón
+      banner: 'linear-gradient(135deg, rgba(255, 0, 255, 0.12), rgba(150, 0, 150, 0.08))'
+    },
+    default: {
+      icono: '✨',
+      label: 'Contenido',
+      color: '#00f0ff', // azul neón
+      banner: 'linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 100, 130, 0.05))'
     }
+  };
+
+  function getTipoConfig(tipo) {
+    return TIPOS_CONTENIDO[tipo] || TIPOS_CONTENIDO.default;
   }
 
   if (cargando) {
     return (
       <div className="seccion-contenido cargando">
-        <div className="loading-spinner"></div>
+        <div className="loading-orbe">
+          <div className="orbe-inner"></div>
+        </div>
         <p>Cargando contenido mágico...</p>
         <style jsx>{`
           .seccion-contenido.cargando {
@@ -1900,16 +2281,29 @@ function SeccionContenido() {
             min-height: 400px;
             color: rgba(255, 255, 255, 0.6);
           }
-          .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(212, 175, 55, 0.2);
-            border-top-color: #d4af37;
+          .loading-orbe {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: orbePulse 2s ease-in-out infinite;
             margin-bottom: 20px;
           }
-          @keyframes spin {
+          .orbe-inner {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4af37, #8b6914);
+            animation: orbeRotate 1.5s linear infinite;
+          }
+          @keyframes orbePulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+          }
+          @keyframes orbeRotate {
             to { transform: rotate(360deg); }
           }
         `}</style>
@@ -1918,358 +2312,1517 @@ function SeccionContenido() {
   }
 
   return (
-    <div className="seccion-contenido">
-      {/* Header con duende de la semana */}
-      {duendeSemana && (
-        <div className="contenido-header">
-          <div className="duende-semana-badge">
-            <span className="duende-icono">✨</span>
-            <div className="duende-info">
-              <span className="duende-label">Guardián de la Semana</span>
-              <span className="duende-nombre">{duendeSemana.nombre}</span>
-              <span className="duende-categoria">{duendeSemana.categoria}</span>
+    <div className="seccion-contenido-nueva">
+      {/* Header del Círculo */}
+      <div className="contenido-cabecera">
+        <div className="cabecera-decoracion izq"></div>
+        <h2 className="contenido-titulo-principal">Contenido del Círculo</h2>
+        <div className="cabecera-decoracion der"></div>
+      </div>
+
+      {contenidos.length === 0 ? (
+        <div className="sin-contenido-card">
+          <div className="sin-contenido-orbe"></div>
+          <p>El contenido de esta semana está siendo preparado con mucho amor...</p>
+          <span className="sin-contenido-firma">— Los Guardianes</span>
+        </div>
+      ) : (
+        <div className="contenido-grid">
+          {/* Lista lateral de contenidos */}
+          <aside className="contenido-sidebar">
+            <h3 className="sidebar-titulo">Esta semana</h3>
+            <div className="sidebar-lista">
+              {contenidos.map((item, idx) => {
+                const config = getTipoConfig(item.tipo);
+                return (
+                  <button
+                    key={item.fecha || idx}
+                    className={`sidebar-item ${contenidoActivo === item ? 'activo' : ''}`}
+                    onClick={() => setContenidoActivo(item)}
+                    style={{ '--tipo-color': config.color }}
+                  >
+                    <span className="sidebar-icono">{config.icono}</span>
+                    <div className="sidebar-info">
+                      <div className="sidebar-meta">
+                        <span className="sidebar-tipo">{config.label}</span>
+                        <span className="sidebar-fecha-corta">{formatearFechaCorta(item.fecha)}</span>
+                      </div>
+                      <span className="sidebar-titulo-item">{item.titulo?.substring(0, 35)}{item.titulo?.length > 35 ? '...' : ''}</span>
+                    </div>
+                    <span className="sidebar-indicador"></span>
+                  </button>
+                );
+              })}
             </div>
-          </div>
+          </aside>
+
+          {/* Contenido principal con plantilla estética */}
+          {contenidoActivo && (
+            <article className="contenido-principal">
+              {/* Banner decorativo */}
+              <div
+                className="contenido-banner"
+                style={{ background: getTipoConfig(contenidoActivo.tipo).banner }}
+              >
+                <div className="banner-particulas-contenido"></div>
+                <div className="banner-contenido-info">
+                  <span
+                    className="banner-tipo-badge"
+                    style={{ borderColor: getTipoConfig(contenidoActivo.tipo).color }}
+                  >
+                    {getTipoConfig(contenidoActivo.tipo).icono} {getTipoConfig(contenidoActivo.tipo).label}
+                  </span>
+                  <span className="banner-fecha">{formatearFecha(contenidoActivo.fecha)}</span>
+                </div>
+              </div>
+
+              {/* Cabecera con foto del duende */}
+              <div className="contenido-header-estetico">
+                {/* Foto circular del duende autor */}
+                <div className="autor-foto-wrap">
+                  <div className="autor-foto-glow" style={{ background: getTipoConfig(contenidoActivo.tipo).color }}></div>
+                  <div className="autor-foto-marco">
+                    <img
+                      src={obtenerImagenDuende(contenidoActivo.duendeNombre) || duendeSemana?.imagen || '/images/guardian-default.jpg'}
+                      alt={contenidoActivo.duendeNombre || 'Guardián'}
+                      className="autor-foto"
+                    />
+                  </div>
+                </div>
+
+                <div className="contenido-meta">
+                  <span className="contenido-por">Transmitido por</span>
+                  <h4 className="contenido-autor-nombre">{contenidoActivo.duendeNombre || 'Un Guardián'}</h4>
+                </div>
+              </div>
+
+              {/* Título y subtítulo */}
+              <div className="contenido-titulos">
+                <h3 className="contenido-titulo">{contenidoActivo.titulo}</h3>
+                {contenidoActivo.subtitulo && (
+                  <p className="contenido-subtitulo">{contenidoActivo.subtitulo}</p>
+                )}
+              </div>
+
+              {/* Sección animada decorativa */}
+              <div className="contenido-separador-animado">
+                <div className="separador-linea"></div>
+                <div className="separador-orbe">
+                  <span className="orbe-simbolo">✧</span>
+                </div>
+                <div className="separador-linea"></div>
+              </div>
+
+              {/* Cuerpo del contenido */}
+              <div className="contenido-cuerpo">
+                {contenidoActivo.cuerpo?.split('\n\n').map((parrafo, i) => (
+                  <p key={i} className="contenido-parrafo">{parrafo}</p>
+                ))}
+              </div>
+
+              {/* Si es ritual, mostrar pasos */}
+              {contenidoActivo.ritual && (
+                <div className="contenido-ritual">
+                  <div className="ritual-header">
+                    <span className="ritual-icono">🕯️</span>
+                    <div className="ritual-info">
+                      <h4 className="ritual-nombre">{contenidoActivo.ritual.nombre}</h4>
+                      <span className="ritual-duracion">{contenidoActivo.ritual.duracion}</span>
+                    </div>
+                  </div>
+
+                  {contenidoActivo.ritual.materiales && (
+                    <div className="ritual-materiales">
+                      <h5>Materiales</h5>
+                      <ul>
+                        {contenidoActivo.ritual.materiales.map((m, i) => (
+                          <li key={i}>{m}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {contenidoActivo.ritual.pasos && (
+                    <div className="ritual-pasos">
+                      <h5>Pasos del Ritual</h5>
+                      {contenidoActivo.ritual.pasos.map((paso, i) => (
+                        <div key={i} className="ritual-paso">
+                          <div className="paso-numero">{paso.numero || i + 1}</div>
+                          <div className="paso-contenido">
+                            <h6>{paso.titulo}</h6>
+                            <p>{paso.descripcion}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Afirmación del día */}
+              {contenidoActivo.afirmacion && (
+                <div className="contenido-afirmacion">
+                  <div className="afirmacion-decoracion-izq">✦</div>
+                  <div className="afirmacion-contenido">
+                    <span className="afirmacion-etiqueta">Afirmación del día</span>
+                    <p className="afirmacion-texto">"{contenidoActivo.afirmacion}"</p>
+                  </div>
+                  <div className="afirmacion-decoracion-der">✦</div>
+                </div>
+              )}
+
+              {/* Imagen generada (placeholder estético) */}
+              <div className="contenido-imagen-generada">
+                <div className="imagen-placeholder">
+                  <div className="imagen-patron-fondo"></div>
+                  <div className="imagen-overlay">
+                    <span className="imagen-icono">🌿</span>
+                    <span className="imagen-texto">Imagen contemplativa</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cierre */}
+              {contenidoActivo.cierre && (
+                <div className="contenido-cierre">
+                  <div className="cierre-borde"></div>
+                  <p>{contenidoActivo.cierre}</p>
+                </div>
+              )}
+
+              {/* Firma del autor */}
+              <div className="contenido-firma">
+                <span className="firma-linea"></span>
+                <span className="firma-texto">Con amor, {contenidoActivo.duendeNombre || 'Tu Guardián'}</span>
+                <span className="firma-linea"></span>
+              </div>
+            </article>
+          )}
         </div>
       )}
 
-      <h2>Contenido de la Semana</h2>
+      <style jsx>{`
+        /* ═══════════════════════════════════════════════════════════════════════════
+           ESTILOS SECCION CONTENIDO - PLANTILLA ESTÉTICA
+           ═══════════════════════════════════════════════════════════════════════════ */
 
-      {contenidos.length === 0 ? (
-        <div className="sin-contenido">
-          <p>El contenido de esta semana está siendo preparado con mucho amor...</p>
-          <span className="emoji">🌙</span>
+        .seccion-contenido-nueva {
+          padding: 20px;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        /* Cabecera */
+        .contenido-cabecera {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 30px;
+          margin-bottom: 40px;
+        }
+
+        .cabecera-decoracion {
+          flex: 1;
+          max-width: 200px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.5), transparent);
+        }
+
+        .contenido-titulo-principal {
+          font-family: 'Tangerine', cursive;
+          font-size: 52px;
+          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-blue));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin: 0;
+          text-shadow: 0 0 30px var(--neon-blue-glow);
+        }
+
+        /* Sin contenido - NEÓN */
+        .sin-contenido-card {
+          text-align: center;
+          padding: 80px 40px;
+          background: rgba(10, 10, 18, 0.8);
+          border: 1px solid rgba(0, 240, 255, 0.2);
+          border-radius: 20px;
+        }
+
+        .sin-contenido-orbe {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 25px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(0, 240, 255, 0.15), rgba(255, 0, 255, 0.1), transparent);
+          animation: orbePulse 3s ease-in-out infinite;
+          box-shadow: 0 0 30px var(--neon-blue-glow);
+        }
+
+        .sin-contenido-card p {
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0 0 15px;
+        }
+
+        .sin-contenido-firma {
+          font-style: italic;
+          color: var(--neon-magenta);
+          text-shadow: 0 0 10px var(--neon-magenta-glow);
+          font-size: 14px;
+        }
+
+        /* Grid principal */
+        .contenido-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+
+        @media (min-width: 1000px) {
+          .contenido-grid {
+            grid-template-columns: 320px 1fr;
+          }
+        }
+
+        /* Sidebar - NEÓN */
+        .contenido-sidebar {
+          background: rgba(8, 8, 15, 0.9);
+          border: 1px solid rgba(0, 240, 255, 0.2);
+          border-radius: 16px;
+          padding: 20px;
+          height: fit-content;
+          max-height: 700px;
+          overflow-y: auto;
+        }
+
+        .sidebar-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--neon-blue);
+          text-shadow: 0 0 10px var(--neon-blue-glow);
+          margin: 0 0 20px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .sidebar-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .sidebar-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px;
+          background: rgba(15, 15, 25, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-align: left;
+          position: relative;
+        }
+
+        .sidebar-item:hover {
+          background: rgba(0, 240, 255, 0.08);
+          border-color: var(--tipo-color, var(--neon-blue));
+          box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+        }
+
+        .sidebar-item.activo {
+          background: rgba(0, 240, 255, 0.1);
+          border-color: var(--tipo-color, var(--neon-blue));
+          box-shadow: 0 0 20px var(--neon-blue-glow);
+        }
+
+        .sidebar-item.activo .sidebar-indicador {
+          width: 4px;
+          background: var(--tipo-color, var(--neon-blue));
+          box-shadow: 0 0 10px var(--tipo-color, var(--neon-blue-glow));
+        }
+
+        .sidebar-icono {
+          font-size: 22px;
+          flex-shrink: 0;
+        }
+
+        .sidebar-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          min-width: 0;
+        }
+
+        .sidebar-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .sidebar-tipo {
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--tipo-color, var(--neon-magenta));
+        }
+
+        .sidebar-fecha-corta {
+          font-size: 10px;
+          color: rgba(255, 255, 255, 0.5);
+          font-weight: 400;
+        }
+
+        .sidebar-titulo-item {
+          font-size: 13px;
+          color: #ffffff;
+          line-height: 1.3;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .sidebar-indicador {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 0;
+          height: 60%;
+          border-radius: 2px 0 0 2px;
+          transition: all 0.3s ease;
+        }
+
+        /* Contenido principal - NEÓN */
+        .contenido-principal {
+          background: linear-gradient(180deg, rgba(10, 10, 18, 0.95) 0%, rgba(5, 5, 12, 0.98) 100%);
+          border: 1px solid rgba(255, 0, 255, 0.2);
+          border-radius: 20px;
+          overflow: hidden;
+        }
+
+        /* Banner decorativo */
+        .contenido-banner {
+          position: relative;
+          padding: 20px 30px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .banner-particulas-contenido {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+          background-size: 20px 20px;
+          pointer-events: none;
+        }
+
+        .banner-contenido-info {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
+        .banner-tipo-badge {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #ffffff;
+          background: rgba(0, 0, 0, 0.3);
+          padding: 8px 18px;
+          border-radius: 20px;
+          border: 1px solid;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .banner-fecha {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.7);
+          text-transform: capitalize;
+        }
+
+        /* Header estético - NEÓN */
+        .contenido-header-estetico {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          padding: 25px 30px;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        }
+
+        .autor-foto-wrap {
+          position: relative;
+          flex-shrink: 0;
+        }
+
+        .autor-foto-glow {
+          position: absolute;
+          inset: -8px;
+          border-radius: 50%;
+          opacity: 0.4;
+          filter: blur(10px);
+        }
+
+        .autor-foto-marco {
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          padding: 3px;
+          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-blue));
+          position: relative;
+          box-shadow: 0 0 15px var(--neon-magenta-glow);
+        }
+
+        .autor-foto {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+          display: block;
+        }
+
+        .contenido-meta {
+          flex: 1;
+        }
+
+        .contenido-por {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: rgba(255, 255, 255, 0.6);
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        .contenido-autor-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 20px;
+          color: var(--neon-magenta);
+          text-shadow: 0 0 15px var(--neon-magenta-glow);
+          margin: 0;
+        }
+
+        /* Títulos */
+        .contenido-titulos {
+          padding: 30px 30px 20px;
+        }
+
+        .contenido-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 28px;
+          color: #ffffff;
+          margin: 0 0 12px;
+          line-height: 1.3;
+        }
+
+        .contenido-subtitulo {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.7);
+          font-style: italic;
+          margin: 0;
+        }
+
+        /* Separador animado - NEÓN */
+        .contenido-separador-animado {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 0 30px 30px;
+        }
+
+        .separador-linea {
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
+        }
+
+        .separador-orbe {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255, 0, 255, 0.1);
+          border: 1px solid rgba(255, 0, 255, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: orbeRotateSlow 8s linear infinite;
+          box-shadow: 0 0 15px var(--neon-magenta-glow);
+        }
+
+        @keyframes orbeRotateSlow {
+          to { transform: rotate(360deg); }
+        }
+
+        .orbe-simbolo {
+          font-size: 16px;
+          color: var(--neon-blue);
+          text-shadow: 0 0 10px var(--neon-blue-glow);
+        }
+
+        /* Cuerpo */
+        .contenido-cuerpo {
+          padding: 0 30px 30px;
+        }
+
+        .contenido-parrafo {
+          font-size: 16px;
+          line-height: 1.9;
+          color: rgba(255, 255, 255, 0.85);
+          margin: 0 0 20px;
+        }
+
+        /* Ritual */
+        .contenido-ritual {
+          margin: 30px;
+          padding: 30px;
+          background: rgba(155, 89, 182, 0.08);
+          border: 1px solid rgba(155, 89, 182, 0.3);
+          border-radius: 16px;
+        }
+
+        .ritual-header {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          margin-bottom: 25px;
+        }
+
+        .ritual-icono {
+          font-size: 36px;
+        }
+
+        .ritual-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 20px;
+          color: #ffffff;
+          margin: 0;
+        }
+
+        .ritual-duracion {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .ritual-materiales {
+          margin-bottom: 25px;
+        }
+
+        .ritual-materiales h5,
+        .ritual-pasos h5 {
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: rgba(155, 89, 182, 0.9);
+          margin: 0 0 12px;
+        }
+
+        .ritual-materiales ul {
+          margin: 0;
+          padding-left: 20px;
+        }
+
+        .ritual-materiales li {
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 8px;
+          font-size: 14px;
+        }
+
+        .ritual-paso {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+
+        .paso-numero {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(155, 89, 182, 0.3);
+          border: 1px solid rgba(155, 89, 182, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .paso-contenido h6 {
+          font-family: 'Cinzel', serif;
+          font-size: 15px;
+          color: #ffffff;
+          margin: 0 0 8px;
+        }
+
+        .paso-contenido p {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.75);
+          margin: 0;
+          line-height: 1.7;
+        }
+
+        /* Afirmación - NEÓN */
+        .contenido-afirmacion {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          margin: 30px;
+          padding: 25px 30px;
+          background: linear-gradient(135deg, rgba(255, 107, 0, 0.08), rgba(255, 0, 255, 0.05));
+          border: 1px solid rgba(255, 107, 0, 0.4);
+          border-radius: 16px;
+          box-shadow: 0 0 25px rgba(255, 107, 0, 0.1);
+        }
+
+        .afirmacion-decoracion-izq,
+        .afirmacion-decoracion-der {
+          font-size: 24px;
+          color: var(--neon-orange);
+          text-shadow: 0 0 15px var(--neon-orange-glow);
+        }
+
+        .afirmacion-contenido {
+          flex: 1;
+          text-align: center;
+        }
+
+        .afirmacion-etiqueta {
+          display: block;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: var(--neon-green);
+          text-shadow: 0 0 10px var(--neon-green-glow);
+          margin-bottom: 10px;
+        }
+
+        .afirmacion-texto {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 20px;
+          font-style: italic;
+          color: var(--neon-orange);
+          text-shadow: 0 0 10px var(--neon-orange-glow);
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        /* Imagen generada (placeholder) - NEÓN */
+        .contenido-imagen-generada {
+          padding: 0 30px 30px;
+        }
+
+        .imagen-placeholder {
+          position: relative;
+          height: 200px;
+          border-radius: 16px;
+          overflow: hidden;
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(255, 0, 255, 0.05));
+          border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .imagen-patron-fondo {
+          position: absolute;
+          inset: 0;
+          background-image:
+            radial-gradient(circle at 20% 30%, rgba(255, 0, 255, 0.1) 0%, transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(0, 240, 255, 0.1) 0%, transparent 40%);
+        }
+
+        .imagen-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .imagen-icono {
+          font-size: 40px;
+          opacity: 0.6;
+        }
+
+        .imagen-texto {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
+        }
+
+        /* Cierre - NEÓN */
+        .contenido-cierre {
+          margin: 0 30px 30px;
+          padding: 20px;
+          border-left: 3px solid var(--neon-green);
+          background: rgba(57, 255, 20, 0.05);
+          border-radius: 0 12px 12px 0;
+        }
+
+        .contenido-cierre p {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.8);
+          font-style: italic;
+          margin: 0;
+        }
+
+        /* Firma - NEÓN */
+        .contenido-firma {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          padding: 25px 30px;
+          border-top: 1px solid rgba(255, 0, 255, 0.15);
+        }
+
+        .firma-linea {
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(255, 0, 255, 0.4), transparent);
+        }
+
+        .firma-texto {
+          font-family: 'Tangerine', cursive;
+          font-size: 28px;
+          color: var(--neon-magenta);
+          text-shadow: 0 0 15px var(--neon-magenta-glow);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .contenido-cabecera {
+            gap: 15px;
+          }
+
+          .contenido-titulo-principal {
+            font-size: 38px;
+          }
+
+          .contenido-banner {
+            padding: 15px 20px;
+          }
+
+          .contenido-header-estetico {
+            padding: 20px;
+          }
+
+          .contenido-titulos,
+          .contenido-cuerpo,
+          .contenido-imagen-generada {
+            padding-left: 20px;
+            padding-right: 20px;
+          }
+
+          .contenido-afirmacion,
+          .contenido-cierre {
+            margin-left: 20px;
+            margin-right: 20px;
+          }
+
+          .contenido-ritual {
+            margin: 20px;
+            padding: 20px;
+          }
+
+          .contenido-titulo {
+            font-size: 22px;
+          }
+
+          .sidebar-item {
+            padding: 12px;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECCIÓN CURSOS
+// Cursos mensuales del Círculo - 4 módulos, 4 duendes
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function SeccionCursos({ usuario }) {
+  const [cursos, setCursos] = useState([]);
+  const [cursoActivo, setCursoActivo] = useState(null);
+  const [progreso, setProgreso] = useState({});
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    cargarCursos();
+  }, []);
+
+  async function cargarCursos() {
+    setCargando(true);
+    try {
+      const res = await fetch('/api/admin/cursos?tipo=publico');
+      const data = await res.json();
+      if (data.success) {
+        const publicados = data.cursos.filter(c => c.estado === 'publicado');
+        setCursos(publicados);
+        if (publicados.length > 0) {
+          setCursoActivo(publicados[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando cursos:', error);
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  if (cargando) {
+    return (
+      <div className="seccion-cursos cargando">
+        <div className="curso-loader">
+          <div className="loader-libro">📚</div>
+          <p>Cargando cursos mágicos...</p>
+        </div>
+        <style jsx>{`
+          .seccion-cursos.cargando {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: rgba(255, 255, 255, 0.6);
+          }
+          .loader-libro {
+            font-size: 48px;
+            animation: floatBook 2s ease-in-out infinite;
+            margin-bottom: 20px;
+          }
+          @keyframes floatBook {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  return (
+    <div className="seccion-cursos">
+      {/* Header */}
+      <div className="cursos-header">
+        <div className="header-decoracion izq"></div>
+        <div className="header-centro">
+          <span className="header-icono">📚</span>
+          <h2>Academia de los Guardianes</h2>
+          <p>Cursos mensuales impartidos por los duendes más sabios</p>
+        </div>
+        <div className="header-decoracion der"></div>
+      </div>
+
+      {cursos.length === 0 ? (
+        <div className="cursos-vacio">
+          <div className="vacio-icono">📖</div>
+          <h3>Próximamente</h3>
+          <p>Los guardianes están preparando cursos mágicos para vos...</p>
+          <span className="vacio-firma">— El Círculo</span>
         </div>
       ) : (
-        <div className="contenido-layout">
-          {/* Lista de contenidos */}
-          <div className="contenido-lista">
-            {contenidos.map((item, idx) => (
+        <div className="cursos-contenido">
+          {/* Lista de cursos disponibles */}
+          <div className="cursos-lista">
+            {cursos.map(curso => (
               <button
-                key={item.fecha || idx}
-                className={`contenido-item ${contenidoActivo === item ? 'activo' : ''}`}
-                onClick={() => setContenidoActivo(item)}
+                key={curso.id}
+                className={`curso-card ${cursoActivo?.id === curso.id ? 'activo' : ''}`}
+                onClick={() => setCursoActivo(curso)}
               >
-                <span className="item-icono">{getTipoIcon(item.tipo)}</span>
-                <div className="item-info">
-                  <span className="item-tipo">{getTipoLabel(item.tipo)}</span>
-                  <span className="item-titulo">{item.titulo}</span>
-                  <span className="item-fecha">{formatearFecha(item.fecha)}</span>
+                <div className="curso-card-header">
+                  <span className="curso-mes">{curso.mes} {curso.año}</span>
+                  {curso.badge && <span className="curso-badge-icon">{curso.badge.icono}</span>}
                 </div>
-                {item.duendeNombre && (
-                  <span className="item-duende">Por {item.duendeNombre}</span>
+                <h4 className="curso-nombre">{curso.nombre}</h4>
+                <div className="curso-stats">
+                  <span>📖 {curso.totalModulos || 4} módulos</span>
+                  <span>🧙 {curso.duendes?.length || 4} guardianes</span>
+                </div>
+                {curso.progreso?.porcentaje > 0 && (
+                  <div className="curso-progreso-mini">
+                    <div className="progreso-barra-mini">
+                      <div className="progreso-fill-mini" style={{ width: `${curso.progreso.porcentaje}%` }}></div>
+                    </div>
+                    <span>{curso.progreso.porcentaje}%</span>
+                  </div>
                 )}
               </button>
             ))}
           </div>
 
-          {/* Contenido activo */}
-          {contenidoActivo && (
-            <div className="contenido-detalle">
-              <div className="detalle-header">
-                <span className="detalle-tipo">{getTipoIcon(contenidoActivo.tipo)} {getTipoLabel(contenidoActivo.tipo)}</span>
-                <span className="detalle-fecha">{formatearFecha(contenidoActivo.fecha)}</span>
+          {/* Detalle del curso activo */}
+          {cursoActivo && (
+            <div className="curso-detalle">
+              {/* Banner del curso */}
+              <div className="curso-banner">
+                <div className="banner-patron-curso"></div>
+                <div className="banner-info">
+                  <span className="curso-portal">{cursoActivo.portalInfo?.nombre || 'Portal Mágico'}</span>
+                  <h3>{cursoActivo.nombre}</h3>
+                  <p>{cursoActivo.descripcion}</p>
+                </div>
+                {cursoActivo.badge && (
+                  <div className="banner-badge">
+                    <span className="badge-big-icon">{cursoActivo.badge.icono}</span>
+                    <span className="badge-nombre">{cursoActivo.badge.nombre}</span>
+                  </div>
+                )}
               </div>
 
-              <h3 className="detalle-titulo">{contenidoActivo.titulo}</h3>
+              {/* Módulos del curso */}
+              <div className="modulos-grid">
+                <h4 className="modulos-titulo">
+                  <span className="titulo-linea"></span>
+                  <span>Los 4 Módulos</span>
+                  <span className="titulo-linea"></span>
+                </h4>
 
-              {contenidoActivo.subtitulo && (
-                <p className="detalle-subtitulo">{contenidoActivo.subtitulo}</p>
-              )}
+                {cursoActivo.modulos?.map((modulo, idx) => (
+                  <div key={idx} className="modulo-card">
+                    {/* Número de semana */}
+                    <div className="modulo-numero">
+                      <span className="numero-semana">Semana {idx + 1}</span>
+                      <span className="numero-big">{idx + 1}</span>
+                    </div>
 
-              {contenidoActivo.duendeNombre && (
-                <div className="detalle-autor">
-                  <span className="autor-icono">✨</span>
-                  <span>Por {contenidoActivo.duendeNombre}</span>
-                </div>
-              )}
+                    {/* Info del módulo */}
+                    <div className="modulo-info">
+                      <h5>{modulo.titulo}</h5>
 
-              <div className="detalle-cuerpo">
-                {contenidoActivo.cuerpo?.split('\n\n').map((parrafo, i) => (
-                  <p key={i}>{parrafo}</p>
+                      {/* Duende profesor */}
+                      {modulo.duende && (
+                        <div className="modulo-duende">
+                          <div className="duende-avatar-mini">
+                            <span className="avatar-placeholder">🧙</span>
+                          </div>
+                          <div className="duende-datos">
+                            <span className="duende-nombre">{modulo.duende.nombre}</span>
+                            <span className="duende-categoria">{modulo.duende.categoria}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Preview del contenido */}
+                      {modulo.contenido?.introduccion && (
+                        <p className="modulo-preview">
+                          {modulo.contenido.introduccion.substring(0, 150)}...
+                        </p>
+                      )}
+
+                      {/* Cristales del duende */}
+                      {modulo.duende?.cristales && (
+                        <div className="modulo-cristales">
+                          {modulo.duende.cristales.map((cristal, i) => (
+                            <span key={i} className="cristal-tag">💎 {cristal}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Duración */}
+                    <div className="modulo-duracion">
+                      <span className="duracion-icono">⏱️</span>
+                      <span>{modulo.duracion_minutos || 30} min</span>
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              {contenidoActivo.afirmacion && (
-                <div className="detalle-afirmacion">
-                  <span className="afirmacion-label">Afirmación del día</span>
-                  <p className="afirmacion-texto">"{contenidoActivo.afirmacion}"</p>
-                </div>
-              )}
-
-              {contenidoActivo.cierre && (
-                <div className="detalle-cierre">
-                  <p>{contenidoActivo.cierre}</p>
-                </div>
-              )}
+              {/* Botón para ir al curso */}
+              <div className="curso-cta">
+                <a href={`/circulo/cursos/${cursoActivo.id}`} className="btn-empezar-curso">
+                  <span>Comenzar el Curso</span>
+                  <span className="btn-arrow">→</span>
+                </a>
+              </div>
             </div>
           )}
         </div>
       )}
 
       <style jsx>{`
-        .seccion-contenido {
-          padding: 40px 20px;
-          max-width: 1200px;
-          margin: 0 auto;
-          background: linear-gradient(180deg, rgba(45, 55, 40, 0.3) 0%, rgba(35, 45, 30, 0.2) 100%);
-          border-radius: 20px;
-          border: 1px solid rgba(85, 107, 47, 0.2);
+        .seccion-cursos {
+          animation: fadeIn 0.5s ease;
         }
 
-        .contenido-header {
-          margin-bottom: 30px;
+        /* Header */
+        .cursos-header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 30px;
+          margin-bottom: 50px;
           text-align: center;
         }
 
-        .duende-semana-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 15px;
-          background: linear-gradient(135deg, rgba(85, 107, 47, 0.3), rgba(85, 107, 47, 0.1));
-          border: 1px solid rgba(85, 107, 47, 0.4);
-          border-radius: 50px;
-          padding: 12px 25px;
+        .header-decoracion {
+          flex: 1;
+          max-width: 150px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
         }
 
-        .duende-icono {
-          font-size: 28px;
-        }
-
-        .duende-info {
+        .header-centro {
           display: flex;
           flex-direction: column;
+          align-items: center;
+          gap: 10px;
         }
 
-        .duende-label {
+        .header-icono {
+          font-size: 48px;
+          animation: floatBook 3s ease-in-out infinite;
+        }
+
+        .header-centro h2 {
+          font-family: 'Tangerine', cursive;
+          font-size: 52px;
+          color: #ffffff;
+          margin: 0;
+          text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .header-centro p {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.6);
+          margin: 0;
+        }
+
+        /* Vacío */
+        .cursos-vacio {
+          text-align: center;
+          padding: 80px 40px;
+          background: rgba(30, 35, 25, 0.5);
+          border: 1px solid rgba(85, 107, 47, 0.3);
+          border-radius: 20px;
+        }
+
+        .vacio-icono {
+          font-size: 64px;
+          margin-bottom: 20px;
+        }
+
+        .cursos-vacio h3 {
+          font-family: 'Cinzel', serif;
+          font-size: 24px;
+          color: #d4af37;
+          margin: 0 0 15px;
+        }
+
+        .cursos-vacio p {
+          color: rgba(255, 255, 255, 0.6);
+          margin: 0 0 20px;
+        }
+
+        .vacio-firma {
+          font-style: italic;
+          color: rgba(212, 175, 55, 0.6);
+        }
+
+        /* Contenido */
+        .cursos-contenido {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+
+        @media (min-width: 1100px) {
+          .cursos-contenido {
+            grid-template-columns: 300px 1fr;
+          }
+        }
+
+        /* Lista de cursos */
+        .cursos-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        @media (min-width: 1100px) {
+          .cursos-lista {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+          }
+        }
+
+        .curso-card {
+          background: rgba(30, 35, 25, 0.8);
+          border: 1px solid rgba(85, 107, 47, 0.3);
+          border-radius: 16px;
+          padding: 20px;
+          text-align: left;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .curso-card:hover {
+          border-color: rgba(212, 175, 55, 0.4);
+          transform: translateX(5px);
+        }
+
+        .curso-card.activo {
+          background: rgba(85, 107, 47, 0.3);
+          border-color: #d4af37;
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .curso-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        .curso-mes {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: rgba(212, 175, 55, 0.8);
+        }
+
+        .curso-badge-icon {
+          font-size: 20px;
+        }
+
+        .curso-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 18px;
+          color: #ffffff;
+          margin: 0 0 12px;
+        }
+
+        .curso-stats {
+          display: flex;
+          gap: 15px;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .curso-progreso-mini {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 12px;
+        }
+
+        .progreso-barra-mini {
+          flex: 1;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+
+        .progreso-fill-mini {
+          height: 100%;
+          background: linear-gradient(90deg, #d4af37, #8b6914);
+          transition: width 0.3s ease;
+        }
+
+        .curso-progreso-mini span {
+          font-size: 11px;
+          color: #d4af37;
+        }
+
+        /* Detalle del curso */
+        .curso-detalle {
+          background: rgba(20, 25, 18, 0.9);
+          border: 1px solid rgba(85, 107, 47, 0.3);
+          border-radius: 20px;
+          overflow: hidden;
+        }
+
+        .curso-banner {
+          position: relative;
+          padding: 40px 30px;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(85, 107, 47, 0.1));
+        }
+
+        .banner-patron-curso {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(circle, rgba(212, 175, 55, 0.1) 1px, transparent 1px);
+          background-size: 25px 25px;
+          pointer-events: none;
+        }
+
+        .banner-info {
+          position: relative;
+          z-index: 1;
+        }
+
+        .curso-portal {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: rgba(212, 175, 55, 0.8);
+          display: block;
+          margin-bottom: 10px;
+        }
+
+        .banner-info h3 {
+          font-family: 'Cinzel', serif;
+          font-size: 28px;
+          color: #ffffff;
+          margin: 0 0 15px;
+        }
+
+        .banner-info p {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0;
+          line-height: 1.6;
+        }
+
+        .banner-badge {
+          position: absolute;
+          top: 30px;
+          right: 30px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 5px;
+          text-align: center;
+        }
+
+        .badge-big-icon {
+          font-size: 40px;
+        }
+
+        .badge-nombre {
+          font-size: 11px;
+          color: rgba(212, 175, 55, 0.8);
+          max-width: 100px;
+        }
+
+        /* Módulos */
+        .modulos-grid {
+          padding: 30px;
+        }
+
+        .modulos-titulo {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: #d4af37;
+          margin: 0 0 30px;
+        }
+
+        .titulo-linea {
+          flex: 1;
+          max-width: 100px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+        }
+
+        .modulo-card {
+          display: grid;
+          grid-template-columns: 80px 1fr auto;
+          gap: 25px;
+          padding: 25px;
+          background: rgba(45, 55, 40, 0.3);
+          border: 1px solid rgba(85, 107, 47, 0.3);
+          border-radius: 16px;
+          margin-bottom: 20px;
+          transition: all 0.3s ease;
+        }
+
+        .modulo-card:hover {
+          border-color: rgba(212, 175, 55, 0.4);
+          background: rgba(85, 107, 47, 0.2);
+        }
+
+        .modulo-numero {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+
+        .numero-semana {
           font-size: 10px;
           text-transform: uppercase;
           letter-spacing: 1px;
-          color: rgba(212, 175, 55, 0.7);
+          color: rgba(255, 255, 255, 0.5);
+          margin-bottom: 5px;
+        }
+
+        .numero-big {
+          font-family: 'Tangerine', cursive;
+          font-size: 48px;
+          color: #d4af37;
+          line-height: 1;
+        }
+
+        .modulo-info h5 {
+          font-family: 'Cinzel', serif;
+          font-size: 18px;
+          color: #ffffff;
+          margin: 0 0 15px;
+        }
+
+        .modulo-duende {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 15px;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
+        }
+
+        .duende-avatar-mini {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #d4af37, #8b6914);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .avatar-placeholder {
+          font-size: 24px;
+        }
+
+        .duende-datos {
+          display: flex;
+          flex-direction: column;
         }
 
         .duende-nombre {
           font-family: 'Cinzel', serif;
-          font-size: 18px;
-          color: #d4af37;
+          font-size: 15px;
+          color: #ffffff;
         }
 
         .duende-categoria {
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(212, 175, 55, 0.8);
         }
 
-        h2 {
-          font-family: 'Tangerine', cursive;
-          font-size: 48px;
-          color: #ffffff;
-          margin-bottom: 30px;
-          text-align: center;
-        }
-
-        .sin-contenido {
-          text-align: center;
-          padding: 60px 20px;
-          color: rgba(255, 255, 255, 0.5);
-        }
-
-        .sin-contenido .emoji {
-          font-size: 48px;
-          display: block;
-          margin-top: 20px;
-        }
-
-        .contenido-layout {
-          display: flex;
-          flex-direction: column;
-          gap: 30px;
-        }
-
-        @media (min-width: 900px) {
-          .contenido-layout {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-          }
-        }
-
-        .contenido-lista {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          max-height: 400px;
-          overflow-y: auto;
-          padding-right: 10px;
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 12px;
-          padding: 15px;
-        }
-
-        @media (min-width: 900px) {
-          .contenido-lista {
-            max-height: 600px;
-          }
-        }
-
-        .contenido-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          padding: 15px;
-          background: rgba(45, 55, 40, 0.4);
-          border: 1px solid rgba(85, 107, 47, 0.3);
-          border-radius: 12px;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-align: left;
-        }
-
-        .contenido-item:hover {
-          background: rgba(85, 107, 47, 0.4);
-          border-color: rgba(212, 175, 55, 0.3);
-        }
-
-        .contenido-item.activo {
-          background: rgba(85, 107, 47, 0.5);
-          border-color: #d4af37;
-          box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
-        }
-
-        .item-icono {
-          font-size: 24px;
-          flex-shrink: 0;
-        }
-
-        .item-info {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          flex: 1;
-        }
-
-        .item-tipo {
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #d4af37;
-        }
-
-        .item-titulo {
+        .modulo-preview {
           font-size: 14px;
-          color: #ffffff;
-          line-height: 1.3;
+          color: rgba(255, 255, 255, 0.6);
+          line-height: 1.6;
+          margin: 0 0 15px;
         }
 
-        .item-fecha {
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        .item-duende {
-          font-size: 10px;
-          color: rgba(212, 175, 55, 0.6);
-          align-self: flex-end;
-        }
-
-        .contenido-detalle {
-          background: linear-gradient(180deg, rgba(45, 55, 40, 0.6) 0%, rgba(35, 45, 30, 0.4) 100%);
-          border: 1px solid rgba(85, 107, 47, 0.4);
-          border-radius: 16px;
-          padding: 30px;
-          max-height: none;
-          overflow-y: visible;
-        }
-
-        @media (min-width: 900px) {
-          .contenido-detalle {
-            max-height: 600px;
-            overflow-y: auto;
-          }
-        }
-
-        .detalle-header {
+        .modulo-cristales {
           display: flex;
-          justify-content: space-between;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .cristal-tag {
+          font-size: 11px;
+          color: rgba(212, 175, 55, 0.7);
+          background: rgba(212, 175, 55, 0.1);
+          padding: 4px 10px;
+          border-radius: 12px;
+          border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .modulo-duracion {
+          display: flex;
+          flex-direction: column;
           align-items: center;
-          margin-bottom: 15px;
-        }
-
-        .detalle-tipo {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #d4af37;
-        }
-
-        .detalle-fecha {
-          font-size: 12px;
+          justify-content: center;
+          gap: 5px;
           color: rgba(255, 255, 255, 0.5);
+          font-size: 12px;
         }
 
-        .detalle-titulo {
-          font-family: 'Cinzel', serif;
-          font-size: 26px;
-          color: #ffffff;
-          margin-bottom: 10px;
-          line-height: 1.3;
+        .duracion-icono {
+          font-size: 20px;
         }
 
-        .detalle-subtitulo {
-          font-size: 16px;
-          color: rgba(255, 255, 255, 0.7);
-          font-style: italic;
-          margin-bottom: 20px;
+        /* CTA */
+        .curso-cta {
+          padding: 30px;
+          text-align: center;
+          border-top: 1px solid rgba(85, 107, 47, 0.2);
         }
 
-        .detalle-autor {
+        .btn-empezar-curso {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          color: rgba(212, 175, 55, 0.8);
-          margin-bottom: 25px;
+          gap: 15px;
+          background: linear-gradient(135deg, #d4af37, #b8972e);
+          color: #0a0a0a;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 600;
+          letter-spacing: 2px;
+          text-decoration: none;
+          padding: 18px 40px;
+          border-radius: 50px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
         }
 
-        .detalle-cuerpo {
-          color: rgba(255, 255, 255, 0.85);
-          line-height: 1.8;
-          font-size: 15px;
+        .btn-empezar-curso:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
         }
 
-        .detalle-cuerpo p {
-          margin-bottom: 18px;
-        }
-
-        .detalle-afirmacion {
-          margin-top: 30px;
-          padding: 20px;
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.02));
-          border-left: 3px solid #d4af37;
-          border-radius: 0 12px 12px 0;
-        }
-
-        .afirmacion-label {
-          display: block;
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: rgba(212, 175, 55, 0.7);
-          margin-bottom: 8px;
-        }
-
-        .afirmacion-texto {
-          font-family: 'Cormorant Garamond', serif;
+        .btn-arrow {
           font-size: 18px;
-          font-style: italic;
-          color: #d4af37;
-          margin: 0;
+          transition: transform 0.3s ease;
         }
 
-        .detalle-cierre {
-          margin-top: 25px;
-          padding-top: 20px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.6);
-          font-style: italic;
+        .btn-empezar-curso:hover .btn-arrow {
+          transform: translateX(5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .header-centro h2 {
+            font-size: 38px;
+          }
+
+          .modulo-card {
+            grid-template-columns: 60px 1fr;
+          }
+
+          .modulo-duracion {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding-top: 15px;
+            border-top: 1px solid rgba(85, 107, 47, 0.2);
+            margin-top: 15px;
+          }
+
+          .banner-badge {
+            position: static;
+            margin-top: 20px;
+            flex-direction: row;
+            gap: 10px;
+          }
         }
       `}</style>
     </div>
@@ -2433,6 +3986,9 @@ function SeccionForo({ usuario }) {
       </div>
 
       <style jsx>{`
+        /* ═══════════════════════════════════════════════════════════════════════════
+           FORO - ESTÉTICA NEÓN PREMIUM
+           ═══════════════════════════════════════════════════════════════════════════ */
         .seccion-foro {
           animation: fadeIn 0.5s ease;
         }
@@ -2447,18 +4003,20 @@ function SeccionForo({ usuario }) {
         .foro-titulo-wrap h2 {
           font-family: 'Tangerine', cursive;
           font-size: 48px;
-          color: #ffffff;
+          background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           margin: 0 0 5px;
         }
 
         .foro-miembros {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
         }
 
         .btn-nuevo-post {
-          background: linear-gradient(135deg, #d4af37, #b8972e);
-          color: #0a0a0a;
+          background: linear-gradient(135deg, var(--neon-green), #2dcc70);
+          color: #000;
           font-family: 'Cinzel', serif;
           font-size: 12px;
           font-weight: 600;
@@ -2468,14 +4026,15 @@ function SeccionForo({ usuario }) {
           border-radius: 30px;
           cursor: pointer;
           transition: all 0.3s ease;
+          box-shadow: 0 0 20px var(--neon-green-glow);
         }
 
         .btn-nuevo-post:hover {
           transform: translateY(-3px);
-          box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+          box-shadow: 0 10px 35px var(--neon-green-glow);
         }
 
-        /* Categorías */
+        /* Categorías - NEÓN */
         .foro-categorias {
           display: flex;
           gap: 10px;
@@ -2484,9 +4043,9 @@ function SeccionForo({ usuario }) {
         }
 
         .cat-btn {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.6);
+          background: rgba(15, 15, 25, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: rgba(255, 255, 255, 0.7);
           font-size: 13px;
           padding: 10px 18px;
           border-radius: 20px;
@@ -2495,17 +4054,19 @@ function SeccionForo({ usuario }) {
         }
 
         .cat-btn:hover {
-          border-color: rgba(212, 175, 55, 0.5);
+          border-color: var(--neon-blue);
           color: #ffffff;
+          box-shadow: 0 0 15px var(--neon-blue-glow);
         }
 
         .cat-btn.active {
-          background: rgba(212, 175, 55, 0.2);
-          border-color: #d4af37;
-          color: #d4af37;
+          background: rgba(0, 240, 255, 0.1);
+          border-color: var(--neon-blue);
+          color: var(--neon-blue);
+          box-shadow: 0 0 20px var(--neon-blue-glow);
         }
 
-        /* Posts */
+        /* Posts - NEÓN */
         .posts-lista {
           display: flex;
           flex-direction: column;
@@ -2514,13 +4075,13 @@ function SeccionForo({ usuario }) {
 
         .cargando, .sin-posts {
           text-align: center;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
           padding: 60px;
           font-style: italic;
         }
 
         .post-card {
-          background: rgba(255, 255, 255, 0.03);
+          background: rgba(15, 15, 25, 0.7);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 20px;
           padding: 25px;
@@ -2529,13 +4090,15 @@ function SeccionForo({ usuario }) {
         }
 
         .post-card:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(212, 175, 55, 0.3);
+          background: rgba(25, 25, 40, 0.8);
+          border-color: var(--neon-magenta);
+          box-shadow: 0 0 20px var(--neon-magenta-glow);
         }
 
         .post-card.expandido {
-          background: rgba(212, 175, 55, 0.05);
-          border-color: rgba(212, 175, 55, 0.4);
+          background: rgba(255, 0, 255, 0.05);
+          border-color: var(--neon-magenta);
+          box-shadow: 0 0 25px var(--neon-magenta-glow);
         }
 
         .post-header {
@@ -2568,7 +4131,7 @@ function SeccionForo({ usuario }) {
 
         .autor-nivel {
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
         }
 
         .post-meta {
@@ -2578,27 +4141,27 @@ function SeccionForo({ usuario }) {
         .post-categoria {
           display: block;
           font-size: 12px;
-          color: rgba(212, 175, 55, 0.8);
+          color: var(--neon-orange);
           margin-bottom: 4px;
         }
 
         .post-fecha {
           font-size: 11px;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.5);
         }
 
         .post-contenido {
           font-size: 16px;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(255, 255, 255, 0.9);
           line-height: 1.7;
           margin-bottom: 15px;
         }
 
         .post-guardian-tag {
           display: inline-block;
-          background: rgba(107, 33, 168, 0.2);
-          border: 1px solid rgba(107, 33, 168, 0.4);
-          color: #b794f6;
+          background: rgba(255, 0, 255, 0.1);
+          border: 1px solid rgba(255, 0, 255, 0.4);
+          color: var(--neon-magenta);
           font-size: 12px;
           padding: 5px 12px;
           border-radius: 15px;
@@ -2620,13 +4183,13 @@ function SeccionForo({ usuario }) {
 
         .stat-item {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255, 255, 255, 0.7);
         }
 
         .btn-responder {
           background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(0, 240, 255, 0.4);
+          color: var(--neon-blue);
           font-size: 12px;
           padding: 8px 15px;
           border-radius: 20px;
@@ -2635,22 +4198,24 @@ function SeccionForo({ usuario }) {
         }
 
         .btn-responder:hover {
-          border-color: #d4af37;
-          color: #d4af37;
+          border-color: var(--neon-blue);
+          background: rgba(0, 240, 255, 0.1);
+          box-shadow: 0 0 15px var(--neon-blue-glow);
         }
 
-        /* Respuestas */
+        /* Respuestas - NEÓN */
         .respuestas-preview {
           margin-top: 20px;
           padding-top: 20px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          border-top: 1px solid rgba(0, 240, 255, 0.15);
         }
 
         .respuesta-item {
           display: flex;
           gap: 12px;
           padding: 15px;
-          background: rgba(0, 0, 0, 0.2);
+          background: rgba(10, 10, 20, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.05);
           border-radius: 12px;
           margin-bottom: 10px;
         }
@@ -2673,21 +4238,21 @@ function SeccionForo({ usuario }) {
 
         .respuesta-contenido p {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(255, 255, 255, 0.8);
           margin: 0 0 5px;
           line-height: 1.5;
         }
 
         .respuesta-contenido small {
           font-size: 11px;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.5);
         }
 
         .btn-ver-todas {
           width: 100%;
-          background: rgba(212, 175, 55, 0.1);
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          color: #d4af37;
+          background: rgba(57, 255, 20, 0.1);
+          border: 1px solid rgba(57, 255, 20, 0.3);
+          color: var(--neon-green);
           font-size: 13px;
           padding: 12px;
           border-radius: 10px;
@@ -2696,7 +4261,8 @@ function SeccionForo({ usuario }) {
         }
 
         .btn-ver-todas:hover {
-          background: rgba(212, 175, 55, 0.2);
+          background: rgba(57, 255, 20, 0.2);
+          box-shadow: 0 0 15px var(--neon-green-glow);
         }
 
         @media (max-width: 600px) {
@@ -2738,12 +4304,14 @@ function SeccionArchivo() {
         h2 {
           font-family: 'Tangerine', cursive;
           font-size: 48px;
-          color: #ffffff;
+          background: linear-gradient(135deg, var(--neon-orange), var(--neon-magenta));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           margin-bottom: 20px;
         }
 
         .placeholder {
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
           font-style: italic;
         }
       `}</style>

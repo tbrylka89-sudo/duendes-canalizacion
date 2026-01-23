@@ -142,12 +142,39 @@ export async function GET(request) {
     if (tipo === 'actividad') {
       // "X personas viendo ahora"
       const viendoAhora = 8 + Math.floor(Math.random() * 15);
-      const ultimaCompra = PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
-      const guardianesPopulares = ['Rowan', 'Luna', 'Sage', 'Frost', 'Aurora', 'Ember'];
-      const guardianComprado = guardianesPopulares[Math.floor(Math.random() * guardianesPopulares.length)];
+
+      // Obtener historial reciente para evitar repeticiones
+      let historialReciente = await kv.get('comunidad:historial_actividad') || { personas: [], guardianes: [] };
+
+      // Filtrar personas que no se mostraron recientemente (últimas 10)
+      const personasRecientes = new Set(historialReciente.personas || []);
+      const personasDisponibles = PERFILES_BOT.filter(p => !personasRecientes.has(p.id));
+      const ultimaCompra = personasDisponibles.length > 0
+        ? personasDisponibles[Math.floor(Math.random() * personasDisponibles.length)]
+        : PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
+
+      // Guardianes con variedad (más opciones, evitar recientes)
+      const todosGuardianes = ['Rowan', 'Luna', 'Sage', 'Frost', 'Aurora', 'Ember', 'Dorado', 'Obsidiana', 'Índigo', 'Jade', 'Willow', 'Coral', 'Phoenix', 'Ivy', 'Maple'];
+      const guardianesRecientes = new Set(historialReciente.guardianes || []);
+      const guardianesDisponibles = todosGuardianes.filter(g => !guardianesRecientes.has(g));
+      const guardianComprado = guardianesDisponibles.length > 0
+        ? guardianesDisponibles[Math.floor(Math.random() * guardianesDisponibles.length)]
+        : todosGuardianes[Math.floor(Math.random() * todosGuardianes.length)];
+
+      // Actualizar historial (mantener últimos 10)
+      historialReciente.personas = [...(historialReciente.personas || []), ultimaCompra.id].slice(-10);
+      historialReciente.guardianes = [...(historialReciente.guardianes || []), guardianComprado].slice(-8);
+      await kv.set('comunidad:historial_actividad', historialReciente, { ex: 3600 }); // expira en 1 hora
 
       // Tiempo aleatorio "hace X minutos"
       const minutosAtras = 2 + Math.floor(Math.random() * 25);
+
+      // Escribiendo: persona diferente a la compra
+      let escribiendo = null;
+      if (Math.random() > 0.6) {
+        const otrasPersonas = PERFILES_BOT.filter(p => p.id !== ultimaCompra.id);
+        escribiendo = otrasPersonas[Math.floor(Math.random() * otrasPersonas.length)].nombre;
+      }
 
       return Response.json({
         success: true,
@@ -159,7 +186,7 @@ export async function GET(request) {
             guardian: guardianComprado,
             hace: `${minutosAtras} min`
           },
-          escribiendo: Math.random() > 0.6 ? PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)].nombre : null
+          escribiendo
         }
       });
     }
