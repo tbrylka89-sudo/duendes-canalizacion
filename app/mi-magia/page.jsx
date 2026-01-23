@@ -8,6 +8,7 @@ import Referidos from './referidos';
 import { DashboardGamificacion, ColeccionBadges, MisionesPanel, HistorialLecturas, LeaderboardRachas, ToastProvider } from './gamificacion-components';
 import { ExperienciasMagicas } from './experiencias-magicas';
 import { estilos } from './components/styles';
+import TestPerfiladoPsicologico from './TestPerfiladoPsicologico';
 import { AccesoRestringido, BadgeNivelAcceso, BannerUpgrade } from './components/AccesoRestringido';
 import { BannerPromociones } from './components/BannerPromociones';
 
@@ -3871,6 +3872,7 @@ export default function MiMagia() {
   const [onboarding, setOnboarding] = useState(false);
   const [mostrandoTour, setMostrandoTour] = useState(false);
   const [mostrandoPerfil, setMostrandoPerfil] = useState(false);
+  const [mostrandoPerfilado, setMostrandoPerfilado] = useState(false);
   const [chatAbierto, setChatAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
@@ -3962,9 +3964,12 @@ export default function MiMagia() {
         body: JSON.stringify({ email: usuario.email, tourVisto: true })
       });
     } catch(e) { console.error('Error guardando tourVisto:', e); }
-    // Si no completó el perfil, mostrarlo
+    // Si no completó el perfil básico, mostrarlo primero
     if (!usuario?.perfilCompleto) {
       setMostrandoPerfil(true);
+    } else if (!usuario?.perfilPsicologico && !usuario?.perfiladoCompletado) {
+      // Si ya tiene perfil básico pero no el psicológico, mostrar perfilado
+      setMostrandoPerfilado(true);
     }
   }} />;
 
@@ -3973,8 +3978,29 @@ export default function MiMagia() {
     onComplete={(perfilData) => {
       setUsuario({...usuario, ...perfilData, perfilCompleto: true});
       setMostrandoPerfil(false);
+      // Mostrar test de perfilado psicológico si no está completado
+      if (!usuario?.perfilPsicologico) {
+        setMostrandoPerfilado(true);
+      }
     }}
-    onSkip={() => setMostrandoPerfil(false)}
+    onSkip={() => {
+      setMostrandoPerfil(false);
+      // Mostrar test de perfilado psicológico si no está completado
+      if (!usuario?.perfilPsicologico) {
+        setMostrandoPerfilado(true);
+      }
+    }}
+  />;
+
+  if (mostrandoPerfilado) return <TestPerfiladoPsicologico
+    usuario={usuario}
+    onComplete={(perfilPsicologico) => {
+      if (perfilPsicologico) {
+        setUsuario({...usuario, perfilPsicologico, perfiladoCompletado: true});
+      }
+      setMostrandoPerfilado(false);
+    }}
+    onSkip={() => setMostrandoPerfilado(false)}
   />;
 
   const renderSeccion = () => {
