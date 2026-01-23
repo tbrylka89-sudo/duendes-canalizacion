@@ -189,7 +189,9 @@ export async function POST(request) {
     // GENERAR DÍA ESPECÍFICO
     // ═══════════════════════════════════════════════════════════════════════
     if (accion === 'generar-dia' || (!accion && fecha)) {
-      const [año, mes, dia] = fecha.split('-').map(Number);
+      // Si no se pasa fecha, usar hoy
+      const fechaUsar = fecha || new Date().toISOString().split('T')[0];
+      const [año, mes, dia] = fechaUsar.split('-').map(Number);
       const fechaObj = new Date(año, mes - 1, dia);
       const diaSemana = fechaObj.getDay();
       const semanaDelMes = Math.ceil(dia / 7);
@@ -293,7 +295,8 @@ Respondé SOLO con el JSON válido.`;
     // GENERAR SEMANA COMPLETA
     // ═══════════════════════════════════════════════════════════════════════
     if (accion === 'generar-semana') {
-      const [año, mes, dia] = (fechaInicio || fecha).split('-').map(Number);
+      const fechaBase = fechaInicio || fecha || new Date().toISOString().split('T')[0];
+      const [año, mes, dia] = fechaBase.split('-').map(Number);
       const resultados = [];
 
       for (let i = 0; i < 7; i++) {
@@ -344,7 +347,8 @@ Respondé SOLO con el JSON válido.`;
     // GENERAR MES COMPLETO
     // ═══════════════════════════════════════════════════════════════════════
     if (accion === 'generar-mes') {
-      const [año, mes] = (fechaInicio || fecha).split('-').map(Number);
+      const fechaBase = fechaInicio || fecha || new Date().toISOString().split('T')[0];
+      const [año, mes] = fechaBase.split('-').map(Number);
       const diasEnMes = new Date(año, mes, 0).getDate();
       const resultados = [];
 

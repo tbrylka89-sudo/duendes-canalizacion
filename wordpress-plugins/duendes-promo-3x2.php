@@ -466,51 +466,25 @@ add_action('woocommerce_before_main_content', function() {
 
 function duendes_banner_promo_3x2() {
     if (!DUENDES_PROMO_3X2_ACTIVA) return;
-
-    // Obtener minis solo si WooCommerce está cargado
-    $minis = [];
-    if (function_exists('wc_get_products')) {
-        $minis = wc_get_products([
-            'status' => 'publish',
-            'limit' => 3,
-            'orderby' => 'rand',
-            'category' => [DUENDES_PROMO_CATEGORIA_MINI],
-        ]);
-        if (!is_array($minis)) $minis = [];
-    }
-
     ?>
     <style>
-        @keyframes dfb-float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
-        }
-        @keyframes dfb-float-delayed {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(-2deg); }
-        }
-        @keyframes dfb-glow {
-            0%, 100% { box-shadow: 0 5px 30px rgba(198,169,98,0.2); }
-            50% { box-shadow: 0 8px 40px rgba(198,169,98,0.35); }
-        }
-        @keyframes dfb-shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        @keyframes dfb-pulse-soft {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+        @keyframes dfb-glow-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(198,169,98,0.2); }
+            50% { box-shadow: 0 0 35px rgba(198,169,98,0.4); }
         }
         .duendes-banner-3x2 {
             position: relative;
             background: linear-gradient(135deg, #0a0a10 0%, #12101a 100%);
-            border: 1px solid rgba(198,169,98,0.2);
-            border-radius: 16px;
-            padding: 0;
-            margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            overflow: hidden;
+            border: 1px solid rgba(198,169,98,0.25);
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin: 20px auto 30px;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            animation: dfb-glow-pulse 3s ease-in-out infinite;
         }
         .duendes-banner-3x2::before {
             content: '';
@@ -521,192 +495,61 @@ function duendes_banner_promo_3x2() {
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(198,169,98,0.5), transparent);
         }
-
-        /* Contenido principal */
-        .dfb-3x2-main {
-            padding: 35px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .dfb-3x2-content {
+            flex: 1;
         }
         .dfb-3x2-eyebrow {
             color: #C6A962;
             font-family: 'Cinzel', serif;
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            margin: 0 0 10px 0;
-            opacity: 0.8;
+            margin: 0 0 8px 0;
         }
         .dfb-3x2-titulo {
             color: #fff;
-            margin: 0 0 8px 0;
+            margin: 0;
             font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 500;
-            line-height: 1.2;
+            line-height: 1.3;
         }
         .dfb-3x2-titulo em {
             color: #C6A962;
             font-style: normal;
         }
-        .dfb-3x2-desc {
-            color: rgba(255,255,255,0.6);
-            margin: 0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 15px;
-            font-style: italic;
-        }
-
-        /* Área visual con minis */
-        .dfb-3x2-visual {
-            position: relative;
-            width: 280px;
-            background: linear-gradient(135deg, rgba(198,169,98,0.08) 0%, rgba(198,169,98,0.02) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow: hidden;
-        }
-        .dfb-3x2-visual::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 1px;
-            background: linear-gradient(180deg, transparent, rgba(198,169,98,0.3), transparent);
-        }
-        .dfb-3x2-visual::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            animation: dfb-shimmer 4s ease-in-out infinite;
-        }
-
-        /* Minis flotantes */
-        .dfb-3x2-minis {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            z-index: 1;
-        }
-        .dfb-3x2-mini {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid rgba(198,169,98,0.3);
-            animation: dfb-float 4s ease-in-out infinite, dfb-glow 3s ease-in-out infinite;
-            transition: all 0.3s ease;
-        }
-        .dfb-3x2-mini:nth-child(1) { animation-delay: 0s; }
-        .dfb-3x2-mini:nth-child(2) {
-            animation: dfb-float-delayed 4.5s ease-in-out infinite, dfb-glow 3s ease-in-out infinite;
-            animation-delay: 0.5s;
-            width: 75px;
-            height: 75px;
-        }
-        .dfb-3x2-mini:nth-child(3) { animation-delay: 1s; }
-        .dfb-3x2-mini:hover {
-            transform: scale(1.1);
-            border-color: #C6A962;
-        }
-        .dfb-3x2-mini img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Badge de regalo - PROMINENTE */
         .dfb-3x2-gift {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #C6A962 0%, #d4b86a 50%, #C6A962 100%);
-            background-size: 200% 200%;
+            background: linear-gradient(135deg, #C6A962, #a88a42);
             color: #0a0a10;
             font-family: 'Cinzel', serif;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: 2px;
             text-transform: uppercase;
-            padding: 15px 20px;
+            padding: 14px 24px;
             border-radius: 8px;
-            animation: dfb-pulse-soft 2s ease-in-out infinite, dfb-gradient-shift 3s ease infinite;
-            box-shadow: 0 4px 20px rgba(198,169,98,0.4), 0 0 30px rgba(198,169,98,0.2);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        @keyframes dfb-gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        /* Sin minis - mostrar texto */
-        .dfb-3x2-no-minis {
-            color: rgba(255,255,255,0.5);
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 14px;
-            font-style: italic;
-            text-align: center;
-            padding: 20px;
-        }
-
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
             .duendes-banner-3x2 {
-                grid-template-columns: 1fr;
-            }
-            .dfb-3x2-main {
-                padding: 28px 25px;
+                flex-direction: column;
                 text-align: center;
+                padding: 20px;
             }
-            .dfb-3x2-visual {
-                width: 100%;
-                padding: 25px;
-                justify-content: center;
-            }
-            .dfb-3x2-visual::before {
-                display: none;
-            }
-            .dfb-3x2-titulo {
-                font-size: 22px;
-            }
+            .dfb-3x2-titulo { font-size: 18px; }
+            .dfb-3x2-gift { margin-top: 10px; }
         }
     </style>
 
     <div class="duendes-banner-3x2">
-        <div class="dfb-3x2-main">
-            <p class="dfb-3x2-eyebrow">Promo especial</p>
+        <div class="dfb-3x2-content">
+            <p class="dfb-3x2-eyebrow">Promo 3×2</p>
             <h3 class="dfb-3x2-titulo">
-                Llevás dos guardianes,<br>
-                <em>un mini te elige a vos</em>
+                Llevás dos guardianes, <em>un mini te elige a vos</em>
             </h3>
-            <p class="dfb-3x2-desc">El tercero va de regalo</p>
         </div>
-
-        <div class="dfb-3x2-visual">
-            <?php if (!empty($minis)): ?>
-            <div class="dfb-3x2-minis">
-                <?php foreach ($minis as $mini):
-                    $img = wp_get_attachment_image_url($mini->get_image_id(), 'thumbnail');
-                    if (!$img) $img = wc_placeholder_img_src('thumbnail');
-                ?>
-                <div class="dfb-3x2-mini">
-                    <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($mini->get_name()); ?>">
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <?php else: ?>
-            <p class="dfb-3x2-no-minis">Elegí tu mini<br>favorito</p>
-            <?php endif; ?>
-            <span class="dfb-3x2-gift">Regalo</span>
-        </div>
+        <span class="dfb-3x2-gift">Regalo</span>
     </div>
     <?php
 }
