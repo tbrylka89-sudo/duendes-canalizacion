@@ -1,9 +1,11 @@
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
+import { generarBannerDuendeSemana, generarImagenDuende, verificarConfiguracion } from '@/lib/imagenes/generador';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API ADMIN: DUENDE DE LA SEMANA
 // Sistema mejorado para gestionar el guardián protagonista semanal del Círculo
+// Con generación automática de imágenes cuando se activa un duende
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const anthropic = new Anthropic({
@@ -402,6 +404,143 @@ export async function POST(request) {
           resultados,
           total: resultados.length,
           exitosos: resultados.filter(r => r.success).length
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // GENERAR IMAGEN: Crear imagen IA para el duende de la semana
+      // ─────────────────────────────────────────────────────────────────────────
+      case 'generar-imagen': {
+        const semanaKey = datos?.semanaKey;
+        const tipoImagen = datos?.tipo || 'banner'; // 'banner' o 'avatar'
+        const api = datos?.api || 'replicate';
+        const modelo = datos?.modelo || 'flux-schnell';
+
+        // Verificar que hay APIs configuradas
+        const config = verificarConfiguracion();
+        if (!config.replicate && !config.openai) {
+          return Response.json({
+            success: false,
+            error: 'No hay APIs de imágenes configuradas (REPLICATE_API_TOKEN o OPENAI_API_KEY)'
+          }, { status: 400 });
+        }
+
+        // Obtener duende
+        let duendeActual;
+        if (semanaKey) {
+          duendeActual = await kv.get(`duende-semana:${semanaKey}`);
+        } else {
+          duendeActual = await kv.get(KEYS.actual);
+        }
+
+        if (!duendeActual) {
+          return Response.json({ success: false, error: 'No hay duende seleccionado' }, { status: 400 });
+        }
+
+        console.log(`[DUENDE-SEMANA] Generando imagen ${tipoImagen} para ${duendeActual.nombre}`);
+
+        // Generar imagen según tipo
+        let resultado;
+        const opciones = { api, modelo };
+
+        if (tipoImagen === 'banner') {
+          resultado = await generarBannerDuendeSemana(duendeActual, { ...opciones, aspectRatio: '16:9' });
+        } else {
+          resultado = await generarImagenDuende(duendeActual, { ...opciones, aspectRatio: '1:1' });
+        }
+
+        if (!resultado.success) {
+          return Response.json({
+            success: false,
+            error: resultado.error || 'Error generando imagen'
+          }, { status: 500 });
+        }
+
+        // Guardar URL en el duende
+        if (tipoImagen === 'banner') {
+          duendeActual.imagenBanner = resultado.url;
+          duendeActual.imagenBannerGeneradaEn = new Date().toISOString();
+        } else {
+          duendeActual.imagenGenerada = resultado.url;
+          duendeActual.imagenGeneradaEn = new Date().toISOString();
+        }
+
+        // Actualizar en KV
+        if (semanaKey) {
+          await kv.set(`duende-semana:${semanaKey}`, duendeActual);
+        }
+        await kv.set(KEYS.actual, duendeActual);
+
+        return Response.json({
+          success: true,
+          imagen: {
+            url: resultado.url,
+            tipo: tipoImagen,
+            api: api,
+            modelo: resultado.modelo
+          },
+          duende: duendeActual,
+          mensaje: `Imagen ${tipoImagen} generada para ${duendeActual.nombre}`
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // ACTIVAR CON IMAGEN: Activar duende y generar imagen si no tiene
+      // ─────────────────────────────────────────────────────────────────────────
+      case 'activar-con-imagen': {
+        const { semanaKey, generarSiNoTiene = true } = datos || {};
+
+        if (!semanaKey) {
+          return Response.json({ success: false, error: 'Se requiere semanaKey' }, { status: 400 });
+        }
+
+        const duendeProgramado = await kv.get(`duende-semana:${semanaKey}`);
+
+        if (!duendeProgramado) {
+          return Response.json({ success: false, error: 'No hay duende programado para esa semana' }, { status: 404 });
+        }
+
+        // Guardar actual en historial
+        const duendeAnterior = await kv.get(KEYS.actual);
+        if (duendeAnterior && duendeAnterior.duendeId !== duendeProgramado.duendeId) {
+          const historial = await kv.get(KEYS.historial) || [];
+          historial.unshift({
+            ...duendeAnterior,
+            fechaFin: new Date().toISOString()
+          });
+          await kv.set(KEYS.historial, historial.slice(0, 50));
+        }
+
+        // Generar imagen banner si no tiene y está configurado
+        let imagenGenerada = null;
+        if (generarSiNoTiene && !duendeProgramado.imagenBanner) {
+          const config = verificarConfiguracion();
+          if (config.replicate || config.openai) {
+            console.log(`[DUENDE-SEMANA] Generando imagen automática para ${duendeProgramado.nombre}`);
+            const resultado = await generarBannerDuendeSemana(duendeProgramado, {
+              api: config.preferida,
+              modelo: 'flux-schnell',
+              aspectRatio: '16:9'
+            });
+
+            if (resultado.success) {
+              duendeProgramado.imagenBanner = resultado.url;
+              duendeProgramado.imagenBannerGeneradaEn = new Date().toISOString();
+              imagenGenerada = resultado.url;
+              // Actualizar también en la key de semana
+              await kv.set(`duende-semana:${semanaKey}`, duendeProgramado);
+            }
+          }
+        }
+
+        // Activar el programado
+        await kv.set(KEYS.actual, duendeProgramado);
+
+        return Response.json({
+          success: true,
+          duende: duendeProgramado,
+          imagenGenerada,
+          mensaje: `${duendeProgramado.nombre} activado como Duende de la Semana${imagenGenerada ? ' (imagen generada)' : ''}`
         });
       }
 

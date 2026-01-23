@@ -126,10 +126,8 @@ export function AccesoRestringido({
 
           {mensaje.ctaAction === 'activar-trial' && !puedeUsarTrial && !usuario?.esCirculo && (
             <a
-              href="https://duendesdeluruguay.com/circulo"
+              href="/mi-magia/circulo"
               className="acceso-btn"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               Unirse al Círculo
             </a>
@@ -444,10 +442,8 @@ export function BannerUpgrade({ usuario, onActivarTrial }) {
           </button>
         ) : (
           <a
-            href="https://duendesdeluruguay.com/circulo"
+            href="/mi-magia/circulo"
             className="banner-btn"
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Ver planes
           </a>

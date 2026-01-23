@@ -787,8 +787,8 @@ async function enviarEmailCirculo(resend, email, nombre, plan, expira, runasBien
 
   // Link principal al Círculo con token
   const linkCirculo = token
-    ? `https://duendes-vercel.vercel.app/circulo?token=${token}`
-    : 'https://duendes-vercel.vercel.app/circulo';
+    ? `https://duendes-vercel.vercel.app/mi-magia/circulo?token=${token}`
+    : 'https://duendes-vercel.vercel.app/mi-magia/circulo';
 
   // Link secundario a Mi Magia
   const linkMiMagia = token
