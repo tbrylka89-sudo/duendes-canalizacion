@@ -862,6 +862,29 @@ Necesito conocer algunos datos. Empecemos:
         { id: 'proposito', label: 'Propósito', descripcion: 'Encontrar sentido de vida' },
         { id: 'gratitud', label: 'Gratitud', descripcion: 'Cultivar agradecimiento' },
       ]
+    },
+    viajeros: {
+      titulo: '🎒 Viajeros - Cambio de Rumbo',
+      chips: [
+        { id: 'viajero', label: 'Viajero', descripcion: 'Trae cambios de rumbo, nuevas perspectivas' },
+        { id: 'viajero_aventura', label: 'Aventura', descripcion: 'Inspirar a animarse a lo nuevo' },
+        { id: 'viajero_sabiduria', label: 'Sabiduría Viajera', descripcion: 'Conocimiento de mil caminos' },
+        { id: 'viajero_reinvencion', label: 'Reinvención', descripcion: 'Empezar de cero en otro lugar' },
+        { id: 'viajero_horizontes', label: 'Nuevos Horizontes', descripcion: 'Abrir la mente a lo desconocido' },
+        { id: 'viajero_despegue', label: 'Despegue', descripcion: 'Soltar lo conocido y volar' },
+      ]
+    },
+    naturaleza: {
+      titulo: '🍄 Bosque - Naturaleza',
+      chips: [
+        { id: 'bosque', label: 'Bosque/Naturaleza', descripcion: 'Conexión profunda con la tierra' },
+        { id: 'bosque_sanacion', label: 'Sanación Natural', descripcion: 'Sanar con la energía de la tierra' },
+        { id: 'bosque_raices', label: 'Raíces', descripcion: 'Conectar con lo ancestral, la tierra' },
+        { id: 'bosque_micelios', label: 'Micelios', descripcion: 'Interconexión de todo lo vivo' },
+        { id: 'bosque_hierbas', label: 'Hierbas/Yuyos', descripcion: 'Poder sanador de las plantas' },
+        { id: 'bosque_hongos', label: 'Hongos', descripcion: 'Transformación y renacimiento natural' },
+        { id: 'bosque_equilibrio', label: 'Equilibrio Natural', descripcion: 'Volver al ritmo de la naturaleza' },
+      ]
     }
   };
 

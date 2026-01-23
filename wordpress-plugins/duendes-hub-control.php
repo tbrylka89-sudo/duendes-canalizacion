@@ -8,8 +8,10 @@
 
 if (!defined('ABSPATH')) exit;
 
-// URL de tu app en Vercel
-define('DUENDES_APP_URL', 'https://duendes-vercel.vercel.app');
+// URL de tu app en Vercel (solo definir si no existe)
+if (!defined('DUENDES_APP_URL')) {
+    define('DUENDES_APP_URL', 'https://duendes-vercel.vercel.app');
+}
 
 class DuendesHubControl {
 
