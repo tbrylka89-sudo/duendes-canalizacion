@@ -1,0 +1,20 @@
+# Robots.txt - Duendes del Uruguay
+# https://duendes-vercel.vercel.app
+
+User-agent: *
+
+# Paginas publicas permitidas
+Allow: /
+Allow: /tienda
+
+# Paginas privadas bloqueadas
+Disallow: /mi-magia/*
+Disallow: /lectura/*
+Disallow: /guardian/*
+Disallow: /certificado/*
+Disallow: /portal/*
+Disallow: /api/*
+Disallow: /admin/*
+
+# Sitemap
+Sitemap: https://duendes-vercel.vercel.app/sitemap.xml

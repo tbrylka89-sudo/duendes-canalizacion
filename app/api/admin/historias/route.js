@@ -938,7 +938,271 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const accion = searchParams.get('accion');
 
-  // NUEVA ACCIÓN: Listar historias existentes para evitar repeticiones
+  // ACCIÓN: Verificar errores en todas las historias
+  if (accion === 'verificar_errores') {
+    try {
+      const auth = Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64');
+      const productos = [];
+
+      for (let page = 1; page <= 5; page++) {
+        const response = await fetch(
+          `${WC_URL}/wp-json/wc/v3/products?per_page=100&page=${page}&status=publish`,
+          {
+            headers: { 'Authorization': `Basic ${auth}` },
+            cache: 'no-store'
+          }
+        );
+        if (!response.ok) break;
+        const data = await response.json();
+        if (data.length === 0) break;
+        productos.push(...data);
+      }
+
+      const MARCADOR = '<!-- historia-generador-duendes-v1 -->';
+      const errores = [];
+      let conMarcador = 0;
+
+      // Patrones a buscar
+      const patronesProhibidos = [
+        { regex: /thibisay/i, mensaje: "Mención individual 'Thibisay' (debe ser equipo)" },
+        { regex: /gabriel(?!.*arc[aá]ngel)/i, mensaje: "Mención individual 'Gabriel' (debe ser equipo)" },
+        { regex: /desde las profundidades/i, mensaje: "Frase IA: 'desde las profundidades'" },
+        { regex: /brumas ancestrales/i, mensaje: "Frase IA: 'brumas ancestrales'" },
+        { regex: /velo entre mundos/i, mensaje: "Frase IA: 'velo entre mundos'" },
+        { regex: /tiempos inmemoriales/i, mensaje: "Frase IA: 'tiempos inmemoriales'" },
+        { regex: /susurro del viento/i, mensaje: "Frase IA: 'susurro del viento'" },
+        { regex: /vibraciones c[oó]smicas/i, mensaje: "Frase IA: 'vibraciones cósmicas'" },
+        { regex: /847/i, mensaje: "Número prohibido: 847" },
+        { regex: /\bmi taller\b/i, mensaje: "'mi taller' (debe ser 'nuestro taller' o voz pasiva)" },
+        { regex: /mientras (lo |la )?(modelaba|pintaba|creaba|terminaba)/i, mensaje: "Primera persona singular (debe ser voz pasiva)" },
+        { regex: /cuando (lo |la )?(terminé|hice|creé)/i, mensaje: "Primera persona singular (debe ser voz pasiva)" },
+      ];
+
+      for (const producto of productos) {
+        const desc = producto.description || '';
+        if (!desc.includes(MARCADOR)) continue;
+
+        conMarcador++;
+
+        for (const patron of patronesProhibidos) {
+          if (patron.regex.test(desc)) {
+            errores.push({
+              id: producto.id,
+              nombre: producto.name,
+              error: patron.mensaje
+            });
+          }
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        total_productos: productos.length,
+        con_marcador: conMarcador,
+        errores_encontrados: errores.length,
+        errores: errores
+      });
+
+    } catch (error) {
+      return NextResponse.json({
+        success: false,
+        error: error.message
+      }, { status: 500 });
+    }
+  }
+
+  // ACCIÓN: Analizar temas de cada historia
+  if (accion === 'analizar_temas') {
+    try {
+      const auth = Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64');
+      const productos = [];
+
+      for (let page = 1; page <= 5; page++) {
+        const response = await fetch(
+          `${WC_URL}/wp-json/wc/v3/products?per_page=100&page=${page}&status=publish`,
+          {
+            headers: { 'Authorization': `Basic ${auth}` },
+            cache: 'no-store'
+          }
+        );
+        if (!response.ok) break;
+        const data = await response.json();
+        if (data.length === 0) break;
+        productos.push(...data);
+      }
+
+      const MARCADOR = '<!-- historia-generador-duendes-v1 -->';
+      const resultados = [];
+
+      // Palabras clave por tema
+      const temas = {
+        'abundancia': ['abundancia', 'dinero', 'prosperidad', 'riqueza', 'flujo', 'oportunidad', 'materializ', 'fortuna', 'citrino', 'oro', 'moneda'],
+        'protección': ['proteg', 'escudo', 'guard', 'defend', 'segur', 'ampara', 'turmalina negra', 'vigila'],
+        'amor': ['amor', 'corazón', 'cuarzo rosa', 'pareja', 'vínculo', 'relacion', 'afecto', 'romántic'],
+        'sanación': ['sana', 'cura', 'heal', 'restaur', 'reparar', 'herida', 'dolor', 'trauma'],
+        'sabiduría': ['sabidur', 'conocimiento', 'maestr', 'enseñ', 'aprend', 'guía', 'mentor'],
+        'calma': ['calma', 'paz', 'tranquil', 'seren', 'ansied', 'estres', 'relaj', 'sodalita'],
+        'intuición': ['intuic', 'percib', 'senti', 'amatista', 'tercer ojo', 'vision'],
+        'empoderamiento': ['poder', 'fuerza', 'valiente', 'coraje', 'guerrer', 'lucha', 'batalla'],
+        'suerte': ['suerte', 'trébol', 'leprechaun', 'azar', 'fortuna', 'destino'],
+        'bosque/naturaleza': ['bosque', 'naturaleza', 'planta', 'árbol', 'raíz', 'tierra', 'verde'],
+        'familia': ['familia', 'hogar', 'casa', 'hijo', 'madre', 'padre', 'unión familiar'],
+        'éxito/negocios': ['éxito', 'negocio', 'trabajo', 'emprendedor', 'carrera', 'profesion', 'cliente'],
+        'autoestima': ['autoestima', 'valor propio', 'merec', 'digno', 'confian', 'segur de ti'],
+        'vikingo': ['viking', 'guerrer', 'nórdic', 'batalla', 'hacha', 'escudo', 'conquist'],
+        'bruja/magia': ['bruj', 'magi', 'hechiz', 'ritual', 'escoba', 'caldero', 'luna'],
+        'tiempo': ['tiempo', 'reloj', 'pasado', 'futuro', 'momento', 'ciclo', 'etapa'],
+        'herbolaria': ['hierba', 'planta medicinal', 'remedio', 'infus', 'herbol', 'botánic'],
+      };
+
+      for (const producto of productos) {
+        const desc = (producto.description || '').toLowerCase();
+        if (!desc.includes(MARCADOR.toLowerCase())) continue;
+
+        // Contar coincidencias por tema
+        const scores = {};
+        for (const [tema, palabras] of Object.entries(temas)) {
+          scores[tema] = 0;
+          for (const palabra of palabras) {
+            const matches = (desc.match(new RegExp(palabra, 'gi')) || []).length;
+            scores[tema] += matches;
+          }
+        }
+
+        // Encontrar tema principal
+        let temaPrincipal = 'general';
+        let maxScore = 0;
+        for (const [tema, score] of Object.entries(scores)) {
+          if (score > maxScore) {
+            maxScore = score;
+            temaPrincipal = tema;
+          }
+        }
+
+        // Detectar tipo especial por nombre
+        const nombre = producto.name.toLowerCase();
+        let tipo = 'guardián';
+        if (nombre.includes('pixie')) tipo = 'pixie';
+        else if (nombre.includes('bruj')) tipo = 'bruja/brujo';
+        else if (desc.includes('viking')) tipo = 'vikingo/a';
+        else if (desc.includes('gauch')) tipo = 'gaucho/a';
+        else if (desc.includes('leprechaun')) tipo = 'leprechaun';
+
+        resultados.push({
+          id: producto.id,
+          nombre: producto.name,
+          tipo: tipo,
+          tema: temaPrincipal,
+          score: maxScore
+        });
+      }
+
+      // Ordenar por nombre
+      resultados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+      return NextResponse.json({
+        success: true,
+        total: resultados.length,
+        guardianes: resultados
+      });
+
+    } catch (error) {
+      return NextResponse.json({
+        success: false,
+        error: error.message
+      }, { status: 500 });
+    }
+  }
+
+  // ACCIÓN: Corregir errores automáticamente (Thibisay → nuestro equipo)
+  if (accion === 'corregir_errores') {
+    try {
+      const auth = Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64');
+      const productos = [];
+
+      for (let page = 1; page <= 5; page++) {
+        const response = await fetch(
+          `${WC_URL}/wp-json/wc/v3/products?per_page=100&page=${page}&status=publish`,
+          {
+            headers: { 'Authorization': `Basic ${auth}` },
+            cache: 'no-store'
+          }
+        );
+        if (!response.ok) break;
+        const data = await response.json();
+        if (data.length === 0) break;
+        productos.push(...data);
+      }
+
+      const MARCADOR = '<!-- historia-generador-duendes-v1 -->';
+      const corregidos = [];
+
+      for (const producto of productos) {
+        let desc = producto.description || '';
+        if (!desc.includes(MARCADOR)) continue;
+
+        let modificado = false;
+        const descOriginal = desc;
+
+        // Correcciones
+        if (/thibisay/i.test(desc)) {
+          desc = desc.replace(/cuando thibisay canaliza/gi, 'cuando se canaliza');
+          desc = desc.replace(/thibisay canaliza/gi, 'nuestro equipo canaliza');
+          desc = desc.replace(/thibisay/gi, 'nuestro equipo');
+          modificado = true;
+        }
+
+        if (/\bmi taller\b/i.test(desc)) {
+          desc = desc.replace(/\bmi taller\b/gi, 'nuestro taller');
+          modificado = true;
+        }
+
+        if (modificado && desc !== descOriginal) {
+          // Guardar corrección
+          const updateResponse = await fetch(
+            `${WC_URL}/wp-json/wc/v3/products/${producto.id}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ description: desc })
+            }
+          );
+
+          if (updateResponse.ok) {
+            corregidos.push({
+              id: producto.id,
+              nombre: producto.name,
+              status: 'corregido'
+            });
+          } else {
+            corregidos.push({
+              id: producto.id,
+              nombre: producto.name,
+              status: 'error',
+              error: await updateResponse.text()
+            });
+          }
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        corregidos: corregidos.length,
+        detalles: corregidos
+      });
+
+    } catch (error) {
+      return NextResponse.json({
+        success: false,
+        error: error.message
+      }, { status: 500 });
+    }
+  }
+
+  // ACCIÓN: Listar historias existentes para evitar repeticiones
   if (accion === 'listar_existentes') {
     try {
       // Obtener TODOS los productos de WooCommerce con paginación

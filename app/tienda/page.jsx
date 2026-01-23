@@ -1,13 +1,20 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+  generateItemListSchema,
+  generateBreadcrumbSchema,
+  generateCollectionPageSchema,
+  combineSchemas,
+  serializeSchema
+} from '@/lib/seo/schema';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TIENDA MÁGICA - CARTAS DE TAROT
-// Productos de WooCommerce con diseño de cartas de tarot místicas
+// TIENDA MAGICA - CARTAS DE TAROT
+// Productos de WooCommerce con diseno de cartas de tarot misticas
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// URLs centralizadas - cambiar aquí cuando migre el dominio
+// URLs centralizadas - cambiar aqui cuando migre el dominio
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
 
 const CATEGORIAS = [
@@ -25,6 +32,56 @@ const PARTICULAS = {
   salud: ['🌿', '🍀', '🌱', '🌸'],
   sabiduria: ['🔮', '📿', '🌙', '⭐']
 };
+
+// Componente para inyectar schema dinamicamente en cliente
+function DynamicSchemaMarkup({ productos }) {
+  useEffect(() => {
+    if (!productos || productos.length === 0) return;
+
+    // Generar schemas para la tienda
+    const breadcrumbs = generateBreadcrumbSchema([
+      { name: 'Inicio', url: '/' },
+      { name: 'Tienda', url: '/tienda' }
+    ]);
+    const itemList = generateItemListSchema(productos, {
+      listName: 'Guardianes Disponibles',
+      listDescription: 'Coleccion de guardianes artesanales unicos de Duendes del Uruguay'
+    });
+    const collectionPage = generateCollectionPageSchema({
+      name: 'Tienda de Guardianes',
+      description: 'Explora nuestra coleccion de guardianes artesanales unicos, hechos a mano en Piriapolis, Uruguay',
+      url: '/tienda'
+    });
+
+    const combinedSchema = combineSchemas(breadcrumbs, itemList, collectionPage);
+    const jsonLd = serializeSchema(combinedSchema);
+
+    // Buscar y eliminar schema anterior si existe
+    const existingScript = document.querySelector('script[data-schema-tienda]');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Inyectar nuevo schema
+    if (jsonLd) {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-schema-tienda', 'true');
+      script.textContent = jsonLd;
+      document.head.appendChild(script);
+    }
+
+    // Cleanup al desmontar
+    return () => {
+      const scriptToRemove = document.querySelector('script[data-schema-tienda]');
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [productos]);
+
+  return null;
+}
 
 export default function TiendaMagica() {
   const [productos, setProductos] = useState([]);
@@ -81,6 +138,9 @@ export default function TiendaMagica() {
 
   return (
     <div className="tienda-container">
+      {/* Schema Markup dinamico para SEO */}
+      <DynamicSchemaMarkup productos={productos} />
+
       {/* Hero Section */}
       <section className="tienda-hero">
         <div className="hero-bg"></div>
