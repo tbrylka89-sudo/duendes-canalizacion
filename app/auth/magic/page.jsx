@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PÁGINA DE MAGIC LINK - Valida token y redirige
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export default function MagicLinkPage() {
+function MagicLinkContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [estado, setEstado] = useState('validando');
@@ -37,12 +37,10 @@ export default function MagicLinkPage() {
 
       if (data.success) {
         setEstado('exito');
-        // Guardar token en localStorage
         localStorage.setItem('duendes_token', data.usuario.token);
         localStorage.setItem('duendes_email', data.usuario.email);
         localStorage.setItem('duendes_nombre', data.usuario.nombre || '');
 
-        // Redirigir a Mi Magia con token
         setTimeout(() => {
           router.push(`/mi-magia?token=${data.usuario.token}`);
         }, 1500);
@@ -58,6 +56,100 @@ export default function MagicLinkPage() {
 
   return (
     <div style={{
+      background: 'rgba(26, 26, 46, 0.9)',
+      border: '1px solid rgba(212, 175, 55, 0.3)',
+      borderRadius: '20px',
+      padding: '40px',
+      maxWidth: '400px',
+      textAlign: 'center'
+    }}>
+      {estado === 'validando' && (
+        <>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            margin: '0 auto 20px',
+            border: '3px solid rgba(212, 175, 55, 0.3)',
+            borderTopColor: '#d4af37',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>Verificando...</h2>
+          <p style={{ color: '#a0a0a0' }}>Un momento mientras validamos tu enlace mágico</p>
+        </>
+      )}
+
+      {estado === 'exito' && (
+        <>
+          <div style={{ fontSize: '60px', marginBottom: '20px' }}>✨</div>
+          <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>¡Bienvenida!</h2>
+          <p style={{ color: '#a0a0a0' }}>Redirigiendo a Mi Magia...</p>
+        </>
+      )}
+
+      {estado === 'error' && (
+        <>
+          <div style={{ fontSize: '60px', marginBottom: '20px' }}>🔮</div>
+          <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>Enlace expirado</h2>
+          <p style={{ color: '#a0a0a0', marginBottom: '20px' }}>{error}</p>
+          <button
+            onClick={() => router.push('/mi-magia/login')}
+            style={{
+              background: 'linear-gradient(135deg, #d4af37, #f4d03f)',
+              color: '#1a1a1a',
+              border: 'none',
+              padding: '12px 30px',
+              borderRadius: '50px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            Solicitar nuevo enlace
+          </button>
+        </>
+      )}
+
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div style={{
+      background: 'rgba(26, 26, 46, 0.9)',
+      border: '1px solid rgba(212, 175, 55, 0.3)',
+      borderRadius: '20px',
+      padding: '40px',
+      maxWidth: '400px',
+      textAlign: 'center'
+    }}>
+      <div style={{
+        width: '60px',
+        height: '60px',
+        margin: '0 auto 20px',
+        border: '3px solid rgba(212, 175, 55, 0.3)',
+        borderTopColor: '#d4af37',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite'
+      }} />
+      <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>Cargando...</h2>
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default function MagicLinkPage() {
+  return (
+    <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%)',
       display: 'flex',
@@ -65,72 +157,9 @@ export default function MagicLinkPage() {
       justifyContent: 'center',
       padding: '20px'
     }}>
-      <div style={{
-        background: 'rgba(26, 26, 46, 0.9)',
-        border: '1px solid rgba(212, 175, 55, 0.3)',
-        borderRadius: '20px',
-        padding: '40px',
-        maxWidth: '400px',
-        textAlign: 'center'
-      }}>
-        {estado === 'validando' && (
-          <>
-            <div style={{
-              width: '60px',
-              height: '60px',
-              margin: '0 auto 20px',
-              border: '3px solid rgba(212, 175, 55, 0.3)',
-              borderTopColor: '#d4af37',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }} />
-            <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>Verificando...</h2>
-            <p style={{ color: '#a0a0a0' }}>Un momento mientras validamos tu enlace mágico</p>
-          </>
-        )}
-
-        {estado === 'exito' && (
-          <>
-            <div style={{
-              fontSize: '60px',
-              marginBottom: '20px'
-            }}>✨</div>
-            <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>¡Bienvenida!</h2>
-            <p style={{ color: '#a0a0a0' }}>Redirigiendo a Mi Magia...</p>
-          </>
-        )}
-
-        {estado === 'error' && (
-          <>
-            <div style={{
-              fontSize: '60px',
-              marginBottom: '20px'
-            }}>🔮</div>
-            <h2 style={{ color: '#d4af37', marginBottom: '10px' }}>Enlace expirado</h2>
-            <p style={{ color: '#a0a0a0', marginBottom: '20px' }}>{error}</p>
-            <button
-              onClick={() => router.push('/mi-magia/login')}
-              style={{
-                background: 'linear-gradient(135deg, #d4af37, #f4d03f)',
-                color: '#1a1a1a',
-                border: 'none',
-                padding: '12px 30px',
-                borderRadius: '50px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              Solicitar nuevo enlace
-            </button>
-          </>
-        )}
-      </div>
-
-      <style jsx>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <Suspense fallback={<LoadingFallback />}>
+        <MagicLinkContent />
+      </Suspense>
     </div>
   );
 }

@@ -12,10 +12,12 @@ if (!defined('ABSPATH')) exit;
 // CONFIGURACIÓN DE LA PROMOCIÓN
 // ═══════════════════════════════════════════════════════════════════════════
 
-define('DUENDES_PROMO_3X2_ACTIVA', true);
-define('DUENDES_PROMO_GUARDIANES_REQUERIDOS', 2); // Comprar 2
-define('DUENDES_PROMO_CATEGORIA_MINI', 'mini'); // Slug de categoría de minis
-define('DUENDES_PROMO_MENSAJE', '🎁 ¡Llevás 2 guardianes! Elegí tu mini de regalo');
+if (!defined('DUENDES_PROMO_3X2_ACTIVA')) {
+    define('DUENDES_PROMO_3X2_ACTIVA', true);
+    define('DUENDES_PROMO_GUARDIANES_REQUERIDOS', 2);
+    define('DUENDES_PROMO_CATEGORIA_MINI', 'mini');
+    define('DUENDES_PROMO_MENSAJE', 'Llevás 2 guardianes! Elegí tu mini de regalo');
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DETECTAR CUANDO HAY 2+ GUARDIANES EN EL CARRITO
@@ -432,8 +434,8 @@ function duendes_guardar_mini_gratis_orden($item, $cart_item_key, $values, $orde
 // UBICACIONES DEL BANNER
 // ═══════════════════════════════════════════════════════════════════════════
 
-// 1. Tienda (página de productos)
-add_action('woocommerce_before_shop_loop', 'duendes_banner_promo_3x2', 5);
+// 1. Tienda (página de productos) - prioridad 10 para aparecer DESPUÉS del hero
+add_action('woocommerce_before_shop_loop', 'duendes_banner_promo_3x2', 10);
 
 // 2. Página de producto individual (arriba de productos relacionados)
 add_action('woocommerce_after_single_product_summary', 'duendes_banner_promo_3x2_producto', 15);
@@ -465,13 +467,17 @@ add_action('woocommerce_before_main_content', function() {
 function duendes_banner_promo_3x2() {
     if (!DUENDES_PROMO_3X2_ACTIVA) return;
 
-    // Obtener 3 minis aleatorios para mostrar
-    $minis = wc_get_products([
-        'status' => 'publish',
-        'limit' => 3,
-        'orderby' => 'rand',
-        'category' => [DUENDES_PROMO_CATEGORIA_MINI],
-    ]);
+    // Obtener minis solo si WooCommerce está cargado
+    $minis = [];
+    if (function_exists('wc_get_products')) {
+        $minis = wc_get_products([
+            'status' => 'publish',
+            'limit' => 3,
+            'orderby' => 'rand',
+            'category' => [DUENDES_PROMO_CATEGORIA_MINI],
+        ]);
+        if (!is_array($minis)) $minis = [];
+    }
 
     ?>
     <style>
