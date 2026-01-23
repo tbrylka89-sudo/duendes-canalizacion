@@ -18,6 +18,24 @@ function duendes_test_guardian_v12_render() {
 <div id="tg-app" data-v="<?php echo $v; ?>">
 
 <style>
+/* ======================================== PROTECCIÓN ELEMENTOR ======================================== */
+/* Fix: Elementor oculta shortcodes vacíos. Estas reglas protegen el contenedor del test */
+.elementor-shortcode:has(#tg-app),
+.elementor-widget-shortcode:has(#tg-app),
+.elementor-element:has(#tg-app) {
+    display: block !important;
+    min-height: 100vh !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+}
+
+/* Fallback para navegadores sin soporte :has() */
+.elementor-shortcode,
+.elementor-widget-shortcode {
+    min-height: auto;
+}
+
 /* ======================================== BASE ======================================== */
 #tg-app {
     display: block !important;
@@ -862,6 +880,25 @@ function duendes_test_guardian_v12_render() {
 <script>
 (function() {
     'use strict';
+
+    // ==================== PROTECCIÓN ELEMENTOR ====================
+    // Fix: Asegura que los contenedores padre sean visibles
+    (function protegerContenedor() {
+        var app = document.getElementById('tg-app');
+        if (!app) return;
+
+        // Recorrer hacia arriba y forzar visibilidad
+        var parent = app.parentElement;
+        while (parent && parent !== document.body) {
+            var classes = parent.className || '';
+            if (classes.indexOf('elementor-shortcode') > -1 ||
+                classes.indexOf('elementor-widget') > -1 ||
+                classes.indexOf('elementor-element') > -1) {
+                parent.style.cssText = 'display: block !important; min-height: 100vh !important; visibility: visible !important; opacity: 1 !important;';
+            }
+            parent = parent.parentElement;
+        }
+    })();
 
     var API = 'https://duendes-vercel.vercel.app/api';
     var TOTAL_Q = 12;
