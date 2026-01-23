@@ -104,6 +104,29 @@ Precio                          | Orden en que ve productos
 
 ---
 
+## INTEGRACIONES DE IA DISPONIBLES
+
+| API | Variable | Estado | Usos |
+|-----|----------|--------|------|
+| **Claude** | `ANTHROPIC_API_KEY` | ✅ | Historias, contenido Círculo, cursos |
+| **OpenAI/DALL-E** | `OPENAI_API_KEY` | ✅ | Imágenes para contenido y cursos |
+| **Replicate** | `REPLICATE_API_TOKEN` | ✅ | Flux, SDXL, video (Minimax, Luma, Kling) |
+| **Gemini** | `GEMINI_API_KEY` | ❌ | Cursos alternativos, imágenes Nano Banana |
+| **WP Media** | `WP_APP_PASSWORD` | ❌ | Subir archivos a WordPress |
+
+### Endpoints de generación de imágenes:
+- `/api/admin/imagen/replicate` - 20+ modelos (Flux, SDXL, Ideogram, Recraft, video)
+- `/api/admin/imagen/gemini` - Gemini 2.0 Flash (requiere GEMINI_API_KEY)
+- `/api/admin/circulo/generar-contenido-pro` - DALL-E 3 para Círculo
+
+### Endpoint de cursos:
+- `/api/admin/cursos/generar-con-ia` - Genera cursos completos con Gemini o Claude + imágenes DALL-E
+
+### Panel Maestro del Círculo:
+- `/admin/circulo/maestro` - UI para explorar Replicate, generar cursos, etc.
+
+---
+
 ## ARCHIVOS CLAVE
 
 | Archivo | Qué hace |
