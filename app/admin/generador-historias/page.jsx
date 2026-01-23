@@ -6395,6 +6395,8 @@ Necesito conocer algunos datos. Empecemos:
           padding: 1rem;
           margin-bottom: 1rem;
           border: 1px solid rgba(255,255,255,0.1);
+          position: relative;
+          z-index: 50;
         }
 
         .conversion-score.aprobada {
