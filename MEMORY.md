@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-23 22:30 (sesión 9 - EN CURSO)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 9 - COMPLETADA)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -309,6 +309,13 @@ El archivo `/app/mi-magia/page.jsx` fue refactorizado de 8000 líneas a módulos
      - Admin API ahora busca en ambos formatos de key
      - Soporte para parámetro `ano` (sin ñ) además de `año`
    - **Resultado:** Ambas APIs ahora devuelven los mismos resultados
+
+**⚠️ NOTA SOBRE CONTENIDO DEL CÍRCULO:**
+- El contenido existente fue guardado con diferentes formatos de keys en KV
+- Algunos usan `circulo:contenido:año:mes:dia`, otros usan `contenido:YYYY-MM-DD`
+- Las APIs ahora buscan en AMBOS formatos
+- Si hay discrepancias después del deploy, esperar unos minutos para que el caché de Vercel se actualice
+- En peor caso, regenerar contenido con `/api/admin/circulo/generar-contenido-pro` que guarda en ambos formatos
 
 **Commits de esta sesión:**
 1. `Fix token parsing in cofre-diario API`
