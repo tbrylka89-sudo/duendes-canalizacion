@@ -137,6 +137,53 @@ function GeneradorHistoriasContent() {
   // === TEMAS APRENDIDOS (auto-aprendizaje) ===
   const [temasAprendidos, setTemasAprendidos] = useState({});
 
+  // === CREADOR INTELIGENTE DE PRODUCTOS ===
+  const [creadorProducto, setCreadorProducto] = useState({
+    // Fotos
+    fotos: [], // [{file, preview, nombre, esPrincipal}]
+    fotosProcesando: false,
+
+    // Análisis Vision
+    analisisVision: null,
+    analizando: false,
+    textoLibre: '',
+
+    // Datos parseados (editables)
+    datosParseados: {
+      nombre: '',
+      especie: 'duende',
+      genero: 'M',
+      categoria: 'Protección',
+      tamano: 'mediano_especial',
+      tamanoCm: 18,
+      accesorios: '',
+      esUnico: true
+    },
+
+    // Historia generada
+    historiaGenerada: '',
+    datosConversion: null,
+
+    // Datos WooCommerce
+    datosWooCommerce: {
+      precioRegular: '',
+      precioOferta: '',
+      categoriaWC: [],
+      stock: 1,
+      estadoStock: 'instock',
+      sku: ''
+    },
+
+    // Estado de publicación
+    publicando: false,
+    progresoPublicacion: { paso: '', porcentaje: 0 },
+    productoCreado: null,
+    imagenesSubidas: []
+  });
+
+  // Categorías de WooCommerce
+  const [categoriasWC, setCategoriasWC] = useState([]);
+
   // Mini-encuesta al regenerar
   const [showMiniEncuesta, setShowMiniEncuesta] = useState(false);
   const [miniEncuesta, setMiniEncuesta] = useState({
@@ -563,6 +610,375 @@ Necesito conocer algunos datos. Empecemos:
       await cargarTemasAprendidos();
     } catch (e) {
       console.error('Error registrando tema aprendido:', e);
+    }
+  };
+
+  // === FUNCIONES CREADOR INTELIGENTE DE PRODUCTOS ===
+
+  // Cargar categorías de WooCommerce
+  const cargarCategoriasWC = async () => {
+    try {
+      const res = await fetch('/api/admin/woocommerce/productos?accion=categorias');
+      const data = await res.json();
+      if (data.success && data.categorias) {
+        setCategoriasWC(data.categorias);
+      }
+    } catch (e) {
+      console.error('Error cargando categorías WC:', e);
+    }
+  };
+
+  // Manejar subida de fotos
+  const handleFotosUpload = (files) => {
+    const nuevasFotos = Array.from(files).map((file, index) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      nombre: file.name,
+      esPrincipal: creadorProducto.fotos.length === 0 && index === 0
+    }));
+
+    setCreadorProducto(prev => ({
+      ...prev,
+      fotos: [...prev.fotos, ...nuevasFotos]
+    }));
+  };
+
+  // Eliminar una foto
+  const eliminarFoto = (index) => {
+    setCreadorProducto(prev => {
+      const nuevasFotos = prev.fotos.filter((_, i) => i !== index);
+      // Si eliminamos la principal, la primera pasa a ser principal
+      if (prev.fotos[index]?.esPrincipal && nuevasFotos.length > 0) {
+        nuevasFotos[0].esPrincipal = true;
+      }
+      return { ...prev, fotos: nuevasFotos };
+    });
+  };
+
+  // Marcar una foto como principal
+  const marcarFotoPrincipal = (index) => {
+    setCreadorProducto(prev => ({
+      ...prev,
+      fotos: prev.fotos.map((f, i) => ({ ...f, esPrincipal: i === index }))
+    }));
+  };
+
+  // Analizar foto con Claude Vision
+  const analizarFotoConVision = async () => {
+    const fotoPrincipal = creadorProducto.fotos.find(f => f.esPrincipal) || creadorProducto.fotos[0];
+    if (!fotoPrincipal) return;
+
+    setCreadorProducto(prev => ({ ...prev, analizando: true }));
+
+    try {
+      // Convertir a base64
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(fotoPrincipal.file);
+      });
+      const base64Data = await base64Promise;
+
+      // Llamar a la API de análisis
+      const res = await fetch('/api/admin/historias/analizar-imagen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imagenBase64: base64Data,
+          nombre: creadorProducto.datosParseados.nombre || 'Producto nuevo',
+          categoria: creadorProducto.datosParseados.categoria || 'General'
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setCreadorProducto(prev => ({
+          ...prev,
+          analisisVision: data.analisis,
+          analizando: false
+        }));
+      } else {
+        setError(data.error || 'Error analizando imagen');
+        setCreadorProducto(prev => ({ ...prev, analizando: false }));
+      }
+    } catch (e) {
+      setError(e.message);
+      setCreadorProducto(prev => ({ ...prev, analizando: false }));
+    }
+  };
+
+  // Parsear texto libre del usuario
+  const parsearTextoProducto = (texto) => {
+    // Parser simple integrado (sin import externo para evitar SSR issues)
+    const resultado = {
+      nombre: null,
+      especie: null,
+      genero: null,
+      categoria: null,
+      tamanoCm: null,
+      accesorios: [],
+      cristales: []
+    };
+
+    if (!texto) return resultado;
+
+    const textoLower = texto.toLowerCase();
+
+    // Detectar nombre
+    const patronNombre = /(?:se llama|nombre[:\s]+)["']?([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)["']?/i;
+    const matchNombre = texto.match(patronNombre);
+    if (matchNombre) resultado.nombre = matchNombre[1];
+
+    // Detectar tamaño en cm
+    const patronCm = /(\d{1,2})\s*(?:cm|centimetros|centímetros)/i;
+    const matchCm = texto.match(patronCm);
+    if (matchCm) resultado.tamanoCm = parseInt(matchCm[1]);
+
+    // Detectar especie
+    const especies = ['pixie', 'duende', 'duenda', 'elfo', 'elfa', 'bruja', 'brujo', 'vikingo', 'vikinga', 'leprechaun', 'gnomo', 'hada', 'mago', 'maga', 'chaman', 'chamana'];
+    for (const esp of especies) {
+      if (textoLower.includes(esp)) {
+        resultado.especie = esp;
+        if (['pixie', 'duenda', 'elfa', 'bruja', 'vikinga', 'hada', 'maga', 'chamana'].includes(esp)) {
+          resultado.genero = 'F';
+        } else {
+          resultado.genero = 'M';
+        }
+        break;
+      }
+    }
+
+    // Detectar categoría
+    const catMap = {
+      'Protección': ['protege', 'protección', 'guardian', 'cuida', 'escudo'],
+      'Abundancia': ['abundancia', 'dinero', 'prosperidad', 'fortuna', 'suerte'],
+      'Amor': ['amor', 'corazón', 'pareja', 'autoestima'],
+      'Sanación': ['sanación', 'sanar', 'salud', 'curar'],
+      'Sabiduría': ['sabiduría', 'sabio', 'conocimiento', 'intuición'],
+      'Viajeros': ['viajero', 'mochila', 'aventura', 'camino'],
+      'Naturaleza': ['bosque', 'naturaleza', 'plantas', 'hongos', 'hierbas']
+    };
+    for (const [cat, keywords] of Object.entries(catMap)) {
+      if (keywords.some(k => textoLower.includes(k))) {
+        resultado.categoria = cat;
+        break;
+      }
+    }
+
+    // Detectar cristales
+    const cristales = ['amatista', 'citrino', 'cuarzo', 'turmalina', 'fluorita', 'sodalita', 'pirita', 'obsidiana', 'jade'];
+    resultado.cristales = cristales.filter(c => textoLower.includes(c));
+
+    // Detectar accesorios
+    const patronAcc = /(?:con|tiene|lleva)\s+([^.,]+)/gi;
+    let matchAcc;
+    while ((matchAcc = patronAcc.exec(texto)) !== null) {
+      resultado.accesorios.push(matchAcc[1].trim());
+    }
+
+    return resultado;
+  };
+
+  // Aplicar datos parseados del texto libre
+  const aplicarDatosParseados = () => {
+    const parseado = parsearTextoProducto(creadorProducto.textoLibre);
+
+    setCreadorProducto(prev => ({
+      ...prev,
+      datosParseados: {
+        ...prev.datosParseados,
+        nombre: parseado.nombre || prev.datosParseados.nombre,
+        especie: parseado.especie || prev.datosParseados.especie,
+        genero: parseado.genero || prev.datosParseados.genero,
+        categoria: parseado.categoria || prev.datosParseados.categoria,
+        tamanoCm: parseado.tamanoCm || prev.datosParseados.tamanoCm,
+        accesorios: [
+          ...parseado.cristales,
+          ...parseado.accesorios,
+          prev.datosParseados.accesorios
+        ].filter(Boolean).join(', '),
+        esUnico: (parseado.tamanoCm || prev.datosParseados.tamanoCm) > 15
+      }
+    }));
+  };
+
+  // Generar historia para el producto nuevo
+  const generarHistoriaProducto = async () => {
+    setCargando(true);
+    setError(null);
+
+    try {
+      const datos = creadorProducto.datosParseados;
+      const res = await fetch('/api/admin/historias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: datos.nombre,
+          genero: datos.genero,
+          especie: datos.especie,
+          categoria: datos.categoria,
+          tamanoCm: datos.tamanoCm,
+          accesorios: datos.accesorios,
+          esUnico: datos.esUnico,
+          analisisImagen: creadorProducto.analisisVision
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setCreadorProducto(prev => ({
+          ...prev,
+          historiaGenerada: data.historia,
+          datosConversion: {
+            score: data.score_conversion,
+            arco: data.arco_emocional,
+            cierres: data.cierres_por_perfil,
+            aprobada: data.aprobada,
+            advertencias: data.advertencias
+          }
+        }));
+        setPaso(22); // Ir a configurar WooCommerce
+      } else {
+        setError(data.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    }
+    setCargando(false);
+  };
+
+  // Generar SKU automático
+  const generarSKU = () => {
+    const datos = creadorProducto.datosParseados;
+    const prefijos = {
+      pixie: 'PX', duende: 'DU', duenda: 'DA', elfo: 'EL', elfa: 'EA',
+      gnomo: 'GN', hada: 'HD', bruja: 'BR', brujo: 'BO', vikingo: 'VK',
+      vikinga: 'VA', leprechaun: 'LP', mago: 'MG', maga: 'MA', chaman: 'CH'
+    };
+    const prefijo = prefijos[datos.especie?.toLowerCase()] || 'PR';
+    const nombre = datos.nombre ? datos.nombre.substring(0, 3).toUpperCase() : 'XXX';
+    const timestamp = Date.now().toString().slice(-6);
+    return `${prefijo}-${nombre}-${timestamp}`;
+  };
+
+  // Publicar producto a WooCommerce
+  const publicarProductoWC = async () => {
+    setCreadorProducto(prev => ({
+      ...prev,
+      publicando: true,
+      progresoPublicacion: { paso: 'Subiendo imágenes...', porcentaje: 10 }
+    }));
+
+    try {
+      // 1. Subir cada foto a WP Media Library
+      const imagenesSubidas = [];
+      for (let i = 0; i < creadorProducto.fotos.length; i++) {
+        const foto = creadorProducto.fotos[i];
+        setCreadorProducto(prev => ({
+          ...prev,
+          progresoPublicacion: {
+            paso: `Subiendo imagen ${i + 1} de ${creadorProducto.fotos.length}...`,
+            porcentaje: 10 + (i / creadorProducto.fotos.length) * 40
+          }
+        }));
+
+        const formData = new FormData();
+        formData.append('archivo', foto.file);
+        formData.append('titulo', `${creadorProducto.datosParseados.nombre} - ${i + 1}`);
+
+        const res = await fetch('/api/admin/woocommerce/media', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          imagenesSubidas.push({
+            id: data.medio.id,
+            src: data.medio.url,
+            position: foto.esPrincipal ? 0 : i + 1
+          });
+        }
+      }
+
+      // Ordenar por position (principal primero)
+      imagenesSubidas.sort((a, b) => a.position - b.position);
+
+      setCreadorProducto(prev => ({
+        ...prev,
+        imagenesSubidas,
+        progresoPublicacion: { paso: 'Creando producto...', porcentaje: 60 }
+      }));
+
+      // 2. Crear producto en WooCommerce
+      const datos = creadorProducto.datosParseados;
+      const datosWC = creadorProducto.datosWooCommerce;
+
+      // Convertir historia a HTML
+      const historiaHTML = creadorProducto.historiaGenerada
+        .split('\n\n')
+        .map(p => `<p>${p}</p>`)
+        .join('\n');
+
+      const productoWC = {
+        name: datos.nombre || 'Producto nuevo',
+        type: 'simple',
+        status: 'publish',
+        description: historiaHTML,
+        short_description: `${datos.especie} de ${datos.tamanoCm}cm - ${datos.categoria}`,
+        regular_price: datosWC.precioRegular,
+        sale_price: datosWC.precioOferta || undefined,
+        sku: datosWC.sku || generarSKU(),
+        stock_quantity: datosWC.stock,
+        stock_status: datosWC.estadoStock,
+        manage_stock: true,
+        categories: datosWC.categoriaWC.map(id => ({ id })),
+        images: imagenesSubidas.map(img => ({
+          id: img.id,
+          position: img.position
+        })),
+        attributes: [
+          { name: 'Especie', options: [datos.especie], visible: true },
+          { name: 'Tamaño', options: [`${datos.tamanoCm} cm`], visible: true },
+          { name: 'Categoría', options: [datos.categoria], visible: true }
+        ]
+      };
+
+      setCreadorProducto(prev => ({
+        ...prev,
+        progresoPublicacion: { paso: 'Guardando en WooCommerce...', porcentaje: 80 }
+      }));
+
+      const resProducto = await fetch('/api/admin/woocommerce/productos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'crear',
+          producto: productoWC
+        })
+      });
+
+      const dataProducto = await resProducto.json();
+
+      if (dataProducto.success) {
+        setCreadorProducto(prev => ({
+          ...prev,
+          publicando: false,
+          progresoPublicacion: { paso: '¡Completado!', porcentaje: 100 },
+          productoCreado: dataProducto.producto
+        }));
+        setPaso(23); // Ir a confirmación
+      } else {
+        throw new Error(dataProducto.error || 'Error creando producto');
+      }
+
+    } catch (e) {
+      setError(e.message);
+      setCreadorProducto(prev => ({
+        ...prev,
+        publicando: false,
+        progresoPublicacion: { paso: 'Error', porcentaje: 0 }
+      }));
     }
   };
 
@@ -1479,6 +1895,48 @@ Necesito conocer algunos datos. Empecemos:
                 <h3>Planificador Visual</h3>
                 <p>Ves todas las fotos, marcás categorías (pueden ser varias), y generás todo de una</p>
                 <span className="badge destacado">EL MÁS POTENTE</span>
+              </div>
+
+              <div className="modo-card creador-producto" onClick={() => {
+                setModo('creador-producto');
+                setPaso(18);
+                setCreadorProducto({
+                  fotos: [],
+                  fotosProcesando: false,
+                  analisisVision: null,
+                  analizando: false,
+                  textoLibre: '',
+                  datosParseados: {
+                    nombre: '',
+                    especie: 'duende',
+                    genero: 'M',
+                    categoria: 'Protección',
+                    tamano: 'mediano_especial',
+                    tamanoCm: 18,
+                    accesorios: '',
+                    esUnico: true
+                  },
+                  historiaGenerada: '',
+                  datosConversion: null,
+                  datosWooCommerce: {
+                    precioRegular: '',
+                    precioOferta: '',
+                    categoriaWC: [],
+                    stock: 1,
+                    estadoStock: 'instock',
+                    sku: ''
+                  },
+                  publicando: false,
+                  progresoPublicacion: { paso: '', porcentaje: 0 },
+                  productoCreado: null,
+                  imagenesSubidas: []
+                });
+                cargarCategoriasWC();
+              }}>
+                <div className="icono">📸</div>
+                <h3>Crear Producto Nuevo</h3>
+                <p>Subí fotos, la IA analiza, genera historia y publica directo a WooCommerce</p>
+                <span className="badge destacado">NUEVO - TODO EN UNO</span>
               </div>
             </div>
           </div>
@@ -3368,6 +3826,527 @@ Necesito conocer algunos datos. Empecemos:
 
             <button className="btn-secondary volver-inicio" onClick={() => { setPaso(1); setModo(null); setChatEncuesta([]); }}>
               Cancelar y volver
+            </button>
+          </div>
+        )}
+
+        {/* ============================================ */}
+        {/* CREADOR INTELIGENTE DE PRODUCTOS - PASOS 18-23 */}
+        {/* ============================================ */}
+
+        {/* PASO 18: Subir fotos */}
+        {paso === 18 && modo === 'creador-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>📸 Subí las fotos del producto</h2>
+            <p className="subtitulo">Arrastrá o hacé click para subir. La primera será la principal.</p>
+
+            <div
+              className="dropzone"
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove('dragover'); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                handleFotosUpload(e.dataTransfer.files);
+              }}
+              onClick={() => document.getElementById('input-fotos').click()}
+            >
+              <input
+                id="input-fotos"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                style={{ display: 'none' }}
+                onChange={(e) => handleFotosUpload(e.target.files)}
+              />
+              <div className="dropzone-content">
+                <span className="icono">📷</span>
+                <p>Arrastrá fotos acá o hacé click para seleccionar</p>
+                <span className="formatos">JPG, PNG, WEBP - Máximo 10MB por foto</span>
+              </div>
+            </div>
+
+            {creadorProducto.fotos.length > 0 && (
+              <div className="fotos-preview">
+                <h4>Fotos subidas ({creadorProducto.fotos.length})</h4>
+                <div className="fotos-grid">
+                  {creadorProducto.fotos.map((foto, index) => (
+                    <div key={index} className={`foto-item ${foto.esPrincipal ? 'principal' : ''}`}>
+                      <img src={foto.preview} alt={foto.nombre} />
+                      <div className="foto-overlay">
+                        <button
+                          className="btn-principal"
+                          onClick={(e) => { e.stopPropagation(); marcarFotoPrincipal(index); }}
+                          title="Hacer principal"
+                        >
+                          {foto.esPrincipal ? '⭐' : '☆'}
+                        </button>
+                        <button
+                          className="btn-eliminar"
+                          onClick={(e) => { e.stopPropagation(); eliminarFoto(index); }}
+                          title="Eliminar"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      {foto.esPrincipal && <span className="badge-principal">Principal</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="acciones-paso">
+              <button
+                className="btn-secondary"
+                onClick={() => { setPaso(1); setModo(null); }}
+              >
+                ← Volver
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  setPaso(19);
+                  analizarFotoConVision();
+                }}
+                disabled={creadorProducto.fotos.length === 0}
+              >
+                Continuar y analizar →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 19: Análisis IA + Texto libre */}
+        {paso === 19 && modo === 'creador-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>🤖 Análisis de la imagen</h2>
+
+            <div className="analisis-container">
+              <div className="foto-analizada">
+                {creadorProducto.fotos.find(f => f.esPrincipal) && (
+                  <img
+                    src={creadorProducto.fotos.find(f => f.esPrincipal)?.preview}
+                    alt="Foto principal"
+                  />
+                )}
+              </div>
+
+              <div className="resultado-analisis">
+                {creadorProducto.analizando ? (
+                  <div className="analizando">
+                    <div className="spinner"></div>
+                    <p>Analizando imagen con Claude Vision...</p>
+                  </div>
+                ) : creadorProducto.analisisVision ? (
+                  <div className="analisis-texto">
+                    <h4>🔍 Esto detecté:</h4>
+                    <div className="analisis-contenido">
+                      {creadorProducto.analisisVision}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="sin-analisis">
+                    <button className="btn-primary" onClick={analizarFotoConVision}>
+                      🔍 Analizar imagen
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="texto-libre-section">
+              <h4>✍️ Agregá información que sepas (opcional)</h4>
+              <p className="hint">
+                Escribí libremente: nombre, tamaño, categoría, accesorios, cristales...
+                El sistema interpreta todo automáticamente.
+              </p>
+              <textarea
+                value={creadorProducto.textoLibre}
+                onChange={(e) => setCreadorProducto(prev => ({ ...prev, textoLibre: e.target.value }))}
+                placeholder="Ej: Se llama Aurora, es una pixie de 11cm con amatista. Es para protección del hogar. Lleva una bolsita de terciopelo azul."
+                rows={4}
+              />
+            </div>
+
+            <div className="acciones-paso">
+              <button className="btn-secondary" onClick={() => setPaso(18)}>
+                ← Volver
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  aplicarDatosParseados();
+                  setPaso(20);
+                }}
+              >
+                Continuar →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 20: Review de datos parseados */}
+        {paso === 20 && modo === 'creador-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>📝 Verificá los datos del producto</h2>
+            <p className="subtitulo">Ajustá lo que necesites antes de generar la historia</p>
+
+            <div className="datos-producto-form">
+              <div className="campo-row">
+                <div className="campo">
+                  <label>Nombre del guardián *</label>
+                  <input
+                    type="text"
+                    value={creadorProducto.datosParseados.nombre}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosParseados: { ...prev.datosParseados, nombre: e.target.value }
+                    }))}
+                    placeholder="Ej: Aurora"
+                  />
+                </div>
+
+                <div className="campo">
+                  <label>Especie</label>
+                  <select
+                    value={creadorProducto.datosParseados.especie}
+                    onChange={(e) => {
+                      const esp = especiesDisponibles.find(x => x.id === e.target.value);
+                      setCreadorProducto(prev => ({
+                        ...prev,
+                        datosParseados: {
+                          ...prev.datosParseados,
+                          especie: e.target.value,
+                          genero: esp?.genero || prev.datosParseados.genero
+                        }
+                      }));
+                    }}
+                  >
+                    {especiesDisponibles.map(esp => (
+                      <option key={esp.id} value={esp.id}>{esp.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="campo-row">
+                <div className="campo">
+                  <label>Categoría</label>
+                  <select
+                    value={creadorProducto.datosParseados.categoria}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosParseados: { ...prev.datosParseados, categoria: e.target.value }
+                    }))}
+                  >
+                    {categoriasDisponibles.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                    <option value="Viajeros">Viajeros</option>
+                    <option value="Naturaleza">Naturaleza</option>
+                  </select>
+                </div>
+
+                <div className="campo">
+                  <label>Tamaño (cm)</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosParseados.tamanoCm}
+                    onChange={(e) => {
+                      const cm = parseInt(e.target.value) || 18;
+                      setCreadorProducto(prev => ({
+                        ...prev,
+                        datosParseados: {
+                          ...prev.datosParseados,
+                          tamanoCm: cm,
+                          esUnico: cm > 15
+                        }
+                      }));
+                    }}
+                    min={5}
+                    max={50}
+                  />
+                </div>
+              </div>
+
+              <div className="campo">
+                <label>Accesorios y detalles</label>
+                <textarea
+                  value={creadorProducto.datosParseados.accesorios}
+                  onChange={(e) => setCreadorProducto(prev => ({
+                    ...prev,
+                    datosParseados: { ...prev.datosParseados, accesorios: e.target.value }
+                  }))}
+                  placeholder="Cristales, ropa, elementos que porta..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="campo-check">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={creadorProducto.datosParseados.esUnico}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosParseados: { ...prev.datosParseados, esUnico: e.target.checked }
+                    }))}
+                  />
+                  Es pieza única (no recreable)
+                </label>
+              </div>
+            </div>
+
+            {error && <div className="error-msg">{error}</div>}
+
+            <div className="acciones-paso">
+              <button className="btn-secondary" onClick={() => setPaso(19)}>
+                ← Volver
+              </button>
+              <button
+                className="btn-primary"
+                onClick={generarHistoriaProducto}
+                disabled={cargando || !creadorProducto.datosParseados.nombre}
+              >
+                {cargando ? 'Generando...' : '✨ Generar Historia'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 21: Historia generada - se salta directo a 22 */}
+
+        {/* PASO 22: Configurar WooCommerce */}
+        {paso === 22 && modo === 'creador-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>🛒 Configurar para WooCommerce</h2>
+
+            <div className="historia-preview">
+              <h4>Historia generada</h4>
+              <div className="historia-texto">
+                {creadorProducto.historiaGenerada}
+              </div>
+              {creadorProducto.datosConversion && (
+                <div className="conversion-stats">
+                  <span className={`score ${creadorProducto.datosConversion.score?.total >= 30 ? 'ok' : 'bajo'}`}>
+                    Score: {creadorProducto.datosConversion.score?.total}/50
+                  </span>
+                  <span className={`arco ${creadorProducto.datosConversion.arco?.completo ? 'ok' : 'incompleto'}`}>
+                    Arco: {creadorProducto.datosConversion.arco?.score}%
+                  </span>
+                  {creadorProducto.datosConversion.aprobada && <span className="aprobada">✓ Aprobada</span>}
+                </div>
+              )}
+              <button
+                className="btn-regenerar"
+                onClick={() => {
+                  setPaso(20);
+                }}
+              >
+                🔄 Modificar datos y regenerar
+              </button>
+            </div>
+
+            <div className="woocommerce-form">
+              <h4>💰 Precio</h4>
+              <div className="campo-row">
+                <div className="campo">
+                  <label>Precio regular (UYU) *</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosWooCommerce.precioRegular}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, precioRegular: e.target.value }
+                    }))}
+                    placeholder="8000"
+                  />
+                </div>
+                <div className="campo">
+                  <label>Precio oferta (opcional)</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosWooCommerce.precioOferta}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, precioOferta: e.target.value }
+                    }))}
+                    placeholder="6500"
+                  />
+                </div>
+              </div>
+
+              <h4>📦 Inventario</h4>
+              <div className="campo-row">
+                <div className="campo">
+                  <label>SKU (automático si vacío)</label>
+                  <input
+                    type="text"
+                    value={creadorProducto.datosWooCommerce.sku}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, sku: e.target.value }
+                    }))}
+                    placeholder={generarSKU()}
+                  />
+                </div>
+                <div className="campo">
+                  <label>Stock</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosWooCommerce.stock}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, stock: parseInt(e.target.value) || 1 }
+                    }))}
+                    min={0}
+                  />
+                </div>
+              </div>
+
+              <h4>📁 Categorías WooCommerce</h4>
+              {categoriasWC.length > 0 ? (
+                <div className="categorias-wc-grid">
+                  {categoriasWC.map(cat => (
+                    <label key={cat.id} className="categoria-check">
+                      <input
+                        type="checkbox"
+                        checked={creadorProducto.datosWooCommerce.categoriaWC.includes(cat.id)}
+                        onChange={(e) => {
+                          setCreadorProducto(prev => ({
+                            ...prev,
+                            datosWooCommerce: {
+                              ...prev.datosWooCommerce,
+                              categoriaWC: e.target.checked
+                                ? [...prev.datosWooCommerce.categoriaWC, cat.id]
+                                : prev.datosWooCommerce.categoriaWC.filter(id => id !== cat.id)
+                            }
+                          }));
+                        }}
+                      />
+                      {cat.nombre} {cat.cantidad ? `(${cat.cantidad})` : ''}
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="cargando-cats">Cargando categorías...</p>
+              )}
+            </div>
+
+            {error && <div className="error-msg">{error}</div>}
+
+            <div className="acciones-paso">
+              <button className="btn-secondary" onClick={() => setPaso(20)}>
+                ← Volver
+              </button>
+              <button
+                className="btn-primary publicar"
+                onClick={publicarProductoWC}
+                disabled={creadorProducto.publicando || !creadorProducto.datosWooCommerce.precioRegular}
+              >
+                {creadorProducto.publicando ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    {creadorProducto.progresoPublicacion.paso}
+                  </>
+                ) : (
+                  '🚀 Publicar en WooCommerce'
+                )}
+              </button>
+            </div>
+
+            {creadorProducto.publicando && (
+              <div className="progreso-publicacion">
+                <div
+                  className="progreso-bar"
+                  style={{ width: `${creadorProducto.progresoPublicacion.porcentaje}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PASO 23: Confirmación */}
+        {paso === 23 && modo === 'creador-producto' && (
+          <div className="paso-content creador-producto confirmacion">
+            <div className="exito-icon">🎉</div>
+            <h2>¡Producto creado exitosamente!</h2>
+
+            {creadorProducto.productoCreado && (
+              <div className="producto-creado-info">
+                <p><strong>Nombre:</strong> {creadorProducto.productoCreado.nombre}</p>
+                <p><strong>ID:</strong> {creadorProducto.productoCreado.id}</p>
+                <p><strong>Precio:</strong> ${creadorProducto.datosWooCommerce.precioRegular}</p>
+                <p><strong>Imágenes subidas:</strong> {creadorProducto.imagenesSubidas.length}</p>
+
+                <div className="acciones-producto">
+                  <a
+                    href={`https://duendesdeluruguay.com/?p=${creadorProducto.productoCreado.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary"
+                  >
+                    Ver producto en la tienda →
+                  </a>
+                  <a
+                    href={`https://duendesdeluruguay.com/wp-admin/post.php?post=${creadorProducto.productoCreado.id}&action=edit`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                  >
+                    Editar en WordPress
+                  </a>
+                </div>
+              </div>
+            )}
+
+            <button
+              className="btn-nuevo"
+              onClick={() => {
+                setModo('creador-producto');
+                setPaso(18);
+                setCreadorProducto({
+                  fotos: [],
+                  fotosProcesando: false,
+                  analisisVision: null,
+                  analizando: false,
+                  textoLibre: '',
+                  datosParseados: {
+                    nombre: '',
+                    especie: 'duende',
+                    genero: 'M',
+                    categoria: 'Protección',
+                    tamano: 'mediano_especial',
+                    tamanoCm: 18,
+                    accesorios: '',
+                    esUnico: true
+                  },
+                  historiaGenerada: '',
+                  datosConversion: null,
+                  datosWooCommerce: {
+                    precioRegular: '',
+                    precioOferta: '',
+                    categoriaWC: [],
+                    stock: 1,
+                    estadoStock: 'instock',
+                    sku: ''
+                  },
+                  publicando: false,
+                  progresoPublicacion: { paso: '', porcentaje: 0 },
+                  productoCreado: null,
+                  imagenesSubidas: []
+                });
+              }}
+            >
+              ➕ Crear otro producto
+            </button>
+
+            <button
+              className="btn-secondary volver-inicio"
+              onClick={() => { setPaso(1); setModo(null); }}
+            >
+              Volver al inicio
             </button>
           </div>
         )}
@@ -5737,6 +6716,497 @@ Necesito conocer algunos datos. Empecemos:
           margin-top: 0.5rem;
           font-size: 0.8rem;
           color: rgba(255,255,255,0.4);
+        }
+
+        /* ==================== */
+        /* CREADOR DE PRODUCTOS */
+        /* ==================== */
+
+        .modo-card.creador-producto {
+          border-color: rgba(168, 85, 247, 0.3);
+          background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+        }
+
+        .modo-card.creador-producto:hover {
+          border-color: rgba(168, 85, 247, 0.6);
+          background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+        }
+
+        .creador-producto .subtitulo {
+          color: rgba(255,255,255,0.6);
+          margin-bottom: 1.5rem;
+        }
+
+        .dropzone {
+          border: 2px dashed rgba(168, 85, 247, 0.4);
+          border-radius: 12px;
+          padding: 3rem 2rem;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s;
+          background: rgba(168, 85, 247, 0.05);
+        }
+
+        .dropzone:hover,
+        .dropzone.dragover {
+          border-color: rgba(168, 85, 247, 0.8);
+          background: rgba(168, 85, 247, 0.1);
+        }
+
+        .dropzone-content .icono {
+          font-size: 3rem;
+          display: block;
+          margin-bottom: 1rem;
+        }
+
+        .dropzone-content p {
+          margin: 0.5rem 0;
+          color: #fff;
+        }
+
+        .dropzone-content .formatos {
+          font-size: 0.8rem;
+          color: rgba(255,255,255,0.5);
+        }
+
+        .fotos-preview {
+          margin-top: 2rem;
+        }
+
+        .fotos-preview h4 {
+          margin-bottom: 1rem;
+          color: rgba(255,255,255,0.8);
+        }
+
+        .fotos-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          gap: 1rem;
+        }
+
+        .foto-item {
+          position: relative;
+          border-radius: 8px;
+          overflow: hidden;
+          aspect-ratio: 1;
+          background: rgba(0,0,0,0.3);
+        }
+
+        .foto-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .foto-item.principal {
+          border: 2px solid #a855f7;
+        }
+
+        .foto-overlay {
+          position: absolute;
+          top: 0;
+          right: 0;
+          display: flex;
+          gap: 0.25rem;
+          padding: 0.5rem;
+        }
+
+        .foto-overlay button {
+          width: 28px;
+          height: 28px;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .btn-principal {
+          background: rgba(168, 85, 247, 0.9);
+          color: #fff;
+        }
+
+        .btn-eliminar {
+          background: rgba(239, 68, 68, 0.9);
+          color: #fff;
+        }
+
+        .badge-principal {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(168, 85, 247, 0.9);
+          color: #fff;
+          text-align: center;
+          font-size: 0.75rem;
+          padding: 0.25rem;
+        }
+
+        .acciones-paso {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .analisis-container {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 2rem;
+          margin-bottom: 2rem;
+        }
+
+        .foto-analizada {
+          aspect-ratio: 1;
+          border-radius: 12px;
+          overflow: hidden;
+          background: rgba(0,0,0,0.3);
+        }
+
+        .foto-analizada img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .resultado-analisis {
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          padding: 1.5rem;
+        }
+
+        .analizando {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          gap: 1rem;
+        }
+
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(168, 85, 247, 0.2);
+          border-top-color: #a855f7;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .analisis-texto h4 {
+          margin-bottom: 1rem;
+          color: #a855f7;
+        }
+
+        .analisis-contenido {
+          white-space: pre-wrap;
+          font-size: 0.9rem;
+          line-height: 1.6;
+          color: rgba(255,255,255,0.9);
+          max-height: 300px;
+          overflow-y: auto;
+        }
+
+        .texto-libre-section {
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          padding: 1.5rem;
+        }
+
+        .texto-libre-section h4 {
+          margin-bottom: 0.5rem;
+        }
+
+        .texto-libre-section .hint {
+          font-size: 0.85rem;
+          color: rgba(255,255,255,0.5);
+          margin-bottom: 1rem;
+        }
+
+        .texto-libre-section textarea {
+          width: 100%;
+          padding: 1rem;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px;
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 0.95rem;
+          resize: vertical;
+        }
+
+        .texto-libre-section textarea:focus {
+          outline: none;
+          border-color: #a855f7;
+        }
+
+        .datos-producto-form {
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          padding: 1.5rem;
+        }
+
+        .datos-producto-form .campo-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .datos-producto-form .campo label {
+          display: block;
+          margin-bottom: 0.5rem;
+          color: rgba(255,255,255,0.7);
+          font-size: 0.85rem;
+        }
+
+        .datos-producto-form input,
+        .datos-producto-form select,
+        .datos-producto-form textarea {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px;
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 0.95rem;
+        }
+
+        .datos-producto-form input:focus,
+        .datos-producto-form select:focus,
+        .datos-producto-form textarea:focus {
+          outline: none;
+          border-color: #a855f7;
+        }
+
+        .campo-check {
+          margin-top: 1rem;
+        }
+
+        .campo-check label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          cursor: pointer;
+          color: rgba(255,255,255,0.8);
+        }
+
+        .campo-check input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+        }
+
+        .historia-preview {
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .historia-preview h4 {
+          margin-bottom: 1rem;
+          color: #a855f7;
+        }
+
+        .historia-texto {
+          white-space: pre-wrap;
+          font-size: 0.9rem;
+          line-height: 1.7;
+          max-height: 200px;
+          overflow-y: auto;
+          padding-right: 0.5rem;
+        }
+
+        .conversion-stats {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .conversion-stats span {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+        }
+
+        .conversion-stats .score.ok {
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
+        }
+
+        .conversion-stats .score.bajo {
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+        }
+
+        .conversion-stats .arco.ok {
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
+        }
+
+        .conversion-stats .arco.incompleto {
+          background: rgba(251, 191, 36, 0.2);
+          color: #fbbf24;
+        }
+
+        .conversion-stats .aprobada {
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
+        }
+
+        .btn-regenerar {
+          margin-top: 1rem;
+          padding: 0.5rem 1rem;
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.7);
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.85rem;
+        }
+
+        .btn-regenerar:hover {
+          border-color: #a855f7;
+          color: #a855f7;
+        }
+
+        .woocommerce-form {
+          background: rgba(0,0,0,0.2);
+          border-radius: 12px;
+          padding: 1.5rem;
+        }
+
+        .woocommerce-form h4 {
+          margin-bottom: 1rem;
+          color: rgba(255,255,255,0.9);
+          font-size: 1rem;
+        }
+
+        .woocommerce-form h4:not(:first-child) {
+          margin-top: 1.5rem;
+        }
+
+        .categorias-wc-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+          gap: 0.5rem;
+        }
+
+        .categoria-check {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem;
+          background: rgba(255,255,255,0.05);
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.85rem;
+        }
+
+        .categoria-check:hover {
+          background: rgba(168, 85, 247, 0.1);
+        }
+
+        .categoria-check input[type="checkbox"] {
+          width: 16px;
+          height: 16px;
+        }
+
+        .btn-primary.publicar {
+          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .spinner-small {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-top-color: #fff;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        .progreso-publicacion {
+          margin-top: 1rem;
+          height: 4px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+
+        .progreso-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #a855f7, #ec4899);
+          transition: width 0.3s;
+        }
+
+        .confirmacion {
+          text-align: center;
+          padding: 3rem 2rem;
+        }
+
+        .exito-icon {
+          font-size: 4rem;
+          margin-bottom: 1rem;
+        }
+
+        .producto-creado-info {
+          background: rgba(34, 197, 94, 0.1);
+          border: 1px solid rgba(34, 197, 94, 0.3);
+          border-radius: 12px;
+          padding: 1.5rem;
+          margin: 2rem auto;
+          max-width: 500px;
+          text-align: left;
+        }
+
+        .producto-creado-info p {
+          margin: 0.5rem 0;
+        }
+
+        .acciones-producto {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .acciones-producto a {
+          flex: 1;
+          text-align: center;
+          text-decoration: none;
+        }
+
+        .btn-nuevo {
+          margin-top: 2rem;
+          padding: 1rem 2rem;
+          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+          border: none;
+          border-radius: 8px;
+          color: #fff;
+          font-size: 1rem;
+          cursor: pointer;
+        }
+
+        .btn-nuevo:hover {
+          opacity: 0.9;
+        }
+
+        .cargando-cats {
+          color: rgba(255,255,255,0.5);
+          font-style: italic;
         }
 
         @media (max-width: 768px) {

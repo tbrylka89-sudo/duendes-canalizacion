@@ -8,23 +8,40 @@ const anthropic = new Anthropic({
 // POST - Analizar imagen de guardián
 export async function POST(request) {
   try {
-    const { imagenUrl, nombre, categoria } = await request.json();
+    const { imagenUrl, imagenBase64, nombre, categoria } = await request.json();
 
-    if (!imagenUrl) {
+    if (!imagenUrl && !imagenBase64) {
       return NextResponse.json({
         success: false,
-        error: 'Se requiere URL de imagen'
+        error: 'Se requiere URL de imagen o imagen en base64'
       }, { status: 400 });
     }
 
-    // Descargar imagen y convertir a base64
-    const imageResponse = await fetch(imagenUrl);
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
+    let base64Image;
+    let mediaType;
 
-    // Detectar tipo de imagen
-    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-    const mediaType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
+    if (imagenBase64) {
+      // Ya viene en base64 (desde el creador de productos)
+      // Formato: data:image/jpeg;base64,/9j/4AAQ...
+      const matches = imagenBase64.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (matches) {
+        mediaType = `image/${matches[1]}`;
+        base64Image = matches[2];
+      } else {
+        // Si no tiene el prefijo data:, asumir que es base64 puro
+        base64Image = imagenBase64;
+        mediaType = 'image/jpeg';
+      }
+    } else {
+      // Descargar imagen desde URL y convertir a base64
+      const imageResponse = await fetch(imagenUrl);
+      const imageBuffer = await imageResponse.arrayBuffer();
+      base64Image = Buffer.from(imageBuffer).toString('base64');
+
+      // Detectar tipo de imagen
+      const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
+      mediaType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
+    }
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
