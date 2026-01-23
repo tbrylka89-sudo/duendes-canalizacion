@@ -493,32 +493,63 @@ function TourCirculo({ onFinish }) {
   );
 }
 
-// Configuración de portales/temporadas
-const PORTALES = {
+// Configuración de portales/temporadas por hemisferio
+const PORTALES_SUR = {
   yule: {
     nombre: 'Portal de Yule',
-    meses: [5, 6, 7], // junio-agosto
+    meses: [5, 6, 7], // junio-agosto (invierno sur)
     colores: { primario: '#4a90d9', secundario: '#1a3a5c', acento: '#c0d8f0' },
     icono: '❄️',
     descripcion: 'Introspección y renacimiento'
   },
   ostara: {
     nombre: 'Portal de Ostara',
-    meses: [8, 9, 10], // septiembre-noviembre
+    meses: [8, 9, 10], // septiembre-noviembre (primavera sur)
     colores: { primario: '#4a9d4a', secundario: '#1a3c1a', acento: '#90ee90' },
     icono: '🌱',
     descripcion: 'Nuevos comienzos'
   },
   litha: {
     nombre: 'Portal de Litha',
-    meses: [11, 0, 1], // diciembre-febrero
+    meses: [11, 0, 1], // diciembre-febrero (verano sur)
     colores: { primario: '#d4af37', secundario: '#5c4a1a', acento: '#ffd700' },
     icono: '☀️',
     descripcion: 'Abundancia plena'
   },
   mabon: {
     nombre: 'Portal de Mabon',
-    meses: [2, 3, 4], // marzo-mayo
+    meses: [2, 3, 4], // marzo-mayo (otoño sur)
+    colores: { primario: '#d2691e', secundario: '#4a2a0a', acento: '#deb887' },
+    icono: '🍂',
+    descripcion: 'Gratitud y cosecha'
+  }
+};
+
+const PORTALES_NORTE = {
+  yule: {
+    nombre: 'Portal de Yule',
+    meses: [11, 0, 1], // diciembre-febrero (invierno norte)
+    colores: { primario: '#4a90d9', secundario: '#1a3a5c', acento: '#c0d8f0' },
+    icono: '❄️',
+    descripcion: 'Introspección y renacimiento'
+  },
+  ostara: {
+    nombre: 'Portal de Ostara',
+    meses: [2, 3, 4], // marzo-mayo (primavera norte)
+    colores: { primario: '#4a9d4a', secundario: '#1a3c1a', acento: '#90ee90' },
+    icono: '🌱',
+    descripcion: 'Nuevos comienzos'
+  },
+  litha: {
+    nombre: 'Portal de Litha',
+    meses: [5, 6, 7], // junio-agosto (verano norte)
+    colores: { primario: '#d4af37', secundario: '#5c4a1a', acento: '#ffd700' },
+    icono: '☀️',
+    descripcion: 'Abundancia plena'
+  },
+  mabon: {
+    nombre: 'Portal de Mabon',
+    meses: [8, 9, 10], // septiembre-noviembre (otoño norte)
     colores: { primario: '#d2691e', secundario: '#4a2a0a', acento: '#deb887' },
     icono: '🍂',
     descripcion: 'Gratitud y cosecha'
@@ -534,14 +565,35 @@ const COLORES_ELEMENTO = {
   espiritu: { primario: '#d4af37', secundario: '#5c4a1a', glow: 'rgba(212, 175, 55, 0.4)' }
 };
 
-function obtenerPortalActual() {
+// Detectar hemisferio por geolocalización o usar ambos
+function obtenerPortalActual(latitud = null) {
   const mes = new Date().getMonth();
+
+  // Si tenemos latitud, determinamos hemisferio
+  // latitud > 0 = norte, latitud < 0 = sur
+  // Si no tenemos latitud, asumimos sur (Uruguay)
+  const esSur = latitud === null || latitud < 0;
+  const PORTALES = esSur ? PORTALES_SUR : PORTALES_NORTE;
+
   for (const [id, portal] of Object.entries(PORTALES)) {
     if (portal.meses.includes(mes)) {
-      return { id, ...portal };
+      return { id, ...portal, hemisferio: esSur ? 'sur' : 'norte' };
     }
   }
-  return { id: 'litha', ...PORTALES.litha };
+  return { id: 'litha', ...PORTALES.litha, hemisferio: esSur ? 'sur' : 'norte' };
+}
+
+// Obtener portal del hemisferio opuesto para mostrar ambos
+function obtenerPortalOpuesto(portalActual) {
+  const mes = new Date().getMonth();
+  const PORTALES = portalActual.hemisferio === 'sur' ? PORTALES_NORTE : PORTALES_SUR;
+
+  for (const [id, portal] of Object.entries(PORTALES)) {
+    if (portal.meses.includes(mes)) {
+      return { id, ...portal, hemisferio: portalActual.hemisferio === 'sur' ? 'norte' : 'sur' };
+    }
+  }
+  return null;
 }
 
 export default function CirculoDashboard({ usuario }) {
@@ -549,18 +601,47 @@ export default function CirculoDashboard({ usuario }) {
   const [contenidoSemana, setContenidoSemana] = useState(null);
   const [guardianSemana, setGuardianSemana] = useState(null);
   const [portalActual, setPortalActual] = useState(obtenerPortalActual());
+  const [portalOpuesto, setPortalOpuesto] = useState(null);
+  const [hemisferioDetectado, setHemisferioDetectado] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [coloresDuende, setColoresDuende] = useState(COLORES_ELEMENTO.espiritu);
   const [mostrandoTour, setMostrandoTour] = useState(false);
 
   useEffect(() => {
     cargarDatos();
+    detectarHemisferio();
     // Verificar si es la primera vez (mostrar tour)
     const tourVisto = localStorage.getItem('tour_circulo_visto');
     if (!tourVisto) {
       setMostrandoTour(true);
     }
   }, []);
+
+  // Detectar hemisferio por geolocalización
+  function detectarHemisferio() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitud = position.coords.latitude;
+          const nuevoPortal = obtenerPortalActual(latitud);
+          setPortalActual(nuevoPortal);
+          setPortalOpuesto(obtenerPortalOpuesto(nuevoPortal));
+          setHemisferioDetectado(latitud >= 0 ? 'norte' : 'sur');
+        },
+        () => {
+          // Si falla, usar Uruguay (sur) y mostrar ambos
+          const portalSur = obtenerPortalActual(-34);
+          setPortalActual(portalSur);
+          setPortalOpuesto(obtenerPortalOpuesto(portalSur));
+        }
+      );
+    } else {
+      // Sin geolocalización, mostrar ambos (sur como principal)
+      const portalSur = obtenerPortalActual(-34);
+      setPortalActual(portalSur);
+      setPortalOpuesto(obtenerPortalOpuesto(portalSur));
+    }
+  }
 
   function finalizarTour() {
     setMostrandoTour(false);
@@ -613,15 +694,40 @@ export default function CirculoDashboard({ usuario }) {
       {/* Indicadores de comunidad en vivo */}
       <ComunidadIndicadores />
 
-      {/* Banner de Temporada */}
+      {/* Banner de Temporada - Ambos Hemisferios */}
       <div className={`banner-temporada banner-${portalActual.id}`}>
         <div className="banner-particulas"></div>
-        <div className="banner-contenido">
-          <span className="banner-icono">{portalActual.icono}</span>
-          <div className="banner-texto">
-            <span className="banner-nombre">{portalActual.nombre}</span>
-            <span className="banner-desc">{portalActual.descripcion}</span>
+        <div className="banner-contenido-dual">
+          {/* Hemisferio Sur (principal para Uruguay) */}
+          <div className={`banner-hemisferio ${portalActual.hemisferio === 'sur' ? 'activo' : ''}`}>
+            <span className="hemisferio-label">Hemisferio Sur</span>
+            <div className="portal-info">
+              <span className="banner-icono">{portalActual.icono}</span>
+              <div className="banner-texto">
+                <span className="banner-nombre">{portalActual.nombre}</span>
+                <span className="banner-desc">{portalActual.descripcion}</span>
+              </div>
+            </div>
           </div>
+
+          {/* Separador */}
+          <div className="banner-separador">
+            <span className="separador-linea"></span>
+          </div>
+
+          {/* Hemisferio Norte */}
+          {portalOpuesto && (
+            <div className={`banner-hemisferio ${portalActual.hemisferio === 'norte' ? 'activo' : ''}`}>
+              <span className="hemisferio-label">Hemisferio Norte</span>
+              <div className="portal-info">
+                <span className="banner-icono">{portalOpuesto.icono}</span>
+                <div className="banner-texto">
+                  <span className="banner-nombre">{portalOpuesto.nombre}</span>
+                  <span className="banner-desc">{portalOpuesto.descripcion}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className={`banner-animacion animacion-semana-${semanaAno % 4}`}></div>
       </div>
@@ -692,19 +798,16 @@ export default function CirculoDashboard({ usuario }) {
       <style jsx>{`
         .circulo-dashboard {
           min-height: 100vh;
-          background: linear-gradient(180deg, var(--portal-secundario, #0a0a0a) 0%, #0d0810 50%, #0a0a0a 100%);
+          background: #000000;
           color: #ffffff;
           font-family: 'Cormorant Garamond', Georgia, serif;
         }
 
-        /* Banner de Temporada */
+        /* Banner de Temporada - Ambos Hemisferios */
         .banner-temporada {
           position: relative;
-          height: 80px;
+          padding: 15px 20px;
           overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
         }
 
         .banner-yule {
@@ -714,7 +817,7 @@ export default function CirculoDashboard({ usuario }) {
           background: linear-gradient(135deg, #1a3c1a 0%, #0a1510 50%, #1a3c1a 100%);
         }
         .banner-litha {
-          background: linear-gradient(135deg, #5c4a1a 0%, #201508 50%, #5c4a1a 100%);
+          background: linear-gradient(135deg, #3d3510 0%, #1a1508 50%, #3d3510 100%);
         }
         .banner-mabon {
           background: linear-gradient(135deg, #4a2a0a 0%, #1a0a00 50%, #4a2a0a 100%);
@@ -725,7 +828,7 @@ export default function CirculoDashboard({ usuario }) {
           inset: 0;
           background-image: radial-gradient(circle, var(--portal-acento) 1px, transparent 1px);
           background-size: 30px 30px;
-          opacity: 0.3;
+          opacity: 0.2;
           animation: particulasFloat 20s linear infinite;
         }
 
@@ -734,22 +837,62 @@ export default function CirculoDashboard({ usuario }) {
           100% { background-position: 30px 30px; }
         }
 
-        .banner-contenido {
+        .banner-contenido-dual {
           position: relative;
           z-index: 2;
           display: flex;
           align-items: center;
-          gap: 15px;
+          justify-content: center;
+          gap: 30px;
+          flex-wrap: wrap;
+        }
+
+        .banner-hemisferio {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          opacity: 0.6;
+          transition: opacity 0.3s;
+        }
+
+        .banner-hemisferio.activo {
+          opacity: 1;
+        }
+
+        .hemisferio-label {
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .portal-info {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .banner-separador {
+          display: flex;
+          align-items: center;
+          height: 50px;
+        }
+
+        .separador-linea {
+          width: 1px;
+          height: 100%;
+          background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
         }
 
         .banner-icono {
-          font-size: 32px;
+          font-size: 28px;
           animation: iconoPulse 3s ease-in-out infinite;
         }
 
         @keyframes iconoPulse {
           0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
+          50% { transform: scale(1.1); }
         }
 
         .banner-texto {
@@ -759,17 +902,33 @@ export default function CirculoDashboard({ usuario }) {
 
         .banner-nombre {
           font-family: 'Cinzel', serif;
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 600;
-          letter-spacing: 3px;
+          letter-spacing: 2px;
           text-transform: uppercase;
           color: var(--portal-acento);
         }
 
         .banner-desc {
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.6);
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.5);
           font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+          .banner-contenido-dual {
+            flex-direction: column;
+            gap: 15px;
+          }
+          .banner-separador {
+            height: 1px;
+            width: 100px;
+          }
+          .separador-linea {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          }
         }
 
         .banner-animacion {
@@ -1853,18 +2012,22 @@ function SeccionContenido() {
           padding: 40px 20px;
           max-width: 1200px;
           margin: 0 auto;
+          background: linear-gradient(180deg, rgba(45, 55, 40, 0.3) 0%, rgba(35, 45, 30, 0.2) 100%);
+          border-radius: 20px;
+          border: 1px solid rgba(85, 107, 47, 0.2);
         }
 
         .contenido-header {
           margin-bottom: 30px;
+          text-align: center;
         }
 
         .duende-semana-badge {
           display: inline-flex;
           align-items: center;
           gap: 15px;
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          background: linear-gradient(135deg, rgba(85, 107, 47, 0.3), rgba(85, 107, 47, 0.1));
+          border: 1px solid rgba(85, 107, 47, 0.4);
           border-radius: 50px;
           padding: 12px 25px;
         }
@@ -1917,14 +2080,15 @@ function SeccionContenido() {
         }
 
         .contenido-layout {
-          display: grid;
-          grid-template-columns: 350px 1fr;
+          display: flex;
+          flex-direction: column;
           gap: 30px;
         }
 
-        @media (max-width: 900px) {
+        @media (min-width: 900px) {
           .contenido-layout {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: 350px 1fr;
           }
         }
 
@@ -1932,9 +2096,18 @@ function SeccionContenido() {
           display: flex;
           flex-direction: column;
           gap: 10px;
-          max-height: 600px;
+          max-height: 400px;
           overflow-y: auto;
           padding-right: 10px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
+          padding: 15px;
+        }
+
+        @media (min-width: 900px) {
+          .contenido-lista {
+            max-height: 600px;
+          }
         }
 
         .contenido-item {
@@ -1942,8 +2115,8 @@ function SeccionContenido() {
           align-items: flex-start;
           gap: 12px;
           padding: 15px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(45, 55, 40, 0.4);
+          border: 1px solid rgba(85, 107, 47, 0.3);
           border-radius: 12px;
           cursor: pointer;
           transition: all 0.2s;
@@ -1951,13 +2124,14 @@ function SeccionContenido() {
         }
 
         .contenido-item:hover {
-          background: rgba(212, 175, 55, 0.08);
-          border-color: rgba(212, 175, 55, 0.2);
+          background: rgba(85, 107, 47, 0.4);
+          border-color: rgba(212, 175, 55, 0.3);
         }
 
         .contenido-item.activo {
-          background: rgba(212, 175, 55, 0.12);
-          border-color: rgba(212, 175, 55, 0.4);
+          background: rgba(85, 107, 47, 0.5);
+          border-color: #d4af37;
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
         }
 
         .item-icono {
@@ -1997,12 +2171,19 @@ function SeccionContenido() {
         }
 
         .contenido-detalle {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: linear-gradient(180deg, rgba(45, 55, 40, 0.6) 0%, rgba(35, 45, 30, 0.4) 100%);
+          border: 1px solid rgba(85, 107, 47, 0.4);
           border-radius: 16px;
           padding: 30px;
-          max-height: 600px;
-          overflow-y: auto;
+          max-height: none;
+          overflow-y: visible;
+        }
+
+        @media (min-width: 900px) {
+          .contenido-detalle {
+            max-height: 600px;
+            overflow-y: auto;
+          }
         }
 
         .detalle-header {
