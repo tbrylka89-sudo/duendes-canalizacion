@@ -1650,26 +1650,444 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function SeccionContenido() {
+  const [contenidos, setContenidos] = useState([]);
+  const [contenidoActivo, setContenidoActivo] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [duendeSemana, setDuendeSemana] = useState(null);
+
+  useEffect(() => {
+    cargarContenido();
+  }, []);
+
+  async function cargarContenido() {
+    setCargando(true);
+    try {
+      // Cargar duende de la semana
+      const resDuende = await fetch('/api/circulo/duende-semana');
+      const dataDuende = await resDuende.json();
+      if (dataDuende.success) {
+        setDuendeSemana(dataDuende.duende);
+      }
+
+      // Cargar contenido del mes actual
+      const hoy = new Date();
+      const res = await fetch(`/api/circulo/contenido?tipo=mes&mes=${hoy.getMonth() + 1}&ano=${hoy.getFullYear()}`);
+      const data = await res.json();
+      if (data.success && data.contenidos?.length > 0) {
+        // Ordenar por fecha descendente
+        const ordenados = data.contenidos.sort((a, b) => {
+          const fechaA = new Date(a.fecha || `${a.fecha?.año}-${a.fecha?.mes}-${a.fecha?.dia}`);
+          const fechaB = new Date(b.fecha || `${b.fecha?.año}-${b.fecha?.mes}-${b.fecha?.dia}`);
+          return fechaB - fechaA;
+        });
+        setContenidos(ordenados);
+        // Mostrar el más reciente por defecto
+        setContenidoActivo(ordenados[0]);
+      }
+    } catch (error) {
+      console.error('Error cargando contenido:', error);
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  function formatearFecha(fecha) {
+    if (typeof fecha === 'string') {
+      const [year, month, day] = fecha.split('-');
+      return new Date(year, month - 1, day).toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+    }
+    return new Date(fecha.año, fecha.mes - 1, fecha.dia).toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    });
+  }
+
+  function getTipoIcon(tipo) {
+    switch (tipo) {
+      case 'presentacion': return '👋';
+      case 'ensenanza': return '📖';
+      case 'ritual': return '🕯️';
+      case 'cierre': return '🌙';
+      default: return '✨';
+    }
+  }
+
+  function getTipoLabel(tipo) {
+    switch (tipo) {
+      case 'presentacion': return 'Presentación';
+      case 'ensenanza': return 'Enseñanza';
+      case 'ritual': return 'Ritual';
+      case 'cierre': return 'Cierre de Semana';
+      default: return 'Contenido';
+    }
+  }
+
+  if (cargando) {
+    return (
+      <div className="seccion-contenido cargando">
+        <div className="loading-spinner"></div>
+        <p>Cargando contenido mágico...</p>
+        <style jsx>{`
+          .seccion-contenido.cargando {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: rgba(255, 255, 255, 0.6);
+          }
+          .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+          }
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="seccion-contenido">
+      {/* Header con duende de la semana */}
+      {duendeSemana && (
+        <div className="contenido-header">
+          <div className="duende-semana-badge">
+            <span className="duende-icono">✨</span>
+            <div className="duende-info">
+              <span className="duende-label">Guardián de la Semana</span>
+              <span className="duende-nombre">{duendeSemana.nombre}</span>
+              <span className="duende-categoria">{duendeSemana.categoria}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h2>Contenido de la Semana</h2>
-      <p className="placeholder">El contenido de esta semana aparecerá aquí...</p>
+
+      {contenidos.length === 0 ? (
+        <div className="sin-contenido">
+          <p>El contenido de esta semana está siendo preparado con mucho amor...</p>
+          <span className="emoji">🌙</span>
+        </div>
+      ) : (
+        <div className="contenido-layout">
+          {/* Lista de contenidos */}
+          <div className="contenido-lista">
+            {contenidos.map((item, idx) => (
+              <button
+                key={item.fecha || idx}
+                className={`contenido-item ${contenidoActivo === item ? 'activo' : ''}`}
+                onClick={() => setContenidoActivo(item)}
+              >
+                <span className="item-icono">{getTipoIcon(item.tipo)}</span>
+                <div className="item-info">
+                  <span className="item-tipo">{getTipoLabel(item.tipo)}</span>
+                  <span className="item-titulo">{item.titulo}</span>
+                  <span className="item-fecha">{formatearFecha(item.fecha)}</span>
+                </div>
+                {item.duendeNombre && (
+                  <span className="item-duende">Por {item.duendeNombre}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Contenido activo */}
+          {contenidoActivo && (
+            <div className="contenido-detalle">
+              <div className="detalle-header">
+                <span className="detalle-tipo">{getTipoIcon(contenidoActivo.tipo)} {getTipoLabel(contenidoActivo.tipo)}</span>
+                <span className="detalle-fecha">{formatearFecha(contenidoActivo.fecha)}</span>
+              </div>
+
+              <h3 className="detalle-titulo">{contenidoActivo.titulo}</h3>
+
+              {contenidoActivo.subtitulo && (
+                <p className="detalle-subtitulo">{contenidoActivo.subtitulo}</p>
+              )}
+
+              {contenidoActivo.duendeNombre && (
+                <div className="detalle-autor">
+                  <span className="autor-icono">✨</span>
+                  <span>Por {contenidoActivo.duendeNombre}</span>
+                </div>
+              )}
+
+              <div className="detalle-cuerpo">
+                {contenidoActivo.cuerpo?.split('\n\n').map((parrafo, i) => (
+                  <p key={i}>{parrafo}</p>
+                ))}
+              </div>
+
+              {contenidoActivo.afirmacion && (
+                <div className="detalle-afirmacion">
+                  <span className="afirmacion-label">Afirmación del día</span>
+                  <p className="afirmacion-texto">"{contenidoActivo.afirmacion}"</p>
+                </div>
+              )}
+
+              {contenidoActivo.cierre && (
+                <div className="detalle-cierre">
+                  <p>{contenidoActivo.cierre}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <style jsx>{`
         .seccion-contenido {
-          text-align: center;
-          padding: 60px 20px;
+          padding: 40px 20px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .contenido-header {
+          margin-bottom: 30px;
+        }
+
+        .duende-semana-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 15px;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 50px;
+          padding: 12px 25px;
+        }
+
+        .duende-icono {
+          font-size: 28px;
+        }
+
+        .duende-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .duende-label {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: rgba(212, 175, 55, 0.7);
+        }
+
+        .duende-nombre {
+          font-family: 'Cinzel', serif;
+          font-size: 18px;
+          color: #d4af37;
+        }
+
+        .duende-categoria {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
         }
 
         h2 {
           font-family: 'Tangerine', cursive;
           font-size: 48px;
           color: #ffffff;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .sin-contenido {
+          text-align: center;
+          padding: 60px 20px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sin-contenido .emoji {
+          font-size: 48px;
+          display: block;
+          margin-top: 20px;
+        }
+
+        .contenido-layout {
+          display: grid;
+          grid-template-columns: 350px 1fr;
+          gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+          .contenido-layout {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .contenido-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-height: 600px;
+          overflow-y: auto;
+          padding-right: 10px;
+        }
+
+        .contenido-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 15px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-align: left;
+        }
+
+        .contenido-item:hover {
+          background: rgba(212, 175, 55, 0.08);
+          border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .contenido-item.activo {
+          background: rgba(212, 175, 55, 0.12);
+          border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        .item-icono {
+          font-size: 24px;
+          flex-shrink: 0;
+        }
+
+        .item-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          flex: 1;
+        }
+
+        .item-tipo {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #d4af37;
+        }
+
+        .item-titulo {
+          font-size: 14px;
+          color: #ffffff;
+          line-height: 1.3;
+        }
+
+        .item-fecha {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .item-duende {
+          font-size: 10px;
+          color: rgba(212, 175, 55, 0.6);
+          align-self: flex-end;
+        }
+
+        .contenido-detalle {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 30px;
+          max-height: 600px;
+          overflow-y: auto;
+        }
+
+        .detalle-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+        }
+
+        .detalle-tipo {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #d4af37;
+        }
+
+        .detalle-fecha {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .detalle-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 26px;
+          color: #ffffff;
+          margin-bottom: 10px;
+          line-height: 1.3;
+        }
+
+        .detalle-subtitulo {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.7);
+          font-style: italic;
           margin-bottom: 20px;
         }
 
-        .placeholder {
-          color: rgba(255, 255, 255, 0.5);
+        .detalle-autor {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: rgba(212, 175, 55, 0.8);
+          margin-bottom: 25px;
+        }
+
+        .detalle-cuerpo {
+          color: rgba(255, 255, 255, 0.85);
+          line-height: 1.8;
+          font-size: 15px;
+        }
+
+        .detalle-cuerpo p {
+          margin-bottom: 18px;
+        }
+
+        .detalle-afirmacion {
+          margin-top: 30px;
+          padding: 20px;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.02));
+          border-left: 3px solid #d4af37;
+          border-radius: 0 12px 12px 0;
+        }
+
+        .afirmacion-label {
+          display: block;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: rgba(212, 175, 55, 0.7);
+          margin-bottom: 8px;
+        }
+
+        .afirmacion-texto {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 18px;
+          font-style: italic;
+          color: #d4af37;
+          margin: 0;
+        }
+
+        .detalle-cierre {
+          margin-top: 25px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.6);
           font-style: italic;
         }
       `}</style>
