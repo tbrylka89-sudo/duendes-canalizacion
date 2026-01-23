@@ -2530,13 +2530,21 @@ function SeccionContenido() {
                 </div>
               )}
 
-              {/* Imagen generada (placeholder estético) */}
+              {/* Imagen generada o placeholder */}
               <div className="contenido-imagen-generada">
-                <div className="imagen-placeholder">
+                {contenidoActivo.imagen ? (
+                  <img
+                    src={contenidoActivo.imagen}
+                    alt={contenidoActivo.titulo}
+                    className="imagen-contenido-real"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                  />
+                ) : null}
+                <div className="imagen-placeholder" style={{ display: contenidoActivo.imagen ? 'none' : 'flex' }}>
                   <div className="imagen-patron-fondo"></div>
                   <div className="imagen-overlay">
-                    <span className="imagen-icono">🌿</span>
-                    <span className="imagen-texto">Imagen contemplativa</span>
+                    <span className="imagen-icono">{getTipoConfig(contenidoActivo.tipo).icono}</span>
+                    <span className="imagen-texto">{contenidoActivo.titulo?.substring(0, 50)}</span>
                   </div>
                 </div>
               </div>
@@ -3127,9 +3135,19 @@ function SeccionContenido() {
           line-height: 1.5;
         }
 
-        /* Imagen generada (placeholder) - NEÓN */
+        /* Imagen generada o placeholder - NEÓN */
         .contenido-imagen-generada {
           padding: 0 30px 30px;
+        }
+
+        .imagen-contenido-real {
+          width: 100%;
+          height: auto;
+          max-height: 400px;
+          object-fit: cover;
+          border-radius: 15px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(0, 240, 255, 0.2);
         }
 
         .imagen-placeholder {
