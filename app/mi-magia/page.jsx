@@ -13,14 +13,25 @@ import TestPerfiladoPsicologico from './TestPerfiladoPsicologico';
 import { AccesoRestringido, BadgeNivelAcceso, BannerUpgrade } from './components/AccesoRestringido';
 import { BannerPromociones } from './components/BannerPromociones';
 
-const API_BASE = '';
-const WORDPRESS_URL = 'https://duendesdeluruguay.com';
+// Componentes extraídos (refactorizados)
+import { Tito, TitoBurbuja } from './components/Tito';
+import SeccionInicio from './components/SeccionInicio';
+import SeccionCanalizaciones from './components/SeccionCanalizaciones';
+import SeccionRegalos from './components/SeccionRegalos';
+import SeccionGrimorio from './components/SeccionGrimorio';
+import SeccionCirculo from './components/SeccionCirculo';
+// Importar solo las constantes necesarias para evitar duplicados
+// TIPOS_DIARIO, RANGOS, getRango, getSiguienteRango se definen localmente con formato diferente
+import { API_BASE, WORDPRESS_URL, TITO_IMG, CATEGORIAS_LECTURAS, NIVELES_INFO, limpiarTexto } from './components/constants';
+import CofreDiario from './components/CofreDiario';
+
+// NOTA: CofreDiario ahora importado desde ./components/CofreDiario
 
 // ═══════════════════════════════════════════════════════════════
-// COFRE DIARIO - GAMIFICACIÓN
+// COFRE DIARIO - LOCAL (DEPRECATED - usar el importado)
 // ═══════════════════════════════════════════════════════════════
 
-function CofreDiario({ usuario, token, onRunasGanadas }) {
+function CofreDiarioLocal({ usuario, token, onRunasGanadas }) {
   const [gamificacion, setGamificacion] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -272,22 +283,7 @@ function CofreDiario({ usuario, token, onRunasGanadas }) {
 // CATÁLOGO DE LECTURAS GAMIFICADO
 // ═══════════════════════════════════════════════════════════════
 
-const CATEGORIAS_LECTURAS = {
-  basicas: { nombre: 'Básicas', icono: '🌱', color: '#8B9A46', desc: 'Para empezar tu camino' },
-  estandar: { nombre: 'Estándar', icono: '🌿', color: '#5D8A4A', desc: 'Profundizá tu conexión' },
-  premium: { nombre: 'Premium', icono: '🌳', color: '#4A7C59', desc: 'Experiencias transformadoras' },
-  ultraPremium: { nombre: 'Ultra Premium', icono: '✨', color: '#D4AF37', desc: 'Lo más profundo del bosque' },
-  eventos: { nombre: 'Eventos Lunares', icono: '🌙', color: '#9370DB', desc: 'Solo en momentos especiales' },
-  temporada: { nombre: 'Portales Estacionales', icono: '🌀', color: '#4169E1', desc: 'Energías de los solsticios' }
-};
-
-const NIVELES_INFO = {
-  iniciada: { nombre: 'Iniciada', icono: '🌱', color: '#8B9A46' },
-  aprendiz: { nombre: 'Aprendiz', icono: '🌿', color: '#5D8A4A' },
-  guardiana: { nombre: 'Guardiana', icono: '🌳', color: '#4A7C59' },
-  maestra: { nombre: 'Maestra', icono: '✨', color: '#D4AF37' },
-  sabia: { nombre: 'Sabia', icono: '👑', color: '#9B59B6' }
-};
+// CATEGORIAS_LECTURAS y NIVELES_INFO ahora importados desde ./components/constants
 
 function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
   const [catalogo, setCatalogo] = useState(null);
@@ -2202,18 +2198,7 @@ function TiendaMembresias({ usuario, circulo }) {
   );
 }
 
-// Helper: Limpiar tags HTML que aparecen como texto
-function limpiarTexto(texto) {
-  if (!texto) return '';
-  return texto
-    .replace(/<\/?em>/gi, '')
-    .replace(/<\/?strong>/gi, '')
-    .replace(/<\/?i>/gi, '')
-    .replace(/<\/?b>/gi, '')
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '');
-}
-const TITO_IMG = `${WORDPRESS_URL}/wp-content/uploads/2025/12/gemini-image-2_que_tenga_un_pin_en_su_ropa_con_este_logo_en_negro_y_dorado_solo_el_circulo_que_-0_b02c570f-fd54-4b54-b306-3aa6a2b413b2-scaled.jpg`;
+// limpiarTexto y TITO_IMG ahora importados desde ./components/constants
 
 // ═══════════════════════════════════════════════════════════════
 // PACKS DE RUNAS (con URLs directas)
@@ -4017,8 +4002,13 @@ function MiMagiaContent() {
 
   const renderSeccion = () => {
     switch(seccion) {
-      case 'inicio': return <Inicio usuario={usuario} ir={setSeccion} token={token} setUsuario={setUsuario} />;
-      case 'canalizaciones': return <Canalizaciones usuario={usuario} />;
+      // Componentes extraídos (importados)
+      case 'inicio': return <SeccionInicio usuario={usuario} ir={setSeccion} token={token} setUsuario={setUsuario} />;
+      case 'canalizaciones': return <SeccionCanalizaciones usuario={usuario} />;
+      case 'regalos': return <SeccionRegalos ir={setSeccion} usuario={usuario} setUsuario={setUsuario} />;
+      case 'circulo': return <SeccionCirculo usuario={usuario} pais={pais} />;
+      case 'grimorio': return <SeccionGrimorio usuario={usuario} token={token} setUsuario={setUsuario} />;
+      // Componentes locales (aún no extraídos)
       case 'historial_lecturas': return <SeccionHistorialLecturas token={token} />;
       case 'jardin': return <Jardin usuario={usuario} setUsuario={setUsuario} pais={pais} token={token} />;
       case 'experiencias': return <ExperienciasMagicas usuario={usuario} token={token} setUsuario={setUsuario} />;
@@ -4026,7 +4016,6 @@ function MiMagiaContent() {
       case 'lecturas_gamificadas': return <CatalogoLecturasGamificado usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'tienda_runas': return <TiendaRunas usuario={usuario} />;
       case 'tienda_membresias': return <TiendaMembresias usuario={usuario} circulo={circulo} />;
-      case 'regalos': return <Regalos ir={setSeccion} usuario={usuario} setUsuario={setUsuario} />;
       case 'mundo': return <MundoSec />;
       case 'cuidados': return <CuidadosSec />;
       case 'cristales': return <CristalesSec />;
@@ -4034,13 +4023,11 @@ function MiMagiaContent() {
       case 'test_elemental': return <TestElemental usuario={usuario} onComplete={(r) => setUsuario({...usuario, elemento: r.elemento_principal})} />;
       case 'test_guardian': return <TestGuardian usuario={usuario} onComplete={(r) => setUsuario({...usuario, testGuardian: r})} />;
       case 'cosmos': return <CosmosMes usuario={usuario} />;
-      case 'circulo': return <CirculoSec usuario={usuario} setUsuario={setUsuario} token={token} pais={pais} />;
       case 'promociones': return <PromocionesMagicas usuario={usuario} ir={setSeccion} />;
-      case 'grimorio': return <GrimorioSec usuario={usuario} token={token} setUsuario={setUsuario} />;
       case 'foro': return <ForoSec usuario={usuario} setUsuario={setUsuario} />;
       case 'utilidades': return <UtilidadesSec usuario={usuario} />;
       case 'faq': return <FaqSec onVerTour={() => setMostrandoTour(true)} />;
-      default: return <Inicio usuario={usuario} ir={setSeccion} />;
+      default: return <SeccionInicio usuario={usuario} ir={setSeccion} token={token} setUsuario={setUsuario} />;
     }
   };
 
@@ -4347,7 +4334,8 @@ function Onboarding({ usuario, token, onDone }) {
 // INICIO
 // ═══════════════════════════════════════════════════════════════
 
-function Inicio({ usuario, ir, token, setUsuario }) {
+// DEPRECATED: Usar SeccionInicio importado
+function InicioLocal({ usuario, ir, token, setUsuario }) {
   const rango = getRango(usuario?.gastado);
   const siguiente = getSiguienteRango(usuario?.gastado);
   const progreso = siguiente ? ((usuario?.gastado || 0) / siguiente.min) * 100 : 100;
@@ -4604,7 +4592,8 @@ function SeccionHistorialLecturas({ token }) {
 // MIS CANALIZACIONES (antes Santuario)
 // ═══════════════════════════════════════════════════════════════
 
-function Canalizaciones({ usuario }) {
+// DEPRECATED: Usar SeccionCanalizaciones importado
+function CanalizacionesLocal({ usuario }) {
   const [tab, setTab] = useState('guardianes');
   const [canalizacionAbierta, setCanalizacionAbierta] = useState(null);
 
@@ -5769,7 +5758,8 @@ const LECTURAS_REGALABLES = [
   { id: 'estudio_alma', nombre: 'Estudio del Alma', runas: 200, icono: '👁️', descripcion: 'Quién sos realmente, revelado', categoria: 'premium' }
 ];
 
-function Regalos({ ir, usuario, setUsuario }) {
+// DEPRECATED: Usar SeccionRegalos importado
+function RegalosLocal({ ir, usuario, setUsuario }) {
   const [vista, setVista] = useState('menu'); // menu, lecturas, form, enviando, exito
   const [lecturaSeleccionada, setLecturaSeleccionada] = useState(null);
   const [form, setForm] = useState({ nombreDestinatario: '', emailDestinatario: '', mensaje: '' });
@@ -6282,7 +6272,8 @@ function CristalesSec() {
 // CÍRCULO - Sección simplificada (redirecciona a página completa)
 // ═══════════════════════════════════════════════════════════════
 
-function CirculoSec({ usuario, pais }) {
+// DEPRECATED: Usar SeccionCirculo importado
+function CirculoSecLocal({ usuario, pais }) {
   const [historial, setHistorial] = useState([]);
   const [cargando, setCargando] = useState(false);
   const esUY = pais === 'UY';
@@ -6414,7 +6405,8 @@ function CirculoSec({ usuario, pais }) {
 // GRIMORIO (con explicación completa)
 // ═══════════════════════════════════════════════════════════════
 
-function GrimorioSec({ usuario, token, setUsuario }) {
+// DEPRECATED: Usar SeccionGrimorio importado
+function GrimorioSecLocal({ usuario, token, setUsuario }) {
   const [tab, setTab] = useState('intro');
   const [entrada, setEntrada] = useState('');
   const [tipoEntrada, setTipoEntrada] = useState('libre');
@@ -7683,7 +7675,8 @@ function FaqSec({ onVerTour }) {
 // ═══════════════════════════════════════════════════════════════
 
 // BURBUJA DE SUGERENCIAS DE TITO
-function TitoBurbuja({ usuario, onAbrir }) {
+// DEPRECATED: Usar TitoBurbuja importado desde ./components/Tito
+function TitoBurbujaLocal({ usuario, onAbrir }) {
   const [sugerencia, setSugerencia] = useState(null);
   const [visible, setVisible] = useState(false);
   const [cerrada, setCerrada] = useState(false);
@@ -7846,7 +7839,8 @@ function TitoBurbuja({ usuario, onAbrir }) {
   );
 }
 
-function Tito({ usuario, abierto, setAbierto }) {
+// DEPRECATED: Usar Tito importado desde ./components/Tito
+function TitoLocal({ usuario, abierto, setAbierto }) {
   const [msgs, setMsgs] = useState([]);
   const [input, setInput] = useState('');
   const [env, setEnv] = useState(false);
