@@ -1,8 +1,8 @@
 'use client';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function CirculoRedirect() {
+function CirculoRedirectInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,5 +28,25 @@ export default function CirculoRedirect() {
     }}>
       <p>Redirigiendo al Circulo...</p>
     </div>
+  );
+}
+
+export default function CirculoRedirect() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#050508',
+        color: '#d4af37',
+        fontFamily: "'Cormorant Garamond', serif"
+      }}>
+        <p>Cargando...</p>
+      </div>
+    }>
+      <CirculoRedirectInner />
+    </Suspense>
   );
 }
