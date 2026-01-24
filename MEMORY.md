@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 14 - EN PROGRESO)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 15 - SEO PRO COMPLETADO)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -602,18 +602,43 @@ Sistema SEO profesional para visibilidad óptima en buscadores.
   - `/app/api/lectura-ancestral/route.js`
   - `/app/api/generate/route.js`
 
-**13. SEO BULK UPDATE WOOCOMMERCE - COMPLETO** ✅
-- **122 productos actualizados** con 100% éxito, 0 errores
-- Metadata RankMath en cada producto:
-  - `rank_math_title` (60 chars)
-  - `rank_math_description` (155 chars)
-  - `rank_math_focus_keyword`
-  - `rank_math_schema_Product` (JSON-LD)
+**13. SEO PRO UPDATE - COMPLETO v2.0** ✅
+- **122 productos actualizados** con 100% éxito
+- **1,830 tags de producto generados y asignados** automáticamente
+- Metadata RankMath completa en cada producto:
+  - `rank_math_title` (60 chars optimizado)
+  - `rank_math_description` (155 chars con power words)
+  - `rank_math_focus_keyword` + keywords secundarias
+  - `rank_math_schema_Product` (JSON-LD Product)
   - OpenGraph (facebook_title, facebook_description, facebook_image)
   - Twitter Cards (twitter_title, twitter_description, twitter_card_type)
-  - `_duendes_lsi_keywords` (keywords relacionadas)
-- Script actualizado: `/scripts/seo-bulk-update.mjs` con 122 IDs
-- API: POST `/api/seo/bulk-update`
+  - `_duendes_lsi_keywords` (10 keywords LSI por producto)
+  - `_duendes_seo_score` (estimado 85+)
+
+**Sistema de Tags automático:**
+- Tags por tipo: duende, pixie, bruja, mago, leprechaun, gnomo, guardian
+- Tags por categoría: proteccion, abundancia, amor, sanacion, sabiduria
+- Tags por cristales: cuarzo, amatista, turmalina, citrino, etc.
+- Tags de características: artesanal, hecho a mano, uruguay, piriapolis
+- Tags long-tail: comprar [tipo], [tipo] para [categoria], regalo [categoria]
+
+**Archivos creados/modificados:**
+- `/lib/seo/tags-generator.js` - Generador inteligente de tags
+- `/app/api/seo/pro-update/route.js` - API PRO con offset/limit
+- `/lib/seo/index.js` - Exports actualizados
+
+**API:** POST `/api/seo/pro-update`
+```json
+{
+  "dryRun": false,
+  "includeTags": true,
+  "limit": 5,
+  "offset": 0
+}
+```
+
+**⚠️ NOTA IMPORTANTE:** RankMath necesita reconexión manual en WordPress.
+El usuario debe ir a RankMath > Dashboard > y hacer clic en "Reconnect" si aparece el mensaje "site URL changed".
 
 ---
 
