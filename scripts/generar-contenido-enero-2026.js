@@ -899,6 +899,323 @@ El trébol de cuatro hojas existe. Tu sueño también puede.`,
     cristalDelDia: 'Citrino',
     elementoActivo: 'tierra',
     estado: 'publicado'
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SEMANA 4 - MARCOS (continuación: días 24-31)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  {
+    fecha: '2026-01-24',
+    dia: 24,
+    mes: 1,
+    año: 2026,
+    tipo: 'ejercicio',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'El Ejercicio del Ángulo Diferente',
+    subtitulo: 'Una práctica para ver lo que no estás viendo',
+    cuerpo: `Hoy te propongo un ejercicio sencillo pero poderoso.
+
+Elegí algo que te esté dando vueltas en la cabeza. Un problema, una decisión, una situación que no sabés cómo resolver.
+
+Ahora, cambiá físicamente de posición. Literalmente. Si estás sentado, parate. Si estás adentro, salí afuera. Si estás mirando hacia un lado, girá.
+
+Desde esa nueva posición, pensá en el mismo problema.
+
+¿Qué ves diferente? ¿Qué notás que antes no notabas?
+
+Esto no es magia. Es neurociencia. Cuando cambiás tu posición física, cambiás las conexiones neuronales que se activan. Tu cerebro accede a información diferente.
+
+Los antiguos sabios lo sabían sin saber por qué. Por eso caminaban mientras pensaban. Por eso meditaban en diferentes posturas. Por eso los rituales incluían movimiento.
+
+Hacé este ejercicio cada vez que te sientas estancado. El simple acto de cambiar de lugar puede mostrarte la respuesta que buscás.
+
+A veces la claridad está a solo un paso de distancia. Literal.`,
+    afirmacion: 'Cambio de perspectiva, cambio de resultado.',
+    cierre: 'La claridad llega cuando dejás de forzarla. Con sabiduría, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Fluorita',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-25',
+    dia: 25,
+    mes: 1,
+    año: 2026,
+    tipo: 'ritual',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Ritual del Silencio Consciente',
+    subtitulo: 'Cuando callamos, escuchamos',
+    cuerpo: `Este ritual es simple: una hora de silencio.
+
+No silencio de no hablar. Silencio de no consumir.
+
+Sin música. Sin podcasts. Sin redes sociales. Sin mensajes. Sin televisión. Sin nada que entre por tus oídos o tus ojos que no sea tu entorno inmediato.
+
+Una hora. Solo vos y el silencio.
+
+¿Por qué?
+
+Porque tu mente necesita espacio para pensar sus propios pensamientos. Cuando todo el día consumimos contenido de otros, dejamos de escuchar nuestra propia voz interior.
+
+Esa voz tiene cosas que decirte. Respuestas que buscás. Ideas que necesitás. Pero no puede hablar si no parás de llenar el espacio con ruido.
+
+Una hora. Elegí cuándo. Puede ser caminando, cocinando, limpiando. No tiene que ser meditación formal. Solo tiene que ser silencio.
+
+Después de esa hora, escribí tres cosas que notaste. Pensamientos que aparecieron. Sensaciones que surgieron. Ideas que llegaron.
+
+La sabiduría no grita. Susurra. Y solo la escuchamos cuando hacemos silencio.`,
+    afirmacion: 'En el silencio encuentro mis respuestas.',
+    cierre: 'A veces la sabiduría es simplemente quedarse quieto. Con claridad, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Cuarzo Ahumado',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-26',
+    dia: 26,
+    mes: 1,
+    año: 2026,
+    tipo: 'reflexion',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Sobre Las Decisiones Imposibles',
+    subtitulo: 'Cuando ninguna opción parece buena',
+    cuerpo: `A veces no hay opción buena.
+
+A veces todas las alternativas tienen costos. Todas implican perder algo. Todas duelen de alguna manera.
+
+Los humanos gastan mucha energía buscando la "decisión correcta" cuando la verdad es que a veces no existe.
+
+Lo que existe es la decisión que podés sostener.
+
+No la perfecta. No la que te deja sin culpa. No la que todos aprueban. La que podés bancar después de tomarla.
+
+Esa es la única pregunta que importa: ¿podés vivir con esto?
+
+Si la respuesta es sí, aunque duela, aunque cueste, aunque otros no entiendan... es tu decisión.
+
+Las decisiones imposibles no se resuelven encontrando la opción correcta. Se resuelven aceptando que vas a perder algo, eligiendo qué estás dispuesto a perder, y bancándote esa elección.
+
+Eso es madurez. No es lindo. Pero es lo que hay.
+
+Si estás frente a una decisión imposible, dejá de buscar la salida perfecta. Preguntate: ¿cuál puedo sostener?`,
+    afirmacion: 'Elijo la decisión que puedo sostener.',
+    cierre: '¿Y si miraras esto desde otro ángulo? Con perspectiva, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Citrino',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-27',
+    dia: 27,
+    mes: 1,
+    año: 2026,
+    tipo: 'ensenanza',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Los Nudos en Mi Barba',
+    subtitulo: 'Cada lección tiene su lugar',
+    cuerpo: `Cada nudo en mi barba es un lugar que visité. Cada giro, una lección que aprendí.
+
+Pero no cualquier lección. Solo las que costaron.
+
+Las lecciones fáciles no dejan marca. Se olvidan rápido. Son útiles pero no transformadoras.
+
+Las que cambian quién sos son las que dolieron aprenderlas.
+
+Mirá tu vida. ¿Cuáles son tus "nudos"? Esos momentos que te marcaron. Esas experiencias que te hicieron quien sos hoy.
+
+Apuesto que ninguna fue cómoda mientras la vivías.
+
+Eso no significa que debas buscar el sufrimiento. Significa que cuando te toca atravesar algo difícil, podés elegir verlo como un nudo más en tu barba. Una lección más en tu camino. Una marca más de sabiduría.
+
+No pediste esa experiencia. Pero ya está ahí. La pregunta es qué vas a hacer con ella.
+
+¿Va a ser solo dolor? ¿O va a ser también aprendizaje?
+
+El dolor viene igual. El aprendizaje es opcional. Elegí.`,
+    afirmacion: 'Transformo el dolor en sabiduría.',
+    cierre: 'Confiá en lo que sabés, aunque no sepas cómo lo sabés. Con amor, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Fluorita',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-28',
+    dia: 28,
+    mes: 1,
+    año: 2026,
+    tipo: 'afirmacion',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Afirmaciones de Claridad',
+    subtitulo: 'Palabras que iluminan el camino',
+    cuerpo: `Hoy te dejo afirmaciones para invocar claridad.
+
+No son magia. Son recordatorios. Formas de enfocar tu mente en lo que querés ver.
+
+Elegí las que resuenen con vos:
+
+"Las respuestas que busco ya las tengo."
+
+"Confío en mi capacidad de ver lo que necesito ver."
+
+"La claridad llega cuando dejo de forzarla."
+
+"Cada experiencia me enseña algo valioso."
+
+"Puedo ver esto desde otro ángulo."
+
+"Mi intuición sabe más de lo que mi mente entiende."
+
+"No necesito saberlo todo para actuar."
+
+"La confusión es parte del camino hacia la claridad."
+
+"Estoy exactamente donde necesito estar para aprender lo que necesito aprender."
+
+Repetí las que te sirvan. Escribilas. Ponelas donde las veas.
+
+La claridad no es ausencia de dudas. Es confianza en tu capacidad de encontrar el camino aunque no lo veas completo.
+
+Eso es sabiduría: caminar sin ver el final, confiando en cada paso.`,
+    afirmacion: 'Las respuestas que busco ya las tengo.',
+    cierre: 'La claridad llega cuando dejás de forzarla. Con paz, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Cuarzo Ahumado',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-29',
+    dia: 29,
+    mes: 1,
+    año: 2026,
+    tipo: 'ejercicio',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Escribir Para Entender',
+    subtitulo: 'El papel como espejo del alma',
+    cuerpo: `Los humanos piensan que escriben para comunicar.
+
+Pero escribir es, primero, para entender.
+
+Cuando sacás los pensamientos de tu cabeza y los ponés en papel, algo cambia. Lo que era confuso se ordena. Lo que parecía enorme se vuelve manejable. Lo que no veías aparece.
+
+Hoy te invito a escribir sin destino.
+
+Agarrá papel y lápiz (mejor que pantalla, pero pantalla también sirve). Y escribí durante 10 minutos sin parar.
+
+Sin pensar. Sin editar. Sin juzgar lo que sale.
+
+Dejá que la mano vaya sola. Si no sabés qué escribir, escribí "no sé qué escribir" hasta que aparezca otra cosa.
+
+La única regla: no pares.
+
+Después de 10 minutos, leé lo que escribiste. Subrayá las frases que te sorprendan. Las que no esperabas. Las que parecen venir de otro lado.
+
+Ahí está tu sabiduría interior hablando.
+
+No hace falta entenderlo todo. Solo hace falta escucharte.`,
+    afirmacion: 'Escribo para encontrarme.',
+    cierre: 'A veces la sabiduría es simplemente quedarse quieto. Con claridad, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Citrino',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-30',
+    dia: 30,
+    mes: 1,
+    año: 2026,
+    tipo: 'reflexion',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'El Arte de No Saber',
+    subtitulo: 'Por qué está bien no tener todas las respuestas',
+    cuerpo: `Hay una presión enorme por saber.
+
+Saber qué querés. Saber quién sos. Saber a dónde vas. Saber por qué te pasa lo que te pasa. Saber qué hacer.
+
+Como si no saber fuera un problema. Un déficit. Una falla.
+
+Pero el no saber es parte del camino.
+
+Más aún: el no saber es necesario para aprender. Si ya supieras todo, ¿qué aprenderías?
+
+Los seres más sabios que conozco tienen algo en común: se sienten cómodos diciendo "no sé".
+
+No "no sé pero debería" o "no sé y me da vergüenza". Simplemente "no sé", con la tranquilidad de quien entiende que no saber es natural.
+
+Hoy te invito a practicar el "no sé" sin ansiedad.
+
+Cuando alguien te pregunte algo que no sabés, decí "no sé" y dejalo ahí. Sin excusas. Sin promesas de averiguarlo. Sin culpa.
+
+Es liberador.
+
+No tenés que saber todo. No tenés que tener todo resuelto. No tenés que entender cada cosa que te pasa.
+
+A veces la respuesta más sabia es: no sé. Y está bien.`,
+    afirmacion: 'No saber es parte del camino.',
+    cierre: 'Confiá en lo que sabés, aunque no sepas cómo lo sabés. Con sabiduría, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Fluorita',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
+  },
+
+  {
+    fecha: '2026-01-31',
+    dia: 31,
+    mes: 1,
+    año: 2026,
+    tipo: 'cierre',
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Hasta Que Nos Volvamos a Encontrar',
+    subtitulo: 'Cierre de enero y mensaje de despedida',
+    cuerpo: `Enero termina.
+
+Fue un mes de mucho movimiento. Cuatro guardianes compartieron su sabiduría con vos: Gaia te recordó tu fuerza y tus raíces. Noah te enseñó a soltar lo que no necesitás. Winter te ayudó a reavivar tu fuego interior. Y yo intenté ofrecerte perspectiva.
+
+¿Qué te llevás de este mes?
+
+No tiene que ser algo grande. A veces las lecciones más importantes son las más sutiles. Un cambio pequeño en cómo pensás. Una nueva forma de mirarte. Una decisión que finalmente tomaste.
+
+Sea lo que sea, honralo. Es tuyo.
+
+Febrero trae nuevos guardianes, nuevas enseñanzas, nuevas oportunidades de crecimiento. Pero primero, cerrá enero con gratitud.
+
+Gracias por leer. Gracias por practicar. Gracias por quedarte.
+
+La sabiduría es un camino, no un destino. Y cada paso cuenta.
+
+Nos vemos en el próximo cruce del camino.
+
+Con sabiduría y afecto,
+Marcos
+
+PD: El trébol sigue en mi bolsillo. Lo improbable sigue existiendo. Y vos seguís caminando.`,
+    afirmacion: 'Honro mi camino y celebro cada paso.',
+    cierre: 'Las respuestas que buscás ya las tenés. Solo hay que mirar diferente. Hasta pronto, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Citrino',
+    elementoActivo: 'tierra',
+    estado: 'publicado'
   }
 ];
 
