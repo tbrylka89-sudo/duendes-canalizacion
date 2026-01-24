@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 11 - COMPLETADA)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 12 - COMPLETADA)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
 
@@ -282,6 +282,43 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ## ÚLTIMAS SESIONES
 
+### 2026-01-24 (sesión 13) - COMPLETADA
+
+**🔧 FIX CRÍTICO: PLUGIN HUB DUPLICADO + ACTUALIZACIÓN v3.0**
+
+1. **DIAGNÓSTICO DE ERROR CRÍTICO** ✅
+   - WordPress mostraba pantalla blanca "critical error"
+   - Activé WP_DEBUG temporalmente para ver el error real
+   - **Error:** `Cannot declare class DuendesHubControl, because the name is already in use`
+   - **Causa:** Había DOS copias del plugin Hub:
+     - `mu-plugins/duendes-hub-control.php` ✓ (activo, 34KB)
+     - `plugins/duendes-hub-control.php` ✗ (duplicado viejo, 22KB)
+
+2. **SOLUCIÓN** ✅
+   - Renombrado duplicado a `plugins/duendes-hub-control.php.DUPLICADO`
+   - WordPress volvió a funcionar
+   - Restaurado wp-config.php sin debug
+
+3. **HUB v3.0 SUBIDO EXITOSAMENTE** ✅
+   - **Archivo:** `/wordpress-plugins/duendes-hub-control.php`
+   - Nuevas secciones:
+     - 🌟 Guardianes Maestros del Círculo (6 guardianes con badges de colores)
+     - 🔌 APIs del Círculo (contenido, duende-semana, seed-enero, bots)
+     - 🤖 Tabla de Integraciones IA (Claude, DALL-E, Gemini, Replicate)
+   - Acceso rápido: Panel Maestro con botón jade
+   - Referencia rápida actualizada para enero 2026
+
+**Archivos afectados:**
+| Archivo | Acción |
+|---------|--------|
+| `mu-plugins/duendes-hub-control.php` | ACTUALIZADO a v3.0 (37KB) |
+| `plugins/duendes-hub-control.php` | RENOMBRADO a .DUPLICADO |
+| `wp-config.php` | Restaurado (WP_DEBUG=false) |
+
+**Lección aprendida:** Nunca tener el mismo plugin en `mu-plugins/` Y `plugins/` - PHP no puede declarar la misma clase dos veces.
+
+---
+
 ### 2026-01-24 (sesión 12) - COMPLETADA
 
 **🚀 SISTEMA SEO COMPLETO IMPLEMENTADO**
@@ -393,23 +430,55 @@ Sistema SEO profesional para visibilidad óptima en buscadores.
 
 ---
 
+### 2026-01-24 (sesión 12) - COMPLETADA
+
+**🔄 CÍRCULO: ACTUALIZACIÓN A DUENDES REALES DE LA TIENDA**
+
+Se reemplazaron los guardianes inventados (Dorado, Obsidiana, Índigo, Jade) por duendes REALES de la tienda WooCommerce.
+
+**Cambios realizados:**
+1. **Guardianes Maestros actualizados** (`/lib/circulo/duendes-semanales-2026.js`)
+   - Gaia (ID 2993) → Semana 1 - Protección/Tierra
+   - Noah (ID 4145) → Semana 2 - Caminos/Soltar
+   - Winter (ID 4520) → Semana 3 - Fuego Interior
+   - Marcos (ID 4244) → Semana 4 - Sabiduría/Claridad
+
+2. **Contenido enero reescrito** (`/scripts/generar-contenido-enero-2026.js`)
+   - 23 días de contenido adaptados a las personalidades reales
+   - Imágenes de los productos reales de WooCommerce
+   - Frases y mensajes basados en las historias de los productos
+
+3. **Hub WP actualizado** (`/wordpress-plugins/duendes-hub-control.php` v3.0)
+   - Nueva sección Guardianes Maestros
+   - Nueva sección APIs del Círculo
+   - Tabla de integraciones IA
+
+4. **Deploy y Seed ejecutados**
+   - Commit: "Actualizar Círculo con duendes reales: Gaia, Noah, Winter, Marcos"
+   - Vercel deploy: exitoso
+   - Seed API: 23 días, 4 semanas actualizados en KV
+
+**Fix crítico:** Se resolvió error de WordPress por plugin duplicado (`DuendesHubControl` declarada dos veces).
+
+---
+
 ### 2026-01-24 (sesión 11) - COMPLETADA
 
 **🎯 CÍRCULO DE DUENDES: SISTEMA COMPLETO ENERO 2026**
 
 Sistema completo del Círculo de Duendes con contenido pre-generado para todo enero 2026.
 
-**1. GUARDIANES MAESTROS** ✅
+**1. GUARDIANES MAESTROS** ✅ (ACTUALIZADO 24-ene con duendes REALES de la tienda)
 - **Archivo:** `/lib/circulo/duendes-semanales-2026.js`
-- 6 Guardianes con historias completas, personalidades, cristales, colores, frases típicas:
-  - **Dorado** - Abundancia (Semana 1: 1-7 enero)
-  - **Obsidiana** - Protección (Semana 2: 8-14 enero)
-  - **Índigo** - Sabiduría (Semana 3: 15-21 enero)
-  - **Jade** - Sanación (Semana 4: 22-31 enero)
-  - **Coral** - Amor (futuro)
-  - **Aurora** - Intuición (futuro)
-- Funciones exportadas: `obtenerGuardianPorFecha()`, `obtenerSemanaActual()`
-- Cada guardián tiene: historia, personalidad, temas, cristales, imagen, color, saludo, despedida, frases típicas, productoWooCommerce
+- 4 Guardianes REALES de la tienda WooCommerce + 2 pendientes:
+  - **Gaia** (ID 2993) - Protección/Tierra (Semana 1: 1-7 enero) - "Ya tenés la fuerza"
+  - **Noah** (ID 4145) - Protección/Caminos (Semana 2: 8-14 enero) - "El camino se hace caminando"
+  - **Winter** (ID 4520) - Protección/Fuego (Semana 3: 15-21 enero) - "El poder interior se enciende"
+  - **Marcos** (ID 4244) - Sabiduría (Semana 4: 22-31 enero) - "Mirá desde otro ángulo"
+  - **Coral** - Amor (futuro, pendiente asignar duende real)
+  - **Aurora** - Intuición (futuro, pendiente asignar duende real)
+- Funciones exportadas: `obtenerGuardianPorFecha()`, `obtenerSemanaActual()`, `obtenerGuardianPorId()`
+- Cada guardián tiene: historia real del producto, personalidad, temas, cristales, imagen de WooCommerce, color, saludo, despedida, frases típicas, productoWooCommerce (ID real)
 
 **2. CONTENIDO PRE-GENERADO: 23 DÍAS** ✅
 - **Archivo:** `/scripts/generar-contenido-enero-2026.js`
