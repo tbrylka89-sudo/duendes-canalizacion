@@ -349,7 +349,8 @@ export async function POST(request) {
       productIds = [],    // IDs específicos o vacío para todos
       dryRun = false,     // Solo simular
       includeTags = true, // Incluir generación de tags
-      limit = 0           // Límite de productos (0 = sin límite)
+      limit = 0,          // Límite de productos (0 = sin límite)
+      offset = 0          // Offset para paginación
     } = body;
 
     // Validar configuración
@@ -385,6 +386,10 @@ export async function POST(request) {
       products = await getAllProducts();
     }
 
+    // Aplicar offset y limit para paginación
+    if (offset > 0) {
+      products = products.slice(offset);
+    }
     if (limit > 0) {
       products = products.slice(0, limit);
     }
@@ -541,7 +546,8 @@ export async function GET(request) {
         productIds: '[opcional] Array de IDs, vacío para todos',
         dryRun: 'true para simular sin cambios',
         includeTags: 'true para generar/asignar tags',
-        limit: '0 para sin límite'
+        limit: '0 para sin límite',
+        offset: '0 para empezar desde el inicio'
       }
     },
     acciones: {
