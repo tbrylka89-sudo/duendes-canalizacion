@@ -20,22 +20,63 @@ export async function GET(request) {
     const semanaDelAno = obtenerSemanaDelAno(ahora);
     const claveGuardianSemanal = `circulo:guardian-semana:${ahora.getFullYear()}-W${semanaDelAno}`;
 
-    // Verificar si ya hay un guardián asignado para esta semana
-    let guardianSemana = await kv.get(claveGuardianSemanal);
+    // PRIORIDAD 1: Buscar en la rotación semanal REAL (Gaia, Noah, Winter, Marcos)
+    const mes = ahora.getMonth() + 1;
+    const dia = ahora.getDate();
+    let semanaMes = 1;
+    if (dia >= 22) semanaMes = 4;
+    else if (dia >= 15) semanaMes = 3;
+    else if (dia >= 8) semanaMes = 2;
 
-    if (!guardianSemana) {
-      // Seleccionar guardián para la semana
-      guardianSemana = await seleccionarGuardianSemana(semanaDelAno, ahora.getFullYear());
+    const rotacionKey = `circulo:duende-semana:${ahora.getFullYear()}:${mes}:${semanaMes}`;
+    const rotacionData = await kv.get(rotacionKey);
+
+    let guardianSemana;
+
+    if (rotacionData?.guardian) {
+      // Usar el guardián de la rotación REAL
+      const g = rotacionData.guardian;
+      guardianSemana = {
+        id: g.slug || g.id,
+        nombre: g.nombre,
+        imagen: g.imagen,
+        categoria: g.categoria || 'Guardián',
+        tipo_ser: 'guardian',
+        tipo_ser_nombre: 'Guardián',
+        arquetipo: g.descripcion || 'Sabiduría ancestral',
+        elemento: g.elemento || 'todos',
+        tono_voz: g.personalidad || 'Cálido y sabio',
+        forma_hablar: 'Con claridad y cercanía',
+        frase_tipica: g.frasesTipicas?.[0] || 'Confía en tu camino',
+        url_tienda: g.productoWooCommerce ? `https://duendesdeluruguay.com/?p=${g.productoWooCommerce}` : null
+      };
+    } else {
+      // FALLBACK: Verificar cache viejo o seleccionar del catálogo
+      guardianSemana = await kv.get(claveGuardianSemanal);
 
       if (!guardianSemana) {
-        return Response.json({
-          success: false,
-          error: 'No hay guardianes disponibles'
-        }, { status: 404 });
-      }
+        guardianSemana = await seleccionarGuardianSemana(semanaDelAno, ahora.getFullYear());
 
-      // Guardar para toda la semana (7 días * 24h * 60min * 60seg)
-      await kv.set(claveGuardianSemanal, guardianSemana, { ex: 604800 });
+        if (!guardianSemana) {
+          // FALLBACK FINAL: Marcos
+          guardianSemana = {
+            id: 'marcos',
+            nombre: 'Marcos',
+            imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/03/Marcos-1.jpg',
+            categoria: 'Sabiduría',
+            tipo_ser: 'guardian',
+            tipo_ser_nombre: 'Guardián',
+            arquetipo: 'La claridad que ilumina el camino',
+            elemento: 'aire',
+            tono_voz: 'Sereno y profundo',
+            forma_hablar: 'Con preguntas que abren puertas',
+            frase_tipica: 'A veces la respuesta está en la pregunta'
+          };
+        }
+
+        // Guardar para toda la semana
+        await kv.set(claveGuardianSemanal, guardianSemana, { ex: 604800 });
+      }
     }
 
     // Contar visitas del día para esta persona (solo si pasaron 2+ horas desde última)

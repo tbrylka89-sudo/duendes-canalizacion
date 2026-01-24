@@ -573,4 +573,86 @@ Antes de que Claude entregue cualquier texto, verificar:
 
 ---
 
+## 9. INFORMACIÓN TÉCNICA DEL SITIO
+
+### Acceso al Servidor (SFTP)
+
+```
+Host: 34.70.139.72
+Puerto: 55309
+Usuario: sftp_live_WfP6i
+Password: JzflrSheUnj4itUE27Aqr0SgD3cG5LXhCR
+Ruta mu-plugins: web/wp-live/wp-content/mu-plugins/
+```
+
+**Hosting:** 10Web Premium Hosting (Council Bluffs, Iowa, USA)
+**Panel:** my.10web.io/websites/1453202/main
+
+### Paleta de Colores de la Marca
+
+| Color | Hex | Uso |
+|-------|-----|-----|
+| Negro profundo | `#0a0a0a` | Fondo principal |
+| Negro secundario | `#1a1a1a` | Cajas, cards, footer |
+| Dorado principal | `#c9a227` | Títulos destacados, iconos, CTAs |
+| Dorado claro | `#e8d48b` | Hover, acentos |
+| Dorado oscuro | `#8b6914` | Gradientes |
+| Púrpura | `#9370db` | Acentos místicos |
+| Texto claro | `rgba(255,255,255,0.85)` | Texto principal |
+| Texto muted | `rgba(255,255,255,0.6)` | Texto secundario |
+
+**Tipografías:**
+- Títulos: `'Cinzel', serif`
+- Cuerpo: `'Cormorant Garamond', Georgia, serif`
+
+### Plugins mu-plugins Importantes
+
+| Plugin | Función |
+|--------|---------|
+| `duendes-fixes-master.php` | Fixes globales: ocultar Grimorio, traducciones, footer |
+| `duendes-pagina-como-funciona.php` | Reemplazo de página Cómo Funciona (DESACTIVADO) |
+| `duendes-como-funciona-estilos.php` | Solo CSS/JS para página Cómo Funciona |
+| `duendes-experiencia-magica.php` | Experiencia de producto |
+| `duendes-mi-magia.php` | Portal Mi Magia |
+| `duendes-emails-magicos.php` | Emails post-compra |
+| `duendes-carrito-abandonado.php` | Emails carrito abandonado |
+| `duendes-fabrica-banners.php` | Sistema de banners inteligentes |
+| `duendes-promo-3x2.php` | Promoción 3x2 |
+
+### Lecciones Técnicas Importantes
+
+**1. Elementor ignora `the_content` filter**
+- Si querés reemplazar una página de Elementor, usá `template_redirect` con `get_header()` y `get_footer()`
+- Para solo cambiar estilos, inyectá CSS/JS via `wp_head` y `wp_footer`
+
+**2. No usar output buffering global**
+- Rompe el menú hamburguesa y otras funcionalidades de JS
+- Si necesitás modificar HTML, hacelo con JavaScript del lado del cliente
+
+**3. Para detectar páginas:**
+```php
+// Método más confiable
+$uri = $_SERVER['REQUEST_URI'] ?? '';
+if (strpos($uri, 'como-funciona') !== false) {
+    // código
+}
+```
+
+**4. Para forzar estilos sobre Elementor:**
+- Usar `!important` en todo
+- Usar JavaScript con `element.style.setProperty('prop', 'value', 'important')`
+- Usar MutationObserver para elementos cargados dinámicamente
+
+**5. Desactivar plugins problemáticos:**
+- Renombrar a `.php.DISABLED` via SFTP
+- Los mu-plugins se cargan automáticamente, no hay UI para desactivarlos
+
+### Archivos Locales WordPress
+
+Ubicación: `/Users/usuario/Desktop/duendes-vercel/wordpress-plugins/`
+
+Contiene las versiones locales de los plugins antes de subir al servidor.
+
+---
+
 *Este documento es la guía viva de cómo creamos magia real en Duendes del Uruguay. Cada palabra cuenta. Cada mensaje importa. Cada persona merece sentirse única.*
