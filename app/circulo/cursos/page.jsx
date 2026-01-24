@@ -29,35 +29,21 @@ export default function CursosPage() {
         setPerfil(perfilData.perfil);
       }
 
-      // Cargar cursos publicados
-      const cursosRes = await fetch('/api/admin/cursos?tipo=publico');
+      // Cargar cursos publicados desde la nueva API de academia
+      const cursosRes = await fetch('/api/circulo/academia?progreso=true');
       const cursosData = await cursosRes.json();
 
-      if (cursosData.success) {
-        const cursosPublicados = cursosData.cursos.filter(c => c.estado === 'publicado');
+      if (cursosData.success && cursosData.cursos) {
+        // La API ya devuelve cursos con progreso incluido
+        setCursosConProgreso(cursosData.cursos.map(c => ({
+          ...c,
+          titulo: c.titulo,
+          descripcion: c.descripcion,
+          imagen: c.imagen,
+          progreso: c.progreso || { porcentaje: 0 }
+        })));
 
-        // Cargar progreso si hay usuario
-        if (perfilData.perfil?.id) {
-          const progresoRes = await fetch(`/api/circulo/cursos/progreso?usuarioId=${perfilData.perfil.id}`);
-          const progresoData = await progresoRes.json();
-
-          if (progresoData.success) {
-            // Combinar cursos con progreso
-            const combinados = cursosPublicados.map(curso => {
-              const progreso = progresoData.progresos.find(p => p.cursoId === curso.id);
-              return {
-                ...curso,
-                progreso: progreso || { porcentaje: 0, leccionesCompletadas: [] }
-              };
-            });
-            setCursosConProgreso(combinados);
-            setBadges(progresoData.badges || []);
-          } else {
-            setCursosConProgreso(cursosPublicados.map(c => ({ ...c, progreso: { porcentaje: 0 } })));
-          }
-        } else {
-          setCursosConProgreso(cursosPublicados.map(c => ({ ...c, progreso: { porcentaje: 0 } })));
-        }
+        // TODO: cargar badges del usuario
       }
     } catch (err) {
       console.error('Error cargando cursos:', err);
@@ -78,7 +64,7 @@ export default function CursosPage() {
   }
 
   // MODO MANTENIMIENTO - Mientras rediseñamos la Academia
-  const enMantenimiento = true;
+  const enMantenimiento = false;
 
   if (enMantenimiento) {
     return (
