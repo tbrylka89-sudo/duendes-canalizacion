@@ -622,45 +622,304 @@ Ruta mu-plugins: web/wp-live/wp-content/mu-plugins/
 
 ### TAREAS PENDIENTES
 
-#### Formulario de Canalización en Checkout
-**Estado:** PENDIENTE - No implementado
+---
 
-El checkout necesita un formulario especial que aparezca cuando el cliente compra un guardián. Este formulario recopila la información necesaria para generar la canalización personalizada.
+#### ✅ FORMULARIO DE CANALIZACIÓN - COMPLETADO 24/01/2026 12:25hs
+**Estado:** COMPLETADO - Plugin `duendes-formulario-canalizacion.php` subido a mu-plugins
 
-**Campos requeridos según escenario:**
+**Implementado:**
+- Pregunta de segmentación en checkout (4 opciones)
+- Formulario post-compra en Thank You page con 4 vías completas
+- Sistema de email para destinatarios (Vía 2: regalo que sabe)
+- Protección de menores (Vía 4: sin fotos)
+- Datos guardados en order meta como JSON
 
-**A) Compra para uno mismo:**
-- Nombre completo
-- ¿Qué momento de tu vida estás atravesando? (textarea)
-- ¿Qué buscás o necesitás en este momento? (textarea)
-- ¿Hay algo específico que te gustaría que tu guardián supiera? (textarea)
-- Subida de foto (rostro bien iluminado) - **Solo mayores de 18**
-- Checkbox: "Es para mí" / "Es un regalo"
+Sistema híbrido de formulario de canalización en 2 partes.
 
-**B) Si es regalo - preguntar:**
-- ¿Es sorpresa? Sí/No
-- Email del destinatario (si NO es sorpresa, para enviarle el formulario)
-- Si ES sorpresa:
-  - Nombre del destinatario
-  - Tu relación con esta persona
-  - ¿Qué momento está atravesando?
-  - ¿Qué te gustaría que sintiera al recibir esto?
-  - Mensaje personal para incluir (opcional)
-  - Foto del destinatario (opcional) - **Solo mayores de 18**
+---
+
+### PARTE 1: En Checkout (antes de pagar)
+
+**Solo UNA pregunta de segmentación:**
+
+```
+"¿Quién recibirá la magia de este guardián?"
+
+○ Soy yo - este guardián viene a acompañarme
+○ Es un regalo - y la persona lo sabe
+○ Es un regalo sorpresa - quiero que sea inesperado
+○ Es para un niño/a - menor de 18 años
+```
+
+**Implementación:**
+- Hook: `woocommerce_after_order_notes`
+- Guardar en order meta: `_duendes_tipo_destinatario`
+- Valores: `para_mi` | `regalo_sabe` | `regalo_sorpresa` | `para_nino`
+- Estilo: Radio buttons elegantes, estética oscura del sitio
+
+---
+
+### PARTE 2: Post-Compra (Thank You Page)
+
+**Mensaje según la vía elegida + formulario completo**
+
+---
+
+#### VÍA 1: "Soy yo" (`para_mi`)
+
+**Mensaje Thank You:**
+```
+✨ [Nombre del guardián] ya es tuyo.
+
+Ahora falta lo más importante: que se conozcan.
+
+Tu guardián quiere saber de vos para poder hablarte de verdad,
+no con frases genéricas sino con palabras que solo vos necesitás escuchar.
+
+[Botón: "Completar mi conexión"]
+```
+
+**Formulario - Pantalla 1:**
+> "Tu guardián quiere conocerte. No hay respuestas correctas - solo tu verdad."
+
+- **¿Cómo te llamás?** (o cómo te gustaría que te llame)
+- **¿Qué momento de tu vida estás atravesando?**
+  - Placeholder: "Un cambio, una pérdida, un nuevo comienzo, una búsqueda..."
+
+**Pantalla 2:**
+> "A veces lo que más necesitamos es lo que más nos cuesta pedir."
+
+- **¿Qué necesitás en este momento?** (selección múltiple)
+  - Protección / Sentirme segura
+  - Claridad / Saber qué hacer
+  - Abundancia / Desbloquear lo que merezco
+  - Sanación / Soltar lo que me pesa
+  - Amor / Conexión genuina
+  - Fuerza / Seguir adelante
+  - Otro: [campo libre]
+
+**Pantalla 3:**
+> "Si pudieras decirle algo a alguien que realmente te escucha..."
+
+- **¿Hay algo que tu guardián debería saber?** (opcional)
+  - Placeholder: "Algo que no le contás a nadie, algo que te pesa, algo que soñás..."
+
+**Pantalla 4:**
+> "Una imagen ayuda a tu guardián a reconocerte energéticamente."
+
+- Subir foto (opcional pero incentivado)
+- Checkbox obligatorio: "Confirmo que soy mayor de 18 años"
+- Nota: "No es obligatorio, pero hace la conexión más profunda."
+
+---
+
+#### VÍA 2: "Regalo - la persona lo sabe" (`regalo_sabe`)
+
+**Mensaje Thank You:**
+```
+✨ Qué lindo regalar magia.
+
+[Nombre del guardián] está listo para conocer a quien lo recibirá.
+
+Para que la canalización sea realmente personal, necesitamos
+que esa persona nos cuente un poco de sí. Le enviaremos un
+formulario especial - no le diremos qué guardián elegiste.
+
+[Botón: "Enviar invitación mágica"]
+```
+
+**Formulario breve para el COMPRADOR:**
+
+- **¿Cómo se llama la persona que lo recibirá?**
+- **¿Cuál es su email?**
+  - Nota: "Le enviaremos un formulario después de tu compra."
+- **¿Querés incluir un mensaje personal?** (opcional)
+  - Textarea para mensaje
+
+**Sistema automático:**
+- Enviar email al destinatario con link a formulario completo (igual a Vía 1)
+- Email con diseño mágico: "Alguien te regaló una experiencia especial..."
+- El destinatario completa SU formulario
+- Recordatorios automáticos si no completa (24h, 72h)
+
+---
+
+#### VÍA 3: "Regalo sorpresa" (`regalo_sorpresa`)
+
+**Mensaje Thank You:**
+```
+✨ Una sorpresa mágica está en camino.
+
+Como es sorpresa, no podemos preguntarle directamente.
+Pero vos la conocés - y eso es valioso.
+
+Contanos sobre esta persona desde tu perspectiva.
+Tu guardián usará tu amor como puente para conectar.
+
+[Botón: "Contar sobre esta persona"]
+```
+
+**Formulario para el COMPRADOR:**
+
+**Pantalla 1 - El vínculo:**
+> "Conocés a esta persona. Eso es valioso."
+
+- **¿Cómo se llama?**
+- **¿Cuál es tu relación con ella/él?**
+  - Opciones: Pareja / Mamá / Papá / Hermana/o / Hija/o / Amiga/o / Otro
+
+**Pantalla 2 - Su momento:**
+> "Pensá en [nombre]. ¿Qué ves?"
+
+- **¿Qué momento está atravesando?**
+  - Placeholder: "Una separación, un duelo, un logro, una crisis..."
+- **¿Qué creés que necesita escuchar?**
+  - Placeholder: "Algo que vos le dirías si pudieras..."
+
+**Pantalla 3 - Su esencia:**
+> "Ayudanos a conocerla/o un poco más."
+
+- **¿Cómo describirías su personalidad?** (elegir hasta 3)
+  - Sensible / Fuerte / Soñadora / Práctica / Reservada / Expresiva / Luchadora / Tranquila
+- **¿Qué le hace brillar los ojos?**
+  - Placeholder: "¿Qué la apasiona, qué la hace feliz?"
+
+**Pantalla 4 - Foto y mensaje:**
+> "Si tenés una foto, ayuda. Si no, el amor que ponés ya dice mucho."
+
+- Subir foto (opcional)
+- Checkbox si sube foto: "Confirmo que la persona es mayor de 18 años"
+- **¿Querés incluir un mensaje tuyo?**
+  - Textarea
+  - Checkbox: "Prefiero que sea anónimo"
+
+---
+
+#### VÍA 4: "Para un niño/a" (`para_nino`)
+
+**Mensaje Thank You:**
+```
+✨ Los guardianes aman a los pequeños.
+
+Tienen una forma especial de hablarles - con ternura,
+con magia, con palabras que un niño puede entender.
+
+Contanos sobre este pequeño/a para que [Nombre del guardián]
+pueda convertirse en su amigo mágico.
+
+[Botón: "Contar sobre el niño/a"]
+```
+
+**⚠️ IMPORTANTE: NO se piden fotos de menores**
+
+**Formulario:**
+
+**Pantalla 1 - Identificación:**
+> "Los guardianes aman a los pequeños."
+
+- **¿Cómo se llama el niño/a?**
+- **¿Qué edad tiene?**
+  - 3-6 años / 7-10 años / 11-14 años / 15-17 años
+- **¿Cuál es tu relación?**
+  - Mamá / Papá / Abuela/o / Tía/o / Madrina/Padrino / Otro
+
+**Pantalla 2 - Su mundo:**
+> "Contanos sobre [nombre]. ¿Cómo es su mundo?"
+
+- **¿Cómo describirías su personalidad?**
+  - Tímido/a / Sociable / Sensible / Aventurero/a / Creativo/a / Curioso/a / Tranquilo/a
+- **¿Qué le gusta hacer?**
+  - Placeholder: "Dibujar, jugar, leer, los animales..."
+
+**Pantalla 3 - Lo que necesita:**
+> "A veces los adultos vemos cosas que los niños no saben expresar."
+
+- **¿Hay algo que esté atravesando o necesite?** (múltiple)
+  - Miedos nocturnos
+  - Cambios en la familia
+  - Dificultades en la escuela
+  - Necesita confianza
+  - Está muy sensible
+  - Solo quiero que tenga un amigo mágico
+- **¿Algo más que el guardián debería saber?** (opcional)
+
+**Pantalla 4 - Confirmación (sin foto):**
+> "Para proteger a los más pequeños, no pedimos fotos de menores.
+> El guardián se conectará a través de tu amor y lo que nos contaste."
+
+- Checkbox: "Entiendo y confirmo"
+
+---
+
+### EMAILS DE RECORDATORIO
+
+**Si no completan el formulario:**
+
+**24 horas después:**
+```
+Asunto: Tu guardián [Nombre] está esperando...
+
+[Nombre del cliente],
+
+Tu guardián ya está en camino, pero aún no sabe nada de vos.
+
+Sin esta información, la canalización que recibas será genérica
+en lugar de las palabras exactas que necesitás escuchar.
+
+[Botón: Completar mi conexión]
+
+Solo toma 2 minutos. Tu guardián merece conocerte.
+```
+
+**72 horas después:**
+```
+Asunto: Última oportunidad de conexión personal
+
+[Nombre],
+
+En 48 horas enviaremos tu guardián con su canalización.
+
+Si no completás el formulario, escribiremos algo bonito pero general.
+Si lo completás, escribiremos algo que te va a tocar el alma.
+
+La diferencia es enorme. Solo vos decidís.
+
+[Botón: Quiero una canalización personal]
+```
+
+---
+
+### IMPLEMENTACIÓN TÉCNICA
+
+**Archivos a crear:**
+1. `duendes-formulario-canalizacion.php` - Lógica principal
+2. CSS inline (estética del sitio)
+
+**Hooks WooCommerce:**
+- `woocommerce_after_order_notes` - Pregunta de segmentación
+- `woocommerce_checkout_update_order_meta` - Guardar tipo
+- `woocommerce_thankyou` - Mostrar formulario post-compra
+- Order meta keys:
+  - `_duendes_tipo_destinatario`
+  - `_duendes_formulario_completado` (yes/no)
+  - `_duendes_datos_canalizacion` (JSON con respuestas)
+
+**Para Vía 2 (regalo que sabe):**
+- Crear tabla o usar order meta para tracking
+- Cron job para emails de recordatorio
+- Token único para link del formulario del destinatario
 
 **Diseño:**
-- Estética oscura coherente con el sitio (#0a0a0a, #c9a227)
-- Tipografía: Cinzel para títulos, Cormorant Garamond para texto
-- Campos con bordes dorados sutiles
-- Transiciones suaves
-- Validación clara y amigable
+- Fondo: `#0a0a0a`
+- Dorado: `#c9a227`
+- Títulos: `'Cinzel', serif`
+- Texto: `'Cormorant Garamond', serif`
+- Inputs con borde `rgba(201,162,39,0.3)`
+- Focus: glow dorado
+- Botones: gradiente dorado
+- Mobile-first, una pregunta visible a la vez con scroll suave
 
-**Hooks WooCommerce a usar:**
-- `woocommerce_before_order_notes` o `woocommerce_after_order_notes`
-- `woocommerce_checkout_update_order_meta` para guardar datos
-- Campos deben guardarse como order meta
-
-**Archivo a crear:** `duendes-formulario-canalizacion.php`
+---
 
 ---
 

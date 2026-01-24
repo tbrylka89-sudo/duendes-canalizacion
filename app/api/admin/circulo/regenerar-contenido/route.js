@@ -312,10 +312,15 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     const {
       mes = new Date().getMonth() + 1,
-      año = new Date().getFullYear(),
+      año,
+      anio,
+      year,
       soloFaltantes = false,
       diaEspecifico = null
     } = body;
+
+    // Aceptar año, anio o year para evitar problemas de encoding
+    const yearValue = año || anio || year || new Date().getFullYear();
 
     // Obtener duendes reales
     const duendes = await kv.get('circulo:duendes-reales') || [];
@@ -329,17 +334,17 @@ export async function POST(request) {
     }
 
     // Asignar duendes a semanas
-    const duendesPorSemana = asignarDuendesMes(mes, año, duendes);
+    const duendesPorSemana = asignarDuendesMes(mes, yearValue, duendes);
 
     const hoy = new Date();
-    const ultimoDia = new Date(año, mes, 0);
+    const ultimoDia = new Date(yearValue, mes, 0);
     const totalDias = ultimoDia.getDate();
     const contenidosGenerados = [];
     const errores = [];
 
     // Si es un día específico
     if (diaEspecifico) {
-      const fecha = new Date(año, mes - 1, diaEspecifico);
+      const fecha = new Date(yearValue, mes - 1, diaEspecifico);
       const diaSemana = fecha.getDay();
       const numSemana = getNumeroSemana(fecha);
       const estructura = ESTRUCTURA_SEMANAL[diaSemana];
@@ -348,7 +353,7 @@ export async function POST(request) {
       const fechaStr = `${String(mes).padStart(2, '0')}-${String(diaEspecifico).padStart(2, '0')}`;
       const especial = FECHAS_ESPECIALES[fechaStr];
 
-      const contenido = await generarContenidoDia(`${diaEspecifico}/${mes}/${año}`, estructura, especial, duende, apiKey);
+      const contenido = await generarContenidoDia(`${diaEspecifico}/${mes}/${yearValue}`, estructura, especial, duende, apiKey);
 
       // Generar imagen con DALL-E
       let imagenUrl = null;
@@ -365,11 +370,11 @@ export async function POST(request) {
       }
 
       const contenidoCompleto = {
-        id: `${año}-${mes}-${diaEspecifico}`,
+        id: `${yearValue}-${mes}-${diaEspecifico}`,
         fecha: fecha.toISOString(),
         dia: diaEspecifico,
         mes,
-        año,
+        año: yearValue,
         diaSemana,
         semana: numSemana,
         tipo: estructura.tipo,
@@ -399,11 +404,11 @@ export async function POST(request) {
         publicadoEn: fecha <= hoy ? new Date().toISOString() : null
       };
 
-      await kv.set(`circulo:contenido:${año}:${mes}:${diaEspecifico}`, contenidoCompleto);
+      await kv.set(`circulo:contenido:${yearValue}:${mes}:${diaEspecifico}`, contenidoCompleto);
 
       return Response.json({
         success: true,
-        mensaje: `Contenido generado para ${diaEspecifico}/${mes}/${año}`,
+        mensaje: `Contenido generado para ${diaEspecifico}/${mes}/${yearValue}`,
         contenido: contenidoCompleto,
         duende: duende.nombre
       });
@@ -413,11 +418,11 @@ export async function POST(request) {
     for (let dia = 1; dia <= totalDias; dia++) {
       // Si solo faltantes, verificar si ya existe
       if (soloFaltantes) {
-        const existente = await kv.get(`circulo:contenido:${año}:${mes}:${dia}`);
+        const existente = await kv.get(`circulo:contenido:${yearValue}:${mes}:${dia}`);
         if (existente) continue;
       }
 
-      const fecha = new Date(año, mes - 1, dia);
+      const fecha = new Date(yearValue, mes - 1, dia);
       const diaSemana = fecha.getDay();
       const numSemana = getNumeroSemana(fecha);
       const estructura = ESTRUCTURA_SEMANAL[diaSemana];
@@ -427,7 +432,7 @@ export async function POST(request) {
       const especial = FECHAS_ESPECIALES[fechaStr];
 
       try {
-        const contenido = await generarContenidoDia(`${dia}/${mes}/${año}`, estructura, especial, duende, apiKey);
+        const contenido = await generarContenidoDia(`${dia}/${mes}/${yearValue}`, estructura, especial, duende, apiKey);
 
         // Generar imagen con DALL-E
         let imagenUrl = null;
@@ -445,11 +450,11 @@ export async function POST(request) {
         }
 
         const contenidoCompleto = {
-          id: `${año}-${mes}-${dia}`,
+          id: `${yearValue}-${mes}-${dia}`,
           fecha: fecha.toISOString(),
           dia,
           mes,
-          año,
+          año: yearValue,
           diaSemana,
           semana: numSemana,
           tipo: estructura.tipo,
@@ -479,7 +484,7 @@ export async function POST(request) {
           publicadoEn: fecha <= hoy ? new Date().toISOString() : null
         };
 
-        await kv.set(`circulo:contenido:${año}:${mes}:${dia}`, contenidoCompleto);
+        await kv.set(`circulo:contenido:${yearValue}:${mes}:${dia}`, contenidoCompleto);
         contenidosGenerados.push({ dia, titulo: contenido.titulo, duende: duende.nombre });
 
         // Pausa entre llamadas a la API
@@ -493,7 +498,7 @@ export async function POST(request) {
 
     // Guardar índice del mes
     const indice = {
-      año,
+      año: yearValue,
       mes,
       totalContenidos: contenidosGenerados.length,
       generadoEn: new Date().toISOString(),
@@ -505,11 +510,11 @@ export async function POST(request) {
       usandoDuendesReales: true
     };
 
-    await kv.set(`circulo:indice:${año}:${mes}`, indice);
+    await kv.set(`circulo:indice:${yearValue}:${mes}`, indice);
 
     return Response.json({
       success: true,
-      mensaje: `Generados ${contenidosGenerados.length} contenidos para ${mes}/${año} con duendes reales`,
+      mensaje: `Generados ${contenidosGenerados.length} contenidos para ${mes}/${yearValue} con duendes reales`,
       duendesUsados: duendes.map(d => d.nombre),
       contenidos: contenidosGenerados,
       errores: errores.length > 0 ? errores : null

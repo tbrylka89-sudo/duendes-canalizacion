@@ -3389,6 +3389,52 @@ function SeccionContenido() {
           margin: 0 0 20px;
         }
 
+        /* Formato viejo: mensaje + enseñanza + práctica */
+        .contenido-mensaje {
+          font-size: 18px;
+          font-style: italic;
+          color: rgba(255, 255, 255, 0.9);
+          border-left: 3px solid var(--neon-magenta);
+          padding-left: 20px;
+          margin-bottom: 25px;
+        }
+
+        .contenido-ensenanza,
+        .contenido-practica {
+          background: rgba(255, 0, 255, 0.05);
+          border: 1px solid rgba(255, 0, 255, 0.15);
+          border-radius: 12px;
+          padding: 20px;
+          margin: 20px 0;
+        }
+
+        .ensenanza-label,
+        .practica-label {
+          display: block;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--neon-magenta);
+          margin-bottom: 10px;
+        }
+
+        .contenido-ensenanza p,
+        .contenido-practica p {
+          margin: 0;
+          color: rgba(255, 255, 255, 0.85);
+          line-height: 1.7;
+        }
+
+        .contenido-reflexion {
+          font-style: italic;
+          font-size: 18px;
+          color: var(--neon-blue);
+          text-align: center;
+          padding: 20px;
+          margin-top: 30px;
+          border-top: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
         /* Formato secciones - regenerar-contenido */
         .contenido-intro {
           margin-bottom: 25px;

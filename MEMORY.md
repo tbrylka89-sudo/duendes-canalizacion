@@ -436,7 +436,7 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 - [x] Deploy a Vercel ✅
 - [x] Probar APIs en producción ✅
 - [x] Aprovechar Gemini para contenido diario ✅ (Gemini 2.0 Flash como primario, Claude fallback)
-- [ ] Investigar duendes duplicados en foro
+- [x] Arreglar duendes duplicados en foro ✅ (nombres ficticios para únicos, minis pueden repetir)
 - [ ] Arreglar formato consejo-del-dia (asteriscos extra)
 
 ---
