@@ -1,200 +1,707 @@
 <?php
 /**
- * Plugin Name: Duendes - Promoción 3x2
- * Description: Comprá 2 guardianes y llevate un mini de regalo a elección
- * Version: 1.0
+ * Plugin Name: Duendes - Promoción 3x2 + Estilo Carrito/Checkout
+ * Description: Promo 3x2 y estética oscura completa para carrito y checkout
+ * Version: 2.0
  * Author: Duendes del Uruguay
  */
 
 if (!defined('ABSPATH')) exit;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN DE LA PROMOCIÓN
+// CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════════════════
 
-if (!defined('DUENDES_PROMO_3X2_ACTIVA')) {
-    define('DUENDES_PROMO_3X2_ACTIVA', true);
-    define('DUENDES_PROMO_GUARDIANES_REQUERIDOS', 2);
-    define('DUENDES_PROMO_CATEGORIA_MINI', 'mini');
-    define('DUENDES_PROMO_MENSAJE', 'Llevás 2 guardianes! Elegí tu mini de regalo');
+define('DUENDES_PROMO_3X2_ACTIVA', true);
+define('DUENDES_PROMO_GUARDIANES_REQUERIDOS', 2);
+define('DUENDES_PROMO_CATEGORIA_MINI', 'mini');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ESTILOS GLOBALES PARA CARRITO Y CHECKOUT
+// ═══════════════════════════════════════════════════════════════════════════
+
+add_action('wp_head', 'duendes_estilos_carrito_checkout', 999);
+
+function duendes_estilos_carrito_checkout() {
+    if (!is_cart() && !is_checkout()) return;
+    ?>
+    <style id="duendes-cart-checkout-styles">
+    /* ═══════════════════════════════════════════════════════════════════
+       VARIABLES Y BASE
+       ═══════════════════════════════════════════════════════════════════ */
+    :root {
+        --duendes-bg-dark: #0a0a0f;
+        --duendes-bg-card: #0d0d14;
+        --duendes-bg-card-hover: #12101a;
+        --duendes-gold: #C6A962;
+        --duendes-gold-dim: rgba(198,169,98,0.6);
+        --duendes-gold-subtle: rgba(198,169,98,0.15);
+        --duendes-gold-border: rgba(198,169,98,0.25);
+        --duendes-text: #ffffff;
+        --duendes-text-dim: rgba(255,255,255,0.7);
+        --duendes-text-muted: rgba(255,255,255,0.5);
+        --duendes-font-title: 'Cinzel', Georgia, serif;
+        --duendes-font-body: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       FONDO GENERAL
+       ═══════════════════════════════════════════════════════════════════ */
+    body.woocommerce-cart,
+    body.woocommerce-checkout {
+        background: var(--duendes-bg-dark) !important;
+    }
+
+    body.woocommerce-cart .site-content,
+    body.woocommerce-checkout .site-content,
+    body.woocommerce-cart .entry-content,
+    body.woocommerce-checkout .entry-content,
+    body.woocommerce-cart main,
+    body.woocommerce-checkout main,
+    body.woocommerce-cart article,
+    body.woocommerce-checkout article {
+        background: transparent !important;
+    }
+
+    .woocommerce-cart .woocommerce,
+    .woocommerce-checkout .woocommerce {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    /* Ocultar notices molestos */
+    .woocommerce-message,
+    .woocommerce-info:not(.duendes-keep) {
+        display: none !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PÁGINA DE CARRITO
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* Contenedor principal del carrito */
+    .woocommerce-cart-form {
+        background: linear-gradient(145deg, var(--duendes-bg-card) 0%, var(--duendes-bg-card-hover) 100%);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    /* Tabla del carrito */
+    .woocommerce table.shop_table {
+        background: transparent !important;
+        border: none !important;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+
+    .woocommerce table.shop_table thead {
+        display: none; /* Ocultar encabezados - diseño más limpio */
+    }
+
+    .woocommerce table.shop_table tbody tr {
+        background: rgba(255,255,255,0.02);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .woocommerce table.shop_table tbody tr:hover {
+        background: var(--duendes-gold-subtle);
+    }
+
+    .woocommerce table.shop_table td {
+        background: transparent !important;
+        border: none !important;
+        padding: 20px 15px !important;
+        vertical-align: middle;
+        color: var(--duendes-text) !important;
+    }
+
+    .woocommerce table.shop_table td:first-child {
+        border-radius: 12px 0 0 12px;
+    }
+
+    .woocommerce table.shop_table td:last-child {
+        border-radius: 0 12px 12px 0;
+    }
+
+    /* Imagen del producto */
+    .woocommerce table.shop_table td.product-thumbnail img {
+        border-radius: 12px;
+        width: 80px !important;
+        height: 80px !important;
+        object-fit: cover;
+        border: 1px solid var(--duendes-gold-border);
+    }
+
+    /* Nombre del producto */
+    .woocommerce table.shop_table td.product-name {
+        font-family: var(--duendes-font-body);
+        font-size: 18px;
+    }
+
+    .woocommerce table.shop_table td.product-name a {
+        color: var(--duendes-text) !important;
+        text-decoration: none !important;
+        transition: color 0.3s ease;
+    }
+
+    .woocommerce table.shop_table td.product-name a:hover {
+        color: var(--duendes-gold) !important;
+    }
+
+    /* Precio */
+    .woocommerce table.shop_table td.product-price,
+    .woocommerce table.shop_table td.product-subtotal {
+        font-family: var(--duendes-font-title);
+        font-size: 16px;
+        color: var(--duendes-gold) !important;
+        letter-spacing: 1px;
+    }
+
+    .woocommerce table.shop_table .woocommerce-Price-amount {
+        color: var(--duendes-gold) !important;
+    }
+
+    /* Campo de cantidad */
+    .woocommerce table.shop_table td.product-quantity .quantity {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .woocommerce table.shop_table .quantity .qty {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid var(--duendes-gold-border) !important;
+        color: var(--duendes-text) !important;
+        border-radius: 8px !important;
+        width: 60px !important;
+        height: 40px !important;
+        text-align: center;
+        font-family: var(--duendes-font-title);
+    }
+
+    /* Botón eliminar */
+    .woocommerce table.shop_table td.product-remove a.remove {
+        color: var(--duendes-gold-dim) !important;
+        font-size: 24px;
+        transition: all 0.3s ease;
+    }
+
+    .woocommerce table.shop_table td.product-remove a.remove:hover {
+        color: #ff6b6b !important;
+        background: transparent !important;
+    }
+
+    /* Cupón y actualizar carrito */
+    .woocommerce table.shop_table td.actions {
+        background: transparent !important;
+        padding-top: 30px !important;
+    }
+
+    .woocommerce .coupon {
+        display: flex !important;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .woocommerce .coupon label {
+        display: none;
+    }
+
+    .woocommerce .coupon #coupon_code {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 25px;
+        padding: 12px 20px;
+        color: var(--duendes-text);
+        font-family: var(--duendes-font-body);
+        min-width: 200px;
+    }
+
+    .woocommerce .coupon #coupon_code::placeholder {
+        color: var(--duendes-text-muted);
+    }
+
+    .woocommerce .coupon #coupon_code:focus {
+        border-color: var(--duendes-gold);
+        outline: none;
+        box-shadow: 0 0 15px rgba(198,169,98,0.2);
+    }
+
+    /* Botones del carrito */
+    .woocommerce .button,
+    .woocommerce button.button,
+    .woocommerce input.button {
+        background: linear-gradient(135deg, var(--duendes-gold) 0%, #a88a42 100%) !important;
+        color: var(--duendes-bg-dark) !important;
+        border: none !important;
+        border-radius: 25px !important;
+        padding: 12px 28px !important;
+        font-family: var(--duendes-font-title) !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .woocommerce .button:hover,
+    .woocommerce button.button:hover,
+    .woocommerce input.button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(198,169,98,0.35) !important;
+    }
+
+    .woocommerce button[name="update_cart"] {
+        background: transparent !important;
+        border: 1px solid var(--duendes-gold-border) !important;
+        color: var(--duendes-gold) !important;
+    }
+
+    .woocommerce button[name="update_cart"]:hover {
+        background: var(--duendes-gold-subtle) !important;
+        border-color: var(--duendes-gold) !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       TOTALES DEL CARRITO
+       ═══════════════════════════════════════════════════════════════════ */
+
+    .cart_totals {
+        background: linear-gradient(145deg, var(--duendes-bg-card) 0%, var(--duendes-bg-card-hover) 100%);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 20px;
+        padding: 30px;
+    }
+
+    .cart_totals h2 {
+        color: var(--duendes-gold) !important;
+        font-family: var(--duendes-font-title) !important;
+        font-size: 18px !important;
+        letter-spacing: 3px !important;
+        text-transform: uppercase !important;
+        margin-bottom: 25px !important;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--duendes-gold-border);
+    }
+
+    .cart_totals table {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .cart_totals table th,
+    .cart_totals table td {
+        background: transparent !important;
+        border: none !important;
+        padding: 12px 0 !important;
+        color: var(--duendes-text) !important;
+        font-family: var(--duendes-font-body);
+        font-size: 16px;
+    }
+
+    .cart_totals table th {
+        color: var(--duendes-text-dim) !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 12px;
+    }
+
+    .cart_totals table .order-total th,
+    .cart_totals table .order-total td {
+        font-family: var(--duendes-font-title) !important;
+        font-size: 20px !important;
+        color: var(--duendes-gold) !important;
+        padding-top: 20px !important;
+        border-top: 1px solid var(--duendes-gold-border) !important;
+    }
+
+    .cart_totals .wc-proceed-to-checkout {
+        margin-top: 25px;
+    }
+
+    .cart_totals .wc-proceed-to-checkout .checkout-button {
+        width: 100%;
+        text-align: center;
+        padding: 16px 28px !important;
+        font-size: 14px !important;
+    }
+
+    /* Shipping */
+    .cart_totals .shipping th,
+    .cart_totals .shipping td {
+        vertical-align: top;
+    }
+
+    .cart_totals .shipping ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .cart_totals .shipping li {
+        margin-bottom: 8px;
+        color: var(--duendes-text-dim);
+    }
+
+    .cart_totals .shipping label {
+        color: var(--duendes-text) !important;
+    }
+
+    .cart_totals .shipping .woocommerce-Price-amount {
+        color: var(--duendes-gold) !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PÁGINA DE CHECKOUT
+       ═══════════════════════════════════════════════════════════════════ */
+
+    .woocommerce-checkout .woocommerce {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 40px;
+        align-items: start;
+    }
+
+    @media (max-width: 968px) {
+        .woocommerce-checkout .woocommerce {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Formulario de checkout */
+    .woocommerce-checkout .woocommerce-billing-fields,
+    .woocommerce-checkout .woocommerce-shipping-fields,
+    .woocommerce-checkout .woocommerce-additional-fields {
+        background: linear-gradient(145deg, var(--duendes-bg-card) 0%, var(--duendes-bg-card-hover) 100%);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+
+    .woocommerce-checkout h3 {
+        color: var(--duendes-gold) !important;
+        font-family: var(--duendes-font-title) !important;
+        font-size: 16px !important;
+        letter-spacing: 3px !important;
+        text-transform: uppercase !important;
+        margin: 0 0 25px 0 !important;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--duendes-gold-border);
+    }
+
+    /* Campos del formulario */
+    .woocommerce-checkout .form-row {
+        margin-bottom: 18px;
+    }
+
+    .woocommerce-checkout .form-row label {
+        color: var(--duendes-text-dim) !important;
+        font-family: var(--duendes-font-body);
+        font-size: 14px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .woocommerce-checkout .form-row label .required {
+        color: var(--duendes-gold);
+    }
+
+    .woocommerce-checkout input[type="text"],
+    .woocommerce-checkout input[type="email"],
+    .woocommerce-checkout input[type="tel"],
+    .woocommerce-checkout input[type="number"],
+    .woocommerce-checkout input[type="password"],
+    .woocommerce-checkout select,
+    .woocommerce-checkout textarea {
+        background: rgba(255,255,255,0.03) !important;
+        border: 1px solid var(--duendes-gold-border) !important;
+        border-radius: 12px !important;
+        padding: 14px 18px !important;
+        color: var(--duendes-text) !important;
+        font-family: var(--duendes-font-body) !important;
+        font-size: 15px !important;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .woocommerce-checkout input:focus,
+    .woocommerce-checkout select:focus,
+    .woocommerce-checkout textarea:focus {
+        border-color: var(--duendes-gold) !important;
+        outline: none !important;
+        box-shadow: 0 0 20px rgba(198,169,98,0.15) !important;
+        background: rgba(198,169,98,0.03) !important;
+    }
+
+    .woocommerce-checkout input::placeholder,
+    .woocommerce-checkout textarea::placeholder {
+        color: var(--duendes-text-muted) !important;
+    }
+
+    /* Select2 dropdowns */
+    .woocommerce-checkout .select2-container--default .select2-selection--single {
+        background: rgba(255,255,255,0.03) !important;
+        border: 1px solid var(--duendes-gold-border) !important;
+        border-radius: 12px !important;
+        height: 50px !important;
+    }
+
+    .woocommerce-checkout .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--duendes-text) !important;
+        line-height: 50px !important;
+        padding-left: 18px !important;
+        font-family: var(--duendes-font-body) !important;
+    }
+
+    .woocommerce-checkout .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 50px !important;
+        right: 12px !important;
+    }
+
+    .select2-dropdown {
+        background: var(--duendes-bg-card) !important;
+        border: 1px solid var(--duendes-gold-border) !important;
+        border-radius: 12px !important;
+    }
+
+    .select2-results__option {
+        color: var(--duendes-text) !important;
+        padding: 12px 18px !important;
+    }
+
+    .select2-results__option--highlighted {
+        background: var(--duendes-gold-subtle) !important;
+        color: var(--duendes-gold) !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESUMEN DEL PEDIDO (CHECKOUT)
+       ═══════════════════════════════════════════════════════════════════ */
+
+    .woocommerce-checkout-review-order {
+        background: linear-gradient(145deg, var(--duendes-bg-card) 0%, #15121f 100%);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 20px;
+        padding: 30px;
+        position: sticky;
+        top: 30px;
+    }
+
+    .woocommerce-checkout-review-order h3 {
+        border-bottom: none;
+        margin-bottom: 20px !important;
+    }
+
+    .woocommerce-checkout-review-order-table {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .woocommerce-checkout-review-order-table th,
+    .woocommerce-checkout-review-order-table td {
+        background: transparent !important;
+        border: none !important;
+        padding: 12px 0 !important;
+        color: var(--duendes-text) !important;
+        font-family: var(--duendes-font-body);
+    }
+
+    .woocommerce-checkout-review-order-table thead th {
+        color: var(--duendes-text-muted) !important;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--duendes-gold-border) !important;
+        padding-bottom: 15px !important;
+    }
+
+    .woocommerce-checkout-review-order-table tbody tr {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .woocommerce-checkout-review-order-table .product-name {
+        font-size: 15px;
+    }
+
+    .woocommerce-checkout-review-order-table .product-total {
+        color: var(--duendes-gold) !important;
+        font-family: var(--duendes-font-title);
+    }
+
+    .woocommerce-checkout-review-order-table tfoot th {
+        color: var(--duendes-text-dim) !important;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    .woocommerce-checkout-review-order-table tfoot .order-total th,
+    .woocommerce-checkout-review-order-table tfoot .order-total td {
+        font-family: var(--duendes-font-title) !important;
+        font-size: 22px !important;
+        color: var(--duendes-gold) !important;
+        padding-top: 20px !important;
+        border-top: 1px solid var(--duendes-gold-border) !important;
+    }
+
+    /* Métodos de pago */
+    .woocommerce-checkout-payment {
+        background: transparent !important;
+        margin-top: 25px;
+    }
+
+    .woocommerce-checkout-payment ul.payment_methods {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px 0;
+        border: none !important;
+    }
+
+    .woocommerce-checkout-payment li.payment_method {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 12px;
+        margin-bottom: 10px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .woocommerce-checkout-payment li.payment_method:hover {
+        border-color: var(--duendes-gold-dim);
+    }
+
+    .woocommerce-checkout-payment li.payment_method label {
+        color: var(--duendes-text) !important;
+        font-family: var(--duendes-font-body);
+        cursor: pointer;
+    }
+
+    .woocommerce-checkout-payment .payment_box {
+        background: var(--duendes-gold-subtle) !important;
+        border-radius: 8px;
+        margin-top: 12px;
+        padding: 15px;
+        color: var(--duendes-text-dim);
+        font-size: 14px;
+    }
+
+    .woocommerce-checkout-payment .payment_box::before {
+        display: none;
+    }
+
+    /* Botón de compra */
+    .woocommerce-checkout #place_order {
+        width: 100%;
+        padding: 18px 28px !important;
+        font-size: 15px !important;
+        margin-top: 15px;
+    }
+
+    /* Terms */
+    .woocommerce-checkout .woocommerce-terms-and-conditions-wrapper {
+        margin: 20px 0;
+    }
+
+    .woocommerce-checkout .woocommerce-privacy-policy-text {
+        color: var(--duendes-text-muted);
+        font-size: 13px;
+    }
+
+    .woocommerce-checkout .woocommerce-privacy-policy-text a {
+        color: var(--duendes-gold);
+    }
+
+    /* Checkbox styling */
+    .woocommerce-checkout input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--duendes-gold-border);
+        border-radius: 4px;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+
+    .woocommerce-checkout input[type="checkbox"]:checked {
+        background: var(--duendes-gold);
+        border-color: var(--duendes-gold);
+    }
+
+    .woocommerce-checkout input[type="checkbox"]:checked::after {
+        content: '✓';
+        position: absolute;
+        color: var(--duendes-bg-dark);
+        font-size: 14px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════ */
+
+    @media (max-width: 768px) {
+        .woocommerce-cart-form {
+            padding: 20px;
+        }
+
+        .woocommerce table.shop_table td {
+            padding: 12px 8px !important;
+        }
+
+        .woocommerce table.shop_table td.product-thumbnail img {
+            width: 60px !important;
+            height: 60px !important;
+        }
+
+        .woocommerce table.shop_table td.product-name {
+            font-size: 15px;
+        }
+
+        .cart_totals,
+        .woocommerce-checkout .woocommerce-billing-fields,
+        .woocommerce-checkout-review-order {
+            padding: 20px;
+        }
+
+        .woocommerce-checkout .woocommerce {
+            padding: 20px 15px;
+        }
+    }
+    </style>
+    <?php
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DETECTAR CUANDO HAY 2+ GUARDIANES EN EL CARRITO
+// HOOKS PARA LA PROMO 3x2
 // ═══════════════════════════════════════════════════════════════════════════
 
 add_action('woocommerce_after_cart_table', 'duendes_verificar_promo_3x2');
-add_action('woocommerce_before_checkout_form', 'duendes_verificar_promo_3x2');
-
-// Estilos oscuros para carrito y checkout (matching site aesthetic)
-add_action('wp_head', function() {
-    if (is_cart() || is_checkout()) {
-        ?>
-        <style>
-            /* Ocultar notices feos */
-            .woocommerce-message, .woocommerce-info { display: none !important; }
-
-            /* Fondo oscuro general */
-            body.woocommerce-cart,
-            body.woocommerce-checkout {
-                background-color: #0a0a0f !important;
-            }
-
-            /* Contenedor principal */
-            .woocommerce-cart .entry-content,
-            .woocommerce-checkout .entry-content,
-            .woocommerce-cart .woocommerce,
-            .woocommerce-checkout .woocommerce {
-                background-color: #0a0a0f !important;
-                color: #fff !important;
-            }
-
-            /* Tabla del carrito */
-            .woocommerce-cart-form,
-            .woocommerce table.shop_table {
-                background: linear-gradient(135deg, #0d0d14 0%, #12101a 100%) !important;
-                border: 1px solid rgba(198,169,98,0.2) !important;
-                border-radius: 16px !important;
-                overflow: hidden !important;
-            }
-
-            .woocommerce table.shop_table th,
-            .woocommerce table.shop_table td {
-                background: transparent !important;
-                color: #fff !important;
-                border-color: rgba(198,169,98,0.15) !important;
-            }
-
-            .woocommerce table.shop_table th {
-                color: #C6A962 !important;
-                font-family: 'Cinzel', serif !important;
-                text-transform: uppercase !important;
-                letter-spacing: 2px !important;
-                font-size: 12px !important;
-            }
-
-            /* Links de productos */
-            .woocommerce-cart-form .product-name a,
-            .woocommerce table.shop_table a {
-                color: #fff !important;
-                text-decoration: none !important;
-            }
-
-            .woocommerce-cart-form .product-name a:hover {
-                color: #C6A962 !important;
-            }
-
-            /* Precios */
-            .woocommerce .cart-subtotal td,
-            .woocommerce .order-total td,
-            .woocommerce-Price-amount {
-                color: #C6A962 !important;
-            }
-
-            /* Inputs */
-            .woocommerce input[type="text"],
-            .woocommerce input[type="email"],
-            .woocommerce input[type="tel"],
-            .woocommerce input[type="number"],
-            .woocommerce select,
-            .woocommerce textarea {
-                background: rgba(255,255,255,0.05) !important;
-                border: 1px solid rgba(198,169,98,0.3) !important;
-                color: #fff !important;
-                border-radius: 8px !important;
-            }
-
-            .woocommerce input:focus,
-            .woocommerce select:focus,
-            .woocommerce textarea:focus {
-                border-color: #C6A962 !important;
-                outline: none !important;
-            }
-
-            /* Labels */
-            .woocommerce label,
-            .woocommerce-billing-fields h3,
-            .woocommerce-shipping-fields h3 {
-                color: #fff !important;
-            }
-
-            /* Botones */
-            .woocommerce .button,
-            .woocommerce input[type="submit"],
-            .woocommerce button[type="submit"] {
-                background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%) !important;
-                color: #0d0d14 !important;
-                border: none !important;
-                border-radius: 25px !important;
-                font-family: 'Cinzel', serif !important;
-                font-weight: 600 !important;
-                letter-spacing: 1px !important;
-                text-transform: uppercase !important;
-                padding: 12px 30px !important;
-                transition: all 0.3s ease !important;
-            }
-
-            .woocommerce .button:hover,
-            .woocommerce input[type="submit"]:hover,
-            .woocommerce button[type="submit"]:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 8px 25px rgba(198,169,98,0.3) !important;
-            }
-
-            /* Totales del carrito */
-            .cart_totals,
-            .woocommerce-checkout-review-order-table {
-                background: linear-gradient(135deg, #0d0d14 0%, #12101a 100%) !important;
-                border: 1px solid rgba(198,169,98,0.2) !important;
-                border-radius: 16px !important;
-                padding: 20px !important;
-            }
-
-            .cart_totals h2,
-            .woocommerce-checkout h3 {
-                color: #C6A962 !important;
-                font-family: 'Cinzel', serif !important;
-            }
-
-            /* Cantidad input */
-            .woocommerce .quantity .qty {
-                background: rgba(255,255,255,0.05) !important;
-                color: #fff !important;
-                border: 1px solid rgba(198,169,98,0.3) !important;
-            }
-
-            /* Remove button */
-            .woocommerce a.remove {
-                color: #C6A962 !important;
-            }
-
-            /* Cupón */
-            .woocommerce .coupon {
-                display: flex !important;
-                gap: 10px !important;
-                align-items: center !important;
-            }
-
-            /* Título de página */
-            .woocommerce-cart .entry-title,
-            .woocommerce-checkout .entry-title {
-                color: #fff !important;
-            }
-        </style>
-        <?php
-    }
-});
+add_action('woocommerce_before_checkout_form', 'duendes_verificar_promo_3x2', 5);
 
 function duendes_verificar_promo_3x2() {
     if (!DUENDES_PROMO_3X2_ACTIVA) return;
+    if (!WC()->cart) return;
 
-    $guardianes_en_carrito = duendes_contar_guardianes_carrito();
-    $minis_gratis_actuales = duendes_contar_minis_gratis_en_carrito();
-    $minis_gratis_merecidos = floor($guardianes_en_carrito / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
-    $minis_pendientes = $minis_gratis_merecidos - $minis_gratis_actuales;
+    $guardianes = duendes_contar_guardianes_carrito();
+    $minis_actuales = duendes_contar_minis_gratis_en_carrito();
+    $minis_merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
+    $minis_pendientes = $minis_merecidos - $minis_actuales;
 
     if ($minis_pendientes > 0) {
-        duendes_mostrar_selector_mini($minis_pendientes, $minis_gratis_merecidos);
+        duendes_mostrar_selector_mini($minis_pendientes, $minis_merecidos);
     }
 }
 
@@ -203,24 +710,14 @@ function duendes_contar_guardianes_carrito() {
 
     $count = 0;
     foreach (WC()->cart->get_cart() as $cart_item) {
-        $product_id = $cart_item['product_id'];
-
-        // No contar los minis gratis
         if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
             continue;
         }
-
-        // Verificar si es un guardián (no es mini)
-        if (!has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product_id)) {
+        if (!has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $cart_item['product_id'])) {
             $count += $cart_item['quantity'];
         }
     }
-
     return $count;
-}
-
-function duendes_tiene_mini_gratis_en_carrito() {
-    return duendes_contar_minis_gratis_en_carrito() > 0;
 }
 
 function duendes_contar_minis_gratis_en_carrito() {
@@ -232,7 +729,6 @@ function duendes_contar_minis_gratis_en_carrito() {
             $count += $cart_item['quantity'];
         }
     }
-
     return $count;
 }
 
@@ -241,831 +737,325 @@ function duendes_contar_minis_gratis_en_carrito() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1) {
-    // Obtener minis disponibles usando WP_Query directamente
-    $args = [
+    $categoria = get_term_by('slug', DUENDES_PROMO_CATEGORIA_MINI, 'product_cat');
+    if (!$categoria) return;
+
+    $query = new WP_Query([
         'post_type' => 'product',
         'post_status' => 'publish',
         'posts_per_page' => 8,
-        'meta_query' => [
-            [
-                'key' => '_stock_status',
-                'value' => 'instock',
-                'compare' => '='
-            ]
-        ],
-        'tax_query' => [
-            [
-                'taxonomy' => 'product_cat',
-                'field' => 'slug',
-                'terms' => DUENDES_PROMO_CATEGORIA_MINI,
-            ]
-        ],
-    ];
+        'tax_query' => [[
+            'taxonomy' => 'product_cat',
+            'field' => 'term_id',
+            'terms' => $categoria->term_id,
+        ]]
+    ]);
 
-    $query = new WP_Query($args);
     $minis = [];
-
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
-            $minis[] = wc_get_product(get_the_ID());
+            $product = wc_get_product(get_the_ID());
+            if ($product && $product->is_in_stock()) {
+                $minis[] = $product;
+            }
         }
         wp_reset_postdata();
     }
 
     if (empty($minis)) return;
-
     ?>
-    <style>
-        @keyframes dfb-selector-fade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes dfb-selector-glow {
-            0%, 100% { box-shadow: 0 0 25px rgba(198,169,98,0.15); }
-            50% { box-shadow: 0 0 40px rgba(198,169,98,0.25); }
-        }
-        @keyframes dfb-card-appear {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .duendes-selector-3x2 {
-            background: #0a0a0f !important;
-            border: 1px solid rgba(198,169,98,0.4) !important;
-            border-radius: 24px !important;
-            padding: 40px !important;
-            margin: 30px 0 !important;
-            text-align: center !important;
-            position: relative !important;
-            overflow: hidden !important;
-            animation: dfb-selector-fade 0.6s ease-out, dfb-selector-glow 4s ease-in-out infinite !important;
-        }
-        .duendes-selector-3x2::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(198,169,98,0.5), transparent);
-        }
-        .dfb-selector-titulo {
-            color: #fff !important;
-            margin: 0 0 8px 0 !important;
-            font-family: 'Cinzel', Georgia, serif !important;
-            font-size: 24px !important;
-            font-weight: 500 !important;
-            letter-spacing: 3px !important;
-            text-transform: uppercase !important;
-        }
-        .dfb-selector-subtitulo {
-            color: rgba(255,255,255,0.8) !important;
-            margin: 0 0 30px 0 !important;
-            font-family: 'Cormorant Garamond', Georgia, serif !important;
-            font-size: 17px !important;
-            font-style: italic !important;
-        }
-        .dfb-minis-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 20px;
-            max-width: 700px;
-            margin: 0 auto 30px auto;
-        }
-        .dfb-mini-card {
-            background: linear-gradient(135deg, rgba(198,169,98,0.08) 0%, rgba(198,169,98,0.02) 100%);
-            border: 1px solid rgba(198,169,98,0.2);
-            border-radius: 16px;
-            padding: 18px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: dfb-card-appear 0.5s ease-out backwards;
-        }
-        .dfb-mini-card:hover {
-            border-color: rgba(198,169,98,0.5);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3), 0 0 20px rgba(198,169,98,0.1);
-        }
-        .dfb-mini-card.selected {
-            border-color: #C6A962;
-            background: linear-gradient(135deg, rgba(198,169,98,0.2) 0%, rgba(198,169,98,0.08) 100%);
-            box-shadow: 0 0 30px rgba(198,169,98,0.3), inset 0 0 20px rgba(198,169,98,0.05);
-        }
-        .dfb-mini-card img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            transition: transform 0.3s ease;
-        }
-        .dfb-mini-card:hover img {
-            transform: scale(1.05);
-        }
-        .dfb-mini-card p {
-            color: #fff !important;
-            margin: 0 !important;
-            font-family: 'Cormorant Garamond', Georgia, serif !important;
-            font-size: 15px !important;
-            line-height: 1.4 !important;
-        }
-        .dfb-selector-btn {
-            background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%);
-            color: #0d0d14;
-            border: none;
-            padding: 16px 40px;
-            border-radius: 30px;
-            font-family: 'Cinzel', Georgia, serif;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            opacity: 0.4;
-            transition: all 0.4s ease;
-        }
-        .dfb-selector-btn:not(:disabled) {
-            opacity: 1;
-        }
-        .dfb-selector-btn:not(:disabled):hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(198,169,98,0.3);
-        }
-        .dfb-selector-nota {
-            color: rgba(255,255,255,0.4);
-            font-size: 12px;
-            margin: 20px 0 0 0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-style: italic;
-        }
-    </style>
+    <div class="duendes-promo-3x2-selector">
+        <style>
+            .duendes-promo-3x2-selector {
+                margin: 35px 0;
+            }
+            .duendes-promo-box {
+                background: linear-gradient(145deg, #0d0d14 0%, #18141f 100%);
+                border: 1px solid rgba(198,169,98,0.35);
+                border-radius: 20px;
+                padding: 35px;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .duendes-promo-box::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #C6A962, transparent);
+            }
+            .duendes-promo-titulo {
+                color: #C6A962;
+                margin: 0 0 8px 0;
+                font-family: 'Cinzel', Georgia, serif;
+                font-size: 20px;
+                font-weight: 500;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+            .duendes-promo-subtitulo {
+                color: rgba(255,255,255,0.7);
+                margin: 0 0 28px 0;
+                font-family: 'Cormorant Garamond', Georgia, serif;
+                font-size: 16px;
+                font-style: italic;
+            }
+            .duendes-minis-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 15px;
+                max-width: 600px;
+                margin: 0 auto 28px auto;
+            }
+            .duendes-mini-opcion {
+                background: rgba(198,169,98,0.04);
+                border: 1px solid rgba(198,169,98,0.2);
+                border-radius: 14px;
+                padding: 18px 12px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .duendes-mini-opcion:hover {
+                border-color: rgba(198,169,98,0.5);
+                transform: translateY(-4px);
+                box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+            }
+            .duendes-mini-opcion.elegido {
+                border-color: #C6A962;
+                background: rgba(198,169,98,0.12);
+                box-shadow: 0 0 25px rgba(198,169,98,0.25);
+            }
+            .duendes-mini-opcion img {
+                width: 85px;
+                height: 85px;
+                object-fit: cover;
+                border-radius: 10px;
+                margin-bottom: 10px;
+            }
+            .duendes-mini-opcion span {
+                display: block;
+                color: #fff;
+                font-family: 'Cormorant Garamond', Georgia, serif;
+                font-size: 14px;
+                line-height: 1.3;
+            }
+            .duendes-promo-btn {
+                background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%);
+                color: #0d0d14;
+                border: none;
+                padding: 15px 40px;
+                border-radius: 30px;
+                font-family: 'Cinzel', Georgia, serif;
+                font-size: 14px;
+                font-weight: 600;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                cursor: pointer;
+                opacity: 0.35;
+                transition: all 0.3s ease;
+            }
+            .duendes-promo-btn.activo {
+                opacity: 1;
+            }
+            .duendes-promo-btn.activo:hover {
+                transform: scale(1.03);
+                box-shadow: 0 10px 30px rgba(198,169,98,0.4);
+            }
+            .duendes-promo-nota {
+                color: rgba(255,255,255,0.35);
+                font-size: 12px;
+                margin: 20px 0 0 0;
+                font-family: 'Cormorant Garamond', Georgia, serif;
+                font-style: italic;
+            }
+        </style>
 
-    <div class="duendes-selector-3x2">
-        <h3 class="dfb-selector-titulo">
-            <?php echo $minis_pendientes > 1 ? "Tenés {$minis_pendientes} regalos por elegir" : "Tu regalo te espera"; ?>
-        </h3>
-        <p class="dfb-selector-subtitulo">
-            <?php echo $minis_pendientes > 1
-                ? "Elegí {$minis_pendientes} minis guardianes para llevarte"
-                : "Elegí el mini guardián que querés llevarte"; ?>
-        </p>
+        <div class="duendes-promo-box">
+            <h3 class="duendes-promo-titulo">
+                <?php echo $minis_pendientes > 1 ? "Elegí tus {$minis_pendientes} regalos" : "Tu regalo te espera"; ?>
+            </h3>
+            <p class="duendes-promo-subtitulo">
+                <?php echo $minis_pendientes > 1
+                    ? "Seleccioná {$minis_pendientes} mini guardianes de regalo"
+                    : "Seleccioná el mini guardián que querés llevarte"; ?>
+            </p>
 
-        <div class="dfb-minis-grid">
-            <?php $delay = 0; foreach ($minis as $mini):
-                $imagen = wp_get_attachment_image_url($mini->get_image_id(), 'thumbnail') ?: wc_placeholder_img_src();
-                $delay += 0.1;
-            ?>
-            <div class="dfb-mini-card" style="animation-delay: <?php echo $delay; ?>s;" onclick="duendesSeleccionarMini(<?php echo $mini->get_id(); ?>, this)">
-                <img src="<?php echo esc_url($imagen); ?>" alt="<?php echo esc_attr($mini->get_name()); ?>">
-                <p><?php echo esc_html($mini->get_name()); ?></p>
+            <div class="duendes-minis-grid">
+                <?php foreach ($minis as $mini):
+                    $img = wp_get_attachment_image_url($mini->get_image_id(), 'thumbnail') ?: wc_placeholder_img_src();
+                ?>
+                <div class="duendes-mini-opcion" data-id="<?php echo $mini->get_id(); ?>">
+                    <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($mini->get_name()); ?>">
+                    <span><?php echo esc_html($mini->get_name()); ?></span>
+                </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
+
+            <button class="duendes-promo-btn" id="duendes-btn-agregar">
+                Agregar mi regalo
+            </button>
+
+            <p class="duendes-promo-nota">
+                Promo 3x2: Por cada 2 guardianes, un mini de regalo
+                <?php if ($minis_totales > 1): ?> • Te corresponden <?php echo $minis_totales; ?> minis<?php endif; ?>
+            </p>
         </div>
 
-        <button id="duendes-agregar-mini-btn" class="dfb-selector-btn" disabled onclick="duendesAgregarMiniGratis()">
-            Elegir este regalo
-        </button>
+        <script>
+        (function() {
+            var elegido = null;
+            var opciones = document.querySelectorAll('.duendes-mini-opcion');
+            var btn = document.getElementById('duendes-btn-agregar');
 
-        <p class="dfb-selector-nota">
-            Promo 3x2: Por cada 2 guardianes, un mini de regalo
-            <?php if ($minis_totales > 1): ?> • Te corresponden <?php echo $minis_totales; ?> minis<?php endif; ?>
-        </p>
+            opciones.forEach(function(op) {
+                op.addEventListener('click', function() {
+                    opciones.forEach(function(o) { o.classList.remove('elegido'); });
+                    this.classList.add('elegido');
+                    elegido = this.getAttribute('data-id');
+                    btn.classList.add('activo');
+                });
+            });
+
+            btn.addEventListener('click', function() {
+                if (!elegido || !btn.classList.contains('activo')) return;
+                btn.textContent = 'Agregando...';
+                btn.classList.remove('activo');
+
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=duendes_agregar_mini_gratis&product_id=' + elegido + '&nonce=<?php echo wp_create_nonce('duendes_mini_gratis'); ?>'
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.data || 'Error');
+                        btn.textContent = 'Agregar mi regalo';
+                        btn.classList.add('activo');
+                    }
+                });
+            });
+        })();
+        </script>
     </div>
-
-    <script>
-    var duendesMiniSeleccionado = null;
-
-    function duendesSeleccionarMini(productId, element) {
-        // Quitar selección anterior
-        document.querySelectorAll('.dfb-mini-card').forEach(function(el) {
-            el.classList.remove('selected');
-        });
-
-        // Seleccionar este
-        element.classList.add('selected');
-        duendesMiniSeleccionado = productId;
-
-        // Habilitar botón
-        document.getElementById('duendes-agregar-mini-btn').disabled = false;
-    }
-
-    function duendesAgregarMiniGratis() {
-        if (!duendesMiniSeleccionado) return;
-
-        var btn = document.getElementById('duendes-agregar-mini-btn');
-        btn.textContent = 'Agregando...';
-        btn.disabled = true;
-
-        // Llamar AJAX para agregar el mini gratis
-        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'action=duendes_agregar_mini_gratis&product_id=' + duendesMiniSeleccionado + '&nonce=<?php echo wp_create_nonce('duendes_mini_gratis'); ?>'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Recargar página para mostrar el mini en el carrito
-                location.reload();
-            } else {
-                alert(data.data || 'Error al agregar el regalo');
-                btn.textContent = 'Agregar mi regalo';
-                btn.disabled = false;
-            }
-        })
-        .catch(error => {
-            alert('Error de conexión');
-            btn.textContent = 'Agregar mi regalo';
-            btn.disabled = false;
-        });
-    }
-    </script>
     <?php
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AJAX: AGREGAR MINI GRATIS AL CARRITO
+// AJAX: AGREGAR MINI GRATIS
 // ═══════════════════════════════════════════════════════════════════════════
 
 add_action('wp_ajax_duendes_agregar_mini_gratis', 'duendes_ajax_agregar_mini_gratis');
 add_action('wp_ajax_nopriv_duendes_agregar_mini_gratis', 'duendes_ajax_agregar_mini_gratis');
 
 function duendes_ajax_agregar_mini_gratis() {
-    // Verificar nonce
     if (!wp_verify_nonce($_POST['nonce'] ?? '', 'duendes_mini_gratis')) {
-        wp_send_json_error('Sesión expirada. Recargá la página.');
+        wp_send_json_error('Sesión expirada');
     }
 
     $product_id = intval($_POST['product_id'] ?? 0);
-    if (!$product_id) {
+    if (!$product_id) wp_send_json_error('Producto inválido');
+
+    $guardianes = duendes_contar_guardianes_carrito();
+    $merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
+    $actuales = duendes_contar_minis_gratis_en_carrito();
+
+    if ($guardianes < DUENDES_PROMO_GUARDIANES_REQUERIDOS) {
+        wp_send_json_error('Necesitás 2 guardianes');
+    }
+    if ($actuales >= $merecidos) {
+        wp_send_json_error('Ya tenés todos tus regalos');
+    }
+    if (!has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product_id)) {
         wp_send_json_error('Producto no válido');
     }
 
-    // Verificar cuántos minis merece y cuántos tiene
-    $guardianes = duendes_contar_guardianes_carrito();
-    $minis_merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
-    $minis_actuales = duendes_contar_minis_gratis_en_carrito();
-
-    if ($guardianes < DUENDES_PROMO_GUARDIANES_REQUERIDOS) {
-        wp_send_json_error('Necesitás ' . DUENDES_PROMO_GUARDIANES_REQUERIDOS . ' guardianes para el regalo');
-    }
-
-    // Verificar que no haya alcanzado el límite de minis
-    if ($minis_actuales >= $minis_merecidos) {
-        wp_send_json_error('Ya elegiste todos tus minis de regalo');
-    }
-
-    // Verificar que el producto es un mini válido
-    if (!has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product_id)) {
-        wp_send_json_error('Este producto no es un mini válido');
-    }
-
-    // Agregar al carrito con precio 0 y marca especial
-    $cart_item_data = [
+    $key = WC()->cart->add_to_cart($product_id, 1, 0, [], [
         'duendes_mini_gratis' => true,
         'duendes_promo_3x2' => true,
-    ];
+    ]);
 
-    $cart_item_key = WC()->cart->add_to_cart($product_id, 1, 0, [], $cart_item_data);
-
-    if ($cart_item_key) {
-        wp_send_json_success(['message' => '¡Mini agregado!', 'cart_item_key' => $cart_item_key]);
+    if ($key) {
+        wp_send_json_success();
     } else {
-        wp_send_json_error('No se pudo agregar el mini');
+        wp_send_json_error('Error al agregar');
     }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PRECIO 0 PARA MINI GRATIS
+// PRECIO 0 Y DISPLAY
 // ═══════════════════════════════════════════════════════════════════════════
 
-add_action('woocommerce_before_calculate_totals', 'duendes_precio_mini_gratis', 99);
-
-function duendes_precio_mini_gratis($cart) {
+add_action('woocommerce_before_calculate_totals', function($cart) {
     if (is_admin() && !defined('DOING_AJAX')) return;
     if (did_action('woocommerce_before_calculate_totals') >= 2) return;
 
-    foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
-        if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
-            $cart_item['data']->set_price(0);
+    foreach ($cart->get_cart() as $item) {
+        if (!empty($item['duendes_mini_gratis'])) {
+            $item['data']->set_price(0);
         }
     }
-}
+}, 99);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MOSTRAR "REGALO" EN EL CARRITO
-// ═══════════════════════════════════════════════════════════════════════════
-
-add_filter('woocommerce_cart_item_name', 'duendes_nombre_mini_gratis', 10, 3);
-
-function duendes_nombre_mini_gratis($name, $cart_item, $cart_item_key) {
-    if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
-        $name .= ' <span style="background: linear-gradient(135deg, #C6A962, #a88a42); color: #000; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 8px;">🎁 REGALO</span>';
+add_filter('woocommerce_cart_item_name', function($name, $item, $key) {
+    if (!empty($item['duendes_mini_gratis'])) {
+        $name .= ' <span style="background:linear-gradient(135deg,#C6A962,#a88a42);color:#0d0d14;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:600;margin-left:10px;">REGALO</span>';
     }
     return $name;
-}
+}, 10, 3);
 
-add_filter('woocommerce_cart_item_price', 'duendes_precio_display_mini_gratis', 10, 3);
-
-function duendes_precio_display_mini_gratis($price, $cart_item, $cart_item_key) {
-    if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
-        return '<span style="color: #C6A962; font-weight: 600;">¡Gratis!</span>';
+add_filter('woocommerce_cart_item_price', function($price, $item, $key) {
+    if (!empty($item['duendes_mini_gratis'])) {
+        return '<span style="color:#C6A962;font-weight:600;">¡Gratis!</span>';
     }
     return $price;
-}
+}, 10, 3);
+
+add_filter('woocommerce_cart_item_quantity', function($qty, $key, $item) {
+    if (!empty($item['duendes_mini_gratis'])) {
+        return '<span style="color:#C6A962;">1</span>';
+    }
+    return $qty;
+}, 10, 3);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// VALIDAR QUE SIGUE TENIENDO 2+ GUARDIANES AL ACTUALIZAR CARRITO
+// VALIDACIÓN AL ACTUALIZAR CARRITO
 // ═══════════════════════════════════════════════════════════════════════════
 
-add_action('woocommerce_cart_updated', 'duendes_validar_promo_3x2');
-
-function duendes_validar_promo_3x2() {
+add_action('woocommerce_cart_updated', function() {
     if (!WC()->cart) return;
 
     $guardianes = duendes_contar_guardianes_carrito();
-    $minis_merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
-    $minis_actuales = duendes_contar_minis_gratis_en_carrito();
+    $merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
+    $actuales = duendes_contar_minis_gratis_en_carrito();
 
-    // Si tiene más minis de los que merece, quitar el exceso
-    if ($minis_actuales > $minis_merecidos) {
-        $a_remover = $minis_actuales - $minis_merecidos;
+    if ($actuales > $merecidos) {
+        $remover = $actuales - $merecidos;
         $removidos = 0;
 
-        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
-            if ($removidos >= $a_remover) break;
-
-            if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
-                WC()->cart->remove_cart_item($cart_item_key);
+        foreach (WC()->cart->get_cart() as $key => $item) {
+            if ($removidos >= $remover) break;
+            if (!empty($item['duendes_mini_gratis'])) {
+                WC()->cart->remove_cart_item($key);
                 $removidos++;
             }
         }
-
-        if ($removidos > 0) {
-            wc_add_notice('Se ajustaron los minis de regalo según la cantidad de guardianes en tu carrito.', 'notice');
-        }
     }
-}
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// NO PERMITIR EDITAR CANTIDAD DEL MINI GRATIS
+// GUARDAR EN ORDEN
 // ═══════════════════════════════════════════════════════════════════════════
 
-add_filter('woocommerce_cart_item_quantity', 'duendes_cantidad_mini_gratis', 10, 3);
-
-function duendes_cantidad_mini_gratis($product_quantity, $cart_item_key, $cart_item) {
-    if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
-        return '<span style="color: #C6A962;">1</span>';
-    }
-    return $product_quantity;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// GUARDAR INFO EN LA ORDEN
-// ═══════════════════════════════════════════════════════════════════════════
-
-add_action('woocommerce_checkout_create_order_line_item', 'duendes_guardar_mini_gratis_orden', 10, 4);
-
-function duendes_guardar_mini_gratis_orden($item, $cart_item_key, $values, $order) {
-    if (isset($values['duendes_mini_gratis']) && $values['duendes_mini_gratis']) {
+add_action('woocommerce_checkout_create_order_line_item', function($item, $key, $values, $order) {
+    if (!empty($values['duendes_mini_gratis'])) {
         $item->add_meta_data('_duendes_mini_gratis', 'yes', true);
-        $item->add_meta_data('Mini de Regalo (Promo 3x2)', '¡Sí!', true);
+        $item->add_meta_data('Regalo Promo 3x2', 'Sí', true);
     }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// BANNER PROMOCIONAL PARA LA TIENDA
-// ═══════════════════════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════════════════════════════════
-// UBICACIONES DEL BANNER
-// ═══════════════════════════════════════════════════════════════════════════
-
-// 1. Tienda (página de productos) - prioridad 10 para aparecer DESPUÉS del hero
-add_action('woocommerce_before_shop_loop', 'duendes_banner_promo_3x2', 10);
-
-// 2. Página de producto individual (arriba de productos relacionados)
-add_action('woocommerce_after_single_product_summary', 'duendes_banner_promo_3x2_producto', 15);
-
-function duendes_banner_promo_3x2_producto() {
-    // Solo mostrar si NO es un mini (no tiene sentido en la página del mini)
-    global $product;
-    if ($product && has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product->get_id())) {
-        return;
-    }
-    duendes_banner_promo_3x2();
-}
-
-// 3. Homepage (si usa widgets o shortcode)
-add_shortcode('duendes_promo_3x2', function() {
-    if (!DUENDES_PROMO_3X2_ACTIVA) return '';
-    ob_start();
-    duendes_banner_promo_3x2();
-    return ob_get_clean();
-});
-
-// 4. Homepage - inyectar via JavaScript porque Elementor no usa hooks estándar
-add_action('wp_footer', function() {
-    if (!is_front_page() && !is_home()) return;
-    if (!DUENDES_PROMO_3X2_ACTIVA) return;
-
-    // Capturar el HTML del banner
-    ob_start();
-    duendes_banner_promo_3x2();
-    $banner_html = ob_get_clean();
-    $banner_js = json_encode($banner_html);
-    ?>
-    <script>
-    (function() {
-        var banner = <?php echo $banner_js; ?>;
-
-        function insertarBanner() {
-            // Buscar el hero o primera sección después del header
-            var targets = [
-                document.querySelector('.hero'),
-                document.querySelector('.elementor-section-wrap > .elementor-section:first-child'),
-                document.querySelector('.elementor-element.elementor-section:first-of-type'),
-                document.querySelector('main'),
-                document.querySelector('#content')
-            ];
-
-            var target = null;
-            for (var i = 0; i < targets.length; i++) {
-                if (targets[i]) {
-                    target = targets[i];
-                    break;
-                }
-            }
-
-            if (target && !document.querySelector('.duendes-banner-3x2')) {
-                var div = document.createElement('div');
-                div.innerHTML = banner;
-                div.style.padding = '0 20px';
-                div.style.maxWidth = '1200px';
-                div.style.margin = '20px auto';
-                target.parentNode.insertBefore(div, target.nextSibling);
-            }
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', insertarBanner);
-        } else {
-            insertarBanner();
-        }
-    })();
-    </script>
-    <?php
-}, 99);
-
-function duendes_banner_promo_3x2() {
-    if (!DUENDES_PROMO_3X2_ACTIVA) return;
-
-    // Obtener minis solo si WooCommerce está cargado
-    $minis = [];
-    if (function_exists('wc_get_products')) {
-        $minis = wc_get_products([
-            'status' => 'publish',
-            'limit' => 3,
-            'orderby' => 'rand',
-            'category' => [DUENDES_PROMO_CATEGORIA_MINI],
-        ]);
-        if (!is_array($minis)) $minis = [];
-    }
-
-    ?>
-    <style>
-        @keyframes dfb-float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        @keyframes dfb-glow {
-            0%, 100% { box-shadow: 0 5px 30px rgba(198,169,98,0.2); }
-            50% { box-shadow: 0 8px 40px rgba(198,169,98,0.35); }
-        }
-        @keyframes dfb-shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        .duendes-banner-3x2 {
-            position: relative;
-            background: linear-gradient(135deg, #0a0a10 0%, #12101a 100%);
-            border: 1px solid rgba(198,169,98,0.2);
-            border-radius: 16px;
-            padding: 0;
-            margin: 20px 0 30px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            overflow: hidden;
-        }
-        .duendes-banner-3x2::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(198,169,98,0.5), transparent);
-        }
-
-        /* Contenido principal */
-        .dfb-3x2-main {
-            padding: 30px 35px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .dfb-3x2-eyebrow {
-            color: #C6A962;
-            font-family: 'Cinzel', serif;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin: 0 0 10px 0;
-            opacity: 0.8;
-        }
-        .dfb-3x2-titulo {
-            color: #fff;
-            margin: 0 0 8px 0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 24px;
-            font-weight: 500;
-            line-height: 1.3;
-        }
-        .dfb-3x2-titulo em {
-            color: #C6A962;
-            font-style: normal;
-        }
-        .dfb-3x2-desc {
-            color: rgba(255,255,255,0.6);
-            margin: 0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 15px;
-            font-style: italic;
-        }
-
-        /* Área visual derecha */
-        .dfb-3x2-visual {
-            position: relative;
-            min-width: 220px;
-            background: linear-gradient(135deg, rgba(198,169,98,0.08) 0%, rgba(198,169,98,0.02) 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 25px 30px;
-            gap: 15px;
-        }
-        .dfb-3x2-visual::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 1px;
-            background: linear-gradient(180deg, transparent, rgba(198,169,98,0.3), transparent);
-        }
-        .dfb-3x2-visual::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            animation: dfb-shimmer 4s ease-in-out infinite;
-        }
-
-        /* Minis flotantes */
-        .dfb-3x2-minis {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        .dfb-3x2-mini {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid rgba(198,169,98,0.3);
-            animation: dfb-float 4s ease-in-out infinite, dfb-glow 3s ease-in-out infinite;
-            transition: all 0.3s ease;
-        }
-        .dfb-3x2-mini:nth-child(1) { animation-delay: 0s; }
-        .dfb-3x2-mini:nth-child(2) { animation-delay: 0.3s; width: 65px; height: 65px; }
-        .dfb-3x2-mini:nth-child(3) { animation-delay: 0.6s; }
-        .dfb-3x2-mini:hover {
-            transform: scale(1.1);
-            border-color: #C6A962;
-        }
-        .dfb-3x2-mini img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Texto cuando no hay minis */
-        .dfb-3x2-no-minis {
-            color: rgba(255,255,255,0.5);
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 14px;
-            font-style: italic;
-            text-align: center;
-        }
-
-        /* Badge REGALO - debajo de los minis, no encima */
-        .dfb-3x2-gift {
-            background: linear-gradient(135deg, #C6A962 0%, #d4b86a 50%, #C6A962 100%);
-            background-size: 200% 200%;
-            color: #0a0a10;
-            font-family: 'Cinzel', serif;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            padding: 10px 20px;
-            border-radius: 6px;
-            position: relative;
-            z-index: 1;
-        }
-
-        @media (max-width: 600px) {
-            .duendes-banner-3x2 {
-                grid-template-columns: 1fr;
-            }
-            .dfb-3x2-main {
-                padding: 25px 20px;
-                text-align: center;
-            }
-            .dfb-3x2-titulo {
-                font-size: 20px;
-            }
-            .dfb-3x2-visual {
-                min-width: auto;
-                padding: 20px;
-                flex-direction: row;
-                justify-content: center;
-            }
-            .dfb-3x2-visual::before {
-                display: none;
-            }
-            .dfb-3x2-minis {
-                gap: 8px;
-            }
-            .dfb-3x2-mini {
-                width: 45px;
-                height: 45px;
-            }
-            .dfb-3x2-mini:nth-child(2) {
-                width: 55px;
-                height: 55px;
-            }
-        }
-    </style>
-
-    <div class="duendes-banner-3x2">
-        <div class="dfb-3x2-main">
-            <p class="dfb-3x2-eyebrow">Promo especial</p>
-            <h3 class="dfb-3x2-titulo">
-                Llevás dos guardianes,<br>
-                <em>un mini te elige a vos</em>
-            </h3>
-            <p class="dfb-3x2-desc">El tercero va de regalo</p>
-        </div>
-
-        <div class="dfb-3x2-visual">
-            <?php if (!empty($minis)): ?>
-            <div class="dfb-3x2-minis">
-                <?php foreach ($minis as $mini):
-                    $img = wp_get_attachment_image_url($mini->get_image_id(), 'thumbnail');
-                    if (!$img) $img = wc_placeholder_img_src('thumbnail');
-                ?>
-                <div class="dfb-3x2-mini">
-                    <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($mini->get_name()); ?>">
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <?php else: ?>
-            <p class="dfb-3x2-no-minis">Elegí tu mini favorito</p>
-            <?php endif; ?>
-            <span class="dfb-3x2-gift">Regalo</span>
-        </div>
-    </div>
-    <?php
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PANEL DE ADMIN SIMPLE
-// ═══════════════════════════════════════════════════════════════════════════
-
-add_action('admin_menu', function() {
-    add_submenu_page(
-        'woocommerce',
-        'Promoción 3x2',
-        'Promo 3x2',
-        'manage_woocommerce',
-        'duendes-promo-3x2',
-        'duendes_admin_promo_3x2'
-    );
-});
-
-function duendes_admin_promo_3x2() {
-    // Guardar configuración
-    if (isset($_POST['duendes_save_promo']) && wp_verify_nonce($_POST['_wpnonce'], 'duendes_promo_3x2')) {
-        update_option('duendes_promo_3x2_activa', isset($_POST['promo_activa']) ? 1 : 0);
-        update_option('duendes_promo_3x2_guardianes', intval($_POST['guardianes_requeridos']));
-        update_option('duendes_promo_3x2_categoria', sanitize_text_field($_POST['categoria_mini']));
-        echo '<div class="notice notice-success"><p>Configuración guardada.</p></div>';
-    }
-
-    $activa = get_option('duendes_promo_3x2_activa', 1);
-    $guardianes = get_option('duendes_promo_3x2_guardianes', 2);
-    $categoria = get_option('duendes_promo_3x2_categoria', 'mini');
-
-    // Contar órdenes con promo
-    global $wpdb;
-    $ordenes_con_promo = $wpdb->get_var("
-        SELECT COUNT(DISTINCT order_id)
-        FROM {$wpdb->prefix}woocommerce_order_itemmeta
-        WHERE meta_key = '_duendes_mini_gratis' AND meta_value = 'yes'
-    ");
-
-    ?>
-    <div class="wrap">
-        <h1>🎁 Promoción 3x2</h1>
-
-        <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-top: 20px;">
-            <div style="background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h2 style="margin-top: 0;">Configuración</h2>
-
-                <form method="post">
-                    <?php wp_nonce_field('duendes_promo_3x2'); ?>
-
-                    <table class="form-table">
-                        <tr>
-                            <th>Estado</th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="promo_activa" value="1" <?php checked($activa, 1); ?>>
-                                    Promoción activa
-                                </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Guardianes requeridos</th>
-                            <td>
-                                <input type="number" name="guardianes_requeridos" value="<?php echo esc_attr($guardianes); ?>" min="1" max="10" style="width: 80px;">
-                                <p class="description">Cantidad de guardianes necesarios para obtener el regalo</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Categoría de minis</th>
-                            <td>
-                                <input type="text" name="categoria_mini" value="<?php echo esc_attr($categoria); ?>" class="regular-text">
-                                <p class="description">Slug de la categoría de productos que se ofrecen como regalo</p>
-                            </td>
-                        </tr>
-                    </table>
-
-                    <p class="submit">
-                        <input type="submit" name="duendes_save_promo" class="button-primary" value="Guardar cambios">
-                    </p>
-                </form>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #1a1a28, #2a1a2a); padding: 25px; border-radius: 8px; color: #fff;">
-                <h3 style="color: #C6A962; margin-top: 0;">📊 Estadísticas</h3>
-
-                <div style="text-align: center; padding: 20px 0;">
-                    <p style="color: rgba(255,255,255,0.6); margin: 0 0 5px 0; font-size: 12px;">
-                        Órdenes con promoción
-                    </p>
-                    <p style="color: #C6A962; font-size: 48px; margin: 0; font-weight: 700;">
-                        <?php echo intval($ordenes_con_promo); ?>
-                    </p>
-                </div>
-
-                <hr style="border-color: rgba(198,169,98,0.2); margin: 20px 0;">
-
-                <p style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6;">
-                    <strong style="color: #C6A962;">Cómo funciona:</strong><br>
-                    1. Cliente agrega 2+ guardianes<br>
-                    2. Aparece selector de minis<br>
-                    3. Elige su regalo<br>
-                    4. Mini se agrega gratis
-                </p>
-            </div>
-        </div>
-
-        <div style="background: #fff; padding: 25px; border-radius: 8px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <h3>Preview del Banner</h3>
-            <div style="background: #0a0a0f; padding: 30px; border-radius: 8px;">
-                <?php duendes_banner_promo_3x2(); ?>
-            </div>
-        </div>
-    </div>
-    <?php
-}
+}, 10, 4);

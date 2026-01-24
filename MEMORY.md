@@ -1,6 +1,37 @@
-# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 12 - COMPLETADA)
+# MEMORIA DEL PROYECTO - ÚLTIMA ACTUALIZACIÓN: 2026-01-24 (sesión 14 - EN PROGRESO)
 
 Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para continuar el trabajo.
+
+---
+
+## ⚠️ URGENTE: CÍRCULO EN MODO MANTENIMIENTO
+
+**Estado:** El Círculo de Duendes (`/mi-magia/circulo`) está en modo mantenimiento por error React #31.
+
+**Problema:**
+- Error "Objects are not valid as a React child" (React error #31)
+- El error aparece después de unos segundos de carga
+- Afecta a usuarios con membresía cuando acceden al Círculo
+
+**Solución temporal:**
+- `MODO_MANTENIMIENTO = true` en `/app/mi-magia/circulo/page.jsx`
+- Muestra página elegante "El Círculo está en transformación"
+- Protege a usuarios de ver errores
+
+**Para arreglar definitivamente:**
+1. Cambiar `MODO_MANTENIMIENTO = false` en page.jsx (línea ~15)
+2. Encontrar qué objeto se está renderizando como hijo de React
+3. Probablemente en Dashboard.jsx o BienvenidaGuardian
+4. Posibles causantes:
+   - `guardian.especialidad` podría ser un objeto en vez de string
+   - Datos cacheados en Vercel KV con estructura incorrecta
+   - Respuesta de API con campos que son objetos
+
+**Emails reseteados:** tbrylka89@gmail.com, consulta@duendesdeluruguay.com, duendesdeluruguay@gmail.com, brylka0911@gmail.com, info@duendesdeluruguay.com
+
+**API para resetear más usuarios:** POST `/api/circulo/reset-bienvenida` con `{email: "..."}`
+
+**API de test user:** POST `/api/admin/circulo/crear-test-user` con `{email: "...", nombre: "..."}`
 
 ---
 
@@ -281,6 +312,57 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 ---
 
 ## ÚLTIMAS SESIONES
+
+### 2026-01-24 (sesión 14) - EN PROGRESO
+
+**🚨 CÍRCULO: MODO MANTENIMIENTO ACTIVADO**
+
+**Problema:** React error #31 ("Objects are not valid as a React child") persistente en el Círculo de Duendes.
+
+**Contexto:**
+- Se reemplazaron guardianes inventados (Dorado, Obsidiana, Índigo, Jade) por duendes REALES: Gaia, Noah, Winter, Marcos
+- Las APIs devuelven datos correctos (Marcos como guardián de la semana)
+- El error aparece en el cliente después de unos segundos de carga
+- Múltiples intentos de fix no resolvieron el problema
+
+**Cambios realizados:**
+
+1. **APIs actualizadas para usar duendes reales:**
+   - `/api/circulo/duende-semana/route.js` - Prioriza rotación
+   - `/api/circulo/bienvenida-guardian/route.js` - Usa sistema de rotación
+   - `/api/circulo/duende-del-dia/route.js` - Usa guardián semanal
+
+2. **Nombres de guardianes reemplazados:**
+   - `/api/comunidad/bots/route.js` - 50+ testimonios actualizados
+   - Dorado→Gaia, Obsidiana→Noah, Índigo→Winter, Jade→Marcos
+
+3. **Nuevas APIs creadas:**
+   - `/api/circulo/reset-bienvenida/route.js` - Limpiar cache de usuario
+   - `/api/admin/circulo/crear-test-user/route.js` - Crear usuario de prueba
+
+4. **Modo mantenimiento implementado:**
+   - Variable `MODO_MANTENIMIENTO = true` en page.jsx
+   - Página elegante de "transformación" para usuarios
+   - ErrorBoundary como safety net adicional
+
+**Archivos modificados:**
+| Archivo | Cambio |
+|---------|--------|
+| `/app/mi-magia/circulo/page.jsx` | Modo mantenimiento + ErrorBoundary |
+| `/app/api/circulo/duende-semana/route.js` | Prioriza rotación semanal |
+| `/app/api/circulo/bienvenida-guardian/route.js` | Usa rotación + especialidad |
+| `/app/api/circulo/duende-del-dia/route.js` | Usa guardián semanal |
+| `/app/api/comunidad/bots/route.js` | Nombres de guardianes actualizados |
+| `/app/api/circulo/reset-bienvenida/route.js` | NUEVO - Reset cache usuario |
+| `/app/api/admin/circulo/crear-test-user/route.js` | NUEVO - Test user |
+
+**Pendiente:**
+- [ ] Encontrar causa exacta del React error #31
+- [ ] Verificar estructura de datos en Vercel KV
+- [ ] Testear con MODO_MANTENIMIENTO = false
+- [ ] Quitar modo mantenimiento cuando funcione
+
+---
 
 ### 2026-01-24 (sesión 13) - COMPLETADA
 

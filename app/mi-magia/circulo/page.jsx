@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import PortalEntrada from './PortalEntrada';
 import CirculoDashboard from './Dashboard';
 import Onboarding from './Onboarding';
@@ -8,6 +8,214 @@ import Onboarding from './Onboarding';
 // PÁGINA PRINCIPAL DEL CÍRCULO DE DUENDES
 // Diseño premium con landing page completa para no miembros
 // ═══════════════════════════════════════════════════════════════════════════════
+
+// MODO MANTENIMIENTO - Cambiar a false cuando esté todo funcionando
+const MODO_MANTENIMIENTO = true;
+
+// Error Boundary para capturar errores de React
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error en Círculo:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <PaginaMantenimiento />;
+    }
+    return this.props.children;
+  }
+}
+
+// Página de mantenimiento elegante
+function PaginaMantenimiento() {
+  return (
+    <div className="mantenimiento-page">
+      <div className="mantenimiento-content">
+        <div className="mantenimiento-glow"></div>
+
+        <div className="mantenimiento-icono">✨</div>
+
+        <h1>El Círculo está en transformación</h1>
+
+        <p className="mantenimiento-subtitulo">
+          Estamos preparando algo mágico para vos
+        </p>
+
+        <div className="mantenimiento-mensaje">
+          <p>
+            Los guardianes están trabajando en mejoras especiales para el Círculo.
+            Muy pronto vas a poder disfrutar de una experiencia renovada.
+          </p>
+          <p>
+            Mientras tanto, podés explorar nuestros guardianes en la tienda
+            o contactarnos si tenés alguna consulta.
+          </p>
+        </div>
+
+        <div className="mantenimiento-acciones">
+          <a href="https://duendesdeluruguay.com/tienda" className="btn-tienda">
+            Visitar la Tienda
+          </a>
+          <a href="/mi-magia" className="btn-volver">
+            Volver a Mi Magia
+          </a>
+        </div>
+
+        <div className="mantenimiento-contacto">
+          <p>¿Tenés una membresía activa y necesitás ayuda?</p>
+          <a href="mailto:info@duendesdeluruguay.com">info@duendesdeluruguay.com</a>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .mantenimiento-page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(ellipse at 30% 20%, rgba(107, 33, 168, 0.15) 0%, transparent 50%),
+                      radial-gradient(ellipse at 70% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                      linear-gradient(180deg, #050508 0%, #0a0a0a 100%);
+          padding: 40px 20px;
+          font-family: 'Cormorant Garamond', serif;
+          color: #fff;
+          text-align: center;
+        }
+
+        .mantenimiento-content {
+          position: relative;
+          max-width: 550px;
+          width: 100%;
+        }
+
+        .mantenimiento-glow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 300px;
+          height: 300px;
+          background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+          pointer-events: none;
+        }
+
+        .mantenimiento-icono {
+          font-size: 60px;
+          margin-bottom: 20px;
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        h1 {
+          font-family: 'Cinzel', serif;
+          font-size: clamp(24px, 5vw, 36px);
+          background: linear-gradient(135deg, #d4af37, #e8d5a3);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin: 0 0 15px;
+        }
+
+        .mantenimiento-subtitulo {
+          font-size: 20px;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0 0 40px;
+        }
+
+        .mantenimiento-mensaje {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 30px;
+          margin-bottom: 40px;
+        }
+
+        .mantenimiento-mensaje p {
+          font-size: 17px;
+          line-height: 1.7;
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0 0 15px;
+        }
+
+        .mantenimiento-mensaje p:last-child {
+          margin-bottom: 0;
+        }
+
+        .mantenimiento-acciones {
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin-bottom: 40px;
+        }
+
+        .btn-tienda {
+          background: linear-gradient(135deg, #d4af37, #b8972e);
+          color: #0a0a0a;
+          padding: 15px 30px;
+          border-radius: 50px;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
+          transition: all 0.3s ease;
+        }
+
+        .btn-tienda:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-volver {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: #fff;
+          padding: 15px 30px;
+          border-radius: 50px;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          text-decoration: none;
+          transition: all 0.3s ease;
+        }
+
+        .btn-volver:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .mantenimiento-contacto {
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 14px;
+        }
+
+        .mantenimiento-contacto p {
+          margin: 0 0 5px;
+        }
+
+        .mantenimiento-contacto a {
+          color: #d4af37;
+          text-decoration: none;
+        }
+
+        .mantenimiento-contacto a:hover {
+          text-decoration: underline;
+        }
+      `}</style>
+    </div>
+  );
+}
 
 // URLs centralizadas - cambiar aquí cuando migre el dominio
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
@@ -2014,6 +2222,19 @@ function BienvenidaGuardian({ usuario, onContinuar }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function CirculoPage() {
+  // Si está en modo mantenimiento, mostrar página de mantenimiento
+  if (MODO_MANTENIMIENTO) {
+    return <PaginaMantenimiento />;
+  }
+
+  return (
+    <ErrorBoundary>
+      <CirculoPageInterno />
+    </ErrorBoundary>
+  );
+}
+
+function CirculoPageInterno() {
   const [estado, setEstado] = useState('verificando');
   const [usuario, setUsuario] = useState(null);
   const [diasTrial, setDiasTrial] = useState(null);
