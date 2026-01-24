@@ -10,7 +10,7 @@ import Onboarding from './Onboarding';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // MODO MANTENIMIENTO - Cambiar a false cuando esté todo funcionando
-const MODO_MANTENIMIENTO = true;
+const MODO_MANTENIMIENTO = false;
 
 // Error Boundary para capturar errores de React
 class ErrorBoundary extends Component {
