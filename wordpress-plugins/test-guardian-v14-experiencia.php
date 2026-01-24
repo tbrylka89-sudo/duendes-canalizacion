@@ -107,7 +107,7 @@ function duendes_test_guardian_v14_render() {
             <button id="tg-btn-sin-musica" class="tg-btn-secondary">SIN MÚSICA</button>
         </div>
         <audio id="tg-audio" loop>
-            <source src="https://duendesdeluruguay.com/wp-content/uploads/2025/05/Raices-y-Agua-Interior.mp3" type="audio/mpeg">
+            <source src="https://duendesdeluruguay.com/wp-content/uploads/2025/12/Raices-y-Agua-Interior.mp3" type="audio/mpeg">
         </audio>
     </div>
 </div>
@@ -1133,10 +1133,6 @@ function duendes_test_guardian_v14_render() {
         padding: 15px !important;
     }
 
-    .tg-orb-float {
-        filter: blur(70px) !important;
-        opacity: 0.5 !important;
-    }
 }
 </style>
 
