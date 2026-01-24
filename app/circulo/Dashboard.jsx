@@ -1019,38 +1019,83 @@ function SeccionContenido({ usuario }) {
           {/* Contenido del día */}
           {contenidoActivo && (
             <div className="contenido-dia">
+              {/* Imagen principal del contenido (generada con IA) */}
+              {contenidoActivo.imagen && (
+                <div className="contenido-imagen-principal">
+                  <img src={contenidoActivo.imagen} alt={contenidoActivo.titulo} />
+                </div>
+              )}
+
               <div className="contenido-header">
-                <span className="contenido-fecha">
-                  {contenidoActivo.fecha?.dia} de {['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][contenidoActivo.fecha?.mes]}
-                </span>
-                {contenidoActivo.guardian && (
-                  <span className="contenido-guardian">Por {contenidoActivo.guardian.nombre}</span>
+                <div className="contenido-meta">
+                  <span className="contenido-fecha">
+                    {contenidoActivo.fecha?.dia} de {['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][contenidoActivo.fecha?.mes]}
+                  </span>
+                  {contenidoActivo.tipo && (
+                    <span className="contenido-tipo">{contenidoActivo.icono} {contenidoActivo.tipo}</span>
+                  )}
+                </div>
+                {(contenidoActivo.guardian || contenidoActivo.duendeInfo) && (
+                  <div className="contenido-guardian-badge">
+                    <img
+                      src={contenidoActivo.guardian?.imagen || contenidoActivo.duendeInfo?.imagen}
+                      alt={contenidoActivo.guardian?.nombre || contenidoActivo.duendeInfo?.nombre}
+                    />
+                    <span>Por {contenidoActivo.guardian?.nombre || contenidoActivo.duendeInfo?.nombre}</span>
+                  </div>
                 )}
               </div>
 
               <h3 className="contenido-titulo">{contenidoActivo.titulo || 'Enseñanza del día'}</h3>
 
-              {contenidoActivo.mensaje && (
+              {/* Contenido con secciones (nuevo formato) */}
+              {contenidoActivo.secciones?.intro && (
+                <div className="contenido-seccion contenido-intro">
+                  <p>{contenidoActivo.secciones.intro}</p>
+                </div>
+              )}
+
+              {contenidoActivo.secciones?.desarrollo && (
+                <div className="contenido-seccion contenido-desarrollo">
+                  <p>{contenidoActivo.secciones.desarrollo}</p>
+                </div>
+              )}
+
+              {contenidoActivo.secciones?.practica && (
+                <div className="contenido-seccion contenido-practica-nuevo">
+                  <h4>✨ Práctica</h4>
+                  <p>{contenidoActivo.secciones.practica}</p>
+                </div>
+              )}
+
+              {contenidoActivo.secciones?.cierre && (
+                <div className="contenido-seccion contenido-cierre">
+                  <blockquote>{contenidoActivo.secciones.cierre}</blockquote>
+                </div>
+              )}
+
+              {/* Contenido formato antiguo (fallback) */}
+              {contenidoActivo.mensaje && !contenidoActivo.secciones && (
                 <div className="contenido-mensaje">
                   <p>{contenidoActivo.mensaje}</p>
                 </div>
               )}
 
-              {contenidoActivo.ensenanza && (
+              {contenidoActivo.ensenanza && !contenidoActivo.secciones && (
                 <div className="contenido-ensenanza">
                   <h4>Enseñanza</h4>
                   <p>{contenidoActivo.ensenanza}</p>
                 </div>
               )}
 
-              {contenidoActivo.practica && (
+              {contenidoActivo.practica && !contenidoActivo.secciones && (
                 <div className="contenido-practica">
                   <h4>Práctica del día</h4>
                   <p>{contenidoActivo.practica}</p>
                 </div>
               )}
 
-              {contenidoActivo.reflexion && (
+              {contenidoActivo.reflexion && !contenidoActivo.secciones && (
                 <div className="contenido-reflexion">
                   <blockquote>"{contenidoActivo.reflexion}"</blockquote>
                 </div>
@@ -1167,7 +1212,45 @@ function SeccionContenido({ usuario }) {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 25px;
-          padding: 40px;
+          padding: 0;
+          overflow: hidden;
+        }
+
+        /* Imagen principal generada con IA */
+        .contenido-imagen-principal {
+          width: 100%;
+          height: 300px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .contenido-imagen-principal::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 80px;
+          background: linear-gradient(transparent, rgba(10, 10, 10, 0.9));
+        }
+
+        .contenido-imagen-principal img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .contenido-dia > *:not(.contenido-imagen-principal) {
+          padding-left: 40px;
+          padding-right: 40px;
+        }
+
+        .contenido-dia > .contenido-header {
+          padding-top: 30px;
+        }
+
+        .contenido-dia > .contenido-likes {
+          padding-bottom: 30px;
         }
 
         .contenido-header {
@@ -1175,12 +1258,45 @@ function SeccionContenido({ usuario }) {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 20px;
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+
+        .contenido-meta {
+          display: flex;
+          align-items: center;
+          gap: 15px;
         }
 
         .contenido-fecha {
           font-size: 14px;
           color: rgba(212, 175, 55, 0.8);
           text-transform: capitalize;
+        }
+
+        .contenido-tipo {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+          background: rgba(212, 175, 55, 0.15);
+          padding: 5px 12px;
+          border-radius: 15px;
+          text-transform: capitalize;
+        }
+
+        .contenido-guardian-badge {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .contenido-guardian-badge img {
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(212, 175, 55, 0.4);
         }
 
         .contenido-guardian {
@@ -1193,6 +1309,54 @@ function SeccionContenido({ usuario }) {
           font-size: 28px;
           color: #ffffff;
           margin-bottom: 25px;
+        }
+
+        /* Secciones del contenido nuevo */
+        .contenido-seccion {
+          margin-bottom: 25px;
+        }
+
+        .contenido-seccion p {
+          font-size: 16px;
+          line-height: 1.9;
+          color: rgba(255, 255, 255, 0.85);
+          white-space: pre-wrap;
+        }
+
+        .contenido-intro p {
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .contenido-practica-nuevo {
+          background: rgba(212, 175, 55, 0.08);
+          border-radius: 15px;
+          padding: 25px !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+
+        .contenido-practica-nuevo h4 {
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          color: #d4af37;
+          margin-bottom: 15px;
+        }
+
+        .contenido-cierre {
+          margin-top: 30px;
+          padding-top: 25px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contenido-cierre blockquote {
+          margin: 0;
+          font-style: italic;
+          font-size: 17px;
+          color: rgba(212, 175, 55, 0.9);
+          padding-left: 20px;
+          border-left: 3px solid rgba(212, 175, 55, 0.5);
+          line-height: 1.7;
         }
 
         .contenido-mensaje p,
