@@ -1,91 +1,79 @@
 import { kv } from '@vercel/kv';
-import { generarPerfilGuardian } from '@/lib/circulo/voces-guardianes';
 
 export const dynamic = 'force-dynamic';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DUENDE DEL DÍA
-// Selecciona un guardián random y genera su mensaje de bienvenida
+// Ahora devuelve el guardián de la SEMANA (Gaia, Noah, Winter, Marcos)
+// en vez de uno random del catálogo
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export async function GET(request) {
   try {
-    const url = new URL(request.url);
-    const forzar = url.searchParams.get('forzar') === '1';
-    const hoy = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const ahora = new Date();
+    const año = ahora.getFullYear();
+    const mes = ahora.getMonth() + 1;
+    const dia = ahora.getDate();
 
-    // Verificar si ya hay duende del día (a menos que se fuerce regenerar)
-    if (!forzar) {
-      const duendeGuardado = await kv.get(`circulo:duende-dia:${hoy}`);
-      if (duendeGuardado) {
-        return Response.json({
-          success: true,
-          cached: true,
-          ...duendeGuardado
-        });
-      }
-    }
+    // Determinar número de semana del mes
+    let semanaNum = 1;
+    if (dia >= 22) semanaNum = 4;
+    else if (dia >= 15) semanaNum = 3;
+    else if (dia >= 8) semanaNum = 2;
 
-    // Obtener catálogo de guardianes
-    const catalogo = await kv.get('productos:catalogo') || [];
+    // Buscar guardián de la semana actual
+    const semanaKey = `circulo:duende-semana:${año}:${mes}:${semanaNum}`;
+    const semanaData = await kv.get(semanaKey);
 
-    if (catalogo.length === 0) {
+    if (semanaData?.guardian) {
+      const guardian = semanaData.guardian;
       return Response.json({
-        success: false,
-        error: 'No hay guardianes en el catálogo'
-      }, { status: 404 });
+        success: true,
+        guardian: {
+          id: guardian.slug,
+          nombre: guardian.nombre,
+          nombreCompleto: guardian.nombreCompleto,
+          imagen: guardian.imagen,
+          categoria: guardian.categoria,
+          elemento: guardian.elemento,
+          color: guardian.color
+        },
+        tema: semanaData.tema,
+        descripcion: semanaData.descripcion,
+        semana: semanaNum,
+        portal_actual: obtenerPortalActual()
+      });
     }
 
-    // Filtrar solo guardianes con imagen y que estén publicados
-    const guardianesValidos = catalogo.filter(p =>
-      p.imagen &&
-      p.estado === 'publish' &&
-      p.stockStatus !== 'outofstock'
-    );
-
-    if (guardianesValidos.length === 0) {
+    // Fallback: buscar en formato antiguo
+    const guardianActual = await kv.get('duende-semana:actual');
+    if (guardianActual) {
       return Response.json({
-        success: false,
-        error: 'No hay guardianes válidos disponibles'
-      }, { status: 404 });
+        success: true,
+        guardian: {
+          id: guardianActual.slug || 'guardian',
+          nombre: guardianActual.nombre,
+          nombreCompleto: guardianActual.nombreCompleto,
+          imagen: guardianActual.imagen,
+          categoria: guardianActual.categoria,
+          elemento: guardianActual.elemento
+        },
+        portal_actual: obtenerPortalActual()
+      });
     }
 
-    // Selección pseudo-aleatoria basada en la fecha (mismo guardián todo el día)
-    const seed = hashFecha(hoy);
-    const indice = seed % guardianesValidos.length;
-    const productoSeleccionado = guardianesValidos[indice];
-
-    // Generar perfil enriquecido
-    const guardian = generarPerfilGuardian(productoSeleccionado);
-
-    // Generar mensaje del día con Claude
-    const mensaje = await generarMensajeDelDia(guardian);
-
-    // Construir respuesta
-    const duendeDelDia = {
-      fecha: hoy,
-      guardian: {
-        id: guardian.id,
-        nombre: guardian.nombre,
-        imagen: guardian.imagen,
-        categoria: guardian.categoria,
-        tipo_ser: guardian.tipo_ser,
-        tipo_ser_nombre: guardian.tipo_ser_info?.nombre || 'Guardián',
-        arquetipo: guardian.arquetipo,
-        elemento: guardian.elemento,
-        url_tienda: guardian.url_tienda
-      },
-      mensaje: mensaje,
-      portal_actual: obtenerPortalActual()
-    };
-
-    // Guardar en caché para el resto del día
-    await kv.set(`circulo:duende-dia:${hoy}`, duendeDelDia, { ex: 86400 }); // 24h
-
+    // Fallback final a Marcos
     return Response.json({
       success: true,
-      cached: false,
-      ...duendeDelDia
+      guardian: {
+        id: 'marcos',
+        nombre: 'Marcos',
+        nombreCompleto: 'Marcos, Guardián de la Sabiduría',
+        imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/03/Marcos-1.jpg',
+        categoria: 'Sabiduría',
+        elemento: 'aire'
+      },
+      portal_actual: obtenerPortalActual()
     });
 
   } catch (error) {
@@ -98,102 +86,8 @@ export async function GET(request) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// GENERAR MENSAJE DEL DÍA
-// ═══════════════════════════════════════════════════════════════════════════════
-
-async function generarMensajeDelDia(guardian) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    // Fallback si no hay API key
-    return {
-      saludo: `Buen día, viajero del Círculo`,
-      mensaje: `Soy ${guardian.nombre}, y hoy te acompaño. Que este día te traiga la claridad que buscás.`,
-      consejo: `Recordá que la magia está en los pequeños momentos.`
-    };
-  }
-
-  const portal = obtenerPortalActual();
-  const hora = new Date().getHours();
-  const momento = hora < 12 ? 'mañana' : hora < 19 ? 'tarde' : 'noche';
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        system: `Sos ${guardian.nombre}, un ${guardian.tipo_ser_info?.nombre || 'guardián'} de la categoría ${guardian.categoria}.
-
-Tu personalidad: ${guardian.tono_voz}
-Tu forma de hablar: ${guardian.forma_hablar}
-Tu frase característica: "${guardian.frase_tipica}"
-
-Escribí en español rioplatense (vos, tenés, podés).
-Sé breve pero profundo. Cada palabra cuenta.
-Hablás en primera persona - SOS ${guardian.nombre}.`,
-        messages: [{
-          role: 'user',
-          content: `Es ${momento} y alguien acaba de entrar al Círculo de Duendes.
-Estamos en el ${portal.nombre} (${portal.energia}).
-
-Generá un mensaje de bienvenida con este formato exacto:
-
-SALUDO: [Una línea de saludo personal, cálido]
-MENSAJE: [2-3 oraciones profundas pero accesibles, que conecten con la energía del día]
-CONSEJO: [Un consejo práctico para hoy, algo que puedan hacer]
-
-No uses asteriscos ni formato markdown. Solo texto puro.`
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error('Error en API');
-    }
-
-    const data = await response.json();
-    const texto = data.content?.[0]?.text || '';
-
-    // Parsear la respuesta
-    const saludoMatch = texto.match(/SALUDO:\s*(.+?)(?=MENSAJE:|$)/s);
-    const mensajeMatch = texto.match(/MENSAJE:\s*(.+?)(?=CONSEJO:|$)/s);
-    const consejoMatch = texto.match(/CONSEJO:\s*(.+?)$/s);
-
-    return {
-      saludo: saludoMatch?.[1]?.trim() || `Bienvenido al Círculo`,
-      mensaje: mensajeMatch?.[1]?.trim() || `Hoy te acompaño en tu camino.`,
-      consejo: consejoMatch?.[1]?.trim() || `Tomate un momento para respirar.`
-    };
-
-  } catch (error) {
-    console.error('Error generando mensaje:', error);
-    return {
-      saludo: `Buen día, alma curiosa`,
-      mensaje: `Soy ${guardian.nombre}, y hoy el universo nos conectó. No es casualidad que estés acá.`,
-      consejo: `Prestá atención a las señales que aparezcan hoy. Están ahí para vos.`
-    };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // UTILIDADES
 // ═══════════════════════════════════════════════════════════════════════════════
-
-function hashFecha(fecha) {
-  let hash = 0;
-  for (let i = 0; i < fecha.length; i++) {
-    const char = fecha.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash);
-}
 
 function obtenerPortalActual() {
   const mes = new Date().getMonth();

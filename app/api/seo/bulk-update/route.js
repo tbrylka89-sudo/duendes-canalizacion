@@ -17,9 +17,9 @@ import {
 // CONFIGURACION
 // ═══════════════════════════════════════════════════════════════
 
-const WOOCOMMERCE_URL = process.env.WOOCOMMERCE_URL || process.env.NEXT_PUBLIC_WOOCOMMERCE_URL;
-const WOOCOMMERCE_KEY = process.env.WOOCOMMERCE_CONSUMER_KEY;
-const WOOCOMMERCE_SECRET = process.env.WOOCOMMERCE_CONSUMER_SECRET;
+const WOOCOMMERCE_URL = process.env.WOOCOMMERCE_URL || process.env.NEXT_PUBLIC_WOOCOMMERCE_URL || process.env.WORDPRESS_URL;
+const WOOCOMMERCE_KEY = process.env.WOOCOMMERCE_CONSUMER_KEY || process.env.WC_CONSUMER_KEY;
+const WOOCOMMERCE_SECRET = process.env.WOOCOMMERCE_CONSUMER_SECRET || process.env.WC_CONSUMER_SECRET;
 
 const BATCH_SIZE = 10; // Productos por request
 const DELAY_BETWEEN_UPDATES = 500; // ms entre actualizaciones

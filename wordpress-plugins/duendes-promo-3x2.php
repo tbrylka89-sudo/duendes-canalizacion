@@ -89,12 +89,18 @@ function duendes_contar_minis_gratis_en_carrito() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1) {
-    // Obtener minis disponibles
+    // Obtener minis disponibles (máximo 8 para no sobrecargar)
     $minis = wc_get_products([
         'status' => 'publish',
-        'limit' => -1,
+        'limit' => 8,
         'stock_status' => 'instock',
-        'category' => [DUENDES_PROMO_CATEGORIA_MINI],
+        'tax_query' => [
+            [
+                'taxonomy' => 'product_cat',
+                'field' => 'slug',
+                'terms' => DUENDES_PROMO_CATEGORIA_MINI,
+            ]
+        ],
     ]);
 
     if (empty($minis)) return;
@@ -114,15 +120,15 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
             to { opacity: 1; transform: scale(1); }
         }
         .duendes-selector-3x2 {
-            background: linear-gradient(135deg, #0d0d14 0%, #1a1525 50%, #0d0d14 100%);
-            border: 1px solid rgba(198,169,98,0.3);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 35px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            animation: dfb-selector-fade 0.6s ease-out, dfb-selector-glow 4s ease-in-out infinite;
+            background: #0a0a0f !important;
+            border: 1px solid rgba(198,169,98,0.4) !important;
+            border-radius: 24px !important;
+            padding: 40px !important;
+            margin: 30px 0 !important;
+            text-align: center !important;
+            position: relative !important;
+            overflow: hidden !important;
+            animation: dfb-selector-fade 0.6s ease-out, dfb-selector-glow 4s ease-in-out infinite !important;
         }
         .duendes-selector-3x2::before {
             content: '';
@@ -134,20 +140,20 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
             background: linear-gradient(90deg, transparent, rgba(198,169,98,0.5), transparent);
         }
         .dfb-selector-titulo {
-            color: #C6A962;
-            margin: 0 0 8px 0;
-            font-family: 'Cinzel', Georgia, serif;
-            font-size: 24px;
-            font-weight: 500;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            color: #fff !important;
+            margin: 0 0 8px 0 !important;
+            font-family: 'Cinzel', Georgia, serif !important;
+            font-size: 24px !important;
+            font-weight: 500 !important;
+            letter-spacing: 3px !important;
+            text-transform: uppercase !important;
         }
         .dfb-selector-subtitulo {
-            color: rgba(255,255,255,0.7);
-            margin: 0 0 30px 0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 17px;
-            font-style: italic;
+            color: rgba(255,255,255,0.8) !important;
+            margin: 0 0 30px 0 !important;
+            font-family: 'Cormorant Garamond', Georgia, serif !important;
+            font-size: 17px !important;
+            font-style: italic !important;
         }
         .dfb-minis-grid {
             display: grid;

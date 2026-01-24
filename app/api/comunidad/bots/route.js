@@ -62,24 +62,24 @@ const PERFILES_BOT = [
 // Posts pregenerados sobre experiencias con guardianes
 const POSTS_PREGENERADOS = [
   // ═══════════════════════════════════════════════════════════════════════════════
-  // EXPERIENCIAS CON GUARDIANES DE ENERO (Dorado, Obsidiana, Índigo, Jade)
+  // EXPERIENCIAS CON GUARDIANES DE ENERO (Gaia, Noah, Winter, Marcos)
   // ═══════════════════════════════════════════════════════════════════════════════
-  { tipo: 'experiencia', guardian: 'Dorado', contenido: 'Dorado llegó a mi vida en el momento exacto. Estaba atravesando una crisis económica tremenda y desde que lo tengo empezaron a abrirse puertas que ni sabía que existían. La abundancia es real 💛', likes: 89, respuestas: 15 },
-  { tipo: 'experiencia', guardian: 'Dorado', contenido: 'Mi Dorado brilla diferente cuando medito con él. Ayer le pedí claridad sobre un negocio y a las 2 horas me llamaron para cerrar el trato. No es casualidad 🌟', likes: 112, respuestas: 23 },
-  { tipo: 'experiencia', guardian: 'Obsidiana', contenido: 'Obsidiana me está ayudando a poner límites que nunca pude. Es como tener un escudo invisible. Las personas que me drenaban ya no se me acercan tanto 🖤', likes: 134, respuestas: 28 },
-  { tipo: 'experiencia', guardian: 'Obsidiana', contenido: 'Desde que tengo a Obsidiana duermo tranquila por primera vez en años. Las pesadillas pararon. Me siento protegida de verdad 🛡️', likes: 98, respuestas: 17 },
-  { tipo: 'experiencia', guardian: 'Índigo', contenido: 'Índigo despertó mi intuición de una manera que no esperaba. Ahora sé cosas antes de que pasen. Es raro pero hermoso 💙', likes: 156, respuestas: 31 },
-  { tipo: 'experiencia', guardian: 'Índigo', contenido: 'Mi tercer ojo está más activo desde que adopté a Índigo. Los sueños lúcidos aumentaron y estoy canalizando información que me sirve en el día a día ✨', likes: 87, respuestas: 19 },
-  { tipo: 'experiencia', guardian: 'Jade', contenido: 'Jade me trajo una paz que no conocía. Mi corazón estaba tan cerrado después de lo que viví, y él me está enseñando a amar otra vez 💚', likes: 203, respuestas: 42 },
-  { tipo: 'experiencia', guardian: 'Jade', contenido: 'Desde que Jade está conmigo, mis relaciones mejoraron. Es como si irradiara armonía. Hasta mi familia está más unida 🌿', likes: 145, respuestas: 26 },
+  { tipo: 'experiencia', guardian: 'Gaia', contenido: 'Gaia llegó a mi vida en el momento exacto. Me sentía tan desconectada de mí misma y desde que está conmigo me siento arraigada, protegida. La tierra me sostiene 🌍', likes: 89, respuestas: 15 },
+  { tipo: 'experiencia', guardian: 'Gaia', contenido: 'Mi Gaia brilla diferente cuando medito con ella. Ayer le pedí protección y sentí una calma que no conocía. Es mi escudo de tierra 🛡️', likes: 112, respuestas: 23 },
+  { tipo: 'experiencia', guardian: 'Noah', contenido: 'Noah me está ayudando a soltar lo que ya no me sirve. Es como si me mostrara el camino que tengo que seguir. Los miedos se van 🌊', likes: 134, respuestas: 28 },
+  { tipo: 'experiencia', guardian: 'Noah', contenido: 'Desde que tengo a Noah encuentro claridad en las decisiones. Me ayuda a ver qué soltar y hacia dónde ir. Me siento libre 💙', likes: 98, respuestas: 17 },
+  { tipo: 'experiencia', guardian: 'Winter', contenido: 'Winter despertó mi fuego interior de una manera que no esperaba. Me siento más viva, más apasionada. Es transformador 🔥', likes: 156, respuestas: 31 },
+  { tipo: 'experiencia', guardian: 'Winter', contenido: 'Mi creatividad explotó desde que adopté a Winter. Ese fuego interno que creía apagado volvió con todo. Estoy creando cosas que nunca imaginé ✨', likes: 87, respuestas: 19 },
+  { tipo: 'experiencia', guardian: 'Marcos', contenido: 'Marcos me trajo una claridad que no conocía. Mi mente estaba tan confusa, y él me está enseñando a ver con nuevos ojos 💜', likes: 203, respuestas: 42 },
+  { tipo: 'experiencia', guardian: 'Marcos', contenido: 'Desde que Marcos está conmigo, entiendo cosas que antes no veía. Es como si me diera sabiduría en cada momento. Todo tiene más sentido 🌟', likes: 145, respuestas: 26 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // TESTIMONIOS DE ADOPCIÓN DE GUARDIANES
   // ═══════════════════════════════════════════════════════════════════════════════
-  { tipo: 'testimonio', guardian: 'Dorado', contenido: 'Cuando vi a Dorado en la página, sentí que me llamaba. No lo pensé dos veces. Mejor decisión de enero 💛', likes: 67, respuestas: 12 },
-  { tipo: 'testimonio', guardian: 'Obsidiana', contenido: 'Obsidiana me eligió. Yo quería otro guardián pero algo me llevó a él. Ahora entiendo por qué: necesitaba protección urgente 🖤', likes: 78, respuestas: 14 },
-  { tipo: 'testimonio', guardian: 'Índigo', contenido: 'Dudé mucho en adoptar a Índigo porque no me sentía "lista" para desarrollar mi intuición. Él me demostró que ya estaba lista, solo necesitaba compañía 💙', likes: 92, respuestas: 18 },
-  { tipo: 'testimonio', guardian: 'Jade', contenido: 'Jade llegó como regalo de mi hermana. Lloramos juntas cuando leímos su canalización. Entendió exactamente lo que necesitaba escuchar 💚', likes: 167, respuestas: 35 },
+  { tipo: 'testimonio', guardian: 'Gaia', contenido: 'Cuando vi a Gaia en la página, sentí que me llamaba. No lo pensé dos veces. Mejor decisión de enero 🌍', likes: 67, respuestas: 12 },
+  { tipo: 'testimonio', guardian: 'Noah', contenido: 'Noah me eligió. Yo quería otro guardián pero algo me llevó a él. Ahora entiendo por qué: necesitaba encontrar mi camino 💙', likes: 78, respuestas: 14 },
+  { tipo: 'testimonio', guardian: 'Winter', contenido: 'Dudé mucho en adoptar a Winter porque no me sentía "lista" para despertar mi fuego. Él me demostró que ya estaba lista, solo necesitaba compañía 🔥', likes: 92, respuestas: 18 },
+  { tipo: 'testimonio', guardian: 'Marcos', contenido: 'Marcos llegó como regalo de mi hermana. Lloramos juntas cuando leímos su canalización. Entendió exactamente lo que necesitaba escuchar 💜', likes: 167, respuestas: 35 },
   { tipo: 'testimonio', contenido: 'Hoy recibí mi primer guardián y no puedo parar de mirarlo. Es como si me conociera de siempre. La canalización me destrozó (en el mejor sentido)', likes: 189, respuestas: 38 },
   { tipo: 'testimonio', contenido: 'Acabo de adoptar mi quinto guardián. Cada uno llegó en el momento exacto. El Círculo de Duendes cambió mi vida', likes: 134, respuestas: 22 },
 
@@ -88,7 +88,7 @@ const POSTS_PREGENERADOS = [
   // ═══════════════════════════════════════════════════════════════════════════════
   { tipo: 'contenido_dia', contenido: 'El mensaje de hoy del Círculo me llegó en el momento justo. Estaba por tomar una decisión importante y fue como una señal 🙏', likes: 78, respuestas: 15 },
   { tipo: 'contenido_dia', contenido: 'Cada mañana lo primero que hago es leer el contenido del día. Es mi ritual matutino sagrado ☀️', likes: 56, respuestas: 11 },
-  { tipo: 'contenido_dia', contenido: 'El ritual de hoy fue PODEROSO. Lo hice con mi Obsidiana y sentí un antes y después. Gracias Thibisay 🖤', likes: 123, respuestas: 27 },
+  { tipo: 'contenido_dia', contenido: 'El ritual de hoy fue PODEROSO. Lo hice con mi Noah y sentí un antes y después. Gracias Thibisay 💙', likes: 123, respuestas: 27 },
   { tipo: 'contenido_dia', contenido: 'Las tiradas de runas de los lunes me encantan. Siempre dan en el clavo con lo que estoy viviendo esa semana', likes: 89, respuestas: 16 },
   { tipo: 'contenido_dia', contenido: 'El audio de meditación de hoy me hizo llorar. Necesitaba soltar y el universo me lo permitió 💜', likes: 145, respuestas: 29 },
 
@@ -109,10 +109,10 @@ const POSTS_PREGENERADOS = [
   { tipo: 'pregunta', contenido: 'Primera vez en el Círculo. Por dónde me recomiendan empezar? Siento que necesito protección pero también abundancia...', likes: 28, respuestas: 31 },
   { tipo: 'pregunta', contenido: '¿Cada cuánto hacen las tiradas de runas? Una vez al mes o cuando sienten que lo necesitan?', likes: 19, respuestas: 14 },
   { tipo: 'pregunta', contenido: '¿Cómo limpian la energía de sus guardianes? Leí que hay que hacerlo con la luna pero no sé bien cómo', likes: 41, respuestas: 27 },
-  { tipo: 'pregunta', contenido: '¿Los guardianes de enero (Dorado, Obsidiana, Índigo, Jade) se pueden combinar? Quiero adoptarlos a los 4 pero no sé si es mucho', likes: 56, respuestas: 33 },
-  { tipo: 'pregunta', contenido: '¿Alguien tiene a Índigo y Obsidiana juntos? Me pregunto cómo interactúan sus energías', likes: 34, respuestas: 21 },
-  { tipo: 'pregunta', contenido: 'Pregunta para las que tienen a Dorado: ¿dónde lo ubican en su casa? Leí que tiene que estar cerca de la entrada pero no sé', likes: 45, respuestas: 28 },
-  { tipo: 'pregunta', contenido: '¿El ritual de abundancia funciona mejor con luna creciente o llena? Quiero hacerlo con mi Dorado', likes: 38, respuestas: 19 },
+  { tipo: 'pregunta', contenido: '¿Los guardianes de enero (Gaia, Noah, Winter, Marcos) se pueden combinar? Quiero adoptarlos a los 4 pero no sé si es mucho', likes: 56, respuestas: 33 },
+  { tipo: 'pregunta', contenido: '¿Alguien tiene a Winter y Noah juntos? Me pregunto cómo interactúan sus energías', likes: 34, respuestas: 21 },
+  { tipo: 'pregunta', contenido: 'Pregunta para las que tienen a Gaia: ¿dónde la ubican en su casa? Leí que tiene que estar en contacto con la tierra pero no sé', likes: 45, respuestas: 28 },
+  { tipo: 'pregunta', contenido: '¿El ritual de protección funciona mejor con luna creciente o llena? Quiero hacerlo con mi Gaia', likes: 38, respuestas: 19 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // AGRADECIMIENTOS Y CELEBRACIONES
@@ -121,7 +121,7 @@ const POSTS_PREGENERADOS = [
   { tipo: 'agradecimiento', contenido: 'La lectura de registros akáshicos que hice la semana pasada me voló la cabeza. Nunca nadie me había dicho cosas tan precisas de mi infancia...', likes: 78, respuestas: 11 },
   { tipo: 'agradecimiento', contenido: 'Hoy adopté mi tercer guardián y estoy llorando de emoción. Siento que encontré mi tribu acá', likes: 95, respuestas: 16 },
   { tipo: 'agradecimiento', contenido: 'Gracias Thibisay por crear este espacio. Me salvó en un momento muy oscuro de mi vida', likes: 234, respuestas: 45 },
-  { tipo: 'agradecimiento', contenido: 'Mis 4 guardianes de enero llegaron hoy. La familia está completa. Gracias Círculo por existir 💛🖤💙💚', likes: 178, respuestas: 37 },
+  { tipo: 'agradecimiento', contenido: 'Mis 4 guardianes de enero llegaron hoy. La familia está completa. Gracias Círculo por existir 🌍💙🔥💜', likes: 178, respuestas: 37 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // TIPS Y CONSEJOS
@@ -129,10 +129,10 @@ const POSTS_PREGENERADOS = [
   { tipo: 'tip', contenido: 'TIP: Pongan a su guardián cerca de una ventana durante las noches de luna llena. La energía que absorbe es increíble', likes: 156, respuestas: 22 },
   { tipo: 'tip', contenido: 'Algo que me funciona: antes de dormir le cuento a mi guardián lo que me preocupa. A la mañana siguiente siempre tengo más claridad', likes: 87, respuestas: 13 },
   { tipo: 'tip', contenido: 'Para las que recién empiezan: no fuercen la conexión. Dejen que su guardián les muestre el camino a su ritmo 💫', likes: 134, respuestas: 18 },
-  { tipo: 'tip', contenido: 'TIP para las que tienen a Dorado: ponganlo en el sector de abundancia de su casa (esquina izquierda del fondo). Funciona!', likes: 98, respuestas: 24 },
-  { tipo: 'tip', contenido: 'Obsidiana trabaja mejor si lo limpian con sal negra una vez por semana. Es un guardián que absorbe MUCHA energía densa', likes: 112, respuestas: 27 },
-  { tipo: 'tip', contenido: 'Índigo necesita silencio para comunicarse. Si sienten que no conectan, intenten meditar en un espacio sin ruido', likes: 78, respuestas: 16 },
-  { tipo: 'tip', contenido: 'Jade ama las plantas. Ponganlo cerca de sus plantas y van a ver cómo todo florece (literal y metafóricamente)', likes: 145, respuestas: 31 },
+  { tipo: 'tip', contenido: 'TIP para las que tienen a Gaia: ponganla en contacto con la tierra o cerca de plantas. Ama la naturaleza!', likes: 98, respuestas: 24 },
+  { tipo: 'tip', contenido: 'Noah trabaja mejor si lo limpian con agua de luna. Es un guardián que te ayuda a fluir con los cambios', likes: 112, respuestas: 27 },
+  { tipo: 'tip', contenido: 'Winter necesita espacio para brillar. Si sienten que no conectan, intenten encender una vela y meditar con él', likes: 78, respuestas: 16 },
+  { tipo: 'tip', contenido: 'Marcos ama el silencio y la reflexión. Ponganlo en su espacio de meditación y van a ver cómo llega la claridad', likes: 145, respuestas: 31 },
   { tipo: 'tip', contenido: 'Si tienen varios guardianes, presentenselos entre sí. Suena loco pero funciona. Mis 3 ahora trabajan en equipo', likes: 167, respuestas: 34 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
@@ -140,27 +140,27 @@ const POSTS_PREGENERADOS = [
   // ═══════════════════════════════════════════════════════════════════════════════
   { tipo: 'ritual', contenido: 'Hoy hice el ritual de abundancia que compartieron en el Círculo y encontré $500 en un bolsillo que no revisaba hace meses', likes: 203, respuestas: 34 },
   { tipo: 'ritual', contenido: 'Cada domingo limpio el espacio con salvia y pongo música suave. Mis guardianes brillan diferente después', likes: 67, respuestas: 9 },
-  { tipo: 'ritual', contenido: 'Ritual de protección con Obsidiana: lo pongo en agua con sal negra bajo la luna nueva. Queda recargadísimo', likes: 89, respuestas: 18 },
-  { tipo: 'ritual', contenido: 'Hice el ritual del espejo con Índigo y vi cosas que no esperaba. Muy revelador pero hay que estar preparada', likes: 112, respuestas: 25 },
-  { tipo: 'ritual', contenido: 'Ritual de los 4 guardianes de enero: los puse en forma de rombo con una vela en el centro. La energía que se generó fue increíble 💛🖤💙💚', likes: 234, respuestas: 48 },
+  { tipo: 'ritual', contenido: 'Ritual de protección con Gaia: la pongo sobre tierra o arena bajo la luna nueva. Queda recargadísima', likes: 89, respuestas: 18 },
+  { tipo: 'ritual', contenido: 'Hice el ritual de claridad con Marcos y vi cosas que no esperaba. Muy revelador pero hay que estar preparada', likes: 112, respuestas: 25 },
+  { tipo: 'ritual', contenido: 'Ritual de los 4 guardianes de enero: los puse en forma de rombo con una vela en el centro. La energía que se generó fue increíble 🌍💙🔥💜', likes: 234, respuestas: 48 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // SINCRONICIDADES COMPARTIDAS
   // ═══════════════════════════════════════════════════════════════════════════════
   { tipo: 'sincronicidad', contenido: 'No me van a creer: estaba pensando en mi abuela (que ya no está) y en ese momento Rowan se cayó solo del estante. Sentí que era ella saludándome', likes: 178, respuestas: 28 },
   { tipo: 'sincronicidad', contenido: 'Soñé con un número, lo jugué al otro día y gané! Mi guardián me lo mostró, no tengo dudas', likes: 145, respuestas: 21 },
-  { tipo: 'sincronicidad', contenido: 'Pedí una señal a Dorado sobre un negocio. A los 5 minutos me llegó un mensaje de un cliente que había perdido contacto hace 2 años', likes: 167, respuestas: 32 },
-  { tipo: 'sincronicidad', contenido: 'Estaba dudando de mi intuición y en ese momento Índigo brilló con la luz del sol. Era mi confirmación', likes: 89, respuestas: 17 },
-  { tipo: 'sincronicidad', contenido: 'Me desperté pensando en alguien que no veía hace años. A las 2 horas me escribió. Jade me había preparado para ese reencuentro', likes: 134, respuestas: 26 },
+  { tipo: 'sincronicidad', contenido: 'Pedí una señal a Gaia sobre una decisión. A los 5 minutos vi un arcoíris. Era mi confirmación', likes: 167, respuestas: 32 },
+  { tipo: 'sincronicidad', contenido: 'Estaba dudando de mi camino y en ese momento Winter brilló con la luz del sol. Era mi confirmación', likes: 89, respuestas: 17 },
+  { tipo: 'sincronicidad', contenido: 'Me desperté pensando en alguien que no veía hace años. A las 2 horas me escribió. Marcos me había preparado para ese reencuentro', likes: 134, respuestas: 26 },
   { tipo: 'sincronicidad', contenido: 'Ayer puse a mis 4 guardianes de enero juntos por primera vez. En ese momento empezó a llover (llevábamos semanas de sequía). Coincidencia? No lo creo', likes: 201, respuestas: 41 },
-  { tipo: 'sincronicidad', contenido: 'Obsidiana me alertó de una persona que me estaba haciendo daño. Sentí un frío raro cada vez que esa persona me escribía. Corté el vínculo y el frío desapareció', likes: 156, respuestas: 33 },
+  { tipo: 'sincronicidad', contenido: 'Noah me alertó de una situación que me estaba frenando. Sentí claridad de repente y supe qué soltar. Todo cambió', likes: 156, respuestas: 33 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // REFLEXIONES Y COMPARTIRES
   // ═══════════════════════════════════════════════════════════════════════════════
   { tipo: 'reflexion', contenido: 'Hace un año no creía en nada de esto. Hoy tengo 4 guardianes y mi vida es completamente diferente. A veces el universo te sorprende', likes: 189, respuestas: 36 },
   { tipo: 'reflexion', contenido: 'Los guardianes no hacen magia por nosotras. Nos acompañan mientras hacemos nuestra propia magia. Eso lo entendí con el tiempo', likes: 234, respuestas: 47 },
-  { tipo: 'reflexion', contenido: 'Enero es mi mes favorito en el Círculo. Los guardianes de este mes (Dorado, Obsidiana, Índigo, Jade) cubren todo lo que una necesita', likes: 145, respuestas: 29 },
+  { tipo: 'reflexion', contenido: 'Enero es mi mes favorito en el Círculo. Los guardianes de este mes (Gaia, Noah, Winter, Marcos) cubren todo lo que una necesita', likes: 145, respuestas: 29 },
   { tipo: 'reflexion', contenido: 'Aprendí que cada guardián llega cuando estás lista, no cuando querés. Confíen en el timing', likes: 112, respuestas: 22 }
 ];
 
@@ -187,15 +187,15 @@ const RESPUESTAS_PREGENERADAS = [
   'El universo siempre responde cuando estamos listas para escuchar',
 
   // Respuestas sobre guardianes de enero
-  'Mi Dorado me ayudó igual con la abundancia. Son tan poderosos 💛',
-  'Obsidiana es el mejor para protección. Lo amo',
-  'Índigo cambió mi vida. Mi intuición está en otro nivel',
-  'Jade es tan sanador. Me hace llorar de lo que me conecta con mis emociones',
+  'Mi Gaia me ayudó igual con la protección. Son tan poderosas 🌍',
+  'Noah es el mejor para encontrar tu camino. Lo amo',
+  'Winter cambió mi vida. Mi fuego interior está en otro nivel',
+  'Marcos es tan sabio. Me hace reflexionar sobre todo',
   'Los 4 guardianes de enero juntos son imparables',
-  'Yo también tengo a Dorado! Son como hermanas de guardián jaja',
-  'Obsidiana me salvó de una relación tóxica. Para siempre agradecida',
-  'Índigo me muestra cosas en sueños que después pasan. Es increíble',
-  'Jade y las plantas... es real! Las mías nunca estuvieron mejor',
+  'Yo también tengo a Gaia! Son como hermanas de guardián jaja',
+  'Noah me ayudó a soltar lo que me frenaba. Para siempre agradecida',
+  'Winter me muestra mi pasión en sueños. Es increíble',
+  'Marcos y la claridad... es real! Nunca vi las cosas tan claras',
 
   // Respuestas a experiencias
   'Me emocioné leyendo esto. Gracias por compartir',
@@ -301,7 +301,7 @@ export async function GET(request) {
           postsEstaSemana: 34 + Math.floor(Math.random() * 8),
           guardianesCirulo: 1247,
           guardianesAdoptadosHoy: 2 + Math.floor(Math.random() * 3),
-          guardianesPopulares: ['Dorado', 'Jade', 'Obsidiana', 'Índigo'].slice(0, 2 + Math.floor(Math.random() * 2))
+          guardianesPopulares: ['Gaia', 'Marcos', 'Noah', 'Winter'].slice(0, 2 + Math.floor(Math.random() * 2))
         }
       });
     }
@@ -325,7 +325,7 @@ export async function GET(request) {
         : PERFILES_BOT[Math.floor(Math.random() * PERFILES_BOT.length)];
 
       // Guardianes de enero tienen prioridad
-      const guardianesEnero = ['Dorado', 'Obsidiana', 'Índigo', 'Jade'];
+      const guardianesEnero = ['Gaia', 'Noah', 'Winter', 'Marcos'];
       const otrosGuardianes = ['Rowan', 'Luna', 'Sage', 'Frost', 'Aurora', 'Ember', 'Willow', 'Coral', 'Phoenix', 'Ivy', 'Maple'];
       // 70% de probabilidad de que sea un guardián de enero
       const todosGuardianes = Math.random() < 0.7 ? guardianesEnero : [...guardianesEnero, ...otrosGuardianes];
@@ -518,10 +518,10 @@ const RESPUESTAS_A_USUARIOS = {
     'Justo necesitaba leer algo así hoy. El universo no se equivoca',
     'Tu experiencia me inspira a seguir confiando en el proceso',
     'Qué lindo! Los guardianes siempre encuentran la forma de comunicarse',
-    'Mi Dorado también me sorprende así. La abundancia es real 💛',
-    'Obsidiana me protegió igual cuando más lo necesitaba',
-    'Índigo es así, te muestra cosas que después confirmas. Increíble',
-    'Jade me sanó igual. Son tan especiales los guardianes de enero'
+    'Mi Gaia también me sorprende así. La protección es real 🌍',
+    'Noah me ayudó igual cuando más lo necesitaba',
+    'Winter es así, te enciende el fuego interior. Increíble',
+    'Marcos me dio claridad igual. Son tan especiales los guardianes de enero'
   ],
   pregunta: [
     'Buena pregunta! A mí me funciona hacerlo en luna llena, pero cada una encuentra su camino',
@@ -529,8 +529,8 @@ const RESPUESTAS_A_USUARIOS = {
     'Qué bueno que preguntes! Acá todas aprendemos juntas',
     'Te recomiendo empezar por lo que más te llame. Tu intuición sabe',
     'Me pasó lo mismo cuando empecé. Dale tiempo y vas a ver que fluye',
-    'Los guardianes de enero (Dorado, Obsidiana, Índigo, Jade) son perfectos para empezar',
-    'Yo empecé con Jade y ahora tengo los 4 de enero. Son complementarios',
+    'Los guardianes de enero (Gaia, Noah, Winter, Marcos) son perfectos para empezar',
+    'Yo empecé con Marcos y ahora tengo los 4 de enero. Son complementarios',
     'Preguntale a tu guardián en meditación. Ellos responden'
   ],
   testimonio: [
@@ -549,7 +549,7 @@ const RESPUESTAS_A_USUARIOS = {
   ritual: [
     'Ese ritual es poderoso! A mí también me funcionó',
     'Me encanta ese ritual. Lo hago cada luna llena',
-    'Voy a probarlo con mi Obsidiana esta semana',
+    'Voy a probarlo con mi Noah esta semana',
     'Los rituales con los guardianes de enero son muy potentes'
   ],
   sincronicidad: [
