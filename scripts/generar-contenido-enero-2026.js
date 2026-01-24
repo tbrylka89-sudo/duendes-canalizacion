@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // SCRIPT: Generar contenido completo del Círculo - Enero 2026
 // Ejecutar con: node scripts/generar-contenido-enero-2026.js
+// ACTUALIZADO: Usando duendes reales (Gaia, Noah, Winter, Marcos)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { GUARDIANES_MAESTROS, ROTACION_ENERO_2026, obtenerGuardianPorFecha } from '../lib/circulo/duendes-semanales-2026.js';
@@ -10,7 +11,7 @@ import { GUARDIANES_MAESTROS, ROTACION_ENERO_2026, obtenerGuardianPorFecha } fro
 
 export const CONTENIDO_ENERO_2026 = [
   // ═══════════════════════════════════════════════════════════════════════════
-  // SEMANA 1: DORADO (1-7 enero) - Abundancia y Nuevos Comienzos
+  // SEMANA 1: GAIA (1-7 enero) - Raíces y Fuerza Interior
   // ═══════════════════════════════════════════════════════════════════════════
   {
     fecha: '2026-01-01',
@@ -18,33 +19,31 @@ export const CONTENIDO_ENERO_2026 = [
     mes: 1,
     año: 2026,
     tipo: 'presentacion',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'El Año Nuevo Empieza Con Vos',
-    subtitulo: 'Un mensaje de Dorado para este primer día del año',
-    cuerpo: `¡Hola, alma próspera!
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Los Pies en la Tierra, el Corazón en Calma',
+    subtitulo: 'Gaia te da la bienvenida al nuevo año',
+    cuerpo: `Los pies en la tierra, el corazón en calma.
 
-Soy Dorado, y hoy tengo el honor de abrir las puertas del año nuevo junto a vos.
+Soy Gaia. Y antes de que empieces a hacer listas de propósitos y promesas que después te van a pesar, necesito que hagas algo conmigo.
 
-Sé lo que estás pensando. "Otro año, otras promesas que probablemente no cumpla." Pero pará. Respirá. Este momento es diferente porque VOS decidís que lo sea.
+Tocá el suelo. Si podés, descalzo. Si no, al menos sentí tus pies contra la superficie donde estés.
 
-No te voy a pedir que hagas listas interminables de propósitos. No te voy a decir que este año tiene que ser "el mejor de tu vida". Lo que sí te voy a pedir es algo más simple y más difícil a la vez: que te permitas recibir.
+¿Lo sentís? Eso que hay debajo de vos no es solo piso. Es la tierra que sostiene todo. Que sostuvo a tus abuelos, a los abuelos de tus abuelos, y te va a sostener a vos también.
 
-¿Sabés cuántas veces rechazás la abundancia sin darte cuenta? Cuando decís "no era para tanto" ante un cumplido. Cuando te sentís culpable por descansar. Cuando creés que no merecés ese ascenso, ese amor, esa alegría.
+Este año nuevo, no te voy a pedir que cambies. No te voy a pedir que seas mejor versión de nada. Te voy a pedir algo más difícil: que recuerdes quién ya sos.
 
-Este año, mi misión es recordarte que merecés cosas buenas. Punto. Sin peros.
+Tenés una fuerza adentro que olvidaste que existe. No porque no la uses, sino porque te convencieron de que necesitás buscarla afuera. En libros, en gurús, en métodos de 21 días.
 
-La abundancia no es solo dinero, aunque el dinero también cuenta. Es flujo. Es permitirte recibir ayuda cuando la necesitás. Es celebrar tus logros sin minimizarlos. Es creer que hay suficiente para todos, incluyéndote a vos.
+Tu fuerza está en tus raíces. En las historias que te contaron de chico. En las veces que pensaste que no podías más y sin embargo acá estás, leyendo esto.
 
-Hoy, en este primer día, te invito a hacer algo pequeño pero poderoso: cuando algo bueno te pase, no lo deflectes. Recibilo. Decí "gracias" y sentí esa palabra en el pecho.
+No vine a protegerte de todo. Vine a recordarte que ya tenés la fuerza.
 
-El universo está conspirando a tu favor. Solo necesita que abras las manos para recibir lo que ya te pertenece.
-
-Que la abundancia fluya hacia vos como río que encuentra el mar.`,
-    afirmacion: 'Merezco abundancia en todas sus formas. Me abro a recibir.',
-    cierre: 'Con cariño dorado, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Citrino',
+Este año, cuando sientas que te perdés, volvé a tus pies. Volvé a la tierra. Volvé a vos.`,
+    afirmacion: 'Ya tengo la fuerza. Siempre la tuve.',
+    cierre: 'Con arcilla y verdad, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Cuarzo Ahumado',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -55,44 +54,35 @@ Que la abundancia fluya hacia vos como río que encuentra el mar.`,
     mes: 1,
     año: 2026,
     tipo: 'afirmacion',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'Afirmaciones de Abundancia para el Año Nuevo',
-    subtitulo: 'Palabras que transforman tu relación con la prosperidad',
-    cuerpo: `Buenos días, alma próspera.
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Tu Cuerpo Sabe',
+    subtitulo: 'Aprendiendo a escuchar la sabiduría física',
+    cuerpo: `Buenos días.
 
-Hoy quiero hablarte del poder de las palabras. No del poder mágico de decir algo y que aparezca (ojalá fuera tan fácil), sino del poder real de cómo te hablás a vos mismo/a.
+Hoy quiero hablarte de algo que la mayoría ignora: tu cuerpo tiene memoria. Y tiene sabiduría.
 
-Escuchá las frases que repetís sobre el dinero, sobre el éxito, sobre merecer:
-- "La plata no alcanza"
-- "Nunca me pasan cosas buenas"
-- "No soy de los que tienen suerte"
+Esa tensión en los hombros cuando alguien te pide algo que no querés hacer. Ese nudo en el estómago antes de una decisión importante. Esas ganas de huir cuando entrás a ciertos lugares.
 
-Cada vez que decís eso, le estás dando instrucciones a tu cerebro. Y tu cerebro, obediente como es, busca evidencia que confirme lo que le decís.
+No son nervios. No es ansiedad genérica. Es tu cuerpo hablándote.
 
-Hoy te propongo un experimento: por 24 horas, cambiá el disco.
+El problema es que aprendimos a ignorarlo. "Son solo nervios", decimos. "Estoy exagerando." Y seguimos adelante, pisoteando señales que podrían ahorrarnos meses de sufrimiento.
 
-Cuando te descubras pensando "no me alcanza", pausá y decí: "Siempre encuentro la manera." No es mentirte. Es elegir una verdad diferente, igualmente válida.
+Hoy te propongo un ejercicio simple:
 
-Mis afirmaciones favoritas para este comienzo de año:
+Antes de tomar cualquier decisión (por pequeña que sea), pausá. Respirá. Y preguntate: ¿cómo se siente esto en mi cuerpo?
 
-"El universo tiene recursos infinitos, y yo soy parte de esa abundancia."
+Si la respuesta es tensión, contracción, incomodidad... tu cuerpo está diciendo no. No importa lo que diga tu cabeza.
 
-"Cada día encuentro nuevas oportunidades de prosperidad."
+Si la respuesta es expansión, liviandad, apertura... es un sí.
 
-"Recibir es tan sagrado como dar."
+Empezá con decisiones chicas. ¿Qué quiero comer? ¿Por dónde quiero caminar? Practicá escuchar. Después, cuando lleguen las decisiones grandes, vas a tener el canal abierto.
 
-"Mi valor no depende de mi cuenta bancaria."
-
-"La abundancia fluye hacia mí fácilmente."
-
-No las digas como loro. Sentí cada palabra. Si alguna te genera resistencia ("¿fácilmente? ja!"), esa es exactamente la que más necesitás trabajar.
-
-La abundancia empieza en tu mente. Y tu mente empieza con tus palabras.`,
-    afirmacion: 'El universo tiene recursos infinitos, y yo soy parte de esa abundancia.',
-    cierre: 'Hablate bonito. Es gratis y cambia todo. Con brillo, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Pirita',
+Tu cuerpo sabe cosas que tu mente todavía no entiende. Dale espacio para que te hable.`,
+    afirmacion: 'Mi cuerpo es sabio. Elijo escucharlo.',
+    cierre: 'Escuchá hacia adentro. Con raíces, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Jaspe Rojo',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -102,37 +92,36 @@ La abundancia empieza en tu mente. Y tu mente empieza con tus palabras.`,
     dia: 3,
     mes: 1,
     año: 2026,
-    tipo: 'ensenanza',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'El Mito del Esfuerzo y la Abundancia',
-    subtitulo: 'Por qué trabajar más no siempre significa prosperar más',
-    cuerpo: `Hola de nuevo, alma próspera.
+    tipo: 'ejercicio',
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Ritual de Enraizamiento',
+    subtitulo: 'Un ejercicio para conectar con tu fuerza interior',
+    cuerpo: `Hoy vamos a hacer algo juntos.
 
-Tengo que contarte algo que quizás no quieras escuchar: el esfuerzo solo no trae abundancia.
+Buscá un lugar donde puedas estar 5 minutos sin que te interrumpan. Si podés estar en contacto con la tierra (jardín, plaza, maceta grande), mejor. Pero cualquier lugar sirve.
 
-Sé que va contra todo lo que te enseñaron. "El que trabaja triunfa." "El esfuerzo tiene recompensa." "Hay que ganarse el pan con el sudor de la frente."
+Parate con los pies separados al ancho de tus caderas. Flexioná levemente las rodillas. No estás rígida. Estás plantada.
 
-Pero mirá a tu alrededor. ¿Cuántas personas conocés que trabajan durísimo y apenas sobreviven? ¿Y cuántas que parecen atraer oportunidades sin romperse la espalda?
+Cerrá los ojos.
 
-La diferencia no es suerte. Es energía.
+Imaginá que de la planta de tus pies salen raíces. No raíces delicadas. Raíces gruesas, fuertes, como las de un árbol centenario.
 
-Cuando trabajás desde la escasez ("tengo que trabajar más porque sino no alcanza"), generás más escasez. Es como correr en una rueda de hámster: mucho movimiento, poco avance.
+Esas raíces bajan. Atraviesan el piso, la tierra, las capas de roca. Bajan hasta el centro de la tierra, donde hay fuego y fuerza pura.
 
-Cuando trabajás desde la abundancia ("trabajo porque me gusta, porque aporto valor, porque sé que siempre hay más"), algo mágico pasa. Las oportunidades llegan. La gente quiere colaborar con vos. El dinero fluye.
+Con cada inhalación, subí esa energía por tus raíces. Sentí cómo entra por tus pies, sube por tus piernas, llena tu torso, tus brazos, tu cabeza.
 
-No te estoy diciendo que dejes de trabajar. Te estoy diciendo que cambies el DESDE DÓNDE trabajás.
+Con cada exhalación, soltá lo que no te pertenece. Las preocupaciones ajenas. Las expectativas de otros. El ruido del mundo.
 
-Ejercicio para hoy: Antes de empezar cualquier tarea, preguntate:
-- ¿Estoy haciendo esto desde el miedo o desde la confianza?
-- ¿Estoy creando valor o solo apagando incendios?
-- ¿Cómo se sentiría hacer esto mismo pero con ligereza?
+Repetí tres veces: "Ya tengo la fuerza. Siempre la tuve."
 
-La abundancia no es premio al sufrimiento. Es consecuencia del alineamiento.`,
-    afirmacion: 'Trabajo desde la confianza, no desde el miedo. La abundancia es mi estado natural.',
-    cierre: 'Menos hustle, más flow. Te lo dice alguien que observó humanos por siglos. Con sabiduría dorada, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Jade verde',
+Abrí los ojos lentamente.
+
+Cuando sientas que te perdés, volvé a este ejercicio. Tus raíces siempre están ahí, esperando que las recuerdes.`,
+    afirmacion: 'Mis raíces me sostienen. Estoy conectada con mi fuerza.',
+    cierre: 'Plantada y presente. Con tierra, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Turmalina Negra',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -142,40 +131,36 @@ La abundancia no es premio al sufrimiento. Es consecuencia del alineamiento.`,
     dia: 4,
     mes: 1,
     año: 2026,
-    tipo: 'ejercicio',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'El Ritual del Primer Billete',
-    subtitulo: 'Una práctica simple para transformar tu energía financiera',
-    cuerpo: `¡Hola, alma próspera!
+    tipo: 'ensenanza',
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Sobre Pedir Ayuda',
+    subtitulo: 'Por qué soltar el control no es debilidad',
+    cuerpo: `Tengo que confesarte algo.
 
-Hoy te traigo uno de mis rituales favoritos. Es simple, no necesita velas ni inciensos (aunque podés agregarlos si querés), y funciona.
+Durante siglos, me resistí a pedir ayuda. Soy Gaia. Soy tierra. Soy la que sostiene. ¿Cómo iba yo a necesitar que alguien me sostenga a mí?
 
-Se llama el Ritual del Primer Billete.
+Hasta que un día, durante una sequía terrible, entendí algo: hasta la tierra necesita agua. Hasta la montaña más sólida necesita lluvia.
 
-Buscá un billete. Puede ser del valor que sea, no importa. Lo importante es que sea físico, que puedas tocarlo.
+Pedir ayuda no es debilidad. Es sabiduría.
 
-Ahora, sentate en un lugar tranquilo con el billete en las manos. Cerrá los ojos y hacé tres respiraciones profundas.
+Hay algo en los humanos (especialmente en los que sienten que tienen que ser fuertes para otros) que los hace creer que necesitar es vergonzoso. Que deberían poder solos. Que pedir es molestar.
 
-Paso 1: Gratitud
-Pensá en todo lo que el dinero te ha permitido tener, hacer, vivir. No solo las cosas grandes. El café de esta mañana. El techo sobre tu cabeza. El celular desde donde probablemente estés leyendo esto.
+Pero mirá la naturaleza: ningún elemento existe solo. La tierra necesita agua. El fuego necesita aire. Todo está conectado, intercambiando, recibiendo y dando.
 
-Paso 2: Perdón
-Pedile perdón al dinero por todas las veces que lo trataste mal. Por las veces que dijiste "sos el origen de todos los problemas". Por las veces que lo gastaste con culpa o lo retuviste con miedo.
+¿Cuándo fue la última vez que pediste ayuda sin disculparte?
 
-Paso 3: Intención
-Decile a ese billete exactamente qué querés que represente. No "quiero más dinero" (eso es muy vago). Algo específico: "Quiero sentir tranquilidad financiera." "Quiero poder ayudar a mi familia." "Quiero tener un colchón de emergencia."
+No "perdón por molestar, pero..." No "sé que estás ocupada, pero..."
 
-Paso 4: Circulación
-En las próximas 24 horas, gastá ese billete en algo que te haga feliz. No en cuentas. No en algo "útil". En algo que genuinamente te de alegría. Un alfajor. Una flor. Un libro.
+Solo: "Necesito ayuda con esto."
 
-Esto es lo que le dice al universo: confío en que hay más. No me aferro. El dinero está para circular.
+Hoy te invito a practicar esa frase. Decila en voz alta, aunque sea a la pared. "Necesito ayuda."
 
-Hacé este ritual una vez al mes. Vas a ver cambios.`,
-    afirmacion: 'El dinero es energía que fluye. Confío en la circulación de la abundancia.',
-    cierre: 'La prosperidad ama la gratitud y la circulación. Con brillo, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Citrino',
+No te hace menos fuerte. Te hace más sabia.`,
+    afirmacion: 'Pedir ayuda es un acto de sabiduría, no de debilidad.',
+    cierre: 'Hasta la tierra necesita lluvia. Con amor terrenal, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Cuarzo Ahumado',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -185,43 +170,32 @@ Hacé este ritual una vez al mes. Vas a ver cambios.`,
     dia: 5,
     mes: 1,
     año: 2026,
-    tipo: 'ritual',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'Ritual de Luna Nueva: Sembrar Intenciones',
-    subtitulo: 'Aprovechá la energía de nuevos comienzos',
-    cuerpo: `Alma próspera, la luna nueva se acerca y con ella la mejor energía para sembrar.
+    tipo: 'reflexion',
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Lo Que Heredaste',
+    subtitulo: 'Conectando con la fuerza de tus ancestros',
+    cuerpo: `¿Alguna vez pensaste en todo lo que tuvieron que sobrevivir tus ancestros para que vos estés acá?
 
-La luna nueva es como una página en blanco. Es el momento ideal para plantar semillas de lo que querés manifestar. Y como estamos en la primera semana del año, esta luna nueva es doblemente poderosa.
+Guerras. Hambrunas. Pérdidas. Migraciones. Enfermedades. Corazones rotos. Incertidumbre.
 
-Te propongo un ritual simple pero efectivo:
+Y sin embargo, generación tras generación, siguieron adelante. Se enamoraron. Tuvieron hijos. Plantaron semillas. Construyeron casas. Contaron historias.
 
-Vas a necesitar:
-- Papel y lapicera (de los que te gusten)
-- Una vela (amarilla si tenés, sino blanca)
-- Un citrino o cuarzo transparente (o cualquier piedra que te llame)
+Todo eso está en tu sangre.
 
-El ritual:
+No sos frágil. Venís de gente que sobrevivió lo inimaginable. Esa fuerza no desaparece. Se transmite.
 
-1. Encendé la vela y colocá la piedra cerca.
+Hoy te invito a honrar esa herencia. No tenés que saber los nombres de todos tus ancestros. No tenés que conocer sus historias.
 
-2. Escribí en el papel: "En este año 2026, me abro a recibir..." y completá con 3 intenciones específicas. No "quiero ser rico" sino "quiero sentir libertad financiera y paz con mi situación económica."
+Solo reconocé que existieron. Que lucharon. Que amaron. Que de alguna manera, a través del tiempo, te trajeron hasta acá.
 
-3. Debajo de cada intención, escribí qué vas a HACER para acercarte a ella. La magia no trabaja sola. Trabaja CON vos.
+Ponete una mano en el corazón y decí: "Honro a quienes vinieron antes que yo. Cargo su fuerza en mi sangre."
 
-4. Doblá el papel hacia vos (simboliza que las cosas vienen hacia vos, no se alejan).
-
-5. Pasá el papel por el humo de la vela (con cuidado, no lo quemes) y decí: "Estas semillas están plantadas. Confío en el proceso."
-
-6. Guardá el papel en algún lugar especial. En luna llena (dos semanas después), lo vas a releer y ver cómo van esas semillas.
-
-7. Dejá la vela consumirse (si podés) o apagala con los dedos (nunca soplando, que dispersa la intención).
-
-La clave está en la especificidad y el compromiso. Sembrar sin cuidar es desperdiciar semillas.`,
-    afirmacion: 'Siembro intenciones claras y me comprometo a nutrirlas.',
-    cierre: 'La luna es nuestra aliada. Usala sabiamente. Con luz dorada, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Cuarzo transparente',
+Cuando sientas que no podés, recordá: podés. Porque venís de gente que pudo.`,
+    afirmacion: 'Cargo la fuerza de mis ancestros en mi sangre.',
+    cierre: 'Sos más fuerte de lo que creés. Con memoria de tierra, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Jaspe Rojo',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -231,46 +205,34 @@ La clave está en la especificidad y el compromiso. Sembrar sin cuidar es desper
     dia: 6,
     mes: 1,
     año: 2026,
-    tipo: 'reflexion',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'Día de Reyes: El Arte de Pedir',
-    subtitulo: 'Qué nos enseña esta tradición sobre manifestar',
-    cuerpo: `Alma próspera, ¡feliz día de Reyes!
+    tipo: 'ritual',
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Ritual de los Pies Descalzos',
+    subtitulo: 'Reconectando con la energía de la tierra',
+    cuerpo: `Hoy el ritual es simple y poderoso.
 
-Hay algo mágico en esta fecha que va más allá del chocolate y los juguetes. Es el arte de PEDIR.
+Necesitás: tus pies y un pedazo de tierra. Puede ser tu jardín, una plaza, la tierra de una maceta. Lo importante es que sea tierra real, no cemento.
 
-¿Te acordás de escribir la carta a los Reyes? Esa inocencia con la que pedías exactamente lo que querías, sin filtros, sin "no creo que me lo merezca", sin "es demasiado caro".
+Sacate los zapatos y las medias. Sí, aunque haga frío.
 
-Los niños piden con fe absoluta. Y muchas veces, reciben.
+Parate sobre la tierra. Sentí la textura bajo tus pies. ¿Es húmeda? ¿Seca? ¿Fría? ¿Tibia?
 
-¿Qué pasó en el camino? ¿Cuándo dejaste de pedir con esa misma confianza?
+Cerrá los ojos.
 
-El universo funciona como los Reyes Magos. Necesita saber qué querés. Y necesita que lo pidas con claridad, con convicción, con esa certeza infantil de que ES POSIBLE.
+Con cada respiración, imaginá que intercambiás energía con la tierra. Inhalás: subís nutrientes, fuerza, estabilidad. Exhalás: bajás tensión, preocupación, lo que ya no necesitás.
 
-Hoy te propongo un ejercicio: escribí una carta al universo.
+La tierra lo recibe todo. Lo transforma. No la sobrecargás. Es su naturaleza reciclar.
 
-No la llames "carta de manifestación" ni uses lenguaje new age. Escribila como si tuvieras 7 años y le escribieras a los Reyes.
+Quedate así entre 3 y 5 minutos. Si podés, más.
 
-"Querido Universo:
+Cuando termines, agradecé. Puede ser en silencio, puede ser en voz alta. "Gracias, tierra, por sostenerme."
 
-Este año me gustaría... [sé específico/a]
-
-Lo pido porque... [conectá con la emoción, no solo la cosa]
-
-Sé que va a llegar porque... [declará tu fe]
-
-Gracias de antemano.
-
-[Tu nombre]"
-
-Guardá la carta. No la releas hasta fin de año. Te sorprenderás.
-
-Pedir no es debilidad. Pedir es activar la magia de la colaboración entre vos y el universo.`,
-    afirmacion: 'Pido con claridad y confianza. El universo escucha y responde.',
-    cierre: 'Que los Reyes te traigan lo que tu corazón más necesita. Con amor dorado, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Pirita',
+Este ritual lo podés hacer cada vez que te sientas perdida, ansiosa o desconectada. La tierra siempre está ahí. Esperándote.`,
+    afirmacion: 'La tierra me sostiene y me nutre. Estoy conectada.',
+    cierre: 'Pies descalzos, alma anclada. Con raíces profundas, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Turmalina Negra',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -281,43 +243,41 @@ Pedir no es debilidad. Pedir es activar la magia de la colaboración entre vos y
     mes: 1,
     año: 2026,
     tipo: 'cierre',
-    duendeId: 'guardian-dorado',
-    duendeNombre: 'Dorado',
-    titulo: 'Cerrando la Semana con Gratitud',
-    subtitulo: 'Un mensaje de despedida de Dorado',
-    cuerpo: `Alma próspera, llegamos al final de nuestra semana juntos.
+    duendeId: 'guardian-gaia',
+    duendeNombre: 'Gaia',
+    titulo: 'Hasta Pronto, No Adiós',
+    subtitulo: 'Gaia se despide de esta semana',
+    cuerpo: `Llegamos al último día de mi semana con vos.
 
-Ha sido un honor acompañarte en estos primeros días del año. Espero que algo de lo que compartí se haya quedado resonando en vos.
+Quiero que sepas algo antes de irme: no me voy lejos. Sigo estando cada vez que tocás la tierra. Cada vez que sentís tus pies firmes. Cada vez que recordás tu fuerza.
 
-Antes de irme, quiero recordarte algunas verdades que espero no olvides:
+Esta semana te hablé de raíces, de fuerza interior, de escuchar a tu cuerpo. Pero si tuviera que resumir todo en una frase, sería esta:
 
-1. Merecés abundancia. No tenés que ganártela. Ya es tuya por el simple hecho de existir.
+Ya tenés todo lo que necesitás.
 
-2. La escasez es una ilusión. Hay suficiente para todos. Incluyéndote a vos.
+No hace falta que busques afuera. No hace falta que te arreglen. No hace falta que esperes el momento perfecto, la pareja perfecta, el trabajo perfecto.
 
-3. Recibir es sagrado. No es egoísmo, no es debilidad, no es aprovecharse. Es completar el ciclo.
+Podés empezar ahora. Desde donde estás. Con lo que tenés.
 
-4. Tus palabras crean realidad. Hablate con amor. Hablá de tu vida con esperanza.
+Mañana llega Noah. Viene a enseñarte sobre soltar, sobre caminar liviano, sobre elegir qué cargar. Te va a gustar. Es sabio a su manera.
 
-5. El esfuerzo sin alineamiento es rueda de hámster. Trabajá desde la confianza, no desde el miedo.
+Pero antes de recibirlo, llevate esto conmigo:
 
-La próxima semana, mi querida amiga Obsidiana tomará el timón. Ella te enseñará algo igualmente importante: cómo proteger todo lo que sembramos juntos esta semana.
+Cuando dudes de vos, tocá la tierra. Cuando sientas que no podés, recordá a tus ancestros. Cuando el mundo te parezca demasiado, volvé a tus raíces.
 
-Porque de nada sirve plantar si no cuidás el jardín.
+Siempre voy a estar ahí abajo, sosteniéndote.
 
-Me despido pero no me voy. Seguiré susurrándote al oído cada vez que necesites recordar que merecés más.
-
-Que la abundancia fluya hacia vos como río que encuentra el mar.`,
-    afirmacion: 'Cierro esta semana con gratitud y abro la siguiente con confianza.',
-    cierre: 'Con todo mi brillo dorado, hasta pronto. Tu guardián, Dorado',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/5-3.png',
-    cristalDelDia: 'Citrino',
+Recordá: ya tenés la fuerza. Siempre la tuviste.`,
+    afirmacion: 'Ya tengo todo lo que necesito. Mi fuerza es real.',
+    cierre: 'Con arcilla verde y amor de tierra, Gaia',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1df-b19a-6f80-9733-7cfc443f1e69_2_2_009b2b10-ecb4-4182-985a-392a31940ba8.png',
+    cristalDelDia: 'Cuarzo Ahumado',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SEMANA 2: OBSIDIANA (8-14 enero) - Protección
+  // SEMANA 2: NOAH (8-14 enero) - Soltar y Caminar Liviano
   // ═══════════════════════════════════════════════════════════════════════════
   {
     fecha: '2026-01-08',
@@ -325,37 +285,33 @@ Que la abundancia fluya hacia vos como río que encuentra el mar.`,
     mes: 1,
     año: 2026,
     tipo: 'presentacion',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'Proteger Lo Que Sembraste',
-    subtitulo: 'Obsidiana se presenta y te enseña sobre límites',
-    cuerpo: `Bienvenido/a a tu espacio seguro.
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'El Camino Se Hace Caminando',
+    subtitulo: 'Noah te invita a soltar lo que pesa',
+    cuerpo: `El camino se hace caminando.
 
-Soy Obsidiana. Dorado me pasó la estafeta y ahora es mi turno de acompañarte.
+Soy Noah. Y tengo una pregunta para vos:
 
-Si la semana pasada sembraste intenciones de abundancia, ahora viene lo importante: protegerlas.
+¿Realmente necesitás todo eso que llevás?
 
-¿Sabés qué mata más sueños que el fracaso? La gente. No toda la gente, obviamente. Pero esa gente que te dice "bajá un cambio", "no es para tanto", "¿en serio pensás que vas a lograr eso?"
+No hablo solo de objetos. Hablo de las preocupaciones que cargás desde hace años. Las expectativas que ni siquiera son tuyas. Los "debería" que te pesan los hombros.
 
-Mi trabajo esta semana es enseñarte a poner límites. No límites hostiles, agresivos, de esos que te aíslan del mundo. Límites amorosos. Límites que dicen: "Te quiero, pero mi sueño no está en discusión."
+Cargo tres cosas: un hacha, un martillo y una bolsa de dormir. El hacha para cortar lo que ya no sirve. El martillo para construir lo nuevo. La bolsa de dormir para recordar que el descanso es parte del viaje.
 
-No voy a endulzar la verdad. Poner límites es incómodo. La gente que se beneficia de que no los tengas se va a enojar. Van a decir que cambiaste, que te creés más que los demás, que sos egoísta.
+Esta semana vamos a caminar juntos. Y para caminar liviano, primero hay que soltar.
 
-Pero escuchame bien: protegerte no te hace mala persona. Te hace persona.
+No te voy a pedir que tires todo y te vayas a vivir a una cueva. Pero sí te voy a invitar a preguntarte, con cada cosa (física o emocional) que sostenés: ¿esto me hace más liviano o más pesado?
 
-Esta semana vamos a trabajar juntos/as en:
-- Identificar dónde te están drenando energía
-- Aprender a decir "no" sin culpa
-- Crear escudos energéticos reales (nada de humo, cosas que funcionan)
-- Diferenciar entre vulnerabilidad y falta de límites
+Lo que te hace más pesado, hay que evaluarlo. Tal vez sea necesario. Tal vez solo es costumbre. Tal vez es miedo disfrazado de responsabilidad.
 
-Preparate. Esto puede remover cosas. Pero del otro lado hay libertad.
+Esta semana, miramos el equipaje. Decidimos qué sigue y qué se queda.
 
-Nadie entra sin tu permiso. Empezamos.`,
-    afirmacion: 'Mis límites son actos de amor hacia mí mismo/a.',
-    cierre: 'Tu escudo está activo. Nadie entra sin tu permiso. Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Turmalina negra',
+¿Caminamos?`,
+    afirmacion: 'Elijo cargar solo lo que me hace más liviano.',
+    cierre: 'Un paso a la vez. Con hacha y martillo, Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Ojo de Tigre',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -366,43 +322,33 @@ Nadie entra sin tu permiso. Empezamos.`,
     mes: 1,
     año: 2026,
     tipo: 'ensenanza',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'El Arte de Decir No',
-    subtitulo: 'Por qué "no" es una oración completa',
-    cuerpo: `Hola de nuevo.
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'Sobre Cortar Para Construir',
+    subtitulo: 'A veces hay que destruir para crear',
+    cuerpo: `Hay algo que los humanos no entienden sobre la destrucción:
 
-Hoy vamos directo al grano: necesitás aprender a decir NO.
+No siempre es mala.
 
-No "no, pero...", no "no, lo que pasa es que...", no "no, perdón, es que...".
+Para que nazca algo nuevo, algo viejo tiene que morir. Para que una casa nueva se construya, a veces hay que demoler la anterior. Para que una relación sana exista, a veces hay que terminar la tóxica.
 
-Solo NO.
+Mi hacha no es para atacar. Es para podar.
 
-¿Sabés por qué nos cuesta tanto? Porque nos enseñaron que decir no es ser malo/a. Que la gente buena dice que sí. Que negarse es egoísmo.
+¿Sabés por qué se podan los árboles? Para que la energía vaya a las ramas que importan. Para que crezcan más fuertes. Para que den mejores frutos.
 
-Mentira.
+¿Qué necesita una poda en tu vida?
 
-Cada vez que decís sí a algo que no querés, le estás diciendo no a algo que sí querés. Estás traicionando a la persona más importante de tu vida: vos.
+Puede ser una relación que te drena. Un proyecto que ya no te emociona. Un hábito que te resta más de lo que te suma. Un "sí" automático que te conviene convertir en "no."
 
-Hoy te voy a dar una herramienta simple pero poderosa: El NO diferido.
+Cortar no es violento cuando se hace con intención. Es liberador.
 
-Cuando alguien te pida algo y tu primer impulso sea decir que sí aunque no quieras, probá esto:
+Hoy te invito a identificar una rama que necesita podarse. No tenés que cortarla hoy. Solo reconocela. Nombrala.
 
-"Dejame que lo piense y te confirmo."
-
-Eso es todo. No te comprometas en el momento. Date tiempo. Y después, si realmente no querés, escribí: "Lo pensé y no voy a poder."
-
-Sin explicaciones. Sin excusas elaboradas. Sin mentiras.
-
-La gente que te quiere de verdad va a respetar tu no. La gente que se enoja porque pusiste un límite es exactamente la gente con la que necesitabas poner ese límite.
-
-Práctica para hoy: decí NO a algo pequeño. Un favor que no querés hacer. Una invitación a la que no querés ir. Un pedido que te drena.
-
-Observá qué sentís. El malestar inicial es normal. Lo que viene después es libertad.`,
-    afirmacion: 'Decir no es cuidarme. Merezco ese cuidado.',
-    cierre: 'Practicá el no como si fuera un músculo. Porque lo es. Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Obsidiana',
+Mañana hablamos sobre cómo sostener el hacha sin temblar.`,
+    afirmacion: 'Tengo el coraje de soltar lo que ya no sirve.',
+    cierre: 'Podar es un acto de amor. Con hacha sabia, Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Aventurina',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -413,47 +359,36 @@ Observá qué sentís. El malestar inicial es normal. Lo que viene después es l
     mes: 1,
     año: 2026,
     tipo: 'ejercicio',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'Auditoría de Energía',
-    subtitulo: 'Identificá qué te drena y qué te nutre',
-    cuerpo: `Hoy hacemos números. Pero no de plata, de energía.
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'El Ejercicio de las Tres Pilas',
+    subtitulo: 'Clasificando lo que llevás',
+    cuerpo: `Hoy vamos a hacer inventario.
 
-Agarrá papel y lapicera. Vamos a hacer una auditoría de tu vida.
+Agarrá papel y lápiz (o tu celular, si preferís). Vamos a hacer tres listas.
 
-PARTE 1: PERSONAS
+PILA 1: LO QUE TE HACE MÁS LIVIANO
+Anotá todo lo que, cuando pensás en ello, te genera expansión. Puede ser una persona, una actividad, un lugar, una creencia. Lo que sea que te sume energía en lugar de restártela.
 
-Escribí una lista de las 10 personas con las que más interactuás (familia, amigos, compañeros de trabajo, etc.)
+PILA 2: LO QUE TE HACE MÁS PESADO
+Anotá lo opuesto. Las cosas que te generan contracción en el pecho. Las obligaciones que cumplís por miedo, no por amor. Las relaciones que drenan más de lo que nutren.
 
-Al lado de cada nombre, poné:
-+ si después de estar con esa persona te sentís con más energía
-- si te sentís con menos energía
-= si es neutro
+PILA 3: LO QUE NO SABÉS
+A veces hay cosas que no podemos clasificar. Y está bien. Anotalas también. Son las que requieren más observación.
 
-Mirá la lista. ¿Cuántos + tenés? ¿Cuántos -?
+Ahora mirá las listas.
 
-No te estoy diciendo que cortes relación con todos los -. Pero sí que empieces a notar el patrón. Y que limites el tiempo y la energía que les das.
+No te voy a pedir que tires todo lo de la Pila 2. A veces cargamos cosas pesadas porque son necesarias. Lo que sí te voy a pedir es que seas honesta sobre POR QUÉ las cargás.
 
-PARTE 2: ACTIVIDADES
+¿Es necesario? ¿O es costumbre?
+¿Es responsabilidad real? ¿O es miedo a decepcionar?
+¿Es tuyo? ¿O alguien te lo puso encima?
 
-Hacé lo mismo con tus actividades semanales. Trabajo, hobbies, tareas domésticas, redes sociales, etc.
-
-¿Qué te da energía? ¿Qué te la quita?
-
-PARTE 3: PENSAMIENTOS
-
-Esta es la más difícil. Durante las próximas 24 horas, prestá atención a tus pensamientos recurrentes.
-
-¿Son pensamientos + (esperanza, gratitud, entusiasmo)?
-¿O son pensamientos - (miedo, crítica, preocupación)?
-
-Tu energía es un recurso limitado. No dejes que cualquiera la use. No la gastes en cosas que no te aportan.
-
-Protegé tu energía como protegerías tu dinero. Es igual de valiosa.`,
-    afirmacion: 'Mi energía es sagrada. Elijo conscientemente dónde la invierto.',
-    cierre: 'Los números no mienten. Hacé la auditoría. Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Ojo de tigre',
+Las respuestas no tienen que llegar hoy. Solo las preguntas.`,
+    afirmacion: 'Tengo claridad sobre qué me suma y qué me resta.',
+    cierre: 'Clasificar es el primer paso. Con ojos claros, Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Citrino',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -463,45 +398,34 @@ Protegé tu energía como protegerías tu dinero. Es igual de valiosa.`,
     dia: 11,
     mes: 1,
     año: 2026,
-    tipo: 'ritual',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'Ritual del Espejo Negro',
-    subtitulo: 'Crear un escudo energético real',
-    cuerpo: `Hoy te enseño uno de mis rituales más poderosos. Se llama El Espejo Negro.
+    tipo: 'reflexion',
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'El Descanso No Es Perder el Tiempo',
+    subtitulo: 'Por qué la bolsa de dormir es esencial',
+    cuerpo: `¿Te conté por qué cargo una bolsa de dormir?
 
-La obsidiana, mi piedra, tiene la propiedad de absorber energía negativa y reflejar lo que no te pertenece de vuelta a su origen.
+No es solo para el frío. Es un recordatorio.
 
-Vas a necesitar:
-- Una piedra de obsidiana (si no tenés, una piedra negra cualquiera o incluso un espejo pequeño)
-- Una vela negra o blanca
-- Sal gruesa
-- Un espacio tranquilo
+Vi a muchos viajeros perder el camino no porque no supieran hacia dónde iban, sino porque no paraban nunca. Caminaban hasta caer. Y cuando caían, ya no podían levantarse.
 
-El ritual:
+El descanso no es premio por terminar. Es parte del viaje.
 
-1. Hacé un círculo pequeño de sal gruesa (protección). Sentate dentro o cerca.
+Hay una mentira que los humanos modernos se creen: que descansar es pereza. Que si no estás produciendo, estás fallando. Que parar significa quedarse atrás.
 
-2. Encendé la vela y colocá la obsidiana frente a vos.
+Pero mirá la naturaleza. Todo descansa. Las estaciones se turnan. Los animales hibernan. Hasta los volcanes tienen períodos de quietud.
 
-3. Cerrá los ojos. Visualizá tu cuerpo rodeado de una luz negra brillante (sí, el negro puede brillar). Es un escudo, no una sombra.
+¿Por qué vos deberías ser diferente?
 
-4. Decí en voz alta o mentalmente:
-"Todo lo que no me pertenece, regresa a su origen.
-Todo lo que busca dañarme, se refleja.
-Estoy protegido/a, estoy a salvo, estoy en paz."
+Hoy te invito a descansar sin culpa. Puede ser una siesta. Puede ser no hacer nada por una hora. Puede ser simplemente respirar más lento.
 
-5. Sostené la obsidiana entre tus manos. Sentí cómo absorbe cualquier energía pesada que estés cargando.
+No es pereza. Es recarga.
 
-6. Cuando sientas que es suficiente, abrí los ojos. Lavá la piedra con agua corriente (para limpiarla) y dejala al sol o la luna para recargarla.
-
-Este ritual podés repetirlo cuando sientas que absorbiste energía que no es tuya: después de una discusión, un lugar con mucha gente, una mala noticia.
-
-Tu escudo está activado.`,
-    afirmacion: 'Estoy protegido/a. Todo lo que no me pertenece se refleja.',
-    cierre: 'La obsidiana guarda tus secretos y devuelve lo que no es tuyo. Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Obsidiana',
+Y un viajero recargado llega más lejos que uno agotado.`,
+    afirmacion: 'Mi descanso es sagrado. Me recarga para el camino.',
+    cierre: 'Parar es parte de avanzar. Con bolsa de dormir, Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Ojo de Tigre',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -511,46 +435,33 @@ Tu escudo está activado.`,
     dia: 12,
     mes: 1,
     año: 2026,
-    tipo: 'ensenanza',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'Vampiros Energéticos: Cómo Identificarlos',
-    subtitulo: 'No todos los que te drenan tienen malas intenciones',
-    cuerpo: `Hablemos de los vampiros energéticos.
+    tipo: 'ritual',
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'Ritual de Soltar con Fuego',
+    subtitulo: 'Liberando lo que ya cumplió su ciclo',
+    cuerpo: `Hoy vamos a soltar.
 
-No, no son seres sobrenaturales que chupan sangre. Son personas comunes que, consciente o inconscientemente, drenan tu energía vital.
+Necesitás: un papel pequeño, algo para escribir, algo para quemar (puede ser una vela, puede ser el fuego de la cocina, con cuidado).
 
-Y acá viene lo importante: muchos de ellos no lo hacen a propósito. Son personas que sufren, que no saben manejar sus emociones, que buscan en otros lo que no encuentran en sí mismos.
+En el papel, escribí algo que querés soltar. Puede ser un miedo. Una creencia. Un nombre. Una expectativa. No le expliques a nadie qué es. Es entre vos y el fuego.
 
-Entender esto es clave porque no se trata de odiarlos, sino de protegerte de ellos.
+Sostenelo en tus manos.
 
-Tipos de vampiros energéticos:
+Decí (en voz alta o en tu mente): "Te agradezco por lo que me enseñaste. Ya no te necesito. Te libero."
 
-1. El Víctima Perpetua: Todo le pasa a él/ella. Nada es su culpa. Siempre necesita que lo/a rescates.
+Prendelo fuego. Mirá cómo se consume. Sentí el calor. Mirá cómo se convierte en ceniza.
 
-2. El Criticón: Nada está bien. Tu ropa, tus decisiones, tus sueños... todo tiene un "pero".
+Lo que quemaste ya no existe en su forma anterior. Puede volver como aprendizaje. Puede volver como sabiduría. Pero la forma que te pesaba ya no está.
 
-3. El Drama Queen/King: Cada situación menor es una crisis. Necesita tu atención constante.
+Si no podés usar fuego, podés romper el papel en pedazos muy pequeños y tirarlos al agua corriente (pileta, arroyo). El agua también transforma.
 
-4. El Pasivo-Agresivo: No te dice las cosas de frente pero te castiga con silencios, indirectas, "bromas" que duelen.
-
-5. El Absorbente: Te necesita para TODO. No puede tomar una decisión sin consultarte. Te ahoga con su dependencia.
-
-¿Reconocés a alguien?
-
-No te estoy diciendo que los saques de tu vida (aunque a veces es necesario). Te estoy diciendo que pongas límites:
-
-- Limitá el tiempo que pasás con ellos
-- No alimentes el drama (escuchá pero no te involucres emocionalmente)
-- Visualizá tu escudo cuando estés cerca
-- No te sientas culpable por cuidarte
-
-Protegerte no es ser malo/a. Es sobrevivir.`,
-    afirmacion: 'Reconozco lo que me drena y elijo proteger mi energía.',
-    cierre: 'No tenés obligación de ser el hospital de nadie. Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Turmalina negra',
-    elementoActivo: 'tierra',
+Soltar no es olvidar. Es agradecer y seguir caminando.`,
+    afirmacion: 'Suelto con gratitud lo que ya cumplió su ciclo.',
+    cierre: 'El fuego transforma. El camino continúa. Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Aventurina',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -559,42 +470,37 @@ Protegerte no es ser malo/a. Es sobrevivir.`,
     dia: 13,
     mes: 1,
     año: 2026,
-    tipo: 'reflexion',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'El Límite Más Difícil: Vos Mismo/a',
-    subtitulo: 'Cuando el vampiro energético vive adentro tuyo',
-    cuerpo: `Hoy vamos profundo. Prepárate.
+    tipo: 'afirmacion',
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'El Arte de Elegir la Paz',
+    subtitulo: 'Sobre el símbolo que llevo en el pecho',
+    cuerpo: `¿Viste el símbolo de paz que llevo en el pecho?
 
-Hablamos de vampiros energéticos externos. Pero ¿qué pasa cuando el vampiro sos vos mismo/a?
+No es decoración. Es una decisión.
 
-Me refiero a:
-- La voz interna que te critica sin piedad
-- El perfeccionismo que nunca te deja estar satisfecho/a
-- La autoexigencia que te agota más que cualquier trabajo
-- La culpa constante por no ser "suficiente"
+Hubo momentos en mi camino donde la guerra parecía la única opción. Momentos donde la vida me dio razones para elegir la pelea, el resentimiento, la venganza.
 
-Esto también drena energía. Y es peor porque no podés alejarte de vos mismo/a.
+Elegí la paz igual.
 
-Hoy te invito a una reflexión honesta:
+No porque sea fácil. No porque sea cobarde. Elegí la paz porque la guerra interna consume más que cualquier batalla externa.
 
-¿Cómo te hablás? Si alguien le hablara a tu mejor amigo/a como vos te hablás a vos, ¿lo permitirías?
+¿Cuántas guerras estás peleando ahora mismo que no te corresponden? ¿Cuántas peleas mantenés vivas solo porque soltar se siente como perder?
 
-¿Cuándo descansás? No digo ver Netflix agotado/a. Digo descanso real, sin culpa, sin lista de pendientes en la cabeza.
+La paz no es rendirse. Es elegir dónde ponés tu energía.
 
-¿Te perdonás? ¿O cargás errores de hace años como si hubieran sido ayer?
+Afirmaciones para hoy:
 
-El límite más difícil de poner es el que te ponés a tu propio maltrato interno.
+"Elijo la paz, incluso cuando me dan razones para la guerra."
+"Mi tranquilidad no está en venta."
+"Puedo soltar una pelea sin perder mi dignidad."
+"Elijo batallas que valen la pena. El resto, lo suelto."
 
-Práctica para hoy:
-
-Cada vez que te descubras criticándote, pausá. Preguntate: "¿Le diría esto a un niño?" Si la respuesta es no, cambiá el mensaje.
-
-Protegerte también significa protegerte de vos.`,
-    afirmacion: 'Me protejo de mi propio maltrato interno. Me hablo con amor.',
-    cierre: 'El crítico interno también necesita límites. Ponéselos. Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Cuarzo ahumado',
+La paz no es ausencia de conflicto. Es presencia de claridad sobre qué conflictos merecen tu energía.`,
+    afirmacion: 'Elijo la paz. Mi tranquilidad no está en venta.',
+    cierre: 'La paz es una elección diaria. Con símbolo de paz, Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Citrino',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
@@ -605,45 +511,43 @@ Protegerte también significa protegerte de vos.`,
     mes: 1,
     año: 2026,
     tipo: 'cierre',
-    duendeId: 'guardian-obsidiana',
-    duendeNombre: 'Obsidiana',
-    titulo: 'Cierre de Semana: Tu Escudo Está Activado',
-    subtitulo: 'Mensaje de despedida de Obsidiana',
-    cuerpo: `Llegamos al final de nuestra semana juntos/as.
+    duendeId: 'guardian-noah',
+    duendeNombre: 'Noah',
+    titulo: 'Nos Vemos en el Camino',
+    subtitulo: 'Noah se despide de esta semana',
+    cuerpo: `Llegamos al final de nuestra semana juntos.
 
-Trabajamos duro. Vimos cosas que quizás preferirías no ver. Pero necesitabas verlas.
+Hablamos de soltar. De cortar para construir. De descansar sin culpa. De elegir la paz.
 
-Quiero que te lleves esto:
+Si tuviera que dejarte una sola idea, sería esta:
 
-1. Decir NO es un acto de amor propio. No necesitás explicaciones ni excusas.
+No estás perdido/a. Estás encontrando un camino nuevo.
 
-2. Tu energía es un recurso limitado. No la regales a quien no la merece.
+A veces el camino viejo se termina. A veces nosotros lo terminamos. Y en ese momento entre lo que era y lo que será, es fácil sentirse a la deriva.
 
-3. Los límites no te aíslan, te liberan. La gente correcta los respeta; la incorrecta se queja.
+Pero no hay tal cosa como estar perdido si seguís caminando.
 
-4. Protegerte no es egoísmo. Es supervivencia.
+Cada paso cuenta. Incluso los que parecen ir hacia ningún lado. Incluso los que tenés que desandar.
 
-5. A veces el vampiro vive adentro. El límite más importante es el que le ponés a tu crítico interno.
+Mañana llega Winter. Viene con fuego en el pelo y en el alma. Si sentís que algo en vos se apagó, ella va a ayudarte a encenderlo de nuevo.
 
-La próxima semana, Índigo va a tomar la posta. Él te llevará más profundo, a lugares de sabiduría y claridad.
+Pero antes de que llegue, llevate esto:
 
-Mi trabajo era construir las murallas. El de Índigo es iluminar lo que hay dentro de ellas.
+Cargá solo lo que te hace más liviano. Descansá sin culpa. Elegí la paz cuando puedas. Y cuando no sepas hacia dónde ir, seguí caminando.
 
-No te dejo sola/o. Tu escudo sigue activo. Cada vez que sientas que algo te drena, recordá:
+El camino se hace caminando.
 
-Todo lo que no te pertenece, se refleja.
-
-Fuiste valiente esta semana. Estoy orgullosa de vos.`,
-    afirmacion: 'Mi escudo está activo. Estoy protegido/a. Estoy en paz.',
-    cierre: 'Nadie entra sin tu permiso. Nunca lo olvides. Con fuerza y amor, Obsidiana',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/13-1.png',
-    cristalDelDia: 'Turmalina negra',
+Nos vemos por ahí, viajero/a.`,
+    afirmacion: 'No estoy perdido/a. Estoy encontrando un camino nuevo.',
+    cierre: 'Cargá solo lo que te hace más liviano. Con pasos firmes, Noah',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0ea6-54e5-6010-9f8d-8cd45b883fbd_1_1_9d3bd6e8-bdef-4dab-8e4e-c1e272d9a0f9.png',
+    cristalDelDia: 'Ojo de Tigre',
     elementoActivo: 'tierra',
     estado: 'publicado'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SEMANA 3: ÍNDIGO (15-21 enero) - Sabiduría
+  // SEMANA 3: WINTER (15-21 enero) - Fuego Interior
   // ═══════════════════════════════════════════════════════════════════════════
   {
     fecha: '2026-01-15',
@@ -651,40 +555,34 @@ Fuiste valiente esta semana. Estoy orgullosa de vos.`,
     mes: 1,
     año: 2026,
     tipo: 'presentacion',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'Las Respuestas Ya Están En Vos',
-    subtitulo: 'Índigo se presenta y abre la puerta a la sabiduría interior',
-    cuerpo: `Las preguntas correctas ya están en vos...
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'El Poder Interior No Se Encuentra. Se Enciende.',
+    subtitulo: 'Winter llega con fuego en el pelo y en el alma',
+    cuerpo: `¿Sentís ese calor? Es tu fuego despertando.
 
-Soy Índigo. Llegué para acompañarte en este tramo del camino.
+Soy Winter. Sí, me llamo Winter pero soy puro fuego. El nombre es un recordatorio de lo que entiendo: los inviernos internos.
 
-Dorado te enseñó sobre abundancia. Obsidiana sobre protección. Yo vengo a hablarte de algo más sutil: la sabiduría que ya tenés pero olvidaste escuchar.
+Esos períodos donde todo se apaga. Donde la pasión se siente como un recuerdo lejano. Donde te movés por inercia, sobreviviendo más que viviendo.
 
-Vivimos en un mundo que nos bombardea con respuestas. Google tiene 8 billones de ellas. Pero ¿cuántas de esas respuestas son para VOS? ¿Cuántas aplican a TU vida, a TU momento, a TUS circunstancias?
+Conozco esos inviernos porque los viví.
 
-Mi método es diferente. No voy a darte respuestas. Voy a ayudarte a hacer mejores preguntas.
+Y sé algo que tal vez olvidaste: tu fuego no está muerto. Está dormido.
 
-Porque la pregunta correcta, dirigida hacia adentro, activa algo que ningún buscador puede: tu conocimiento interior.
+No vine a calmarte. No vine a darte palmaditas en la espalda y decirte que todo va a estar bien. Vine a encenderte.
 
-Sí, tenés conocimiento interior. Aunque años de "no sabés nada" te hayan convencido de lo contrario.
+Hay una llama en vos que el mundo trató de apagar. Te dijeron que era demasiado. Que te calmaras. Que bajaras un cambio. Que fueras más razonable, más tranquila, más... menos.
 
-Esta semana vamos a trabajar en:
-- Silenciar el ruido externo
-- Reconectar con tu intuición (que no es woo-woo, es inteligencia del cuerpo)
-- Aprender a confiar en lo que sabés aunque no sepas cómo lo sabés
-- Tomar decisiones desde la claridad, no desde el miedo
+Pero esa llama sigue ahí. La veo. Y esta semana, la vamos a avivar juntas.
 
-¿Estás listo/a para dejar de buscar afuera y empezar a escuchar adentro?
+El poder interior no se encuentra. Se enciende.
 
-Hacé una pausa. Respirá. Y preguntate: ¿qué necesito saber hoy?
-
-La respuesta ya viene en camino.`,
-    afirmacion: 'La sabiduría que necesito ya vive en mí.',
-    cierre: 'Confía en lo que sabés, aunque no sepas cómo lo sabés. Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Lapislázuli',
-    elementoActivo: 'aire',
+¿Estás lista para arder?`,
+    afirmacion: 'Mi fuego interior está despertando. Estoy lista para arder.',
+    cierre: 'No dejes que nadie apague tu llama. Con cabello de fuego, Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Cornalina',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -694,48 +592,34 @@ La respuesta ya viene en camino.`,
     mes: 1,
     año: 2026,
     tipo: 'ensenanza',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'El Arte de Preguntar',
-    subtitulo: 'Por qué las preguntas importan más que las respuestas',
-    cuerpo: `Hoy vamos a hablar de preguntas.
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'Sobre la Rabia Sana',
+    subtitulo: 'Por qué el fuego contenido explota',
+    cuerpo: `Voy a decir algo que tal vez te incomode:
 
-No de cualquier pregunta. De las preguntas que abren puertas en lugar de cerrarlas.
+La rabia no es mala.
 
-Hay preguntas que paralizan:
-- "¿Por qué siempre me pasa lo mismo?"
-- "¿Qué hice mal?"
-- "¿Por qué yo?"
+Te enseñaron que sí. Te dijeron que las personas buenas no se enojan. Que la rabia es fea, descontrolada, peligrosa. Especialmente si sos mujer.
 
-Estas preguntas asumen que hay un problema, que sos culpable, que el universo te tiene bronca.
+Pero la rabia es fuego. Y el fuego, bien dirigido, transforma.
 
-Y hay preguntas que iluminan:
-- "¿Qué puedo aprender de esto?"
-- "¿Qué haría si no tuviera miedo?"
-- "¿Qué me está tratando de decir esta situación?"
+¿Cuántas veces tragaste tu rabia para no molestar? ¿Cuántas veces sonreíste cuando querías gritar? ¿Cuántas veces dijiste "no pasa nada" cuando SÍ pasaba?
 
-¿Ves la diferencia? Las primeras buscan culpables. Las segundas buscan sabiduría.
+Ese fuego no desaparece. Se acumula. Y cuando no tiene salida sana, explota en los lugares y momentos equivocados. O peor: se vuelve hacia adentro y te quema a vos.
 
-Hoy te regalo 5 preguntas que cambiarán tu forma de pensar:
+La rabia sana es combustible. Usala.
 
-1. "¿Esto es un problema o una oportunidad disfrazada?"
+No para destruir. Para transformar. Para poner límites. Para decir basta. Para defender lo que amás. Para cambiar lo que no funciona.
 
-2. "¿Qué consejo me daría yo mismo/a dentro de 10 años?"
+Hoy te invito a reconocer una rabia que tenés guardada. No la actuás todavía. Solo la reconocés. Le decís: "Te veo. Sé que estás ahí. Vamos a encontrar qué hacer con vos."
 
-3. "¿Estoy tomando esta decisión desde el amor o desde el miedo?"
-
-4. "Si supiera que no puedo fallar, ¿qué haría?"
-
-5. "¿Qué necesita mi alma hoy?"
-
-Práctica: elegí una de estas preguntas. Sentate en silencio con ella. No fuerces la respuesta. Dejá que venga.
-
-Las mejores respuestas no se buscan. Se reciben.`,
-    afirmacion: 'Hago preguntas que abren puertas. Las respuestas llegan cuando estoy listo/a.',
-    cierre: 'La calidad de tu vida depende de la calidad de tus preguntas. Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Selenita',
-    elementoActivo: 'aire',
+El fuego contenido explota. El fuego dirigido transforma.`,
+    afirmacion: 'Mi rabia es energía válida. Puedo usarla para transformar.',
+    cierre: 'El fuego dirigido no destruye. Transforma. Con llamas, Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Granate',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -745,42 +629,36 @@ Las mejores respuestas no se buscan. Se reciben.`,
     mes: 1,
     año: 2026,
     tipo: 'ejercicio',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'Meditación del Silencio Interior',
-    subtitulo: 'Cómo escuchar cuando todo hace ruido',
-    cuerpo: `Hoy vamos a practicar algo revolucionario: el silencio.
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'Encender la Llama',
+    subtitulo: 'Un ejercicio para despertar tu fuego interno',
+    cuerpo: `Hoy vamos a encender.
 
-No el silencio externo (aunque ayuda). El silencio interior. Ese que parece imposible cuando la mente no para de parlotear.
+Buscá un lugar donde puedas moverte un poco. Este ejercicio necesita cuerpo, no solo mente.
 
-Te voy a guiar en una meditación simple que podés hacer en 10 minutos:
+Parate con los pies firmes. Sacudí el cuerpo entero. Aflojá las articulaciones. Dejá que la tensión se suelte un poco.
 
-1. Sentate cómodo/a. No hace falta posición de loto ni nada raro. Silla, cama, piso, lo que sea.
+Ahora, llevá las manos al centro del pecho. Ahí hay un punto de calor. Todos lo tenemos. Es donde vive el fuego interior.
 
-2. Cerrá los ojos. Hacé 3 respiraciones profundas.
+Cerrá los ojos. Respirá profundo.
 
-3. Ahora, en lugar de tratar de vaciar la mente (imposible), observá tus pensamientos como si fueran nubes pasando.
+Con cada inhalación, imaginá que ese punto de calor crece. Primero como una brasa. Después como una llama pequeña. Después como un fuego que se expande.
 
-No te subas a ninguna nube. No analices. Solo mirá cómo pasan.
+Empezá a mover las manos hacia afuera, como si el fuego creciera y las empujara. Abrí los brazos. Abrí el pecho.
 
-4. Después de unos minutos, empezá a notar los espacios entre pensamientos. Son pequeños al principio. Pero están ahí.
+Si te sale, emitir sonido. Puede ser un "ahhhh" largo. Puede ser un grito. Puede ser lo que necesites.
 
-5. Enfocate en esos espacios. En el silencio entre un pensamiento y otro.
+Repetí tres veces: "Mi fuego está despierto. Mi poder está encendido."
 
-6. Ahora, en ese silencio, hacé una pregunta simple: "¿Qué necesito saber?"
+Abrí los ojos. Movete un poco. Sacudí las manos.
 
-No busques la respuesta. Solo dejá la pregunta flotando.
-
-7. Quedate así 5 minutos más. Quizás la respuesta venga. Quizás venga después, cuando estés haciendo otra cosa. Quizás venga en un sueño.
-
-8. Cuando sientas que es suficiente, hacé 3 respiraciones profundas y abrí los ojos.
-
-Hacé esto todos los días de esta semana. El músculo del silencio se entrena.`,
-    afirmacion: 'En el silencio encuentro mis respuestas más profundas.',
-    cierre: 'El ruido del mundo es fuerte. Tu sabiduría interior es más fuerte. Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Cuarzo ahumado',
-    elementoActivo: 'aire',
+Esto lo podés hacer cada vez que sientas que tu llama se apaga. No necesitás nada externo. El fuego está en vos.`,
+    afirmacion: 'Mi fuego está despierto. Mi poder está encendido.',
+    cierre: 'La llama está en vos. Siempre estuvo. Con calor interior, Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Cornalina',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -789,45 +667,37 @@ Hacé esto todos los días de esta semana. El músculo del silencio se entrena.`
     dia: 18,
     mes: 1,
     año: 2026,
-    tipo: 'ensenanza',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'Intuición: Tu Brújula Interior',
-    subtitulo: 'Por qué tu cuerpo sabe antes que tu mente',
-    cuerpo: `Hablemos de intuición.
+    tipo: 'reflexion',
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'Los Inviernos Que Sobreviviste',
+    subtitulo: 'Honrando tu resiliencia',
+    cuerpo: `Quiero que pienses en los inviernos que ya sobreviviste.
 
-No de la intuición mística, esotérica, de "veo el futuro". De la intuición real: la inteligencia de tu cuerpo.
+No hablo del clima. Hablo de esos períodos donde todo parecía gris. Donde no había energía. Donde seguir adelante era un acto de fe ciega.
 
-Tu cuerpo procesa información que tu mente consciente no puede. Nota patrones, detecta peligros, siente verdades antes de que puedas articularlas.
+Tal vez fue una pérdida. Tal vez fue una enfermedad. Tal vez fue un corazón roto. Tal vez fue una época donde simplemente no sabías por qué seguir.
 
-¿Alguna vez conociste a alguien y sentiste algo raro que no podías explicar? Y después resultó que esa persona no era de fiar?
+Y sin embargo, acá estás.
 
-¿Alguna vez tomaste una decisión contra tu instinto y todo salió mal?
+Leyendo esto. Respirando. Viva.
 
-Eso es intuición. No es magia. Es millones de años de evolución diciéndote que prestes atención.
+No subestimes eso. No minimices lo que costó. Cada invierno que sobreviviste te dejó una capa de fortaleza que tal vez no ves pero está ahí.
 
-El problema es que nos enseñaron a ignorarla.
+Hoy te invito a honrar tu resiliencia.
 
-"No seas paranoico/a."
-"Eso es irracional."
-"Tenés que ser objetivo/a."
+No como "ay, qué fuerte soy" en un meme de Instagram. Honrarla de verdad. Reconocer que hubo momentos donde no sabías si ibas a poder, y pudiste.
 
-Y así fuimos desconectando de nuestra brújula más confiable.
+Ponete una mano en el corazón y decí: "Honro los inviernos que sobreviví. Reconozco mi fuerza. Celebro que sigo acá."
 
-Cómo reconectar:
+Tu fuego se apagó más de una vez. Y más de una vez volvió a encenderse.
 
-1. Prestá atención a las sensaciones físicas. Cuando algo te da "mala espina", ¿dónde lo sentís? ¿Estómago? ¿Pecho? ¿Garganta?
-
-2. Antes de tomar decisiones, pausá y preguntate: "¿Qué siento en el cuerpo?" No qué pensás, qué SENTÍS.
-
-3. Llevá un diario de intuiciones. Cada vez que tengas un "presentimiento", anotalo. Después verificá si se cumplió. Te vas a sorprender.
-
-Tu cuerpo sabe. Escuchalo.`,
-    afirmacion: 'Mi cuerpo es sabio. Escucho su guía.',
-    cierre: 'La intuición no se explica, se siente. Empezá a confiar. Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Labradorita',
-    elementoActivo: 'aire',
+Eso no es suerte. Eso es poder.`,
+    afirmacion: 'He sobrevivido inviernos. Mi resiliencia es real.',
+    cierre: 'Tu fuego se apagó y volvió a encenderse. Eso es poder. Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Ámbar',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -837,46 +707,34 @@ Tu cuerpo sabe. Escuchalo.`,
     mes: 1,
     año: 2026,
     tipo: 'ritual',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'Ritual de Claridad con Vela Azul',
-    subtitulo: 'Iluminá tu camino cuando todo parece confuso',
-    cuerpo: `Hoy te comparto un ritual que uso cuando necesito claridad.
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'Ritual de la Vela',
+    subtitulo: 'Encendiendo intenciones',
+    cuerpo: `Hoy trabajamos con fuego literal.
 
-La confusión no es tu enemiga. Es sabiduría gestándose. Pero a veces necesitamos un empujón para que la claridad emerja.
+Necesitás: una vela (del color que quieras, pero si podés elegir, roja o naranja) y un espacio tranquilo.
 
-Vas a necesitar:
-- Una vela azul (si no tenés, blanca)
-- Lapislázuli o cualquier piedra azul (opcional)
-- Papel y lapicera
-- Un espacio tranquilo
+Sentate frente a la vela apagada. Cerrá los ojos.
 
-El ritual:
+Pensá en algo que querés encender en tu vida. Puede ser pasión. Puede ser motivación. Puede ser coraje. Puede ser claridad sobre algo específico. Lo que necesites.
 
-1. Encendé la vela. Sentate frente a ella.
+Abrí los ojos. Encendé la vela.
 
-2. Mirá la llama durante 2 minutos sin pensar en nada específico. Solo respirá y mirá.
+Mientras la llama crece, imaginá que eso que querés encender también crece dentro de vos. La misma chispa que enciende la vela está encendiendo tu deseo.
 
-3. Cuando sientas calma, tomá el papel y escribí: "Necesito claridad sobre..."
+Mirá la llama. Notá cómo baila, cómo cambia, cómo persiste.
 
-Completá con UNA cosa. No mil. Una.
+Decí en voz alta: "Enciendo [lo que elegiste]. Esta llama representa mi intención. A medida que arde, mi deseo se fortalece."
 
-4. Cerrá los ojos. Visualizá esa situación o decisión envuelta en niebla.
+Dejá la vela arder el tiempo que puedas acompañarla (nunca la dejes sola encendida). Cuando la apagues, soplá con gratitud, no con violencia.
 
-5. Ahora visualizá cómo la luz azul de la vela empieza a disipar la niebla. Lentamente. Sin forzar.
-
-6. Mientras la niebla se disipa, preguntá: "¿Qué necesito ver?" No busques la respuesta. Solo preguntá y esperá.
-
-7. Cuando sientas que algo emerge (puede ser una imagen, una palabra, una sensación), abrí los ojos y escribilo inmediatamente. No lo analices todavía.
-
-8. Dejá la vela encendida hasta que se consuma o guardá el papel bajo tu almohada para recibir claridad en sueños.
-
-La claridad llega cuando dejás de buscarla y empezás a recibirla.`,
-    afirmacion: 'La claridad me encuentra cuando estoy listo/a para verla.',
-    cierre: 'Toda confusión es sabiduría gestándose. Confiá en el proceso. Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Lapislázuli',
-    elementoActivo: 'aire',
+Cada vez que enciendas cualquier vela, recordá este momento. Recordá que tenés el poder de encender lo que necesitás.`,
+    afirmacion: 'Enciendo mis intenciones con el poder del fuego.',
+    cierre: 'El fuego de la vela es el mismo que vive en vos. Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Granate',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -885,40 +743,41 @@ La claridad llega cuando dejás de buscarla y empezás a recibirla.`,
     dia: 20,
     mes: 1,
     año: 2026,
-    tipo: 'reflexion',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'El Propósito No Se Encuentra, Se Construye',
-    subtitulo: 'Dejá de buscar tu propósito y empezá a vivirlo',
-    cuerpo: `Hoy quiero desafiar algo que probablemente creés: que tenés que "encontrar" tu propósito.
+    tipo: 'afirmacion',
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'Palabras Que Encienden',
+    subtitulo: 'Afirmaciones de poder personal',
+    cuerpo: `Las palabras son chispas. Pueden encender o apagar.
 
-Como si fuera un tesoro escondido que un día vas a desenterrar y ¡bam! todo tendrá sentido.
+Hoy te doy un set de afirmaciones para cuando sientas que tu fuego se apaga:
 
-No funciona así.
+"Mi poder no depende de la aprobación de otros."
 
-El propósito no se encuentra. Se construye. Día a día. Decisión a decisión. Acción a acción.
+"Tengo derecho a ocupar espacio, hacer ruido y brillar."
 
-No es una revelación mística. Es un descubrimiento gradual que viene de prestar atención a:
+"Mi intensidad no es un defecto. Es mi superpoder."
 
-1. ¿Qué te hace perder la noción del tiempo?
-2. ¿Qué harías aunque no te pagaran?
-3. ¿Qué problema del mundo te indigna lo suficiente como para querer solucionarlo?
-4. ¿Cuándo te sentís más vivo/a?
+"El fuego que intentaron apagarme ahora ilumina mi camino."
 
-Las respuestas a estas preguntas son pistas. No la respuesta completa, pero sí el inicio del mapa.
+"No necesito permiso para ser quien soy."
 
-Y acá viene lo importante: tu propósito puede cambiar. Lo que te daba sentido a los 20 puede no dártelo a los 40. Y está bien.
+"Mi rabia es válida. Mi pasión es válida. Mi voz es válida."
 
-El propósito no es un destino fijo. Es una brújula que se recalibra.
+"Cada vez que me dijeron que era demasiado, el universo me estaba diciendo que era suficiente."
 
-Práctica de hoy: escribí 3 momentos de tu vida donde te sentiste completamente vivo/a, completamente vos. ¿Qué tenían en común esos momentos?
+"No vine a encajar. Vine a encender."
 
-Ahí hay pistas.`,
-    afirmacion: 'Mi propósito se revela mientras vivo. Estoy atento/a a las pistas.',
-    cierre: 'No esperes una revelación. Empezá a prestar atención. Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Fluorita',
-    elementoActivo: 'aire',
+Elegí una que te resuene. Escribila donde puedas verla hoy. Decila en voz alta cuando la necesites.
+
+Las palabras son fuego. Elegí palabras que te enciendan, no que te apaguen.
+
+Y si alguien te dice que bajés un cambio, sonreíle y subí tres.`,
+    afirmacion: 'Mi intensidad no es un defecto. Es mi superpoder.',
+    cierre: 'No viniste a encajar. Viniste a encender. Con llamas, Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Cornalina',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
@@ -928,43 +787,45 @@ Ahí hay pistas.`,
     mes: 1,
     año: 2026,
     tipo: 'cierre',
-    duendeId: 'guardian-indigo',
-    duendeNombre: 'Índigo',
-    titulo: 'Cierre de Semana: Confía en Tu Sabiduría',
-    subtitulo: 'Mensaje de despedida de Índigo',
-    cuerpo: `Llegamos al final de nuestra semana juntos.
+    duendeId: 'guardian-winter',
+    duendeNombre: 'Winter',
+    titulo: 'El Fuego Sigue',
+    subtitulo: 'Winter se despide hasta la próxima',
+    cuerpo: `Llegamos al final de nuestra semana de fuego.
 
-Fue un viaje hacia adentro. Sé que no siempre es cómodo. Pero lo necesario rara vez lo es.
+Hablamos de encender, de la rabia sana, de los inviernos sobrevividos. De que tu intensidad no es un defecto sino un superpoder.
 
-Quiero que te lleves esto:
+Si tuviera que dejarte una sola cosa, sería esta:
 
-1. Las respuestas ya están en vos. Solo tenés que hacer las preguntas correctas y escuchar las respuestas.
+Tu fuego está dormido, no muerto.
 
-2. El silencio es tu aliado. En un mundo de ruido constante, tu mayor ventaja competitiva es la capacidad de quedarte quieto/a y escuchar.
+No importa cuánto tiempo pasó. No importa cuántas veces te apagaron. No importa qué tan gris se sienta todo ahora.
 
-3. Tu intuición es real. No es magia, es inteligencia del cuerpo. Confiá en ella.
+Mientras respires, hay una brasa adentro tuyo esperando una chispa.
 
-4. La claridad llega cuando dejás de buscarla. Soltar el control es a veces la forma más efectiva de obtenerlo.
+Esta semana fue la chispa. Vos decidís si la alimentás.
 
-5. El propósito se construye, no se encuentra. Prestá atención a lo que te da vida y seguí esas pistas.
+Mañana llega Marcos. Viene con lentes para ver diferente, con barba llena de lecciones, con la calma de quien ya caminó mucho. Te va a ayudar a encontrar claridad.
 
-La próxima semana, mi querida amiga Jade toma el timón. Ella te llevará al terreno de la sanación. Porque toda esta sabiduría no sirve de nada si hay heridas sin atender.
+Pero antes de que llegue, prometeme algo:
 
-Te dejo con una última pregunta:
+No dejes que nadie apague tu llama. Ni otros, ni vos misma.
 
-Si ya supieras la respuesta a lo que más te preocupa, ¿cuál sería?
+Brillá aunque incomode. Ardelà aunque te digan que bajes. Encendé aunque el mundo prefiera que te apagues.
 
-Sentate con eso. La respuesta ya viene.`,
-    afirmacion: 'Confío en mi sabiduría interior. Ya tengo todo lo que necesito.',
-    cierre: 'Las preguntas correctas ya están en vos. Solo tenés que escuchar. Con profundo respeto, Índigo',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/7-2.png',
-    cristalDelDia: 'Selenita',
-    elementoActivo: 'aire',
+El poder interior no se encuentra. Se enciende.
+
+Y vos ya sabés cómo.`,
+    afirmacion: 'Mi fuego está encendido. Nadie puede apagarlo.',
+    cierre: 'Brillá aunque incomode. Arda aunque te digan que bajes. Winter',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db9-d0c2-6bd0-890b-011482f2e776_0_0_1b0c68ae-dae7-4948-9c01-b89a01b839c0.png',
+    cristalDelDia: 'Ámbar',
+    elementoActivo: 'fuego',
     estado: 'publicado'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SEMANA 4: JADE (22-23 enero) - Sanación (días parciales)
+  // SEMANA 4: MARCOS (22-23 enero) - Sabiduría y Claridad
   // ═══════════════════════════════════════════════════════════════════════════
   {
     fecha: '2026-01-22',
@@ -972,36 +833,32 @@ Sentate con eso. La respuesta ya viene.`,
     mes: 1,
     año: 2026,
     tipo: 'presentacion',
-    duendeId: 'guardian-jade',
-    duendeNombre: 'Jade',
-    titulo: 'Sanar No Es Olvidar',
-    subtitulo: 'Jade se presenta y abre el espacio de sanación',
-    cuerpo: `Respirá. Estás exactamente donde necesitás estar.
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'Las Respuestas Ya Las Tenés',
+    subtitulo: 'Marcos llega con lentes para ver diferente',
+    cuerpo: `Las respuestas que buscás ya las tenés. Solo hay que mirar diferente.
 
-Soy Jade. Llegué para acompañarte en el tramo más delicado: el de la sanación.
+Soy Marcos. Uso lentes no porque me fallen los ojos, sino porque elijo ver de otra manera.
 
-Dorado te habló de abundancia. Obsidiana de protección. Índigo de sabiduría. Todo eso es importante. Pero nada de eso puede florecer completamente si hay heridas sin atender.
+Llevo caminos tejidos en la trenza de mi barba. Cada nudo es un lugar donde estuve. Cada giro, una lección que no encontré en libros.
 
-Quiero aclarar algo desde el principio: sanar no es olvidar. No es "superar" como si el dolor fuera un obstáculo a eliminar. No es "ser positivo" y tapar todo con una sonrisa.
+Esta semana vengo a hablarte de claridad. Pero no la claridad que te dan otros. La claridad que ya tenés adentro y no estás viendo.
 
-Sanar es integrar. Es mirar lo que dolió, reconocerlo, sentirlo... y permitir que se transforme en otra cosa.
+Hay algo en los humanos que me fascina y me frustra: buscan afuera lo que ya saben adentro. Van de gurú en gurú, de libro en libro, de método en método, buscando que alguien les diga qué hacer.
 
-Las heridas que ignoramos no desaparecen. Supuran. Infectan otras áreas de nuestra vida. Nos hacen reaccionar de formas que no entendemos.
+Y la respuesta estaba en ellos todo el tiempo.
 
-Esta semana (y lo que queda de enero), vamos a trabajar juntos/as en:
-- Identificar qué necesita sanación
-- Crear un espacio seguro para sentir
-- Aprender a soltar sin reprimir
-- Transformar el dolor en compasión
+No digo que no sirva aprender de otros. Claro que sirve. Pero hay un momento donde tenés que dejar de buscar más información y empezar a confiar en la que ya tenés.
 
-No te voy a pedir que revivas traumas. No soy terapeuta y esto no reemplaza la terapia profesional. Pero sí te voy a acompañar en un proceso suave de reconexión con partes de vos que quizás has estado evitando.
+¿Y si miraras desde otro ángulo? ¿Y si la confusión que sentís fuera claridad gestándose?
 
-¿Estás listo/a para sanar?`,
-    afirmacion: 'Me permito sanar a mi propio ritmo. Estoy a salvo.',
-    cierre: 'No tenés que ser fuerte todo el tiempo. Jade está acá. Con infinita compasión, Jade',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/9-1.png',
-    cristalDelDia: 'Cuarzo rosa',
-    elementoActivo: 'agua',
+Esta semana, vamos a mirar diferente.`,
+    afirmacion: 'Las respuestas que busco ya están en mí.',
+    cierre: 'La claridad llega cuando dejás de forzarla. Con lentes sabios, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Cuarzo Ahumado',
+    elementoActivo: 'tierra',
     estado: 'publicado'
   },
 
@@ -1011,74 +868,59 @@ No te voy a pedir que revivas traumas. No soy terapeuta y esto no reemplaza la t
     mes: 1,
     año: 2026,
     tipo: 'ensenanza',
-    duendeId: 'guardian-jade',
-    duendeNombre: 'Jade',
-    titulo: 'El Cuerpo Recuerda Lo Que La Mente Olvida',
-    subtitulo: 'Por qué la sanación empieza en el cuerpo',
-    cuerpo: `Hoy vamos a hablar de algo que quizás no querés escuchar: tu cuerpo está guardando dolor.
+    duendeId: 'guardian-marcos',
+    duendeNombre: 'Marcos',
+    titulo: 'El Trébol de Cuatro Hojas',
+    subtitulo: 'Por qué lo improbable existe',
+    cuerpo: `Tengo un trébol de cuatro hojas en el bolsillo.
 
-No hablo de dolor físico (aunque a veces se manifiesta así). Hablo de emociones no procesadas que se alojan en los tejidos, en la postura, en la tensión crónica.
+No es amuleto de suerte. Es prueba de que lo improbable existe.
 
-¿Tenés los hombros siempre tensos? Quizás estás cargando responsabilidades que no te corresponden.
+¿Sabés qué probabilidad hay de encontrar uno? Una en diez mil. Y sin embargo, existen. Y yo encontré uno. Y vos probablemente conocés a alguien que encontró uno.
 
-¿Dolores de estómago frecuentes? Quizás hay algo que "no podés digerir" emocionalmente.
+Lo improbable no es imposible.
 
-¿Mandíbula apretada? Quizás hay cosas que te tragás en lugar de decir.
+Esa idea que te parece loca. Ese sueño que te da vergüenza admitir. Ese cambio que parece demasiado difícil. Son improbables, sí. Pero no imposibles.
 
-El cuerpo no miente. Y el cuerpo recuerda lo que la mente decide olvidar.
+Los humanos tienen una tendencia a confundir ambas cosas. "Es muy difícil" se convierte en "es imposible" sin que nadie lo note.
 
-Por eso la sanación verdadera no puede quedarse solo en la cabeza. Necesita bajar al cuerpo.
+Pero mirá el trébol. Una en diez mil. Y acá está.
 
-Ejercicio de hoy (hacelo con suavidad):
+Hoy te invito a rescatar algo que descartaste por "imposible". Una idea, un sueño, una posibilidad. Mirala de nuevo.
 
-1. Acostáte cómodo/a. Cerrá los ojos.
+¿Es realmente imposible? ¿O solo es improbable?
 
-2. Escaneá tu cuerpo de pies a cabeza. ¿Dónde sentís tensión, dolor, incomodidad?
+Porque lo improbable, con paciencia, tiempo y un poco de eso que algunos llaman suerte y yo llamo persistencia, puede volverse realidad.
 
-3. Cuando encuentres un punto de tensión, llevá tu atención ahí. Respirá hacia ese lugar.
-
-4. Preguntale a esa parte del cuerpo: "¿Qué estás guardando?" No fuerces la respuesta. Solo preguntá y escuchá.
-
-5. Si viene alguna emoción, dejala estar. No la analices. Solo sentila.
-
-6. Cuando sientas que es suficiente, hacé 3 respiraciones profundas y abrí los ojos.
-
-Las heridas que duelen son las que están sanando. Las que no sentís son las más peligrosas.`,
-    afirmacion: 'Mi cuerpo es sabio. Escucho lo que necesita decirme.',
-    cierre: 'El cuerpo guarda, pero también sabe soltar. Confiá en él. Con ternura, Jade',
-    imagen: 'https://duendesuy.10web.cloud/wp-content/uploads/2025/04/9-1.png',
-    cristalDelDia: 'Aventurina verde',
-    elementoActivo: 'agua',
+El trébol de cuatro hojas existe. Tu sueño también puede.`,
+    afirmacion: 'Lo improbable no es imposible. Mi sueño puede existir.',
+    cierre: 'Lo improbable existe. Este trébol es la prueba. Con sabiduría, Marcos',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0db2-9ef5-6460-a1d6-781bda6f7d78_1_1_fd46f474-3510-43f0-bf1f-0d74b028c768.png',
+    cristalDelDia: 'Citrino',
+    elementoActivo: 'tierra',
     estado: 'publicado'
   }
 ];
 
-// Función para obtener contenido por fecha
+// Función para obtener el contenido de un día específico
 export function obtenerContenidoPorFecha(fecha) {
-  const contenido = CONTENIDO_ENERO_2026.find(c => c.fecha === fecha);
-  if (contenido) {
-    const guardian = obtenerGuardianPorFecha(fecha);
-    return {
-      ...contenido,
-      guardian,
-      imagenGuardian: guardian.imagen
-    };
-  }
-  return null;
+  const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString().split('T')[0];
+  return CONTENIDO_ENERO_2026.find(c => c.fecha === fechaStr);
 }
 
 // Función para obtener todos los contenidos de una semana
-export function obtenerContenidosSemana(semana) {
-  const rango = ROTACION_ENERO_2026[`semana${semana}`];
+export function obtenerContenidosSemana(numeroSemana) {
+  const rangos = {
+    1: { inicio: 1, fin: 7 },
+    2: { inicio: 8, fin: 14 },
+    3: { inicio: 15, fin: 21 },
+    4: { inicio: 22, fin: 31 }
+  };
+
+  const rango = rangos[numeroSemana];
   if (!rango) return [];
 
-  const inicio = new Date(rango.inicio);
-  const fin = new Date(rango.fin);
-
-  return CONTENIDO_ENERO_2026.filter(c => {
-    const fecha = new Date(c.fecha);
-    return fecha >= inicio && fecha <= fin;
-  });
+  return CONTENIDO_ENERO_2026.filter(c => c.dia >= rango.inicio && c.dia <= rango.fin);
 }
 
 export default CONTENIDO_ENERO_2026;

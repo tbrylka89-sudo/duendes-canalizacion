@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Duendes Hub de Control
  * Description: Centro de control con todos los accesos a la app de Vercel
- * Version: 3.1
+ * Version: 3.0
  * Author: Duendes del Uruguay
  */
 
@@ -64,69 +64,65 @@ class DuendesHubControl {
             .quick-btn.purple { background: linear-gradient(135deg, #9370DB 0%, #6B4E9F 100%); }
             .quick-btn.green { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
             .quick-btn.jade { background: linear-gradient(135deg, #00A86B 0%, #2E8B57 100%); }
-            .guardian-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+            .guardian-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin: 4px; }
             .guardian-dorado { background: linear-gradient(135deg, #FFD700, #FFA500); color: #1a1a1a; }
             .guardian-obsidiana { background: linear-gradient(135deg, #1a1a1a, #333); color: white; }
             .guardian-indigo { background: linear-gradient(135deg, #4B0082, #6A5ACD); color: white; }
             .guardian-jade { background: linear-gradient(135deg, #00A86B, #2E8B57); color: white; }
+            .guardian-coral { background: linear-gradient(135deg, #FF7F50, #FF6347); color: white; }
+            .guardian-aurora { background: linear-gradient(135deg, #E6E6FA, #DDA0DD); color: #4B0082; }
         </style>
 
         <div class="hub-container">
             <div class="hub-header">
                 <h1>🎮 Hub de Control - Duendes del Uruguay</h1>
-                <p>Todos tus accesos en un solo lugar. Versión 3.0 - Enero 2026</p>
+                <p>Todos tus accesos en un solo lugar. Version 3.0 - Enero 2026</p>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- ACCESOS RÁPIDOS -->
+            <!-- ACCESOS RAPIDOS -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="quick-access">
                 <a href="<?php echo $url; ?>/admin/modo-dios" target="_blank" class="quick-btn gold">⚡ MODO DIOS</a>
                 <a href="<?php echo $url; ?>/admin/generador-historias" target="_blank" class="quick-btn green">📖 Generador Historias</a>
-                <a href="<?php echo $url; ?>/admin/circulo" target="_blank" class="quick-btn">🏠 Hub Círculo</a>
+                <a href="<?php echo $url; ?>/admin/circulo" target="_blank" class="quick-btn">🏠 Hub Circulo</a>
                 <a href="<?php echo $url; ?>/admin/circulo/maestro" target="_blank" class="quick-btn jade">🎓 Panel Maestro</a>
                 <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="quick-btn purple">📜 Canalizaciones</a>
-                <a href="<?php echo $url; ?>/sitemap.xml" target="_blank" class="quick-btn" style="background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);">🔍 SEO/Sitemap</a>
-                <a href="<?php echo $url; ?>/admin/gamificacion" target="_blank" class="quick-btn secondary">🎮 Gamificación</a>
+                <a href="<?php echo $url; ?>/admin/gamificacion" target="_blank" class="quick-btn secondary">🎮 Gamificacion</a>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- GUARDIANES SEMANALES - NUEVO -->
+            <!-- GUARDIANES MAESTROS DEL CIRCULO - NUEVO v3.0 -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="border: 2px solid #00A86B; background: linear-gradient(135deg, rgba(0,168,107,0.1), rgba(46,139,87,0.05));">
-                <h2>🧚 Guardianes Maestros del Círculo <span class="badge badge-new">NUEVO v3.0</span></h2>
-                <p style="margin-bottom: 20px; color: #555;">Sistema de rotación semanal. Cada guardián guía el contenido de su semana.</p>
+                <h2>🌟 Guardianes Maestros del Circulo <span class="badge badge-new">NUEVO v3.0</span></h2>
+                <p style="margin-bottom: 20px; color: #555;">Sistema de rotacion semanal. Cada guardian guia el contenido de su semana con mensajes, meditaciones y rituales.</p>
 
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
-                    <span class="guardian-badge guardian-dorado">🌟 Dorado - Abundancia</span>
-                    <span class="guardian-badge guardian-obsidiana">🛡️ Obsidiana - Protección</span>
-                    <span class="guardian-badge guardian-indigo">📚 Índigo - Sabiduría</span>
-                    <span class="guardian-badge guardian-jade">💚 Jade - Sanación</span>
+                <div style="margin-bottom: 20px;">
+                    <span class="guardian-badge guardian-dorado">✨ Dorado - Abundancia</span>
+                    <span class="guardian-badge guardian-obsidiana">🛡️ Obsidiana - Proteccion</span>
+                    <span class="guardian-badge guardian-indigo">🔮 Indigo - Sabiduria</span>
+                    <span class="guardian-badge guardian-jade">💚 Jade - Sanacion</span>
+                    <span class="guardian-badge guardian-coral">🔥 Coral - Energia</span>
+                    <span class="guardian-badge guardian-aurora">🌈 Aurora - Transformacion</span>
                 </div>
 
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/admin/circulo/duende-semana" target="_blank" class="hub-card" style="border-color: #00A86B;">
                         <div class="hub-card-title" style="color: #00A86B;">⭐ Duende de la Semana</div>
                         <div class="hub-card-url">/admin/circulo/duende-semana</div>
-                        <div class="hub-card-desc">Seleccionar y configurar el guardián protagonista de esta semana.</div>
-                        <div class="hub-card-uso"><strong>Rotación Enero:</strong> Dorado (1-7) → Obsidiana (8-14) → Índigo (15-21) → Jade (22-31)</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/admin/circulo/duendes" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🧚 Gestión de Guardianes</div>
-                        <div class="hub-card-url">/admin/circulo/duendes</div>
-                        <div class="hub-card-desc">Ver y editar los 6 guardianes maestros: historias, personalidades, cristales, colores.</div>
+                        <div class="hub-card-desc">Seleccionar y configurar el guardian protagonista de esta semana.</div>
+                        <div class="hub-card-uso"><strong>Rotacion Enero:</strong> Dorado (1-7) → Obsidiana (8-14) → Indigo (15-21) → Jade (22-31)</div>
                     </a>
                     <a href="<?php echo $url; ?>/api/circulo/duende-semana" target="_blank" class="hub-card">
                         <div class="hub-card-title">🔌 API Duende Semana</div>
                         <div class="hub-card-url">/api/circulo/duende-semana</div>
-                        <div class="hub-card-desc">Endpoint público que devuelve el guardián actual con su personalidad y contenido.</div>
-                        <div class="hub-card-uso"><strong>Params:</strong> ?mensaje=1 (genera saludo IA), ?contenido=0 (sin contenido)</div>
+                        <div class="hub-card-desc">Endpoint publico que devuelve el guardian actual con su personalidad, colores y estilo.</div>
                     </a>
-                    <a href="<?php echo $url; ?>/api/admin/circulo/seed-enero" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🌱 Seed Enero 2026</div>
-                        <div class="hub-card-url">/api/admin/circulo/seed-enero</div>
-                        <div class="hub-card-desc">POST para poblar contenido de enero (23 días pre-generados).</div>
-                        <div class="hub-card-uso"><strong>Ya ejecutado:</strong> 23 días, 4 semanas, 6 guardianes</div>
+                    <a href="<?php echo $url; ?>/admin/circulo/duendes" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🧚 Gestionar Guardianes</div>
+                        <div class="hub-card-url">/admin/circulo/duendes</div>
+                        <div class="hub-card-desc">Editar los 6 guardianes maestros: personalidad, colores, estilo de contenido.</div>
                     </a>
                 </div>
             </div>
@@ -135,28 +131,28 @@ class DuendesHubControl {
             <!-- MODO DIOS -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="border: 2px solid #d4af37; background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(244, 208, 63, 0.05));">
-                <h2>⚡ MODO DIOS - Control Total</h2>
+                <h2>⚡ MODO DIOS - Control Total <span class="badge badge-new">POWER</span></h2>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/admin/modo-dios" target="_blank" class="hub-card" style="border-color: #d4af37;">
                         <div class="hub-card-title" style="color: #b8860b;">⚡ Panel Modo Dios</div>
                         <div class="hub-card-url">/admin/modo-dios</div>
-                        <div class="hub-card-desc">Control TOTAL de Mi Magia y El Círculo. Generar contenido, usuarios, regalos, cursos.</div>
+                        <div class="hub-card-desc">Control TOTAL de Mi Magia y El Circulo. Generar contenido, usuarios, regalos, cursos.</div>
                         <div class="hub-card-uso"><strong>Usalo para:</strong> TODO. Panel maestro de la plataforma.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/modo-dios#contenido" target="_blank" class="hub-card">
                         <div class="hub-card-title">✨ Generar Contenido Pro</div>
                         <div class="hub-card-url">/admin/modo-dios → Contenido</div>
-                        <div class="hub-card-desc">Claude + DALL-E. Contenido para día, semana o mes con imágenes.</div>
+                        <div class="hub-card-desc">Claude + DALL-E. Contenido para dia, semana o mes con imagenes.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/modo-dios#usuarios" target="_blank" class="hub-card">
-                        <div class="hub-card-title">👥 Gestión Usuarios</div>
+                        <div class="hub-card-title">👥 Gestion Usuarios</div>
                         <div class="hub-card-url">/admin/modo-dios → Usuarios</div>
-                        <div class="hub-card-desc">Buscar, crear usuarios, regalar runas, activar círculo.</div>
+                        <div class="hub-card-desc">Buscar, crear usuarios, regalar runas, activar circulo.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/modo-dios#regalos" target="_blank" class="hub-card">
                         <div class="hub-card-title">🎁 Sistema Regalos</div>
                         <div class="hub-card-url">/admin/modo-dios → Regalos</div>
-                        <div class="hub-card-desc">Regalar runas/tréboles a usuarios o a todo el círculo.</div>
+                        <div class="hub-card-desc">Regalar runas/treboles a usuarios o a todo el circulo.</div>
                     </a>
                 </div>
             </div>
@@ -170,22 +166,23 @@ class DuendesHubControl {
                     <a href="<?php echo $url; ?>/admin/generador-historias" target="_blank" class="hub-card" style="border-color: #27ae60;">
                         <div class="hub-card-title" style="color: #27ae60;">📖 Generador de Historias</div>
                         <div class="hub-card-url">/admin/generador-historias</div>
-                        <div class="hub-card-desc">Genera historias únicas para cada guardián. Modo directo, batch inteligente, creador de productos.</div>
-                        <div class="hub-card-uso"><strong>Sistema:</strong> Hooks + Sincrodestinos + Scoring (mín 30/50) + Cierres adaptativos</div>
+                        <div class="hub-card-desc">Genera historias unicas para cada guardian siguiendo BIBLIA-HISTORIAS-GUARDIANES.md. Analiza imagenes, usa sistema de conversion con scoring.</div>
+                        <div class="hub-card-uso"><strong>Usalo para:</strong> Crear descripciones de productos que VENDEN.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/corregir-productos" target="_blank" class="hub-card">
                         <div class="hub-card-title">🔧 Corregir Productos</div>
                         <div class="hub-card-url">/admin/corregir-productos</div>
-                        <div class="hub-card-desc">Claude Haiku corrige ortografía respetando español rioplatense.</div>
+                        <div class="hub-card-desc">Claude Haiku corrige ortografia respetando espanol rioplatense.</div>
+                        <div class="hub-card-uso"><strong>Usalo para:</strong> Arreglar categorias, precios, stocks masivamente.</div>
                     </a>
                 </div>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- ADMIN: CÍRCULO -->
+            <!-- ADMIN: CIRCULO -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section">
-                <h2>🔮 Admin del Círculo <span class="badge badge-admin">ADMIN</span></h2>
+                <h2>🔮 Admin del Circulo <span class="badge badge-admin">ADMIN</span></h2>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/admin/circulo" target="_blank" class="hub-card">
                         <div class="hub-card-title">🏠 Hub Central</div>
@@ -195,8 +192,12 @@ class DuendesHubControl {
                     <a href="<?php echo $url; ?>/admin/circulo/maestro" target="_blank" class="hub-card" style="border-color: #00A86B;">
                         <div class="hub-card-title" style="color: #00A86B;">🎓 Panel Maestro</div>
                         <div class="hub-card-url">/admin/circulo/maestro</div>
-                        <div class="hub-card-desc">Explorar Replicate (20+ modelos), generar cursos con Gemini, imágenes con DALL-E.</div>
-                        <div class="hub-card-uso"><strong>IAs:</strong> Claude, Gemini, DALL-E 3, Replicate (Flux, SDXL, video)</div>
+                        <div class="hub-card-desc">Explorar Replicate (20+ modelos), generar cursos con Gemini, imagenes con DALL-E.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/admin/circulo/asistente" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🤖 Asistente IA</div>
+                        <div class="hub-card-url">/admin/circulo/asistente</div>
+                        <div class="hub-card-desc">IA que genera contenido automatico: mensajes, meditaciones, rituales.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/circulo/contenido" target="_blank" class="hub-card">
                         <div class="hub-card-title">✍️ Crear Contenido</div>
@@ -208,116 +209,35 @@ class DuendesHubControl {
                         <div class="hub-card-url">/admin/circulo/calendario</div>
                         <div class="hub-card-desc">Vista mensual de contenido programado y publicado.</div>
                     </a>
-                    <a href="<?php echo $url; ?>/admin/circulo/asistente" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🤖 Asistente IA</div>
-                        <div class="hub-card-url">/admin/circulo/asistente</div>
-                        <div class="hub-card-desc">IA que genera contenido automático: mensajes, meditaciones, rituales.</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/admin/circulo-contenido" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📝 Contenido Publicado</div>
-                        <div class="hub-card-url">/admin/circulo-contenido</div>
-                        <div class="hub-card-desc">Gestión de contenidos ya publicados por mes.</div>
-                    </a>
                 </div>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- APIs DEL CÍRCULO - NUEVO -->
+            <!-- APIs DEL CIRCULO - NUEVO v3.0 -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="border-left: 4px solid #7b1fa2;">
-                <h2>🔌 APIs del Círculo <span class="badge badge-api">API</span></h2>
+                <h2>🔌 APIs del Circulo <span class="badge badge-api">API</span></h2>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/api/circulo/contenido?tipo=hoy" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📄 Contenido del Día</div>
+                        <div class="hub-card-title">📅 Contenido del Dia</div>
                         <div class="hub-card-url">/api/circulo/contenido?tipo=hoy</div>
-                        <div class="hub-card-desc">Contenido de hoy con título, afirmación, enseñanza, cierre.</div>
-                        <div class="hub-card-uso"><strong>Params:</strong> tipo=hoy|semana|mes|archivo, dia=X, mes=X, ano=X</div>
+                        <div class="hub-card-desc">Contenido de hoy con titulo, afirmacion, ensenanza, cierre y guardian.</div>
                     </a>
-                    <a href="<?php echo $url; ?>/api/admin/circulo/contenidos?mes=1&ano=2026" target="_blank" class="hub-card">
+                    <a href="<?php echo $url; ?>/api/admin/circulo/contenidos?mes=1" target="_blank" class="hub-card">
                         <div class="hub-card-title">📋 Listar Contenidos</div>
                         <div class="hub-card-url">/api/admin/circulo/contenidos</div>
-                        <div class="hub-card-desc">Lista todos los contenidos del mes. POST para crear, PATCH para publicar, DELETE para borrar.</div>
+                        <div class="hub-card-desc">Lista todos los contenidos del mes. POST para crear, PATCH para publicar.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/api/admin/circulo/seed-enero" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🌱 Seed Enero 2026</div>
+                        <div class="hub-card-url">/api/admin/circulo/seed-enero</div>
+                        <div class="hub-card-desc">POST para poblar contenido de enero (23 dias pre-generados con los 6 guardianes).</div>
                     </a>
                     <a href="<?php echo $url; ?>/api/comunidad/bots?tipo=stats" target="_blank" class="hub-card">
                         <div class="hub-card-title">🤖 Bots del Foro</div>
                         <div class="hub-card-url">/api/comunidad/bots</div>
                         <div class="hub-card-desc">Sistema de 50 bots con 62+ posts sobre guardianes.</div>
-                        <div class="hub-card-uso"><strong>Params:</strong> tipo=stats|actividad|feed|posts</div>
                     </a>
-                    <a href="<?php echo $url; ?>/api/admin/cursos/generar-con-ia" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🎓 Generar Cursos</div>
-                        <div class="hub-card-url">/api/admin/cursos/generar-con-ia</div>
-                        <div class="hub-card-desc">Genera cursos completos con Gemini o Claude + imágenes DALL-E.</div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- SISTEMA SEO - NUEVO -->
-            <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <div class="hub-section" style="border: 2px solid #e91e63; background: linear-gradient(135deg, rgba(233,30,99,0.1), rgba(156,39,176,0.05));">
-                <h2>🔍 Sistema SEO Completo <span class="badge badge-new">NUEVO v3.1</span></h2>
-                <p style="margin-bottom: 20px; color: #555;">Sistema profesional de SEO para máxima visibilidad en buscadores.</p>
-
-                <div class="hub-grid">
-                    <a href="<?php echo $url; ?>/robots.txt" target="_blank" class="hub-card" style="border-color: #e91e63;">
-                        <div class="hub-card-title" style="color: #e91e63;">🤖 robots.txt</div>
-                        <div class="hub-card-url">/robots.txt</div>
-                        <div class="hub-card-desc">Reglas para crawlers. Permite públicas, bloquea privadas y APIs.</div>
-                        <div class="hub-card-uso"><strong>Bloquea:</strong> /mi-magia/*, /lectura/*, /guardian/*, /api/*, /admin/*</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/sitemap.xml" target="_blank" class="hub-card" style="border-color: #e91e63;">
-                        <div class="hub-card-title" style="color: #e91e63;">🗺️ sitemap.xml</div>
-                        <div class="hub-card-url">/sitemap.xml</div>
-                        <div class="hub-card-desc">Sitemap dinámico con productos de WooCommerce.</div>
-                        <div class="hub-card-uso"><strong>Prioridades:</strong> Home 1.0, Tienda 0.9, Productos 0.8</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/site.webmanifest" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📱 PWA Manifest</div>
-                        <div class="hub-card-url">/site.webmanifest</div>
-                        <div class="hub-card-desc">Configuración de Progressive Web App.</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/api/seo/analyze?productId=4542" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🔬 API Analizar SEO</div>
-                        <div class="hub-card-url">/api/seo/analyze</div>
-                        <div class="hub-card-desc">GET: Analiza SEO de producto con score 0-100 y sugerencias.</div>
-                        <div class="hub-card-uso"><strong>Params:</strong> productId=X (GET), productIds=[...] (POST masivo)</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/api/seo/bulk-update" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📤 API Actualizar SEO</div>
-                        <div class="hub-card-url">/api/seo/bulk-update</div>
-                        <div class="hub-card-desc">POST: Actualiza SEO de múltiples productos en WooCommerce.</div>
-                        <div class="hub-card-uso"><strong>Body:</strong> {productIds: [...], dryRun: false, batchSize: 10}</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/producto/finnian" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📦 Páginas de Producto</div>
-                        <div class="hub-card-url">/producto/[slug]</div>
-                        <div class="hub-card-desc">Páginas de producto con SEO completo, Schema JSON-LD, OpenGraph.</div>
-                        <div class="hub-card-uso"><strong>Incluye:</strong> Breadcrumbs, Twitter Cards, productos relacionados</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/tienda" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🏪 Tienda SEO</div>
-                        <div class="hub-card-url">/tienda</div>
-                        <div class="hub-card-desc">Tienda con metadata optimizada y Schema de colección.</div>
-                    </a>
-                </div>
-
-                <div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e0e0e0;">
-                    <h4 style="margin: 0 0 10px 0; color: #e91e63;">📊 Funcionalidades SEO Implementadas</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; font-size: 12px;">
-                        <span>✅ OpenGraph Tags</span>
-                        <span>✅ Twitter Cards</span>
-                        <span>✅ Canonical URLs</span>
-                        <span>✅ Schema Organization</span>
-                        <span>✅ Schema LocalBusiness</span>
-                        <span>✅ Schema Product</span>
-                        <span>✅ Schema WebSite</span>
-                        <span>✅ Schema BreadcrumbList</span>
-                        <span>✅ noindex páginas privadas</span>
-                        <span>✅ RankMath 100/100</span>
-                        <span>✅ LSI Keywords</span>
-                        <span>✅ Alt text automático</span>
-                    </div>
                 </div>
             </div>
 
@@ -328,10 +248,34 @@ class DuendesHubControl {
                 <h2>📜 Panel de Canalizaciones <span class="badge badge-admin">ADMIN</span></h2>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card" style="border-color: #9370DB;">
-                        <div class="hub-card-title" style="color: #6B4E9F;">📜 Panel de Aprobación</div>
+                        <div class="hub-card-title" style="color: #6B4E9F;">📜 Panel de Aprobacion</div>
                         <div class="hub-card-url">/admin/canalizaciones</div>
                         <div class="hub-card-desc">Revisar, editar y aprobar canalizaciones antes de enviar. Con resumen IA y chat editor.</div>
-                        <div class="hub-card-uso"><strong>Flujo:</strong> Compra → Pendiente → Revisás → Aprobás → Mi Magia</div>
+                        <div class="hub-card-uso"><strong>Flujo:</strong> Cliente compra → Pendiente → Revisas → Aprobas → Cliente ve en Mi Magia</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════════ -->
+            <!-- PROMOCIONES -->
+            <!-- ═══════════════════════════════════════════════════════════════════════ -->
+            <div class="hub-section">
+                <h2>🏷️ Promociones <span class="badge badge-admin">ADMIN</span></h2>
+                <div class="hub-grid">
+                    <a href="<?php echo $url; ?>/admin/promociones" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🏷️ Gestion de Promociones</div>
+                        <div class="hub-card-url">/admin/promociones</div>
+                        <div class="hub-card-desc">Ver y administrar codigos promocionales activos.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/admin/promociones/nueva" target="_blank" class="hub-card">
+                        <div class="hub-card-title">➕ Nueva Promocion</div>
+                        <div class="hub-card-url">/admin/promociones/nueva</div>
+                        <div class="hub-card-desc">Crear nuevo codigo de descuento.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/admin/promociones/relampago" target="_blank" class="hub-card">
+                        <div class="hub-card-title">⚡ Relampago</div>
+                        <div class="hub-card-url">/admin/promociones/relampago</div>
+                        <div class="hub-card-desc">Flash sales de tiempo limitado.</div>
                     </a>
                 </div>
             </div>
@@ -345,22 +289,17 @@ class DuendesHubControl {
                     <a href="<?php echo $url; ?>/admin/tito" target="_blank" class="hub-card">
                         <div class="hub-card-title">🤖 Tito Admin</div>
                         <div class="hub-card-url">/admin/tito</div>
-                        <div class="hub-card-desc">Asistente IA con perfilado psicológico integrado.</div>
+                        <div class="hub-card-desc">Asistente IA con perfilado psicologico. "Dale 50 runas a maria@gmail.com"</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/gamificacion" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🎮 Gamificación</div>
+                        <div class="hub-card-title">🎮 Gamificacion</div>
                         <div class="hub-card-url">/admin/gamificacion</div>
                         <div class="hub-card-desc">Runas, badges, rachas, niveles, cofre diario.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/inteligencia" target="_blank" class="hub-card">
                         <div class="hub-card-title">📊 Analytics</div>
                         <div class="hub-card-url">/admin/inteligencia</div>
-                        <div class="hub-card-desc">Métricas y estadísticas de la plataforma.</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/admin/promociones" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🏷️ Promociones</div>
-                        <div class="hub-card-url">/admin/promociones</div>
-                        <div class="hub-card-desc">Códigos de descuento, flash sales, automáticas.</div>
+                        <div class="hub-card-desc">Metricas y estadisticas de la plataforma.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/comunidad" target="_blank" class="hub-card">
                         <div class="hub-card-title">👥 Comunidad/Foro</div>
@@ -374,117 +313,121 @@ class DuendesHubControl {
             <!-- MI MAGIA (USUARIO) -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section">
-                <h2>👤 Mi Magia - Área de Usuario <span class="badge badge-user">USUARIO</span></h2>
+                <h2>👤 Mi Magia - Area de Usuario <span class="badge badge-user">USUARIO</span></h2>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/mi-magia/login" target="_blank" class="hub-card" style="border-color: #d4af37;">
                         <div class="hub-card-title" style="color: #b8860b;">🔐 Login Magic Link</div>
                         <div class="hub-card-url">/mi-magia/login</div>
-                        <div class="hub-card-desc">Acceso sin contraseña. Si no existe, crea cuenta.</div>
+                        <div class="hub-card-desc">Acceso sin contrasena. Si no existe, crea cuenta automaticamente.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/mi-magia/perfilado" target="_blank" class="hub-card" style="border-color: #9370DB;">
+                        <div class="hub-card-title" style="color: #6B4E9F;">📊 Test Perfilado</div>
+                        <div class="hub-card-url">/mi-magia/perfilado</div>
+                        <div class="hub-card-desc">Test de 6 preguntas: vulnerabilidad, dolor, estilo decision, poder adquisitivo, creencias.</div>
                     </a>
                     <a href="<?php echo $url; ?>/mi-magia" target="_blank" class="hub-card">
                         <div class="hub-card-title">✨ Dashboard</div>
                         <div class="hub-card-url">/mi-magia</div>
-                        <div class="hub-card-desc">Dashboard personal con guardianes, puntos, gamificación.</div>
+                        <div class="hub-card-desc">Dashboard personal con guardianes, puntos, gamificacion.</div>
                     </a>
                     <a href="<?php echo $url; ?>/mi-magia/circulo" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🔮 Mi Círculo</div>
+                        <div class="hub-card-title">🔮 Mi Circulo</div>
                         <div class="hub-card-url">/mi-magia/circulo</div>
-                        <div class="hub-card-desc">Dashboard del Círculo con guardián de la semana.</div>
-                    </a>
-                    <a href="<?php echo $url; ?>/mi-magia/comunidad" target="_blank" class="hub-card">
-                        <div class="hub-card-title">👥 Comunidad</div>
-                        <div class="hub-card-url">/mi-magia/comunidad</div>
-                        <div class="hub-card-desc">Foro de interacción entre usuarios + bots.</div>
+                        <div class="hub-card-desc">Dashboard del Circulo con guardian de la semana y contenido diario.</div>
                     </a>
                 </div>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- CÍRCULO EXCLUSIVO -->
+            <!-- CIRCULO EXCLUSIVO -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section">
-                <h2>🌟 Círculo Exclusivo <span class="badge badge-user">MIEMBROS</span></h2>
+                <h2>🌟 Circulo Exclusivo <span class="badge badge-user">MIEMBROS</span></h2>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/circulo" target="_blank" class="hub-card">
-                        <div class="hub-card-title">🌟 Portal del Círculo</div>
+                        <div class="hub-card-title">🌟 Portal del Circulo</div>
                         <div class="hub-card-url">/circulo</div>
                         <div class="hub-card-desc">Entrada principal con onboarding y dashboard.</div>
                     </a>
                     <a href="<?php echo $url; ?>/circulo/cursos" target="_blank" class="hub-card">
                         <div class="hub-card-title">🎓 Academia de Guardianes</div>
                         <div class="hub-card-url">/circulo/cursos</div>
-                        <div class="hub-card-desc">Cursos generados con Gemini, módulos y badges.</div>
+                        <div class="hub-card-desc">Cursos con modulos, lecciones y badges.</div>
                     </a>
                 </div>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- REFERENCIA RÁPIDA -->
+            <!-- PAGINAS PUBLICAS -->
+            <!-- ═══════════════════════════════════════════════════════════════════════ -->
+            <div class="hub-section">
+                <h2>🌐 Paginas Publicas <span class="badge badge-public">PUBLICO</span></h2>
+                <div class="hub-grid">
+                    <a href="<?php echo $url; ?>/" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🏠 Inicio</div>
+                        <div class="hub-card-url">/</div>
+                        <div class="hub-card-desc">Landing que redirige a duendesdeluruguay.com</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/tienda" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🛒 Tienda</div>
+                        <div class="hub-card-url">/tienda</div>
+                        <div class="hub-card-desc">Catalogo de guardianes con filtros.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/auth/magic" target="_blank" class="hub-card">
+                        <div class="hub-card-title">🔮 Validar Magic Link</div>
+                        <div class="hub-card-url">/auth/magic?token=XXX</div>
+                        <div class="hub-card-desc">Pagina que valida enlaces magicos.</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════════ -->
+            <!-- REFERENCIA RAPIDA -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="background: #f0f7ff;">
-                <h2>📋 Referencia Rápida</h2>
+                <h2>📋 Referencia Rapida</h2>
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                     <tr style="background: #1e3a5f; color: white;">
-                        <th style="padding: 10px; text-align: left;">¿Qué quiero hacer?</th>
-                        <th style="padding: 10px; text-align: left;">¿A dónde voy?</th>
+                        <th style="padding: 10px; text-align: left;">Que quiero hacer?</th>
+                        <th style="padding: 10px; text-align: left;">A donde voy?</th>
                     </tr>
                     <tr style="background: #fff8dc;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Control total de TODO</strong></td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> ⚡</td>
                     </tr>
-                    <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Cambiar guardián de la semana</td>
+                    <tr style="background: #e8f5e9;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Cambiar guardian de la semana</strong></td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/circulo/duende-semana</code></td>
                     </tr>
-                    <tr style="background: #e8f5e9;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Ver contenido de enero 2026</strong></td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/admin/circulo/contenidos?mes=1&ano=2026</code></td>
-                    </tr>
                     <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver contenido de enero 2026</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/admin/circulo/contenidos?mes=1</code></td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">Generar historia de producto</td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/generador-historias</code></td>
                     </tr>
-                    <tr style="background: #f8f9fa;">
+                    <tr style="background: white;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">Aprobar canalizaciones</td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code></td>
                     </tr>
-                    <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Dar runas a usuario</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> → Usuarios</td>
-                    </tr>
                     <tr style="background: #f8f9fa;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Crear contenido del círculo</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Dar runas a usuario</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> → Usuarios o <code>/admin/tito</code></td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Crear contenido del circulo</td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/modo-dios</code> → Contenido</td>
                     </tr>
-                    <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Generar curso con IA</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/circulo/maestro</code></td>
-                    </tr>
                     <tr style="background: #f8f9fa;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver stats de bots/foro</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/comunidad/bots?tipo=stats</code></td>
-                    </tr>
-                    <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver calendario programado</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/circulo/calendario</code></td>
-                    </tr>
-                    <tr style="background: #fce4ec;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Ver sitemap de productos</strong></td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/sitemap.xml</code> 🔍</td>
-                    </tr>
-                    <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Analizar SEO de producto</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/api/seo/analyze?productId=X</code></td>
-                    </tr>
-                    <tr style="background: #f8f9fa;">
-                        <td style="padding: 10px;">Actualizar SEO masivo</td>
-                        <td style="padding: 10px;"><code>/api/seo/bulk-update</code> (POST)</td>
+                        <td style="padding: 10px;">Ver stats de bots/foro</td>
+                        <td style="padding: 10px;"><code>/api/comunidad/bots?tipo=stats</code></td>
                     </tr>
                 </table>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- INTEGRACIONES DE IA -->
+            <!-- INTEGRACIONES IA -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="background: linear-gradient(135deg, #f3e5f5, #e8f5e9);">
                 <h2>🤖 Integraciones de IA Disponibles</h2>
@@ -497,29 +440,29 @@ class DuendesHubControl {
                     <tr style="background: white;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Claude</strong></td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">claude-sonnet-4</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Historias, canalizaciones, contenido círculo, chat Tito</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Historias, canalizaciones, contenido circulo</td>
                     </tr>
                     <tr style="background: #f8f9fa;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>OpenAI</strong></td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">DALL-E 3</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Imágenes para contenido del círculo y cursos</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Imagenes para contenido y cursos</td>
                     </tr>
                     <tr style="background: white;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Gemini</strong></td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">gemini-2.0-flash-exp</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Cursos, imágenes alternativas</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Cursos, imagenes alternativas</td>
                     </tr>
                     <tr style="background: #f8f9fa;">
                         <td style="padding: 10px;"><strong>Replicate</strong></td>
-                        <td style="padding: 10px;">Flux, SDXL, Ideogram, video</td>
-                        <td style="padding: 10px;">20+ modelos de imagen y video</td>
+                        <td style="padding: 10px;">Flux, SDXL, video</td>
+                        <td style="padding: 10px;">20+ modelos de imagen y video (Panel Maestro)</td>
                     </tr>
                 </table>
             </div>
 
             <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
                 URL base: <strong><?php echo $url; ?></strong><br>
-                Hub v3.1 - Sistema SEO Completo + Círculo de Duendes - Enero 2026
+                Hub v3.0 - Sistema Circulo de Duendes Completo - Enero 2026
             </div>
 
         </div>
