@@ -34,20 +34,18 @@ export default function CursoDetallePage() {
         setPerfil(perfilData.perfil);
       }
 
-      // Cargar curso
-      const cursoRes = await fetch(`/api/admin/cursos?id=${cursoId}`);
+      // Cargar curso desde la nueva API de academia
+      const cursoRes = await fetch(`/api/circulo/academia?id=${cursoId}`);
       const cursoData = await cursoRes.json();
 
-      if (cursoData.success) {
+      console.log('Curso cargado:', cursoData);
+
+      if (cursoData.success && cursoData.curso) {
         setCurso(cursoData.curso);
 
-        // Cargar progreso si hay usuario
-        if (perfilData.perfil?.id) {
-          const progresoRes = await fetch(`/api/circulo/cursos/progreso?usuarioId=${perfilData.perfil.id}&cursoId=${cursoId}`);
-          const progresoData = await progresoRes.json();
-          if (progresoData.success) {
-            setProgreso(progresoData.progreso);
-          }
+        // El progreso ya viene incluido en la respuesta
+        if (cursoData.curso.progreso) {
+          setProgreso(cursoData.curso.progreso);
         }
       }
     } catch (err) {

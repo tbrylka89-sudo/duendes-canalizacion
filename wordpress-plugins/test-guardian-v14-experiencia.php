@@ -253,7 +253,7 @@ function duendes_test_guardian_v14_render() {
     left: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    background: #000 !important;
+    background: radial-gradient(ellipse at 50% 50%, #0d0815 0%, #050208 50%, #000 100%) !important;
     z-index: 999999 !important;
     overflow: hidden !important;
     font-family: 'Cormorant Garamond', Georgia, serif !important;
@@ -283,53 +283,52 @@ function duendes_test_guardian_v14_render() {
 .tg-orb-float {
     position: absolute !important;
     border-radius: 50% !important;
-    filter: blur(60px) !important;
-    opacity: 0.7 !important;
-    mix-blend-mode: screen !important;
+    filter: blur(80px) !important;
+    opacity: 1 !important;
 }
 
 .tg-orb-1 {
-    width: 350px !important;
-    height: 350px !important;
-    background: radial-gradient(circle, rgba(255,0,128,0.9) 0%, rgba(255,0,128,0.4) 40%, transparent 70%) !important;
+    width: 400px !important;
+    height: 400px !important;
+    background: rgba(255,0,128,0.5) !important;
     top: 5% !important;
-    left: 5% !important;
+    left: -5% !important;
     animation: tgOrbMove1 25s ease-in-out infinite !important;
 }
 
 .tg-orb-2 {
-    width: 400px !important;
-    height: 400px !important;
-    background: radial-gradient(circle, rgba(150,0,255,0.8) 0%, rgba(150,0,255,0.3) 40%, transparent 70%) !important;
-    top: 40% !important;
-    right: 5% !important;
+    width: 500px !important;
+    height: 500px !important;
+    background: rgba(120,0,255,0.4) !important;
+    top: 30% !important;
+    right: -10% !important;
     animation: tgOrbMove2 30s ease-in-out infinite !important;
 }
 
 .tg-orb-3 {
-    width: 300px !important;
-    height: 300px !important;
-    background: radial-gradient(circle, rgba(255,50,150,0.85) 0%, rgba(255,50,150,0.3) 40%, transparent 70%) !important;
-    bottom: 10% !important;
-    left: 25% !important;
+    width: 350px !important;
+    height: 350px !important;
+    background: rgba(255,50,150,0.45) !important;
+    bottom: 5% !important;
+    left: 20% !important;
     animation: tgOrbMove3 20s ease-in-out infinite !important;
 }
 
 .tg-orb-4 {
-    width: 250px !important;
-    height: 250px !important;
-    background: radial-gradient(circle, rgba(200,0,255,0.75) 0%, rgba(200,0,255,0.3) 40%, transparent 70%) !important;
-    top: 60% !important;
-    left: 10% !important;
+    width: 300px !important;
+    height: 300px !important;
+    background: rgba(180,0,255,0.4) !important;
+    top: 55% !important;
+    left: 5% !important;
     animation: tgOrbMove4 22s ease-in-out infinite !important;
 }
 
 .tg-orb-5 {
-    width: 320px !important;
-    height: 320px !important;
-    background: radial-gradient(circle, rgba(255,100,180,0.8) 0%, rgba(255,100,180,0.3) 40%, transparent 70%) !important;
-    top: 15% !important;
-    right: 20% !important;
+    width: 380px !important;
+    height: 380px !important;
+    background: rgba(255,80,180,0.4) !important;
+    top: 10% !important;
+    right: 15% !important;
     animation: tgOrbMove5 28s ease-in-out infinite !important;
 }
 
@@ -380,7 +379,7 @@ function duendes_test_guardian_v14_render() {
     opacity: 0 !important;
     visibility: hidden !important;
     transition: opacity 1.5s ease, visibility 1.5s ease !important;
-    background: radial-gradient(ellipse at center, rgba(10,5,15,0.85) 0%, rgba(0,0,0,0.9) 100%) !important;
+    background: rgba(0,0,0,0.3) !important;
     z-index: 2 !important;
     overflow-y: auto !important;
 }
@@ -730,29 +729,38 @@ function duendes_test_guardian_v14_render() {
 .tg-options {
     display: flex !important;
     flex-direction: column !important;
-    gap: 18px !important;
+    gap: 16px !important;
+    width: 100% !important;
 }
 
 .tg-option {
-    background: rgba(255,0,128,0.05) !important;
-    border: 1px solid rgba(255,0,128,0.2) !important;
-    padding: 20px 25px !important;
+    background: rgba(255,0,128,0.08) !important;
+    border: 1px solid rgba(255,0,128,0.25) !important;
+    padding: 22px 30px !important;
     cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    text-align: left !important;
-    border-radius: 8px !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    text-align: center !important;
+    border-radius: 50px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .tg-option:hover {
-    background: rgba(255,0,128,0.15) !important;
-    border-color: rgba(255,0,128,0.5) !important;
-    transform: translateX(5px) !important;
+    background: rgba(255,0,128,0.2) !important;
+    border-color: rgba(255,0,128,0.6) !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 0 30px rgba(255,0,128,0.3), inset 0 0 20px rgba(255,0,128,0.1) !important;
+}
+
+.tg-option:active {
+    transform: scale(0.98) !important;
 }
 
 .tg-option span {
-    font-size: clamp(14px, 3.5vw, 17px) !important;
-    color: rgba(255,255,255,0.9) !important;
+    font-size: clamp(15px, 3.8vw, 18px) !important;
+    color: #fff !important;
     line-height: 1.4 !important;
+    letter-spacing: 0.02em !important;
 }
 
 /* ============================================
@@ -949,62 +957,65 @@ function duendes_test_guardian_v14_render() {
 }
 
 .tg-resultado-analisis {
-    background: rgba(150,0,255,0.1) !important;
+    background: rgba(100,0,150,0.15) !important;
     border: 1px solid rgba(150,0,255,0.3) !important;
-    border-radius: 12px !important;
-    padding: 20px !important;
-    margin-bottom: 20px !important;
+    border-radius: 20px !important;
+    padding: 25px 20px !important;
+    margin-bottom: 25px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .tg-analisis-titulo {
-    font-size: 11px !important;
-    color: rgba(255,255,255,0.5) !important;
-    letter-spacing: 0.2em !important;
+    font-size: 10px !important;
+    color: rgba(255,255,255,0.4) !important;
+    letter-spacing: 0.25em !important;
     text-transform: uppercase !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 18px !important;
+    font-family: 'Cinzel', serif !important;
 }
 
 .tg-analisis-items {
     display: flex !important;
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 12px !important;
 }
 
 .tg-analisis-item {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 8px 0 !important;
-    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-}
-
-.tg-analisis-item:last-child {
-    border-bottom: none !important;
+    padding: 10px 15px !important;
+    background: rgba(255,255,255,0.03) !important;
+    border-radius: 10px !important;
 }
 
 .tg-analisis-label {
     font-size: 13px !important;
-    color: rgba(255,255,255,0.6) !important;
+    color: rgba(255,255,255,0.5) !important;
 }
 
 .tg-analisis-valor {
     font-size: 14px !important;
     color: #ff0080 !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
+    text-shadow: 0 0 10px rgba(255,0,128,0.3) !important;
 }
 
 .tg-resultado-reflexion {
-    background: rgba(255,0,128,0.08) !important;
-    border: 1px solid rgba(255,0,128,0.2) !important;
-    border-radius: 12px !important;
-    padding: 20px !important;
-    margin-bottom: 20px !important;
+    background: rgba(255,0,128,0.1) !important;
+    border: 1px solid rgba(255,0,128,0.25) !important;
+    border-radius: 20px !important;
+    padding: 25px 22px !important;
+    margin-bottom: 25px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .tg-reflexion-texto {
-    font-size: clamp(14px, 3.5vw, 16px) !important;
-    color: rgba(255,255,255,0.85) !important;
-    line-height: 1.7 !important;
+    font-size: clamp(15px, 3.8vw, 17px) !important;
+    color: rgba(255,255,255,0.9) !important;
+    line-height: 1.8 !important;
     font-style: italic !important;
 }
 
@@ -1057,12 +1068,17 @@ function duendes_test_guardian_v14_render() {
     }
 
     .tg-option {
-        padding: 18px 20px !important;
+        padding: 20px 25px !important;
+        border-radius: 40px !important;
     }
 
     .tg-option span {
         font-size: 15px !important;
         line-height: 1.5 !important;
+    }
+
+    .tg-orb-float {
+        filter: blur(100px) !important;
     }
 
     .tg-question {
