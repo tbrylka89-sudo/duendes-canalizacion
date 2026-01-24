@@ -436,12 +436,20 @@ Sistema SEO profesional para visibilidad óptima en buscadores.
 - Diseño: Gradiente azul místico + símbolo dorado + tipografía elegante
 
 **12. FIX MAGIC LINK EMAIL** ✅
-- **Problema:** El email no llegaba porque `hola@duendesdeluruguay.com` no está verificado en Resend
-- **Solución:** Cambiado a `onboarding@resend.dev` que siempre funciona
+- **Problema:** El email no llegaba porque usaba dominio no verificado
+- **Solución:** Cambiado a `info@duendesdeluruguay.com` (email verificado en Resend)
 - **Archivos modificados:**
   - `/app/mi-magia/login/page.jsx` - Usa `/api/mi-magia/magic-link`
-  - `/app/api/admin/clientes/crear/route.js` - Mejor manejo de errores
-- **PENDIENTE:** Verificar dominio `duendesdeluruguay.com` en Resend para usar email propio
+  - `/app/api/admin/clientes/crear/route.js`
+  - `/app/api/mi-magia/magic-link/route.js`
+  - `/app/api/lectura-ancestral/route.js`
+  - `/app/api/generate/route.js`
+
+**13. SEO BULK UPDATE WOOCOMMERCE** ✅
+- Ejecutado bulk update de SEO para productos de WooCommerce
+- Metadata RankMath actualizada: title, description, focus_keyword, schema, OpenGraph, Twitter
+- Script disponible: `/scripts/seo-bulk-update.mjs`
+- API: POST `/api/seo/bulk-update` con `{productIds: [...], dryRun: false}`
 
 ---
 
