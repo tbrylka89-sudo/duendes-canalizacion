@@ -78,7 +78,7 @@ Situacion actual: ${lectura.situacion || 'No especificada'}
     if (emailCliente) {
       try {
         await resend.emails.send({
-          from: 'Duendes del Uruguay <onboarding@resend.dev>',
+          from: 'Duendes del Uruguay <info@duendesdeluruguay.com>',
           to: emailCliente,
           subject: 'Tu Lectura Ancestral esta lista!',
           html: '<div style="font-family:Georgia;background:#FDF8F0;padding:40px;max-width:600px;margin:0 auto;"><h1 style="color:#4A5D4A;text-align:center;">Lectura Ancestral</h1><div style="background:white;padding:30px;border-radius:10px;"><p>Hola <strong>' + nombreCliente + '</strong>!</p><p>Tu lectura esta lista.</p><div style="text-align:center;margin:30px;"><a href="' + lecturaUrl + '" style="background:#4A5D4A;color:white;padding:15px 40px;text-decoration:none;border-radius:5px;">Ver mi Lectura</a></div></div></div>'

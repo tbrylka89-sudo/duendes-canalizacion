@@ -62,7 +62,7 @@ export async function POST(request) {
     if (process.env.RESEND_API_KEY) {
       console.log('📧 Enviando email a:', emailLower);
       emailResult = await resend.emails.send({
-        from: 'Duendes del Uruguay <onboarding@resend.dev>',
+        from: 'Duendes del Uruguay <info@duendesdeluruguay.com>',
         to: emailLower,
         subject: esNuevo ? '✨ Tu portal mágico te espera' : '🔮 Entrá a Mi Magia',
         html: `

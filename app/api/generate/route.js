@@ -123,7 +123,7 @@ GENERA JSON (sin markdown):
     if (compradorEmail) {
       try {
         await resend.emails.send({
-          from: 'Duendes del Uruguay <onboarding@resend.dev>',
+          from: 'Duendes del Uruguay <info@duendesdeluruguay.com>',
           to: compradorEmail,
           subject: '🌿 Tu Guia de ' + nombresProductos,
           html: '<div style="font-family:Georgia;background:#FDF8F0;padding:40px;max-width:600px;margin:0 auto;"><h1 style="color:#4A5D4A;text-align:center;">🍀 Duendes del Uruguay</h1><div style="background:white;padding:30px;border-radius:10px;"><p>Hola <strong>' + (esRegalo ? compradorNombre : receptorNombre) + '</strong>!</p><p>Tu guia de <strong>' + nombresProductos + '</strong> esta lista.</p><div style="text-align:center;margin:30px;"><a href="' + guideUrl + '" style="background:#4A5D4A;color:white;padding:15px 40px;text-decoration:none;border-radius:5px;">Ver mi Guia ✨</a></div><p style="text-align:center;"><a href="' + pdfUrl + '" style="color:#4A5D4A;">📥 PDF</a></p></div></div>'

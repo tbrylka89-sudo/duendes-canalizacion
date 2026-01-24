@@ -33,7 +33,7 @@ async function crearMagicLink(email) {
 }
 
 // Email de bienvenida para usuarios nuevos
-// Nota: Usar onboarding@resend.dev mientras no se verifique el dominio en Resend
+// Nota: Usar info@duendesdeluruguay.com mientras no se verifique el dominio en Resend
 async function enviarEmailBienvenida(email, token, nombre, runasRegaladas = 0) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://duendes-vercel.vercel.app';
 
@@ -43,7 +43,7 @@ async function enviarEmailBienvenida(email, token, nombre, runasRegaladas = 0) {
   }
 
   const result = await resend.emails.send({
-    from: 'Duendes del Uruguay <onboarding@resend.dev>',
+    from: 'Duendes del Uruguay <info@duendesdeluruguay.com>',
     to: email,
     subject: '✨ Tu portal a Mi Magia está listo',
     html: `
@@ -71,12 +71,12 @@ async function enviarEmailBienvenida(email, token, nombre, runasRegaladas = 0) {
 }
 
 // Email de magic link para usuarios existentes
-// Nota: Usar onboarding@resend.dev mientras no se verifique el dominio en Resend
+// Nota: Usar info@duendesdeluruguay.com mientras no se verifique el dominio en Resend
 async function enviarMagicLink(email, magicToken, nombre) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://duendes-vercel.vercel.app';
 
   const result = await resend.emails.send({
-    from: 'Duendes del Uruguay <onboarding@resend.dev>',
+    from: 'Duendes del Uruguay <info@duendesdeluruguay.com>',
     to: email,
     subject: '🔮 Tu enlace mágico para entrar',
     html: `
