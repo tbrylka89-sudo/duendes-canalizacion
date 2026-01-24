@@ -22,53 +22,52 @@ export async function GET(request) {
     const incluirContenido = url.searchParams.get('contenido') !== '0';
     const generarMensaje = url.searchParams.get('mensaje') === '1';
 
-    // Obtener duende actual - buscar en múltiples formatos
-    let duendeActual = await kv.get('duende-semana:actual');
+    // Obtener duende actual - PRIMERO buscar en rotación semanal (datos nuevos)
+    let duendeActual = null;
 
-    // Si no existe, buscar en formato nuevo (circulo:duende-semana:año:mes:semana)
+    const ahora = new Date();
+    const año = ahora.getFullYear();
+    const mes = ahora.getMonth() + 1;
+    const dia = ahora.getDate();
+
+    // Determinar número de semana del mes
+    let semanaNum = 1;
+    if (dia >= 22) semanaNum = 4;
+    else if (dia >= 15) semanaNum = 3;
+    else if (dia >= 8) semanaNum = 2;
+
+    const semanaKey = `circulo:duende-semana:${año}:${mes}:${semanaNum}`;
+    const semanaData = await kv.get(semanaKey);
+
+    if (semanaData?.guardian) {
+      // Usar datos de la rotación semanal (prioridad)
+      const guardian = semanaData.guardian;
+      duendeActual = {
+        nombre: guardian.nombre,
+        nombreCompleto: guardian.nombreCompleto,
+        imagen: guardian.imagen,
+        categoria: guardian.categoria,
+        descripcion: semanaData.descripcion,
+        proposito: semanaData.tema,
+        elemento: guardian.elemento,
+        cristales: guardian.cristales,
+        color: guardian.color,
+        saludo: guardian.saludo,
+        despedida: guardian.despedida,
+        frasesTipicas: guardian.frasesTipicas,
+        personalidad: guardian.personalidad,
+        historia: guardian.historia,
+        temas: guardian.temas,
+        fechaInicio: semanaData.inicio,
+        fechaFin: semanaData.fin,
+        productoWooCommerce: guardian.productoWooCommerce,
+        slug: guardian.slug
+      };
+    }
+
+    // Fallback: buscar en formato antiguo si no hay rotación
     if (!duendeActual) {
-      const ahora = new Date();
-      const año = ahora.getFullYear();
-      const mes = ahora.getMonth() + 1;
-      const dia = ahora.getDate();
-
-      // Determinar número de semana del mes
-      let semanaNum = 1;
-      if (dia >= 22) semanaNum = 4;
-      else if (dia >= 15) semanaNum = 3;
-      else if (dia >= 8) semanaNum = 2;
-
-      const semanaKey = `circulo:duende-semana:${año}:${mes}:${semanaNum}`;
-      const semanaData = await kv.get(semanaKey);
-
-      if (semanaData) {
-        // También cargar guardianes maestros para datos completos
-        const guardianes = await kv.get('circulo:guardianes-maestros');
-        const guardianInfo = guardianes?.[semanaData.guardianId] || {};
-
-        duendeActual = {
-          nombre: semanaData.guardianNombre || guardianInfo.nombre,
-          nombreCompleto: guardianInfo.nombreCompleto,
-          imagen: guardianInfo.imagen,
-          categoria: guardianInfo.categoria,
-          descripcion: semanaData.descripcion,
-          proposito: semanaData.tema,
-          elemento: guardianInfo.elemento,
-          cristales: guardianInfo.cristales,
-          personalidadGenerada: {
-            manera_de_hablar: guardianInfo.personalidad,
-            tono_emocional: guardianInfo.personalidad?.split(',')[0] || 'cálido',
-            como_da_consejos: guardianInfo.personalidad?.split('.')[1] || 'con amor',
-            frase_caracteristica: guardianInfo.frasesTipicas?.[0] || '',
-            forma_de_despedirse: guardianInfo.despedida,
-            temas_favoritos: guardianInfo.temas
-          },
-          fechaInicio: semanaData.inicio,
-          fechaFin: semanaData.fin,
-          color: guardianInfo.color,
-          saludo: guardianInfo.saludo
-        };
-      }
+      duendeActual = await kv.get('duende-semana:actual');
     }
 
     if (!duendeActual) {
