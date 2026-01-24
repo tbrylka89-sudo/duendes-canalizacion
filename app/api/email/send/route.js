@@ -35,17 +35,37 @@ export async function POST(request) {
       );
     }
 
-    const { data: resendData, error } = await resend.emails.send({
-      from: from || 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
-      to: Array.isArray(to) ? to : [to],
-      subject,
-      html: emailHtml,
-      replyTo: replyTo || 'duendesdeluruguay@gmail.com',
-    });
+    // Lista de remitentes a probar (dominio verificado primero, fallback después)
+    const fromOptions = [
+      from || 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
+      'Duendes del Uruguay <onboarding@resend.dev>', // Fallback para testing
+    ];
 
-    if (error) {
-      console.error('Error Resend:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    let lastError = null;
+    let resendData = null;
+
+    // Intentar enviar con cada opción de from hasta que funcione
+    for (const fromEmail of fromOptions) {
+      const { data, error } = await resend.emails.send({
+        from: fromEmail,
+        to: Array.isArray(to) ? to : [to],
+        subject,
+        html: emailHtml,
+        replyTo: replyTo || 'duendesdeluruguay@gmail.com',
+      });
+
+      if (!error && data) {
+        resendData = data;
+        break;
+      }
+
+      lastError = error;
+      console.log(`Falló con ${fromEmail}, probando siguiente...`);
+    }
+
+    if (!resendData) {
+      console.error('Error Resend (todos los intentos):', lastError);
+      return NextResponse.json({ error: lastError?.message || 'Error enviando email' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, id: resendData.id });
