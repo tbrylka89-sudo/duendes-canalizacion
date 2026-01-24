@@ -66,10 +66,15 @@ export async function POST(request) {
     // Verificar si ya recibió bienvenida
     const bienvenidaRecibida = await kv.get(`bienvenida:${email}`);
     if (bienvenidaRecibida) {
+      // Asegurar que el guardian tenga especialidad (para caches viejos)
+      const guardianConEspecialidad = {
+        ...bienvenidaRecibida.guardian,
+        especialidad: bienvenidaRecibida.guardian?.especialidad || 'Guía del Círculo'
+      };
       return Response.json({
         success: true,
         yaRecibida: true,
-        guardian: bienvenidaRecibida.guardian,
+        guardian: guardianConEspecialidad,
         mensaje: bienvenidaRecibida.mensaje
       });
     }
@@ -124,25 +129,24 @@ Escribí SOLO el mensaje, sin explicaciones ni formato markdown.`
     const mensajeBienvenida = response.content[0].text;
 
     // Guardar que ya recibió la bienvenida
+    const guardianData = {
+      id: guardian.id || guardian.slug,
+      nombre: guardian.nombre,
+      nombreCompleto: guardian.nombreCompleto,
+      imagen: guardian.imagen,
+      especialidad: guardian.especialidad || guardian.categoria || 'Guía del Círculo',
+      color: guardian.color || '#D4AF37'
+    };
+
     await kv.set(`bienvenida:${email}`, {
-      guardian: {
-        id: guardian.id || guardian.slug,
-        nombre: guardian.nombre,
-        imagen: guardian.imagen,
-        color: '#D4AF37'
-      },
+      guardian: guardianData,
       mensaje: mensajeBienvenida,
       fecha: new Date().toISOString()
     });
 
     return Response.json({
       success: true,
-      guardian: {
-        id: guardian.id || guardian.slug,
-        nombre: guardian.nombre,
-        imagen: guardian.imagen,
-        color: '#D4AF37'
-      },
+      guardian: guardianData,
       mensaje: mensajeBienvenida
     });
 

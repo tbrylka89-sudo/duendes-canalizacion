@@ -26,10 +26,162 @@ if (!defined('DUENDES_PROMO_3X2_ACTIVA')) {
 add_action('woocommerce_after_cart_table', 'duendes_verificar_promo_3x2');
 add_action('woocommerce_before_checkout_form', 'duendes_verificar_promo_3x2');
 
-// Ocultar notices feos de WooCommerce en el carrito
+// Estilos oscuros para carrito y checkout (matching site aesthetic)
 add_action('wp_head', function() {
-    if (is_cart()) {
-        echo '<style>.woocommerce-message, .woocommerce-info { display: none !important; }</style>';
+    if (is_cart() || is_checkout()) {
+        ?>
+        <style>
+            /* Ocultar notices feos */
+            .woocommerce-message, .woocommerce-info { display: none !important; }
+
+            /* Fondo oscuro general */
+            body.woocommerce-cart,
+            body.woocommerce-checkout {
+                background-color: #0a0a0f !important;
+            }
+
+            /* Contenedor principal */
+            .woocommerce-cart .entry-content,
+            .woocommerce-checkout .entry-content,
+            .woocommerce-cart .woocommerce,
+            .woocommerce-checkout .woocommerce {
+                background-color: #0a0a0f !important;
+                color: #fff !important;
+            }
+
+            /* Tabla del carrito */
+            .woocommerce-cart-form,
+            .woocommerce table.shop_table {
+                background: linear-gradient(135deg, #0d0d14 0%, #12101a 100%) !important;
+                border: 1px solid rgba(198,169,98,0.2) !important;
+                border-radius: 16px !important;
+                overflow: hidden !important;
+            }
+
+            .woocommerce table.shop_table th,
+            .woocommerce table.shop_table td {
+                background: transparent !important;
+                color: #fff !important;
+                border-color: rgba(198,169,98,0.15) !important;
+            }
+
+            .woocommerce table.shop_table th {
+                color: #C6A962 !important;
+                font-family: 'Cinzel', serif !important;
+                text-transform: uppercase !important;
+                letter-spacing: 2px !important;
+                font-size: 12px !important;
+            }
+
+            /* Links de productos */
+            .woocommerce-cart-form .product-name a,
+            .woocommerce table.shop_table a {
+                color: #fff !important;
+                text-decoration: none !important;
+            }
+
+            .woocommerce-cart-form .product-name a:hover {
+                color: #C6A962 !important;
+            }
+
+            /* Precios */
+            .woocommerce .cart-subtotal td,
+            .woocommerce .order-total td,
+            .woocommerce-Price-amount {
+                color: #C6A962 !important;
+            }
+
+            /* Inputs */
+            .woocommerce input[type="text"],
+            .woocommerce input[type="email"],
+            .woocommerce input[type="tel"],
+            .woocommerce input[type="number"],
+            .woocommerce select,
+            .woocommerce textarea {
+                background: rgba(255,255,255,0.05) !important;
+                border: 1px solid rgba(198,169,98,0.3) !important;
+                color: #fff !important;
+                border-radius: 8px !important;
+            }
+
+            .woocommerce input:focus,
+            .woocommerce select:focus,
+            .woocommerce textarea:focus {
+                border-color: #C6A962 !important;
+                outline: none !important;
+            }
+
+            /* Labels */
+            .woocommerce label,
+            .woocommerce-billing-fields h3,
+            .woocommerce-shipping-fields h3 {
+                color: #fff !important;
+            }
+
+            /* Botones */
+            .woocommerce .button,
+            .woocommerce input[type="submit"],
+            .woocommerce button[type="submit"] {
+                background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%) !important;
+                color: #0d0d14 !important;
+                border: none !important;
+                border-radius: 25px !important;
+                font-family: 'Cinzel', serif !important;
+                font-weight: 600 !important;
+                letter-spacing: 1px !important;
+                text-transform: uppercase !important;
+                padding: 12px 30px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .woocommerce .button:hover,
+            .woocommerce input[type="submit"]:hover,
+            .woocommerce button[type="submit"]:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(198,169,98,0.3) !important;
+            }
+
+            /* Totales del carrito */
+            .cart_totals,
+            .woocommerce-checkout-review-order-table {
+                background: linear-gradient(135deg, #0d0d14 0%, #12101a 100%) !important;
+                border: 1px solid rgba(198,169,98,0.2) !important;
+                border-radius: 16px !important;
+                padding: 20px !important;
+            }
+
+            .cart_totals h2,
+            .woocommerce-checkout h3 {
+                color: #C6A962 !important;
+                font-family: 'Cinzel', serif !important;
+            }
+
+            /* Cantidad input */
+            .woocommerce .quantity .qty {
+                background: rgba(255,255,255,0.05) !important;
+                color: #fff !important;
+                border: 1px solid rgba(198,169,98,0.3) !important;
+            }
+
+            /* Remove button */
+            .woocommerce a.remove {
+                color: #C6A962 !important;
+            }
+
+            /* Cupón */
+            .woocommerce .coupon {
+                display: flex !important;
+                gap: 10px !important;
+                align-items: center !important;
+            }
+
+            /* Título de página */
+            .woocommerce-cart .entry-title,
+            .woocommerce-checkout .entry-title {
+                color: #fff !important;
+            }
+        </style>
+        <?php
     }
 });
 
@@ -89,11 +241,18 @@ function duendes_contar_minis_gratis_en_carrito() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1) {
-    // Obtener minis disponibles (máximo 8 para no sobrecargar)
-    $minis = wc_get_products([
-        'status' => 'publish',
-        'limit' => 8,
-        'stock_status' => 'instock',
+    // Obtener minis disponibles usando WP_Query directamente
+    $args = [
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => 8,
+        'meta_query' => [
+            [
+                'key' => '_stock_status',
+                'value' => 'instock',
+                'compare' => '='
+            ]
+        ],
         'tax_query' => [
             [
                 'taxonomy' => 'product_cat',
@@ -101,7 +260,18 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
                 'terms' => DUENDES_PROMO_CATEGORIA_MINI,
             ]
         ],
-    ]);
+    ];
+
+    $query = new WP_Query($args);
+    $minis = [];
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $minis[] = wc_get_product(get_the_ID());
+        }
+        wp_reset_postdata();
+    }
 
     if (empty($minis)) return;
 
@@ -193,11 +363,11 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
             transform: scale(1.05);
         }
         .dfb-mini-card p {
-            color: rgba(255,255,255,0.85);
-            margin: 0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 15px;
-            line-height: 1.4;
+            color: #fff !important;
+            margin: 0 !important;
+            font-family: 'Cormorant Garamond', Georgia, serif !important;
+            font-size: 15px !important;
+            line-height: 1.4 !important;
         }
         .dfb-selector-btn {
             background: linear-gradient(135deg, #C6A962 0%, #a88a42 100%);
@@ -267,7 +437,7 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
 
     function duendesSeleccionarMini(productId, element) {
         // Quitar selección anterior
-        document.querySelectorAll('.duendes-mini-option').forEach(function(el) {
+        document.querySelectorAll('.dfb-mini-card').forEach(function(el) {
             el.classList.remove('selected');
         });
 

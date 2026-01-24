@@ -1830,7 +1830,7 @@ function BienvenidaGuardian({ usuario, onContinuar }) {
         {/* Mensaje personalizado */}
         <div className="mensaje-container">
           <div className="mensaje-burbuja">
-            {mensaje.split('\n\n').map((parrafo, i) => (
+            {(mensaje || '').split('\n\n').map((parrafo, i) => (
               <p key={i}>{parrafo}</p>
             ))}
           </div>
