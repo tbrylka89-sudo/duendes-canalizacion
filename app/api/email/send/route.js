@@ -74,7 +74,7 @@ export async function GET(request) {
     const html = templates.emailTest({ nombre });
 
     const { data, error } = await resend.emails.send({
-      from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
+      from: 'Duendes del Uruguay <onboarding@resend.dev>',
       to: [email],
       subject: '✨ Email de prueba - Duendes del Uruguay',
       html,
