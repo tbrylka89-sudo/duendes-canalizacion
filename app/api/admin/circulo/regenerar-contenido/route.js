@@ -1,7 +1,37 @@
 import { kv } from '@vercel/kv';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GENERACIÓN CON GEMINI (más económico) o Claude (fallback)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function generarConGemini(prompt, systemPrompt) {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey) return null;
+
+  try {
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\n${prompt}` }] }],
+      generationConfig: {
+        temperature: 0.8,
+        maxOutputTokens: 4000,
+      }
+    });
+
+    const texto = result.response.text();
+    console.log('[REGENERAR] Contenido generado con Gemini');
+    return texto;
+  } catch (error) {
+    console.error('[REGENERAR] Error Gemini:', error.message);
+    return null;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GENERACIÓN DE IMÁGENES CON DALL-E 3
@@ -203,6 +233,23 @@ FORMATO JSON:
   "cierre": "..."
 }`;
 
+  const systemPrompt = getSystemPrompt(duende);
+
+  // INTENTO 1: Gemini (más económico)
+  const geminiResult = await generarConGemini(userPrompt, systemPrompt);
+  if (geminiResult) {
+    const jsonMatch = geminiResult.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch (e) {
+        console.log('[REGENERAR] Gemini JSON inválido, probando Claude');
+      }
+    }
+  }
+
+  // INTENTO 2: Claude (fallback)
+  console.log('[REGENERAR] Usando Claude como fallback');
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {

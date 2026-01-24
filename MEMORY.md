@@ -433,9 +433,36 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 **Pendiente inmediato:**
 - [x] Completar integración DALL-E en regenerar-contenido ✅
 - [x] Mejorar prompts de cursos con reglas CLAUDE.md ✅
+- [x] Deploy a Vercel ✅
+- [x] Probar APIs en producción ✅
+- [ ] Aprovechar Gemini para contenido diario (más económico)
 - [ ] Investigar duendes duplicados en foro
-- [ ] Probar Círculo con MODO_MANTENIMIENTO = false
-- [ ] Deploy a Vercel para activar cambios
+- [ ] Arreglar formato consejo-del-dia (asteriscos extra)
+
+---
+
+### 2026-01-24 12:32 - DEPLOY Y PRUEBAS (sesión 14 continuación)
+
+**Commits:**
+- `761b30f` - DALL-E images + course prompts
+- `10d0569` - Fix Claude model to claude-sonnet-4-20250514
+- `e4bf90e` - Fix model in generar-mes API
+
+**Pruebas producción:**
+| API | Estado |
+|-----|--------|
+| regenerar-contenido | ✅ Genera contenido + imagen DALL-E |
+| bots/stats | ✅ 349 miembros |
+| bots/actividad | ✅ escribiendo funciona |
+| consejo-del-dia | ✅ Marcos (real), formato con ** extra |
+| bienvenida-guardian | ✅ Mensaje personalizado |
+| generar-con-ia | ⚠️ Timeout (>60s) |
+
+**Contenido generado:**
+- Día 25/01: "Ritual del Escudo de Cuarzo" por Azalea
+- Imagen DALL-E: ✅
+
+**MODO_MANTENIMIENTO = false** (Círculo accesible)
 
 ---
 
