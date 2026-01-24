@@ -116,10 +116,14 @@ function ComunidadIndicadores() {
           <span className="stat-icon">👥</span>
           <span>{safeRender(stats.totalMiembros)} guardianas en el Círculo</span>
         </div>
-        {actividad?.escribiendo && (
+        {actividad?.escribiendo && Array.isArray(actividad.escribiendo) && actividad.escribiendo.length > 0 && (
           <div className="stat-item escribiendo">
             <span className="stat-icon">✍️</span>
-            <span>{safeRender(actividad.escribiendo)} está escribiendo...</span>
+            <span>
+              {actividad.escribiendo.map((p, i) => (
+                <span key={i}>{i > 0 ? ', ' : ''}{safeRender(p?.nombre || p)}</span>
+              ))} {actividad.escribiendo.length > 1 ? 'están' : 'está'} escribiendo...
+            </span>
           </div>
         )}
       </div>
