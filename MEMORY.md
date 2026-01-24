@@ -4,34 +4,100 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 ---
 
-## ⚠️ URGENTE: CÍRCULO EN MODO MANTENIMIENTO
+## ⚠️ URGENTE: CÍRCULO - PROBLEMAS IDENTIFICADOS
 
-**Estado:** El Círculo de Duendes (`/mi-magia/circulo`) está en modo mantenimiento por error React #31.
+### 1. React Error #31 - PARCIALMENTE RESUELTO
 
-**Problema:**
-- Error "Objects are not valid as a React child" (React error #31)
-- El error aparece después de unos segundos de carga
-- Afecta a usuarios con membresía cuando acceden al Círculo
+**Estado:** Modo mantenimiento activado. Funciona en incógnito pero usuarios con cache viejo ven errores.
 
-**Solución temporal:**
-- `MODO_MANTENIMIENTO = true` en `/app/mi-magia/circulo/page.jsx`
-- Muestra página elegante "El Círculo está en transformación"
-- Protege a usuarios de ver errores
+**Fixes aplicados (sesión 14):**
+- `safeRender()` helper en Dashboard.jsx, page.jsx, PortalEntrada.jsx - convierte objetos a strings
+- `limpiarLocalStorageViejo()` - limpia cache versión < 2.0 al cargar
+- `ErrorBoundary` - captura errores sin romper toda la página
+- API reset expandida - limpia 52 semanas de cache de guardianes
 
-**Para arreglar definitivamente:**
-1. Cambiar `MODO_MANTENIMIENTO = false` en page.jsx (línea ~15)
-2. Encontrar qué objeto se está renderizando como hijo de React
-3. Probablemente en Dashboard.jsx o BienvenidaGuardian
-4. Posibles causantes:
-   - `guardian.especialidad` podría ser un objeto en vez de string
-   - Datos cacheados en Vercel KV con estructura incorrecta
-   - Respuesta de API con campos que son objetos
+**Para reactivar:**
+1. Cambiar `MODO_MANTENIMIENTO = false` en `/app/mi-magia/circulo/page.jsx`
+2. Los usuarios con cache viejo se limpian automáticamente ahora
+
+### 2. CONTENIDOS SIN IMÁGENES - RESUELTO ✅
+
+**Problema:** Los contenidos del Círculo se generaban sin imágenes.
+
+**Solución implementada:**
+- Agregada función `generarImagenContenido()` con DALL-E 3 a `regenerar-contenido`
+- Genera escenas mágicas según tipo de contenido (ritual, meditación, artículo, guía, historia, reflexión)
+- Paleta de colores según elemento del duende (Tierra, Agua, Fuego, Aire, Espíritu)
+- Imágenes en formato 1792x1024 (horizontal, ideal para cards)
+
+**Archivos modificados:**
+- `/app/api/admin/circulo/regenerar-contenido/route.js` - +80 líneas de generación DALL-E
+
+### 3. CURSOS DE MALA CALIDAD - RESUELTO ✅
+
+**Problema:** Los cursos generados eran genéricos, no seguían CLAUDE.md.
+
+**Solución implementada:**
+- Reescrito `SYSTEM_PROMPT` completo con:
+  - Frases prohibidas de CLAUDE.md (todas listadas explícitamente)
+  - Estructura emocional de 6 fases (gancho, espejo, validación, enseñanza, práctica, cierre)
+  - Reglas de tono rioplatense
+  - Descripción de personalidades de guardianes
+  - Verificación de calidad pre-generación
+- Mejorado `construirPromptCurso()` con:
+  - Estructura detallada de cada lección
+  - Instrucciones específicas para cada fase
+  - Personalidades de duendes incluidas en el prompt
+
+**Archivos modificados:**
+- `/app/api/admin/cursos/generar-con-ia/route.js` - SYSTEM_PROMPT y construirPromptCurso() reescritos
+
+### 4. GEMINI SUBUTILIZADO - IDENTIFICADO ⚠️
+
+**Estado:** Gemini está configurado (`GEMINI_API_KEY`) pero solo se usa como fallback en cursos.
+
+**Oportunidades:**
+- Usar Gemini para contenido diario del Círculo (más económico que Claude)
+- Usar Gemini para pre-validar prompts antes de Claude
+- Usar Gemini para análisis de imágenes
+
+**APIs con Gemini:**
+- `/api/admin/cursos/generar-con-ia` - usa Gemini como primera opción, Claude como fallback
+- `/api/admin/imagen/gemini` - genera imágenes (Gemini 2.0 Flash)
+
+### 5. DUENDES DUPLICADOS EN FORO - INVESTIGACIÓN PARCIAL
+
+**Problema reportado:** Los duendes que compraron aparecen duplicados en el foro.
+
+**Investigación realizada:**
+- `/api/comunidad/bots/route.js` tiene `PERFILES_BOT` (50 bots con nombres latinos)
+- `/lib/comunidad/miembros-fundadores.js` tiene `MIEMBROS_FUNDADORES` (50 perfiles diferentes)
+- **NO se mezclan** directamente en las APIs
+- El Dashboard muestra `actividad.escribiendo` como array - esto fue corregido con `safeRender()`
+
+**Posibles causas del duplicado:**
+1. El usuario real tiene nombre similar a un bot (ej: "Luciana" existe en ambas listas)
+2. Las compras reales se guardan Y también aparece en actividad simulada
+3. Falta filtrar bots cuando hay usuarios reales con el mismo email
+
+**Requiere más información:**
+- ¿El duplicado es visual (mismo nombre 2 veces)?
+- ¿El duplicado es de datos (mismo email 2 entries en KV)?
+- ¿Dónde exactamente ve el usuario los duplicados?
+
+**Archivos involucrados:**
+- `/api/comunidad/bots/route.js` - Actividad simulada
+- `/api/comunidad/route.js` - Foro real
+- `/lib/comunidad/miembros-fundadores.js` - 50 perfiles fundadores
+- `/mi-magia/circulo/Dashboard.jsx` - Frontend que muestra todo
+
+---
 
 **Emails reseteados:** tbrylka89@gmail.com, consulta@duendesdeluruguay.com, duendesdeluruguay@gmail.com, brylka0911@gmail.com, info@duendesdeluruguay.com
 
 **API para resetear más usuarios:** POST `/api/circulo/reset-bienvenida` con `{email: "..."}`
 
-**API de test user:** POST `/api/admin/circulo/crear-test-user` con `{email: "...", nombre: "..."}`
+**API para limpieza total:** POST `/api/circulo/reset-bienvenida` con `{limpiezaTotal: true}`
 
 ---
 
@@ -315,52 +381,61 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 
 ### 2026-01-24 (sesión 14) - EN PROGRESO
 
-**🚨 CÍRCULO: MODO MANTENIMIENTO ACTIVADO**
+**🚨 CÍRCULO: INVESTIGACIÓN Y FIXES**
 
-**Problema:** React error #31 ("Objects are not valid as a React child") persistente en el Círculo de Duendes.
+**Diagnóstico completado:**
 
-**Contexto:**
-- Se reemplazaron guardianes inventados (Dorado, Obsidiana, Índigo, Jade) por duendes REALES: Gaia, Noah, Winter, Marcos
-- Las APIs devuelven datos correctos (Marcos como guardián de la semana)
-- El error aparece en el cliente después de unos segundos de carga
-- Múltiples intentos de fix no resolvieron el problema
+1. **React error #31 - CAUSA: localStorage con datos viejos + objetos renderizados**
+   - Usuarios con cache viejo (`circulo_version` !== '2.0') tenían datos corruptos
+   - Campos como `actividad.escribiendo` eran arrays de objetos renderizados directamente
+   - Guardianes viejos (Vero, Dorado, etc.) cacheados en KV
 
-**Cambios realizados:**
+2. **Contenidos sin imágenes - CAUSA: API regenerar-contenido no genera imágenes**
+   - `regenerar-contenido` solo genera texto (Claude)
+   - `generar-contenido-pro` sí genera imágenes (DALL-E)
+   - Scripts de seed no incluyen campo imagen
 
-1. **APIs actualizadas para usar duendes reales:**
-   - `/api/circulo/duende-semana/route.js` - Prioriza rotación
-   - `/api/circulo/bienvenida-guardian/route.js` - Usa sistema de rotación
-   - `/api/circulo/duende-del-dia/route.js` - Usa guardián semanal
+3. **Cursos malos - CAUSA: prompts genéricos**
+   - `generar-con-ia` no sigue reglas de CLAUDE.md
+   - No tiene frases prohibidas, ni arco emocional, ni scoring
 
-2. **Nombres de guardianes reemplazados:**
-   - `/api/comunidad/bots/route.js` - 50+ testimonios actualizados
-   - Dorado→Gaia, Obsidiana→Noah, Índigo→Winter, Jade→Marcos
+4. **Gemini subutilizado - Solo como fallback de cursos**
+   - Podría usarse para contenido diario más económico
 
-3. **Nuevas APIs creadas:**
-   - `/api/circulo/reset-bienvenida/route.js` - Limpiar cache de usuario
-   - `/api/admin/circulo/crear-test-user/route.js` - Crear usuario de prueba
+**Fixes aplicados:**
 
-4. **Modo mantenimiento implementado:**
-   - Variable `MODO_MANTENIMIENTO = true` en page.jsx
-   - Página elegante de "transformación" para usuarios
-   - ErrorBoundary como safety net adicional
+1. **safeRender() helper** - Convierte cualquier objeto a string antes de renderizar
+   - Dashboard.jsx, page.jsx, PortalEntrada.jsx
 
-**Archivos modificados:**
+2. **limpiarLocalStorageViejo()** - Limpia cache si versión < 2.0
+   - Se ejecuta al cargar page.jsx
+
+3. **API reset expandida** - Limpia 52 semanas de cache guardianes
+   - POST `/api/circulo/reset-bienvenida` con `{limpiezaTotal: true}`
+
+4. **Fix escribiendo duplicados** - Array se mapea correctamente
+   - Dashboard.jsx línea del "escribiendo"
+
+5. **Generación de imágenes en regenerar-contenido** - EN PROGRESO
+   - Agregada función `generarImagenContenido()` con DALL-E
+   - Falta integrar en el flujo de generación
+
+**Archivos modificados esta sesión:**
 | Archivo | Cambio |
 |---------|--------|
-| `/app/mi-magia/circulo/page.jsx` | Modo mantenimiento + ErrorBoundary |
-| `/app/api/circulo/duende-semana/route.js` | Prioriza rotación semanal |
-| `/app/api/circulo/bienvenida-guardian/route.js` | Usa rotación + especialidad |
-| `/app/api/circulo/duende-del-dia/route.js` | Usa guardián semanal |
-| `/app/api/comunidad/bots/route.js` | Nombres de guardianes actualizados |
-| `/app/api/circulo/reset-bienvenida/route.js` | NUEVO - Reset cache usuario |
-| `/app/api/admin/circulo/crear-test-user/route.js` | NUEVO - Test user |
+| `/app/mi-magia/circulo/page.jsx` | safeRender, limpiarLocalStorageViejo, ErrorBoundary |
+| `/app/mi-magia/circulo/Dashboard.jsx` | safeRender, fix escribiendo array |
+| `/app/mi-magia/circulo/PortalEntrada.jsx` | safeRender |
+| `/app/api/circulo/reset-bienvenida/route.js` | Limpieza 52 semanas |
+| `/app/api/circulo/consejo-del-dia/route.js` | Prioriza rotación real |
+| `/app/api/admin/circulo/regenerar-contenido/route.js` | EN PROGRESO - agregando DALL-E |
 
-**Pendiente:**
-- [ ] Encontrar causa exacta del React error #31
-- [ ] Verificar estructura de datos en Vercel KV
-- [ ] Testear con MODO_MANTENIMIENTO = false
-- [ ] Quitar modo mantenimiento cuando funcione
+**Pendiente inmediato:**
+- [x] Completar integración DALL-E en regenerar-contenido ✅
+- [x] Mejorar prompts de cursos con reglas CLAUDE.md ✅
+- [ ] Investigar duendes duplicados en foro
+- [ ] Probar Círculo con MODO_MANTENIMIENTO = false
+- [ ] Deploy a Vercel para activar cambios
 
 ---
 

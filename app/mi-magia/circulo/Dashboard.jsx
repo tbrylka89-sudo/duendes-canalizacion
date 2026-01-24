@@ -2457,7 +2457,18 @@ function SeccionContenido() {
   }
 
   // Obtener info completa del guardian para mostrar en contenido
-  function obtenerInfoGuardian(nombreDuende, fechaContenido) {
+  function obtenerInfoGuardian(nombreDuende, fechaContenido, contenidoObj = null) {
+    // Prioridad 0: Si el contenido tiene guardian con imagen directamente (formato viejo)
+    if (contenidoObj?.guardian?.imagen) {
+      return {
+        nombre: contenidoObj.guardian.nombre || nombreDuende,
+        nombreCompleto: contenidoObj.guardian.nombreCompleto || contenidoObj.guardian.nombre,
+        imagen: contenidoObj.guardian.imagen,
+        categoria: contenidoObj.guardian.arquetipo || contenidoObj.guardian.categoria,
+        elemento: contenidoObj.guardian.elemento
+      };
+    }
+
     // Prioridad 1: Guardian local por nombre
     const guardianLocal = obtenerGuardianLocalPorNombre(nombreDuende);
     if (guardianLocal) {
@@ -2638,7 +2649,7 @@ function SeccionContenido() {
             <div className="sidebar-lista">
               {contenidos.map((item, idx) => {
                 const config = getTipoConfig(item.tipo);
-                const guardianInfo = obtenerInfoGuardian(item.duendeNombre, item.fecha);
+                const guardianInfo = obtenerInfoGuardian(item.duendeNombre, item.fecha, item);
                 return (
                   <button
                     key={item.fecha || idx}
@@ -2691,7 +2702,7 @@ function SeccionContenido() {
 
               {/* Cabecera con foto del duende */}
               {(() => {
-                const guardianInfo = obtenerInfoGuardian(contenidoActivo.duendeNombre, contenidoActivo.fecha);
+                const guardianInfo = obtenerInfoGuardian(contenidoActivo.duendeNombre, contenidoActivo.fecha, contenidoActivo);
                 const tipoConfig = getTipoConfig(contenidoActivo.tipo);
                 return (
                   <div className="contenido-header-estetico">

@@ -4,6 +4,97 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// GENERACIÓN DE IMÁGENES CON DALL-E 3
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function generarImagenContenido(titulo, tipo, categoria, duendeNombre, elemento) {
+  const openaiKey = process.env.OPENAI_API_KEY;
+  if (!openaiKey) {
+    console.log('[REGENERAR] No hay OPENAI_API_KEY, saltando imagen');
+    return null;
+  }
+
+  // Escenas mágicas según tipo de contenido
+  const escenasPorTipo = {
+    ritual: [
+      'sacred altar with candles, crystals, and mystical symbols in moonlight',
+      'magical circle with runes and floating energy orbs',
+      'enchanted ritual space with incense smoke and ethereal glow'
+    ],
+    meditacion: [
+      'serene meditation garden with floating lotus flowers and soft golden light',
+      'peaceful forest clearing with sunbeams and gentle mist',
+      'mystical cave with crystals and calm water reflections'
+    ],
+    articulo: [
+      'ancient grimoire open on wooden desk with magical artifacts',
+      'mystical library with floating books and candlelight',
+      'enchanted study with scrolls, crystals, and celestial maps'
+    ],
+    guia: [
+      'magical crafting table with herbs, bottles, and glowing ingredients',
+      'artisan workshop with mystical tools and enchanted materials',
+      'herbalist corner with dried flowers, potions, and natural elements'
+    ],
+    historia: [
+      'mystical portal in ancient forest with guardian figure silhouette',
+      'magical being in enchanted garden surrounded by fireflies',
+      'wise guardian in crystal cave with ambient mystical lighting'
+    ],
+    reflexion: [
+      'full moon over mystical landscape with aurora lights',
+      'celestial scene with stars, planets, and cosmic energy',
+      'moonlit sacred grove with standing stones and soft glow'
+    ]
+  };
+
+  // Paleta de colores por elemento del duende
+  const coloresPorElemento = {
+    Tierra: 'earthy greens, browns, amber, moss tones',
+    Agua: 'deep blues, teals, silver, aquamarine hues',
+    Fuego: 'warm oranges, reds, golden flames, ember glow',
+    Aire: 'soft whites, pale blues, silver mist, ethereal pastels',
+    Espíritu: 'purples, indigo, cosmic violet, mystical gold'
+  };
+
+  const escenas = escenasPorTipo[tipo] || escenasPorTipo.articulo;
+  const escena = escenas[Math.floor(Math.random() * escenas.length)];
+  const colores = coloresPorElemento[elemento] || 'mystical purples and golds';
+
+  const prompt = `${escena}, theme: "${titulo.slice(0, 50)}", color palette: ${colores}, Duendes del Uruguay magical aesthetic, fantasy art illustration style, no text, no letters, no words, high quality, atmospheric lighting, 4K digital art`;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: prompt,
+        n: 1,
+        size: '1792x1024',
+        quality: 'standard'
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.data?.[0]?.url) {
+      console.log(`[REGENERAR] Imagen generada para: ${titulo}`);
+      return data.data[0].url;
+    }
+
+    console.error('[REGENERAR] Error DALL-E:', data.error?.message || 'Sin URL');
+    return null;
+  } catch (error) {
+    console.error('[REGENERAR] Error generando imagen:', error.message);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // API: REGENERAR CONTENIDO CON DUENDES REALES
 // Usa los duendes cargados en /admin/circulo/duendes para generar contenido
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -212,6 +303,20 @@ export async function POST(request) {
 
       const contenido = await generarContenidoDia(`${diaEspecifico}/${mes}/${año}`, estructura, especial, duende, apiKey);
 
+      // Generar imagen con DALL-E
+      let imagenUrl = null;
+      try {
+        imagenUrl = await generarImagenContenido(
+          contenido.titulo,
+          estructura.tipo,
+          estructura.categoria,
+          duende.nombre,
+          duende.elemento || 'Tierra'
+        );
+      } catch (imgError) {
+        console.error('[REGENERAR] Error generando imagen:', imgError.message);
+      }
+
       const contenidoCompleto = {
         id: `${año}-${mes}-${diaEspecifico}`,
         fecha: fecha.toISOString(),
@@ -225,6 +330,7 @@ export async function POST(request) {
         icono: estructura.icono,
         titulo: contenido.titulo,
         extracto: contenido.extracto,
+        imagen: imagenUrl,
         secciones: {
           intro: contenido.intro,
           desarrollo: contenido.desarrollo,
@@ -276,6 +382,21 @@ export async function POST(request) {
       try {
         const contenido = await generarContenidoDia(`${dia}/${mes}/${año}`, estructura, especial, duende, apiKey);
 
+        // Generar imagen con DALL-E
+        let imagenUrl = null;
+        try {
+          imagenUrl = await generarImagenContenido(
+            contenido.titulo,
+            estructura.tipo,
+            estructura.categoria,
+            duende.nombre,
+            duende.elemento || 'Tierra'
+          );
+          console.log(`[REGENERAR] Imagen generada para día ${dia}`);
+        } catch (imgError) {
+          console.error(`[REGENERAR] Error imagen día ${dia}:`, imgError.message);
+        }
+
         const contenidoCompleto = {
           id: `${año}-${mes}-${dia}`,
           fecha: fecha.toISOString(),
@@ -289,6 +410,7 @@ export async function POST(request) {
           icono: estructura.icono,
           titulo: contenido.titulo,
           extracto: contenido.extracto,
+          imagen: imagenUrl,
           secciones: {
             intro: contenido.intro,
             desarrollo: contenido.desarrollo,
