@@ -63,66 +63,7 @@ export default function CursosPage() {
     );
   }
 
-  // MODO MANTENIMIENTO - Mientras rediseñamos la Academia
-  const enMantenimiento = false;
-
-  if (enMantenimiento) {
-    return (
-      <div className="cursos-page">
-        <header className="cursos-header">
-          <div className="header-content">
-            <Link href="/circulo" className="back-link">← Volver al Círculo</Link>
-            <h1>🔮 Academia de los Guardianes</h1>
-          </div>
-        </header>
-
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '60vh',
-          padding: '40px 20px',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(138, 99, 210, 0.1))',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            borderRadius: '20px',
-            padding: '60px 40px',
-            maxWidth: '500px'
-          }}>
-            <span style={{ fontSize: '64px', display: 'block', marginBottom: '20px' }}>✨🔧✨</span>
-            <h2 style={{
-              fontFamily: "'Cinzel', serif",
-              fontSize: '28px',
-              color: '#d4af37',
-              marginBottom: '20px'
-            }}>
-              Estamos preparando algo mágico
-            </h2>
-            <p style={{
-              color: 'rgba(255,255,255,0.8)',
-              fontSize: '16px',
-              lineHeight: '1.8',
-              marginBottom: '25px'
-            }}>
-              Los guardianes están trabajando en una nueva experiencia de aprendizaje.
-              Cursos más profundos, contenido más valioso, y la sabiduría de nuestros
-              duendes reales guiándote semana a semana.
-            </p>
-            <p style={{
-              color: 'rgba(212, 175, 55, 0.9)',
-              fontSize: '14px',
-              fontStyle: 'italic'
-            }}>
-              Muy pronto... la Academia renace.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // MODO MANTENIMIENTO ELIMINADO - Academia activa
 
   return (
     <div className="cursos-page">

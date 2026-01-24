@@ -101,6 +101,209 @@ Este archivo se lee automáticamente. Contiene TODO lo que necesitás saber para
 
 ---
 
+## 🎓 ACADEMIA DE GUARDIANES - SISTEMA CONECTADO
+
+### Visión: Universo Totalmente Conectado
+
+Todo fluye y se conecta entre sí:
+- **duendesdeluruguay.com** (WooCommerce - tienda)
+- **Vercel** (APIs, lógica, generación)
+- **Mi Magia** (portal del usuario)
+- **Círculo de los Duendes** (membresía, cursos, contenido)
+
+Los **119+ duendes REALES de la tienda** son los profesores, cada uno con sus atributos únicos que determinan qué puede enseñar.
+
+### Conexiones del Ecosistema
+
+```
+GUARDIÁN (WooCommerce)
+├── Categoría (proteccion, amor, sanacion, abundancia, sabiduria, salud)
+├── Especie (pixie, duende, leprechaun, bruja, vikingo, elfo, chaman...)
+├── Especialización (24+ opciones en lib/conversion/especializaciones.js)
+├── Cristales (amatista, citrino, cuarzo rosa, turmalina...)
+├── Accesorios (determinan poderes y personalidad)
+├── Tamaño (mini, mediano, grande, gigante)
+└── Historia y Personalidad únicas
+     │
+     ├──→ CURSOS (puede enseñar sobre su especialización)
+     ├──→ CONTENIDO DIARIO (consejos desde su perspectiva)
+     ├──→ CANALIZACIÓN (mensaje personal al comprador)
+     └──→ TIENDA (link de compra)
+```
+
+### Mapeo Flexible: Guardián → Temas que Puede Enseñar
+
+Un guardián puede enseñar sobre MÚLTIPLES temas según sus atributos:
+
+| Atributo | Temas que Desbloquea |
+|----------|---------------------|
+| **Categoría: proteccion** | Escudos energéticos, límites, limpiezas, decir que no |
+| **Categoría: sanacion** | Soltar el pasado, trabajo emocional, perdón |
+| **Categoría: abundancia** | Manifestación, desbloqueo, merecimiento, flujo |
+| **Categoría: sabiduria** | Decisiones, claridad, guía, intuición |
+| **Categoría: amor** | Relaciones, amor propio, corazón abierto |
+| **Especie: pixie** | Conexión con plantas, alegría, naturaleza |
+| **Especie: bruja** | Rituales, hierbas, ciclos lunares |
+| **Especie: vikingo** | Fuerza interior, guerrero/a interior |
+| **Especie: elfo** | Viajes, cambios de rumbo, horizontes |
+| **Especie: chaman** | Sanación profunda, plantas medicinales |
+| **Cristal: amatista** | Protección, calma, espiritualidad |
+| **Cristal: citrino** | Abundancia, energía solar, confianza |
+| **Cristal: cuarzo rosa** | Amor, autoestima, sanación emocional |
+| **Cristal: turmalina** | Protección, grounding, límites |
+| **Accesorio: mochila** | Viajes, soltar, nuevos comienzos |
+| **Accesorio: hongos** | Transformación, ciclos, interconexión |
+| **Accesorio: llaves** | Abrecaminos, desbloqueos, oportunidades |
+
+### Especialidades Existentes (lib/conversion/especializaciones.js)
+
+**24+ especialidades ya definidas con dolor/espejo/validación/solución:**
+
+- `fortuna` - Suerte, oportunidades
+- `proteccion` - Escudos, límites
+- `amor_romantico` - Relaciones de pareja
+- `amor_propio` - Autoestima
+- `sanacion` - Soltar el pasado
+- `calma` - Paz, ansiedad
+- `abundancia` - Prosperidad, dinero
+- `sabiduria` - Claridad, decisiones
+- `transformacion` - Cambios profundos
+- `alegria` - Recuperar la luz
+- `viajero` - Cambio de rumbo (con 5 sub-especialidades)
+- `bosque` - Conexión natural (con 6 sub-especialidades)
+
+### Sistema de Generación Inteligente
+
+**El sistema debe ser capaz de:**
+
+1. **Analizar un guardián** → Determinar qué puede enseñar basado en TODOS sus atributos
+2. **Seleccionar guardián para tema** → Filtrar por múltiples criterios, no solo categoría
+3. **Generar contenido desde su voz** → Usar personalidad, historia, cristales, accesorios
+4. **Conectar con tienda** → Cada curso linkea a guardianes relacionados
+5. **Adaptar a eventos** → Lunas, eclipses, solsticios determinan temas
+
+### Workflow de Automatización
+
+```
+1. CONFIGURAR
+   ├── Tema del curso/contenido
+   ├── Evento lunar (opcional)
+   ├── Criterios de selección de guardianes (flexibles)
+   └── Fechas de publicación
+
+2. GENERAR (automático)
+   ├── Selecciona guardianes que matcheen los criterios
+   ├── Genera contenido desde la voz de cada uno
+   ├── Genera imágenes con DALL-E
+   └── Prepara para revisión
+
+3. APROBAR (admin)
+   ├── Preview del contenido
+   ├── Edición si necesario
+   └── Aprobación o rechazo
+
+4. PUBLICAR (automático)
+   ├── Se activa en la fecha programada
+   └── Notifica a usuarios del Círculo
+
+5. CONECTAR (automático)
+   ├── Linkea guardianes relacionados en tienda
+   ├── Actualiza recomendaciones en Mi Magia
+   └── Alimenta a Tito con nuevo contenido
+```
+
+### Sistema de Prevención de Errores
+
+**Ubicación:** `/lib/academia/`
+
+El sistema previene errores ANTES de que ocurran y se recupera cuando fallan cosas.
+
+**Módulos creados:**
+
+| Archivo | Función |
+|---------|---------|
+| `validaciones.js` | Validación preventiva de datos |
+| `resiliencia.js` | Recuperación automática de fallos |
+| `index.js` | Funciones de alto nivel |
+
+**Errores que previene:**
+
+| Error Potencial | Prevención |
+|-----------------|------------|
+| Guardián sin datos completos | `validarGuardianParaAcademia()` verifica 8 campos críticos |
+| Curso mal configurado | `validarConfiguracionCurso()` verifica mes, tema, guardianes |
+| Contenido genérico de IA | `validarContenidoGenerado()` detecta frases prohibidas, score 0-100 |
+| Guardianes repetidos | `validarSeleccionGuardianes()` filtra historial reciente |
+| Datos desactualizados | `validarSincronizacionWoo()` compara con WooCommerce |
+| Curso incompleto | `validarCursoParaPublicar()` checklist de 12 puntos |
+| API caída (WooCommerce, OpenAI, Claude) | Circuit breaker + fallbacks automáticos |
+| Timeout en requests | Retry con backoff exponencial |
+| Sin imagen | Placeholder automático |
+| Sin historia | Plantilla de contenido mínimo |
+
+**Cómo usar:**
+
+```javascript
+import academia from '@/lib/academia';
+
+// Validar un guardián
+const validacion = academia.validaciones.validarGuardianParaAcademia(guardian);
+// → { valid: true/false, errores: [], advertencias: [], puedeEnsenar: [] }
+
+// Seleccionar guardianes para un tema
+const seleccion = academia.seleccionarGuardianesParaTema(guardianes, 'proteccion', {
+  cantidad: 4,
+  historialReciente: guardianesUsadosAntes
+});
+// → { guardianes: [...], advertencias: [] }
+
+// Validar curso completo antes de publicar
+const resultado = await academia.validarCursoCompleto(curso, { verificarWoo: true });
+// → { aptoParaPublicar: true/false, checklist: {...} }
+
+// Reporte de salud del sistema
+const salud = await academia.reporteSalud();
+// → { servicios: {...}, erroresRecientes: [], recomendaciones: [] }
+```
+
+### Estado Actual
+
+| Componente | Estado |
+|------------|--------|
+| Cursos en mantenimiento | ✅ Activo |
+| Plan documentado | ✅ PLAN-ACADEMIA-GUARDIANES.md |
+| Ejemplo de calidad | ✅ EJEMPLO-MODULO-CURSO.md |
+| Base de datos de guardianes | ✅ lib/productos-base-datos.json (100+) |
+| Especializaciones | ✅ lib/conversion/especializaciones.js (24+) |
+| Sistema de validaciones | ✅ lib/academia/validaciones.js |
+| Sistema de resiliencia | ✅ lib/academia/resiliencia.js |
+| API generación inteligente | ✅ /api/admin/academia/generar |
+| API gestión (aprobar/publicar) | ✅ /api/admin/academia/gestionar |
+| API pública (usuarios) | ✅ /api/circulo/academia |
+| UI configuración | ⏳ Pendiente |
+| UI aprobación | ⏳ Pendiente |
+| Sistema de agentes | ⏳ Futuro |
+
+### Archivos del Sistema Conectado
+
+| Archivo | Función |
+|---------|---------|
+| `/lib/academia/index.js` | Módulo central de la Academia |
+| `/lib/academia/validaciones.js` | Validación preventiva de errores |
+| `/lib/academia/resiliencia.js` | Circuit breaker, retry, fallbacks |
+| `/app/api/admin/academia/generar/route.js` | API generación inteligente |
+| `/app/api/admin/academia/gestionar/route.js` | API aprobar/programar/publicar |
+| `/app/api/circulo/academia/route.js` | API pública para usuarios |
+| `/lib/productos-base-datos.json` | 100+ guardianes con atributos |
+| `/lib/conversion/especializaciones.js` | 24+ especialidades con dolor/solución |
+| `/lib/guardian-intelligence/productos-base.json` | Tipos, tamaños, reglas |
+| `/lib/circulo/duendes-semanales-2026.js` | Guardianes del Círculo |
+| `/PLAN-ACADEMIA-GUARDIANES.md` | Plan completo |
+| `/EJEMPLO-MODULO-CURSO.md` | Ejemplo de calidad |
+| `/app/circulo/cursos/page.jsx` | UI (en mantenimiento) |
+
+---
+
 ## ESTADO ACTUAL
 
 ### Sistema de Generación de Historias: ✅ FUNCIONANDO
@@ -378,6 +581,111 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 ---
 
 ## ÚLTIMAS SESIONES
+
+### 2026-01-24 (sesión 16) - ACADEMIA DE GUARDIANES
+
+**🎓 REDISEÑO COMPLETO DE CURSOS DEL CÍRCULO**
+
+**Problema identificado:**
+- Cursos existentes eran genéricos, sin personalidad
+- Contenido de baja calidad que no seguía CLAUDE.md
+- No usaban los duendes reales de la tienda como profesores
+
+**Investigación realizada:**
+- Perfil psicológico del público objetivo (mujeres 25-55, New Age)
+- Tendencias 2026: cristales, DIY espiritual, protección energética, rituales lunares
+- Cursos exitosos en el mercado: limpieza energética, chakras, manifestación
+
+**Documentos creados:**
+1. `/PLAN-ACADEMIA-GUARDIANES.md` - Plan completo con:
+   - Demografía y motivaciones psicológicas del público
+   - Eventos lunares 2026 para sincronizar cursos
+   - Cristales y DIY en tendencia
+   - Nueva arquitectura de cursos
+   - Plan de cursos Febrero-Septiembre 2026
+   - Reglas de calidad de contenido
+   - Cronograma de implementación
+
+2. `/EJEMPLO-MODULO-CURSO.md` - Módulo 1 completo:
+   - Profesora: Azalea (Pixie real de la tienda)
+   - Curso: "Protección y Límites" (Febrero 2026)
+   - 4 lecciones detalladas:
+     1. Teoría: Los 3 tipos de fugas energéticas
+     2. Práctica: Escáner corporal de protección (meditación 12 min)
+     3. DIY: Frasco de protección personal (materiales específicos)
+     4. Integración: El límite como acto de amor
+   - Siguiendo todas las reglas de CLAUDE.md
+
+**Acciones:**
+- ✅ Modo mantenimiento activado en `/app/circulo/cursos/page.jsx`
+- ✅ Sección ACADEMIA DE GUARDIANES agregada a MEMORY.md
+- ✅ Sistema de automatización documentado (workflow: generar → programar → aprobar → publicar)
+- ✅ Visión de sistema conectado (todo fluye: WooCommerce ↔ Vercel ↔ Mi Magia ↔ Círculo)
+- ✅ Mapeo flexible guardián → temas (por categoría + especie + cristales + accesorios)
+- ✅ Sistema de prevención de errores creado:
+  - `lib/academia/validaciones.js` - Validación preventiva
+  - `lib/academia/resiliencia.js` - Circuit breaker, retry, fallbacks
+  - `lib/academia/index.js` - Funciones de alto nivel
+
+**Sistema de prevención de errores:**
+- Valida guardianes (8 campos, completitud, qué puede enseñar)
+- Valida configuración de cursos (mes, tema, guardianes suficientes)
+- Valida contenido generado (detecta frases de IA, score 0-100)
+- Valida selección de guardianes (evita repetidos, asegura variedad)
+- Sincroniza con WooCommerce (detecta productos eliminados/sin stock)
+- Circuit breaker para APIs externas (WooCommerce, OpenAI, Claude)
+- Retry con backoff exponencial
+- Fallbacks automáticos (DALL-E → Replicate → Placeholder)
+- Cache inteligente con TTL
+- Health check y reporte de salud
+
+**APIs creadas:**
+
+| Endpoint | Método | Función |
+|----------|--------|---------|
+| `/api/admin/academia/generar` | POST | Genera curso completo con IA |
+| `/api/admin/academia/generar` | GET | Health check o obtener curso |
+| `/api/admin/academia/gestionar` | POST | Aprobar/programar/publicar/editar |
+| `/api/admin/academia/gestionar` | GET | Estado de cursos |
+| `/api/circulo/academia` | GET | Cursos publicados (usuarios) |
+| `/api/circulo/academia` | POST | Marcar lección completada |
+
+**Ejemplo de uso - Generar curso:**
+```bash
+curl -X POST /api/admin/academia/generar \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tema": "Protección y Límites",
+    "mes": 2,
+    "year": 2026,
+    "categorias": ["proteccion"],
+    "eventoLunar": "Eclipse solar 17 feb",
+    "generarImagenes": true,
+    "generarContenido": true
+  }'
+```
+
+**Ejemplo - Aprobar y publicar:**
+```bash
+# Aprobar
+curl -X POST /api/admin/academia/gestionar \
+  -d '{"accion": "aprobar", "cursoId": "curso_2026_2_xxx"}'
+
+# Programar
+curl -X POST /api/admin/academia/gestionar \
+  -d '{"accion": "programar", "cursoId": "...", "fechaPublicacion": "2026-02-01"}'
+
+# Publicar inmediatamente
+curl -X POST /api/admin/academia/gestionar \
+  -d '{"accion": "publicar", "cursoId": "..."}'
+```
+
+**Próximo paso:**
+- Crear UI de administración para la Academia
+- Generar curso piloto de Febrero
+- Probar el sistema completo
+
+---
 
 ### 2026-01-24 (sesión 14) - EN PROGRESO
 
