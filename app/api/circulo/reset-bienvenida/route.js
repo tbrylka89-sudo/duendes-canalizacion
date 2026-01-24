@@ -46,13 +46,15 @@ export async function POST(request) {
       await borrarKey('duende-semana-actual');
 
       // Limpiar TODAS las semanas del año (el consejo-del-dia usa este formato)
+      // Borramos las 52 semanas para asegurar limpieza total
       for (let w = 1; w <= 52; w++) {
         await borrarKey(`circulo:guardian-semana:${año}-W${w}`);
       }
 
-      // También el formato antiguo por si acaso
-      await borrarKey(`circulo:guardian-semana:${año}-W${semanaDelAño}`);
-      await borrarKey(`circulo:guardian-semana:${año}-W${semanaDelAño - 1}`);
+      // También las semanas del año pasado por si hay cache viejo
+      for (let w = 50; w <= 52; w++) {
+        await borrarKey(`circulo:guardian-semana:${año - 1}-W${w}`);
+      }
 
       // Cache de duende del día
       await borrarKey(`circulo:duende-dia:${hoy}`);
