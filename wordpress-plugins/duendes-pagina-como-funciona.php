@@ -10,17 +10,20 @@ if (!defined('ABSPATH')) exit;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DETECTAR Y REEMPLAZAR CONTENIDO DE LA PAGINA COMO FUNCIONA
+// Usamos template_redirect para tomar control completo (Elementor ignora the_content)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-add_filter('the_content', 'duendes_como_funciona_content', 999);
+add_action('template_redirect', 'duendes_como_funciona_redirect');
 
-function duendes_como_funciona_content($content) {
+function duendes_como_funciona_redirect() {
     // Solo aplicar en la pagina como-funciona
-    if (!is_page('como-funciona')) return $content;
+    if (!is_page('como-funciona')) return;
 
-    ob_start();
+    // Renderizar la pagina completa
+    get_header();
     duendes_render_como_funciona();
-    return ob_get_clean();
+    get_footer();
+    exit;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -219,8 +222,15 @@ add_action('wp_head', function() {
         }
 
         .dcf-diferenciador-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px;
+            color: var(--gold);
+        }
+
+        .dcf-diferenciador-icon svg {
+            width: 100%;
+            height: 100%;
         }
 
         .dcf-diferenciador h4 {
@@ -340,23 +350,42 @@ add_action('wp_head', function() {
         }
 
         .dcf-step-icon {
-            font-size: 32px;
+            width: 40px;
+            height: 40px;
             margin-bottom: 15px;
+            color: var(--gold);
+        }
+
+        .dcf-step-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .dcf-step:nth-child(odd) .dcf-step-icon {
+            margin-left: auto;
         }
 
         .dcf-step-title {
             font-family: 'Cinzel', serif;
             font-size: 1.3rem;
-            color: var(--gold);
+            color: var(--gold) !important;
             margin: 0 0 10px;
             font-weight: 500;
         }
 
         .dcf-step-desc {
             font-size: 1.05rem;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.85) !important;
             margin: 0;
             line-height: 1.7;
+        }
+
+        .dcf-step h3 {
+            color: var(--gold) !important;
+        }
+
+        .dcf-step p {
+            color: rgba(255,255,255,0.85) !important;
         }
 
         /* Mobile timeline */
@@ -447,7 +476,13 @@ add_action('wp_head', function() {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            color: var(--gold);
+            padding: 20px;
+        }
+
+        .dcf-incluye-card-icon svg {
+            width: 100%;
+            height: 100%;
         }
 
         .dcf-incluye-card h4 {
@@ -547,8 +582,15 @@ add_action('wp_head', function() {
         }
 
         .dcf-mi-magia-feature-icon {
-            font-size: 28px;
-            margin-bottom: 12px;
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 12px;
+            color: var(--purple);
+        }
+
+        .dcf-mi-magia-feature-icon svg {
+            width: 100%;
+            height: 100%;
         }
 
         .dcf-mi-magia-feature h5 {
@@ -615,16 +657,27 @@ add_action('wp_head', function() {
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           FAQ - Preguntas frecuentes
+           FAQ - Preguntas frecuentes - Diseño Elegante
            ═══════════════════════════════════════════════════════════════════ */
         .dcf-faq {
             padding: 100px 20px;
-            background: var(--bg-dark);
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #0a0812 50%, var(--bg-dark) 100%);
+            position: relative;
+        }
+
+        .dcf-faq::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 600px 400px at 50% 30%, rgba(201, 162, 39, 0.03) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .dcf-faq-inner {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
 
         .dcf-faq-header {
@@ -643,67 +696,106 @@ add_action('wp_head', function() {
         .dcf-faq-header p {
             font-size: 1.1rem;
             color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .dcf-faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .dcf-faq-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .dcf-faq-item {
-            margin-bottom: 20px;
-            border: 1px solid rgba(201, 162, 39, 0.15);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
         }
 
         .dcf-faq-item:hover {
-            border-color: rgba(201, 162, 39, 0.35);
+            border-color: rgba(201, 162, 39, 0.25);
+            background: rgba(255,255,255,0.025);
         }
 
         .dcf-faq-question {
             width: 100%;
-            padding: 25px 30px;
-            background: rgba(255,255,255,0.02);
+            padding: 24px 28px;
+            background: transparent;
             border: none;
             text-align: left;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            gap: 16px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            font-weight: 500;
             color: #fff;
             transition: all 0.3s ease;
         }
 
         .dcf-faq-question:hover {
-            background: rgba(255,255,255,0.04);
+            color: var(--gold);
         }
 
-        .dcf-faq-question::after {
-            content: '+';
-            font-size: 1.5rem;
-            color: var(--gold);
+        .dcf-faq-toggle {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(201, 162, 39, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .dcf-faq-toggle svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--gold);
+            stroke-width: 2;
             transition: transform 0.3s ease;
         }
 
-        .dcf-faq-item.active .dcf-faq-question::after {
+        .dcf-faq-item.active .dcf-faq-toggle {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .dcf-faq-item.active .dcf-faq-toggle svg {
+            stroke: #0a0a0a;
             transform: rotate(45deg);
         }
 
         .dcf-faq-answer {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .dcf-faq-item.active .dcf-faq-answer {
-            max-height: 500px;
+            max-height: 400px;
         }
 
         .dcf-faq-answer-inner {
-            padding: 0 30px 25px;
-            font-size: 1.05rem;
-            color: var(--text-muted);
+            padding: 0 28px 24px;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
             line-height: 1.8;
+        }
+
+        .dcf-faq-answer-inner strong {
+            color: var(--gold);
+            font-weight: 500;
         }
 
         /* ═══════════════════════════════════════════════════════════════════
@@ -823,8 +915,11 @@ add_action('wp_head', function() {
             color: var(--text-muted);
         }
 
-        .dcf-trust-signal span {
-            font-size: 1.3rem;
+        .dcf-trust-signal svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gold);
+            flex-shrink: 0;
         }
 
         /* ═══════════════════════════════════════════════════════════════════
@@ -886,6 +981,14 @@ add_action('wp_footer', function() {
     ?>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // FORZAR COLORES DEL TIMELINE
+        document.querySelectorAll('.dcf-step-title').forEach(function(el) {
+            el.style.setProperty('color', '#C9A227', 'important');
+        });
+        document.querySelectorAll('.dcf-step-desc').forEach(function(el) {
+            el.style.setProperty('color', 'rgba(255,255,255,0.85)', 'important');
+        });
+
         // FAQ Accordion
         var faqItems = document.querySelectorAll('.dcf-faq-item');
         faqItems.forEach(function(item) {
@@ -923,6 +1026,33 @@ add_action('wp_footer', function() {
 
 function duendes_render_como_funciona() {
     ?>
+    <style>
+    /* CSS INLINE - DENTRO DEL CONTENIDO */
+    .dcf-wrapper {
+        --gold: #c9a227;
+        --gold-light: #e8d48b;
+        --purple: #9370db;
+        --bg-dark: #0a0a0a;
+        --text-light: rgba(255,255,255,0.85);
+        --text-muted: rgba(255,255,255,0.6);
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        color: var(--text-light);
+        background: var(--bg-dark);
+    }
+    .dcf-step-title {
+        color: #C9A227 !important;
+        font-family: 'Cinzel', serif !important;
+    }
+    .dcf-step-desc {
+        color: rgba(255,255,255,0.85) !important;
+    }
+    .dcf-faq-question span:first-child {
+        color: #fff !important;
+    }
+    .dcf-faq-answer-inner {
+        color: rgba(255,255,255,0.7) !important;
+    }
+    </style>
     <div class="dcf-wrapper">
 
         <!-- ═══════════════════════════════════════════════════════════════════
@@ -930,11 +1060,11 @@ function duendes_render_como_funciona() {
              ═══════════════════════════════════════════════════════════════════ -->
         <section class="dcf-hero">
             <div class="dcf-hero-content">
-                <span class="dcf-badge">Una experiencia unica</span>
-                <h1>No compras un guardian.<br><span>El te elige a vos.</span></h1>
+                <span class="dcf-badge">Una experiencia única</span>
+                <h1>No comprás un guardián.<br><span>Él te elige a vos.</span></h1>
                 <p class="dcf-hero-subtitle">
-                    Cada guardian es una pieza unica, creada a mano en Piriapolis.
-                    Y cada uno busca a la persona correcta para acompanar.
+                    Cada guardián es una pieza única, creada a mano en Piriápolis.
+                    Y cada uno busca a la persona correcta para acompañar.
                 </p>
                 <a href="/test-del-guardian/" class="dcf-hero-cta">
                     Descubri quien te espera
@@ -951,29 +1081,44 @@ function duendes_render_como_funciona() {
              ═══════════════════════════════════════════════════════════════════ -->
         <section class="dcf-intro">
             <div class="dcf-intro-inner">
-                <h2>Esto no es una tienda comun</h2>
+                <h2>Esto no es una tienda común</h2>
                 <p class="dcf-intro-text">
-                    <strong>No vendemos munequitos.</strong> Creamos guardianes con historia,
-                    personalidad y proposito. Cada uno esta hecho a mano, canalizado con intencion,
-                    y viene con un mensaje personal escrito <strong>especificamente para vos</strong>.
+                    <strong>No vendemos muñequitos.</strong> Creamos guardianes con historia,
+                    personalidad y propósito. Cada uno está hecho a mano, canalizado con intención,
+                    y viene con un mensaje personal escrito <strong>específicamente para vos</strong>.
                     <br><br>
-                    No es decoracion. No es coleccionismo. Es una conexion.
+                    No es decoración. No es coleccionismo. Es una conexión.
                 </p>
 
                 <div class="dcf-diferenciadores">
                     <div class="dcf-diferenciador">
-                        <div class="dcf-diferenciador-icon">&#9997;</div>
+                        <div class="dcf-diferenciador-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                                <path d="M2 2l7.586 7.586"/>
+                                <circle cx="11" cy="11" r="2"/>
+                            </svg>
+                        </div>
                         <h4>100% Hechos a Mano</h4>
-                        <p>Cada guardian es modelado, pintado y terminado manualmente. No hay dos iguales.</p>
+                        <p>Cada guardián es modelado, pintado y terminado manualmente. No hay dos iguales.</p>
                     </div>
                     <div class="dcf-diferenciador">
-                        <div class="dcf-diferenciador-icon">&#128156;</div>
-                        <h4>Canalizacion Personal</h4>
-                        <p>Recibis una carta escrita por tu guardian, basada en lo que compartis al comprar.</p>
+                        <div class="dcf-diferenciador-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                            </svg>
+                        </div>
+                        <h4>Canalización Personal</h4>
+                        <p>Recibís una carta escrita por tu guardián, basada en lo que compartís al comprar.</p>
                     </div>
                     <div class="dcf-diferenciador">
-                        <div class="dcf-diferenciador-icon">&#127775;</div>
-                        <h4>Pieza Unica</h4>
+                        <div class="dcf-diferenciador-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </div>
+                        <h4>Pieza Única</h4>
                         <p>Cuando alguien lo adopta, desaparece de la tienda. Solo existe uno de cada.</p>
                     </div>
                 </div>
@@ -995,11 +1140,15 @@ function duendes_render_como_funciona() {
                 <div class="dcf-step">
                     <div class="dcf-step-number">1</div>
                     <div class="dcf-step-content">
-                        <div class="dcf-step-icon">&#128270;</div>
-                        <h3 class="dcf-step-title">El Encuentro</h3>
-                        <p class="dcf-step-desc">
-                            Hace el Test del Guardian o explora la tienda. Algo te detiene en uno.
-                            No sabemos por que, pero pasa. Eso es el llamado.
+                        <div class="dcf-step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                        </div>
+                        <h3 class="dcf-step-title" style="color: #C9A227 !important;">El Encuentro</h3>
+                        <p class="dcf-step-desc" style="color: rgba(255,255,255,0.85) !important;">
+                            Hacé el Test del Guardián o explorá la tienda. Algo te detiene en uno.
+                            No sabemos por qué, pero pasa. Eso es el llamado.
                         </p>
                     </div>
                 </div>
@@ -1008,11 +1157,15 @@ function duendes_render_como_funciona() {
                 <div class="dcf-step">
                     <div class="dcf-step-number">2</div>
                     <div class="dcf-step-content">
-                        <div class="dcf-step-icon">&#128221;</div>
-                        <h3 class="dcf-step-title">Tu Historia</h3>
-                        <p class="dcf-step-desc">
-                            Al adoptar, te pedimos que compartas un poco de vos: que estas viviendo,
-                            que buscas, para quien es. Esto alimenta tu canalizacion.
+                        <div class="dcf-step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                        </div>
+                        <h3 class="dcf-step-title" style="color: #C9A227 !important;">Tu Historia</h3>
+                        <p class="dcf-step-desc" style="color: rgba(255,255,255,0.85) !important;">
+                            Al adoptar, te pedimos que compartas un poco de vos: qué estás viviendo,
+                            qué buscás, para quién es. Esto alimenta tu canalización.
                         </p>
                     </div>
                 </div>
@@ -1021,11 +1174,15 @@ function duendes_render_como_funciona() {
                 <div class="dcf-step">
                     <div class="dcf-step-number">3</div>
                     <div class="dcf-step-content">
-                        <div class="dcf-step-icon">&#10024;</div>
-                        <h3 class="dcf-step-title">La Canalizacion</h3>
-                        <p class="dcf-step-desc">
-                            Thibisay lee lo que compartiste y canaliza el mensaje de tu guardian.
-                            No es generico: es una carta personal escrita para vos.
+                        <div class="dcf-step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <h3 class="dcf-step-title" style="color: #C9A227 !important;">La Canalización</h3>
+                        <p class="dcf-step-desc" style="color: rgba(255,255,255,0.85) !important;">
+                            Thibisay lee lo que compartiste y canaliza el mensaje de tu guardián.
+                            No es genérico: es una carta personal escrita para vos.
                         </p>
                     </div>
                 </div>
@@ -1034,10 +1191,14 @@ function duendes_render_como_funciona() {
                 <div class="dcf-step">
                     <div class="dcf-step-number">4</div>
                     <div class="dcf-step-content">
-                        <div class="dcf-step-icon">&#127873;</div>
-                        <h3 class="dcf-step-title">La Preparacion</h3>
-                        <p class="dcf-step-desc">
-                            Tu guardian es preparado con ritual: sahumo, cristales y la intencion
+                        <div class="dcf-step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            </svg>
+                        </div>
+                        <h3 class="dcf-step-title" style="color: #C9A227 !important;">La Preparación</h3>
+                        <p class="dcf-step-desc" style="color: rgba(255,255,255,0.85) !important;">
+                            Tu guardián es preparado con ritual: sahúmo, cristales y la intención
                             de proteger el viaje. Luego es empacado con sumo cuidado.
                         </p>
                     </div>
@@ -1047,10 +1208,14 @@ function duendes_render_como_funciona() {
                 <div class="dcf-step">
                     <div class="dcf-step-number">5</div>
                     <div class="dcf-step-content">
-                        <div class="dcf-step-icon">&#9992;</div>
-                        <h3 class="dcf-step-title">El Viaje</h3>
-                        <p class="dcf-step-desc">
-                            Sale de Piriapolis hacia vos. DHL Express internacional (5-7 dias)
+                        <div class="dcf-step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                        <h3 class="dcf-step-title" style="color: #C9A227 !important;">El Viaje</h3>
+                        <p class="dcf-step-desc" style="color: rgba(255,255,255,0.85) !important;">
+                            Sale de Piriápolis hacia vos. DHL Express internacional (5-7 días)
                             o DAC para Uruguay (24-72hs). Siempre con seguimiento.
                         </p>
                     </div>
@@ -1060,11 +1225,15 @@ function duendes_render_como_funciona() {
                 <div class="dcf-step">
                     <div class="dcf-step-number">6</div>
                     <div class="dcf-step-content">
-                        <div class="dcf-step-icon">&#128150;</div>
-                        <h3 class="dcf-step-title">El Encuentro Real</h3>
-                        <p class="dcf-step-desc">
-                            Llega a tu puerta. Lo desempacas, lees su carta, haces el ritual
-                            de activacion. Y la conexion comienza.
+                        <div class="dcf-step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+                        <h3 class="dcf-step-title" style="color: #C9A227 !important;">El Encuentro Real</h3>
+                        <p class="dcf-step-desc" style="color: rgba(255,255,255,0.85) !important;">
+                            Llega a tu puerta. Lo desempacás, leés su carta, hacés el ritual
+                            de activación. Y la conexión comienza.
                         </p>
                     </div>
                 </div>
@@ -1077,70 +1246,82 @@ function duendes_render_como_funciona() {
         <section class="dcf-incluye">
             <div class="dcf-incluye-inner">
                 <div class="dcf-incluye-header">
-                    <span class="dcf-badge">Que recibis</span>
-                    <h2>Mucho mas que una figura</h2>
-                    <p>Cada adopcion incluye todo lo que necesitas para conectar</p>
+                    <span class="dcf-badge">Qué recibís</span>
+                    <h2>Mucho más que una figura</h2>
+                    <p>Cada adopción incluye todo lo que necesitás para conectar</p>
                 </div>
 
                 <div class="dcf-incluye-grid">
                     <div class="dcf-incluye-card">
-                        <div class="dcf-incluye-card-icon">&#129668;</div>
-                        <h4>Tu Guardian</h4>
+                        <div class="dcf-incluye-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <h4>Tu Guardián</h4>
                         <p>
-                            Pieza unica hecha a mano en nuestro taller de Piriapolis.
-                            Modelado en arcilla, pintado con amor, preparado con intencion.
+                            Pieza única hecha a mano en nuestro taller de Piriápolis.
+                            Modelado en arcilla, pintado con amor, preparado con intención.
                         </p>
-                        <div class="dcf-incluye-card-highlight">Pieza unica e irrepetible</div>
+                        <div class="dcf-incluye-card-highlight">Pieza única e irrepetible</div>
                     </div>
 
                     <div class="dcf-incluye-card">
-                        <div class="dcf-incluye-card-icon">&#128220;</div>
-                        <h4>Canalizacion Personal</h4>
+                        <div class="dcf-incluye-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h4>Canalización Personal</h4>
                         <p>
-                            Una carta de tu guardian escrita especialmente para vos,
-                            basada en lo que compartiste. No es generica: es tuya.
+                            Una carta de tu guardián escrita especialmente para vos,
+                            basada en lo que compartiste. No es genérica: es tuya.
                         </p>
-                        <div class="dcf-incluye-card-highlight">Mensaje unico e irrepetible</div>
+                        <div class="dcf-incluye-card-highlight">Mensaje único e irrepetible</div>
                     </div>
 
                     <div class="dcf-incluye-card">
-                        <div class="dcf-incluye-card-icon">&#128302;</div>
-                        <h4>Ritual de Activacion</h4>
+                        <div class="dcf-incluye-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <h4>Ritual de Activación</h4>
                         <p>
-                            Guia paso a paso para activar la conexion con tu guardian
-                            cuando lo recibas. Crea el vinculo inicial.
+                            Guía paso a paso para activar la conexión con tu guardián
+                            cuando lo recibas. Crea el vínculo inicial.
                         </p>
-                        <div class="dcf-incluye-card-highlight">Guia impresa + digital</div>
+                        <div class="dcf-incluye-card-highlight">Guía impresa + digital</div>
                     </div>
 
                     <div class="dcf-incluye-card">
-                        <div class="dcf-incluye-card-icon">&#127919;</div>
+                        <div class="dcf-incluye-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                        </div>
                         <h4>Acceso a Mi Magia</h4>
                         <p>
-                            Tu portal personal donde guardas tu canalizacion,
-                            podes pedir estudios energeticos y recibir mensajes.
+                            Tu portal personal donde guardás tu canalización,
+                            podés pedir estudios energéticos y recibir mensajes.
                         </p>
                         <div class="dcf-incluye-card-highlight">Acceso de por vida</div>
                     </div>
 
                     <div class="dcf-incluye-card">
-                        <div class="dcf-incluye-card-icon">&#128197;</div>
+                        <div class="dcf-incluye-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+                        </div>
                         <h4>Certificado de Origen</h4>
                         <p>
-                            Documento que certifica la autenticidad de tu guardian,
-                            su nombre, especie y fecha de canalizacion.
+                            Documento que certifica la autenticidad de tu guardián,
+                            su nombre, especie y fecha de canalización.
                         </p>
-                        <div class="dcf-incluye-card-highlight">Fisico + digital</div>
+                        <div class="dcf-incluye-card-highlight">Físico + digital</div>
                     </div>
 
                     <div class="dcf-incluye-card">
-                        <div class="dcf-incluye-card-icon">&#128230;</div>
+                        <div class="dcf-incluye-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                        </div>
                         <h4>Empaque Protector</h4>
                         <p>
-                            Caja con proteccion multiple para que tu guardian
+                            Caja con protección múltiple para que tu guardián
                             llegue perfecto. De nuestras manos a las tuyas.
                         </p>
-                        <div class="dcf-incluye-card-highlight">Envio asegurado</div>
+                        <div class="dcf-incluye-card-highlight">Envío asegurado</div>
                     </div>
                 </div>
             </div>
@@ -1151,28 +1332,36 @@ function duendes_render_como_funciona() {
              ═══════════════════════════════════════════════════════════════════ -->
         <section class="dcf-mi-magia">
             <div class="dcf-mi-magia-inner">
-                <span class="dcf-mi-magia-badge">Despues de recibirlo</span>
+                <span class="dcf-mi-magia-badge">Después de recibirlo</span>
                 <h2>Tu portal personal: Mi Magia</h2>
                 <p class="dcf-mi-magia-desc">
-                    Cuando adoptas un guardian, desbloqueamos tu acceso a Mi Magia:
-                    un espacio privado donde tu conexion sigue creciendo.
+                    Cuando adoptás un guardián, desbloqueamos tu acceso a Mi Magia:
+                    un espacio privado donde tu conexión sigue creciendo.
                 </p>
 
                 <div class="dcf-mi-magia-features">
                     <div class="dcf-mi-magia-feature">
-                        <div class="dcf-mi-magia-feature-icon">&#128220;</div>
-                        <h5>Tu Canalizacion</h5>
+                        <div class="dcf-mi-magia-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h5>Tu Canalización</h5>
                     </div>
                     <div class="dcf-mi-magia-feature">
-                        <div class="dcf-mi-magia-feature-icon">&#128302;</div>
-                        <h5>Estudios Energeticos</h5>
+                        <div class="dcf-mi-magia-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        </div>
+                        <h5>Estudios Energéticos</h5>
                     </div>
                     <div class="dcf-mi-magia-feature">
-                        <div class="dcf-mi-magia-feature-icon">&#128172;</div>
-                        <h5>Mensajes del Guardian</h5>
+                        <div class="dcf-mi-magia-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </div>
+                        <h5>Mensajes del Guardián</h5>
                     </div>
                     <div class="dcf-mi-magia-feature">
-                        <div class="dcf-mi-magia-feature-icon">&#127775;</div>
+                        <div class="dcf-mi-magia-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
                         <h5>Runas para Canjear</h5>
                     </div>
                 </div>
@@ -1184,20 +1373,20 @@ function duendes_render_como_funciona() {
              ═══════════════════════════════════════════════════════════════════ -->
         <section class="dcf-circulo">
             <div class="dcf-circulo-inner">
-                <h3>El Circulo de Duendes</h3>
+                <h3>El Círculo de Duendes</h3>
                 <p>
-                    Para quienes quieren ir mas profundo. Membresia con contenido exclusivo,
+                    Para quienes quieren ir más profundo. Membresía con contenido exclusivo,
                     canalizaciones mensuales, descuentos especiales y acceso a una comunidad
                     de personas como vos.
                 </p>
                 <a href="/el-circulo/" class="dcf-circulo-btn">
-                    Conoce El Circulo
+                    Conocé El Círculo
                 </a>
             </div>
         </section>
 
         <!-- ═══════════════════════════════════════════════════════════════════
-             FAQ
+             FAQ - Rediseñado
              ═══════════════════════════════════════════════════════════════════ -->
         <section class="dcf-faq">
             <div class="dcf-faq-inner">
@@ -1206,87 +1395,122 @@ function duendes_render_como_funciona() {
                     <p>Lo que todos quieren saber antes de adoptar</p>
                 </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Los guardianes son reales?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            Son tan reales como vos quieras que sean. Son figuras fisicas hechas a mano,
-                            con historias creadas para conectar con quien las recibe. Si crees en la energia,
-                            en la intencion, en el poder de los simbolos... entonces si, son muy reales.
-                            Si no, igual tenes una pieza de arte unica con un mensaje que te puede remover algo.
+                <div class="dcf-faq-grid">
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Los guardianes son reales?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                Son tan reales como vos quieras que sean. Son figuras físicas hechas a mano,
+                                con historias creadas para conectar con quien las recibe. Si creés en la energía,
+                                en la intención, en el poder de los símbolos... entonces sí, son muy reales.
+                                Si no, igual tenés una pieza de arte única con un mensaje que te puede remover algo.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Que es la canalizacion?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            Es una carta personal de tu guardian para vos. Cuando compras, te pedimos
-                            que compartas un poco de tu momento de vida. Con eso, Thibisay se conecta
-                            con la energia del guardian y escribe un mensaje especifico para vos.
-                            No es generico: es tuyo. Si cambiaras el nombre, no tendria sentido.
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Qué es la canalización?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                Es una carta personal de tu guardián para vos. Cuando comprás, te pedimos
+                                que compartas un poco de tu momento de vida. Con eso, Thibisay se conecta
+                                con la energía del guardián y escribe un mensaje específico para vos.
+                                No es genérico: es tuyo. Si cambiaras el nombre, no tendría sentido.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Cuanto tardan en llegar?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            <strong>Uruguay:</strong> 24-72 horas habiles via DAC.<br>
-                            <strong>Internacional:</strong> 5-7 dias habiles via DHL Express.<br><br>
-                            Antes del envio, tu guardian pasa por la canalizacion y preparacion
-                            (2-4 dias). Siempre recibis numero de seguimiento.
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Cuánto tardan en llegar?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                <strong>Uruguay:</strong> 24-72 horas hábiles vía DAC.<br>
+                                <strong>Internacional:</strong> 5-7 días hábiles vía DHL Express.<br><br>
+                                Antes del envío, tu guardián pasa por la canalización y preparación
+                                (2-4 días). Siempre recibís número de seguimiento.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Puedo regalarlo?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            Si! Tenemos dos opciones:<br><br>
-                            <strong>Regalo NO sorpresa:</strong> Vos pagas, y le mandamos el formulario
-                            a la persona para que complete sus datos. La canalizacion se hace para ella.<br><br>
-                            <strong>Regalo sorpresa:</strong> Vos completas un formulario especial contando
-                            lo que sabes de la persona. La canalizacion se hace con esa info.
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Puedo regalarlo?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                ¡Sí! Tenemos dos opciones:<br><br>
+                                <strong>Regalo NO sorpresa:</strong> Vos pagás, y le mandamos el formulario
+                                a la persona para que complete sus datos. La canalización se hace para ella.<br><br>
+                                <strong>Regalo sorpresa:</strong> Vos completás un formulario especial contando
+                                lo que sabés de la persona. La canalización se hace con esa info.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Por que el precio?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            Cada guardian toma varias horas de trabajo manual: modelado, secado,
-                            pintado, detalles, preparacion energetica. Mas la canalizacion personal,
-                            que lleva tiempo de conexion y escritura. No es produccion en masa:
-                            es artesania con alma. Y cuando lo recibas, vas a entender.
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Por qué el precio?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                Cada guardián toma varias horas de trabajo manual: modelado, secado,
+                                pintado, detalles, preparación energética. Más la canalización personal,
+                                que lleva tiempo de conexión y escritura. No es producción en masa:
+                                es artesanía con alma. Y cuando lo recibas, vas a entender.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Que pasa si se rompe en el viaje?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            Nunca paso. Pero si pasara, te lo reponemos sin costo.
-                            Empacamos con proteccion extrema precisamente para que tu guardian
-                            llegue perfecto. El envio esta asegurado.
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Qué pasa si se rompe en el viaje?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                Nunca pasó. Pero si pasara, te lo reponemos sin costo.
+                                Empacamos con protección extrema precisamente para que tu guardián
+                                llegue perfecto. El envío está asegurado.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="dcf-faq-item">
-                    <button class="dcf-faq-question">Esto es una estafa?</button>
-                    <div class="dcf-faq-answer">
-                        <div class="dcf-faq-answer-inner">
-                            Entendemos la pregunta. Hay mucho humo en internet.
-                            Somos un emprendimiento familiar real, con taller en Piriapolis, Uruguay.
-                            Trabajamos con pasarelas de pago seguras (Mercado Pago, tarjeta internacional).
-                            Tenes nuestros datos de contacto, redes sociales con anos de historia,
-                            y cientos de clientes felices que pueden dar fe. Si algo sale mal, respondemos.
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Es seguro comprar acá?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                Totalmente. Somos un emprendimiento familiar real, con taller en Piriápolis, Uruguay.
+                                Trabajamos con pasarelas de pago seguras (Mercado Pago, tarjeta internacional).
+                                Tenés nuestros datos de contacto, redes sociales con años de historia,
+                                y cientos de clientes felices que pueden dar fe. Si algo sale mal, respondemos.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dcf-faq-item">
+                        <button class="dcf-faq-question">
+                            <span>¿Hacen envíos internacionales?</span>
+                            <span class="dcf-faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                        </button>
+                        <div class="dcf-faq-answer">
+                            <div class="dcf-faq-answer-inner">
+                                Sí, enviamos a todo el mundo vía DHL Express. El envío incluye seguimiento
+                                y seguro. Tu guardián viaja protegido para llegar perfecto a donde estés.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1298,15 +1522,15 @@ function duendes_render_como_funciona() {
              ═══════════════════════════════════════════════════════════════════ -->
         <section class="dcf-cta-final">
             <div class="dcf-cta-final-inner">
-                <h2>Tu guardian <span>te esta esperando</span></h2>
+                <h2>Tu guardián <span>te está esperando</span></h2>
                 <p>
-                    No sabemos como llegaste aca. Pero si seguiste leyendo hasta el final,
-                    quizas hay algo que quiere encontrarte.
+                    No sabemos cómo llegaste acá. Pero si seguiste leyendo hasta el final,
+                    quizás hay algo que quiere encontrarte.
                 </p>
 
                 <div class="dcf-cta-buttons">
                     <a href="/test-del-guardian/" class="dcf-cta-btn-primary">
-                        Hacer el Test del Guardian
+                        Hacer el Test del Guardián
                     </a>
                     <a href="/tienda/" class="dcf-cta-btn-secondary">
                         Ver la Tienda
@@ -1315,19 +1539,19 @@ function duendes_render_como_funciona() {
 
                 <div class="dcf-trust-signals">
                     <div class="dcf-trust-signal">
-                        <span>&#128274;</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         Pago 100% seguro
                     </div>
                     <div class="dcf-trust-signal">
-                        <span>&#9992;</span>
-                        Envio con seguimiento
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                        Envío con seguimiento
                     </div>
                     <div class="dcf-trust-signal">
-                        <span>&#128172;</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                         Soporte por WhatsApp
                     </div>
                     <div class="dcf-trust-signal">
-                        <span>&#10084;</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         Hecho con amor en Uruguay
                     </div>
                 </div>

@@ -428,6 +428,21 @@ Sistema SEO profesional para visibilidad óptima en buscadores.
 - Tabla de referencia rápida actualizada con SEO
 - Botón de acceso rápido SEO/Sitemap
 
+**11. IMÁGENES SEO CREADAS** ✅
+- `/public/og-image.jpg` (1200x630) - OpenGraph principal
+- `/public/og-image-square.jpg` (600x600) - Redes sociales
+- `/public/icon-192.png` - PWA icon pequeño
+- `/public/icon-512.png` - PWA icon grande
+- Diseño: Gradiente azul místico + símbolo dorado + tipografía elegante
+
+**12. FIX MAGIC LINK EMAIL** ✅
+- **Problema:** El email no llegaba porque `hola@duendesdeluruguay.com` no está verificado en Resend
+- **Solución:** Cambiado a `onboarding@resend.dev` que siempre funciona
+- **Archivos modificados:**
+  - `/app/mi-magia/login/page.jsx` - Usa `/api/mi-magia/magic-link`
+  - `/app/api/admin/clientes/crear/route.js` - Mejor manejo de errores
+- **PENDIENTE:** Verificar dominio `duendesdeluruguay.com` en Resend para usar email propio
+
 ---
 
 ### 2026-01-24 (sesión 12) - COMPLETADA

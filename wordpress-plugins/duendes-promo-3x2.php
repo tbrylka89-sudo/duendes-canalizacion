@@ -23,17 +23,26 @@ if (!defined('DUENDES_PROMO_3X2_ACTIVA')) {
 // DETECTAR CUANDO HAY 2+ GUARDIANES EN EL CARRITO
 // ═══════════════════════════════════════════════════════════════════════════
 
-add_action('woocommerce_before_cart', 'duendes_verificar_promo_3x2');
+add_action('woocommerce_after_cart_table', 'duendes_verificar_promo_3x2');
 add_action('woocommerce_before_checkout_form', 'duendes_verificar_promo_3x2');
+
+// Ocultar notices feos de WooCommerce en el carrito
+add_action('wp_head', function() {
+    if (is_cart()) {
+        echo '<style>.woocommerce-message, .woocommerce-info { display: none !important; }</style>';
+    }
+});
 
 function duendes_verificar_promo_3x2() {
     if (!DUENDES_PROMO_3X2_ACTIVA) return;
 
     $guardianes_en_carrito = duendes_contar_guardianes_carrito();
-    $tiene_mini_gratis = duendes_tiene_mini_gratis_en_carrito();
+    $minis_gratis_actuales = duendes_contar_minis_gratis_en_carrito();
+    $minis_gratis_merecidos = floor($guardianes_en_carrito / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
+    $minis_pendientes = $minis_gratis_merecidos - $minis_gratis_actuales;
 
-    if ($guardianes_en_carrito >= DUENDES_PROMO_GUARDIANES_REQUERIDOS && !$tiene_mini_gratis) {
-        duendes_mostrar_selector_mini();
+    if ($minis_pendientes > 0) {
+        duendes_mostrar_selector_mini($minis_pendientes, $minis_gratis_merecidos);
     }
 }
 
@@ -59,22 +68,27 @@ function duendes_contar_guardianes_carrito() {
 }
 
 function duendes_tiene_mini_gratis_en_carrito() {
-    if (!WC()->cart) return false;
+    return duendes_contar_minis_gratis_en_carrito() > 0;
+}
 
+function duendes_contar_minis_gratis_en_carrito() {
+    if (!WC()->cart) return 0;
+
+    $count = 0;
     foreach (WC()->cart->get_cart() as $cart_item) {
         if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
-            return true;
+            $count += $cart_item['quantity'];
         }
     }
 
-    return false;
+    return $count;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SELECTOR DE MINI GRATIS
 // ═══════════════════════════════════════════════════════════════════════════
 
-function duendes_mostrar_selector_mini() {
+function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1) {
     // Obtener minis disponibles
     $minis = wc_get_products([
         'status' => 'publish',
@@ -211,9 +225,13 @@ function duendes_mostrar_selector_mini() {
     </style>
 
     <div class="duendes-selector-3x2">
-        <h3 class="dfb-selector-titulo">Tu regalo te espera</h3>
+        <h3 class="dfb-selector-titulo">
+            <?php echo $minis_pendientes > 1 ? "Tenés {$minis_pendientes} regalos por elegir" : "Tu regalo te espera"; ?>
+        </h3>
         <p class="dfb-selector-subtitulo">
-            Elegí el mini guardián que querés llevarte
+            <?php echo $minis_pendientes > 1
+                ? "Elegí {$minis_pendientes} minis guardianes para llevarte"
+                : "Elegí el mini guardián que querés llevarte"; ?>
         </p>
 
         <div class="dfb-minis-grid">
@@ -233,7 +251,8 @@ function duendes_mostrar_selector_mini() {
         </button>
 
         <p class="dfb-selector-nota">
-            Por tu compra de <?php echo DUENDES_PROMO_GUARDIANES_REQUERIDOS; ?> o más guardianes
+            Promo 3x2: Por cada 2 guardianes, un mini de regalo
+            <?php if ($minis_totales > 1): ?> • Te corresponden <?php echo $minis_totales; ?> minis<?php endif; ?>
         </p>
     </div>
 
@@ -308,15 +327,18 @@ function duendes_ajax_agregar_mini_gratis() {
         wp_send_json_error('Producto no válido');
     }
 
-    // Verificar que sigue teniendo 2+ guardianes
+    // Verificar cuántos minis merece y cuántos tiene
     $guardianes = duendes_contar_guardianes_carrito();
+    $minis_merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
+    $minis_actuales = duendes_contar_minis_gratis_en_carrito();
+
     if ($guardianes < DUENDES_PROMO_GUARDIANES_REQUERIDOS) {
         wp_send_json_error('Necesitás ' . DUENDES_PROMO_GUARDIANES_REQUERIDOS . ' guardianes para el regalo');
     }
 
-    // Verificar que no tenga ya un mini gratis
-    if (duendes_tiene_mini_gratis_en_carrito()) {
-        wp_send_json_error('Ya tenés un mini de regalo en el carrito');
+    // Verificar que no haya alcanzado el límite de minis
+    if ($minis_actuales >= $minis_merecidos) {
+        wp_send_json_error('Ya elegiste todos tus minis de regalo');
     }
 
     // Verificar que el producto es un mini válido
@@ -388,14 +410,25 @@ function duendes_validar_promo_3x2() {
     if (!WC()->cart) return;
 
     $guardianes = duendes_contar_guardianes_carrito();
+    $minis_merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
+    $minis_actuales = duendes_contar_minis_gratis_en_carrito();
 
-    // Si ya no tiene suficientes guardianes, quitar el mini gratis
-    if ($guardianes < DUENDES_PROMO_GUARDIANES_REQUERIDOS) {
+    // Si tiene más minis de los que merece, quitar el exceso
+    if ($minis_actuales > $minis_merecidos) {
+        $a_remover = $minis_actuales - $minis_merecidos;
+        $removidos = 0;
+
         foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+            if ($removidos >= $a_remover) break;
+
             if (isset($cart_item['duendes_mini_gratis']) && $cart_item['duendes_mini_gratis']) {
                 WC()->cart->remove_cart_item($cart_item_key);
-                wc_add_notice('El mini de regalo fue removido porque ya no tenés ' . DUENDES_PROMO_GUARDIANES_REQUERIDOS . ' guardianes en el carrito.', 'notice');
+                $removidos++;
             }
+        }
+
+        if ($removidos > 0) {
+            wc_add_notice('Se ajustaron los minis de regalo según la cantidad de guardianes en tu carrito.', 'notice');
         }
     }
 }

@@ -8,31 +8,47 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic();
 
-// Obtener guardián de la semana desde KV (sincronizado de WooCommerce)
+// Obtener guardián de la semana desde rotación de Enero 2026
 async function obtenerGuardianSemana() {
-  // Primero intentar obtener el guardián configurado
-  const guardianActual = await kv.get('duende-semana-actual');
+  const ahora = new Date();
+  const año = ahora.getFullYear();
+  const mes = ahora.getMonth() + 1;
+  const dia = ahora.getDate();
+
+  // Determinar número de semana del mes
+  let semanaNum = 1;
+  if (dia >= 22) semanaNum = 4;
+  else if (dia >= 15) semanaNum = 3;
+  else if (dia >= 8) semanaNum = 2;
+
+  // Buscar en rotación semanal (datos nuevos - Gaia, Noah, Winter, Marcos)
+  const semanaKey = `circulo:duende-semana:${año}:${mes}:${semanaNum}`;
+  const semanaData = await kv.get(semanaKey);
+
+  if (semanaData?.guardian) {
+    return {
+      id: semanaData.guardian.slug,
+      nombre: semanaData.guardian.nombre,
+      nombreCompleto: semanaData.guardian.nombreCompleto,
+      imagen: semanaData.guardian.imagen,
+      especialidad: semanaData.tema,
+      color: semanaData.guardian.color
+    };
+  }
+
+  // Fallback: buscar en formato antiguo
+  const guardianActual = await kv.get('duende-semana:actual');
   if (guardianActual) {
     return guardianActual;
   }
 
-  // Si no hay, obtener de la lista de guardianes reales
-  const guardianes = await kv.get('duendes:guardianes');
-  if (guardianes && guardianes.length > 0) {
-    // Rotar basado en la semana del año
-    const ahora = new Date();
-    const inicioAno = new Date(ahora.getFullYear(), 0, 1);
-    const semanaDelAno = Math.ceil(((ahora - inicioAno) / 86400000 + inicioAno.getDay() + 1) / 7);
-    const indice = semanaDelAno % guardianes.length;
-    return guardianes[indice];
-  }
-
-  // Fallback a un guardián por defecto si no hay datos
+  // Fallback final a Marcos (semana 4 de enero)
   return {
-    id: 'finnian',
-    nombre: 'Finnian',
-    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/12/Finnian.jpg',
-    especialidad: 'protección y sabiduría ancestral'
+    id: 'marcos',
+    nombre: 'Marcos',
+    nombreCompleto: 'Marcos, Guardián de la Sabiduría',
+    imagen: 'https://duendesdeluruguay.com/wp-content/uploads/2025/03/Marcos-1.jpg',
+    especialidad: 'claridad y nueva perspectiva'
   };
 }
 
