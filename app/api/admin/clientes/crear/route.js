@@ -33,6 +33,7 @@ async function crearMagicLink(email) {
 }
 
 // Email de bienvenida para usuarios nuevos
+// Nota: Usar onboarding@resend.dev mientras no se verifique el dominio en Resend
 async function enviarEmailBienvenida(email, token, nombre, runasRegaladas = 0) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://duendes-vercel.vercel.app';
 
@@ -41,8 +42,8 @@ async function enviarEmailBienvenida(email, token, nombre, runasRegaladas = 0) {
     mensajeRunas = `<p style="background:#2d2d2d;padding:15px;border-radius:10px;margin:20px 0;">🎁 <strong>¡Regalo especial!</strong> Te dimos ${runasRegaladas} runas de bienvenida para que explores.</p>`;
   }
 
-  await resend.emails.send({
-    from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
+  const result = await resend.emails.send({
+    from: 'Duendes del Uruguay <onboarding@resend.dev>',
     to: email,
     subject: '✨ Tu portal a Mi Magia está listo',
     html: `
@@ -60,14 +61,22 @@ async function enviarEmailBienvenida(email, token, nombre, runasRegaladas = 0) {
       </div>
     `
   });
+
+  if (result.error) {
+    console.error('[CREAR CLIENTE] Error enviando email bienvenida:', result.error);
+    throw new Error(`Error enviando email: ${result.error.message}`);
+  }
+
+  return result;
 }
 
 // Email de magic link para usuarios existentes
+// Nota: Usar onboarding@resend.dev mientras no se verifique el dominio en Resend
 async function enviarMagicLink(email, magicToken, nombre) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://duendes-vercel.vercel.app';
 
-  await resend.emails.send({
-    from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
+  const result = await resend.emails.send({
+    from: 'Duendes del Uruguay <onboarding@resend.dev>',
     to: email,
     subject: '🔮 Tu enlace mágico para entrar',
     html: `
@@ -84,6 +93,13 @@ async function enviarMagicLink(email, magicToken, nombre) {
       </div>
     `
   });
+
+  if (result.error) {
+    console.error('[CREAR CLIENTE] Error enviando magic link:', result.error);
+    throw new Error(`Error enviando email: ${result.error.message}`);
+  }
+
+  return result;
 }
 
 // POST - Crear cliente o enviar magic link si existe

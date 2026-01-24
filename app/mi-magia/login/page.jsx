@@ -25,25 +25,18 @@ export default function LoginPage() {
     setEstado('enviando');
 
     try {
-      // Usar la API de crear cliente que maneja anti-duplicados
-      const res = await fetch('/api/admin/clientes/crear', {
+      // Usar la API de magic-link de Mi Magia (tiene rate limiting y email verificado)
+      const res = await fetch('/api/mi-magia/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          enviarEmail: true
-        })
+        body: JSON.stringify({ email })
       });
 
       const data = await res.json();
 
       if (data.success) {
         setEstado('enviado');
-        if (data.yaExistia) {
-          setMensaje('Te enviamos un enlace mágico a tu email. Revisá tu bandeja de entrada.');
-        } else {
-          setMensaje('¡Cuenta creada! Te enviamos un email de bienvenida con tu acceso.');
-        }
+        setMensaje('Te enviamos un enlace mágico a tu email. Revisá tu bandeja de entrada.');
       } else {
         setEstado('error');
         setMensaje(data.error || 'Algo salió mal. Intentá de nuevo.');
