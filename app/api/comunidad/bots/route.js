@@ -63,19 +63,25 @@ const PERFILES_BOT = [
 // NOMBRES DE GUARDIANES FICTICIOS (únicos, creíbles, NO existen en la web)
 // Para posts donde dicen que "compraron" un guardián - cada nombre solo aparece 1 vez
 // ═══════════════════════════════════════════════════════════════════════════════
+// IMPORTANTE: Estos nombres NO existen en la web de Duendes del Uruguay
+// Verificado contra la lista real de guardianes - ninguno de estos es real
 const GUARDIANES_FICTICIOS = [
-  // Nombres místicos/célticos
+  // Nombres célticos/irlandeses (no usados en la web)
   'Eileen', 'Brigid', 'Fionn', 'Aisling', 'Ronan', 'Niamh', 'Cormac', 'Sorcha',
-  // Nombres nórdicos/vikingos
-  'Sigrid', 'Thorin', 'Freya', 'Ragnar', 'Astrid', 'Leif', 'Ingrid', 'Bjorn',
-  // Nombres de naturaleza
-  'Roble', 'Sauce', 'Cedro', 'Helecho', 'Musgo', 'Ámbar', 'Coral', 'Jade',
-  // Nombres esotéricos
-  'Selene', 'Orion', 'Vega', 'Lyra', 'Nova', 'Luna', 'Sol', 'Estrella',
+  'Declan', 'Siobhan', 'Padraig', 'Aoife', 'Ciaran', 'Maeve', 'Oisin', 'Roisin',
+  // Nombres nórdicos (SIN los que son reales: Freya, Astrid, Björn)
+  'Sigrid', 'Thorin', 'Ragnar', 'Leif', 'Ingrid', 'Gunnar', 'Helga', 'Harald',
+  'Thyra', 'Ivar', 'Solveig', 'Magnus', 'Sigurd', 'Hilda', 'Olaf', 'Dagny',
+  // Nombres de naturaleza (SIN los que son reales: Jade)
+  'Roble', 'Sauce', 'Cedro', 'Helecho', 'Musgo', 'Ámbar', 'Coral', 'Hiedra',
+  'Liquen', 'Brezo', 'Tejo', 'Fresno', 'Saúco', 'Acebo', 'Abeto', 'Ciprés',
+  // Nombres esotéricos (SIN los que son reales: Selene)
+  'Orion', 'Vega', 'Lyra', 'Nova', 'Cassio', 'Polaris', 'Rigel', 'Altais',
+  'Deneb', 'Capella', 'Sirio', 'Mira', 'Electra', 'Alcyone', 'Castor', 'Antares',
   // Nombres simples místicos
-  'Alma', 'Luz', 'Paz', 'Vida', 'Fe', 'Alba', 'Cielo', 'Mar',
-  // Nombres latinos
-  'Aurelio', 'Cassia', 'Dario', 'Elena', 'Flavia', 'Gala', 'Helena', 'Iris'
+  'Alma', 'Luz', 'Paz', 'Vida', 'Fe', 'Alba', 'Cielo', 'Brisa',
+  // Nombres medievales/fantásticos (verificados que no existen)
+  'Gwendolyn', 'Aldric', 'Rowena', 'Cedric', 'Elara', 'Theron', 'Isolde', 'Gareth'
 ];
 
 // Guardianes MINI (estos SÍ pueden repetirse porque varias personas los tienen)
@@ -107,16 +113,16 @@ const POSTS_PREGENERADOS = [
   { tipo: 'pregunta', contenido: '¿Los audios de meditación se pueden descargar? Me gustaría escucharlos sin wifi', likes: 41, respuestas: 12 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
-  // EXPERIENCIAS CON GUARDIANES ÚNICOS (nombres ficticios, cada uno aparece 1 sola vez)
+  // EXPERIENCIAS CON GUARDIANES ÚNICOS (nombres ficticios verificados, cada uno aparece 1 sola vez)
   // ═══════════════════════════════════════════════════════════════════════════════
   { tipo: 'experiencia', guardian: 'Eileen', contenido: 'Mi Eileen llegó ayer y ya siento la diferencia. Dormí como no dormía hace meses. Ella me protege 💚', likes: 89, respuestas: 15 },
   { tipo: 'experiencia', guardian: 'Thorin', contenido: 'Thorin es imponente. Cuando lo vi supe que era para mí. Desde que está conmigo me siento más fuerte', likes: 112, respuestas: 19 },
-  { tipo: 'experiencia', guardian: 'Selene', contenido: 'Adopté a Selene en luna llena y fue la mejor decisión. Su energía lunar me acompaña cada noche ✨', likes: 134, respuestas: 24 },
+  { tipo: 'experiencia', guardian: 'Orion', contenido: 'Adopté a Orion en luna llena y fue la mejor decisión. Su energía estelar me acompaña cada noche ✨', likes: 134, respuestas: 24 },
   { tipo: 'experiencia', guardian: 'Roble', contenido: 'Mi Roble es inmenso y me da una sensación de arraigo increíble. Es mi ancla a tierra cuando todo se mueve', likes: 98, respuestas: 17 },
   { tipo: 'experiencia', guardian: 'Brigid', contenido: 'Brigid me eligió a mí, no al revés. La vi y sentí que me llamaba. Ahora entiendo el significado de conexión', likes: 145, respuestas: 28 },
   { tipo: 'experiencia', guardian: 'Ámbar', contenido: 'Mi pequeña Ámbar brilla diferente con la luz del sol. La pongo en la ventana y siento su calor todo el día 🌅', likes: 78, respuestas: 13 },
   { tipo: 'experiencia', guardian: 'Fionn', contenido: 'Fionn me está enseñando paciencia. Cada vez que me acelero, siento su presencia que me calma', likes: 87, respuestas: 16 },
-  { tipo: 'experiencia', guardian: 'Astrid', contenido: 'Mi vikinga Astrid es guerrera como yo. Juntas estamos enfrentando cosas que antes me daban miedo', likes: 156, respuestas: 31 },
+  { tipo: 'experiencia', guardian: 'Sigrid', contenido: 'Mi vikinga Sigrid es guerrera como yo. Juntas estamos enfrentando cosas que antes me daban miedo', likes: 156, respuestas: 31 },
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // EXPERIENCIAS CON GUARDIANES MINI (estos SÍ pueden repetirse)
