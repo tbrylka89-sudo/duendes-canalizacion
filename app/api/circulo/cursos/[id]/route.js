@@ -1,9 +1,38 @@
 import { kv } from '@vercel/kv';
-import {
-  getSemanaDelMes,
-  moduloDesbloqueado,
-  calcularProgresoCurso
-} from '@/lib/cursos/cursos-data';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS (migradas del viejo sistema)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function getSemanaDelMes() {
+  const hoy = new Date();
+  const dia = hoy.getDate();
+  if (dia <= 7) return 'S1';
+  if (dia <= 14) return 'S2';
+  if (dia <= 21) return 'S3';
+  return 'S4';
+}
+
+function moduloDesbloqueado(modulo, curso) {
+  // Si el curso está en modo libre, todos los módulos están desbloqueados
+  if (curso.modoLibre) return true;
+
+  // Obtener semana actual
+  const semanaActual = getSemanaDelMes();
+  const semanaNum = parseInt(semanaActual.replace('S', ''));
+
+  // Un módulo está desbloqueado si su número es <= a la semana actual
+  return modulo.numero <= semanaNum;
+}
+
+function calcularProgresoCurso(curso, modulosCompletadosIds) {
+  if (!curso.modulos || curso.modulos.length === 0) return 0;
+
+  const totalModulos = curso.modulos.length;
+  const completados = modulosCompletadosIds?.length || 0;
+
+  return Math.round((completados / totalModulos) * 100);
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: CURSO INDIVIDUAL PARA MIEMBROS DEL CIRCULO
