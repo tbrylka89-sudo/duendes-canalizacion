@@ -27,6 +27,30 @@ function safeRender(value) {
   return String(value);
 }
 
+// Limpiar localStorage viejo que puede causar errores
+function limpiarLocalStorageViejo() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const version = localStorage.getItem('circulo_version');
+    // Si no hay version o es vieja, limpiar datos del círculo
+    if (version !== '2.0') {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('circulo_') || key.startsWith('guardian_') || key.startsWith('consejo_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      localStorage.setItem('circulo_version', '2.0');
+      console.log('[Círculo] localStorage limpiado - versión actualizada a 2.0');
+    }
+  } catch (e) {
+    console.error('Error limpiando localStorage:', e);
+  }
+}
+
 // Error Boundary para capturar errores de React
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -2255,6 +2279,8 @@ function CirculoPageInterno() {
   const [diasTrial, setDiasTrial] = useState(null);
 
   useEffect(() => {
+    // Limpiar localStorage viejo al cargar
+    limpiarLocalStorageViejo();
     verificarAcceso();
   }, []);
 
