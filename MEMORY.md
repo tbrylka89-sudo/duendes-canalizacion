@@ -435,7 +435,7 @@ Lo que la gente PIDE (para tener en cuenta al generar historias):
 - [x] Mejorar prompts de cursos con reglas CLAUDE.md ✅
 - [x] Deploy a Vercel ✅
 - [x] Probar APIs en producción ✅
-- [ ] Aprovechar Gemini para contenido diario (más económico)
+- [x] Aprovechar Gemini para contenido diario ✅ (Gemini 2.0 Flash como primario, Claude fallback)
 - [ ] Investigar duendes duplicados en foro
 - [ ] Arreglar formato consejo-del-dia (asteriscos extra)
 
