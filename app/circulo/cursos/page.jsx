@@ -22,19 +22,24 @@ export default function CursosPage() {
   async function cargarDatos() {
     setCargando(true);
     try {
-      // Cargar perfil del usuario
-      const perfilRes = await fetch('/api/circulo/perfil');
-      const perfilData = await perfilRes.json();
-      if (perfilData.success) {
-        setPerfil(perfilData.perfil);
+      // Cargar perfil del usuario (opcional, no bloquea)
+      try {
+        const perfilRes = await fetch('/api/circulo/perfil');
+        const perfilData = await perfilRes.json();
+        if (perfilData.success) {
+          setPerfil(perfilData.perfil);
+        }
+      } catch (e) {
+        console.log('Perfil no disponible, continuando sin login');
       }
 
       // Cargar cursos publicados desde la nueva API de academia
-      const cursosRes = await fetch('/api/circulo/academia?progreso=true');
+      const cursosRes = await fetch('/api/circulo/academia');
       const cursosData = await cursosRes.json();
 
-      if (cursosData.success && cursosData.cursos) {
-        // La API ya devuelve cursos con progreso incluido
+      console.log('Respuesta API cursos:', cursosData);
+
+      if (cursosData.success && cursosData.cursos && cursosData.cursos.length > 0) {
         setCursosConProgreso(cursosData.cursos.map(c => ({
           ...c,
           titulo: c.titulo,
@@ -42,8 +47,8 @@ export default function CursosPage() {
           imagen: c.imagen,
           progreso: c.progreso || { porcentaje: 0 }
         })));
-
-        // TODO: cargar badges del usuario
+      } else {
+        console.warn('No hay cursos o respuesta inesperada:', cursosData);
       }
     } catch (err) {
       console.error('Error cargando cursos:', err);
