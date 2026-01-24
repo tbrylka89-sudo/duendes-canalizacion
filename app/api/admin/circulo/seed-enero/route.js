@@ -108,6 +108,48 @@ export async function POST(request) {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // 5. Actualizar duende-semana:actual con el guardian de la semana actual
+    // ═══════════════════════════════════════════════════════════════════════════
+    try {
+      const ahora = new Date();
+      const dia = ahora.getDate();
+      let semanaActual = 'semana1';
+      if (dia >= 22) semanaActual = 'semana4';
+      else if (dia >= 15) semanaActual = 'semana3';
+      else if (dia >= 8) semanaActual = 'semana2';
+
+      const rotacionActual = ROTACION_ENERO_2026[semanaActual];
+      const guardianActual = GUARDIANES_MAESTROS[rotacionActual.guardian];
+
+      await kv.set('duende-semana:actual', {
+        nombre: guardianActual.nombre,
+        nombreCompleto: guardianActual.nombreCompleto,
+        imagen: guardianActual.imagen,
+        categoria: guardianActual.categoria,
+        descripcion: rotacionActual.descripcion,
+        proposito: rotacionActual.tema,
+        elemento: guardianActual.elemento,
+        cristales: guardianActual.cristales,
+        color: guardianActual.color,
+        saludo: guardianActual.saludo,
+        despedida: guardianActual.despedida,
+        frasesTipicas: guardianActual.frasesTipicas,
+        personalidad: guardianActual.personalidad,
+        historia: guardianActual.historia,
+        temas: guardianActual.temas,
+        fechaInicio: rotacionActual.inicio,
+        fechaFin: rotacionActual.fin
+      });
+      resultados.duendeActual = guardianActual.nombre;
+    } catch (error) {
+      resultados.errores.push({
+        tipo: 'duendeActual',
+        key: 'duende-semana:actual',
+        error: error.message
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // 5. Generar resumen
     // ═══════════════════════════════════════════════════════════════════════════
     const resumen = {
