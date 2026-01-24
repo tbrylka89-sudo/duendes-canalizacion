@@ -82,7 +82,6 @@ export async function GET(request) {
     const portal = obtenerPortalActual();
 
     // Calcular días restantes de la semana
-    const ahora = new Date();
     const finSemana = new Date(duendeActual.fechaFin);
     const diasRestantes = Math.max(0, Math.ceil((finSemana - ahora) / (1000 * 60 * 60 * 24)));
 
