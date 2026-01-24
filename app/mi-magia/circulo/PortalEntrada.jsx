@@ -6,6 +6,19 @@ import { useState, useEffect, useRef } from 'react';
 // Experiencia inmersiva: bosque mágico + guardián del día
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// Helper para renderizar valores de forma segura (evita React error #31)
+function safeRender(value) {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string' || typeof value === 'number') return value;
+  if (Array.isArray(value)) return value.map(v => safeRender(v)).join(', ');
+  if (typeof value === 'object') {
+    if (value.nombre) return value.nombre;
+    if (value.texto) return value.texto;
+    try { return JSON.stringify(value); } catch { return ''; }
+  }
+  return String(value);
+}
+
 export default function PortalEntrada({ onEntrar, usuarioNombre }) {
   const [fase, setFase] = useState('cargando'); // cargando, bosque, guardian, transicion
   const [duendeDelDia, setDuendeDelDia] = useState(null);
@@ -163,17 +176,17 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
             {/* Info del guardián */}
             <div className="guardian-info">
               <span className="guardian-tipo">
-                {duendeDelDia.guardian?.tipo_ser_nombre} de {duendeDelDia.guardian?.categoria}
+                {safeRender(duendeDelDia.guardian?.tipo_ser_nombre)} de {safeRender(duendeDelDia.guardian?.categoria)}
               </span>
-              <h2 className="guardian-nombre">{duendeDelDia.guardian?.nombre}</h2>
-              <p className="guardian-arquetipo">{duendeDelDia.guardian?.arquetipo}</p>
+              <h2 className="guardian-nombre">{safeRender(duendeDelDia.guardian?.nombre)}</h2>
+              <p className="guardian-arquetipo">{safeRender(duendeDelDia.guardian?.arquetipo)}</p>
             </div>
 
             {/* Mensaje del día */}
             <div className="mensaje-del-dia">
-              <p className="mensaje-saludo">{duendeDelDia.mensaje?.saludo}</p>
-              <p className="mensaje-principal">{duendeDelDia.mensaje?.mensaje}</p>
-              <p className="mensaje-consejo">{duendeDelDia.mensaje?.consejo}</p>
+              <p className="mensaje-saludo">{safeRender(duendeDelDia.mensaje?.saludo)}</p>
+              <p className="mensaje-principal">{safeRender(duendeDelDia.mensaje?.mensaje)}</p>
+              <p className="mensaje-consejo">{safeRender(duendeDelDia.mensaje?.consejo)}</p>
             </div>
 
             {/* Botón de entrada */}
@@ -184,8 +197,8 @@ export default function PortalEntrada({ onEntrar, usuarioNombre }) {
 
             {/* Portal actual */}
             <div className="portal-actual">
-              <span className="portal-nombre">{duendeDelDia.portal_actual?.nombre}</span>
-              <span className="portal-energia">{duendeDelDia.portal_actual?.energia}</span>
+              <span className="portal-nombre">{safeRender(duendeDelDia.portal_actual?.nombre)}</span>
+              <span className="portal-energia">{safeRender(duendeDelDia.portal_actual?.energia)}</span>
             </div>
           </div>
         )}

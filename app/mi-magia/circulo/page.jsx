@@ -12,6 +12,21 @@ import Onboarding from './Onboarding';
 // MODO MANTENIMIENTO - Cambiar a false cuando esté todo funcionando
 const MODO_MANTENIMIENTO = false;
 
+// Helper para renderizar valores de forma segura (evita React error #31)
+function safeRender(value) {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string' || typeof value === 'number') return value;
+  if (typeof value === 'boolean') return value ? 'sí' : 'no';
+  if (Array.isArray(value)) return value.map(v => safeRender(v)).join(', ');
+  if (typeof value === 'object') {
+    if (value.nombre) return value.nombre;
+    if (value.texto) return value.texto;
+    if (value.titulo) return value.titulo;
+    try { return JSON.stringify(value); } catch { return '[objeto]'; }
+  }
+  return String(value);
+}
+
 // Error Boundary para capturar errores de React
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -2031,14 +2046,14 @@ function BienvenidaGuardian({ usuario, onContinuar }) {
         {/* Info del guardián */}
         <div className="guardian-info">
           <span className="guardian-tag">Guardián de la Semana</span>
-          <h1>{guardian?.nombre}</h1>
-          <p className="guardian-especialidad">✦ {guardian?.especialidad}</p>
+          <h1>{safeRender(guardian?.nombre)}</h1>
+          <p className="guardian-especialidad">✦ {safeRender(guardian?.especialidad)}</p>
         </div>
 
         {/* Mensaje personalizado */}
         <div className="mensaje-container">
           <div className="mensaje-burbuja">
-            {(mensaje || '').split('\n\n').map((parrafo, i) => (
+            {(safeRender(mensaje) || '').split('\n\n').map((parrafo, i) => (
               <p key={i}>{parrafo}</p>
             ))}
           </div>

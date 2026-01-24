@@ -618,6 +618,51 @@ Ruta mu-plugins: web/wp-live/wp-content/mu-plugins/
 | `duendes-carrito-abandonado.php` | Emails carrito abandonado |
 | `duendes-fabrica-banners.php` | Sistema de banners inteligentes |
 | `duendes-promo-3x2.php` | Promoción 3x2 |
+| `duendes-formulario-canalizacion.php` | **PENDIENTE** - Formulario checkout para canalizaciones |
+
+### TAREAS PENDIENTES
+
+#### Formulario de Canalización en Checkout
+**Estado:** PENDIENTE - No implementado
+
+El checkout necesita un formulario especial que aparezca cuando el cliente compra un guardián. Este formulario recopila la información necesaria para generar la canalización personalizada.
+
+**Campos requeridos según escenario:**
+
+**A) Compra para uno mismo:**
+- Nombre completo
+- ¿Qué momento de tu vida estás atravesando? (textarea)
+- ¿Qué buscás o necesitás en este momento? (textarea)
+- ¿Hay algo específico que te gustaría que tu guardián supiera? (textarea)
+- Subida de foto (rostro bien iluminado) - **Solo mayores de 18**
+- Checkbox: "Es para mí" / "Es un regalo"
+
+**B) Si es regalo - preguntar:**
+- ¿Es sorpresa? Sí/No
+- Email del destinatario (si NO es sorpresa, para enviarle el formulario)
+- Si ES sorpresa:
+  - Nombre del destinatario
+  - Tu relación con esta persona
+  - ¿Qué momento está atravesando?
+  - ¿Qué te gustaría que sintiera al recibir esto?
+  - Mensaje personal para incluir (opcional)
+  - Foto del destinatario (opcional) - **Solo mayores de 18**
+
+**Diseño:**
+- Estética oscura coherente con el sitio (#0a0a0a, #c9a227)
+- Tipografía: Cinzel para títulos, Cormorant Garamond para texto
+- Campos con bordes dorados sutiles
+- Transiciones suaves
+- Validación clara y amigable
+
+**Hooks WooCommerce a usar:**
+- `woocommerce_before_order_notes` o `woocommerce_after_order_notes`
+- `woocommerce_checkout_update_order_meta` para guardar datos
+- Campos deben guardarse como order meta
+
+**Archivo a crear:** `duendes-formulario-canalizacion.php`
+
+---
 
 ### Lecciones Técnicas Importantes
 

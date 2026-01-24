@@ -10,6 +10,28 @@ import { obtenerGuardianPorFecha, obtenerSemanaActual, GUARDIANES_MAESTROS } fro
 // URLs centralizadas - cambiar aquí cuando migre el dominio
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
 
+// Helper para renderizar valores de forma segura (evita React error #31)
+// Convierte objetos a string para prevenir "Objects are not valid as React child"
+function safeRender(value) {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string' || typeof value === 'number') return value;
+  if (typeof value === 'boolean') return value ? 'sí' : 'no';
+  if (Array.isArray(value)) return value.map(v => safeRender(v)).join(', ');
+  if (typeof value === 'object') {
+    // Si es un objeto, intentar extraer campos comunes o convertir a string
+    if (value.nombre) return value.nombre;
+    if (value.texto) return value.texto;
+    if (value.titulo) return value.titulo;
+    if (value.mensaje) return value.mensaje;
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return '[objeto]';
+    }
+  }
+  return String(value);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENTE: INDICADORES DE COMUNIDAD EN VIVO
 // Muestra actividad simulada de la comunidad (social proof)
@@ -88,16 +110,16 @@ function ComunidadIndicadores() {
       <div className="comunidad-stats-bar">
         <div className="stat-item">
           <span className="stat-dot verde"></span>
-          <span>{actividad?.viendoAhora || 12} personas viendo ahora</span>
+          <span>{safeRender(actividad?.viendoAhora) || 12} personas viendo ahora</span>
         </div>
         <div className="stat-item">
           <span className="stat-icon">👥</span>
-          <span>{stats.totalMiembros} guardianas en el Círculo</span>
+          <span>{safeRender(stats.totalMiembros)} guardianas en el Círculo</span>
         </div>
         {actividad?.escribiendo && (
           <div className="stat-item escribiendo">
             <span className="stat-icon">✍️</span>
-            <span>{actividad.escribiendo} está escribiendo...</span>
+            <span>{safeRender(actividad.escribiendo)} está escribiendo...</span>
           </div>
         )}
       </div>
@@ -105,11 +127,11 @@ function ComunidadIndicadores() {
       {/* Notificación de compra (toast) */}
       {mostrarCompra && actividad?.ultimaCompra && (
         <div className="toast-compra">
-          <div className="toast-avatar">{actividad.ultimaCompra.pais}</div>
+          <div className="toast-avatar">{safeRender(actividad.ultimaCompra.pais)}</div>
           <div className="toast-info">
-            <strong>{actividad.ultimaCompra.nombre}</strong>
-            <span>adoptó a {actividad.ultimaCompra.guardian}</span>
-            <small>hace {actividad.ultimaCompra.hace}</small>
+            <strong>{safeRender(actividad.ultimaCompra.nombre)}</strong>
+            <span>adoptó a {safeRender(actividad.ultimaCompra.guardian)}</span>
+            <small>hace {safeRender(actividad.ultimaCompra.hace)}</small>
           </div>
         </div>
       )}
@@ -1332,8 +1354,8 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
       {infoVisita?.mostrarMensaje && !esPrimeraVisita && mensajeVisible && (
         <div className={`mensaje-visita-toast ${infoVisita.tipoMensaje} ${!mensajeVisible ? 'oculto' : ''}`}>
           <div className="toast-contenido">
-            <span className="toast-titulo">{infoVisita.mensaje?.titulo}</span>
-            <span className="toast-texto">{infoVisita.mensaje?.texto}</span>
+            <span className="toast-titulo">{safeRender(infoVisita.mensaje?.titulo)}</span>
+            <span className="toast-texto">{safeRender(infoVisita.mensaje?.texto)}</span>
           </div>
           <button className="toast-cerrar" onClick={() => setMensajeVisible(false)}>×</button>
         </div>
@@ -1348,7 +1370,7 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
             </div>
             <div className="consejo-titulo-wrap">
               <span className="consejo-etiqueta">Mensaje para vos</span>
-              <h3 className="consejo-titulo">{consejo.consejo?.titulo}</h3>
+              <h3 className="consejo-titulo">{safeRender(consejo.consejo?.titulo)}</h3>
             </div>
             <button className="btn-regenerar" onClick={regenerarConsejo} disabled={cargandoConsejo}>
               {cargandoConsejo ? '...' : '↻'}
@@ -1359,13 +1381,13 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
               <p className="cargando-consejo">Generando mensaje...</p>
             ) : (
               <>
-                <p className="consejo-mensaje">{consejo.consejo?.mensaje}</p>
-                <p className="consejo-reflexion">"{consejo.consejo?.reflexion}"</p>
+                <p className="consejo-mensaje">{safeRender(consejo.consejo?.mensaje)}</p>
+                <p className="consejo-reflexion">"{safeRender(consejo.consejo?.reflexion)}"</p>
               </>
             )}
           </div>
           <div className="consejo-footer">
-            <span>Semana {consejo.semana} • {consejo.diasRestantes} días más con {consejo.guardian?.nombre}</span>
+            <span>Semana {safeRender(consejo.semana)} • {safeRender(consejo.diasRestantes)} días más con {safeRender(consejo.guardian?.nombre)}</span>
           </div>
         </div>
       )}
@@ -1373,7 +1395,7 @@ function SeccionInicio({ guardianSemana, portalActual, usuario, onCambiarSeccion
       {/* Bienvenida */}
       <div className="bienvenida">
         <h2>{personalizarGenero(`Bienvenido/a al Círculo, ${nombreUsuario}`)}</h2>
-        <p>Estamos en el {portalActual?.nombre} - {portalActual?.energia}</p>
+        <p>Estamos en el {safeRender(portalActual?.nombre)} - {safeRender(portalActual?.energia)}</p>
         {infoVisita && infoVisita.visitaNumero > 1 && (
           <span className="visita-contador">Visita #{infoVisita.visitaNumero} de hoy</span>
         )}
@@ -2799,8 +2821,8 @@ function SeccionContenido() {
                   <div className="ritual-header">
                     <span className="ritual-icono">🕯️</span>
                     <div className="ritual-info">
-                      <h4 className="ritual-nombre">{contenidoActivo.ritual.nombre}</h4>
-                      <span className="ritual-duracion">{contenidoActivo.ritual.duracion}</span>
+                      <h4 className="ritual-nombre">{safeRender(contenidoActivo.ritual.nombre)}</h4>
+                      <span className="ritual-duracion">{safeRender(contenidoActivo.ritual.duracion)}</span>
                     </div>
                   </div>
 
@@ -2809,7 +2831,7 @@ function SeccionContenido() {
                       <h5>Materiales</h5>
                       <ul>
                         {contenidoActivo.ritual.materiales.map((m, i) => (
-                          <li key={i}>{m}</li>
+                          <li key={i}>{safeRender(m)}</li>
                         ))}
                       </ul>
                     </div>
@@ -2820,10 +2842,10 @@ function SeccionContenido() {
                       <h5>Pasos del Ritual</h5>
                       {contenidoActivo.ritual.pasos.map((paso, i) => (
                         <div key={i} className="ritual-paso">
-                          <div className="paso-numero">{paso.numero || i + 1}</div>
+                          <div className="paso-numero">{safeRender(paso.numero) || i + 1}</div>
                           <div className="paso-contenido">
-                            <h6>{paso.titulo}</h6>
-                            <p>{paso.descripcion}</p>
+                            <h6>{safeRender(paso.titulo)}</h6>
+                            <p>{safeRender(paso.descripcion)}</p>
                           </div>
                         </div>
                       ))}
