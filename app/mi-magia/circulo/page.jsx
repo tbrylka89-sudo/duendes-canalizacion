@@ -3,6 +3,7 @@ import { useState, useEffect, Component } from 'react';
 import PortalEntrada from './PortalEntrada';
 import CirculoDashboard from './Dashboard';
 import Onboarding from './Onboarding';
+import { Tito } from '../components/Tito';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PÁGINA PRINCIPAL DEL CÍRCULO DE DUENDES
@@ -2277,6 +2278,7 @@ function CirculoPageInterno() {
   const [estado, setEstado] = useState('verificando');
   const [usuario, setUsuario] = useState(null);
   const [diasTrial, setDiasTrial] = useState(null);
+  const [chatAbierto, setChatAbierto] = useState(false);
 
   useEffect(() => {
     // Limpiar localStorage viejo al cargar
@@ -2286,7 +2288,10 @@ function CirculoPageInterno() {
 
   async function verificarAcceso() {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get('token') || localStorage.getItem('circulo_token');
+    // Intentar múltiples fuentes de token
+    const token = params.get('token')
+      || localStorage.getItem('circulo_token')
+      || localStorage.getItem('mimagia_token'); // Fallback a Mi Magia
 
     if (!token) {
       setEstado('landing');
@@ -2361,108 +2366,118 @@ function CirculoPageInterno() {
     setEstado('onboarding');
   }
 
-  // VERIFICANDO
-  if (estado === 'verificando') {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#050508',
-        color: '#fff',
-        fontFamily: "'Cormorant Garamond', serif"
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            fontSize: '60px',
-            color: '#d4af37',
-            animation: 'pulse 2s ease-in-out infinite'
-          }}>ᚱ</div>
-          <p style={{ marginTop: '20px', color: 'rgba(255,255,255,0.6)' }}>
-            Verificando acceso al Círculo...
-          </p>
-        </div>
-        <style jsx>{`
-          @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  // LANDING (NO ACCESO) - Con modal de trial superpuesto
-  if (estado === 'landing' || estado === 'trial_form') {
-    return (
-      <>
-        <div className={estado === 'trial_form' ? 'landing-blur' : ''}>
-          <LandingCirculo onTrialClick={() => setEstado('trial_form')} />
-        </div>
-        {estado === 'trial_form' && (
-          <ModalTrialPrueba
-            onCerrar={() => setEstado('landing')}
-            onExito={handleTrialExito}
-          />
-        )}
-        <style jsx>{`
-          .landing-blur {
-            filter: blur(5px);
-            pointer-events: none;
-          }
-        `}</style>
-      </>
-    );
-  }
-
-  // ONBOARDING
-  if (estado === 'onboarding') {
-    return (
-      <Onboarding
-        email={usuario?.email}
-        nombreInicial={usuario?.nombre}
-        onComplete={handleOnboardingComplete}
-      />
-    );
-  }
-
-  // BIENVENIDA DEL GUARDIÁN DE LA SEMANA
-  if (estado === 'bienvenida') {
-    return (
-      <BienvenidaGuardian
-        usuario={usuario}
-        onContinuar={() => setEstado('portal')}
-      />
-    );
-  }
-
-  // PORTAL
-  if (estado === 'portal') {
-    return (
-      <PortalEntrada
-        onEntrar={handleEntrarAlCirculo}
-        usuarioNombre={usuario?.nombrePreferido || usuario?.nombre}
-      />
-    );
-  }
-
-  // DASHBOARD
-  if (estado === 'dashboard') {
-    return (
-      <>
-        {usuario?.membresia?.esTrial && diasTrial > 0 && (
-          <div style={{ padding: '20px 20px 0', maxWidth: '1200px', margin: '0 auto' }}>
-            <TrialBanner
-              diasRestantes={diasTrial}
-              onSuscribirse={() => window.open(`${WORDPRESS_URL}/producto/circulo-anual/`, '_blank')}
-            />
+  // Función para renderizar contenido según estado (Tito se renderiza siempre al final)
+  const renderContenidoEstado = () => {
+    // VERIFICANDO
+    if (estado === 'verificando') {
+      return (
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#050508',
+          color: '#fff',
+          fontFamily: "'Cormorant Garamond', serif"
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontSize: '60px',
+              color: '#d4af37',
+              animation: 'pulse 2s ease-in-out infinite'
+            }}>ᚱ</div>
+            <p style={{ marginTop: '20px', color: 'rgba(255,255,255,0.6)' }}>
+              Verificando acceso al Círculo...
+            </p>
           </div>
-        )}
-        <CirculoDashboard usuario={usuario} />
-      </>
-    );
-  }
+          <style jsx>{`
+            @keyframes pulse {
+              0%, 100% { opacity: 0.5; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.1); }
+            }
+          `}</style>
+        </div>
+      );
+    }
 
-  return null;
+    // LANDING (NO ACCESO) - Con modal de trial superpuesto
+    if (estado === 'landing' || estado === 'trial_form') {
+      return (
+        <>
+          <div className={estado === 'trial_form' ? 'landing-blur' : ''}>
+            <LandingCirculo onTrialClick={() => setEstado('trial_form')} />
+          </div>
+          {estado === 'trial_form' && (
+            <ModalTrialPrueba
+              onCerrar={() => setEstado('landing')}
+              onExito={handleTrialExito}
+            />
+          )}
+          <style jsx>{`
+            .landing-blur {
+              filter: blur(5px);
+              pointer-events: none;
+            }
+          `}</style>
+        </>
+      );
+    }
+
+    // ONBOARDING
+    if (estado === 'onboarding') {
+      return (
+        <Onboarding
+          email={usuario?.email}
+          nombreInicial={usuario?.nombre}
+          onComplete={handleOnboardingComplete}
+        />
+      );
+    }
+
+    // BIENVENIDA DEL GUARDIÁN DE LA SEMANA
+    if (estado === 'bienvenida') {
+      return (
+        <BienvenidaGuardian
+          usuario={usuario}
+          onContinuar={() => setEstado('portal')}
+        />
+      );
+    }
+
+    // PORTAL
+    if (estado === 'portal') {
+      return (
+        <PortalEntrada
+          onEntrar={handleEntrarAlCirculo}
+          usuarioNombre={usuario?.nombrePreferido || usuario?.nombre}
+        />
+      );
+    }
+
+    // DASHBOARD
+    if (estado === 'dashboard') {
+      return (
+        <>
+          {usuario?.membresia?.esTrial && diasTrial > 0 && (
+            <div style={{ padding: '20px 20px 0', maxWidth: '1200px', margin: '0 auto' }}>
+              <TrialBanner
+                diasRestantes={diasTrial}
+                onSuscribirse={() => window.open(`${WORDPRESS_URL}/producto/circulo-anual/`, '_blank')}
+              />
+            </div>
+          )}
+          <CirculoDashboard usuario={usuario} />
+        </>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <>
+      {renderContenidoEstado()}
+      {estado !== 'verificando' && <Tito usuario={usuario} abierto={chatAbierto} setAbierto={setChatAbierto} />}
+    </>
+  );
 }
