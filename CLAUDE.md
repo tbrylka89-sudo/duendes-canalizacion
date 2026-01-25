@@ -1048,9 +1048,14 @@ if (dicePais && yaSeVieronProductos) {
 - **Solución:** Removido `let` de la segunda definición
 - **Estado actual:** Deploy funcionando, endpoint activo
 
-#### ❌ Links de Tito deben ser clickeables
-- **Problema:** Los links que da Tito hay que copiar y pegar, no son clickeables
-- **Ubicación:** Verificar en `duendes-tito-widget.php` función `agregarMensaje()`
+#### ✅ Links de Tito clickeables - CORREGIDO 25/01/2026
+- **Problema original:** Los links que daba Tito había que copiar y pegar
+- **Causa:** La función `formatearTexto()` no convertía links markdown ni URLs a HTML
+- **Solución:** Agregado soporte para:
+  - Links markdown: `[texto](url)` → `<a href="url">texto</a>`
+  - URLs sueltas: `https://...` → `<a href="url">url</a>`
+  - Estilos CSS para links (color dorado, subrayado, hover)
+- **Archivo:** `wordpress-plugins/duendes-tito-widget.php` líneas 881-884
 
 ---
 

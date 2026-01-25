@@ -426,6 +426,19 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
     margin-bottom: 0 !important;
 }
 
+.tito-msg.bot a {
+    color: var(--tito-dorado-claro) !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px !important;
+    transition: color 0.2s !important;
+    word-break: break-word !important;
+}
+
+.tito-msg.bot a:hover {
+    color: var(--tito-dorado) !important;
+    text-decoration-color: var(--tito-dorado) !important;
+}
+
 .tito-msg.user {
     background: linear-gradient(135deg, var(--tito-dorado), var(--tito-dorado-oscuro)) !important;
     color: var(--tito-negro) !important;
@@ -879,6 +892,10 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         if (!texto) return '';
         // Convertir markdown básico a HTML
         return texto
+            // Links markdown [texto](url)
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+            // URLs sueltas (que no estén ya en un href)
+            .replace(/(?<!href="|">)(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
             // Negritas **texto** o __texto__
             .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
             .replace(/__([^_]+)__/g, '<strong>$1</strong>')
