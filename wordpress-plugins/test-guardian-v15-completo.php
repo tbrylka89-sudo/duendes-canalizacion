@@ -2,9 +2,445 @@
 /*
 Plugin Name: Test Guardian v15 - SISTEMA COMPLETO
 Description: Test del Guardian con perfilado psicologico, productos reales y sincronicidades
-Version: 15.0
+Version: 15.1
 */
 if (!defined('ABSPATH')) exit;
+
+// ===== ENDPOINT AJAX PARA PROCESAR RESULTADOS (sin depender de Vercel) =====
+add_action('wp_ajax_nopriv_tg_analizar', 'tg_analizar_resultados');
+add_action('wp_ajax_tg_analizar', 'tg_analizar_resultados');
+
+// Endpoint para enviar email con resultados
+add_action('wp_ajax_nopriv_tg_enviar_email', 'tg_enviar_email');
+add_action('wp_ajax_tg_enviar_email', 'tg_enviar_email');
+
+function tg_enviar_email() {
+    header('Content-Type: application/json');
+
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if (!$data || empty($data['email'])) {
+        wp_send_json_error(['error' => 'Email requerido']);
+        return;
+    }
+
+    $email = sanitize_email($data['email']);
+    $nombre = sanitize_text_field($data['nombre'] ?? 'Buscador');
+    $resultado = $data['resultado'] ?? [];
+
+    $guardian_nombre = $resultado['guardian']['nombre'] ?? 'Tu Guardian';
+    $guardian_url = $resultado['guardian']['url'] ?? 'https://duendesdeluruguay.com/tienda/';
+    $guardian_imagen = $resultado['guardian']['imagen'] ?? '';
+    $mensaje = $resultado['mensajeGuardian'] ?? '';
+    $signo = $resultado['signo']['nombre'] ?? '';
+
+    // Construir email HTML
+    $subject = "✨ $nombre, tu Guardian te esta esperando";
+
+    $html = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Georgia, serif; background: #0a0a0a; color: #fff; padding: 40px 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 20px; padding: 40px; }
+            h1 { color: #c9a227; font-size: 28px; text-align: center; margin-bottom: 30px; }
+            .guardian-img { width: 200px; height: 200px; border-radius: 50%; display: block; margin: 0 auto 20px; border: 3px solid #ff0080; }
+            .guardian-nombre { color: #fff; font-size: 24px; text-align: center; margin-bottom: 10px; }
+            .mensaje { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; font-style: italic; color: rgba(255,255,255,0.9); line-height: 1.7; margin: 30px 0; }
+            .btn { display: block; width: 80%; margin: 30px auto; background: linear-gradient(135deg, #ff0080 0%, #8b00ff 100%); color: #fff; text-decoration: none; padding: 18px 30px; border-radius: 30px; text-align: center; font-size: 18px; }
+            .footer { text-align: center; color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 40px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>✨ ' . esc_html($nombre) . ', tu Guardian te encontro</h1>
+            ' . ($guardian_imagen ? '<img src="' . esc_url($guardian_imagen) . '" class="guardian-img" alt="' . esc_attr($guardian_nombre) . '">' : '') . '
+            <p class="guardian-nombre">' . esc_html($guardian_nombre) . '</p>
+            ' . ($signo ? '<p style="text-align:center; color: #ff0080;">Signo: ' . esc_html($signo) . '</p>' : '') . '
+            <div class="mensaje">"' . esc_html($mensaje) . '"</div>
+            <a href="' . esc_url($guardian_url) . '" class="btn">Conocer a mi Guardian</a>
+            <p class="footer">
+                Este mensaje fue generado especialmente para vos.<br>
+                Duendes del Uruguay - Guardianes Magicos
+            </p>
+        </div>
+    </body>
+    </html>';
+
+    // Headers para email HTML
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        'From: Duendes del Uruguay <hola@duendesdeluruguay.com>'
+    ];
+
+    // Enviar email
+    $sent = wp_mail($email, $subject, $html, $headers);
+
+    if ($sent) {
+        wp_send_json(['success' => true, 'message' => 'Email enviado']);
+    } else {
+        wp_send_json_error(['error' => 'Error enviando email']);
+    }
+}
+
+function tg_analizar_resultados() {
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if (!$data || !isset($data['respuestas'])) {
+        wp_send_json_error(['error' => 'Datos invalidos']);
+        return;
+    }
+
+    $nombre = sanitize_text_field($data['nombre'] ?? 'Buscador');
+    $respuestas = $data['respuestas'];
+    $fecha_nacimiento = sanitize_text_field($data['fechaNacimiento'] ?? '');
+
+    // 1. Calcular signo zodiacal
+    $signo = tg_calcular_signo($fecha_nacimiento);
+
+    // 2. Analizar perfil psicologico
+    $vulnerabilidad = isset($respuestas['_vulnerabilidad']) ? intval($respuestas['_vulnerabilidad']) : 0;
+    $dolor = sanitize_text_field($respuestas['_dolor'] ?? 'proposito');
+    $categoria = sanitize_text_field($respuestas['_categoria'] ?? 'proteccion');
+    $estilo = sanitize_text_field($respuestas['_estilo'] ?? 'emocional');
+
+    $nivel_vulnerabilidad = $vulnerabilidad >= 40 ? 'alta' : ($vulnerabilidad >= 20 ? 'media' : 'baja');
+
+    // 3. Generar sincronicidades
+    $sincronicidades = tg_generar_sincronicidades($nombre, $fecha_nacimiento);
+
+    // 4. Buscar guardian ideal en WooCommerce
+    $guardian = tg_buscar_guardian($dolor, $categoria);
+
+    // 5. Generar mensaje personalizado (con IA si disponible)
+    $mensaje = tg_generar_mensaje($nombre, $nivel_vulnerabilidad, $dolor, $estilo, $guardian, $respuestas);
+
+    // 6. Estrategias de conversion
+    $estrategias = tg_seleccionar_estrategias($estilo, $nivel_vulnerabilidad);
+
+    $resultado = [
+        'success' => true,
+        'usuario' => ['nombre' => $nombre],
+        'signo' => $signo,
+        'perfil' => [
+            'vulnerabilidad' => $nivel_vulnerabilidad,
+            'dolorPrincipal' => $dolor,
+            'estiloDecision' => $estilo
+        ],
+        'sincronicidades' => $sincronicidades,
+        'guardian' => $guardian,
+        'mensajeGuardian' => $mensaje,
+        'conversion' => [
+            'estrategias' => $estrategias,
+            'cta' => tg_generar_cta($estilo, $guardian)
+        ]
+    ];
+
+    wp_send_json($resultado);
+}
+
+function tg_calcular_signo($fecha) {
+    if (empty($fecha)) return ['id' => 'piscis', 'nombre' => 'Piscis', 'emoji' => '♓', 'elemento' => 'agua'];
+
+    $date = new DateTime($fecha);
+    $mes = intval($date->format('n'));
+    $dia = intval($date->format('j'));
+
+    $signos = [
+        'aries' => ['nombre' => 'Aries', 'emoji' => '♈', 'elemento' => 'fuego', 'mensaje' => 'Tu espiritu guerrero necesita un guardian que entienda tu fuego interior.'],
+        'tauro' => ['nombre' => 'Tauro', 'emoji' => '♉', 'elemento' => 'tierra', 'mensaje' => 'Tu conexion con la tierra te hace receptiva a guardianes de abundancia.'],
+        'geminis' => ['nombre' => 'Geminis', 'emoji' => '♊', 'elemento' => 'aire', 'mensaje' => 'Tu mente curiosa atrae guardianes de sabiduria y comunicacion.'],
+        'cancer' => ['nombre' => 'Cancer', 'emoji' => '♋', 'elemento' => 'agua', 'mensaje' => 'Tu sensibilidad emocional te conecta con guardianes protectores.'],
+        'leo' => ['nombre' => 'Leo', 'emoji' => '♌', 'elemento' => 'fuego', 'mensaje' => 'Tu luz interior atrae guardianes que potencian tu brillo natural.'],
+        'virgo' => ['nombre' => 'Virgo', 'emoji' => '♍', 'elemento' => 'tierra', 'mensaje' => 'Tu busqueda de perfeccion te conecta con guardianes sanadores.'],
+        'libra' => ['nombre' => 'Libra', 'emoji' => '♎', 'elemento' => 'aire', 'mensaje' => 'Tu busqueda de equilibrio atrae guardianes de armonia y amor.'],
+        'escorpio' => ['nombre' => 'Escorpio', 'emoji' => '♏', 'elemento' => 'agua', 'mensaje' => 'Tu profundidad emocional te conecta con guardianes de transformacion.'],
+        'sagitario' => ['nombre' => 'Sagitario', 'emoji' => '♐', 'elemento' => 'fuego', 'mensaje' => 'Tu espiritu aventurero atrae guardianes de expansion y sabiduria.'],
+        'capricornio' => ['nombre' => 'Capricornio', 'emoji' => '♑', 'elemento' => 'tierra', 'mensaje' => 'Tu determinacion te conecta con guardianes de abundancia y estructura.'],
+        'acuario' => ['nombre' => 'Acuario', 'emoji' => '♒', 'elemento' => 'aire', 'mensaje' => 'Tu vision unica atrae guardianes de intuicion y cambio.'],
+        'piscis' => ['nombre' => 'Piscis', 'emoji' => '♓', 'elemento' => 'agua', 'mensaje' => 'Tu sensibilidad espiritual te conecta con todos los reinos de guardianes.']
+    ];
+
+    $signo_id = 'piscis';
+    if (($mes == 3 && $dia >= 21) || ($mes == 4 && $dia <= 19)) $signo_id = 'aries';
+    elseif (($mes == 4 && $dia >= 20) || ($mes == 5 && $dia <= 20)) $signo_id = 'tauro';
+    elseif (($mes == 5 && $dia >= 21) || ($mes == 6 && $dia <= 20)) $signo_id = 'geminis';
+    elseif (($mes == 6 && $dia >= 21) || ($mes == 7 && $dia <= 22)) $signo_id = 'cancer';
+    elseif (($mes == 7 && $dia >= 23) || ($mes == 8 && $dia <= 22)) $signo_id = 'leo';
+    elseif (($mes == 8 && $dia >= 23) || ($mes == 9 && $dia <= 22)) $signo_id = 'virgo';
+    elseif (($mes == 9 && $dia >= 23) || ($mes == 10 && $dia <= 22)) $signo_id = 'libra';
+    elseif (($mes == 10 && $dia >= 23) || ($mes == 11 && $dia <= 21)) $signo_id = 'escorpio';
+    elseif (($mes == 11 && $dia >= 22) || ($mes == 12 && $dia <= 21)) $signo_id = 'sagitario';
+    elseif (($mes == 12 && $dia >= 22) || ($mes == 1 && $dia <= 19)) $signo_id = 'capricornio';
+    elseif (($mes == 1 && $dia >= 20) || ($mes == 2 && $dia <= 18)) $signo_id = 'acuario';
+
+    return array_merge(['id' => $signo_id], $signos[$signo_id]);
+}
+
+function tg_generar_sincronicidades($nombre, $fecha_nacimiento) {
+    $sincro = [];
+
+    // Sincronicidad del dia
+    $dias = [
+        0 => ['planeta' => 'Sol', 'mensaje' => 'El domingo es el dia del Sol. No es casualidad que estes aca hoy: es momento de renovar tu luz interior.'],
+        1 => ['planeta' => 'Luna', 'mensaje' => 'Lunes, dia de la Luna. Tu intuicion te trajo hasta aca, y la Luna no se equivoca.'],
+        2 => ['planeta' => 'Marte', 'mensaje' => 'Martes, el dia de Marte. Llegaste en el dia de la accion. Algo en vos esta listo para moverse.'],
+        3 => ['planeta' => 'Mercurio', 'mensaje' => 'Miercoles, dia de Mercurio. Viniste buscando claridad, y eso ya dice mucho de vos.'],
+        4 => ['planeta' => 'Jupiter', 'mensaje' => 'Jueves, el dia de Jupiter. Llegaste en el dia de la expansion. El universo esta abriendo puertas.'],
+        5 => ['planeta' => 'Venus', 'mensaje' => 'Viernes, dia de Venus. El amor y la belleza te trajeron aca. Tu corazon sabe lo que busca.'],
+        6 => ['planeta' => 'Saturno', 'mensaje' => 'Sabado, dia de Saturno. Llegaste en el dia de la paciencia. Lo que se construye bien, perdura.']
+    ];
+
+    $dia_semana = intval(date('w'));
+    $sincro[] = ['tipo' => 'dia', 'mensaje' => $dias[$dia_semana]['mensaje']];
+
+    // Sincronicidad del nombre
+    if (!empty($nombre)) {
+        $letras = strlen($nombre);
+        $msgs_letras = [
+            3 => 'Tu nombre tiene 3 letras. El numero de la creatividad y expresion.',
+            4 => 'Tu nombre tiene 4 letras. El numero de la estabilidad y los cimientos.',
+            5 => 'Tu nombre tiene 5 letras. El numero del cambio y la libertad.',
+            6 => 'Tu nombre tiene 6 letras. El numero del amor y la armonia.',
+            7 => 'Tu nombre tiene 7 letras. El numero de la espiritualidad y la busqueda.',
+            8 => 'Tu nombre tiene 8 letras. El numero de la abundancia y el poder.',
+            9 => 'Tu nombre tiene 9 letras. El numero de la completitud y la sabiduria.'
+        ];
+        if (isset($msgs_letras[$letras])) {
+            $sincro[] = ['tipo' => 'nombre', 'mensaje' => $msgs_letras[$letras]];
+        }
+    }
+
+    return $sincro;
+}
+
+function tg_buscar_guardian($dolor, $categoria_preferida) {
+    // Mapeo de dolor a categorias WooCommerce
+    $categoria_slugs = [
+        'soledad' => ['amor', 'proteccion'],
+        'dinero' => ['dinero-abundancia-negocios', 'abundancia'],
+        'salud' => ['salud', 'sanacion'],
+        'relaciones' => ['amor', 'proteccion'],
+        'proposito' => ['sabiduria-guia-claridad', 'sabiduria']
+    ];
+
+    $categorias = $categoria_slugs[$dolor] ?? ['proteccion'];
+
+    // Buscar productos de WooCommerce
+    $args = [
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => 10,
+        'orderby' => 'rand',
+        'meta_query' => [
+            ['key' => '_stock_status', 'value' => 'instock']
+        ],
+        'tax_query' => [
+            [
+                'taxonomy' => 'product_cat',
+                'field' => 'slug',
+                'terms' => $categorias,
+                'operator' => 'IN'
+            ]
+        ]
+    ];
+
+    $query = new WP_Query($args);
+    $productos = [];
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $product = wc_get_product(get_the_ID());
+            if ($product) {
+                $productos[] = [
+                    'id' => $product->get_id(),
+                    'nombre' => $product->get_name(),
+                    'precio' => $product->get_price(),
+                    'imagen' => wp_get_attachment_url($product->get_image_id()),
+                    'url' => $product->get_permalink(),
+                    'descripcion' => wp_strip_all_tags($product->get_short_description()),
+                    'categoria' => ''
+                ];
+
+                // Obtener categoria
+                $terms = get_the_terms($product->get_id(), 'product_cat');
+                if ($terms && !is_wp_error($terms)) {
+                    $productos[count($productos) - 1]['categoria'] = $terms[0]->name;
+                }
+            }
+        }
+        wp_reset_postdata();
+    }
+
+    // Si no hay productos, buscar cualquiera
+    if (empty($productos)) {
+        $args['tax_query'] = [];
+        $query = new WP_Query($args);
+        while ($query->have_posts()) {
+            $query->the_post();
+            $product = wc_get_product(get_the_ID());
+            if ($product) {
+                $productos[] = [
+                    'id' => $product->get_id(),
+                    'nombre' => $product->get_name(),
+                    'precio' => $product->get_price(),
+                    'imagen' => wp_get_attachment_url($product->get_image_id()),
+                    'url' => $product->get_permalink(),
+                    'descripcion' => '',
+                    'categoria' => 'Guardian'
+                ];
+            }
+        }
+        wp_reset_postdata();
+    }
+
+    if (empty($productos)) {
+        return null;
+    }
+
+    $guardian = $productos[0];
+    $guardian['alternativas'] = array_slice($productos, 1, 3);
+
+    return $guardian;
+}
+
+function tg_generar_mensaje($nombre, $vulnerabilidad, $dolor, $estilo, $guardian = null, $respuestas = []) {
+    // Intentar generar con IA primero
+    $mensaje_ia = tg_generar_mensaje_con_ia($nombre, $vulnerabilidad, $dolor, $estilo, $guardian, $respuestas);
+    if ($mensaje_ia) {
+        return $mensaje_ia;
+    }
+
+    // Fallback: mensajes predefinidos
+    $mensajes_dolor = [
+        'soledad' => 'Sentirte acompanada no es debilidad, es sabiduria.',
+        'dinero' => 'La abundancia empieza cuando dejas de bloquearla.',
+        'salud' => 'Tu cuerpo escucha lo que tu mente calla.',
+        'relaciones' => 'El amor que buscas afuera ya vive adentro.',
+        'proposito' => 'No estas perdida, estas en transicion.'
+    ];
+
+    $msg = '';
+    if ($vulnerabilidad === 'alta') {
+        $msg = "$nombre, te estuve esperando. Se lo que cargas, y quiero que sepas algo importante: no tenes que seguir haciendolo sola. ";
+    } elseif ($vulnerabilidad === 'media') {
+        $msg = "$nombre, hay algo en vos que me llamo. Una busqueda, una pregunta sin responder. ";
+    } else {
+        $msg = "$nombre, llegaste en el momento justo. Estabas lista, y yo tambien. ";
+    }
+
+    $msg .= $mensajes_dolor[$dolor] ?? $mensajes_dolor['proposito'];
+
+    if ($estilo === 'impulsivo') {
+        $msg .= ' No lo pienses demasiado. Lo que sentis ahora es real.';
+    } elseif ($estilo === 'analitico') {
+        $msg .= ' Toma el tiempo que necesites. Pero escucha: la razon no siempre tiene las respuestas que el corazon busca.';
+    } else {
+        $msg .= ' Dejate sentir lo que este momento desperto en vos.';
+    }
+
+    return $msg;
+}
+
+function tg_generar_mensaje_con_ia($nombre, $vulnerabilidad, $dolor, $estilo, $guardian, $respuestas) {
+    // API Key de Anthropic (definir ANTHROPIC_API_KEY en wp-config.php)
+    $api_key = defined('ANTHROPIC_API_KEY') ? ANTHROPIC_API_KEY : '';
+
+    if (empty($api_key) || strpos($api_key, 'sk-ant') !== 0) {
+        return null;
+    }
+
+    $guardian_nombre = $guardian['nombre'] ?? 'Guardian protector';
+    $guardian_categoria = $guardian['categoria'] ?? 'Proteccion';
+    $texto_libre = $respuestas['texto_libre'] ?? '';
+
+    $prompt = "Sos $guardian_nombre de Duendes del Uruguay.
+
+Escribi un mensaje PERSONAL de 3-4 oraciones para $nombre que acaba de hacer el Test del Guardian.
+
+CONTEXTO:
+- Vulnerabilidad: $vulnerabilidad
+- Dolor principal: $dolor
+- Estilo de decision: $estilo
+- Lo que escribio: $texto_libre
+
+REGLAS:
+1. Habla como un ser real que CONOCE a esta persona
+2. Usa espanol rioplatense (vos, tenes, podes)
+3. NO uses frases cliche (brumas ancestrales, velos, etc)
+4. El tono es cercano, calido, directo
+5. Termina con algo que invite a la accion sin presionar
+
+El mensaje debe sentirse como si REALMENTE conocieras a la persona.";
+
+    $body = json_encode([
+        'model' => 'claude-sonnet-4-20250514',
+        'max_tokens' => 400,
+        'messages' => [
+            ['role' => 'user', 'content' => $prompt]
+        ]
+    ]);
+
+    $response = wp_remote_post('https://api.anthropic.com/v1/messages', [
+        'timeout' => 30,
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'x-api-key' => $api_key,
+            'anthropic-version' => '2023-06-01'
+        ],
+        'body' => $body
+    ]);
+
+    if (is_wp_error($response)) {
+        error_log('[TG IA] Error: ' . $response->get_error_message());
+        return null;
+    }
+
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if (isset($body['content'][0]['text'])) {
+        return $body['content'][0]['text'];
+    }
+
+    error_log('[TG IA] Respuesta inesperada: ' . print_r($body, true));
+    return null;
+}
+
+function tg_seleccionar_estrategias($estilo, $vulnerabilidad) {
+    $estrategias = [];
+
+    if ($estilo === 'impulsivo') {
+        $estrategias[] = ['tipo' => 'escasez', 'texto' => 'Este guardian es pieza unica - cuando encuentre hogar, desaparece para siempre.'];
+    } elseif ($estilo === 'analitico') {
+        $estrategias[] = ['tipo' => 'reciprocidad', 'texto' => 'Ya compartimos algo importante vos y yo. Este test fue un encuentro real.'];
+    } else {
+        $estrategias[] = ['tipo' => 'aversionPerdida', 'texto' => 'Lo que sentiste al verlo no va a volver si dejas que otro lo adopte.'];
+    }
+
+    if ($vulnerabilidad === 'alta') {
+        $estrategias[] = ['tipo' => 'compromiso', 'texto' => 'No hay apuro. Lo importante es que te sentiste escuchada.'];
+    }
+
+    return $estrategias;
+}
+
+function tg_generar_cta($estilo, $guardian) {
+    $nombre = $guardian['nombre'] ?? 'mi guardian';
+
+    $ctas = [
+        'impulsivo' => ['principal' => 'Quiero conocerlo', 'secundario' => 'Adoptalo ahora', 'urgencia' => 'Solo hoy: envio gratis'],
+        'analitico' => ['principal' => 'Ver mas detalles', 'secundario' => 'Guardar para despues', 'urgencia' => null],
+        'emocional' => ['principal' => 'Conectar con ' . $nombre, 'secundario' => 'Contame mas sobre el', 'urgencia' => null]
+    ];
+
+    return $ctas[$estilo] ?? $ctas['emocional'];
+}
 
 // Interceptar la pagina del test ANTES de que Elementor la procese
 add_action('template_redirect', function() {
@@ -19,8 +455,8 @@ add_action('template_redirect', function() {
 }, 1);
 
 function duendes_test_guardian_v15_standalone() {
-    $v = '15.0.' . time();
-    $api_base = 'https://duendes-vercel.vercel.app'; // Cambiar a produccion
+    $v = '15.1.' . time();
+    $ajax_url = admin_url('admin-ajax.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -100,6 +536,125 @@ function duendes_test_guardian_v15_standalone() {
         0%, 100% { transform: translate(0, 0) scale(1); }
         33% { transform: translate(30px, -30px) scale(1.1); }
         66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* ANIMACION DE TEXTO APARECIENDO */
+    .tg-animate {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* INTRO CINEMATOGRAFICA */
+    .tg-cinematic-text {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .tg-text-line {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 1.2s ease;
+        margin-bottom: 25px;
+    }
+
+    .tg-text-line.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .tg-text-line span {
+        font-size: clamp(20px, 5vw, 32px);
+        color: rgba(255,255,255,0.9);
+        line-height: 1.6;
+    }
+
+    .tg-text-line.tg-accent span {
+        color: #ff0080;
+        font-style: italic;
+    }
+
+    .tg-titulo-grande {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(36px, 10vw, 80px);
+        font-weight: 400;
+        letter-spacing: 0.12em;
+        color: #fff;
+        text-shadow: 0 0 60px rgba(255,0,128,0.5), 0 0 120px rgba(139,0,255,0.3);
+        margin: 20px 0 30px;
+        opacity: 0;
+        transform: scale(0.9);
+        transition: all 1.5s ease;
+    }
+
+    .tg-titulo-grande.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .tg-pre-titulo {
+        font-size: clamp(14px, 3vw, 20px);
+        color: rgba(255,255,255,0.7);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        opacity: 0;
+        transition: all 1s ease;
+    }
+
+    .tg-pre-titulo.visible {
+        opacity: 1;
+    }
+
+    .tg-linea-magica {
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ff0080, #8b00ff, transparent);
+        margin: 0 auto;
+        transition: width 1.5s ease;
+    }
+
+    .tg-linea-magica.visible {
+        width: 200px;
+    }
+
+    .tg-btn-magic {
+        background: transparent;
+        border: 2px solid #ff0080;
+        color: #ff0080;
+        font-family: 'Cinzel', serif;
+        font-size: 18px;
+        letter-spacing: 0.2em;
+        padding: 18px 50px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .tg-btn-magic.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .tg-btn-magic:hover {
+        background: linear-gradient(135deg, #ff0080 0%, #8b00ff 100%);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 0 40px rgba(255,0,128,0.5);
     }
 
     /* PANTALLAS */
@@ -379,14 +934,14 @@ function duendes_test_guardian_v15_standalone() {
     }
 
     .tg-guardian-img {
-        width: 180px;
-        height: 180px;
+        width: 260px;
+        height: 260px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #ff0080;
-        margin: 0 auto 20px;
+        border: 4px solid #ff0080;
+        margin: 0 auto 25px;
         display: block;
-        box-shadow: 0 0 40px rgba(255,0,128,0.4);
+        box-shadow: 0 0 60px rgba(255,0,128,0.5);
     }
 
     .tg-guardian-nombre {
@@ -616,19 +1171,49 @@ function duendes_test_guardian_v15_standalone() {
         <div class="tg-orb tg-orb-3"></div>
     </div>
 
-    <!-- PANTALLA 1: INICIO -->
-    <div id="screen-inicio" class="tg-screen active">
+    <!-- PANTALLA 0: INTRO CINEMATOGRAFICA - ELEGIDOS -->
+    <div id="screen-intro-elegidos" class="tg-screen active">
         <div class="tg-container">
-            <h1 class="tg-title">DUENDES DEL URUGUAY</h1>
-            <p class="tg-subtitle">Canalizados para vos</p>
-            <p class="tg-text">Hay un guardian que ya te eligio.<br>Solo falta que lo descubras.</p>
-            <button class="tg-btn" onclick="TG.iniciarExperiencia()">
-                Descubrir mi Guardian
+            <div class="tg-cinematic-text">
+                <div class="tg-text-line tg-line-1"><span>Existen personas que fueron llamadas.</span></div>
+                <div class="tg-text-line tg-line-2"><span>No por su nombre,</span></div>
+                <div class="tg-text-line tg-line-3"><span>sino por algo más profundo.</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 0B: INTRO - LOS ELEGIDOS -->
+    <div id="screen-intro-titulo" class="tg-screen">
+        <div class="tg-container" style="text-align: center;">
+            <p class="tg-pre-titulo">Los llaman</p>
+            <h1 class="tg-titulo-grande">LOS ELEGIDOS</h1>
+            <div class="tg-linea-magica"></div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 0C: INTRO - EXPLICACION -->
+    <div id="screen-intro-explicacion" class="tg-screen">
+        <div class="tg-container">
+            <div class="tg-cinematic-text">
+                <div class="tg-text-line tg-line-1"><span>Son quienes cuidan de un guardián.</span></div>
+                <div class="tg-text-line tg-line-2 tg-accent"><span>O quizás...</span></div>
+                <div class="tg-text-line tg-line-3 tg-accent"><span>son cuidados por él.</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 0D: INTRO - PREGUNTA FINAL -->
+    <div id="screen-intro-pregunta" class="tg-screen">
+        <div class="tg-container" style="text-align: center;">
+            <p class="tg-pre-titulo">La pregunta es:</p>
+            <h1 class="tg-titulo-grande" style="font-size: clamp(28px, 7vw, 55px);">¿Sos una de ellas?</h1>
+            <button class="tg-btn-magic" onclick="TG.finIntro()">
+                DESCUBRILO
             </button>
         </div>
     </div>
 
-    <!-- PANTALLA 2: MUSICA -->
+    <!-- PANTALLA 1: MUSICA -->
     <div id="screen-musica" class="tg-screen">
         <div class="tg-container">
             <div style="font-size: 60px; margin-bottom: 30px;">♫</div>
@@ -734,7 +1319,7 @@ function duendes_test_guardian_v15_standalone() {
                     <a id="result-btn-conocer" href="#" class="tg-btn tg-btn-principal" target="_blank">
                         Conocer a mi Guardian
                     </a>
-                    <a id="result-btn-secundario" href="#" class="tg-btn tg-btn-secondary" style="display: none;">
+                    <a id="result-btn-secundario" href="#" class="tg-btn tg-btn-secondary" style="display: none;" onclick="event.preventDefault(); TG.guardarParaDespues();">
                         Guardar para despues
                     </a>
                 </div>
@@ -858,6 +1443,8 @@ const TG = {
             e.preventDefault();
             this.guardarDatos();
         });
+        // Iniciar intro cinematografica
+        this.iniciarIntro();
     },
 
     // Cambiar pantalla
@@ -868,7 +1455,68 @@ const TG = {
         window.scrollTo(0, 0);
     },
 
-    // Inicio experiencia
+    // ===== INTRO CINEMATOGRAFICA =====
+    iniciarIntro: function() {
+        // Escena 1: Elegidos - texto aparece de a poco
+        setTimeout(() => {
+            document.querySelector('#screen-intro-elegidos .tg-line-1').classList.add('visible');
+        }, 500);
+        setTimeout(() => {
+            document.querySelector('#screen-intro-elegidos .tg-line-2').classList.add('visible');
+        }, 2000);
+        setTimeout(() => {
+            document.querySelector('#screen-intro-elegidos .tg-line-3').classList.add('visible');
+        }, 3500);
+
+        // Escena 2: LOS ELEGIDOS (titulo grande)
+        setTimeout(() => {
+            this.irA('intro-titulo');
+            setTimeout(() => {
+                document.querySelector('#screen-intro-titulo .tg-pre-titulo').classList.add('visible');
+            }, 300);
+            setTimeout(() => {
+                document.querySelector('#screen-intro-titulo .tg-titulo-grande').classList.add('visible');
+            }, 800);
+            setTimeout(() => {
+                document.querySelector('#screen-intro-titulo .tg-linea-magica').classList.add('visible');
+            }, 1500);
+        }, 6000);
+
+        // Escena 3: Explicacion
+        setTimeout(() => {
+            this.irA('intro-explicacion');
+            setTimeout(() => {
+                document.querySelector('#screen-intro-explicacion .tg-line-1').classList.add('visible');
+            }, 500);
+            setTimeout(() => {
+                document.querySelector('#screen-intro-explicacion .tg-line-2').classList.add('visible');
+            }, 2000);
+            setTimeout(() => {
+                document.querySelector('#screen-intro-explicacion .tg-line-3').classList.add('visible');
+            }, 3200);
+        }, 10000);
+
+        // Escena 4: Pregunta final
+        setTimeout(() => {
+            this.irA('intro-pregunta');
+            setTimeout(() => {
+                document.querySelector('#screen-intro-pregunta .tg-pre-titulo').classList.add('visible');
+            }, 300);
+            setTimeout(() => {
+                document.querySelector('#screen-intro-pregunta .tg-titulo-grande').classList.add('visible');
+            }, 800);
+            setTimeout(() => {
+                document.querySelector('#screen-intro-pregunta .tg-btn-magic').classList.add('visible');
+            }, 1800);
+        }, 16000);
+    },
+
+    // Fin de intro, pasar a musica
+    finIntro: function() {
+        this.irA('musica');
+    },
+
+    // Inicio experiencia (ya no se usa, pero lo dejo por compatibilidad)
     iniciarExperiencia: function() {
         this.irA('musica');
     },
@@ -994,8 +1642,8 @@ const TG = {
         }, 2000);
 
         try {
-            // Llamar a la API
-            const response = await fetch('<?php echo $api_base; ?>/api/test-guardian/analizar', {
+            // Llamar al AJAX de WordPress (sin depender de Vercel)
+            const response = await fetch('<?php echo $ajax_url; ?>?action=tg_analizar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1143,8 +1791,57 @@ const TG = {
 
     // Enviar resultado por email
     enviarResultado: async function() {
-        alert('Enviamos tu resultado a ' + this.userData.email + '. Revisa tu casilla en unos minutos.');
-        // TODO: Implementar envio real
+        const btn = event.target;
+        btn.textContent = 'Enviando...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('<?php echo $ajax_url; ?>?action=tg_enviar_email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: this.userData.email,
+                    nombre: this.userData.nombre,
+                    resultado: this.resultado
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                btn.textContent = '✓ Enviado!';
+                btn.style.background = 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)';
+            } else {
+                throw new Error(data.error || 'Error enviando');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            btn.textContent = 'Reintentar';
+            btn.disabled = false;
+            alert('Hubo un error enviando el email. Intenta de nuevo.');
+        }
+    },
+
+    // Guardar para despues
+    guardarParaDespues: function() {
+        // Guardar en localStorage
+        const guardado = {
+            fecha: new Date().toISOString(),
+            usuario: this.userData,
+            resultado: this.resultado
+        };
+        localStorage.setItem('tg_guardian_guardado', JSON.stringify(guardado));
+
+        // Mostrar confirmacion
+        const btn = document.getElementById('result-btn-secundario');
+        btn.textContent = '✓ Guardado!';
+        btn.style.background = 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)';
+        btn.style.color = '#fff';
+
+        // Mensaje
+        setTimeout(() => {
+            alert('Tu guardian fue guardado. Cuando vuelvas a visitar esta pagina, lo recordaremos.');
+        }, 300);
     }
 };
 
