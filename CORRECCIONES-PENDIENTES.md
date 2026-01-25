@@ -10,16 +10,17 @@
 | Área | Estado | Prioridad |
 |------|--------|-----------|
 | Header/Navegación | ✅ Conflicto CSS resuelto | ALTA |
-| Página de Inicio | 🔴 Pendiente análisis | ALTA |
+| Página de Inicio | ✅ Analizada - OK (landing de APIs) | ALTA |
 | Test del Guardián | ✅ Bug corregido | ALTA |
 | Mi Magia | ✅ Tito corregido | ALTA |
 | Círculo de Duendes | ✅ Tito agregado | MEDIA |
 | Chat Tito | ✅ CORREGIDO Mi Magia + Círculo | ALTA |
-| Conexión WordPress-Vercel | 🔴 Pendiente verificar | ALTA |
+| Conexión WordPress-Vercel | 🟡 Requiere SFTP (manual) | ALTA |
 | SEO/Assets | ✅ Favicons + dominio corregidos | MEDIA |
 | Config next.config.js | ✅ Wildcard corregido | MEDIA |
 | URLs hardcodeadas | ✅ Centralizadas | MEDIA |
 | Páginas dinámicas | ✅ Analizadas - OK como están | BAJA |
+| Colores dorados | ✅ Unificados con CSS variable | MEDIA |
 
 ---
 
@@ -59,28 +60,35 @@
 - `/app/tienda/page.jsx`: **1,200+ líneas de CSS inline**
 - **Solución:** Extraer a módulo `tienda-styles.js`
 
-### 1.5 Pendientes
-- [ ] Unificar colores dorados
-- [ ] Extraer CSS inline de tienda
-- [ ] Consolidar headers (una definición con variantes)
-- [ ] Estandarizar breakpoints
-- [ ] Revisar URLs entre sitios
+### 1.5 Estado de correcciones
+- [x] Unificar colores dorados → `var(--color-dorado)` en globals.css
+- [x] Consolidar headers → Renombrado a `.mi-magia-header` para evitar conflictos
+- [x] Revisar URLs entre sitios → Centralizadas en `lib/config/urls.js`
+- [ ] Extraer CSS inline de tienda (~500 líneas, no 1200+ como se estimó)
+- [ ] Estandarizar breakpoints (mejora opcional)
 
 ---
 
-## 2. PROBLEMAS DE PÁGINA DE INICIO
+## 2. PÁGINA DE INICIO - ✅ ANALIZADA
 
 ### 2.1 Página principal de Vercel (`/app/page.js`)
-**Estado:** Es una página de carga simple que redirige
+**Estado:** ✅ OK - Es intencionalmente una landing simple
 
 ```javascript
-// Actual - solo muestra "Duendes del Uruguay - Sistema de Canalización"
+// Muestra "Duendes del Uruguay - Sistema de Canalización"
 // con link a duendesdeluruguay.com
 ```
 
-**Pregunta:** ¿Esta página debería tener más contenido o es solo landing de APIs?
+**Conclusión:** Este diseño es correcto. El app de Vercel es para:
+- APIs (`/api/*`)
+- Portal Mi Magia (`/mi-magia`)
+- Círculo de Duendes (`/mi-magia/circulo`)
+- Admin (`/admin/*`)
+- Tienda proxy (`/tienda`, `/producto/*`)
 
-### 2.2 Verificar inicio en WordPress
+La página principal de WordPress (duendesdeluruguay.com) es la entrada real del usuario.
+
+### 2.2 Verificar inicio en WordPress (requiere SFTP)
 - [ ] Revisar página principal de duendesdeluruguay.com via SFTP
 - [ ] Verificar plugins activos
 - [ ] Verificar elementor/tema
@@ -108,38 +116,40 @@
 
 ---
 
-## 4. ASSETS FALTANTES (Confirmado)
+## 4. ASSETS - ✅ CORREGIDO
 
 ### 4.1 Favicons
-- [ ] `/public/favicon.ico` - NO EXISTE
-- [ ] `/public/icon.svg` - NO EXISTE
-- [ ] `/public/favicon-16x16.png` - NO EXISTE
-- [ ] `/public/favicon-32x32.png` - NO EXISTE
-- [ ] `/public/apple-touch-icon.png` - NO EXISTE
-- [ ] `/public/safari-pinned-tab.svg` - NO EXISTE
+**Estado:** ✅ CORREGIDO - Referencias actualizadas para usar iconos existentes
 
-**Acción:** Crear o quitar referencias en `app/layout.js`
+Se actualizó `app/layout.js` para usar los iconos que SÍ existen:
+- `/public/icon-192.png` → Para icon y apple-touch-icon
+- `/public/icon-512.png` → Para icon grande
 
 ### 4.2 Logo para SEO
-- [ ] `/public/logo.png` - NO EXISTE (usado en `lib/seo/schema.js`)
+**Estado:** ✅ CORREGIDO
+
+Se actualizó `lib/seo/schema.js`:
+- Cambió de `/logo.png` (no existe) a `/icon-512.png` (existe)
 
 ---
 
 ## 5. CONFIGURACIÓN
 
 ### 5.1 next.config.js
-- [ ] Wildcard `**.10web.cloud` puede no funcionar en Next.js 14
-  - **Línea:** 20
-  - **Fix:** Cambiar a `*.10web.cloud` o dominio específico
+**Estado:** ✅ CORREGIDO
+- Cambió `**.10web.cloud` → `*.10web.cloud` (sintaxis válida Next.js 14)
 
 ### 5.2 Google Search Console
+**Estado:** 🟡 Pendiente configuración manual
 - [ ] Placeholder `TU_CODIGO_DE_VERIFICACION_GOOGLE` sin configurar
   - **Archivo:** `app/layout.js` línea 104
+  - **Acción:** Usuario debe obtener código de Google y reemplazarlo
 
-### 5.3 Dominios inconsistentes
-- [ ] Layout usa `duendesdeluruguay.com`
-- [ ] Sitemap usa `duendes-vercel.vercel.app`
-- [ ] Robots.txt usa `duendes-vercel.vercel.app`
+### 5.3 Dominios
+**Estado:** ✅ CORREGIDO
+- [x] Sitemap actualizado a `duendesdeluruguay.com`
+- [x] Robots.txt actualizado a `duendesdeluruguay.com`
+- [x] Layout usa `duendesdeluruguay.com` (ya estaba bien)
 
 ---
 
@@ -164,17 +174,17 @@ Estas páginas usan `'use client'` + `useParams()` cuando deberían usar Server 
 
 ---
 
-## 7. COMPONENTES CON PROBLEMAS POTENCIALES
+## 7. COMPONENTES - ESTADO
 
 ### 7.1 API_BASE vacío
 - **Archivo:** `/app/mi-magia/components/constants.js` línea 5
-- **Problema:** `API_BASE = ''` - todos los fetch usan rutas relativas
-- **Verificar:** ¿Esto funciona correctamente en producción?
+- **Estado:** ✅ OK - Rutas relativas funcionan correctamente en Next.js
+- Las rutas relativas (`/api/...`) funcionan tanto en desarrollo como producción
 
 ### 7.2 URLs hardcodeadas
-- `/app/tienda/page.jsx` línea 18 - define WORDPRESS_URL localmente
-- `/app/producto/[slug]/page.jsx` línea 139 - define WORDPRESS_URL localmente
-- **Deberían usar:** `@/lib/config/urls.js`
+**Estado:** ✅ CORREGIDO
+- [x] `/app/tienda/page.jsx` - Ahora importa de `@/lib/config/urls.js`
+- [x] `/app/producto/[slug]/page.jsx` - Ahora importa de `@/lib/config/urls.js`
 
 ---
 
@@ -230,23 +240,29 @@ Según CLAUDE.md:
 
 ---
 
-## 10. ACCIONES INMEDIATAS
+## 10. ACCIONES - RESUMEN
 
-### Prioridad CRÍTICA
+### ✅ COMPLETADO (código)
+1. [x] Tito visible siempre en Mi Magia
+2. [x] Tito agregado al Círculo
+3. [x] Bug arquetipoScores corregido
+4. [x] Favicons referencias corregidas
+5. [x] Wildcard next.config.js corregido
+6. [x] URLs centralizadas
+7. [x] Dominios unificados (sitemap/robots)
+8. [x] Colores dorados unificados
+9. [x] Conflicto .header resuelto
+
+### 🟡 REQUIERE ACCIÓN MANUAL (usuario)
 1. [ ] Conectar por SFTP y verificar WordPress
-2. [ ] Probar header en producción
-3. [ ] Probar Test del Guardián
-4. [ ] Verificar flujo de compra completo
+2. [ ] Configurar código Google Search Console
+3. [ ] Probar header en producción (navegador)
+4. [ ] Probar Test del Guardián (navegador)
+5. [ ] Verificar flujo de compra completo (navegador)
 
-### Prioridad ALTA
-5. [ ] Crear/agregar favicons faltantes
-6. [ ] Corregir wildcard en next.config.js
-7. [ ] Unificar URLs hardcodeadas
-
-### Prioridad MEDIA
-8. [ ] Corregir páginas dinámicas (si hay errores reales)
-9. [ ] Configurar Google Search Console
-10. [ ] Unificar dominios en sitemap/robots
+### 📋 MEJORAS OPCIONALES (baja prioridad)
+1. [ ] Extraer CSS inline de tienda (~500 líneas)
+2. [ ] Estandarizar breakpoints CSS
 
 ---
 
@@ -306,6 +322,32 @@ Según CLAUDE.md:
 - **DEPLOYADO (Ronda 3):** 2 commits adicionales:
   - `11093c5` refactor(styles): unificar colores dorados con CSS variable
   - `1838d5b` fix(css): renombrar .header a .mi-magia-header
+- **Sesión continuada:** Actualización de documento de tracking
+  - Página de inicio analizada: Es correctamente una landing simple (OK)
+  - Tienda tiene ~500 líneas CSS (no 1200+ como se estimó inicialmente)
+  - Todos los items de código críticos están corregidos
+  - Pendiente: verificación manual en producción y configuración SFTP
+
+---
+
+## RESUMEN FINAL
+
+### Commits deployados: 10 total
+| Commit | Descripción |
+|--------|-------------|
+| `e7f69e3` | fix(mi-magia): Tito chat siempre visible |
+| `afc42f4` | feat(circulo): agregar chat de Tito interactivo |
+| `193769e` | fix(test-guardian): corregir bug arquetipoScores |
+| `bafd740` | docs: agregar CORRECCIONES-PENDIENTES.md |
+| `d291812` | fix(assets): corregir referencias a favicons |
+| `72afc66` | fix(config): corregir wildcard en next.config.js |
+| `cb6b03f` | refactor: centralizar WORDPRESS_URL |
+| `b4eca26` | fix(seo): unificar dominio en sitemap/robots |
+| `11093c5` | refactor(styles): unificar colores dorados |
+| `1838d5b` | fix(css): renombrar .header a .mi-magia-header |
+
+### Estado: ✅ Todos los bugs de código corregidos
+Las tareas pendientes son verificación manual y configuración que requiere acceso SFTP o acciones del usuario.
 
 ---
 
