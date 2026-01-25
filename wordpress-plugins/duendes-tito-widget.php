@@ -343,9 +343,11 @@ function duendes_tito_widget_html() {
     flex: 1 !important;
     overflow-y: auto !important;
     padding: 18px !important;
+    padding-bottom: 10px !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 14px !important;
+    min-height: 0 !important; /* Importante para que flex funcione bien con scroll */
 }
 
 .tito-messages::-webkit-scrollbar {
@@ -510,10 +512,16 @@ function duendes_tito_widget_html() {
 }
 
 .tito-suggestions {
-    padding: 0 18px 12px !important;
+    padding: 8px 18px 5px !important;
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 8px !important;
+    background: rgba(10,12,16,0.95) !important;
+    flex-shrink: 0 !important; /* No se achica */
+}
+
+.tito-suggestions.oculto {
+    display: none !important;
 }
 
 .tito-suggestion {
@@ -609,6 +617,15 @@ function duendes_tito_widget_html() {
         right: -7px !important;
         bottom: 80px !important;
         max-height: 550px !important;
+    }
+
+    .tito-suggestion {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .tito-suggestions {
+        padding: 6px 12px 4px !important;
     }
 
     .tito-burbuja {
@@ -819,6 +836,12 @@ function duendes_tito_widget_html() {
             .replace(/\n/g, '<br>');
     }
 
+    function scrollAlFinal() {
+        if (els.messages) {
+            els.messages.scrollTop = els.messages.scrollHeight + 500;
+        }
+    }
+
     function agregarMensaje(texto, tipo, productos) {
         const msg = document.createElement('div');
         msg.className = 'tito-msg ' + tipo;
@@ -829,11 +852,30 @@ function duendes_tito_widget_html() {
             msg.textContent = texto;
         }
         els.messages.appendChild(msg);
+        scrollAlFinal();
+
         if (productos && productos.length > 0) {
             const galeria = crearGaleria(productos);
             els.messages.appendChild(galeria);
+
+            // Scroll inmediato
+            scrollAlFinal();
+
+            // Scroll cuando cargan las imágenes
+            const imagenes = galeria.querySelectorAll('img');
+            imagenes.forEach(function(img) {
+                img.onload = scrollAlFinal;
+            });
+
+            // Scroll adicional con timeouts
+            setTimeout(scrollAlFinal, 100);
+            setTimeout(scrollAlFinal, 300);
+            setTimeout(scrollAlFinal, 500);
+            setTimeout(scrollAlFinal, 1000);
+            setTimeout(scrollAlFinal, 2000);
+        } else {
+            setTimeout(scrollAlFinal, 50);
         }
-        els.messages.scrollTop = els.messages.scrollHeight;
     }
 
     function crearGaleria(productos) {
@@ -862,12 +904,16 @@ function duendes_tito_widget_html() {
         typing.id = 'titoTyping';
         typing.innerHTML = '<span></span><span></span><span></span>';
         els.messages.appendChild(typing);
-        els.messages.scrollTop = els.messages.scrollHeight;
+        // Ocultar sugerencias mientras carga
+        els.suggestions.classList.add('oculto');
+        scrollAlFinal();
     }
 
     function ocultarTyping() {
         const typing = document.getElementById('titoTyping');
         if (typing) typing.remove();
+        // Mostrar sugerencias de nuevo
+        els.suggestions.classList.remove('oculto');
     }
 
     function mostrarBurbuja(config) {
