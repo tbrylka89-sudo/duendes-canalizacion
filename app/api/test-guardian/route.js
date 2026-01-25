@@ -451,6 +451,15 @@ function analizarRespuestas(respuestas) {
     calma: 0
   };
 
+  // Scores de arquetipo
+  const arquetipoScores = {
+    victima: 0,
+    buscadora: 0,
+    repite_patrones: 0,
+    sanadora_herida: 0,
+    busca_amor: 0
+  };
+
   // Datos del perfil
   let perfilCompra = 'curioso';
   let momento = 'busqueda';
@@ -482,6 +491,10 @@ function analizarRespuestas(respuestas) {
     const r3 = respuestas[3];
     arquetipo = r3.arquetipo || arquetipo;
     if (r3.categoria) categoriaScores[r3.categoria] += 25;
+    // Sumar al arquetipo score
+    if (r3.arquetipo && arquetipoScores[r3.arquetipo] !== undefined) {
+      arquetipoScores[r3.arquetipo] += 40;
+    }
   }
 
   // Pregunta 4: Qué busca (categoria principal)
@@ -508,10 +521,34 @@ function analizarRespuestas(respuestas) {
   const categoriaPrincipal = categoriasSorted[0][0];
   const categoriaSecundaria = categoriasSorted[1][0];
 
+  // Determinar arquetipo principal
+  const arquetiposSorted = Object.entries(arquetipoScores).sort((a, b) => b[1] - a[1]);
+  const arquetipoPrincipal = arquetiposSorted[0][0];
+  const arquetipoSecundario = arquetiposSorted[1][0];
+
+  // Determinar elemento basado en categoría
+  const elementoMap = {
+    proteccion: 'tierra',
+    abundancia: 'fuego',
+    fortuna: 'fuego',
+    amor: 'agua',
+    sanacion: 'agua',
+    transformacion: 'aire',
+    calma: 'aire',
+    amor_propio: 'agua'
+  };
+  const elemento = elementoMap[categoriaPrincipal] || 'tierra';
+
   return {
     categoriaPrincipal,
     categoriaSecundaria,
     categoriaScores,
+    arquetipoScores,
+    arquetipoPrincipal,
+    arquetipoSecundario,
+    elemento,
+    categoria: categoriaPrincipal,
+    intencion: categoriaPrincipal,
     perfilCompra,
     momento,
     urgencia,
