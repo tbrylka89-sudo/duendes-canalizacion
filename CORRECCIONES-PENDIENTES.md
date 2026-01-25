@@ -351,4 +351,83 @@ Las tareas pendientes son verificación manual y configuración que requiere acc
 
 ---
 
+## 12. TEST DEL GUARDIÁN - REDISEÑO COMPLETO (PRIORIDAD MÁXIMA)
+
+### 12.1 Estado Actual
+- ✅ Test funciona visualmente (v14.3 standalone, bypasea Elementor)
+- 🔴 Música no suena (verificar URL)
+- 🔴 Falta sistema de perfilado real
+- 🔴 Falta conexión con productos reales de WooCommerce
+- 🔴 Falta secuencia de micro-compromisos
+
+### 12.2 Sistema de Perfilado Requerido
+
+El test debe clasificar al usuario en:
+
+| Dimensión | Valores | Cómo detectar |
+|-----------|---------|---------------|
+| **Vulnerabilidad** | Alta / Media / Baja | Preguntas emocionales, urgencia |
+| **Dolor Principal** | Soledad / Dinero / Salud / Relaciones | Preguntas directas disfrazadas |
+| **Estilo Decisión** | Impulsivo / Analítico / Emocional | Cómo responde, velocidad |
+| **Poder Adquisitivo** | Alto / Medio / Bajo | Preguntas indirectas sobre estilo vida |
+| **Creencias** | Escéptico / Creyente / Buscador | Preguntas sobre experiencias previas |
+
+### 12.3 Motor de Sincronicidad Personalizada
+
+Crear "señales mágicas" usando datos del usuario:
+
+```javascript
+// Ejemplos:
+// Si entró un martes:
+"Los martes son días de Marte, de acción. No es casualidad que estés acá hoy."
+
+// Si su nombre tiene misma cantidad de letras que el guardián:
+"Tu nombre y el de [guardián] tienen la misma cantidad de letras. Los números no mienten."
+
+// Si es su cumpleaños este mes:
+"Este mes es tu portal. Los guardianes que aparecen cerca de tu cumpleaños vienen con mensajes especiales."
+```
+
+### 12.4 Secuencia de Micro-Compromisos
+
+Escalar gradualmente, no pedir compra directa:
+
+1. "¿Querés saber qué guardián te corresponde?" → **Test gratis**
+2. "¿Querés que te avise si aparece uno para vos?" → **Captura email**
+3. "¿Querés ver el mensaje que tiene para vos?" → **Preview personalizado**
+4. "¿Querés reservarlo antes de que desaparezca?" → **Seña/Reserva**
+5. **Compra completa**
+
+### 12.5 Pantalla de Resultado Requerida
+
+Debe incluir:
+- [ ] Mini estudio personalizado (basado en respuestas + signo)
+- [ ] Validación emocional ("lo que sentís es real")
+- [ ] Signo zodiacal con interpretación
+- [ ] Foto REAL del guardián recomendado (de WooCommerce)
+- [ ] Escanear TODOS los productos y elegir el mejor match
+- [ ] Opción: "Enviar resultado a mi email"
+- [ ] Botón: Mensaje personalizado del guardián (lenguaje neutro)
+- [ ] Link directo al producto recomendado
+
+### 12.6 Requisitos Técnicos
+
+| Componente | Implementación |
+|------------|----------------|
+| **Fetch productos** | API WooCommerce → traer todos los guardianes con categorías |
+| **Algoritmo matching** | Cruzar perfil usuario con atributos del guardián |
+| **Sincronicidad** | JavaScript con datos: día, hora, nombre, cumpleaños |
+| **Captura email** | Integración ManyChat o formulario propio |
+| **Mensaje guardián** | Generar con IA o templates por categoría |
+| **Base datos** | Guardar perfil en Vercel KV o WP user meta |
+
+### 12.7 Archivos Involucrados
+
+- `wordpress-plugins/test-guardian-v14-experiencia.php` - Plugin actual
+- `/api/tienda/productos` - API para traer productos (ya existe)
+- `/api/tito/chat` - Podría generar mensajes personalizados
+- `/lib/circulo/perfilado.js` - Sistema de perfilado existente (revisar)
+
+---
+
 *Este archivo se actualiza conforme se corrigen los problemas*
