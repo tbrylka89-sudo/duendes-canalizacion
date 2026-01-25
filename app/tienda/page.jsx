@@ -8,14 +8,12 @@ import {
   combineSchemas,
   serializeSchema
 } from '@/lib/seo/schema';
+import { WORDPRESS_URL } from '@/lib/config/urls';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TIENDA MAGICA - CARTAS DE TAROT
 // Productos de WooCommerce con diseno de cartas de tarot misticas
 // ═══════════════════════════════════════════════════════════════════════════════
-
-// URLs centralizadas - cambiar aqui cuando migre el dominio
-const WORDPRESS_URL = 'https://duendesdeluruguay.com';
 
 const CATEGORIAS = [
   { slug: 'proteccion', nombre: 'Protección', desc: 'Algo te drena', color: '#3b82f6', icono: '🛡️' },

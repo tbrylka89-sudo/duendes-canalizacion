@@ -9,6 +9,7 @@ import { getProductBySlug, getPopularProducts, getRelatedProducts, formatProduct
 import { generateProductMetadata } from '@/lib/seo/metadata';
 import { generateProductoSchemas } from '@/lib/seo/schema';
 import SchemaMarkup from '@/app/components/SchemaMarkup';
+import { WORDPRESS_URL } from '@/lib/config/urls';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GENERATE METADATA - SEO Dinamico
@@ -136,7 +137,6 @@ function ProductImage({ images, productName }) {
 }
 
 function ProductInfo({ producto }) {
-  const WORDPRESS_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
   const buyUrl = producto.permalink || `${WORDPRESS_URL}/product/${producto.slug}/`;
 
   return (
