@@ -290,6 +290,11 @@ Según CLAUDE.md:
 - **CORREGIDO:** Chat de Tito en Mi Magia (ahora aparece siempre)
 - **CORREGIDO:** Chat de Tito en Círculo (agregado chat interactivo)
 - **CORREGIDO:** Bug en Test del Guardián (`arquetipoScores` no definido)
+- **DEPLOYADO:** 4 commits pusheados a producción:
+  - `e7f69e3` fix(mi-magia): Tito chat siempre visible
+  - `afc42f4` feat(circulo): agregar chat de Tito interactivo
+  - `193769e` fix(test-guardian): corregir bug arquetipoScores
+  - `bafd740` docs: agregar CORRECCIONES-PENDIENTES.md
 
 ---
 
