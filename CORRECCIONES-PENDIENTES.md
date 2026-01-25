@@ -21,7 +21,7 @@
 | URLs hardcodeadas | ✅ Centralizadas | MEDIA |
 | Páginas dinámicas | ✅ Analizadas - OK como están | BAJA |
 | Colores dorados | ✅ Unificados con CSS variable | MEDIA |
-| Emails Test Guardián | 🔴 Implementado pero no llega | MEDIA |
+| Emails Test Guardián | ✅ Gmail SMTP funcionando | MEDIA |
 
 ---
 
@@ -506,7 +506,7 @@ define( 'ANTHROPIC_API_KEY', 'sk-ant-api03-...' );
 
 | Problema | Estado | Notas |
 |----------|--------|-------|
-| Email no llega | 🟡 | Implementado con `wp_mail()`, requiere debug SMTP |
+| Email no llega | ✅ RESUELTO | Gmail SMTP desde info@duendesdeluruguay.com |
 | Vercel no despliega | ✅ RESUELTO | Verificado 2026-01-25 - APIs funcionan |
 | GitHub-Vercel conexión | ✅ RESUELTO | Deploy automático funcionando |
 
