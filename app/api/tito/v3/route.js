@@ -329,7 +329,7 @@ export async function POST(request) {
     const userName = nombre || first_name || usuario?.nombre || '';
     // Usar email como subscriberId si el usuario está logueado
     const subscriberId = subscriber_id || (usuario?.email ? `wp:${usuario.email}` : null);
-    const conversationHistory = historial || history || [];
+    const conversationHistory = (historial && historial.length > 0) ? historial : (history || []);
 
     if (!msg.trim()) {
       return Response.json({

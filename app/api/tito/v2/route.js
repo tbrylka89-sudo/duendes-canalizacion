@@ -470,7 +470,7 @@ export async function POST(request) {
     const userName = nombre || first_name || '';
     const platform_ = plataforma || platform || 'instagram';
     const subscriberId = subscriber_id;
-    const conversationHistory = historial || history || [];
+    const conversationHistory = (historial && historial.length > 0) ? historial : (history || []);
 
     // DEBUG: Ver valores parseados
     console.log('[TITO v2] Parseado:', {
