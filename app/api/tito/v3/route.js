@@ -396,8 +396,40 @@ export async function POST(request) {
     // Determinar si es primera interacción
     const esPrimeraInteraccion = conversationHistory.length === 0;
 
+    // Detectar si están diciendo su país después de que mostramos productos
+    const msgLower = msg.toLowerCase();
+    const dicePais = /^(de |soy de |desde )?(uruguay|argentina|mexico|méxico|colombia|chile|peru|perú|brasil|españa|usa|estados unidos|ecuador|panama|panamá)/i.test(msgLower) ||
+                     /^(uruguayo|argentina|mexicano|colombiano|chileno|peruano|brasileño|español)/i.test(msgLower);
+
+    // Verificar si en el historial ya mostramos productos (buscando patrones de precio)
+    const historialTexto = conversationHistory.map(h => h.content || h.t || '').join(' ');
+    const yaSeVieronProductos = /\$\d+\s*(USD|usd)|\$\d{1,3}(\.\d{3})*\s*pesos/i.test(historialTexto);
+
     let instruccionEspecifica = '';
-    if (esPrimeraInteraccion) {
+
+    // CASO ESPECIAL: Dicen el país después de ver productos
+    if (dicePais && yaSeVieronProductos && !esPrimeraInteraccion) {
+      instruccionEspecifica = `\n\n🚨 ACCIÓN INMEDIATA REQUERIDA - USUARIO DIJO SU PAÍS:
+El usuario acaba de decir de qué país es DESPUÉS de ver productos.
+
+TU ÚNICA TAREA AHORA:
+1. USA la tool calcular_precio para cada producto que mostraste
+2. Respondé SOLO con los precios convertidos a su moneda
+3. Preguntá cuál le gustó más
+
+❌ PROHIBIDO EN ESTA RESPUESTA:
+- Preguntar "¿qué andás buscando?"
+- Preguntar "¿algo en particular?"
+- Reiniciar la conversación
+- Ignorar los productos que ya mostraste
+
+✅ EJEMPLO DE RESPUESTA CORRECTA:
+"¡Genial, paisano! 🇺🇾 Te paso los precios en pesos:
+• Zoe: $16.500
+• Andy: $8.000
+• Abraham: $8.000
+¿Cuál te llamó más?"`;
+    } else if (esPrimeraInteraccion) {
       instruccionEspecifica = `\n\n✨ PRIMERA INTERACCIÓN:
 - El widget YA te presentó, NO digas "Soy Tito"
 - Si el usuario pide algo (precios, abundancia, etc) → USA mostrar_productos INMEDIATAMENTE
