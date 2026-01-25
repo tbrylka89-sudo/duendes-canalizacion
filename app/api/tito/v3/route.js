@@ -498,7 +498,7 @@ export async function POST(request) {
     }
 
     // Si no se retornó antes, continuar con flujo normal
-    let instruccionEspecifica = '';
+    instruccionEspecifica = '';
     if (esPrimeraInteraccion) {
       instruccionEspecifica = `\n\n✨ PRIMERA INTERACCIÓN:
 - El widget YA te presentó, NO digas "Soy Tito"
