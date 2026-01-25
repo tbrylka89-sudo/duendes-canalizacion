@@ -1034,16 +1034,19 @@ if (dicePais && yaSeVieronProductos) {
 
 ### TAREAS PENDIENTES
 
-#### ❌ URL del Test del Guardián
-- **Problema:** Tito menciona `https://duendesdeluruguay.com/descubri-que-duende-te-elige/` pero da 404
-- **Acción requerida:** Crear la página del test o actualizar los links en:
+#### ✅ URL del Test del Guardián - CORREGIDA 25/01/2026
+- **Problema original:** Tito mencionaba `/test-del-guardian/` que daba 404
+- **Solución:** Actualizada a `https://duendesdeluruguay.com/descubri-que-duende-te-elige/` que SÍ existe
+- **Archivos actualizados:**
   - `lib/tito/personalidad.js`
   - `app/api/tito/v3/route.js`
+  - Plugins de WordPress
 
-#### ❌ Verificar Deploy de Vercel
-- **Problema:** Los cambios de git se pushean pero el endpoint `/api/cotizaciones` da 404
-- **Posible causa:** Vercel no está conectado al repo o hay error de build
-- **Verificar en:** https://vercel.com/dashboard → proyecto `duendes-vercel`
+#### ✅ Vercel Deploy - CORREGIDO 25/01/2026
+- **Problema original:** Endpoint `/api/cotizaciones` daba 404, deployments fallando
+- **Causa:** Error de build por variable `instruccionEspecifica` redefinida con `let` en `route.js`
+- **Solución:** Removido `let` de la segunda definición
+- **Estado actual:** Deploy funcionando, endpoint activo
 
 #### ❌ Links de Tito deben ser clickeables
 - **Problema:** Los links que da Tito hay que copiar y pegar, no son clickeables
@@ -1058,7 +1061,7 @@ if (dicePais && yaSeVieronProductos) {
 | API Tito | https://duendes-vercel.vercel.app/api/tito/v3 |
 | API Cotizaciones | https://duendes-vercel.vercel.app/api/cotizaciones |
 | Tienda | https://duendesdeluruguay.com/tienda/ |
-| Test (NO EXISTE) | https://duendesdeluruguay.com/descubri-que-duende-te-elige/ |
+| Test del Guardián | https://duendesdeluruguay.com/descubri-que-duende-te-elige/ |
 
 ---
 
