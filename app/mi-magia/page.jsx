@@ -3947,58 +3947,67 @@ function MiMagiaContent() {
     setCargando(false);
   };
 
-  if (cargando) return <Carga />;
-  if (necesitaLogin) return <LoginMagicLink onLoginExitoso={() => window.location.reload()} />;
-  if (onboarding) return <Onboarding usuario={usuario} token={token} onDone={(d) => { setUsuario({...usuario, ...d, onboardingCompleto: true, runas: 100}); setOnboarding(false); setMostrandoTour(true); }} />;
-  if (mostrandoTour) return <TourMiMagia usuario={usuario} onFinish={async () => {
-    setMostrandoTour(false);
-    localStorage.setItem('tour_mimagia_visto', 'true');
-    // Guardar también en backend para persistencia
-    try {
-      await fetch(`${API_BASE}/api/mi-magia/usuario`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: usuario.email, tourVisto: true })
-      });
-    } catch(e) { console.error('Error guardando tourVisto:', e); }
-    // Si no completó el perfil básico, mostrarlo primero
-    if (!usuario?.perfilCompleto) {
-      setMostrandoPerfil(true);
-    } else if (!usuario?.perfilPsicologico && !usuario?.perfiladoCompletado) {
-      // Si ya tiene perfil básico pero no el psicológico, mostrar perfilado
-      setMostrandoPerfilado(true);
-    }
-  }} />;
-
-  if (mostrandoPerfil) return <FormularioPerfil
-    usuario={usuario}
-    onComplete={(perfilData) => {
-      setUsuario({...usuario, ...perfilData, perfilCompleto: true});
-      setMostrandoPerfil(false);
-      // Mostrar test de perfilado psicológico si no está completado
-      if (!usuario?.perfilPsicologico) {
+  // Función para renderizar contenido según estado (Tito se renderiza siempre al final)
+  const renderContenidoEstado = () => {
+    if (cargando) return <Carga />;
+    if (necesitaLogin) return <LoginMagicLink onLoginExitoso={() => window.location.reload()} />;
+    if (onboarding) return <Onboarding usuario={usuario} token={token} onDone={(d) => { setUsuario({...usuario, ...d, onboardingCompleto: true, runas: 100}); setOnboarding(false); setMostrandoTour(true); }} />;
+    if (mostrandoTour) return <TourMiMagia usuario={usuario} onFinish={async () => {
+      setMostrandoTour(false);
+      localStorage.setItem('tour_mimagia_visto', 'true');
+      try {
+        await fetch(`${API_BASE}/api/mi-magia/usuario`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: usuario.email, tourVisto: true })
+        });
+      } catch(e) { console.error('Error guardando tourVisto:', e); }
+      if (!usuario?.perfilCompleto) {
+        setMostrandoPerfil(true);
+      } else if (!usuario?.perfilPsicologico && !usuario?.perfiladoCompletado) {
         setMostrandoPerfilado(true);
       }
-    }}
-    onSkip={() => {
-      setMostrandoPerfil(false);
-      // Mostrar test de perfilado psicológico si no está completado
-      if (!usuario?.perfilPsicologico) {
-        setMostrandoPerfilado(true);
-      }
-    }}
-  />;
+    }} />;
+    if (mostrandoPerfil) return <FormularioPerfil
+      usuario={usuario}
+      onComplete={(perfilData) => {
+        setUsuario({...usuario, ...perfilData, perfilCompleto: true});
+        setMostrandoPerfil(false);
+        if (!usuario?.perfilPsicologico) {
+          setMostrandoPerfilado(true);
+        }
+      }}
+      onSkip={() => {
+        setMostrandoPerfil(false);
+        if (!usuario?.perfilPsicologico) {
+          setMostrandoPerfilado(true);
+        }
+      }}
+    />;
+    if (mostrandoPerfilado) return <TestPerfiladoPsicologico
+      usuario={usuario}
+      onComplete={(perfilPsicologico) => {
+        if (perfilPsicologico) {
+          setUsuario({...usuario, perfilPsicologico, perfiladoCompletado: true});
+        }
+        setMostrandoPerfilado(false);
+      }}
+      onSkip={() => setMostrandoPerfilado(false)}
+    />;
+    return null; // Estado normal - renderizar contenido principal
+  };
 
-  if (mostrandoPerfilado) return <TestPerfiladoPsicologico
-    usuario={usuario}
-    onComplete={(perfilPsicologico) => {
-      if (perfilPsicologico) {
-        setUsuario({...usuario, perfilPsicologico, perfiladoCompletado: true});
-      }
-      setMostrandoPerfilado(false);
-    }}
-    onSkip={() => setMostrandoPerfilado(false)}
-  />;
+  // Si hay un estado especial (cargando, login, onboarding, etc.), renderizarlo con Tito
+  const estadoEspecial = renderContenidoEstado();
+  if (estadoEspecial) {
+    return (
+      <>
+        <style jsx global>{estilos}</style>
+        {estadoEspecial}
+        {!cargando && <Tito usuario={usuario} abierto={chatAbierto} setAbierto={setChatAbierto} />}
+      </>
+    );
+  }
 
   const renderSeccion = () => {
     switch(seccion) {
