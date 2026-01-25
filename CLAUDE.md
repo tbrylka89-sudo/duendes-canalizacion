@@ -959,4 +959,132 @@ Contiene las versiones locales de los plugins antes de subir al servidor.
 
 ---
 
+## ACTUALIZACIONES 25/01/2026
+
+### Caché de la Web (COMPLETADO)
+
+**Problema:** La web tardaba 2.5s en cargar (TTFB muy alto, x-cache: MISS)
+
+**Causa:** El plugin Multi Currency seteaba cookies en cada request, bloqueando el caché de nginx.
+
+**Solución implementada:**
+- Archivo: `mu-plugins/wmc-cache-fix.php` - Fuerza Multi Currency a usar sessions
+- Archivo: `mu-plugins/duendes-cache-headers.php` - Permite caché en páginas públicas
+
+**Resultado:**
+- TTFB: 2.5s → **0.66s** (4x más rápido)
+- x-cache: MISS → **HIT**
+
+**Archivos en servidor:**
+```
+/web/wp-live/wp-content/mu-plugins/wmc-cache-fix.php
+/web/wp-live/wp-content/mu-plugins/duendes-cache-headers.php
+```
+
+---
+
+### Tito - Contexto al decir País (COMPLETADO)
+
+**Problema:** Cuando el usuario decía su país después de ver productos, Tito preguntaba "¿Qué andás buscando?" en vez de convertir los precios.
+
+**Causa:** Claude no seguía las instrucciones del prompt.
+
+**Solución implementada:**
+- Detección automática cuando dicen país (regex en backend)
+- Respuesta generada DIRECTAMENTE sin llamar a Claude
+- Precios calculados en el backend (determinístico)
+
+**Archivos modificados:**
+- `app/api/tito/v3/route.js` - Detección y respuesta directa
+- `lib/tito/personalidad.js` - Instrucciones actualizadas
+
+**Código clave (route.js líneas ~400-500):**
+```javascript
+// Detectar si están diciendo su país después de que mostramos productos
+const dicePais = /^(de |soy de )?(uruguay|argentina|mexico|...)/.test(msgLower);
+const yaSeVieronProductos = /\$\d+\s*USD/.test(historialTexto);
+
+if (dicePais && yaSeVieronProductos) {
+  // Generar respuesta directa SIN llamar a Claude
+  return Response.json({ respuesta: respuestaDirecta, ... });
+}
+```
+
+---
+
+### Sistema de Cotizaciones en Tiempo Real (COMPLETADO)
+
+**Archivo nuevo:** `lib/tito/cotizaciones.js`
+
+**Funcionalidad:**
+- Obtiene tasas de `exchangerate-api.com` (gratis)
+- Caché de 6 horas en Vercel KV
+- Fallback a tasas hardcoded si API falla
+- Uruguay usa precios FIJOS (no depende de cotización)
+
+**Endpoint:** `/api/cotizaciones`
+- GET: Ver cotizaciones actuales
+- POST: Forzar actualización
+
+**Integración:**
+- `route.js` usa `obtenerCotizaciones()` para convertir precios
+- `tool-executor.js` actualizado para usar cotizaciones live
+
+---
+
+### TAREAS PENDIENTES
+
+#### ❌ URL del Test del Guardián
+- **Problema:** Tito menciona `https://duendesdeluruguay.com/descubri-que-duende-te-elige/` pero da 404
+- **Acción requerida:** Crear la página del test o actualizar los links en:
+  - `lib/tito/personalidad.js`
+  - `app/api/tito/v3/route.js`
+
+#### ❌ Verificar Deploy de Vercel
+- **Problema:** Los cambios de git se pushean pero el endpoint `/api/cotizaciones` da 404
+- **Posible causa:** Vercel no está conectado al repo o hay error de build
+- **Verificar en:** https://vercel.com/dashboard → proyecto `duendes-vercel`
+
+#### ❌ Links de Tito deben ser clickeables
+- **Problema:** Los links que da Tito hay que copiar y pegar, no son clickeables
+- **Ubicación:** Verificar en `duendes-tito-widget.php` función `agregarMensaje()`
+
+---
+
+### URLs Importantes
+
+| Recurso | URL |
+|---------|-----|
+| API Tito | https://duendes-vercel.vercel.app/api/tito/v3 |
+| API Cotizaciones | https://duendes-vercel.vercel.app/api/cotizaciones |
+| Tienda | https://duendesdeluruguay.com/tienda/ |
+| Test (NO EXISTE) | https://duendesdeluruguay.com/descubri-que-duende-te-elige/ |
+
+---
+
+### Notas Técnicas
+
+**Para subir archivos a WordPress via SFTP:**
+```bash
+expect << 'EOF'
+spawn sftp -P 55309 sftp_live_WfP6i@34.70.139.72
+expect "password:"
+send "JzflrSheUnj4itUE27Aqr0SgD3cG5LXhCR\r"
+expect "sftp>"
+send "cd web/wp-live/wp-content/mu-plugins\r"
+expect "sftp>"
+send "put archivo.php\r"
+expect "sftp>"
+send "bye\r"
+expect eof
+EOF
+```
+
+**Para hacer deploy a Vercel:**
+```bash
+git add -A && git commit -m "mensaje" && git push
+```
+
+---
+
 *Este documento es la guía viva de cómo creamos magia real en Duendes del Uruguay. Cada palabra cuenta. Cada mensaje importa. Cada persona merece sentirse única.*

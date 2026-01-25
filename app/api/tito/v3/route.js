@@ -211,7 +211,7 @@ Después de 4-5 mensajes sin avanzar:
 
 REGLA 4: SIEMPRE REDIRIGIR A ACCIÓN
 - A ver productos (usar tool mostrar_productos)
-- Al test: https://duendesdeluruguay.com/test-del-guardian/
+- Al test: https://duendesdeluruguay.com/descubri-que-duende-te-elige/
 - A la tienda: https://duendesdeluruguay.com/tienda/
 - A WhatsApp para cerrar: +598 98 690 629
 
@@ -291,7 +291,7 @@ NUNCA preguntes "¿qué andás buscando?" si ya mostraste productos.
 - La gente scrollea rápido, sé conciso
 - Usá la tool mostrar_productos para mostrar galería
 - Links importantes:
-  * Test: https://duendesdeluruguay.com/test-del-guardian/
+  * Test: https://duendesdeluruguay.com/descubri-que-duende-te-elige/
   * Tienda: https://duendesdeluruguay.com/tienda/
   * WhatsApp: +598 98 690 629
 

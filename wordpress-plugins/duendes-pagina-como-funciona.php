@@ -1066,7 +1066,7 @@ function duendes_render_como_funciona() {
                     Cada guardián es una pieza única, creada a mano en Piriápolis.
                     Y cada uno busca a la persona correcta para acompañar.
                 </p>
-                <a href="/test-del-guardian/" class="dcf-hero-cta">
+                <a href="/descubri-que-duende-te-elige/" class="dcf-hero-cta">
                     Descubri quien te espera
                 </a>
             </div>
@@ -1529,7 +1529,7 @@ function duendes_render_como_funciona() {
                 </p>
 
                 <div class="dcf-cta-buttons">
-                    <a href="/test-del-guardian/" class="dcf-cta-btn-primary">
+                    <a href="/descubri-que-duende-te-elige/" class="dcf-cta-btn-primary">
                         Hacer el Test del Guardián
                     </a>
                     <a href="/tienda/" class="dcf-cta-btn-secondary">

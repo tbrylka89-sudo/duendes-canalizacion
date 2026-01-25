@@ -128,7 +128,7 @@ class Duendes_Fabrica_Banners {
                 'titulo' => 'Tu Guardian Te Espera',
                 'subtitulo' => 'Descubri cual es el guardian que resuena con tu energia. Hace el test gratuito.',
                 'cta_texto' => 'Hacer el Test',
-                'cta_url' => '/test-del-guardian/',
+                'cta_url' => '/descubri-que-duende-te-elige/',
                 'tipo' => 'test',
                 'ubicaciones' => json_encode(['homepage', 'tienda']),
                 'prioridad' => 20,
@@ -1331,7 +1331,7 @@ class Duendes_Fabrica_Banners {
                 'titulo_sugerido' => 'Descubri tu Guardian + Regalo',
                 'descripcion_sugerida' => 'Hace el test y recibiras un codigo especial de bienvenida.',
                 'cta_sugerido' => 'Hacer el Test',
-                'url_sugerida' => '/test-del-guardian/'
+                'url_sugerida' => '/descubri-que-duende-te-elige/'
             ];
         }
 
