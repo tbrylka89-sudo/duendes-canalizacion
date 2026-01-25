@@ -3905,52 +3905,93 @@ function SeccionCursos({ usuario }) {
                 </h4>
 
                 {cursoActivo.modulos?.map((modulo, idx) => (
-                  <div key={idx} className="modulo-card">
-                    {/* Número de semana */}
-                    <div className="modulo-numero">
-                      <span className="numero-semana">Semana {idx + 1}</span>
-                      <span className="numero-big">{idx + 1}</span>
-                    </div>
+                  <div key={idx} className={`modulo-card ${moduloAbierto === idx ? 'abierto' : ''}`}>
+                    {/* Header clickeable */}
+                    <button
+                      className="modulo-header"
+                      onClick={() => setModuloAbierto(moduloAbierto === idx ? null : idx)}
+                    >
+                      {/* Número de semana */}
+                      <div className="modulo-numero">
+                        <span className="numero-semana">Semana {idx + 1}</span>
+                        <span className="numero-big">{idx + 1}</span>
+                      </div>
 
-                    {/* Info del módulo */}
-                    <div className="modulo-info">
-                      <h5>{modulo.titulo}</h5>
+                      {/* Info básica */}
+                      <div className="modulo-info-header">
+                        <h5>{modulo.titulo}</h5>
+                        {modulo.duende && (
+                          <span className="modulo-duende-mini">
+                            🧙 {modulo.duende.nombre} • {modulo.duende.categoria}
+                          </span>
+                        )}
+                      </div>
 
-                      {/* Duende profesor */}
-                      {modulo.duende && (
-                        <div className="modulo-duende">
-                          <div className="duende-avatar-mini">
-                            <span className="avatar-placeholder">🧙</span>
+                      {/* Indicador expandir */}
+                      <div className="modulo-expand">
+                        <span className={`expand-icon ${moduloAbierto === idx ? 'rotado' : ''}`}>▼</span>
+                      </div>
+                    </button>
+
+                    {/* Contenido expandible */}
+                    {moduloAbierto === idx && (
+                      <div className="modulo-contenido-expandido">
+                        {/* Duende profesor con más detalles */}
+                        {modulo.duende && (
+                          <div className="modulo-duende-full">
+                            <div className="duende-avatar">
+                              <span className="avatar-emoji">🧙</span>
+                            </div>
+                            <div className="duende-info-full">
+                              <h6>{modulo.duende.nombre}</h6>
+                              <span className="duende-cat">{modulo.duende.categoria}</span>
+                              {modulo.duende.personalidad && (
+                                <p className="duende-personalidad">{modulo.duende.personalidad}</p>
+                              )}
+                              {modulo.duende.cristales && (
+                                <div className="modulo-cristales">
+                                  {modulo.duende.cristales.map((cristal, i) => (
+                                    <span key={i} className="cristal-tag">💎 {cristal}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <div className="duende-datos">
-                            <span className="duende-nombre">{modulo.duende.nombre}</span>
-                            <span className="duende-categoria">{modulo.duende.categoria}</span>
+                        )}
+
+                        {/* Contenido del módulo */}
+                        {modulo.contenido?.introduccion && (
+                          <div className="modulo-texto">
+                            {modulo.contenido.introduccion.split('\n\n').map((parrafo, i) => (
+                              <p key={i}>{parrafo}</p>
+                            ))}
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Preview del contenido */}
-                      {modulo.contenido?.introduccion && (
-                        <p className="modulo-preview">
-                          {modulo.contenido.introduccion.substring(0, 150)}...
-                        </p>
-                      )}
+                        {/* Lecciones si las hay */}
+                        {modulo.lecciones && modulo.lecciones.length > 0 && (
+                          <div className="modulo-lecciones">
+                            <h6>Lecciones del módulo:</h6>
+                            <ul>
+                              {modulo.lecciones.map((leccion, li) => (
+                                <li key={li}>
+                                  <span className="leccion-numero">{li + 1}</span>
+                                  <span className="leccion-titulo">{leccion.titulo || leccion}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
 
-                      {/* Cristales del duende */}
-                      {modulo.duende?.cristales && (
-                        <div className="modulo-cristales">
-                          {modulo.duende.cristales.map((cristal, i) => (
-                            <span key={i} className="cristal-tag">💎 {cristal}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Duración */}
-                    <div className="modulo-duracion">
-                      <span className="duracion-icono">⏱️</span>
-                      <span>{modulo.duracion_minutos || 30} min</span>
-                    </div>
+                        {/* Ejercicio o práctica */}
+                        {modulo.contenido?.ejercicio && (
+                          <div className="modulo-ejercicio">
+                            <h6>✍️ Ejercicio</h6>
+                            <p>{modulo.contenido.ejercicio}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
