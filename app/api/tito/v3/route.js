@@ -209,6 +209,13 @@ SIEMPRE recordá:
 - Qué necesidad expresó (amor, abundancia, protección)
 - Qué preguntas ya hizo
 NO repitas información ni preguntas que ya hiciste.
+
+CUANDO TE DICEN EL PAÍS - ACCIÓN INMEDIATA:
+Si el usuario dice "soy de uruguay/argentina/colombia/etc":
+1. USA la tool calcular_precio para cada producto que mostraste
+2. Respondé con los precios convertidos
+3. Preguntá cuál le llamó más o si quiere ver más
+NUNCA preguntes "¿qué andás buscando?" si ya mostraste productos.
 `;
 
   // Instrucciones según análisis del cliente
