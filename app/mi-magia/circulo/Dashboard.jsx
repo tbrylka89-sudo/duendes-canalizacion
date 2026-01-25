@@ -3769,6 +3769,7 @@ function SeccionContenido() {
 function SeccionCursos({ usuario }) {
   const [cursos, setCursos] = useState([]);
   const [cursoActivo, setCursoActivo] = useState(null);
+  const [moduloAbierto, setModuloAbierto] = useState(null); // índice del módulo expandido
   const [progreso, setProgreso] = useState({});
   const [cargando, setCargando] = useState(true);
 
