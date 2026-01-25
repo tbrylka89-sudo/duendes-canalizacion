@@ -4079,7 +4079,7 @@ function MiMagiaContent() {
   return (
     <div className="app">
       <style jsx global>{estilos}</style>
-      <header className="header" style={isMobile ? {padding: '0 12px'} : {}}>
+      <header className="mi-magia-header" style={isMobile ? {padding: '0 12px'} : {}}>
         <div className="logo"><span>✦</span> MI MAGIA</div>
         {!isMobile && <div className="user-info">{saludoPersonalizado(usuario?.nombrePreferido, usuario?.genero || usuario?.pronombre)}</div>}
         <div className="hstats" style={isMobile ? {gap: '6px'} : {}}>
