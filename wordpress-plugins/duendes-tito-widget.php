@@ -938,6 +938,8 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         container.className = 'tito-galeria';
         productos.forEach(function(p) {
             const imgSrc = p.imagen && p.imagen !== 'null' && p.imagen.startsWith('http') ? p.imagen : CONFIG.TITO_AVATAR;
+            // El precio puede venir como precio_usd o precio
+            const precio = p.precio_usd || p.precio || '?';
             const card = document.createElement('a');
             card.className = 'tito-galeria-card';
             card.href = p.url || '#';
@@ -945,8 +947,8 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
             card.innerHTML = '<img src="' + imgSrc + '" alt="' + p.nombre + '" onerror="this.src=\'' + CONFIG.TITO_AVATAR + '\'">' +
                 '<div class="tito-galeria-info">' +
                 '<p class="tito-galeria-nombre">' + p.nombre + '</p>' +
-                '<p class="tito-galeria-precio">$' + p.precio + ' USD</p>' +
-                '<span class="tito-galeria-btn">Ver ✨</span>' +
+                '<p class="tito-galeria-precio">$' + precio + ' USD</p>' +
+                '<span class="tito-galeria-btn">Ver</span>' +
                 '</div>';
             container.appendChild(card);
         });
