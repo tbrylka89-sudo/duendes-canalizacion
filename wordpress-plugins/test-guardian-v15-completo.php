@@ -480,6 +480,61 @@ function duendes_test_guardian_v15_standalone() {
         color: rgba(255,255,255,0.7);
     }
 
+    /* CONVERSION ELEMENTS */
+    .tg-urgencia-badge {
+        background: linear-gradient(90deg, #ff0080 0%, #8b00ff 100%);
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 8px 20px;
+        border-radius: 20px;
+        display: inline-block;
+        margin: 10px auto 20px;
+        animation: pulse-soft 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-soft {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.02); opacity: 0.9; }
+    }
+
+    .tg-conversion-box {
+        background: rgba(255,0,128,0.08);
+        border-left: 3px solid rgba(255,0,128,0.5);
+        padding: 15px 20px;
+        margin: 20px 0;
+        text-align: left;
+        border-radius: 0 12px 12px 0;
+    }
+
+    .tg-conversion-texto {
+        font-size: 15px;
+        color: rgba(255,255,255,0.85);
+        font-style: italic;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .tg-btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 25px 0;
+    }
+
+    .tg-btn-principal {
+        background: linear-gradient(135deg, #ff0080 0%, #8b00ff 100%);
+        font-size: 18px;
+        padding: 18px 40px;
+    }
+
+    .tg-btn-principal:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 30px rgba(255,0,128,0.5);
+    }
+
     /* EMAIL CAPTURE */
     .tg-email-box {
         background: rgba(255,255,255,0.05);
@@ -667,11 +722,22 @@ function duendes_test_guardian_v15_standalone() {
                 <p id="result-guardian-categoria" class="tg-guardian-categoria"></p>
                 <p id="result-guardian-precio" class="tg-guardian-precio"></p>
 
+                <!-- Badge de urgencia (se muestra si aplica) -->
+                <div id="result-urgencia" class="tg-urgencia-badge" style="display: none;"></div>
+
                 <div id="result-mensaje" class="tg-mensaje-guardian"></div>
 
-                <a id="result-btn-conocer" href="#" class="tg-btn" target="_blank">
-                    Conocer a mi Guardian
-                </a>
+                <!-- Texto de conversion sutil -->
+                <div id="result-conversion" class="tg-conversion-box" style="display: none;"></div>
+
+                <div class="tg-btn-container">
+                    <a id="result-btn-conocer" href="#" class="tg-btn tg-btn-principal" target="_blank">
+                        Conocer a mi Guardian
+                    </a>
+                    <a id="result-btn-secundario" href="#" class="tg-btn tg-btn-secondary" style="display: none;">
+                        Guardar para despues
+                    </a>
+                </div>
 
                 <div id="result-alternativas" class="tg-alternativas">
                     <p class="tg-alternativas-titulo">Otros guardianes que resuenan con vos:</p>
@@ -990,6 +1056,40 @@ const TG = {
             document.getElementById('result-guardian-categoria').textContent = data.guardian.categoria;
             document.getElementById('result-guardian-precio').textContent = '$' + data.guardian.precio + ' USD';
             document.getElementById('result-btn-conocer').href = data.guardian.url;
+
+            // CTAs personalizados segun perfil
+            if (data.conversion && data.conversion.cta) {
+                const btnConocer = document.getElementById('result-btn-conocer');
+                btnConocer.textContent = data.conversion.cta.principal || 'Quiero conocerlo';
+
+                // Boton secundario
+                if (data.conversion.cta.secundario) {
+                    const btnSecundario = document.getElementById('result-btn-secundario');
+                    if (btnSecundario) {
+                        btnSecundario.textContent = data.conversion.cta.secundario;
+                        btnSecundario.style.display = 'inline-block';
+                    }
+                }
+
+                // Badge de urgencia si aplica
+                if (data.conversion.cta.urgencia) {
+                    const urgenciaBadge = document.getElementById('result-urgencia');
+                    if (urgenciaBadge) {
+                        urgenciaBadge.textContent = data.conversion.cta.urgencia;
+                        urgenciaBadge.style.display = 'block';
+                    }
+                }
+            }
+
+            // Estrategias de conversion (mostramos una sutil)
+            const conversionContainer = document.getElementById('result-conversion');
+            if (data.conversion && data.conversion.estrategias && data.conversion.estrategias.length > 0) {
+                const estrategia = data.conversion.estrategias[0];
+                if (conversionContainer) {
+                    conversionContainer.innerHTML = '<p class="tg-conversion-texto">' + estrategia.texto + '</p>';
+                    conversionContainer.style.display = 'block';
+                }
+            }
 
             // Alternativas
             const altGrid = document.getElementById('result-alt-grid');

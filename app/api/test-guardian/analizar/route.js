@@ -5,12 +5,14 @@
  * - Perfil psicologico completo
  * - Sincronicidades personalizadas
  * - Guardian recomendado (producto real de WooCommerce)
- * - Mensaje personalizado del guardian
+ * - Mensaje personalizado generado con IA
+ * - Estrategias de conversion aplicadas
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { NextResponse } from 'next/server';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+import Anthropic from '@anthropic-ai/sdk';
 
 // ===== CONFIGURACION WOOCOMMERCE =====
 const woo = new WooCommerceRestApi({
@@ -19,6 +21,63 @@ const woo = new WooCommerceRestApi({
   consumerSecret: process.env.WOO_CONSUMER_SECRET,
   version: 'wc/v3'
 });
+
+// ===== CONFIGURACION ANTHROPIC =====
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+// ===== ESTRATEGIAS DE CONVERSION PROBADAS =====
+const CONVERSION_STRATEGIES = {
+  // Escasez: solo quedan X - compra impulsiva
+  escasez: {
+    textos: [
+      'Este guardian es pieza unica - cuando encuentre hogar, desaparece para siempre.',
+      'Solo queda uno disponible. Si sigue aca manana, sera por algo.',
+      'Es el ultimo de su especie en el taller.'
+    ]
+  },
+  // Prueba social: otros compraron
+  pruebaSocial: {
+    textos: [
+      '{n} personas eligieron este guardian esta semana.',
+      'Es uno de los guardianes mas buscados de la tienda.',
+      'Muchas almas sensibles como vos encontraron en el a su companero.'
+    ]
+  },
+  // Aversion a la perdida: lo que perdes si no actuas
+  aversionPerdida: {
+    textos: [
+      'Lo que sentiste al verlo no va a volver si dejas que otro lo adopte.',
+      'Esa conexion que sentis ahora es real. Ignorarla tiene un costo.',
+      'Los guardianes eligen a sus humanos. Si te llamo, hay una razon.'
+    ]
+  },
+  // Urgencia temporal: actuar ahora
+  urgencia: {
+    textos: [
+      'Este momento de claridad es un regalo. No lo dejes pasar.',
+      'Tu intuicion te trajo hasta aca en este preciso momento.',
+      'Lo que buscas ya te encontro. Solo falta que digas si.'
+    ]
+  },
+  // Reciprocidad: ya te di algo
+  reciprocidad: {
+    textos: [
+      'Ya compartimos algo importante vos y yo. Este test fue un encuentro real.',
+      'Lo que te conte sobre vos no te lo cuento a cualquiera.',
+      'Ya te vi. Ya te escuche. El primer paso ya esta dado.'
+    ]
+  },
+  // Compromiso: pequeños pasos
+  compromiso: {
+    textos: [
+      'No tenes que decidir ahora. Pero dejame guardarte un lugar en tu corazon.',
+      'Simplemente agendalo para cuando estes lista. Sin presion.',
+      'Dame tu email y te cuento mas sobre nosotros. Sin compromiso.'
+    ]
+  }
+};
 
 // ===== SISTEMA DE PERFILADO =====
 
@@ -296,7 +355,7 @@ async function buscarGuardianIdeal(perfil) {
   }
 }
 
-function generarMensajeGuardian(perfil, guardian, nombre) {
+function generarMensajeFallback(perfil, guardian, nombre) {
   const nombreUsuario = nombre || 'buscador';
   const dolor = TIPOS_DOLOR[perfil.dolorPrincipal];
 
@@ -324,6 +383,146 @@ function generarMensajeGuardian(perfil, guardian, nombre) {
   }
 
   return mensaje;
+}
+
+// ===== GENERACION CON IA (ANTHROPIC) =====
+
+async function generarMensajeConIA(perfil, guardian, nombre, sincronicidades, respuestas) {
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.log('[IA] No hay API key de Anthropic, usando fallback');
+      return null;
+    }
+
+    const nombreUsuario = nombre || 'alma buscadora';
+    const dolor = TIPOS_DOLOR[perfil.dolorPrincipal];
+    const signo = SIGNOS_ZODIACALES[perfil.signo];
+
+    // Construir contexto rico para la IA
+    const contexto = `
+CONTEXTO DEL USUARIO:
+- Nombre: ${nombreUsuario}
+- Signo: ${signo?.nombre || 'desconocido'} (${signo?.elemento || ''})
+- Vulnerabilidad: ${perfil.vulnerabilidad}
+- Dolor principal: ${perfil.dolorPrincipal} - ${dolor?.mensaje || ''}
+- Estilo de decision: ${perfil.estiloDecision}
+- Respuestas del test: ${JSON.stringify(respuestas).substring(0, 500)}
+
+GUARDIAN RECOMENDADO:
+- Nombre: ${guardian?.nombre || 'Guardian protector'}
+- Categoria: ${guardian?.categoria || 'Proteccion'}
+- Descripcion: ${guardian?.descripcion || ''}
+
+SINCRONICIDADES:
+${sincronicidades.map(s => `- ${s.tipo}: ${s.mensaje}`).join('\n')}
+
+ESTRATEGIA DE CONVERSION A APLICAR:
+${perfil.estiloDecision === 'impulsivo' ? 'URGENCIA + ESCASEZ: actuar ahora, es unico, momento especial' : ''}
+${perfil.estiloDecision === 'analitico' ? 'RECIPROCIDAD + COMPROMISO: ya te di valor, sin presion, pequeno paso' : ''}
+${perfil.estiloDecision === 'emocional' ? 'AVERSION PERDIDA + PRUEBA SOCIAL: conexion real, otros lo eligieron' : ''}
+`;
+
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 600,
+      messages: [{
+        role: 'user',
+        content: `Sos ${guardian?.nombre || 'un guardian magico'} de Duendes del Uruguay.
+
+Escribi un mensaje PERSONAL de 3-4 oraciones para ${nombreUsuario} que acaba de hacer el Test del Guardian.
+
+REGLAS CRITICAS:
+1. Habla como un ser real que CONOCE a esta persona, no como IA generica
+2. Menciona algo ESPECIFICO de sus respuestas o situacion
+3. Usa espanol rioplatense (vos, tenes, podes)
+4. NO uses frases cliche ("desde las profundidades", "brumas ancestrales", etc)
+5. Incluye sutilmente UNA estrategia de conversion sin sonar a venta
+6. El tono es cercano, calido, directo - como un amigo sabio
+7. Termina con algo que invite a la accion sin presionar
+
+${contexto}
+
+IMPORTANTE: El mensaje debe sentirse como si el guardian REALMENTE conociera a la persona y le hablara desde el corazon. Nada generico.`
+      }]
+    });
+
+    return response.content[0].text;
+  } catch (error) {
+    console.error('[generarMensajeConIA] Error:', error);
+    return null;
+  }
+}
+
+// ===== SELECCION DE ESTRATEGIAS DE CONVERSION =====
+
+function seleccionarEstrategias(perfil, guardian) {
+  const estrategiasSeleccionadas = [];
+
+  // Segun estilo de decision
+  if (perfil.estiloDecision === 'impulsivo') {
+    estrategiasSeleccionadas.push({
+      tipo: 'urgencia',
+      texto: CONVERSION_STRATEGIES.urgencia.textos[Math.floor(Math.random() * 3)]
+    });
+    estrategiasSeleccionadas.push({
+      tipo: 'escasez',
+      texto: CONVERSION_STRATEGIES.escasez.textos[0] // pieza unica
+    });
+  } else if (perfil.estiloDecision === 'analitico') {
+    estrategiasSeleccionadas.push({
+      tipo: 'reciprocidad',
+      texto: CONVERSION_STRATEGIES.reciprocidad.textos[Math.floor(Math.random() * 3)]
+    });
+    estrategiasSeleccionadas.push({
+      tipo: 'compromiso',
+      texto: CONVERSION_STRATEGIES.compromiso.textos[0]
+    });
+  } else {
+    // emocional
+    estrategiasSeleccionadas.push({
+      tipo: 'aversionPerdida',
+      texto: CONVERSION_STRATEGIES.aversionPerdida.textos[Math.floor(Math.random() * 3)]
+    });
+    estrategiasSeleccionadas.push({
+      tipo: 'pruebaSocial',
+      texto: CONVERSION_STRATEGIES.pruebaSocial.textos[Math.floor(Math.random() * 3)].replace('{n}', Math.floor(Math.random() * 20) + 8)
+    });
+  }
+
+  // Segun vulnerabilidad
+  if (perfil.vulnerabilidad === 'alta') {
+    // Para vulnerable: reciprocidad + compromiso suave
+    estrategiasSeleccionadas.push({
+      tipo: 'compromiso',
+      texto: 'No hay apuro. Lo importante es que te sentiste escuchada.'
+    });
+  }
+
+  return estrategiasSeleccionadas;
+}
+
+// ===== GENERAR LLAMADA A ACCION SEGUN PERFIL =====
+
+function generarCTA(perfil, guardian) {
+  const ctas = {
+    impulsivo: {
+      principal: 'Quiero conocerlo',
+      secundario: 'Adoptalo ahora',
+      urgencia: 'Solo hoy: envio gratis'
+    },
+    analitico: {
+      principal: 'Ver mas detalles',
+      secundario: 'Guardar para despues',
+      urgencia: null
+    },
+    emocional: {
+      principal: 'Conectar con ' + (guardian?.nombre || 'mi guardian'),
+      secundario: 'Contame mas sobre el',
+      urgencia: null
+    }
+  };
+
+  return ctas[perfil.estiloDecision] || ctas.emocional;
 }
 
 // ===== HANDLER PRINCIPAL =====
@@ -362,10 +561,19 @@ export async function POST(request) {
     // 4. Buscar guardian ideal en WooCommerce
     const guardian = await buscarGuardianIdeal(perfil);
 
-    // 5. Generar mensaje personalizado
-    const mensajeGuardian = generarMensajeGuardian(perfil, guardian, nombre);
+    // 5. Generar mensaje con IA (o fallback)
+    let mensajeGuardian = await generarMensajeConIA(perfil, guardian, nombre, sincronicidades, respuestas);
+    if (!mensajeGuardian) {
+      mensajeGuardian = generarMensajeFallback(perfil, guardian, nombre);
+    }
 
-    // 6. Construir respuesta completa
+    // 6. Seleccionar estrategias de conversion
+    const estrategiasConversion = seleccionarEstrategias(perfil, guardian);
+
+    // 7. Generar CTAs personalizados
+    const cta = generarCTA(perfil, guardian);
+
+    // 8. Construir respuesta completa
     const resultado = {
       success: true,
       usuario: {
@@ -381,6 +589,13 @@ export async function POST(request) {
       sincronicidades,
       guardian,
       mensajeGuardian,
+      conversion: {
+        estrategias: estrategiasConversion,
+        cta,
+        enfoque: perfil.datosVulnerabilidad?.enfoque,
+        presionVenta: perfil.datosVulnerabilidad?.presion || 0,
+        tipoCierre: perfil.datosEstilo?.cierre
+      },
       recomendaciones: {
         enfoque: perfil.datosVulnerabilidad?.enfoque,
         presionVenta: perfil.datosVulnerabilidad?.presion || 0,
