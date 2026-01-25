@@ -532,6 +532,21 @@ function generarCTA(perfil, guardian) {
   return ctas[perfil.estiloDecision] || ctas.emocional;
 }
 
+// ===== CORS HEADERS =====
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Handler OPTIONS para CORS preflight
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders
+  });
+}
+
 // ===== HANDLER PRINCIPAL =====
 
 export async function POST(request) {
@@ -540,7 +555,7 @@ export async function POST(request) {
     const { nombre, email, fechaNacimiento, pais, respuestas } = body;
 
     if (!respuestas) {
-      return NextResponse.json({ error: 'Faltan respuestas del test' }, { status: 400 });
+      return NextResponse.json({ error: 'Faltan respuestas del test' }, { status: 400, headers: corsHeaders });
     }
 
     // 1. Calcular signo zodiacal
@@ -611,13 +626,13 @@ export async function POST(request) {
       timestamp: new Date().toISOString()
     };
 
-    return NextResponse.json(resultado);
+    return NextResponse.json(resultado, { headers: corsHeaders });
 
   } catch (error) {
     console.error('[API test-guardian/analizar] Error:', error);
     return NextResponse.json({
       error: 'Error procesando el test',
       detalle: error.message
-    }, { status: 500 });
+    }, { status: 500, headers: corsHeaders });
   }
 }
