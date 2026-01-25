@@ -9,14 +9,17 @@
 
 | Área | Estado | Prioridad |
 |------|--------|-----------|
-| Header/Navegación | 🟡 Analizado - pendiente fixes | ALTA |
+| Header/Navegación | 🟡 Analizado - pendiente CSS | ALTA |
 | Página de Inicio | 🔴 Pendiente análisis | ALTA |
 | Test del Guardián | ✅ Bug corregido | ALTA |
-| Mi Magia | 🟢 Tito corregido | ALTA |
-| Círculo de Duendes | 🟢 Tito agregado | MEDIA |
+| Mi Magia | ✅ Tito corregido | ALTA |
+| Círculo de Duendes | ✅ Tito agregado | MEDIA |
 | Chat Tito | ✅ CORREGIDO Mi Magia + Círculo | ALTA |
 | Conexión WordPress-Vercel | 🔴 Pendiente verificar | ALTA |
-| SEO/Assets | 🟡 Parcial | MEDIA |
+| SEO/Assets | ✅ Favicons + dominio corregidos | MEDIA |
+| Config next.config.js | ✅ Wildcard corregido | MEDIA |
+| URLs hardcodeadas | ✅ Centralizadas | MEDIA |
+| Páginas dinámicas | ✅ Analizadas - OK como están | BAJA |
 
 ---
 
@@ -290,11 +293,16 @@ Según CLAUDE.md:
 - **CORREGIDO:** Chat de Tito en Mi Magia (ahora aparece siempre)
 - **CORREGIDO:** Chat de Tito en Círculo (agregado chat interactivo)
 - **CORREGIDO:** Bug en Test del Guardián (`arquetipoScores` no definido)
-- **DEPLOYADO:** 4 commits pusheados a producción:
+- **DEPLOYADO (Ronda 1):** 4 commits:
   - `e7f69e3` fix(mi-magia): Tito chat siempre visible
   - `afc42f4` feat(circulo): agregar chat de Tito interactivo
   - `193769e` fix(test-guardian): corregir bug arquetipoScores
   - `bafd740` docs: agregar CORRECCIONES-PENDIENTES.md
+- **DEPLOYADO (Ronda 2):** 4 commits adicionales:
+  - `d291812` fix(assets): corregir referencias a favicons inexistentes
+  - `72afc66` fix(config): corregir wildcard en next.config.js
+  - `cb6b03f` refactor: centralizar WORDPRESS_URL
+  - `b4eca26` fix(seo): unificar dominio en sitemap y robots.txt
 
 ---
 
