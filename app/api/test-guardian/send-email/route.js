@@ -73,26 +73,53 @@ export async function POST(request) {
         `;
 
         // Enviar con Resend
-        const response = await fetch('https://api.resend.com/emails', {
+        // Primero intenta con dominio propio, si falla usa dominio de prueba
+        const dominioPropio = 'Duendes del Uruguay <hola@duendesdeluruguay.com>';
+        const dominioPrueba = 'Duendes del Uruguay <onboarding@resend.dev>';
+
+        const subject = esRegalo
+            ? `${nombre}, alguien te eligió un guardián`
+            : `${nombre}, tu guardián te encontró`;
+
+        // Intentar con dominio propio primero
+        let response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                from: 'Duendes del Uruguay <hola@duendesdeluruguay.com>',
+                from: dominioPropio,
                 to: email,
-                subject: esRegalo
-                    ? `${nombre}, alguien te eligió un guardián`
-                    : `${nombre}, tu guardián te encontró`,
+                subject: subject,
                 html: htmlContent
             })
         });
 
-        const result = await response.json();
+        let result = await response.json();
+
+        // Si falla por dominio no verificado, usar dominio de prueba
+        if (!response.ok && result.message?.includes('not verified')) {
+            console.log('Dominio propio no verificado, usando dominio de prueba de Resend');
+            response = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: dominioPrueba,
+                    to: email,
+                    subject: subject,
+                    html: htmlContent,
+                    reply_to: 'hola@duendesdeluruguay.com'
+                })
+            });
+            result = await response.json();
+        }
 
         if (response.ok) {
-            return NextResponse.json({ success: true, message: 'Email enviado' });
+            return NextResponse.json({ success: true, message: 'Email enviado', id: result.id });
         } else {
             console.error('Error Resend:', result);
             return NextResponse.json({ success: false, error: result.message || 'Error enviando email' });
