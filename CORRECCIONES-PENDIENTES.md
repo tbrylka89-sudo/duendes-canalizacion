@@ -9,7 +9,7 @@
 
 | Área | Estado | Prioridad |
 |------|--------|-----------|
-| Header/Navegación | 🟡 Analizado - pendiente CSS | ALTA |
+| Header/Navegación | ✅ Conflicto CSS resuelto | ALTA |
 | Página de Inicio | 🔴 Pendiente análisis | ALTA |
 | Test del Guardián | ✅ Bug corregido | ALTA |
 | Mi Magia | ✅ Tito corregido | ALTA |
@@ -303,6 +303,9 @@ Según CLAUDE.md:
   - `72afc66` fix(config): corregir wildcard en next.config.js
   - `cb6b03f` refactor: centralizar WORDPRESS_URL
   - `b4eca26` fix(seo): unificar dominio en sitemap y robots.txt
+- **DEPLOYADO (Ronda 3):** 2 commits adicionales:
+  - `11093c5` refactor(styles): unificar colores dorados con CSS variable
+  - `1838d5b` fix(css): renombrar .header a .mi-magia-header
 
 ---
 
