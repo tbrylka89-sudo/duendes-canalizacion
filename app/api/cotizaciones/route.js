@@ -2,6 +2,7 @@
  * API de Cotizaciones
  * GET - Ver cotizaciones actuales
  * POST - Forzar actualización
+ * Updated: 2026-01-25
  */
 
 import { obtenerCotizaciones, forzarActualizacion } from '@/lib/tito/cotizaciones';
