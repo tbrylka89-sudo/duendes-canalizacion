@@ -1,0 +1,679 @@
+<!-- SECCIÓN PAGOS Y ENVÍOS - ESTÉTICA NEGRA Y DORADA -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+.seccion-pagos-envios {
+    background: #0a0a0a !important;
+    padding: 100px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.seccion-pagos-envios * {
+    box-sizing: border-box;
+}
+
+.pagos-envios-deco {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.pagos-envios-deco::before,
+.pagos-envios-deco::after {
+    content: '';
+    position: absolute;
+    font-size: 20px;
+    letter-spacing: 15px;
+    white-space: nowrap;
+    width: 300px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,162,39,0.3), transparent);
+}
+
+.pagos-envios-deco::before {
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pagos-envios-deco::after {
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pagos-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+/* Header */
+.pagos-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.pagos-header .etiqueta {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 14px !important;
+    font-style: italic;
+    color: #c9a227 !important;
+    -webkit-text-fill-color: #c9a227 !important;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: transparent !important;
+}
+
+.pagos-header .etiqueta::before,
+.pagos-header .etiqueta::after {
+    content: '';
+    width: 50px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c9a227) !important;
+}
+
+.pagos-header .etiqueta::after {
+    background: linear-gradient(90deg, #c9a227, transparent) !important;
+}
+
+.pagos-header h2 {
+    font-family: 'Cinzel', serif !important;
+    font-size: clamp(28px, 5vw, 44px) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 400 !important;
+    letter-spacing: 2px !important;
+    margin: 0 0 15px 0 !important;
+    background: transparent !important;
+}
+
+.pagos-header h2 span {
+    color: #c9a227 !important;
+    -webkit-text-fill-color: #c9a227 !important;
+}
+
+.pagos-header .subtitulo {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 19px !important;
+    font-style: italic;
+    color: rgba(255,255,255,0.7) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
+    max-width: 600px;
+    margin: 0 auto;
+    background: transparent !important;
+}
+
+/* Grid principal */
+.pagos-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 35px;
+    margin-bottom: 50px;
+}
+
+/* ========== TARJETA URUGUAY ========== */
+.card-uruguay {
+    background: linear-gradient(145deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%) !important;
+    border: 2px solid rgba(201,162,39,0.3) !important;
+    border-radius: 20px;
+    padding: 40px 35px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.card-uruguay:hover {
+    border-color: rgba(201,162,39,0.5) !important;
+    box-shadow: 0 0 40px rgba(201,162,39,0.15);
+}
+
+.card-uruguay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #c9a227, transparent) !important;
+}
+
+.card-uruguay .region-header {
+    background: linear-gradient(135deg, rgba(201,162,39,0.1) 0%, rgba(201,162,39,0.02) 100%) !important;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 30px;
+    border: 1px solid rgba(201,162,39,0.2) !important;
+}
+
+.card-uruguay .bandera {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.card-uruguay .region-header h3 {
+    font-family: 'Cinzel', serif !important;
+    font-size: 24px !important;
+    color: #c9a227 !important;
+    -webkit-text-fill-color: #c9a227 !important;
+    font-weight: 600 !important;
+    letter-spacing: 3px !important;
+    margin: 0 !important;
+    text-transform: uppercase;
+    background: transparent !important;
+}
+
+.card-uruguay .ubicacion {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 15px !important;
+    color: rgba(255,255,255,0.6) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.6) !important;
+    font-style: italic;
+    margin-top: 8px;
+    background: transparent !important;
+}
+
+/* ========== TARJETA EXTERIOR ========== */
+.card-exterior {
+    background: linear-gradient(145deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%) !important;
+    border: 2px solid rgba(201,162,39,0.3) !important;
+    border-radius: 20px;
+    padding: 40px 35px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.card-exterior:hover {
+    border-color: rgba(201,162,39,0.5) !important;
+    box-shadow: 0 0 40px rgba(201,162,39,0.15);
+}
+
+.card-exterior::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #c9a227, transparent) !important;
+}
+
+.card-exterior .region-header {
+    background: linear-gradient(135deg, rgba(201,162,39,0.1) 0%, rgba(201,162,39,0.02) 100%) !important;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 30px;
+    border: 1px solid rgba(201,162,39,0.2) !important;
+}
+
+.card-exterior .bandera {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.card-exterior .region-header h3 {
+    font-family: 'Cinzel', serif !important;
+    font-size: 24px !important;
+    color: #c9a227 !important;
+    -webkit-text-fill-color: #c9a227 !important;
+    font-weight: 600 !important;
+    letter-spacing: 3px !important;
+    margin: 0 !important;
+    text-transform: uppercase;
+    background: transparent !important;
+}
+
+.card-exterior .ubicacion {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 15px !important;
+    color: rgba(255,255,255,0.6) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.6) !important;
+    font-style: italic;
+    margin-top: 8px;
+    background: transparent !important;
+}
+
+/* Secciones internas */
+.region-seccion {
+    margin-bottom: 30px;
+}
+
+.region-seccion:last-child {
+    margin-bottom: 0;
+}
+
+.region-seccion-titulo {
+    font-family: 'Cinzel', serif !important;
+    font-size: 12px !important;
+    color: rgba(255,255,255,0.5) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.5) !important;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent !important;
+}
+
+.region-seccion-titulo svg {
+    width: 18px;
+    height: 18px;
+    color: #c9a227 !important;
+}
+
+/* Logos */
+.logos-pago-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.logos-pago-grid img {
+    height: 26px;
+    width: auto;
+    border-radius: 4px;
+    opacity: 0.85;
+    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.95);
+    padding: 3px 6px;
+}
+
+.logos-pago-grid img:hover {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+/* Envío box - ambos */
+.card-uruguay .envio-box,
+.card-exterior .envio-box {
+    background: rgba(201,162,39,0.05) !important;
+    border: 1px solid rgba(201,162,39,0.2) !important;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+}
+
+.card-uruguay .envio-box .carrier-logo,
+.card-exterior .envio-box .carrier-logo {
+    height: 38px;
+    width: auto;
+    margin-bottom: 15px;
+    background: rgba(255,255,255,0.95);
+    padding: 5px 15px;
+    border-radius: 6px;
+}
+
+.card-uruguay .envio-box .tiempo,
+.card-exterior .envio-box .tiempo {
+    font-family: 'Cinzel', serif !important;
+    font-size: 28px !important;
+    color: #c9a227 !important;
+    -webkit-text-fill-color: #c9a227 !important;
+    font-weight: 600 !important;
+    margin-bottom: 5px;
+    background: transparent !important;
+}
+
+.card-uruguay .envio-box .descripcion,
+.card-exterior .envio-box .descripcion {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 16px !important;
+    color: rgba(255,255,255,0.7) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
+    font-style: italic;
+    background: transparent !important;
+}
+
+/* Badge envío gratis - ambos */
+.envio-gratis-uy,
+.envio-gratis-ext {
+    display: block;
+    background: linear-gradient(135deg, #c9a227 0%, #a68a1f 100%) !important;
+    color: #0a0a0a !important;
+    -webkit-text-fill-color: #0a0a0a !important;
+    font-family: 'Cinzel', serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.envio-gratis-uy strong,
+.envio-gratis-ext strong {
+    display: block;
+    font-size: 16px !important;
+    margin-bottom: 3px;
+    color: #0a0a0a !important;
+    -webkit-text-fill-color: #0a0a0a !important;
+}
+
+/* Nota pequeña */
+.nota-envio {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 13px !important;
+    color: rgba(255,255,255,0.5) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.5) !important;
+    font-style: italic;
+    text-align: center;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(201,162,39,0.03) !important;
+    border-radius: 8px;
+    border: 1px solid rgba(201,162,39,0.1) !important;
+}
+
+/* Footer seguridad */
+.seguridad-footer {
+    text-align: center;
+    padding-top: 40px;
+    border-top: 1px solid rgba(201,162,39,0.15) !important;
+}
+
+.seguridad-footer p {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 13px !important;
+    color: rgba(255,255,255,0.4) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.4) !important;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    background: transparent !important;
+}
+
+.procesadores-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 25px;
+}
+
+.procesadores-logos img {
+    height: 28px;
+    width: auto;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 12px;
+    border-radius: 6px;
+}
+
+.procesadores-logos img:hover {
+    opacity: 0.9;
+}
+
+.seguridad-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.seg-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 14px !important;
+    color: rgba(255,255,255,0.5) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.5) !important;
+    background: transparent !important;
+}
+
+.seg-badge svg {
+    width: 18px;
+    height: 18px;
+    color: #c9a227 !important;
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .pagos-main-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .seccion-pagos-envios {
+        padding: 70px 20px;
+    }
+
+    .card-uruguay,
+    .card-exterior {
+        padding: 30px 25px;
+    }
+}
+
+@media (max-width: 600px) {
+    .seccion-pagos-envios {
+        padding: 50px 15px;
+    }
+
+    .pagos-header h2 {
+        font-size: 26px !important;
+    }
+
+    .card-uruguay .region-header h3,
+    .card-exterior .region-header h3 {
+        font-size: 20px !important;
+    }
+
+    .logos-pago-grid img {
+        height: 22px;
+    }
+
+    .card-uruguay .envio-box .tiempo,
+    .card-exterior .envio-box .tiempo {
+        font-size: 24px !important;
+    }
+
+    .envio-gratis-uy,
+    .envio-gratis-ext {
+        font-size: 12px !important;
+        padding: 12px 15px;
+    }
+
+    .envio-gratis-uy strong,
+    .envio-gratis-ext strong {
+        font-size: 14px !important;
+    }
+
+    .seguridad-badges {
+        gap: 15px;
+    }
+
+    .seg-badge {
+        font-size: 12px !important;
+    }
+
+    .procesadores-logos {
+        gap: 25px;
+    }
+
+    .procesadores-logos img {
+        height: 22px;
+    }
+}
+</style>
+
+<section class="seccion-pagos-envios">
+    <div class="pagos-envios-deco"></div>
+
+    <div class="pagos-container">
+
+        <!-- Header -->
+        <div class="pagos-header">
+            <span class="etiqueta">Compra Segura</span>
+            <h2>Pagos y <span>Envios</span></h2>
+            <p class="subtitulo">Llegamos a todo el mundo. Conoce las opciones segun tu ubicacion.</p>
+        </div>
+
+        <!-- Grid principal -->
+        <div class="pagos-main-grid">
+
+            <!-- ========== URUGUAY ========== -->
+            <div class="card-uruguay">
+                <div class="region-header">
+                    <div class="bandera">🇺🇾</div>
+                    <h3>Uruguay</h3>
+                    <p class="ubicacion">Envios nacionales</p>
+                </div>
+
+                <!-- Formas de pago UY -->
+                <div class="region-seccion">
+                    <div class="region-seccion-titulo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                        Formas de Pago
+                    </div>
+                    <div class="logos-pago-grid">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.28.42.png" alt="Visa">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.29.10.png" alt="Mastercard">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.29.55.png" alt="Amex">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.30.25.png" alt="OCA">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.31.30.png" alt="PassCard">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.31.48.png" alt="Cabal">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.32.05.png" alt="ANDA">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-23-a-las-23.07.46.png" alt="ClubDelEste">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-23-a-las-23.07.53.png" alt="Redpagos">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.34.01.png" alt="Itau">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.33.44.png" alt="BROU">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-23-a-las-23.08.01.png" alt="Bandes">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.34.55.png" alt="BBVA">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.34.43.png" alt="Scotiabank">
+                    </div>
+                </div>
+
+                <!-- Envío UY -->
+                <div class="region-seccion">
+                    <div class="region-seccion-titulo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                        Envio
+                    </div>
+                    <div class="envio-box">
+                        <img class="carrier-logo" src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.46.41.png" alt="DAC">
+                        <div class="tiempo">5-7 dias habiles</div>
+                        <div class="descripcion">Retiro en agencia o entrega a domicilio</div>
+                    </div>
+                    <div class="envio-gratis-uy">
+                        <strong>ENVIO GRATIS</strong>
+                        en compras superiores a $10.000
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== RESTO DEL MUNDO ========== -->
+            <div class="card-exterior">
+                <div class="region-header">
+                    <div class="bandera">🌎</div>
+                    <h3>Resto del Mundo</h3>
+                    <p class="ubicacion">Envios internacionales</p>
+                </div>
+
+                <!-- Formas de pago INT -->
+                <div class="region-seccion">
+                    <div class="region-seccion-titulo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                        Formas de Pago
+                    </div>
+                    <div class="logos-pago-grid">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.28.42.png" alt="Visa">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.29.10.png" alt="Mastercard">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.29.55.png" alt="Amex">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.35.37.png" alt="Western Union">
+                        <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.35.53.png" alt="MoneyGram">
+                    </div>
+                </div>
+
+                <!-- Envío INT -->
+                <div class="region-seccion">
+                    <div class="region-seccion-titulo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                        Envio
+                    </div>
+                    <div class="envio-box">
+                        <img class="carrier-logo" src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.46.27.png" alt="DHL">
+                        <div class="tiempo">5-10 dias habiles</div>
+                        <div class="descripcion">Entrega internacional puerta a puerta</div>
+                    </div>
+                    <div class="envio-gratis-ext">
+                        <strong>ENVIO GRATIS</strong>
+                        en compras superiores a USD $500
+                    </div>
+                    <p class="nota-envio">
+                        Si tu compra no alcanza USD $500, el costo del envio se calcula automaticamente en el carrito segun tu ubicacion.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer seguridad -->
+        <div class="seguridad-footer">
+            <p>Transacciones procesadas de forma segura por</p>
+            <div class="procesadores-logos">
+                <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.36.23.png" alt="Plexo">
+                <img src="https://www.duendesdeluruguay.com/wp-content/uploads/2025/12/Captura-de-pantalla-2025-12-12-a-las-00.36.04.png" alt="Handy">
+            </div>
+            <div class="seguridad-badges">
+                <span class="seg-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    Pago 100% Seguro
+                </span>
+                <span class="seg-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Datos Encriptados
+                </span>
+                <span class="seg-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Certificacion PCI DSS
+                </span>
+            </div>
+        </div>
+
+    </div>
+</section>

@@ -20,6 +20,19 @@ const anthropic = new Anthropic({
 });
 
 // ═══════════════════════════════════════════════════════════════
+// CORS HEADERS - Permitir llamadas desde WordPress
+// ═══════════════════════════════════════════════════════════════
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return new Response(null, { headers: CORS_HEADERS });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SISTEMA DE DETECCIÓN DE CLIENTE
 // ═══════════════════════════════════════════════════════════════
 
@@ -254,7 +267,7 @@ export async function POST(request) {
         success: true,
         respuesta: `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀 ¿Qué andás buscando?`,
         hay_productos: 'no'
-      });
+      }, { headers: CORS_HEADERS });
     }
 
     // Cargar info del cliente de memoria
@@ -435,7 +448,7 @@ ANÁLISIS DEL CLIENTE:
         // Campos extra para debug
         _tipo_cliente: analisis.tipo,
         _tools: toolsEjecutadas.map(t => t.name)
-      });
+      }, { headers: CORS_HEADERS });
     }
 
     // Formato estándar (web, mi magia)
@@ -448,7 +461,7 @@ ANÁLISIS DEL CLIENTE:
         totalMensajes: analisis.totalMensajes
       },
       tools: toolsEjecutadas.map(t => ({ name: t.name, resultado: t.resultado.success }))
-    });
+    }, { headers: CORS_HEADERS });
 
   } catch (error) {
     console.error('[Tito v3] Error:', error);
@@ -458,7 +471,7 @@ ANÁLISIS DEL CLIENTE:
       respuesta: 'Uy, se me cruzaron los cables 😅 ¿Podés escribirme de nuevo?',
       hay_productos: 'no',
       error: error.message
-    });
+    }, { headers: CORS_HEADERS });
   }
 }
 
@@ -481,9 +494,9 @@ export async function GET(request) {
         subscriberId,
         infoCliente,
         conversacion: memoria
-      });
+      }, { headers: CORS_HEADERS });
     } catch (e) {
-      return Response.json({ status: 'error', error: e.message });
+      return Response.json({ status: 'error', error: e.message }, { headers: CORS_HEADERS });
     }
   }
 
@@ -503,5 +516,5 @@ export async function GET(request) {
       debug: 'GET /api/tito/v3?subscriber_id=X&conversacion=true'
     },
     tools_disponibles: TITO_TOOLS.map(t => t.name)
-  });
+  }, { headers: CORS_HEADERS });
 }

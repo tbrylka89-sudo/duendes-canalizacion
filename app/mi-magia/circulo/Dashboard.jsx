@@ -3779,13 +3779,13 @@ function SeccionCursos({ usuario }) {
   async function cargarCursos() {
     setCargando(true);
     try {
-      const res = await fetch('/api/admin/cursos?tipo=publico');
+      // Usar misma API que la página de cursos para consistencia
+      const res = await fetch('/api/circulo/academia');
       const data = await res.json();
-      if (data.success) {
-        const publicados = data.cursos.filter(c => c.estado === 'publicado');
-        setCursos(publicados);
-        if (publicados.length > 0) {
-          setCursoActivo(publicados[0]);
+      if (data.success && data.cursos) {
+        setCursos(data.cursos);
+        if (data.cursos.length > 0) {
+          setCursoActivo(data.cursos[0]);
         }
       }
     } catch (error) {

@@ -632,10 +632,200 @@ Debe hablar de la sección **Mi Magia**:
 
 ### 13.6 Pendientes de Tito
 
-- [ ] Probar endpoint v3 en producción
-- [ ] Integrar widget de burbujas proactivas en la web
+- [x] Probar endpoint v3 en producción ✅ FUNCIONA
+- [x] Integrar widget en WordPress ✅ SUBIDO
 - [ ] Actualizar ManyChat para usar v3
 - [ ] Testear flujo completo de conversación
+
+---
+
+## 14. WIDGET TITO EN WORDPRESS - ✅ COMPLETADO
+
+### 14.1 Plugin Creado y Subido
+
+**Archivo:** `wordpress-plugins/duendes-tito-widget.php` (37KB)
+**Destino:** `wp-content/mu-plugins/duendes-tito-widget.php`
+
+**Características:**
+- Widget flotante en esquina inferior derecha
+- Botón con imagen de Tito animado
+- Ventana de chat completa con input, mensajes, typing indicator
+- Sistema de burbujas proactivas
+- Botones de acción rápida (Protección, Abundancia, Cómo compro)
+- Responsive para móvil
+- Endpoint: `https://duendes-vercel.vercel.app/api/tito/v3`
+
+### 14.2 Instalación
+
+```bash
+# Subido via SFTP el 2026-01-25
+sftp -P 55309 sftp_live_WfP6i@34.70.139.72
+put duendes-tito-widget.php web/wp-live/wp-content/mu-plugins/
+```
+
+### 14.3 Verificación
+
+- ✅ Plugin subido correctamente (37KB, 1061 líneas)
+- ✅ CSS carga en el sitio
+- ✅ HTML del widget se renderiza
+- ✅ Endpoint v3 responde correctamente
+- ⚠️ Caché de navegador/servidor puede mostrar versión vieja (usar `?v=timestamp`)
+
+---
+
+## 15. HEADER Y FOOTER GARANTIZADO - ✅ COMPLETADO
+
+### 15.1 Plugin Creado y Subido
+
+**Archivo:** `wordpress-plugins/duendes-header-footer-garantizado.php` (18KB)
+**Destino:** `wp-content/mu-plugins/duendes-header-footer-garantizado.php`
+
+### 15.2 Footer Nuevo (Estético y Completo)
+
+**Secciones incluidas:**
+- **Marca**: Logo + descripción + redes sociales (Instagram, Facebook, WhatsApp)
+- **Explorar**: Tienda, Test del Guardián, Cómo Funciona, Testimonios
+- **Información**: Nosotros, FAQ, Contacto, Mi Magia
+- **Contacto**: Email, WhatsApp, Ubicación (Piriápolis)
+- **Legal**: Términos, Privacidad, Envíos, Devoluciones
+- **Copyright**: 2016 — [año actual]
+
+**Diseño:**
+- Fondo gradiente #0a0a0a → #050505
+- Borde superior dorado sutil
+- Tipografía Cinzel (títulos) + Cormorant Garamond (texto)
+- Iconos de redes sociales con hover dorado
+- Totalmente responsive
+
+### 15.3 Sistema de Header Garantizado
+
+**Funcionalidad:**
+- Verifica que el header exista en cada carga
+- Si el header desaparece, lo recrea automáticamente
+- MutationObserver detecta si algo elimina el header
+- Verificaciones periódicas (1s, 3s, 5s)
+
+### 15.4 Instalación
+
+```bash
+# Subido via SFTP el 2026-01-25
+sftp -P 55309 sftp_live_WfP6i@34.70.139.72
+put duendes-header-footer-garantizado.php web/wp-live/wp-content/mu-plugins/
+```
+
+---
+
+## 16. MÚSICA DEL TEST - INVESTIGADO
+
+### 16.1 Estado: Funciona pero con restricciones de navegador
+
+**Hallazgos:**
+- Archivo de audio existe y carga: `Raices-y-Agua-Interior.mp3` (4MB, HTTP 200)
+- Código JavaScript maneja el audio correctamente con `play().catch()`
+- El problema es la **política de autoplay del navegador**
+
+**Cómo funciona:**
+1. Usuario entra al test
+2. Se le pregunta "¿Con música?" / "Prefiero silencio"
+3. Si elige música, se crea `new Audio()` con `loop: true`, `volume: 0.3`
+4. El `play()` puede fallar si el usuario no ha interactuado con la página
+
+**Solución ya implementada:**
+- El código captura el error: `audio.play().catch(e => console.log('Audio bloqueado'))`
+- Botón de control 🔊/🔇 para activar/desactivar manualmente
+
+### 16.2 No requiere cambios
+
+El comportamiento es correcto. Los navegadores modernos bloquean autoplay de audio hasta que el usuario interactúe con la página. La elección "Sí, con música" cuenta como interacción, por lo que debería funcionar.
+
+---
+
+## 17. PLUGINS MU-PLUGINS EN WORDPRESS
+
+### 17.1 Lista Completa Activos (2026-01-25)
+
+| Plugin | Tamaño | Función |
+|--------|--------|---------|
+| `duendes-tito-widget.php` | 37KB | Widget de chat Tito v3 |
+| `duendes-header-footer-garantizado.php` | 18KB | Header/Footer siempre visibles |
+| `duendes-fixes-master.php` | 41KB | Fixes globales, ocultar Grimorio |
+| `duendes-header-fix.php` | 10KB | Menú móvil funcional |
+| `duendes-experiencia-magica.php` | 139KB | Experiencia de producto |
+| `duendes-mi-magia.php` | 55KB | Portal Mi Magia |
+| `duendes-formulario-canalizacion.php` | 74KB | Formulario checkout |
+| `duendes-promo-3x2.php` | 39KB | Promoción 3x2 |
+| `duendes-emails-unificado.php` | 37KB | Emails unificados |
+| `test-guardian-v15-completo.php` | 67KB | Test del Guardián |
+| `producto-ajustes.php` | 25KB | Ajustes de productos |
+| `duendes-tienda-magica.php` | 18KB | Tienda mágica |
+| `duendes-tienda-tarot.php` | 36KB | Tienda tarot |
+| `duendes-neuromarketing.php` | 42KB | Neuromarketing |
+| `duendes-cart-checkout.php` | 21KB | Carrito/checkout |
+| Y otros... | | |
+
+### 17.2 Cómo Subir Plugins
+
+```bash
+# Usando expect para automatizar SFTP
+expect << 'EOF'
+spawn sftp -o StrictHostKeyChecking=no -P 55309 sftp_live_WfP6i@34.70.139.72
+expect "password:"
+send "JzflrSheUnj4itUE27Aqr0SgD3cG5LXhCR\r"
+expect "sftp>"
+send "put [archivo_local] web/wp-live/wp-content/mu-plugins/\r"
+expect "sftp>"
+send "bye\r"
+expect eof
+EOF
+```
+
+---
+
+## NOTAS DE SESIÓN - 2026-01-25 (tarde)
+
+### Acciones Completadas
+
+1. **Tito Widget subido a WordPress**
+   - Plugin `duendes-tito-widget.php` creado y subido
+   - Usa endpoint `/api/tito/v3`
+   - Widget flotante con chat completo
+   - ✅ Funciona (verificado con cache bypass)
+
+2. **Footer Nuevo y Estético**
+   - Plugin `duendes-header-footer-garantizado.php` creado y subido
+   - Footer profesional con: marca, links, redes, legal
+   - Oculta footer viejo de Elementor
+   - ✅ Funciona
+
+3. **Header Garantizado**
+   - Sistema de verificación continua
+   - Recrea header si desaparece
+   - MutationObserver para detección
+   - ✅ Implementado
+
+4. **Música Investigada**
+   - Archivo existe y carga (4MB)
+   - Restricción es política de autoplay del navegador
+   - Código maneja esto correctamente
+   - ✅ No requiere cambios
+
+5. **Endpoint Tito v3 Verificado**
+   - Responde correctamente
+   - Tools funcionan (mostrar_productos, etc.)
+   - Pregunta país para dar precios en moneda local
+   - ✅ Funciona
+
+### Problema Encontrado: Caché
+
+El widget de Tito no aparecía inicialmente porque:
+- 10Web tiene caché de página
+- Navegador tiene caché
+- Solución: usar `?v=timestamp` o limpiar caché
+
+Para verificar sin caché:
+```bash
+curl -sH "Cache-Control: no-cache" "https://duendesdeluruguay.com/?v=$(date +%s)"
+```
 
 ---
 

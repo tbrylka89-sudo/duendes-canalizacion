@@ -56,12 +56,50 @@ add_action('wp_head', function() {
     [class*="grimorio"],
     .grimorio-section,
     .grimorio-home,
-    section[class*="grimorio"] {
+    section[class*="grimorio"],
+    .duendes-ocultar-grimorio {
         display: none !important;
     }
     </style>
     <?php
 }, 1);
+
+// JavaScript para ocultar sección Grimorio en homepage (busca por texto)
+add_action('wp_footer', function() {
+    if (!is_front_page() && !is_home()) return;
+    ?>
+    <script id="duendes-ocultar-grimorio-js">
+    (function() {
+        function ocultarGrimorio() {
+            // Buscar elementos que contengan "El Grimorio" o "Grimorio"
+            var elementos = document.querySelectorAll('h1, h2, h3, h4, .elementor-heading-title, .elementor-widget-heading');
+            elementos.forEach(function(el) {
+                var texto = el.textContent || el.innerText;
+                if (texto && (texto.indexOf('Grimorio') !== -1 || texto.indexOf('GRIMORIO') !== -1)) {
+                    // Subir hasta encontrar la sección padre
+                    var parent = el.closest('.elementor-section') ||
+                                 el.closest('.elementor-element') ||
+                                 el.closest('section') ||
+                                 el.parentElement.parentElement.parentElement.parentElement;
+                    if (parent) {
+                        parent.style.display = 'none';
+                        parent.classList.add('duendes-ocultar-grimorio');
+                    }
+                }
+            });
+        }
+        // Ejecutar al cargar y después de un pequeño delay (para Elementor)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', ocultarGrimorio);
+        } else {
+            ocultarGrimorio();
+        }
+        setTimeout(ocultarGrimorio, 500);
+        setTimeout(ocultarGrimorio, 1500);
+    })();
+    </script>
+    <?php
+}, 99);
 
 // Filtrar enlaces del Grimorio de los menus
 add_filter('wp_nav_menu_items', function($items) {
@@ -213,15 +251,16 @@ add_action('wp_head', function() {
 // 6. UNIFICAR MENU Y URLs (shop -> tienda)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Redirigir /shop/ a /tienda/
-add_action('template_redirect', function() {
-    $uri = $_SERVER['REQUEST_URI'] ?? '';
-    if (strpos($uri, '/shop') === 0 && strpos($uri, '/tienda') === false) {
-        $new_url = str_replace('/shop', '/tienda', $uri);
-        wp_redirect(home_url($new_url), 301);
-        exit;
-    }
-});
+// NOTA: Redirección shop->tienda DESACTIVADA porque WordPress ya redirige tienda->shop
+// Esto causaba loop infinito
+// add_action('template_redirect', function() {
+//     $uri = $_SERVER['REQUEST_URI'] ?? '';
+//     if (strpos($uri, '/shop') === 0 && strpos($uri, '/tienda') === false) {
+//         $new_url = str_replace('/shop', '/tienda', $uri);
+//         wp_redirect(home_url($new_url), 301);
+//         exit;
+//     }
+// });
 
 // Cambiar titulo de pagina Shop
 add_filter('woocommerce_page_title', function($title) {
