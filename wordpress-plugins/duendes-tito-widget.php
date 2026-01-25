@@ -377,6 +377,20 @@ function duendes_tito_widget_html() {
     color: var(--tito-blanco) !important;
     align-self: flex-start !important;
     border-bottom-left-radius: 5px !important;
+    white-space: pre-line !important;
+}
+
+.tito-msg.bot strong {
+    color: var(--tito-dorado-claro) !important;
+    font-weight: 600 !important;
+}
+
+.tito-msg.bot p {
+    margin: 0 0 10px 0 !important;
+}
+
+.tito-msg.bot p:last-child {
+    margin-bottom: 0 !important;
 }
 
 .tito-msg.user {
@@ -642,9 +656,9 @@ function duendes_tito_widget_html() {
         <div class="tito-messages" id="titoMessages"></div>
 
         <div class="tito-suggestions" id="titoSuggestions">
-            <button class="tito-suggestion" data-text="Quiero un duende de protección">Protección 🛡️</button>
-            <button class="tito-suggestion" data-text="Busco abundancia y prosperidad">Abundancia 💰</button>
+            <button class="tito-suggestion" data-text="¿Qué guardián me corresponde?">¿Cuál es para mí? 🔮</button>
             <button class="tito-suggestion" data-text="¿Cómo es el proceso de compra?">¿Cómo compro? 🛒</button>
+            <button class="tito-suggestion" data-text="Quiero saber el estado de mi pedido">Mi pedido 📦</button>
         </div>
 
         <div class="tito-input-container">
@@ -789,10 +803,31 @@ function duendes_tito_widget_html() {
         }
     }
 
+    function formatearTexto(texto) {
+        if (!texto) return '';
+        // Convertir markdown básico a HTML
+        return texto
+            // Negritas **texto** o __texto__
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+            // Cursivas *texto* o _texto_
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/_([^_]+)_/g, '<em>$1</em>')
+            // Saltos de línea dobles = párrafos
+            .replace(/\n\n/g, '</p><p>')
+            // Saltos de línea simples
+            .replace(/\n/g, '<br>');
+    }
+
     function agregarMensaje(texto, tipo, productos) {
         const msg = document.createElement('div');
         msg.className = 'tito-msg ' + tipo;
-        msg.innerHTML = texto;
+        // Formatear texto solo para mensajes del bot
+        if (tipo === 'bot') {
+            msg.innerHTML = '<p>' + formatearTexto(texto) + '</p>';
+        } else {
+            msg.textContent = texto;
+        }
         els.messages.appendChild(msg);
         if (productos && productos.length > 0) {
             const galeria = crearGaleria(productos);
