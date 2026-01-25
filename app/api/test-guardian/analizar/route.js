@@ -22,10 +22,16 @@ const woo = new WooCommerceRestApi({
   version: 'wc/v3'
 });
 
-// ===== CONFIGURACION ANTHROPIC =====
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-});
+// ===== CONFIGURACION ANTHROPIC (lazy) =====
+let anthropicClient = null;
+function getAnthropicClient() {
+  if (!anthropicClient && process.env.ANTHROPIC_API_KEY) {
+    anthropicClient = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY
+    });
+  }
+  return anthropicClient;
+}
 
 // ===== ESTRATEGIAS DE CONVERSION PROBADAS =====
 const CONVERSION_STRATEGIES = {
@@ -389,8 +395,9 @@ function generarMensajeFallback(perfil, guardian, nombre) {
 
 async function generarMensajeConIA(perfil, guardian, nombre, sincronicidades, respuestas) {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.log('[IA] No hay API key de Anthropic, usando fallback');
+    const client = getAnthropicClient();
+    if (!client) {
+      console.log('[IA] No hay cliente de Anthropic disponible, usando fallback');
       return null;
     }
 
@@ -422,7 +429,7 @@ ${perfil.estiloDecision === 'analitico' ? 'RECIPROCIDAD + COMPROMISO: ya te di v
 ${perfil.estiloDecision === 'emocional' ? 'AVERSION PERDIDA + PRUEBA SOCIAL: conexion real, otros lo eligieron' : ''}
 `;
 
-    const response = await anthropic.messages.create({
+    const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 600,
       messages: [{
