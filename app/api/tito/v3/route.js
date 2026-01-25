@@ -254,12 +254,14 @@ export async function POST(request) {
       canal = 'web', // web, manychat, mimagia
       historial = [],
       history,
-      esAdmin = false
+      esAdmin = false,
+      usuario = null // Info del usuario logueado en WordPress
     } = body;
 
     const msg = mensaje || message || '';
-    const userName = nombre || first_name || '';
-    const subscriberId = subscriber_id;
+    const userName = nombre || first_name || usuario?.nombre || '';
+    // Usar email como subscriberId si el usuario está logueado
+    const subscriberId = subscriber_id || (usuario?.email ? `wp:${usuario.email}` : null);
     const conversationHistory = historial || history || [];
 
     if (!msg.trim()) {
@@ -302,9 +304,24 @@ export async function POST(request) {
 
     // Info del cliente para contexto
     let contextoCliente = '';
+
+    // Info de usuario logueado en WordPress
+    if (usuario && usuario.nombre) {
+      contextoCliente = `\n\n👤 USUARIO LOGUEADO EN LA WEB:\n`;
+      contextoCliente += `- Nombre: ${usuario.nombre} (LLAMALA POR SU NOMBRE)\n`;
+      if (usuario.esCliente) {
+        contextoCliente += `- ES CLIENTE: Ya compró ${usuario.totalCompras || 'algunos'} guardián(es) antes ✨\n`;
+        contextoCliente += `- Tratala como familia, agradecer su confianza, preguntar cómo le va con sus guardianes\n`;
+      }
+      if (usuario.email) {
+        contextoCliente += `- Email: ${usuario.email}\n`;
+      }
+    }
+
+    // Info guardada en memoria (de conversaciones anteriores)
     if (Object.keys(infoCliente).length > 0) {
-      contextoCliente = `\n\n📋 LO QUE SABÉS DE ESTE CLIENTE:\n`;
-      if (infoCliente.nombre) contextoCliente += `- Nombre: ${infoCliente.nombre}\n`;
+      contextoCliente += `\n📋 LO QUE SABÉS DE CONVERSACIONES ANTERIORES:\n`;
+      if (infoCliente.nombre && !usuario?.nombre) contextoCliente += `- Nombre: ${infoCliente.nombre}\n`;
       if (infoCliente.pais) contextoCliente += `- País: ${infoCliente.pais} (YA LO SABÉS, no preguntes de nuevo)\n`;
       if (infoCliente.necesidad) contextoCliente += `- Busca: ${infoCliente.necesidad}\n`;
       if (infoCliente.producto_interesado) contextoCliente += `- Le interesa: ${infoCliente.producto_interesado}\n`;

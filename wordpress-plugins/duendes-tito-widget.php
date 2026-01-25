@@ -20,7 +20,38 @@ function duendes_tito_widget_html() {
     // No mostrar en páginas específicas si es necesario
     // if (is_page('mi-magia')) return;
 
+    // Detectar usuario logueado
+    $usuario_data = array(
+        'logueado' => false,
+        'nombre' => '',
+        'email' => '',
+        'esCliente' => false,
+        'totalCompras' => 0
+    );
+
+    if (is_user_logged_in()) {
+        $user = wp_get_current_user();
+        $usuario_data['logueado'] = true;
+        $usuario_data['nombre'] = $user->first_name ?: $user->display_name;
+        $usuario_data['email'] = $user->user_email;
+
+        // Verificar si es cliente (tiene pedidos)
+        if (class_exists('WooCommerce')) {
+            $customer_orders = wc_get_orders(array(
+                'customer' => $user->user_email,
+                'limit' => 5,
+                'status' => array('completed', 'processing', 'on-hold')
+            ));
+            if (!empty($customer_orders)) {
+                $usuario_data['esCliente'] = true;
+                $usuario_data['totalCompras'] = count($customer_orders);
+            }
+        }
+    }
     ?>
+<script>
+window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
 
@@ -426,12 +457,14 @@ function duendes_tito_widget_html() {
 
 .tito-galeria {
     display: flex !important;
-    gap: 12px !important;
+    gap: 10px !important;
     overflow-x: auto !important;
-    padding: 12px 0 !important;
-    margin-top: 10px !important;
+    overflow-y: visible !important;
+    padding: 8px 0 !important;
+    margin-top: 8px !important;
     scroll-behavior: smooth !important;
     scrollbar-width: none !important;
+    flex-shrink: 0 !important;
 }
 
 .tito-galeria::-webkit-scrollbar {
@@ -440,11 +473,10 @@ function duendes_tito_widget_html() {
 
 .tito-galeria-card {
     flex-shrink: 0 !important;
-    width: 150px !important;
-    min-height: 180px !important;
+    width: 120px !important;
     background: rgba(0,0,0,0.5) !important;
     border: 1px solid rgba(212,175,55,0.3) !important;
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
@@ -454,34 +486,34 @@ function duendes_tito_widget_html() {
 
 .tito-galeria-card:hover {
     border-color: var(--tito-dorado) !important;
-    transform: translateY(-4px) !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.2) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(212,175,55,0.2) !important;
 }
 
 .tito-galeria-card img {
-    width: 150px !important;
-    height: 110px !important;
+    width: 120px !important;
+    height: 90px !important;
     object-fit: cover !important;
     display: block !important;
     background: #222 !important;
 }
 
 .tito-galeria-info {
-    padding: 10px !important;
+    padding: 8px !important;
 }
 
 .tito-galeria-nombre {
     font-family: 'Cinzel', serif !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
     color: #fff !important;
-    margin: 0 0 5px 0 !important;
+    margin: 0 0 3px 0 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
 .tito-galeria-precio {
-    font-size: 14px !important;
+    font-size: 12px !important;
     color: var(--tito-dorado) !important;
     font-weight: 600 !important;
     margin: 0 !important;
@@ -492,10 +524,10 @@ function duendes_tito_widget_html() {
     text-align: center !important;
     background: rgba(212,175,55,0.2) !important;
     color: var(--tito-dorado) !important;
-    font-size: 11px !important;
-    padding: 7px !important;
-    margin-top: 8px !important;
-    border-radius: 6px !important;
+    font-size: 10px !important;
+    padding: 5px !important;
+    margin-top: 5px !important;
+    border-radius: 5px !important;
     transition: background 0.2s !important;
 }
 
@@ -635,12 +667,24 @@ function duendes_tito_widget_html() {
     }
 
     .tito-galeria-card {
-        width: 130px !important;
+        width: 100px !important;
     }
 
     .tito-galeria-card img {
-        width: 130px !important;
-        height: 95px !important;
+        width: 100px !important;
+        height: 75px !important;
+    }
+
+    .tito-galeria-info {
+        padding: 6px !important;
+    }
+
+    .tito-galeria-nombre {
+        font-size: 10px !important;
+    }
+
+    .tito-galeria-precio {
+        font-size: 11px !important;
     }
 }
 </style>
@@ -705,6 +749,9 @@ function duendes_tito_widget_html() {
         URL_TIENDA: '/tienda/'
     };
 
+    // Datos del usuario logueado (inyectados por PHP)
+    const usuarioWP = window.titoUsuario || { logueado: false, nombre: '', email: '', esCliente: false };
+
     const estado = {
         chatAbierto: false,
         conversationHistory: [],
@@ -717,7 +764,8 @@ function duendes_tito_widget_html() {
         paginaActual: null,
         productoActual: null,
         carritoItems: [],
-        carritoCount: 0
+        carritoCount: 0,
+        usuario: usuarioWP
     };
 
     let els = {};
@@ -798,7 +846,14 @@ function duendes_tito_widget_html() {
                     message: mensaje,
                     history: estado.conversationHistory.slice(-8),
                     contexto,
-                    visitorId: estado.visitorId
+                    visitorId: estado.visitorId,
+                    // Info del usuario logueado
+                    usuario: estado.usuario.logueado ? {
+                        nombre: estado.usuario.nombre,
+                        email: estado.usuario.email,
+                        esCliente: estado.usuario.esCliente,
+                        totalCompras: estado.usuario.totalCompras
+                    } : null
                 })
             });
             return await response.json();
@@ -1030,10 +1085,29 @@ function duendes_tito_widget_html() {
         els.notif.style.display = 'none';
         els.input.focus();
         if (estado.conversationHistory.length === 0) {
-            const saludo = estado.paginaActual === 'producto' && estado.productoActual
-                ? '¡Hola! Veo que estás mirando a <strong>' + estado.productoActual.nombre + '</strong>... ¿Querés que te cuente sobre este guardián? 🍀'
-                : '¡Hola! Soy Tito, el guardián digital de Duendes del Uruguay. ¿En qué puedo ayudarte hoy? ✨';
+            let saludo;
+            const nombre = estado.usuario.nombre;
+            const esCliente = estado.usuario.esCliente;
+
+            if (estado.paginaActual === 'producto' && estado.productoActual) {
+                // En página de producto
+                saludo = nombre
+                    ? '¡Hola ' + nombre + '! 🍀 Veo que estás mirando a <strong>' + estado.productoActual.nombre + '</strong>... ¿Querés que te cuente sobre este guardián?'
+                    : '¡Hola! Veo que estás mirando a <strong>' + estado.productoActual.nombre + '</strong>... ¿Querés que te cuente sobre este guardián? 🍀';
+            } else if (esCliente && nombre) {
+                // Cliente que ya compró
+                saludo = '¡' + nombre + '! 🍀 Qué lindo verte de nuevo por el bosque. ¿Cómo están tus guardianes? ¿En qué puedo ayudarte?';
+            } else if (nombre) {
+                // Usuario logueado pero no cliente
+                saludo = '¡Hola ' + nombre + '! Soy Tito, el guardián digital 🍀 ¿Qué andás buscando hoy?';
+            } else {
+                // Usuario no logueado
+                saludo = '¡Hola! Soy Tito, el guardián digital de Duendes del Uruguay. ¿En qué puedo ayudarte hoy? ✨';
+            }
+
             agregarMensaje(saludo, 'bot');
+            // Guardar saludo en historial para que el backend sepa que no es primera interacción
+            estado.conversationHistory.push({ role: 'assistant', content: saludo });
         }
     }
 
