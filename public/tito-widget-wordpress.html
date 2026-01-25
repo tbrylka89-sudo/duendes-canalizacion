@@ -855,7 +855,7 @@ FEATURES:
         };
 
         try {
-            const response = await fetch(`${CONFIG.API_BASE}/api/tito/chat`, {
+            const response = await fetch(`${CONFIG.API_BASE}/api/tito/v3`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1063,9 +1063,9 @@ FEATURES:
             {
                 delay: 70000,
                 config: () => ({
-                    texto: `💫 ¿El precio es un obstáculo? Con solo el <strong>30% lo reservás por 30 días</strong>...`,
+                    texto: `💫 ¿Tenés alguna duda sobre este guardián? Puedo contarte su historia, sus dones, o cómo cuidarlo...`,
                     botones: [
-                        { texto: '¿Cómo funciona?', primary: true, accion: 'chat', mensaje: '¿Cómo funciona el sistema de seña?' },
+                        { texto: 'Contame más', primary: true, accion: 'chat', mensaje: 'Contame más sobre este guardián' },
                         { texto: 'No, gracias', accion: 'cerrar' }
                     ]
                 })
@@ -1117,7 +1117,7 @@ FEATURES:
                     texto: `⚡ Recordá: son piezas <strong>únicas</strong>. Si alguien más las adopta mientras tanto, desaparecen para siempre...`,
                     botones: [
                         { texto: 'Voy a pagar', primary: true, accion: 'url', url: CONFIG.URL_CHECKOUT },
-                        { texto: '¿Puedo reservar?', accion: 'chat', mensaje: '¿Puedo reservar con una seña?' }
+                        { texto: 'Tengo una duda', accion: 'chat', mensaje: 'Tengo una duda sobre la compra' }
                     ]
                 })
             }
