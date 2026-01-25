@@ -14,6 +14,7 @@ import { kv } from '@vercel/kv';
 import { TITO_TOOLS, getToolsParaContexto, getToolsParaManyChat } from '@/lib/tito/tools';
 import ejecutarTool from '@/lib/tito/tool-executor';
 import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -426,37 +427,28 @@ export async function POST(request) {
       // Extraer productos y precios del historial (buscar patrón "Nombre - $XXX USD")
       const preciosEncontrados = historialTexto.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)\s*USD/gi) || [];
 
-      // Calcular precios convertidos
-      const tasas = {
-        'UY': { moneda: 'pesos uruguayos', emoji: '🇺🇾', saludo: '¡Genial, paisano!' },
-        'AR': { moneda: 'pesos argentinos', tasa: 1250, emoji: '🇦🇷', saludo: '¡Genial!' },
-        'MX': { moneda: 'pesos mexicanos', tasa: 21, emoji: '🇲🇽', saludo: '¡Órale!' },
-        'CO': { moneda: 'pesos colombianos', tasa: 4500, emoji: '🇨🇴', saludo: '¡Qué bien!' },
-        'CL': { moneda: 'pesos chilenos', tasa: 1020, emoji: '🇨🇱', saludo: '¡Bacán!' },
-        'PE': { moneda: 'soles', tasa: 3.85, emoji: '🇵🇪', saludo: '¡Chevere!' },
-        'BR': { moneda: 'reales', tasa: 6.4, emoji: '🇧🇷', saludo: '¡Legal!' },
-        'ES': { moneda: 'euros', tasa: 0.96, emoji: '🇪🇸', saludo: '¡Genial!' },
-        'US': { moneda: 'dólares', tasa: 1, emoji: '🇺🇸', saludo: '¡Great!' },
-        'EC': { moneda: 'dólares', tasa: 1, emoji: '🇪🇨', saludo: '¡Chevere!' },
-        'PA': { moneda: 'dólares', tasa: 1, emoji: '🇵🇦', saludo: '¡Genial!' }
-      };
-
-      // Función para convertir precio Uruguay (usa tabla fija)
-      const convertirUY = (usd) => {
-        if (usd <= 75) return 2500;
-        if (usd <= 160) return 5500;
-        if (usd <= 210) return 8000;
-        if (usd <= 350) return 12500;
-        if (usd <= 500) return 16500;
-        if (usd <= 700) return 24500;
-        if (usd <= 1100) return 39800;
-        return 79800;
+      // Info de países
+      const infoPaises = {
+        'UY': { moneda: 'pesos uruguayos', emoji: '🇺🇾', saludo: '¡Genial, paisano!', codigoMoneda: 'UYU' },
+        'AR': { moneda: 'pesos argentinos', emoji: '🇦🇷', saludo: '¡Genial!', codigoMoneda: 'ARS' },
+        'MX': { moneda: 'pesos mexicanos', emoji: '🇲🇽', saludo: '¡Órale!', codigoMoneda: 'MXN' },
+        'CO': { moneda: 'pesos colombianos', emoji: '🇨🇴', saludo: '¡Qué bien!', codigoMoneda: 'COP' },
+        'CL': { moneda: 'pesos chilenos', emoji: '🇨🇱', saludo: '¡Bacán!', codigoMoneda: 'CLP' },
+        'PE': { moneda: 'soles', emoji: '🇵🇪', saludo: '¡Chevere!', codigoMoneda: 'PEN' },
+        'BR': { moneda: 'reales', emoji: '🇧🇷', saludo: '¡Legal!', codigoMoneda: 'BRL' },
+        'ES': { moneda: 'euros', emoji: '🇪🇸', saludo: '¡Genial!', codigoMoneda: 'EUR' },
+        'US': { moneda: 'dólares', emoji: '🇺🇸', saludo: '¡Great!', codigoMoneda: 'USD' },
+        'EC': { moneda: 'dólares', emoji: '🇪🇨', saludo: '¡Chevere!', codigoMoneda: 'USD' },
+        'PA': { moneda: 'dólares', emoji: '🇵🇦', saludo: '¡Genial!', codigoMoneda: 'USD' }
       };
 
       // Si encontramos productos, generar respuesta directamente
       if (preciosEncontrados.length > 0) {
-        const tasa = tasas[paisCode] || tasas['US'];
-        let respuestaDirecta = `${tasa.saludo} ${tasa.emoji}\n\nTe paso los precios en ${tasa.moneda}:\n\n`;
+        // Obtener cotizaciones en tiempo real
+        const cotizaciones = await obtenerCotizaciones();
+        const infoPais = infoPaises[paisCode] || infoPaises['US'];
+
+        let respuestaDirecta = `${infoPais.saludo} ${infoPais.emoji}\n\nTe paso los precios en ${infoPais.moneda}:\n\n`;
 
         preciosEncontrados.forEach(match => {
           const parts = match.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)/i);
@@ -465,13 +457,17 @@ export async function POST(request) {
             const precioUSD = parseInt(parts[2]);
 
             if (paisCode === 'UY') {
-              const precioLocal = convertirUY(precioUSD);
+              // Uruguay usa precios FIJOS (no cotización)
+              const precioLocal = PRECIOS_URUGUAY.convertir(precioUSD);
               respuestaDirecta += `• **${nombre}**: $${precioLocal.toLocaleString('es-UY')} pesos\n`;
             } else if (['US', 'EC', 'PA'].includes(paisCode)) {
+              // Países dolarizados
               respuestaDirecta += `• **${nombre}**: $${precioUSD} USD\n`;
             } else {
-              const precioLocal = Math.round(precioUSD * tasa.tasa);
-              respuestaDirecta += `• **${nombre}**: $${precioUSD} USD (aprox. $${precioLocal.toLocaleString('es')} ${tasa.moneda})\n`;
+              // Otros países: usar cotización en tiempo real
+              const tasa = cotizaciones[infoPais.codigoMoneda] || 1;
+              const precioLocal = Math.round(precioUSD * tasa);
+              respuestaDirecta += `• **${nombre}**: $${precioUSD} USD (aprox. $${precioLocal.toLocaleString('es')} ${infoPais.moneda})\n`;
             }
           }
         });
