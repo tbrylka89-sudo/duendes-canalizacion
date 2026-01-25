@@ -408,28 +408,102 @@ export async function POST(request) {
     let instruccionEspecifica = '';
 
     // CASO ESPECIAL: Dicen el país después de ver productos
+    // En este caso, generamos la respuesta DIRECTAMENTE sin depender de Claude
     if (dicePais && yaSeVieronProductos && !esPrimeraInteraccion) {
-      instruccionEspecifica = `\n\n🚨 ACCIÓN INMEDIATA REQUERIDA - USUARIO DIJO SU PAÍS:
-El usuario acaba de decir de qué país es DESPUÉS de ver productos.
+      // Extraer el país del mensaje
+      const paisMatch = msgLower.match(/(uruguay|argentina|mexico|méxico|colombia|chile|peru|perú|brasil|españa|usa|estados unidos|ecuador|panama|panamá)/i);
+      const paisNombre = paisMatch ? paisMatch[1] : 'uruguay';
 
-TU ÚNICA TAREA AHORA:
-1. USA la tool calcular_precio para cada producto que mostraste
-2. Respondé SOLO con los precios convertidos a su moneda
-3. Preguntá cuál le gustó más
+      // Mapear país a código
+      const paisCodigos = {
+        'uruguay': 'UY', 'argentina': 'AR', 'mexico': 'MX', 'méxico': 'MX',
+        'colombia': 'CO', 'chile': 'CL', 'peru': 'PE', 'perú': 'PE',
+        'brasil': 'BR', 'españa': 'ES', 'usa': 'US', 'estados unidos': 'US',
+        'ecuador': 'EC', 'panama': 'PA', 'panamá': 'PA'
+      };
+      const paisCode = paisCodigos[paisNombre.toLowerCase()] || 'US';
 
-❌ PROHIBIDO EN ESTA RESPUESTA:
-- Preguntar "¿qué andás buscando?"
-- Preguntar "¿algo en particular?"
-- Reiniciar la conversación
-- Ignorar los productos que ya mostraste
+      // Extraer productos y precios del historial (buscar patrón "Nombre - $XXX USD")
+      const preciosEncontrados = historialTexto.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)\s*USD/gi) || [];
 
-✅ EJEMPLO DE RESPUESTA CORRECTA:
-"¡Genial, paisano! 🇺🇾 Te paso los precios en pesos:
-• Zoe: $16.500
-• Andy: $8.000
-• Abraham: $8.000
-¿Cuál te llamó más?"`;
-    } else if (esPrimeraInteraccion) {
+      // Calcular precios convertidos
+      const tasas = {
+        'UY': { moneda: 'pesos uruguayos', emoji: '🇺🇾', saludo: '¡Genial, paisano!' },
+        'AR': { moneda: 'pesos argentinos', tasa: 1250, emoji: '🇦🇷', saludo: '¡Genial!' },
+        'MX': { moneda: 'pesos mexicanos', tasa: 21, emoji: '🇲🇽', saludo: '¡Órale!' },
+        'CO': { moneda: 'pesos colombianos', tasa: 4500, emoji: '🇨🇴', saludo: '¡Qué bien!' },
+        'CL': { moneda: 'pesos chilenos', tasa: 1020, emoji: '🇨🇱', saludo: '¡Bacán!' },
+        'PE': { moneda: 'soles', tasa: 3.85, emoji: '🇵🇪', saludo: '¡Chevere!' },
+        'BR': { moneda: 'reales', tasa: 6.4, emoji: '🇧🇷', saludo: '¡Legal!' },
+        'ES': { moneda: 'euros', tasa: 0.96, emoji: '🇪🇸', saludo: '¡Genial!' },
+        'US': { moneda: 'dólares', tasa: 1, emoji: '🇺🇸', saludo: '¡Great!' },
+        'EC': { moneda: 'dólares', tasa: 1, emoji: '🇪🇨', saludo: '¡Chevere!' },
+        'PA': { moneda: 'dólares', tasa: 1, emoji: '🇵🇦', saludo: '¡Genial!' }
+      };
+
+      // Función para convertir precio Uruguay (usa tabla fija)
+      const convertirUY = (usd) => {
+        if (usd <= 75) return 2500;
+        if (usd <= 160) return 5500;
+        if (usd <= 210) return 8000;
+        if (usd <= 350) return 12500;
+        if (usd <= 500) return 16500;
+        if (usd <= 700) return 24500;
+        if (usd <= 1100) return 39800;
+        return 79800;
+      };
+
+      // Si encontramos productos, generar respuesta directamente
+      if (preciosEncontrados.length > 0) {
+        const tasa = tasas[paisCode] || tasas['US'];
+        let respuestaDirecta = `${tasa.saludo} ${tasa.emoji}\n\nTe paso los precios en ${tasa.moneda}:\n\n`;
+
+        preciosEncontrados.forEach(match => {
+          const parts = match.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)/i);
+          if (parts) {
+            const nombre = parts[1];
+            const precioUSD = parseInt(parts[2]);
+
+            if (paisCode === 'UY') {
+              const precioLocal = convertirUY(precioUSD);
+              respuestaDirecta += `• **${nombre}**: $${precioLocal.toLocaleString('es-UY')} pesos\n`;
+            } else if (['US', 'EC', 'PA'].includes(paisCode)) {
+              respuestaDirecta += `• **${nombre}**: $${precioUSD} USD\n`;
+            } else {
+              const precioLocal = Math.round(precioUSD * tasa.tasa);
+              respuestaDirecta += `• **${nombre}**: $${precioUSD} USD (aprox. $${precioLocal.toLocaleString('es')} ${tasa.moneda})\n`;
+            }
+          }
+        });
+
+        respuestaDirecta += `\n¿Cuál te llamó más la atención? ✨`;
+
+        // Guardar info del cliente
+        if (subscriberId) {
+          try {
+            await kv.set(`tito:cliente:${subscriberId}`, {
+              ...infoCliente,
+              pais: paisCode,
+              paisNombre: paisNombre
+            }, { ex: 30 * 24 * 60 * 60 });
+          } catch (e) {}
+        }
+
+        console.log(`[Tito v3] Respuesta directa - País: ${paisCode} | Productos: ${preciosEncontrados.length}`);
+
+        // Retornar respuesta directa sin llamar a Claude
+        return Response.json({
+          success: true,
+          respuesta: respuestaDirecta,
+          productos: [],
+          analisis: { tipoCliente: 'convertir_precio', paisDetectado: paisCode }
+        }, { headers: CORS_HEADERS });
+      }
+    }
+
+    // Si no se retornó antes, continuar con flujo normal
+    let instruccionEspecifica = '';
+    if (esPrimeraInteraccion) {
       instruccionEspecifica = `\n\n✨ PRIMERA INTERACCIÓN:
 - El widget YA te presentó, NO digas "Soy Tito"
 - Si el usuario pide algo (precios, abundancia, etc) → USA mostrar_productos INMEDIATAMENTE
