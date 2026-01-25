@@ -9,6 +9,10 @@
 
 | Área | Estado | Prioridad |
 |------|--------|-----------|
+| **TITO v3 - Tools** | ✅ Sistema completo implementado | ALTA |
+| **Mi Magia conocimiento** | ✅ Agregado a Tito | ALTA |
+| **Precios por país** | ✅ Tasas actualizadas Ene 2026 | ALTA |
+| **FAQ completo** | ✅ Expandido con info de WP | ALTA |
 | Header/Navegación | ✅ Conflicto CSS resuelto | ALTA |
 | Página de Inicio | ✅ Analizada - OK (landing de APIs) | ALTA |
 | Test del Guardián | ✅ v15.2 COMPLETO (email pendiente) | ALTA |
@@ -303,6 +307,45 @@ Según CLAUDE.md:
 
 ## NOTAS DE SESIÓN
 
+### 2026-01-25 (noche) - TITO v3 TOOLS + MI MAGIA + PRECIOS
+
+**TITO 3.0 - Sistema de Tools para Claude:**
+- ✅ Creados archivos `/lib/tito/tools.js` (definición de tools)
+- ✅ Creado `/lib/tito/tool-executor.js` (ejecución de tools)
+- ✅ Creado `/app/api/tito/v3/route.js` (endpoint con Tools API)
+- ✅ Creado `/app/api/tito/proactivo/route.js` (mensajes proactivos)
+- ✅ Actualizado `/lib/tito/personalidad.js` (quitada seña, agregado anti-psicólogo)
+- ✅ Actualizado `/lib/tito/manual-persuasion.js` (quitada seña)
+
+**Mi Magia - Conocimiento agregado:**
+- ✅ Agregada sección `miMagia` completa al FAQ en `conocimiento.js`
+- ✅ Nueva tool `info_mi_magia` en `tools.js`
+- ✅ Implementación en `tool-executor.js`
+- ✅ Tito ahora sabe hablar de Mi Magia cuando pregunten sobre cuidados, canalización, QR, etc.
+
+**Precios por país:**
+- ✅ Actualizado tasas de cambio a Enero 2026
+- ✅ Uruguay: precio fijo en pesos
+- ✅ Exterior: USD + (aprox. en moneda local)
+- ✅ Países dolarizados (US, EC, PA, SV): solo USD
+
+**FAQ Completo actualizado:**
+- ✅ Envíos: DHL Express internacional, DAC Uruguay, envío gratis USD$500+
+- ✅ Pagos: Visa/MC/Amex exterior, OCA/Cabal/Abitab Uruguay
+- ✅ Productos: materiales, cristales reales, tiempo creación
+- ✅ Magia: qué son, cómo elegir, mantenimiento
+- ✅ Garantía: sin devoluciones (piezas únicas), excepciones por daño
+- ✅ Autenticidad: info sobre imitaciones
+- ✅ Removida toda info de seña/reserva 30%
+
+**Reglas importantes para Tito:**
+- NO ofrece seña (eliminado)
+- NO da datos de pago - guía a la web
+- Distingue "quiero comprar" vs "ya compré"
+- Limita conversaciones sin avance (anti-psicólogo)
+- Siempre verifica precios de la fuente, no de memoria
+- Conoce historia del guardián antes de recomendar
+
 ### 2026-01-25 (tarde) - VERIFICACIÓN COMPLETA DEL SISTEMA
 - **VERIFICADO:** Vercel está funcionando correctamente
   - Página principal carga: `duendes-vercel.vercel.app` ✅
@@ -509,6 +552,90 @@ define( 'ANTHROPIC_API_KEY', 'sk-ant-api03-...' );
 | Email no llega | ✅ RESUELTO | Gmail SMTP desde info@duendesdeluruguay.com |
 | Vercel no despliega | ✅ RESUELTO | Verificado 2026-01-25 - APIs funcionan |
 | GitHub-Vercel conexión | ✅ RESUELTO | Deploy automático funcionando |
+
+---
+
+## 13. TITO v3 - SISTEMA DE TOOLS PARA CLAUDE
+
+### 13.1 Arquitectura
+
+**Archivos creados:**
+- `/lib/tito/tools.js` - Definición de tools para Claude API
+- `/lib/tito/tool-executor.js` - Ejecución de tools
+- `/app/api/tito/v3/route.js` - Endpoint principal con Tools
+- `/app/api/tito/proactivo/route.js` - Mensajes proactivos
+
+**Archivos modificados:**
+- `/lib/tito/personalidad.js` - Quitada seña, agregado anti-psicólogo
+- `/lib/tito/manual-persuasion.js` - Quitada seña
+- `/lib/tito/conocimiento.js` - FAQ expandido, Mi Magia, tasas actualizadas
+
+### 13.2 Tools Disponibles
+
+| Tool | Descripción |
+|------|-------------|
+| `mostrar_productos` | Muestra guardianes del catálogo filtrados |
+| `buscar_producto` | Busca un guardián por nombre |
+| `buscar_pedido` | Busca pedido por número/email/nombre |
+| `calcular_precio` | Calcula precio en moneda del cliente |
+| `guardar_info_cliente` | Guarda info en memoria (KV) |
+| `obtener_info_cliente` | Obtiene info guardada |
+| `guiar_compra` | Guía al cliente a comprar en la web |
+| `info_envios` | Info de envíos según país |
+| `info_mi_magia` | Info sobre sección Mi Magia |
+| `consultar_faq` | Consulta FAQ ampliado |
+| `admin_*` | Tools de admin (buscar, dar regalos, estadísticas, etc.) |
+
+### 13.3 Reglas de Tito
+
+**LO QUE NO HACE:**
+- ❌ Ofrecer seña/reserva del 30%
+- ❌ Dar datos de pago o cuentas bancarias
+- ❌ Procesar pagos
+- ❌ Ser psicólogo gratis (límite 6-8 mensajes sin avanzar)
+- ❌ Dar precios de memoria (siempre verifica con tool)
+
+**LO QUE SÍ HACE:**
+- ✅ Guiar a la tienda web para comprar
+- ✅ Distinguir "quiero comprar" vs "ya compré"
+- ✅ Conocer historia del guardián antes de recomendar
+- ✅ Dar precios según país (UY en pesos, exterior en USD + local)
+- ✅ Hablar de Mi Magia cuando pregunten sobre cuidados
+- ✅ Detectar tipo de cliente (comprador, seguimiento, pichi, etc.)
+
+### 13.4 Precios por País
+
+**Uruguay:**
+- Precios fijos en pesos uruguayos
+- Ejemplo: "Mini Clásico $2.500 pesos uruguayos"
+
+**Exterior:**
+- Precios en USD + aproximado en moneda local
+- Ejemplo: "$70 USD (aprox. $87,500 pesos argentinos)"
+
+**Países dolarizados (US, EC, PA, SV):**
+- Solo USD
+
+### 13.5 Mi Magia - Conocimiento
+
+Tito ahora sabe que cuando pregunten sobre:
+- Cuidados del guardián
+- Qué reciben después de comprar
+- Canalización personalizada
+- Código QR del guardián
+
+Debe hablar de la sección **Mi Magia**:
+- URL: duendesdeluruguay.com/mi-magia/
+- Acceso: escaneando QR o con código DU2601-XXXXX
+- Contenido: canalización, historia, dones, ritual, cuidados
+- Recanalización: gratis si es guardián de DU, $7 si es externo
+
+### 13.6 Pendientes de Tito
+
+- [ ] Probar endpoint v3 en producción
+- [ ] Integrar widget de burbujas proactivas en la web
+- [ ] Actualizar ManyChat para usar v3
+- [ ] Testear flujo completo de conversación
 
 ---
 
