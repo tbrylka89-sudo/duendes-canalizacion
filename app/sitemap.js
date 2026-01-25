@@ -3,7 +3,7 @@
  * Next.js 14 App Router - Genera sitemap.xml automaticamente
  */
 
-const SITE_URL = 'https://duendes-vercel.vercel.app';
+const SITE_URL = 'https://duendesdeluruguay.com';
 
 /**
  * Obtiene productos de WooCommerce
