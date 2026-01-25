@@ -1,13 +1,12 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════════
- * API: ANALISIS COMPLETO DEL TEST DEL GUARDIAN
+ * API: ANALISIS COMPLETO DEL TEST DEL GUARDIAN v2
  * Recibe respuestas del test y devuelve:
  * - Perfil psicologico completo
  * - Sincronicidades personalizadas
  * - Guardian recomendado (producto real de WooCommerce)
  * - Mensaje personalizado generado con IA
  * - Estrategias de conversion aplicadas
- * ═══════════════════════════════════════════════════════════════════════════════
+ * Ultimo update: 2026-01-25
  */
 
 import { NextResponse } from 'next/server';
