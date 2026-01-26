@@ -127,6 +127,26 @@ function duendes_footer_garantizado() {
         opacity: 0 !important;
     }
 
+    /* OCULTAR SECCIÓN CON IMÁGENES GRANDES DE TITO (CTA viejo) */
+    .duendes-footer-garantizado ~ *:not(.tito-widget):not(#titoWidget):not(script):not(style),
+    .duendes-footer-garantizado ~ .elementor-section,
+    .duendes-footer-garantizado ~ .e-con,
+    .duendes-footer-garantizado ~ section,
+    .duendes-footer-garantizado ~ div:not(.tito-widget) {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Ocultar secciones con imágenes gigantes al final */
+    .elementor-section:has(img[width="500"]),
+    .elementor-section:has(img[width="600"]),
+    .e-con:has(img[style*="width: 100%"]):last-of-type,
+    section:has(img):last-of-type:not(.duendes-footer-garantizado) {
+        display: none !important;
+    }
+
     /* Ocultar footers que contengan "Explorar", "Colecciones", newsletter */
     .elementor-widget-container:has(.elementor-heading-title:contains("Explorar")),
     .elementor-section:has(.elementor-form),
@@ -454,6 +474,82 @@ function duendes_footer_garantizado() {
     setTimeout(limpiezaAgresiva, 800);
     setTimeout(limpiezaAgresiva, 2000);
     setTimeout(limpiezaAgresiva, 4000);
+
+    // ELIMINAR SECCIÓN CON IMÁGENES GIGANTES DE TITO
+    function eliminarSeccionImagenesTito() {
+        // Buscar el footer garantizado
+        var footer = document.querySelector('.duendes-footer-garantizado');
+        if (!footer) return;
+
+        // Eliminar TODO lo que venga después del footer (excepto Tito widget y scripts)
+        var siguiente = footer.nextElementSibling;
+        while (siguiente) {
+            var temp = siguiente.nextElementSibling;
+
+            // Proteger solo el widget de Tito
+            var esTito = siguiente.classList && (
+                siguiente.classList.contains('tito-widget') ||
+                siguiente.id === 'titoWidget' ||
+                (siguiente.className && typeof siguiente.className === 'string' && siguiente.className.includes('tito'))
+            );
+
+            // Proteger scripts y styles
+            var esScript = siguiente.tagName === 'SCRIPT' || siguiente.tagName === 'STYLE';
+
+            if (!esTito && !esScript) {
+                // Eliminar completamente del DOM
+                siguiente.remove();
+                console.log('[Footer] Eliminado elemento después del footer:', siguiente.tagName, siguiente.className);
+            }
+
+            siguiente = temp;
+        }
+
+        // Buscar secciones con imágenes grandes (probablemente el CTA viejo)
+        document.querySelectorAll('.elementor-section, .e-con, section').forEach(function(seccion) {
+            // Si está después del footer visualmente
+            var rect = seccion.getBoundingClientRect();
+            var footerRect = footer.getBoundingClientRect();
+
+            if (rect.top > footerRect.bottom - 10) {
+                // Está después del footer, eliminar
+                if (!seccion.classList.contains('tito-widget') &&
+                    !seccion.querySelector('.tito-widget') &&
+                    !seccion.classList.contains('duendes-footer-garantizado')) {
+                    seccion.remove();
+                    console.log('[Footer] Eliminado sección post-footer');
+                }
+            }
+        });
+
+        // Buscar imágenes gigantes de Tito sueltas
+        document.querySelectorAll('img').forEach(function(img) {
+            if (img.src && img.src.includes('tito') || img.src.includes('gemini-image')) {
+                // Verificar si está dentro del widget de Tito (permitido) o suelta (eliminar)
+                if (!img.closest('.tito-widget') && !img.closest('#titoWidget') &&
+                    !img.closest('.tito-toggle') && !img.closest('.tito-header')) {
+                    // Verificar tamaño - si es muy grande, es el CTA viejo
+                    var rect = img.getBoundingClientRect();
+                    if (rect.width > 200 || rect.height > 200) {
+                        var parent = img.closest('.elementor-section') || img.closest('.e-con') ||
+                                    img.closest('section') || img.parentElement.parentElement;
+                        if (parent && !parent.classList.contains('duendes-footer-garantizado')) {
+                            parent.remove();
+                            console.log('[Footer] Eliminada sección con imagen grande de Tito');
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Ejecutar múltiples veces para asegurar
+    setTimeout(eliminarSeccionImagenesTito, 100);
+    setTimeout(eliminarSeccionImagenesTito, 500);
+    setTimeout(eliminarSeccionImagenesTito, 1000);
+    setTimeout(eliminarSeccionImagenesTito, 2000);
+    setTimeout(eliminarSeccionImagenesTito, 3000);
+    setTimeout(eliminarSeccionImagenesTito, 5000);
     </script>
 
     <footer class="duendes-footer-garantizado">
