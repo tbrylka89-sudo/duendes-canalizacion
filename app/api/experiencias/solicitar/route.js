@@ -717,6 +717,40 @@ export async function POST(request) {
     colaProcesamiento.push(solicitudId);
     await kv.set('cola:experiencias', colaProcesamiento);
 
+    // ═══════════════════════════════════════════════════════════════
+    // GUARDAR EN HISTORIAL INMEDIATAMENTE (para que aparezca en "Mis Lecturas")
+    // Estado inicial: 'procesando' - se actualizará cuando termine
+    // ═══════════════════════════════════════════════════════════════
+    const historial = await kv.get(`historial:${emailNorm}`) || [];
+    const entradaHistorial = {
+      id: solicitudId,
+      lecturaId: expId,
+      nombre: experiencia.nombre,
+      icono: obtenerIconoExperiencia(expId),
+      categoria: determinarCategoria(expId),
+      runas: experiencia.runas,
+      fecha: new Date().toISOString(),
+      estado: 'procesando',
+      contenido: null
+    };
+    historial.unshift(entradaHistorial);
+    await kv.set(`historial:${emailNorm}`, historial.slice(0, 100));
+
+    // También guardar lectura individual (sin contenido aún)
+    await kv.set(`lectura:${solicitudId}`, {
+      id: solicitudId,
+      lecturaId: expId,
+      nombre: experiencia.nombre,
+      icono: obtenerIconoExperiencia(expId),
+      categoria: determinarCategoria(expId),
+      email: emailNorm,
+      runas: experiencia.runas,
+      fecha: new Date().toISOString(),
+      estado: 'procesando',
+      contenido: null,
+      resultado: null
+    });
+
     // Si es instantáneo o se pidió generación inmediata, generar ahora
     let resultado = null;
     if ((experiencia.tiempoMs === 0 || generarInmediato) && experiencia.generaIA) {
@@ -755,24 +789,18 @@ export async function POST(request) {
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // GUARDAR EN HISTORIAL (para que aparezca en "Mis Lecturas")
+        // ACTUALIZAR HISTORIAL (cambiar estado de 'procesando' a 'completado')
         // ═══════════════════════════════════════════════════════════════
         try {
-          const historial = await kv.get(`historial:${emailNorm}`) || [];
-          historial.unshift({
-            id: solicitudId,
-            lecturaId: expId,
-            nombre: experiencia.nombre,
-            icono: obtenerIconoExperiencia(expId),
-            categoria: determinarCategoria(expId),
-            runas: experiencia.runas,
-            fecha: new Date().toISOString(),
-            estado: 'completado',
-            contenido: resultado?.contenido || null
-          });
-          await kv.set(`historial:${emailNorm}`, historial.slice(0, 100));
+          const historialActual = await kv.get(`historial:${emailNorm}`) || [];
+          const indexHistorial = historialActual.findIndex(h => h.id === solicitudId);
+          if (indexHistorial !== -1) {
+            historialActual[indexHistorial].estado = 'completado';
+            historialActual[indexHistorial].contenido = resultado?.contenido || null;
+            await kv.set(`historial:${emailNorm}`, historialActual);
+          }
 
-          // También guardar lectura individual para el modal
+          // Actualizar lectura individual con el contenido
           await kv.set(`lectura:${solicitudId}`, {
             id: solicitudId,
             lecturaId: expId,
@@ -787,7 +815,7 @@ export async function POST(request) {
             resultado: resultado
           });
         } catch (histError) {
-          console.error('Error guardando en historial:', histError);
+          console.error('Error actualizando historial:', histError);
         }
 
       } catch (iaError) {
