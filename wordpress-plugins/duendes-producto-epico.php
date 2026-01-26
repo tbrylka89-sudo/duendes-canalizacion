@@ -20,7 +20,7 @@ function duendes_render_producto_epico() {
 
     $product = wc_get_product($post->ID);
     if (!$product) {
-        wp_redirect(home_url('/tienda/'));
+        wp_redirect(home_url('/shop/'));
         exit;
     }
 

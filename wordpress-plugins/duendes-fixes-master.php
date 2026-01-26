@@ -32,7 +32,7 @@ add_action('template_redirect', function() {
     if (!is_product()) return;
     global $post;
     if ($post && ($post->post_name === 'prueba' || stripos($post->post_title, 'prueba') !== false)) {
-        wp_redirect(home_url('/tienda/'), 301);
+        wp_redirect(home_url('/shop/'), 301);
         exit;
     }
 });
@@ -227,7 +227,7 @@ add_action('template_redirect', function() {
     if (!is_product_tag() && !is_product_category()) return;
     global $wp_query;
     if (!$wp_query->have_posts() || $wp_query->found_posts === 0) {
-        wp_redirect(home_url('/tienda/'), 302);
+        wp_redirect(home_url('/shop/'), 302);
         exit;
     }
 });
@@ -255,8 +255,8 @@ add_action('wp_head', function() {
 // Esto causaba loop infinito
 // add_action('template_redirect', function() {
 //     $uri = $_SERVER['REQUEST_URI'] ?? '';
-//     if (strpos($uri, '/shop') === 0 && strpos($uri, '/tienda') === false) {
-//         $new_url = str_replace('/shop', '/tienda', $uri);
+//     if (strpos($uri, '/tienda') === 0 && strpos($uri, '/shop') === false) {
+//         $new_url = str_replace('/tienda', '/shop', $uri);
 //         wp_redirect(home_url($new_url), 301);
 //         exit;
 //     }

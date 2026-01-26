@@ -656,7 +656,7 @@ function duendes_email_post_compra_7dias($order_id) {
     $productos = duendes_get_order_products($order);
     $primer_guardian = $productos[0] ?? null;
 
-    $link_resena = $primer_guardian['url'] ?? home_url('/tienda');
+    $link_resena = $primer_guardian['url'] ?? home_url('/shop');
 
     duendes_enviar_email_v2(
         $email,
@@ -708,7 +708,7 @@ function duendes_email_post_compra_30dias($order_id) {
         [
             'nombreCliente' => $nombre,
             'nombreGuardian' => $primer_guardian['nombre'] ?? 'tu guardián',
-            'linkTienda' => home_url('/tienda'),
+            'linkTienda' => home_url('/shop'),
             'codigoDescuento' => $codigo,
         ]
     );

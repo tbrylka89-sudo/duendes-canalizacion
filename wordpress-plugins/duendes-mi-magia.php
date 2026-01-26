@@ -1348,7 +1348,7 @@ add_shortcode('mi_magia', function() {
 
         function renderVistaPrevia() {
             const g = guardianData;
-            const urlCompra = g?.permalink || '/tienda/';
+            const urlCompra = g?.permalink || '/shop/';
 
             app.innerHTML = `
                 <div class="mi-magia-container">

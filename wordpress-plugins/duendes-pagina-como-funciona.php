@@ -1532,7 +1532,7 @@ function duendes_render_como_funciona() {
                     <a href="/descubri-que-duende-te-elige/" class="dcf-cta-btn-primary">
                         Hacer el Test del Guardián
                     </a>
-                    <a href="/tienda/" class="dcf-cta-btn-secondary">
+                    <a href="/shop/" class="dcf-cta-btn-secondary">
                         Ver la Tienda
                     </a>
                 </div>

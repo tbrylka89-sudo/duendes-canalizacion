@@ -759,7 +759,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         TIEMPO_ABANDONO: 60000,
         URL_CARRITO: '/carrito/',
         URL_CHECKOUT: '/caja/',
-        URL_TIENDA: '/tienda/'
+        URL_TIENDA: '/shop/'
     };
 
     // Datos del usuario logueado (inyectados por PHP)
@@ -779,7 +779,8 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         carritoItems: [],
         carritoCount: 0,
         usuario: usuarioWP,
-        paisCliente: null // Se detectará por geolocalización
+        paisCliente: null, // Se detectará por geolocalización
+        acabaDeAgregar: false // Flag para evitar burbujas duplicadas al agregar al carrito
     };
 
     // Geolocalizar al cliente por IP
@@ -847,7 +848,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         if (body.classList.contains('single-product') || path.includes('/producto/') || path.includes('/product/')) return 'producto';
         if (path.includes('/carrito') || path.includes('/cart') || body.classList.contains('woocommerce-cart')) return 'carrito';
         if (path.includes('/caja') || path.includes('/checkout') || body.classList.contains('woocommerce-checkout')) return 'checkout';
-        if (body.classList.contains('woocommerce-shop') || body.classList.contains('post-type-archive-product') || body.classList.contains('tax-product_cat') || path.includes('/tienda') || path.includes('/shop')) return 'tienda';
+        if (body.classList.contains('woocommerce-shop') || body.classList.contains('post-type-archive-product') || body.classList.contains('tax-product_cat') || path.includes('/shop')) return 'tienda';
         return 'general';
     }
 
@@ -1076,39 +1077,268 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         els.burbuja.classList.remove('visible');
     }
 
+    // =====================================================
+    // SISTEMA DE BURBUJAS CONTEXTUALES INTELIGENTES
+    // =====================================================
+
+    // Cargar burbujas ya mostradas desde localStorage (no repetir)
+    function cargarBurbujasMostradas() {
+        try {
+            const saved = localStorage.getItem('tito_burbujas_mostradas');
+            if (saved) {
+                const data = JSON.parse(saved);
+                // Limpiar burbujas de más de 24 horas
+                const ahora = Date.now();
+                const filtrado = {};
+                Object.keys(data).forEach(function(key) {
+                    if (ahora - data[key] < 24 * 60 * 60 * 1000) {
+                        filtrado[key] = data[key];
+                    }
+                });
+                estado.burbujasMostradas = filtrado;
+                localStorage.setItem('tito_burbujas_mostradas', JSON.stringify(filtrado));
+            }
+        } catch (e) {
+            console.log('Error cargando burbujas mostradas:', e);
+        }
+    }
+
+    // Guardar burbuja como mostrada en localStorage (persistencia)
+    function marcarBurbujaMostrada(key) {
+        estado.burbujasMostradas[key] = Date.now();
+        try {
+            localStorage.setItem('tito_burbujas_mostradas', JSON.stringify(estado.burbujasMostradas));
+        } catch (e) {
+            console.log('Error guardando burbuja mostrada:', e);
+        }
+    }
+
+    // Detectar si estamos en página de thank you (post-compra)
+    function esThankYouPage() {
+        const path = window.location.pathname;
+        const params = window.location.search;
+        const body = document.body;
+        return path.includes('order-received') ||
+               path.includes('thank-you') ||
+               path.includes('pedido-recibido') ||
+               params.includes('order-received') ||
+               body.classList.contains('woocommerce-order-received');
+    }
+
     const BURBUJAS = {
+        // ============================================
+        // PAGINA DE PRODUCTO - Contextual con nombre
+        // ============================================
         producto: [
-            { delay: 12000, config: function() { return { texto: '✨ Este guardián es <strong>único en el mundo</strong>... cuando se va, desaparece para siempre.', botones: [{ texto: '💜 Contame más', primary: true, accion: 'chat' }, { texto: 'Sigo mirando', accion: 'cerrar' }] }; } },
-            { delay: 35000, config: function() { return { texto: '🔮 ¿Sabías que cada duende tiene su propia historia y personalidad? Si sentiste algo al verlo, <strong>no es casualidad</strong>.', botones: [{ texto: '¿Cuál es su historia?', primary: true, accion: 'chat', mensaje: '¿Cuál es la historia de este guardián?' }, { texto: 'Después', accion: 'cerrar' }] }; } },
-            { delay: 70000, config: function() { return { texto: '💫 ¿Tenés alguna duda sobre este guardián? Puedo contarte su historia, sus dones, o cómo cuidarlo...', botones: [{ texto: 'Contame más', primary: true, accion: 'chat', mensaje: 'Contame más sobre este guardián' }, { texto: 'No, gracias', accion: 'cerrar' }] }; } }
+            {
+                delay: 15000, // 15 segundos
+                key: 'producto_contextual',
+                config: function() {
+                    const nombreProducto = estado.productoActual ? estado.productoActual.nombre : 'este guardián';
+                    return {
+                        texto: '✨ ¿Querés saber más de <strong>' + nombreProducto + '</strong>? Puedo contarte su historia y sus dones especiales.',
+                        botones: [
+                            { texto: '💜 Sí, contame', primary: true, accion: 'chat', mensaje: 'Contame más sobre ' + nombreProducto },
+                            { texto: 'Sigo mirando', accion: 'cerrar' }
+                        ]
+                    };
+                }
+            },
+            {
+                delay: 45000, // 45 segundos
+                key: 'producto_historia',
+                config: function() {
+                    return {
+                        texto: '🔮 Cada guardián tiene una historia única. Si sentiste algo al verlo, <strong>no es casualidad</strong>.',
+                        botones: [
+                            { texto: '¿Cuál es su historia?', primary: true, accion: 'chat', mensaje: '¿Cuál es la historia de este guardián?' },
+                            { texto: 'Después', accion: 'cerrar' }
+                        ]
+                    };
+                }
+            }
         ],
+
+        // ============================================
+        // PAGINA DE TIENDA/SHOP
+        // ============================================
         tienda: [
-            { delay: 20000, config: async function() { const productos = await obtenerProductosRecomendados({}); return { texto: '🔮 ¿Buscás algo específico? Puedo ayudarte a encontrar el guardián <strong>perfecto para vos</strong>.', productos: productos.slice(0, 3), botones: [{ texto: 'Sí, ayudame', primary: true, accion: 'chat' }, { texto: 'Solo miro', accion: 'cerrar' }] }; } },
-            { delay: 50000, config: function() { return { texto: '✨ ¿Protección, abundancia, amor o sanación? Cada guardián tiene un propósito especial...', botones: [{ texto: '🛡️ Protección', accion: 'chat', mensaje: 'Busco un guardián de protección' }, { texto: '💰 Abundancia', accion: 'chat', mensaje: 'Busco un guardián de abundancia' }, { texto: '💜 Amor', accion: 'chat', mensaje: 'Busco un guardián de amor' }] }; } }
+            {
+                delay: 20000, // 20 segundos
+                key: 'tienda_ayuda',
+                config: function() {
+                    return {
+                        texto: '🔮 ¿Buscás algo en particular? Puedo ayudarte a encontrar <strong>tu guardián ideal</strong>.',
+                        botones: [
+                            { texto: 'Sí, ayudame', primary: true, accion: 'chat', mensaje: 'Ayudame a encontrar mi guardián ideal' },
+                            { texto: 'Solo miro', accion: 'cerrar' }
+                        ]
+                    };
+                }
+            },
+            {
+                delay: 50000, // 50 segundos
+                key: 'tienda_categorias',
+                config: function() {
+                    return {
+                        texto: '✨ ¿Protección, abundancia, amor o sanación? Cada guardián tiene un propósito especial...',
+                        botones: [
+                            { texto: '🛡️ Protección', accion: 'chat', mensaje: 'Busco un guardián de protección' },
+                            { texto: '💰 Abundancia', accion: 'chat', mensaje: 'Busco un guardián de abundancia' },
+                            { texto: '💜 Amor', accion: 'chat', mensaje: 'Busco un guardián de amor' }
+                        ]
+                    };
+                }
+            }
         ],
+
+        // ============================================
+        // PAGINA DE CARRITO
+        // ============================================
         carrito: [
-            { delay: 8000, config: function() { return { texto: '🍀 ¡Excelente elección! Tus guardianes ya están ansiosos por conocerte...', botones: [{ texto: '🛒 Completar compra', primary: true, accion: 'url', url: CONFIG.URL_CHECKOUT }, { texto: 'Tengo dudas', accion: 'chat' }] }; } },
-            { delay: 40000, config: function() { return { texto: '⚡ Recordá: son piezas <strong>únicas</strong>. Si alguien más las adopta mientras tanto, desaparecen para siempre...', botones: [{ texto: 'Voy a pagar', primary: true, accion: 'url', url: CONFIG.URL_CHECKOUT }, { texto: 'Tengo una duda', accion: 'chat', mensaje: 'Tengo una duda sobre la compra' }] }; } }
+            {
+                delay: 10000, // 10 segundos
+                key: 'carrito_listo',
+                config: function() {
+                    return {
+                        texto: '🍀 ¿Todo listo para completar la adopción? Estoy acá si tenés alguna duda.',
+                        botones: [
+                            { texto: '🛒 Ir a pagar', primary: true, accion: 'url', url: CONFIG.URL_CHECKOUT },
+                            { texto: 'Tengo dudas', accion: 'chat', mensaje: 'Tengo una duda sobre mi compra' }
+                        ]
+                    };
+                }
+            },
+            {
+                delay: 40000, // 40 segundos
+                key: 'carrito_urgencia',
+                config: function() {
+                    return {
+                        texto: '⚡ Recordá: son piezas <strong>únicas</strong>. Si alguien más las adopta mientras tanto, desaparecen para siempre...',
+                        botones: [
+                            { texto: 'Voy a pagar', primary: true, accion: 'url', url: CONFIG.URL_CHECKOUT },
+                            { texto: 'Tengo una duda', accion: 'chat', mensaje: 'Tengo una duda sobre el envío' }
+                        ]
+                    };
+                }
+            }
         ],
-        checkout: [
-            { delay: 25000, config: function() { return { texto: '📝 ¿Todo bien con el formulario? Estoy acá si necesitás ayuda.', botones: [{ texto: 'Tengo una duda', primary: true, accion: 'chat' }, { texto: 'Todo bien', accion: 'cerrar' }] }; } }
+
+        // ============================================
+        // PAGINA DE CHECKOUT - NO INTERRUMPIR
+        // ============================================
+        checkout: [], // Array vacío = no hay burbujas proactivas
+
+        // ============================================
+        // PAGINA POST-COMPRA (Thank You)
+        // ============================================
+        thankyou: [
+            {
+                delay: 5000, // 5 segundos después de cargar
+                key: 'thankyou_formulario',
+                config: function() {
+                    return {
+                        texto: '🎉 <strong>¡Felicidades!</strong> No olvides completar tu formulario de canalización para que podamos conectarte con tu guardián.',
+                        botones: [
+                            { texto: '📝 ¿Cómo lo completo?', primary: true, accion: 'chat', mensaje: '¿Cómo completo el formulario de canalización?' },
+                            { texto: 'Ya lo hice', accion: 'cerrar' }
+                        ]
+                    };
+                }
+            }
         ],
+
+        // ============================================
+        // PAGINAS GENERALES
+        // ============================================
         general: [
-            { delay: 30000, config: function() { return { texto: '✨ ¡Hola! Soy Tito, el guardián digital. Si llegaste hasta acá, <strong>no es casualidad</strong>...', botones: [{ texto: 'Contame más', primary: true, accion: 'chat' }, { texto: 'Ver tienda', accion: 'url', url: CONFIG.URL_TIENDA }] }; } }
+            {
+                delay: 30000, // 30 segundos
+                key: 'general_saludo',
+                config: function() {
+                    return {
+                        texto: '✨ ¡Hola! Soy Tito, el guardián digital. Si llegaste hasta acá, <strong>no es casualidad</strong>...',
+                        botones: [
+                            { texto: 'Contame más', primary: true, accion: 'chat' },
+                            { texto: 'Ver tienda', accion: 'url', url: CONFIG.URL_TIENDA }
+                        ]
+                    };
+                }
+            }
         ]
     };
 
     function iniciarBurbujas() {
-        const burbujas = BURBUJAS[estado.paginaActual] || BURBUJAS.general;
-        burbujas.forEach(function(burbuja, index) {
-            const key = estado.paginaActual + '_' + index;
-            if (estado.burbujasMostradas[key]) return;
+        // Cargar burbujas ya mostradas desde localStorage
+        cargarBurbujasMostradas();
+
+        // Detectar si es thank you page (post-compra)
+        let tipoPagina = estado.paginaActual;
+        if (esThankYouPage()) {
+            tipoPagina = 'thankyou';
+            console.log('🍀 Página post-compra detectada');
+        }
+
+        // NO mostrar burbujas proactivas en checkout (no interrumpir el proceso de pago)
+        if (tipoPagina === 'checkout') {
+            console.log('🍀 Burbujas desactivadas en checkout (no interrumpir)');
+            return;
+        }
+
+        const burbujas = BURBUJAS[tipoPagina] || BURBUJAS.general;
+
+        // Si no hay burbujas configuradas para esta página, salir
+        if (!burbujas || burbujas.length === 0) {
+            console.log('🍀 No hay burbujas configuradas para:', tipoPagina);
+            return;
+        }
+
+        console.log('🍀 Iniciando burbujas para:', tipoPagina);
+
+        burbujas.forEach(function(burbuja) {
+            // Usar key única de la burbuja
+            const key = burbuja.key || (tipoPagina + '_' + burbuja.delay);
+
+            // Si ya se mostró esta burbuja (en localStorage), no programarla
+            if (estado.burbujasMostradas[key]) {
+                console.log('🍀 Burbuja ya mostrada anteriormente:', key);
+                return;
+            }
+
             setTimeout(async function() {
-                if (estado.chatAbierto || estado.interactuoConTito) return;
-                if (estado.burbujasMostradas[key]) return;
-                estado.burbujasMostradas[key] = true;
+                // 1. Verificar que el chat NO esté abierto
+                if (estado.chatAbierto) {
+                    console.log('🍀 Chat abierto, no mostrar burbuja:', key);
+                    return;
+                }
+                // 2. Verificar que no haya interactuado ya con Tito
+                if (estado.interactuoConTito) {
+                    console.log('🍀 Ya interactuó con Tito, no mostrar burbuja:', key);
+                    return;
+                }
+                // 3. Verificar que no se haya mostrado ya (doble check por si acaso)
+                if (estado.burbujasMostradas[key]) {
+                    console.log('🍀 Burbuja ya marcada como mostrada:', key);
+                    return;
+                }
+                // 4. Verificar si ya hay una burbuja visible
+                if (els.burbuja && els.burbuja.classList.contains('visible')) {
+                    console.log('🍀 Ya hay una burbuja visible, esperando...');
+                    return;
+                }
+                // 5. No mostrar si acaba de agregar algo al carrito
+                if (estado.acabaDeAgregar) {
+                    console.log('🍀 Acaba de agregar al carrito, no mostrar burbuja');
+                    return;
+                }
+
+                // Marcar como mostrada ANTES de mostrar (guardar en localStorage para persistencia)
+                marcarBurbujaMostrada(key);
+
+                // Obtener configuración de la burbuja (puede ser async)
                 const config = typeof burbuja.config === 'function' ? await burbuja.config() : burbuja.config;
                 mostrarBurbuja(config);
+                console.log('🍀 Burbuja mostrada:', key);
             }, burbuja.delay);
         });
     }
@@ -1221,12 +1451,18 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
 
     function syncWooCommerce() {
         if (typeof jQuery !== 'undefined') {
-            jQuery(document.body).on('added_to_cart', function() {
+            jQuery(document.body).on('added_to_cart', function(event, fragments, cart_hash, button) {
+                // Solo mostrar burbuja si realmente se agregó algo (el evento tiene button)
+                // Esto evita falsos positivos por otros triggers de WooCommerce
+                if (!button && !fragments) return;
+
                 estado.carritoCount++;
+                estado.acabaDeAgregar = true; // Flag para evitar burbujas proactivas inmediatas
                 els.notif.textContent = '1';
                 els.notif.style.display = 'flex';
+
                 setTimeout(function() {
-                    if (!estado.chatAbierto) {
+                    if (!estado.chatAbierto && !estado.interactuoConTito) {
                         mostrarBurbuja({
                             texto: '🎉 ¡Guardián agregado al carrito! ¿Querés completar la adopción?',
                             botones: [
@@ -1235,6 +1471,8 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
                             ]
                         });
                     }
+                    // Resetear flag después de un tiempo
+                    setTimeout(function() { estado.acabaDeAgregar = false; }, 10000);
                 }, 500);
             });
             jQuery(document.body).on('removed_from_cart', function() {

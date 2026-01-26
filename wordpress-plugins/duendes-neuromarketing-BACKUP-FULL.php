@@ -518,7 +518,7 @@ function duendes_hero_emocional_shortcode($atts) {
         'titulo' => 'No buscas un objeto. Buscas un companero del alma.',
         'subtitulo' => 'Un ser que entienda sin palabras, que proteja sin pedir nada, que este ahi cuando nadie mas esta.',
         'cta_texto' => 'Encontrar mi Guardian',
-        'cta_url' => '/tienda/'
+        'cta_url' => '/shop/'
     ), $atts);
 
     ob_start();

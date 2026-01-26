@@ -1065,7 +1065,7 @@ if (dicePais && yaSeVieronProductos) {
 |---------|-----|
 | API Tito | https://duendes-vercel.vercel.app/api/tito/v3 |
 | API Cotizaciones | https://duendes-vercel.vercel.app/api/cotizaciones |
-| Tienda | https://duendesdeluruguay.com/tienda/ |
+| Tienda | https://duendesdeluruguay.com/shop/ |
 | Test del Guardián | https://duendesdeluruguay.com/descubri-que-duende-te-elige/ |
 
 ---

@@ -20,7 +20,7 @@ function duendes_render_producto_magico() {
 
     $product = wc_get_product($post->ID);
     if (!$product) {
-        wp_redirect(home_url('/tienda/'));
+        wp_redirect(home_url('/shop/'));
         exit;
     }
 
@@ -870,7 +870,7 @@ function duendes_render_producto_magico() {
         <header class="header-magico">
             <a href="<?php echo home_url(); ?>" class="header-logo">DUENDES DEL URUGUAY</a>
             <nav class="header-nav">
-                <a href="<?php echo home_url('/tienda/'); ?>">Tienda</a>
+                <a href="<?php echo home_url('/shop/'); ?>">Tienda</a>
                 <a href="<?php echo home_url('/sobre-nosotros/'); ?>">Nosotros</a>
                 <a href="<?php echo home_url('/contacto/'); ?>">Contacto</a>
             </nav>
@@ -1072,7 +1072,7 @@ function duendes_render_producto_magico() {
         <footer class="footer-producto">
             <div class="footer-logo">DUENDES DEL URUGUAY</div>
             <div class="footer-links">
-                <a href="<?php echo home_url('/tienda/'); ?>">Tienda</a>
+                <a href="<?php echo home_url('/shop/'); ?>">Tienda</a>
                 <a href="<?php echo home_url('/sobre-nosotros/'); ?>">Nosotros</a>
                 <a href="<?php echo home_url('/contacto/'); ?>">Contacto</a>
                 <a href="<?php echo home_url('/terminos/'); ?>">Terminos</a>

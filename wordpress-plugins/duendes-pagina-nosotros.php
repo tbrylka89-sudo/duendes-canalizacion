@@ -612,7 +612,7 @@ function duendes_nosotros_header() {
     <header class="dn-header">
         <div class="dn-header-inner">
             <nav class="dn-nav-group">
-                <a href="<?php echo home_url('/tienda/'); ?>" class="dn-nav-item">
+                <a href="<?php echo home_url('/shop/'); ?>" class="dn-nav-item">
                     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     <span>Tienda</span>
                 </a>
@@ -943,7 +943,7 @@ function duendes_nosotros_content() {
                     </svg>
                     Descubri Tu Guardian
                 </a>
-                <a href="<?php echo home_url('/tienda/'); ?>" class="dn-btn dn-btn-secondary">
+                <a href="<?php echo home_url('/shop/'); ?>" class="dn-btn dn-btn-secondary">
                     Ver Todos los Guardianes
                 </a>
             </div>

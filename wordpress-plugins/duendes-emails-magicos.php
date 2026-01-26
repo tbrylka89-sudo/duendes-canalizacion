@@ -546,7 +546,7 @@ add_action('user_register', function($user_id) {
         '¡Bienvenida!',
         'El bosque te estaba esperando',
         'Explorar guardianes',
-        'https://duendesdeluruguay.com/tienda'
+        'https://duendesdeluruguay.com/shop'
     );
 
     // Regalar runas de bienvenida
@@ -1064,7 +1064,7 @@ add_action('wp_ajax_duendes_email_probar_tipo', function() {
                     El bosque te da la bienvenida. 🌙
                 </p>
             ';
-            $enviado = duendes_enviar_email($email, '🌳 [PRUEBA] ¡Bienvenida a Duendes del Uruguay!', $contenido, '¡Bienvenida!', 'El bosque te estaba esperando', 'Explorar guardianes', 'https://duendesdeluruguay.com/tienda');
+            $enviado = duendes_enviar_email($email, '🌳 [PRUEBA] ¡Bienvenida a Duendes del Uruguay!', $contenido, '¡Bienvenida!', 'El bosque te estaba esperando', 'Explorar guardianes', 'https://duendesdeluruguay.com/shop');
             $mensaje = 'Email de bienvenida enviado';
             break;
 

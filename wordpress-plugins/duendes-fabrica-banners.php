@@ -138,7 +138,7 @@ class Duendes_Fabrica_Banners {
                 'titulo' => 'Envio Gratis en Compras +$100',
                 'subtitulo' => 'Por tiempo limitado, tu guardian viaja sin costo a cualquier parte del mundo.',
                 'cta_texto' => 'Ver Guardianes',
-                'cta_url' => '/tienda/',
+                'cta_url' => '/shop/',
                 'codigo_descuento' => 'ENVIOGRATIS100',
                 'tipo' => 'envio',
                 'ubicaciones' => json_encode(['tienda', 'carrito']),
@@ -898,7 +898,7 @@ class Duendes_Fabrica_Banners {
 
                             <div class="dfb-form-group">
                                 <label>URL del Boton</label>
-                                <input type="url" name="cta_url" id="banner_cta_url" placeholder="ej: /tienda/">
+                                <input type="url" name="cta_url" id="banner_cta_url" placeholder="ej: /shop/">
                             </div>
 
                             <div class="dfb-form-group">
@@ -1122,7 +1122,7 @@ class Duendes_Fabrica_Banners {
             document.getElementById('banner_titulo').value = idea.titulo_sugerido || idea.titulo;
             document.getElementById('banner_subtitulo').value = idea.descripcion_sugerida || idea.descripcion;
             document.getElementById('banner_cta_texto').value = idea.cta_sugerido || 'Ver mas';
-            document.getElementById('banner_cta_url').value = idea.url_sugerida || '/tienda/';
+            document.getElementById('banner_cta_url').value = idea.url_sugerida || '/shop/';
             document.getElementById('banner_tipo').value = idea.tipo || 'promocion';
 
             // Trigger preview update
@@ -1289,7 +1289,7 @@ class Duendes_Fabrica_Banners {
                     'titulo_sugerido' => 'Guardianes para ' . $fecha['nombre'],
                     'descripcion_sugerida' => 'El regalo perfecto viene de otro mundo. Un guardian que acompane a quien amas.',
                     'cta_sugerido' => 'Ver Guardianes de Regalo',
-                    'url_sugerida' => '/tienda/'
+                    'url_sugerida' => '/shop/'
                 ];
             }
         }
@@ -1413,7 +1413,7 @@ class Duendes_Fabrica_Banners {
             'titulo_sugerido' => 'Envio Gratis a Todo el Mundo',
             'descripcion_sugerida' => 'Tu guardian viaja sin costo hasta donde estes. Promocion por tiempo limitado.',
             'cta_sugerido' => 'Ver Guardianes',
-            'url_sugerida' => '/tienda/'
+            'url_sugerida' => '/shop/'
         ];
 
         // Limitar a 8 ideas maximo

@@ -1467,28 +1467,28 @@ function duendes_test_guardian_v14_render() {
         guardianes: {
             protector: {
                 nombre: "Guardián Protector",
-                url: "/tienda/?filter_categoria=proteccion",
+                url: "/shop/?filter_categoria=proteccion",
                 img: "https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dd1e1-3fb0-6260-b144-a02f032539b0_1_1_3f3c7c49-8897-4d89-aaf2-b69dde6572aa-747x1024.png",
                 energia: "Protectora",
                 necesidad: "Seguridad y amparo"
             },
             sanador: {
                 nombre: "Guardián Sanador",
-                url: "/tienda/?filter_categoria=sanacion",
+                url: "/shop/?filter_categoria=sanacion",
                 img: "https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0dc61a-a5e9-68b0-b5d7-0a44cafc4fcc_1_1_5f1aed10-8408-414f-8c02-93e3f7de4642-1-640x1024.png",
                 energia: "Sanadora",
                 necesidad: "Paz interior"
             },
             sabio: {
                 nombre: "Guardián Sabio",
-                url: "/tienda/?filter_categoria=sabiduria",
+                url: "/shop/?filter_categoria=sabiduria",
                 img: "https://duendesdeluruguay.com/wp-content/uploads/2025/12/tranquil_forest_portrait_1f0deae8-6049-6b50-b9a8-1c040800a30b_0_0_f2e4a994-eeb5-4242-b57b-61156b42f065-747x1024.png",
                 energia: "Contemplativa",
                 necesidad: "Claridad y propósito"
             },
             abundante: {
                 nombre: "Guardián de la Abundancia",
-                url: "/tienda/?filter_categoria=abundancia",
+                url: "/shop/?filter_categoria=abundancia",
                 img: "https://duendesdeluruguay.com/wp-content/uploads/2026/01/tranquil_forest_portrait_1f0f0df3-2f7a-68b0-b549-e0398911e187_0_0_b5f80caa-cb21-4a65-99e6-ac773604f271-747x1024.png",
                 energia: "Manifestadora",
                 necesidad: "Flujo y merecimiento"

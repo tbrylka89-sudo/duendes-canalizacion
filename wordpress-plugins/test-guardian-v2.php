@@ -604,7 +604,7 @@ function duendes_test_guardian_neon() {
             } else {
                 duendeHtml = '<h3>' + TG.arquetipos[arq].nom + '</h3>' +
                     '<p class="historia">' + TG.arquetipos[arq].msg + '</p>' +
-                    '<a href="/tienda/" class="cta-pacto">Ver guardianes disponibles</a>';
+                    '<a href="/shop/" class="cta-pacto">Ver guardianes disponibles</a>';
             }
             document.getElementById('tg-r-duende').innerHTML = duendeHtml;
 

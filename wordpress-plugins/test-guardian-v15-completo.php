@@ -29,7 +29,7 @@ function tg_enviar_email() {
     $resultado = $data['resultado'] ?? [];
 
     $guardian_nombre = $resultado['guardian']['nombre'] ?? 'Tu Guardian';
-    $guardian_url = $resultado['guardian']['url'] ?? 'https://duendesdeluruguay.com/tienda/';
+    $guardian_url = $resultado['guardian']['url'] ?? 'https://duendesdeluruguay.com/shop/';
     $guardian_imagen = $resultado['guardian']['imagen'] ?? '';
     $mensaje = $resultado['mensajeGuardian'] ?? '';
     $signo = $resultado['signo']['nombre'] ?? '';

@@ -721,7 +721,7 @@ add_action('duendes_email_senales_v3', function($order_id) {
     $primer_item = reset($items);
     $nombre_guardian = $primer_item ? $primer_item->get_name() : 'tu guardiana';
     $product_id = $primer_item ? $primer_item->get_product_id() : 0;
-    $product_url = $product_id ? get_permalink($product_id) : home_url('/tienda');
+    $product_url = $product_id ? get_permalink($product_id) : home_url('/shop');
 
     // Obtener género y pronombres
     $genero = duendes_get_genero_guardian($product_id, $nombre_guardian);

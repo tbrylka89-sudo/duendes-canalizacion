@@ -725,7 +725,7 @@ function duendes_hero_emocional_shortcode($atts) {
         'titulo' => 'Hay un vacío que las cosas no llenan.',
         'subtitulo' => 'Lo sentís aunque no sepas nombrarlo. Esa sensación de que falta algo. De que necesitás algo que te entienda sin explicaciones.',
         'cta_texto' => 'Encontrar mi Guardián',
-        'cta_url' => '/tienda/'
+        'cta_url' => '/shop/'
     ), $atts);
 
     ob_start();

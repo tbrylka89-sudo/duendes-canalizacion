@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Duendes - Promoción 3x2
- * Description: Promo 3x2 con banner en inicio/tienda y notificación al agregar
+ * Description: Promo 3x2 con banner en inicio/shop y notificacion al agregar
  * Version: 4.0
  * Author: Duendes del Uruguay
  */

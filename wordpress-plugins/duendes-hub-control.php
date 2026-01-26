@@ -368,9 +368,9 @@ class DuendesHubControl {
                         <div class="hub-card-url">/</div>
                         <div class="hub-card-desc">Landing que redirige a duendesdeluruguay.com</div>
                     </a>
-                    <a href="<?php echo $url; ?>/tienda" target="_blank" class="hub-card">
+                    <a href="<?php echo $url; ?>/shop" target="_blank" class="hub-card">
                         <div class="hub-card-title">🛒 Tienda</div>
-                        <div class="hub-card-url">/tienda</div>
+                        <div class="hub-card-url">/shop</div>
                         <div class="hub-card-desc">Catalogo de guardianes con filtros.</div>
                     </a>
                     <a href="<?php echo $url; ?>/auth/magic" target="_blank" class="hub-card">

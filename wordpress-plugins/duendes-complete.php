@@ -529,7 +529,7 @@ function duendes_test_guardian($atts) {
                     imagen: '',
                     mensaje: 'Basado en tus respuestas, un guardián con energía de ' + perfil + ' es quien te está buscando. Visitá nuestra tienda para encontrarlo.',
                     traits: [perfil, 'conexión', 'energía'],
-                    url: '/tienda-magica/'
+                    url: '/shop/'
                 });
             }
         }
@@ -653,7 +653,7 @@ function duendes_recomendar_guardian($request) {
         'imagen' => '',
         'mensaje' => 'Basado en tus respuestas, tu guardián ideal tiene energía de ' . $perfil . '. Explorá nuestra tienda para encontrar el que resuene con vos.',
         'traits' => array_keys($conteo),
-        'url' => '/tienda-magica/'
+        'url' => '/shop/'
     );
 }
 
