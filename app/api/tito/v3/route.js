@@ -893,8 +893,12 @@ ANÁLISIS: ${analisis.tipo} | ${analisis.totalMensajes} msgs | compra:${analisis
     let productosParaMostrar = [];
     let toolsEjecutadas = [];
 
-    // Loop para manejar múltiples tool_use
-    while (response.stop_reason === 'tool_use') {
+    // Loop para manejar múltiples tool_use (MÁXIMO 3 iteraciones para evitar loops costosos)
+    let toolIterations = 0;
+    const MAX_TOOL_ITERATIONS = 3;
+
+    while (response.stop_reason === 'tool_use' && toolIterations < MAX_TOOL_ITERATIONS) {
+      toolIterations++;
       const toolUseBlocks = response.content.filter(block => block.type === 'tool_use');
       const toolResults = [];
 
@@ -944,6 +948,11 @@ ANÁLISIS: ${analisis.tipo} | ${analisis.totalMensajes} msgs | compra:${analisis
         ],
         tools: tools
       });
+    }
+
+    // Warning si se alcanzó el límite de iteraciones
+    if (toolIterations >= MAX_TOOL_ITERATIONS) {
+      console.warn(`[Tito v3] ALERTA: Se alcanzó el límite de ${MAX_TOOL_ITERATIONS} iteraciones de tools`);
     }
 
     // Extraer respuesta final de texto

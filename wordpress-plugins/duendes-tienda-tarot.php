@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Duendes Tienda Tarot
  * Description: Tienda con cards estilo cartas de tarot misticas con sonidos
- * Version: 2.0
+ * Version: 2.1
  */
 
 if (!defined('ABSPATH')) exit;
