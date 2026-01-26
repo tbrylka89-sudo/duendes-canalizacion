@@ -18,12 +18,14 @@ export default function TooltipInfo({
   const btnRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detectar móvil
+  // Detectar móvil (solo en cliente)
   useEffect(() => {
-    setIsMobile(window.innerWidth <= 500);
-    const handleResize = () => setIsMobile(window.innerWidth <= 500);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth <= 500);
+      const handleResize = () => setIsMobile(window.innerWidth <= 500);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   // Cerrar al hacer click fuera

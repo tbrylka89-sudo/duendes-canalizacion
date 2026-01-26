@@ -118,7 +118,8 @@ function duendes_footer_garantizado() {
     [data-elementor-type="footer"],
     .elementor-element footer,
     section.elementor-section:has(footer),
-    .e-con:has(footer) {
+    .e-con:has(footer),
+    .ddu-footer-section {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
@@ -130,6 +131,15 @@ function duendes_footer_garantizado() {
     .elementor-widget-container:has(.elementor-heading-title:contains("Explorar")),
     .elementor-section:has(.elementor-form),
     .elementor-element:has(input[placeholder*="email"]) {
+        display: none !important;
+    }
+
+    /* Ocultar cualquier imagen circular grande suelta (posibles restos de footers) */
+    body > .elementor-section img[style*="border-radius: 50%"],
+    body > .elementor-section img[style*="border-radius:50%"],
+    body > section img[style*="border-radius: 50%"],
+    .elementor-location-footer img,
+    [data-elementor-type="footer"] img {
         display: none !important;
     }
     </style>
@@ -223,9 +233,10 @@ function duendes_footer_garantizado() {
             var siguiente = nuestroFooter.nextElementSibling;
             while (siguiente) {
                 var temp = siguiente.nextElementSibling;
-                // No eliminar el widget de Tito
+                // No eliminar el widget de Tito ni los mensajes del guardián
                 if (!siguiente.classList.contains('tito-widget') &&
-                    !siguiente.id.includes('tito')) {
+                    !siguiente.id.includes('tito') &&
+                    !siguiente.id.includes('dmg-')) {
                     siguiente.remove();
                 }
                 siguiente = temp;
@@ -233,9 +244,43 @@ function duendes_footer_garantizado() {
         }
     }
 
+    // Eliminar footers de Elementor con imágenes (círculos de productos, etc.)
+    function eliminarFootersConImagenes() {
+        // Buscar secciones de Elementor que parecen footer y tienen imágenes
+        document.querySelectorAll('.elementor-section, .e-con, section').forEach(function(el) {
+            // Si tiene imágenes circulares y está cerca del final de la página
+            var imagenes = el.querySelectorAll('img');
+            var rect = el.getBoundingClientRect();
+            var esFooterArea = rect.top > (window.innerHeight * 0.7);
+
+            if (imagenes.length > 0 && esFooterArea &&
+                !el.classList.contains('duendes-footer-garantizado') &&
+                !el.closest('.duendes-footer-garantizado') &&
+                !el.closest('.prod-hero') &&
+                !el.closest('.prod-') &&
+                !el.closest('#product-')) {
+                // Verificar si es un footer viejo
+                var texto = el.textContent || '';
+                if (texto.includes('Explorar') || texto.includes('Colecciones') ||
+                    texto.includes('newsletter') || texto.includes('2016') ||
+                    texto.includes('TÉRMINOS') || texto.includes('POLÍTICA')) {
+                    el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+                }
+            }
+        });
+
+        // Eliminar específicamente .ddu-footer-section si existe
+        document.querySelectorAll('.ddu-footer-section').forEach(function(el) {
+            el.remove();
+        });
+    }
+
     setTimeout(eliminarDespuesDeNuestroFooter, 100);
     setTimeout(eliminarDespuesDeNuestroFooter, 1000);
     setTimeout(eliminarDespuesDeNuestroFooter, 2000);
+    setTimeout(eliminarFootersConImagenes, 500);
+    setTimeout(eliminarFootersConImagenes, 1500);
+    setTimeout(eliminarFootersConImagenes, 3000);
     </script>
 
     <footer class="duendes-footer-garantizado">
