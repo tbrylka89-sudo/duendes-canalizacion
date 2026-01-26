@@ -453,6 +453,40 @@ export async function PUT(request) {
 
       await kv.set(lecturasKey, lecturas);
 
+      // ═══════════════════════════════════════════════════════════════
+      // GUARDAR DATOS DEL CERTIFICADO
+      // Necesario para que /api/certificado?order=X funcione
+      // ═══════════════════════════════════════════════════════════════
+
+      // Extraer un mensaje corto del contenido de la canalización
+      let mensajeCorto = canalizacion.contenido || '';
+      // Buscar la primera sección significativa (después del saludo)
+      const primerParrafo = mensajeCorto.split('\n\n').find(p =>
+        p.length > 50 &&
+        !p.startsWith('#') &&
+        !p.includes(canalizacion.nombreDestinatario + ',')
+      ) || mensajeCorto.substring(0, 500);
+      mensajeCorto = primerParrafo.substring(0, 300).replace(/[#*]/g, '').trim();
+      if (mensajeCorto.length >= 297) mensajeCorto += '...';
+
+      // Determinar género del guardián
+      const nombreGuardian = canalizacion.guardian?.nombre || '';
+      const esGeneroFemenino = nombreGuardian.toLowerCase().endsWith('a') ||
+                              nombreGuardian.toLowerCase().includes('duenda');
+
+      await kv.set(`orden:${canalizacion.ordenId}`, {
+        orden_id: canalizacion.ordenId,
+        nombre_humano: canalizacion.nombreDestinatario || canalizacion.nombreCliente,
+        guardian_nombre: canalizacion.guardian?.nombre || 'Guardián',
+        guardian_genero: esGeneroFemenino ? 'f' : 'm',
+        fecha_canalizacion: fecha.toISOString(),
+        mensaje_guardian: mensajeCorto,
+        sincrodestino: 'Canalizado con amor desde el Bosque Ancestral de Piriápolis',
+        categoria: canalizacion.guardian?.categoria || 'Protección'
+      }, { ex: 60 * 60 * 24 * 365 }); // 1 año TTL
+
+      console.log(`[CANALIZACION] Certificado guardado para orden ${canalizacion.ordenId}`);
+
       // TODO: Aquí se podría enviar email también
       // Por ahora queda disponible en Mi Magia
 
