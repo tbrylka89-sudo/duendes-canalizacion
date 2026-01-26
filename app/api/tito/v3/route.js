@@ -13,12 +13,10 @@ import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 import { TITO_TOOLS, getToolsParaContexto, getToolsParaManyChat } from '@/lib/tito/tools';
 import ejecutarTool from '@/lib/tito/tool-executor';
-// Usar personalidad compacta para reducir tokens (~80% menos)
-import {
-  PERSONALIDAD_TITO_COMPACTA as PERSONALIDAD_TITO,
-  CONTEXTO_MANYCHAT_COMPACTO as CONTEXTO_MANYCHAT,
-  prepararMensajesOptimizados
-} from '@/lib/tito/personalidad-compacta';
+// TEMPORALMENTE usando personalidad ORIGINAL para debug
+// TODO: volver a compacta cuando se arregle el bug de loop
+import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+import { prepararMensajesOptimizados } from '@/lib/tito/personalidad-compacta';
 import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 import { detectarObjecion, getInstruccionesObjecion } from '@/lib/tito/objeciones';
