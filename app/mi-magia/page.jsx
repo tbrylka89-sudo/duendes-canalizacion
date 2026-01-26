@@ -2779,6 +2779,8 @@ function LoginMagicLink({ onLoginExitoso }) {
         setEstado('enviado');
         if (data.linkDirecto) {
           setLinkDirecto(data.linkDirecto);
+          setMensaje(data.mensaje || 'Error enviando email');
+          console.log('Debug Resend:', data.debug);
         }
       } else {
         setMensaje(data.error || 'Error al enviar el enlace');
@@ -2798,7 +2800,7 @@ function LoginMagicLink({ onLoginExitoso }) {
           <h1 style={styles.titulo}>¡Magia lista!</h1>
           {linkDirecto ? (
             <>
-              <p style={{color: '#fff', marginBottom: '1rem'}}>Hubo un problema enviando el email. Usá este botón:</p>
+              <p style={{color: '#ff9999', marginBottom: '1rem', fontSize: '0.9rem'}}>{mensaje || 'Error enviando email'}</p>
               <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
                 ✨ Entrar a Mi Magia
               </a>
