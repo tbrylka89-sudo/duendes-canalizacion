@@ -304,6 +304,76 @@ NO SOS TERAPEUTA DE INSTAGRAM. CONVERTÍ O REDIRIGÍ.
 }
 
 // ═══════════════════════════════════════════════════════════════
+// GEOLOCALIZACIÓN POR IP
+// ═══════════════════════════════════════════════════════════════
+
+const INFO_PAISES = {
+  'UY': { moneda: 'pesos uruguayos', emoji: '🇺🇾', saludo: '¡Genial, paisano!', codigoMoneda: 'UYU', nombre: 'Uruguay' },
+  'AR': { moneda: 'pesos argentinos', emoji: '🇦🇷', saludo: '¡Genial!', codigoMoneda: 'ARS', nombre: 'Argentina' },
+  'MX': { moneda: 'pesos mexicanos', emoji: '🇲🇽', saludo: '¡Órale!', codigoMoneda: 'MXN', nombre: 'México' },
+  'CO': { moneda: 'pesos colombianos', emoji: '🇨🇴', saludo: '¡Qué bien!', codigoMoneda: 'COP', nombre: 'Colombia' },
+  'CL': { moneda: 'pesos chilenos', emoji: '🇨🇱', saludo: '¡Bacán!', codigoMoneda: 'CLP', nombre: 'Chile' },
+  'PE': { moneda: 'soles', emoji: '🇵🇪', saludo: '¡Chevere!', codigoMoneda: 'PEN', nombre: 'Perú' },
+  'BR': { moneda: 'reales', emoji: '🇧🇷', saludo: '¡Legal!', codigoMoneda: 'BRL', nombre: 'Brasil' },
+  'ES': { moneda: 'euros', emoji: '🇪🇸', saludo: '¡Genial!', codigoMoneda: 'EUR', nombre: 'España' },
+  'US': { moneda: 'dólares', emoji: '🇺🇸', saludo: '¡Great!', codigoMoneda: 'USD', nombre: 'Estados Unidos' },
+  'EC': { moneda: 'dólares', emoji: '🇪🇨', saludo: '¡Chevere!', codigoMoneda: 'USD', nombre: 'Ecuador' },
+  'PA': { moneda: 'dólares', emoji: '🇵🇦', saludo: '¡Genial!', codigoMoneda: 'USD', nombre: 'Panamá' }
+};
+
+async function geolocalizarIP(request) {
+  try {
+    // Obtener IP de headers de Vercel/CloudFlare
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+               request.headers.get('x-real-ip') ||
+               request.headers.get('cf-connecting-ip') ||
+               null;
+
+    if (!ip || ip === '127.0.0.1' || ip === '::1') {
+      return null;
+    }
+
+    // Intentar obtener de caché primero
+    const cacheKey = `geo:${ip}`;
+    try {
+      const cached = await kv.get(cacheKey);
+      if (cached) return cached;
+    } catch (e) {}
+
+    // Llamar a ipapi.co
+    const res = await fetch(`https://ipapi.co/${ip}/json/`, {
+      headers: { 'User-Agent': 'duendes-tito/1.0' }
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const paisCode = data.country_code || null;
+
+    if (paisCode) {
+      const geoData = {
+        pais: paisCode,
+        paisNombre: data.country_name,
+        ciudad: data.city,
+        region: data.region
+      };
+
+      // Guardar en caché por 24 horas
+      try {
+        await kv.set(cacheKey, geoData, { ex: 24 * 60 * 60 });
+      } catch (e) {}
+
+      return geoData;
+    }
+
+    return null;
+  } catch (e) {
+    console.log('[Tito] Geolocalización falló:', e.message);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // HANDLER PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 
@@ -323,7 +393,8 @@ export async function POST(request) {
       historial = [],
       history,
       esAdmin = false,
-      usuario = null // Info del usuario logueado en WordPress
+      usuario = null, // Info del usuario logueado en WordPress
+      pais_cliente = null // País enviado desde el frontend (si ya geolocalizó)
     } = body;
 
     const msg = mensaje || message || '';
@@ -332,11 +403,22 @@ export async function POST(request) {
     const subscriberId = subscriber_id || (usuario?.email ? `wp:${usuario.email}` : null);
     const conversationHistory = (historial && historial.length > 0) ? historial : (history || []);
 
+    // GEOLOCALIZACIÓN AUTOMÁTICA
+    let geoData = null;
+    if (pais_cliente && INFO_PAISES[pais_cliente]) {
+      // Si el frontend ya envió el país, usarlo
+      geoData = { pais: pais_cliente, paisNombre: INFO_PAISES[pais_cliente].nombre };
+    } else {
+      // Si no, geolocalizar por IP
+      geoData = await geolocalizarIP(request);
+    }
+
     if (!msg.trim()) {
       return Response.json({
         success: true,
         respuesta: `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀 ¿Qué andás buscando?`,
-        hay_productos: 'no'
+        hay_productos: 'no',
+        geo: geoData // Enviar info de geolocalización al frontend
       }, { headers: CORS_HEADERS });
     }
 
@@ -346,6 +428,12 @@ export async function POST(request) {
       try {
         infoCliente = await kv.get(`tito:cliente:${subscriberId}`) || {};
       } catch (e) {}
+    }
+
+    // Si no tenemos país guardado pero sí geolocalizado, guardarlo
+    if (!infoCliente.pais && geoData?.pais) {
+      infoCliente.pais = geoData.pais;
+      infoCliente.paisNombre = geoData.paisNombre;
     }
 
     // Construir mensajes para Claude
@@ -393,6 +481,16 @@ export async function POST(request) {
       if (infoCliente.pais) contextoCliente += `- País: ${infoCliente.pais} (YA LO SABÉS, no preguntes de nuevo)\n`;
       if (infoCliente.necesidad) contextoCliente += `- Busca: ${infoCliente.necesidad}\n`;
       if (infoCliente.producto_interesado) contextoCliente += `- Le interesa: ${infoCliente.producto_interesado}\n`;
+    }
+
+    // GEOLOCALIZACIÓN AUTOMÁTICA - Info detectada por IP
+    if (geoData?.pais && INFO_PAISES[geoData.pais]) {
+      const infoPaisGeo = INFO_PAISES[geoData.pais];
+      contextoCliente += `\n🌍 GEOLOCALIZACIÓN DETECTADA (por IP):\n`;
+      contextoCliente += `- País: ${infoPaisGeo.nombre} (${geoData.pais}) ${infoPaisGeo.emoji}\n`;
+      contextoCliente += `- Moneda: ${infoPaisGeo.moneda}\n`;
+      contextoCliente += `- IMPORTANTE: YA SABÉS DE QUÉ PAÍS ES. Cuando muestres productos, usa "precio_mostrar" que ya viene en la moneda correcta.\n`;
+      contextoCliente += `- NO preguntes "¿de qué país sos?" - YA LO DETECTASTE.\n`;
     }
 
     // Determinar si es primera interacción
@@ -561,7 +659,8 @@ ANÁLISIS DEL CLIENTE:
 
         const resultado = await ejecutarTool(toolUse.name, toolUse.input, {
           subscriberId,
-          esAdmin
+          esAdmin,
+          paisCliente: infoCliente.pais || geoData?.pais || null
         });
 
         toolsEjecutadas.push({

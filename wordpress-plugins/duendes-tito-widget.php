@@ -778,8 +778,38 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         productoActual: null,
         carritoItems: [],
         carritoCount: 0,
-        usuario: usuarioWP
+        usuario: usuarioWP,
+        paisCliente: null // Se detectará por geolocalización
     };
+
+    // Geolocalizar al cliente por IP
+    async function geolocalizarCliente() {
+        try {
+            // Primero intentar desde localStorage (caché de 24h)
+            const cached = localStorage.getItem('tito_geo');
+            if (cached) {
+                const geo = JSON.parse(cached);
+                if (geo.timestamp && Date.now() - geo.timestamp < 24 * 60 * 60 * 1000) {
+                    estado.paisCliente = geo.pais;
+                    return;
+                }
+            }
+
+            // Si no hay caché, geolocalizar
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            if (data.country_code) {
+                estado.paisCliente = data.country_code;
+                localStorage.setItem('tito_geo', JSON.stringify({
+                    pais: data.country_code,
+                    paisNombre: data.country_name,
+                    timestamp: Date.now()
+                }));
+            }
+        } catch (e) {
+            console.log('Geolocalización no disponible');
+        }
+    }
 
     let els = {};
 
@@ -860,6 +890,8 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
                     history: estado.conversationHistory.slice(-8),
                     contexto,
                     visitorId: estado.visitorId,
+                    // País detectado por geolocalización
+                    pais_cliente: estado.paisCliente,
                     // Info del usuario logueado
                     usuario: estado.usuario.logueado ? {
                         nombre: estado.usuario.nombre,
@@ -955,8 +987,15 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         container.className = 'tito-galeria';
         productos.forEach(function(p) {
             const imgSrc = p.imagen && p.imagen !== 'null' && p.imagen.startsWith('http') ? p.imagen : CONFIG.TITO_AVATAR;
-            // El precio puede venir como precio_usd o precio
-            const precio = p.precio_usd || p.precio || '?';
+            // Usar precio_mostrar si viene del backend (ya formateado en la moneda del cliente)
+            // Si no, usar precio_usd o precio con formato USD
+            let precioTexto;
+            if (p.precio_mostrar) {
+                precioTexto = p.precio_mostrar;
+            } else {
+                const precio = p.precio_usd || p.precio || '?';
+                precioTexto = '$' + precio + ' USD';
+            }
             const card = document.createElement('a');
             card.className = 'tito-galeria-card';
             card.href = p.url || '#';
@@ -964,7 +1003,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
             card.innerHTML = '<img src="' + imgSrc + '" alt="' + p.nombre + '" onerror="this.src=\'' + CONFIG.TITO_AVATAR + '\'">' +
                 '<div class="tito-galeria-info">' +
                 '<p class="tito-galeria-nombre">' + p.nombre + '</p>' +
-                '<p class="tito-galeria-precio">$' + precio + ' USD</p>' +
+                '<p class="tito-galeria-precio">' + precioTexto + '</p>' +
                 '<span class="tito-galeria-btn">Ver</span>' +
                 '</div>';
             container.appendChild(card);
@@ -1225,6 +1264,10 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         iniciarContadorTiempo();
         iniciarBurbujas();
         iniciarDeteccionAbandono();
+        // Geolocalizar al cliente para mostrar precios en su moneda
+        geolocalizarCliente().then(function() {
+            console.log('🍀 País detectado:', estado.paisCliente);
+        });
         console.log('🍀 Tito listo!');
     }
 
