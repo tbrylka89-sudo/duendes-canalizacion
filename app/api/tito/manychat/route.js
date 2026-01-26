@@ -111,9 +111,9 @@ export async function POST(request) {
     }
 
     // Llamar a Tito v3 con origen manychat
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+    // Usar la URL del request para construir la URL de v3
+    const requestUrl = new URL(request.url);
+    const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
 
     const v3Response = await fetch(`${baseUrl}/api/tito/v3`, {
       method: 'POST',
