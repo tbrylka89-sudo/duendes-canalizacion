@@ -232,6 +232,11 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ## CHANGELOG
 
+### 25/01/2026 - 19:30hs
+- Corregidos métodos de pago: eliminado PayPal (no disponible)
+- Agregado Mercado Pago para Uruguay
+- Actualizada info de pagos en conocimiento.js y personalidad.js
+
 ### 25/01/2026 - 19:00hs
 - Actualizado roadmap con estado real de todas las fases
 - Documentación de verificaciones completadas

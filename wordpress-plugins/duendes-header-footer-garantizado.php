@@ -104,11 +104,82 @@ function duendes_footer_garantizado() {
         }
     }
 
-    /* Ocultar footer de Elementor si existe */
-    .elementor-location-footer {
+    /* Ocultar TODOS los footers excepto el nuestro */
+    .elementor-location-footer,
+    footer:not(.duendes-footer-garantizado),
+    .site-footer,
+    .footer-widget-area,
+    .footer-main,
+    .ast-footer,
+    .starter-footer,
+    #footer,
+    #site-footer,
+    .wp-block-template-part footer,
+    [data-elementor-type="footer"],
+    .elementor-element footer,
+    section.elementor-section:has(footer),
+    .e-con:has(footer) {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+    }
+
+    /* Ocultar footers que contengan "Explorar", "Colecciones", newsletter */
+    .elementor-widget-container:has(.elementor-heading-title:contains("Explorar")),
+    .elementor-section:has(.elementor-form),
+    .elementor-element:has(input[placeholder*="email"]) {
         display: none !important;
     }
     </style>
+
+    <script>
+    // Remover footers viejos por JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        // Buscar y ocultar todos los footers excepto el nuestro
+        var allFooters = document.querySelectorAll('footer, [data-elementor-type="footer"], .elementor-location-footer, .site-footer, #footer');
+        allFooters.forEach(function(f) {
+            if (!f.classList.contains('duendes-footer-garantizado')) {
+                f.style.display = 'none';
+                f.remove();
+            }
+        });
+
+        // Buscar secciones con "Explorar", "Colecciones", "newsletter" y ocultarlas
+        var sections = document.querySelectorAll('.elementor-section, .e-con, section');
+        sections.forEach(function(sec) {
+            var text = sec.textContent || '';
+            if (text.includes('Explorar') && text.includes('Colecciones') ||
+                text.includes('Suscríbete a nuestra newsletter') ||
+                text.includes('© 2025 Duendes') ||
+                (text.includes('TÉRMINOS Y CONDICIONES') && text.includes('2016'))) {
+                sec.style.display = 'none';
+                sec.remove();
+            }
+        });
+    });
+
+    // Observer para elementos cargados dinámicamente
+    var footerObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+            m.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) {
+                    if (node.tagName === 'FOOTER' && !node.classList.contains('duendes-footer-garantizado')) {
+                        node.remove();
+                    }
+                    var text = node.textContent || '';
+                    if (text.includes('Explorar') && text.includes('Colecciones')) {
+                        node.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+    setTimeout(function() {
+        footerObserver.observe(document.body, { childList: true, subtree: true });
+    }, 500);
+    </script>
 
     <footer class="duendes-footer-garantizado">
         <div class="duendes-footer-container">
