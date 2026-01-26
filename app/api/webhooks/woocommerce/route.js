@@ -4,13 +4,14 @@ import { Resend } from 'resend';
 import crypto from 'crypto';
 import { PAQUETES_RUNAS, MEMBRESIAS, XP_ACCIONES, obtenerNivel } from '@/lib/gamificacion/config';
 import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';
+import { invalidarCacheProductos } from '@/lib/tito/conocimiento';
 
 export const dynamic = 'force-dynamic';
 
 // ═══════════════════════════════════════════════════════════════
 // WEBHOOK UNIFICADO DE WOOCOMMERCE
 // Maneja: Guardianes, Runas de Poder, Membresías del Círculo,
-// Lecturas Ancestrales, Verificación de firma, Reporte diario
+// Lecturas Ancestrales, Productos, Stock, Verificación de firma
 // ═══════════════════════════════════════════════════════════════
 
 // Verificar firma del webhook de WooCommerce
@@ -57,6 +58,8 @@ export async function POST(request) {
 
     const webhookSecret = process.env.WOOCOMMERCE_WEBHOOK_SECRET;
     const signature = request.headers.get('x-wc-webhook-signature');
+    const webhookTopic = request.headers.get('x-wc-webhook-topic');
+    const webhookResource = request.headers.get('x-wc-webhook-resource');
     const rawBody = await request.text();
 
     // Verificar firma si hay secret configurado
@@ -65,11 +68,34 @@ export async function POST(request) {
       return Response.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-    const orden = JSON.parse(rawBody);
+    const payload = JSON.parse(rawBody);
+
+    // ═══════════════════════════════════════════════════════════
+    // DETECTAR TIPO DE EVENTO Y ENRUTAR
+    // ═══════════════════════════════════════════════════════════
+
+    // Eventos de PRODUCTOS (product.updated, product.deleted, product.created)
+    if (webhookTopic?.startsWith('product.') || webhookResource === 'product') {
+      return await manejarEventoProducto(payload, webhookTopic);
+    }
+
+    // Eventos de STOCK (action.woocommerce_low_stock, etc.)
+    if (webhookTopic?.includes('stock') || webhookTopic === 'action.woocommerce_low_stock') {
+      return await manejarEventoStock(payload, webhookTopic);
+    }
+
+    // Si no tiene billing.email, podría ser otro tipo de evento
+    const orden = payload;
 
     // Verificar que es una orden válida
     if (!orden || !orden.id || !orden.billing?.email) {
-      return Response.json({ success: false, error: 'Orden inválida' }, { status: 400 });
+      // Podría ser un ping de prueba o evento desconocido
+      if (orden?.webhook_id || webhookTopic === 'action.woocommerce_webhook_ping') {
+        console.log('[WEBHOOK-WOO] Ping recibido');
+        return Response.json({ success: true, message: 'Ping acknowledged' });
+      }
+      console.log('[WEBHOOK-WOO] Evento no reconocido:', webhookTopic || 'sin topic');
+      return Response.json({ success: false, error: 'Evento no manejado' }, { status: 400 });
     }
 
     const email = orden.billing.email.toLowerCase();
@@ -584,16 +610,188 @@ export async function GET() {
   return Response.json({
     status: 'active',
     endpoint: '/api/webhooks/woocommerce',
-    message: 'Webhook unificado de WooCommerce. Maneja: Guardianes, Runas, Membresías, Lecturas.',
+    message: 'Webhook unificado de WooCommerce. Maneja: Guardianes, Runas, Membresías, Lecturas, Productos, Stock.',
     features: [
-      'Verificación de firma',
+      'Verificación de firma HMAC',
       'Protección anti-duplicados',
       'Gamificación automática',
       'Emails transaccionales',
       'Programación de canalizaciones',
-      'Registro para reporte diario'
-    ]
+      'Registro para reporte diario',
+      'Invalidación de caché de productos',
+      'Detección de stock bajo'
+    ],
+    eventos_soportados: [
+      'order.created - Procesar compras',
+      'product.created - Invalidar caché',
+      'product.updated - Invalidar caché',
+      'product.deleted - Remover de caché',
+      'action.woocommerce_low_stock - Marcar bajo stock'
+    ],
+    configuracion_woocommerce: {
+      url: 'https://duendes-vercel.vercel.app/api/webhooks/woocommerce',
+      secret: 'Configurar WOOCOMMERCE_WEBHOOK_SECRET en Vercel',
+      version: 'WC API Version 3',
+      metodo: 'POST + JSON'
+    }
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MANEJO DE EVENTOS DE PRODUCTOS
+// ═══════════════════════════════════════════════════════════════
+
+async function manejarEventoProducto(producto, topic) {
+  const productoId = producto?.id;
+  const productoNombre = producto?.name || 'Desconocido';
+
+  console.log(`[WEBHOOK-WOO] Evento de producto: ${topic} - ID: ${productoId} - ${productoNombre}`);
+
+  try {
+    // Determinar acción según el topic
+    if (topic === 'product.deleted') {
+      // Producto eliminado - invalidar caché y registrar
+      await invalidarCacheProductos('product.deleted', productoId);
+
+      // Registrar evento para reporte
+      registrarEvento(TIPOS_EVENTO.PRODUCTO, {
+        accion: 'eliminado',
+        productoId,
+        productoNombre
+      });
+
+      console.log(`[WEBHOOK-WOO] Producto ${productoId} (${productoNombre}) eliminado - caché invalidado`);
+
+      return Response.json({
+        success: true,
+        evento: 'product.deleted',
+        productoId,
+        accion: 'cache_invalidado'
+      });
+    }
+
+    if (topic === 'product.updated' || topic === 'product.created') {
+      // Producto actualizado o creado - invalidar caché
+      await invalidarCacheProductos(topic, productoId);
+
+      // Detectar si el producto tiene stock bajo
+      const stockStatus = producto?.stock_status;
+      const stockQuantity = producto?.stock_quantity;
+      const manageStock = producto?.manage_stock;
+
+      let stockBajo = false;
+      if (manageStock && stockQuantity !== null && stockQuantity <= 2) {
+        stockBajo = true;
+        await marcarProductoStockBajo(productoId, productoNombre, stockQuantity);
+      }
+
+      // Registrar evento
+      registrarEvento(TIPOS_EVENTO.PRODUCTO, {
+        accion: topic === 'product.created' ? 'creado' : 'actualizado',
+        productoId,
+        productoNombre,
+        stockStatus,
+        stockQuantity,
+        stockBajo
+      });
+
+      console.log(`[WEBHOOK-WOO] Producto ${productoId} (${productoNombre}) ${topic === 'product.created' ? 'creado' : 'actualizado'} - caché invalidado${stockBajo ? ' - STOCK BAJO' : ''}`);
+
+      return Response.json({
+        success: true,
+        evento: topic,
+        productoId,
+        accion: 'cache_invalidado',
+        stockBajo
+      });
+    }
+
+    // Evento de producto desconocido
+    return Response.json({
+      success: true,
+      evento: topic || 'unknown',
+      productoId,
+      message: 'Evento recibido pero no requiere acción específica'
+    });
+
+  } catch (error) {
+    console.error('[WEBHOOK-WOO] Error procesando evento de producto:', error);
+    return Response.json({
+      success: false,
+      error: error.message,
+      evento: topic
+    }, { status: 500 });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MANEJO DE EVENTOS DE STOCK
+// ═══════════════════════════════════════════════════════════════
+
+async function manejarEventoStock(payload, topic) {
+  console.log(`[WEBHOOK-WOO] Evento de stock: ${topic}`);
+
+  try {
+    // El payload puede ser el producto o un objeto con info de stock
+    const productoId = payload?.id || payload?.product_id;
+    const productoNombre = payload?.name || payload?.product_name || 'Desconocido';
+    const stockQuantity = payload?.stock_quantity ?? payload?.quantity;
+
+    if (productoId) {
+      await marcarProductoStockBajo(productoId, productoNombre, stockQuantity);
+      await invalidarCacheProductos('stock.low', productoId);
+
+      registrarEvento(TIPOS_EVENTO.PRODUCTO, {
+        accion: 'stock_bajo',
+        productoId,
+        productoNombre,
+        stockQuantity
+      });
+
+      console.log(`[WEBHOOK-WOO] ⚠️ Stock bajo detectado: ${productoNombre} (${stockQuantity} unidades)`);
+    }
+
+    return Response.json({
+      success: true,
+      evento: topic,
+      productoId,
+      accion: 'stock_bajo_registrado'
+    });
+
+  } catch (error) {
+    console.error('[WEBHOOK-WOO] Error procesando evento de stock:', error);
+    return Response.json({
+      success: false,
+      error: error.message
+    }, { status: 500 });
+  }
+}
+
+/**
+ * Marca un producto como de stock bajo en KV
+ * para mostrar alertas o notificaciones
+ */
+async function marcarProductoStockBajo(productoId, nombre, cantidad) {
+  try {
+    const key = `stock:bajo:${productoId}`;
+    await kv.set(key, {
+      productoId,
+      nombre,
+      cantidad,
+      detectadoEn: new Date().toISOString()
+    }, { ex: 7 * 24 * 60 * 60 }); // Expira en 7 días
+
+    // Agregar a lista de productos con stock bajo
+    const lista = await kv.get('stock:bajo:lista') || [];
+    if (!lista.includes(productoId)) {
+      lista.push(productoId);
+      await kv.set('stock:bajo:lista', lista);
+    }
+
+    console.log(`[WEBHOOK-WOO] Producto ${productoId} marcado como stock bajo`);
+  } catch (e) {
+    console.error('[WEBHOOK-WOO] Error marcando stock bajo:', e.message);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

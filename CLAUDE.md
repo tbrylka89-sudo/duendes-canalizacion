@@ -1065,8 +1065,150 @@ if (dicePais && yaSeVieronProductos) {
 |---------|-----|
 | API Tito | https://duendes-vercel.vercel.app/api/tito/v3 |
 | API Cotizaciones | https://duendes-vercel.vercel.app/api/cotizaciones |
+| Webhook WooCommerce | https://duendes-vercel.vercel.app/api/webhooks/woocommerce |
 | Tienda | https://duendesdeluruguay.com/shop/ |
 | Test del Guardián | https://duendesdeluruguay.com/descubri-que-duende-te-elige/ |
+
+---
+
+### Webhooks de WooCommerce - FASE 8 (25/01/2026)
+
+**Endpoint:** `https://duendes-vercel.vercel.app/api/webhooks/woocommerce`
+
+Sistema unificado que maneja sincronización en tiempo real con WooCommerce.
+
+#### Eventos Soportados
+
+| Evento | Acción |
+|--------|--------|
+| `order.created` | Procesa compras (guardianes, runas, membresías) |
+| `product.created` | Invalida caché de Tito |
+| `product.updated` | Invalida caché de Tito |
+| `product.deleted` | Remueve de caché |
+| `action.woocommerce_low_stock` | Marca producto como bajo stock |
+
+#### Configuración en WooCommerce
+
+1. Ir a **WooCommerce > Settings > Advanced > Webhooks**
+2. Click en **Add webhook**
+3. Configurar:
+   - **Name:** Vercel - Sincronización
+   - **Status:** Active
+   - **Topic:** Seleccionar según necesidad:
+     - Para órdenes: `Order created`
+     - Para productos: `Product updated`, `Product created`, `Product deleted`
+   - **Delivery URL:** `https://duendes-vercel.vercel.app/api/webhooks/woocommerce`
+   - **Secret:** Generar uno seguro y guardarlo
+   - **API Version:** WP REST API Integration v3
+
+4. Agregar el secret en Vercel:
+   - Ir a Vercel > Project Settings > Environment Variables
+   - Agregar: `WOOCOMMERCE_WEBHOOK_SECRET` = tu-secret-generado
+
+#### Verificación de Firma (HMAC)
+
+El webhook verifica la firma usando:
+- Header: `X-WC-Webhook-Signature`
+- Algoritmo: HMAC-SHA256 (Base64)
+- Si no hay secret configurado, acepta todo (modo desarrollo)
+
+#### Sistema de Caché
+
+- **Caché en memoria:** 5 minutos (instancia local)
+- **Invalidación distribuida:** Via Vercel KV (todas las instancias)
+- **Key de invalidación:** `tito:productos:invalidacion`
+
+Cuando llega un webhook de producto:
+1. Invalida caché local inmediatamente
+2. Marca invalidación en KV
+3. Otras instancias detectan la marca y refrescan su caché
+
+#### Funciones Disponibles
+
+```javascript
+// En conocimiento.js
+import { invalidarCacheProductos } from '@/lib/tito/conocimiento';
+
+// Invalidar manualmente
+await invalidarCacheProductos('motivo', productoId);
+```
+
+#### Stock Bajo
+
+Productos con stock <= 2 se marcan automáticamente:
+- Key individual: `stock:bajo:{productoId}`
+- Lista global: `stock:bajo:lista`
+- Expira en 7 días
+
+---
+
+### Sistema de Persuasión Avanzada - FASE 9 (25/01/2026)
+
+**Archivos:**
+- `lib/tito/persuasion.js` - Sistema de prueba social dinámica y técnicas de neuroventas
+- `lib/tito/personalidad.js` - Técnicas FBI integradas (mirroring, labeling, etc.)
+
+#### Técnicas Implementadas
+
+| Técnica | Descripción | Ejemplo |
+|---------|-------------|---------|
+| **Mirroring** | Repetir últimas 1-3 palabras con tono de pregunta | "¿Protección...?" |
+| **Labeling** | Nombrar la emoción que detectás | "Parece que venís cargando algo pesado..." |
+| **Preguntas Calibradas** | Preguntas con "Cómo" o "Qué" (nunca "Por qué") | "¿Qué es lo que más te hace dudar?" |
+| **Acusación Anticipada** | Adelantarse a objeciones | "Probablemente pensés que es caro..." |
+| **Escasez Real** | Recordar que cada guardián es único | "Cuando se va, ese diseño desaparece del mundo" |
+| **Reciprocidad** | Dar valor primero (tips, consejos) | "Te cuento un secreto sobre la abundancia..." |
+| **Takeaway** | Psicología inversa | "Capaz no es el momento para vos, y está bien" |
+
+#### Prueba Social para Guardianes ÚNICOS
+
+**REGLA DE ORO:** Cada guardián es único. NUNCA decir "alguien compró el mismo".
+
+**Frases correctas:**
+- "Ayer una chica de México adoptó un guardián de protección como este"
+- "Esta semana 3 personas eligieron guardianes sanadores"
+- "Los guardianes de abundancia son los más buscados este mes"
+
+**Frases prohibidas:**
+- "Alguien compró este mismo" (porque son únicos)
+- "El último que quedaba" (si hay más de ese tipo)
+
+#### Funciones de persuasion.js
+
+```javascript
+import {
+  generarPruebaSocialCategoria,  // Prueba social por categoría
+  generarPruebaSocialGeneral,    // Prueba social genérica
+  generarEscasezSutil,           // Frases de escasez
+  generarReciprocidad,           // Tips y consejos de valor
+  generarLabeling,               // Etiquetado emocional
+  generarMirroring,              // Técnica espejo
+  generarPaquetePersuasion       // Paquete completo contextual
+} from '@/lib/tito/persuasion';
+
+// Ejemplo de uso
+const persuasion = generarPaquetePersuasion({
+  categoria: 'proteccion',
+  pais: 'México',
+  emocion: 'ansiedad',
+  tipoGuardian: 'duende',
+  precio: 70
+});
+```
+
+#### Detección de Emociones
+
+El sistema detecta automáticamente la emoción del usuario para aplicar labeling:
+
+| Emoción | Detectores |
+|---------|------------|
+| ansiedad | nervios, ansiedad, preocupad, estresad |
+| tristeza | triste, mal, dolor, sufr, llor |
+| miedo | miedo, asust, temor, insegur |
+| confusion | confund, no sé, perdid, dudas |
+| esperanza | esper, ilusión, quiero cambiar |
+| frustracion | hart, cansad, frustrad, no aguanto |
+| entusiasmo | me encanta, increíble, hermoso |
 
 ---
 
