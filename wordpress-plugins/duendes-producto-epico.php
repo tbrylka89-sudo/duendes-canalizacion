@@ -1243,46 +1243,73 @@ function duendes_render_producto_epico() {
             const pais = data.country_code;
 
             const precioUSD = <?php echo $precio_usd; ?>;
-            const tasas = {
-                UY: { moneda: 'UYU', tasa: 43, simbolo: '$' },
-                AR: { moneda: 'ARS', tasa: 1050, simbolo: '$' },
-                BR: { moneda: 'BRL', tasa: 5.2, simbolo: 'R$' },
-                DEFAULT: { moneda: 'USD', tasa: 1, simbolo: '$' }
-            };
+            const precioUYU_real = <?php echo intval($precio_uyu); ?>; // Precio REAL del producto
 
-            const config = tasas[pais] || tasas.DEFAULT;
-            const precioLocal = Math.round(precioUSD * config.tasa);
-            const sena = Math.round(precioLocal * 0.3);
-
-            // Actualizar precio principal
-            document.getElementById('precio-mostrar').textContent =
-                config.simbolo + precioLocal.toLocaleString('es-UY') + ' ' + config.moneda;
-
-            // Actualizar precio secundario (solo si no es la misma moneda)
-            const precioSecundario = document.querySelector('.precio-secundario');
-            if (precioSecundario && config.moneda !== 'USD') {
-                precioSecundario.textContent = 'o $' + precioUSD + ' USD';
-            } else if (precioSecundario) {
-                precioSecundario.style.display = 'none';
-            }
-
-            // Actualizar botón de seña
-            const btnSena = document.querySelector('.btn-sena');
-            if (btnSena) {
-                btnSena.textContent = 'Reservar con seña (30% = ' + config.simbolo + sena.toLocaleString('es-UY') + ')';
-            }
-
-            // Actualizar precios en relacionados si es Uruguay
+            // Si es Uruguay: mostrar precio en pesos (el real del producto)
             if (pais === 'UY') {
-                document.querySelectorAll('.relacionado-precio').forEach(el => {
-                    const usd = parseInt(el.textContent.replace(/\D/g, ''));
-                    if (usd) {
-                        el.textContent = '$' + Math.round(usd * 43).toLocaleString('es-UY') + ' UYU';
+                document.getElementById('precio-mostrar').textContent =
+                    '$' + precioUYU_real.toLocaleString('es-UY') + ' pesos';
+
+                const precioSecundario = document.querySelector('.precio-secundario');
+                if (precioSecundario) {
+                    precioSecundario.style.display = 'none';
+                }
+
+                const senaUYU = Math.round(precioUYU_real * 0.3);
+                const btnSena = document.querySelector('.btn-sena');
+                if (btnSena) {
+                    btnSena.textContent = 'Reservar con seña (30% = $' + senaUYU.toLocaleString('es-UY') + ')';
+                }
+
+                // Actualizar relacionados con precios reales UY
+                document.querySelectorAll('.relacionado-precio[data-precio-uyu]').forEach(el => {
+                    const uyu = parseInt(el.dataset.precioUyu);
+                    if (uyu) {
+                        el.textContent = '$' + uyu.toLocaleString('es-UY') + ' pesos';
                     }
                 });
             }
+            // Si es otro país: mostrar DÓLARES (aproximadamente X pesos locales)
+            else {
+                // Obtener cotizaciones actualizadas
+                const divisasRes = await fetch('https://duendes-vercel.vercel.app/api/divisas?tasas=true');
+                const divisasData = await divisasRes.json();
+
+                const monedas = {
+                    AR: { nombre: 'pesos argentinos', codigo: 'ARS', simbolo: '$' },
+                    MX: { nombre: 'pesos mexicanos', codigo: 'MXN', simbolo: '$' },
+                    CO: { nombre: 'pesos colombianos', codigo: 'COP', simbolo: '$' },
+                    CL: { nombre: 'pesos chilenos', codigo: 'CLP', simbolo: '$' },
+                    PE: { nombre: 'soles', codigo: 'PEN', simbolo: 'S/' },
+                    BR: { nombre: 'reales', codigo: 'BRL', simbolo: 'R$' },
+                    ES: { nombre: 'euros', codigo: 'EUR', simbolo: '€' },
+                    DEFAULT: { nombre: 'dólares', codigo: 'USD', simbolo: '$' }
+                };
+
+                const moneda = monedas[pais] || monedas.DEFAULT;
+                const tasa = divisasData.tasas?.[moneda.codigo] || 1;
+                const precioLocal = Math.round(precioUSD * tasa);
+                const senaUSD = Math.round(precioUSD * 0.3);
+
+                // Precio principal: X DÓLARES (aproximadamente Y pesos locales)
+                let textoPreio = '$' + precioUSD + ' DÓLARES';
+                if (moneda.codigo !== 'USD') {
+                    textoPreio += ' (aproximadamente ' + moneda.simbolo + precioLocal.toLocaleString('es') + ' ' + moneda.nombre + ')';
+                }
+                document.getElementById('precio-mostrar').innerHTML = textoPreio;
+
+                const precioSecundario = document.querySelector('.precio-secundario');
+                if (precioSecundario) {
+                    precioSecundario.style.display = 'none';
+                }
+
+                const btnSena = document.querySelector('.btn-sena');
+                if (btnSena) {
+                    btnSena.textContent = 'Reservar con seña (30% = $' + senaUSD + ' USD)';
+                }
+            }
         } catch(e) {
-            console.log('Geolocalización no disponible');
+            console.log('Geolocalización no disponible:', e);
         }
     })();
     </script>

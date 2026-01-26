@@ -884,6 +884,7 @@ function duendes_render_tienda_tarot() {
             $card_index = 0;
             while ($products->have_posts()): $products->the_post();
                 global $product;
+                $precio_uyu = get_post_meta(get_the_ID(), '_duendes_precio_uyu', true) ?: round($product->get_price() * 43);
                 $img_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
                 $cats = wp_get_post_terms(get_the_ID(), 'product_cat');
                 $cat_principal = !empty($cats) ? $cats[0] : null;
@@ -936,7 +937,7 @@ function duendes_render_tienda_tarot() {
                     <div class="tarot-info">
                         <div class="tarot-tipo"><?php echo esc_html($tipo); ?></div>
                         <h3 class="tarot-name"><?php echo esc_html($nombre); ?></h3>
-                        <div class="tarot-price" data-precio-usd="<?php echo $product->get_price(); ?>">$<?php echo number_format($product->get_price(), 0); ?> USD</div>
+                        <div class="tarot-price" data-precio-usd="<?php echo $product->get_price(); ?>" data-precio-uyu="<?php echo $precio_uyu; ?>">$<?php echo number_format($product->get_price(), 0); ?> USD</div>
                     </div>
 
                     <div class="tarot-glow"></div>
@@ -1138,37 +1139,43 @@ function duendes_render_tienda_tarot() {
                 const geoData = await geoRes.json();
                 const pais = geoData.country_code || 'US';
 
-                // Si es Uruguay, mostrar en UYU
+                // Si es Uruguay, mostrar precio REAL en pesos (del meta del producto)
                 if (pais === 'UY') {
+                    document.querySelectorAll('.tarot-price[data-precio-uyu]').forEach(el => {
+                        const precioUYU = parseInt(el.dataset.precioUyu) || 0;
+                        el.innerHTML = `$${precioUYU.toLocaleString('es-UY')} pesos`;
+                    });
+                    mostrarBannerEnvio('uy');
+                }
+                // Otros países: X DÓLARES (aproximadamente Y pesos locales)
+                else {
                     const divisasRes = await fetch('https://duendes-vercel.vercel.app/api/divisas?tasas=true');
                     const divisasData = await divisasRes.json();
 
-                    if (divisasData.success) {
-                        const tasaUYU = divisasData.tasas?.UYU || 43;
+                    const monedas = {
+                        AR: { nombre: 'pesos argentinos', codigo: 'ARS', simbolo: '$' },
+                        MX: { nombre: 'pesos mexicanos', codigo: 'MXN', simbolo: '$' },
+                        CO: { nombre: 'pesos colombianos', codigo: 'COP', simbolo: '$' },
+                        CL: { nombre: 'pesos chilenos', codigo: 'CLP', simbolo: '$' },
+                        PE: { nombre: 'soles', codigo: 'PEN', simbolo: 'S/' },
+                        BR: { nombre: 'reales', codigo: 'BRL', simbolo: 'R$' },
+                        ES: { nombre: 'euros', codigo: 'EUR', simbolo: '€' },
+                        DEFAULT: { nombre: 'dólares', codigo: 'USD', simbolo: '$' }
+                    };
 
-                        document.querySelectorAll('.tarot-price[data-precio-usd]').forEach(el => {
-                            const precioUSD = parseFloat(el.dataset.precioUsd);
-                            const precioUYU = Math.round(precioUSD * tasaUYU);
-                            el.innerHTML = `$${precioUYU.toLocaleString('es-UY')} <small style="opacity:0.6">UYU</small>`;
-                        });
+                    const moneda = monedas[pais] || monedas.DEFAULT;
+                    const tasa = divisasData.tasas?.[moneda.codigo] || 1;
 
-                        // Mostrar banner de envío local
-                        mostrarBannerEnvio('uy');
-                    }
-                } else {
-                    // Mostrar precio en USD con aproximación local
-                    const divisasRes = await fetch(`https://duendes-vercel.vercel.app/api/divisas?precio=100&pais=${pais}`);
-                    const divisasData = await divisasRes.json();
+                    document.querySelectorAll('.tarot-price[data-precio-usd]').forEach(el => {
+                        const precioUSD = parseFloat(el.dataset.precioUsd);
+                        let html = `$${precioUSD} DÓLARES`;
 
-                    if (divisasData.success && divisasData.precio.moneda !== 'USD') {
-                        const config = divisasData.precio.config;
-
-                        document.querySelectorAll('.tarot-price[data-precio-usd]').forEach(el => {
-                            const precioUSD = parseFloat(el.dataset.precioUsd);
-                            const precioLocal = precioUSD * (divisasData.tasas?.[divisasData.precio.moneda] || 1);
-                            el.innerHTML = `$${precioUSD} USD <small style="opacity:0.5">(~${config.simbolo}${Math.round(precioLocal).toLocaleString()})</small>`;
-                        });
-                    }
+                        if (moneda.codigo !== 'USD') {
+                            const precioLocal = Math.round(precioUSD * tasa);
+                            html += ` <small style="opacity:0.6">(aprox. ${moneda.simbolo}${precioLocal.toLocaleString('es')} ${moneda.nombre})</small>`;
+                        }
+                        el.innerHTML = html;
+                    });
 
                     mostrarBannerEnvio('intl');
                 }

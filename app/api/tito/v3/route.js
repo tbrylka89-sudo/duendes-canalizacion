@@ -15,6 +15,7 @@ import { TITO_TOOLS, getToolsParaContexto, getToolsParaManyChat } from '@/lib/ti
 import ejecutarTool from '@/lib/tito/tool-executor';
 import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
 import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
+import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -444,8 +445,9 @@ export async function POST(request) {
 
       // Si encontramos productos, generar respuesta directamente
       if (preciosEncontrados.length > 0) {
-        // Obtener cotizaciones en tiempo real
+        // Obtener cotizaciones en tiempo real y productos para precios reales
         const cotizaciones = await obtenerCotizaciones();
+        const productosWoo = await obtenerProductosWoo();
         const infoPais = infoPaises[paisCode] || infoPaises['US'];
 
         let respuestaDirecta = `${infoPais.saludo} ${infoPais.emoji}\n\nTe paso los precios en ${infoPais.moneda}:\n\n`;
@@ -453,21 +455,27 @@ export async function POST(request) {
         preciosEncontrados.forEach(match => {
           const parts = match.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)/i);
           if (parts) {
-            const nombre = parts[1];
+            const nombreProducto = parts[1];
             const precioUSD = parseInt(parts[2]);
 
+            // Buscar el producto real para obtener su precio UYU
+            const productoReal = productosWoo.find(p =>
+              p.nombre.toLowerCase().includes(nombreProducto.toLowerCase()) ||
+              nombreProducto.toLowerCase().includes(p.nombre.toLowerCase().split(' ')[0])
+            );
+
             if (paisCode === 'UY') {
-              // Uruguay usa precios FIJOS (no cotización)
-              const precioLocal = PRECIOS_URUGUAY.convertir(precioUSD);
-              respuestaDirecta += `• **${nombre}**: $${precioLocal.toLocaleString('es-UY')} pesos\n`;
+              // Uruguay: usar precio UYU REAL del producto
+              const precioUYU = productoReal?.precioUYU || PRECIOS_URUGUAY.convertir(precioUSD);
+              respuestaDirecta += `• **${nombreProducto}**: $${precioUYU.toLocaleString('es-UY')} pesos\n`;
             } else if (['US', 'EC', 'PA'].includes(paisCode)) {
               // Países dolarizados
-              respuestaDirecta += `• **${nombre}**: $${precioUSD} USD\n`;
+              respuestaDirecta += `• **${nombreProducto}**: $${precioUSD} DÓLARES\n`;
             } else {
-              // Otros países: usar cotización en tiempo real
+              // Otros países: X DÓLARES (aproximadamente Y pesos locales)
               const tasa = cotizaciones[infoPais.codigoMoneda] || 1;
               const precioLocal = Math.round(precioUSD * tasa);
-              respuestaDirecta += `• **${nombre}**: $${precioUSD} USD (aprox. $${precioLocal.toLocaleString('es')} ${infoPais.moneda})\n`;
+              respuestaDirecta += `• **${nombreProducto}**: $${precioUSD} DÓLARES (aproximadamente $${precioLocal.toLocaleString('es')} ${infoPais.moneda})\n`;
             }
           }
         });
