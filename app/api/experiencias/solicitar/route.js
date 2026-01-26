@@ -102,7 +102,27 @@ function determinarCategoria(experienciaId) {
     'registros-akashicos': 'estudios',
     'carta-ancestral': 'lecturas',
     'mapa-energetico': 'lecturas',
-    'pregunta-especifica': 'mensajes'
+    'pregunta-especifica': 'mensajes',
+    'perfil_numerologico': 'estudios',
+    'año_personal_num': 'estudios',
+    'numerologia_nombre': 'estudios',
+    'lectura_amor_actual': 'amor',
+    'compatibilidad_pareja': 'amor',
+    'sanar_corazon_roto': 'amor',
+    'atraer_amor': 'amor',
+    'interpretar_sueno': 'suenos',
+    'diario_onirico': 'suenos',
+    'suenos_profeticos': 'suenos',
+    'bloqueos_abundancia': 'abundancia',
+    'ritual_abundancia': 'abundancia',
+    'lectura_prosperidad': 'abundancia',
+    'lectura_akashicos': 'estudios',
+    'origen_alma': 'estudios',
+    'limpieza_akashica': 'estudios',
+    'nino_interior': 'sanacion',
+    'sombra_personal': 'sanacion',
+    'sanacion_linaje': 'sanacion',
+    'perdon_profundo': 'sanacion'
   };
   return categorias[experienciaId] || 'otros';
 }
@@ -552,6 +572,178 @@ const EXPERIENCIAS = {
     palabras: 1500,
     tiempoMinMs: 35 * 60 * 1000,
     tiempoMaxMs: 70 * 60 * 1000
+  },
+
+  // === NUMEROLOGÍA (experiencias del frontend Mi Magia) ===
+  'perfil_numerologico': {
+    nombre: 'Tu Perfil Numerológico Completo',
+    runas: 70,
+    generaIA: true,
+    palabras: 4000,
+    tiempoMinMs: 45 * 60 * 1000,
+    tiempoMaxMs: 90 * 60 * 1000
+  },
+  'año_personal_num': {
+    nombre: 'Tu Año Personal Numerológico',
+    runas: 35,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 25 * 60 * 1000,
+    tiempoMaxMs: 50 * 60 * 1000
+  },
+  'numerologia_nombre': {
+    nombre: 'Análisis de tu Nombre',
+    runas: 40,
+    generaIA: true,
+    palabras: 1800,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+
+  // === AMOR (experiencias Mi Magia) ===
+  'lectura_amor_actual': {
+    nombre: 'Lectura de tu Amor Actual',
+    runas: 45,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+  'compatibilidad_pareja': {
+    nombre: 'Compatibilidad de Pareja',
+    runas: 55,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 40 * 60 * 1000,
+    tiempoMaxMs: 80 * 60 * 1000
+  },
+  'sanar_corazon_roto': {
+    nombre: 'Sanar un Corazón Roto',
+    runas: 60,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 45 * 60 * 1000,
+    tiempoMaxMs: 90 * 60 * 1000
+  },
+  'atraer_amor': {
+    nombre: 'Atraer el Amor',
+    runas: 50,
+    generaIA: true,
+    palabras: 1800,
+    tiempoMinMs: 35 * 60 * 1000,
+    tiempoMaxMs: 70 * 60 * 1000
+  },
+
+  // === SUEÑOS (experiencias Mi Magia) ===
+  'interpretar_sueno': {
+    nombre: 'Interpretación de Sueño',
+    runas: 30,
+    generaIA: true,
+    palabras: 1200,
+    tiempoMinMs: 20 * 60 * 1000,
+    tiempoMaxMs: 40 * 60 * 1000
+  },
+  'diario_onirico': {
+    nombre: 'Diario Onírico',
+    runas: 55,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 40 * 60 * 1000,
+    tiempoMaxMs: 80 * 60 * 1000
+  },
+  'suenos_profeticos': {
+    nombre: 'Sueños Proféticos',
+    runas: 45,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+
+  // === ABUNDANCIA (experiencias Mi Magia) ===
+  'bloqueos_abundancia': {
+    nombre: 'Bloqueos de Abundancia',
+    runas: 55,
+    generaIA: true,
+    palabras: 2000,
+    tiempoMinMs: 40 * 60 * 1000,
+    tiempoMaxMs: 80 * 60 * 1000
+  },
+  'ritual_abundancia': {
+    nombre: 'Ritual de Abundancia',
+    runas: 45,
+    generaIA: true,
+    palabras: 1500,
+    tiempoMinMs: 30 * 60 * 1000,
+    tiempoMaxMs: 60 * 60 * 1000
+  },
+  'lectura_prosperidad': {
+    nombre: 'Lectura de Prosperidad',
+    runas: 65,
+    generaIA: true,
+    palabras: 2500,
+    tiempoMinMs: 50 * 60 * 1000,
+    tiempoMaxMs: 100 * 60 * 1000
+  },
+
+  // === AKASHICOS (experiencias Mi Magia) ===
+  'lectura_akashicos': {
+    nombre: 'Lectura de Registros Akáshicos',
+    runas: 250,
+    generaIA: true,
+    palabras: 5000,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 150 * 60 * 1000
+  },
+  'origen_alma': {
+    nombre: 'Origen del Alma',
+    runas: 180,
+    generaIA: true,
+    palabras: 4000,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 120 * 60 * 1000
+  },
+  'limpieza_akashica': {
+    nombre: 'Limpieza Akáshica',
+    runas: 150,
+    generaIA: true,
+    palabras: 3500,
+    tiempoMinMs: 50 * 60 * 1000,
+    tiempoMaxMs: 100 * 60 * 1000
+  },
+
+  // === SANACIÓN (experiencias Mi Magia) ===
+  'nino_interior': {
+    nombre: 'Niño Interior',
+    runas: 80,
+    generaIA: true,
+    palabras: 2500,
+    tiempoMinMs: 50 * 60 * 1000,
+    tiempoMaxMs: 100 * 60 * 1000
+  },
+  'sombra_personal': {
+    nombre: 'Sombra Personal',
+    runas: 90,
+    generaIA: true,
+    palabras: 3000,
+    tiempoMinMs: 60 * 60 * 1000,
+    tiempoMaxMs: 120 * 60 * 1000
+  },
+  'sanacion_linaje': {
+    nombre: 'Sanación de Linaje',
+    runas: 100,
+    generaIA: true,
+    palabras: 3500,
+    tiempoMinMs: 70 * 60 * 1000,
+    tiempoMaxMs: 140 * 60 * 1000
+  },
+  'perdon_profundo': {
+    nombre: 'Perdón Profundo',
+    runas: 70,
+    generaIA: true,
+    palabras: 2200,
+    tiempoMinMs: 45 * 60 * 1000,
+    tiempoMaxMs: 90 * 60 * 1000
   }
 };
 
@@ -1387,6 +1579,151 @@ Respondé de forma directa:
 6. Consejo final concreto
 
 Mínimo 500 palabras. Directo pero profundo.`
+    },
+
+    // === NUMEROLOGÍA (experiencias Mi Magia) ===
+    'perfil_numerologico': {
+      system: `Sos un numerólogo experto de Duendes del Uruguay.
+Calculás e interpretás los números con profundidad mística y precisión matemática.
+Usás español rioplatense (vos, tenés, podés).
+Pronombre: ${pronombre || 'ella'}.`,
+      user: `Realizá un Perfil Numerológico Completo para ${nombreUsuario}.
+${fechaNacimiento ? `Fecha de nacimiento: ${fechaNacimiento}` : ''}
+${solicitud.datosAdicionales?.nombre_completo ? `Nombre completo de nacimiento: ${solicitud.datosAdicionales.nombre_completo}` : ''}
+${solicitud.datosAdicionales?.nombre_actual ? `Nombre actual: ${solicitud.datosAdicionales.nombre_actual}` : ''}
+
+Realizá un estudio numerológico COMPLETO que incluya:
+
+1. **NÚMERO DE VIDA** (de la fecha de nacimiento)
+   - Cálculo detallado
+   - Significado profundo
+   - Cómo se manifiesta en su vida
+
+2. **NÚMERO DE EXPRESIÓN** (del nombre completo)
+   - Valor de cada letra
+   - Cálculo paso a paso
+   - Talentos y habilidades innatas
+
+3. **NÚMERO DEL ALMA** (vocales del nombre)
+   - Lo que realmente desea en el fondo
+   - Motivaciones ocultas
+   - Anhelos del corazón
+
+4. **NÚMERO DE PERSONALIDAD** (consonantes del nombre)
+   - Cómo la ven los demás
+   - Primera impresión que causa
+   - Máscara social
+
+5. **NÚMERO DE DESTINO**
+   - Hacia dónde va su vida
+   - Lecciones que vino a aprender
+   - Misión de vida
+
+6. **AÑO PERSONAL 2026**
+   - Qué energía rige este año
+   - Oportunidades y desafíos
+   - Meses más importantes
+
+7. **NÚMEROS KÁRMICOS Y DESAFÍOS**
+   - Deudas kármicas si las hay
+   - Desafíos numerológicos
+   - Cómo superarlos
+
+8. **SÍNTESIS Y GUÍA**
+   - Cómo se conectan todos los números
+   - Consejos prácticos
+   - Días y colores favorables
+
+Mínimo 4000 palabras. Sé detallado, personal y revelador.`
+    },
+
+    'año_personal_num': {
+      system: `Sos un numerólogo experto de Duendes del Uruguay.
+Calculás e interpretás los ciclos anuales con profundidad.
+Usás español rioplatense.
+Pronombre: ${pronombre || 'ella'}.`,
+      user: `Realizá un análisis del Año Personal Numerológico para ${nombreUsuario}.
+${fechaNacimiento ? `Fecha de nacimiento: ${fechaNacimiento}` : ''}
+${solicitud.datosAdicionales?.fecha_nacimiento_num ? `Fecha: ${solicitud.datosAdicionales.fecha_nacimiento_num}` : ''}
+
+Analizá su Año Personal 2026:
+
+1. **CÁLCULO DEL AÑO PERSONAL**
+   - Fórmula paso a paso
+   - Resultado y su significado
+
+2. **ENERGÍA GENERAL DEL AÑO**
+   - Tema principal de este ciclo
+   - Qué área de vida se activa
+   - Tono emocional del año
+
+3. **MES A MES** (breve para cada mes)
+   - Meses de oportunidad
+   - Meses de descanso
+   - Meses de acción
+
+4. **ÁREAS DE VIDA**
+   - Amor y relaciones
+   - Trabajo y carrera
+   - Dinero y abundancia
+   - Salud y energía
+
+5. **CONSEJOS PARA APROVECHAR**
+   - Qué hacer
+   - Qué evitar
+   - Cómo fluir con la energía
+
+6. **DÍAS DE PODER**
+   - Días del mes más favorables
+   - Horas de poder
+
+Mínimo 1500 palabras.`
+    },
+
+    'numerologia_nombre': {
+      system: `Sos un numerólogo experto especializado en el análisis de nombres.
+Descubrís el poder oculto en las letras y sus vibraciones.
+Usás español rioplatense.
+Pronombre: ${pronombre || 'ella'}.`,
+      user: `Realizá un Análisis Numerológico del Nombre para ${nombreUsuario}.
+${solicitud.datosAdicionales?.nombre_completo ? `Nombre completo: ${solicitud.datosAdicionales.nombre_completo}` : `Nombre: ${nombreUsuario}`}
+${solicitud.datosAdicionales?.nombre_analizar ? `Nombre a analizar: ${solicitud.datosAdicionales.nombre_analizar}` : ''}
+
+Analizá el nombre en profundidad:
+
+1. **VALOR TOTAL DEL NOMBRE**
+   - Cálculo letra por letra
+   - Significado del número resultante
+
+2. **ANÁLISIS DE VOCALES (Número del Alma)**
+   - Qué revelan sobre su interior
+   - Deseos más profundos
+
+3. **ANÁLISIS DE CONSONANTES (Número de Personalidad)**
+   - Cómo se presenta al mundo
+   - Imagen que proyecta
+
+4. **LETRAS PREDOMINANTES**
+   - Qué letras tiene más
+   - Qué significa ese exceso o carencia
+
+5. **INICIALES**
+   - Poder de la primera letra
+   - Combinación de iniciales
+
+6. **VIBRACIÓN GENERAL**
+   - Energía que emana el nombre
+   - Cómo influye en su vida diaria
+
+7. **COMPATIBILIDADES**
+   - Con qué nombres armoniza
+   - Nombres a evitar en socios/parejas
+
+8. **RECOMENDACIONES**
+   - Si debería usar apodo o nombre completo
+   - Cómo potenciar su nombre
+
+Mínimo 1800 palabras.`
     }
   };
 
@@ -1536,7 +1873,27 @@ function obtenerIconoExperiencia(tipo) {
     'registros-akashicos': '📜',
     'carta-ancestral': '🌳',
     'mapa-energetico': '🗺️',
-    'pregunta-especifica': '❓'
+    'pregunta-especifica': '❓',
+    'perfil_numerologico': '🔢',
+    'año_personal_num': '📅',
+    'numerologia_nombre': '✍️',
+    'lectura_amor_actual': '💕',
+    'compatibilidad_pareja': '💑',
+    'sanar_corazon_roto': '💔',
+    'atraer_amor': '💘',
+    'interpretar_sueno': '🌙',
+    'diario_onirico': '📓',
+    'suenos_profeticos': '🔮',
+    'bloqueos_abundancia': '🔒',
+    'ritual_abundancia': '💰',
+    'lectura_prosperidad': '📈',
+    'lectura_akashicos': '📜',
+    'origen_alma': '🌟',
+    'limpieza_akashica': '✨',
+    'nino_interior': '👶',
+    'sombra_personal': '🌑',
+    'sanacion_linaje': '🌳',
+    'perdon_profundo': '🕊️'
   };
   return iconos[tipo] || '✨';
 }
