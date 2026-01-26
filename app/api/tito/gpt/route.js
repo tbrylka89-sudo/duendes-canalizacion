@@ -30,6 +30,8 @@ PERSONALIDAD: Pícaro, sabio, directo pero cálido. Hablás uruguayo: "vos", "te
 
 GÉNERO: NO asumas género. Usá términos neutros como "che", "ey", o simplemente no uses términos de género. NUNCA digas "amigo/amiga" a menos que sepas el género.
 
+FORMATO DE PRODUCTOS: Cuando muestres productos, NO pongas links en el texto. El widget ya muestra las imágenes con botón "Ver". Solo mencioná nombre, precio y descripción breve. Terminá preguntando cuál les llamó la atención.
+
 === MISIÓN: VENDER ===
 
 Tu trabajo es generar ventas. Cada conversación debe terminar en:
@@ -203,40 +205,32 @@ async function ejecutarTool(nombre, args, contexto) {
 
       return seleccionados.map(p => {
         const precioUSD = parseFloat(p.precio) || 150;
+        let precio_mostrar;
 
         if (pais === 'UY') {
-          // Uruguay: precio fijo
+          // Uruguay: precio fijo en pesos
           const precioUY = PRECIOS_URUGUAY.convertir ? PRECIOS_URUGUAY.convertir(precioUSD) : Math.round(precioUSD * 43);
-          return {
-            nombre: p.nombre,
-            precio: `$${precioUY.toLocaleString('es-UY')} pesos uruguayos`,
-            descripcion: p.descripcion?.substring(0, 100) || '',
-            url: p.url,
-            imagen: p.imagen
-          };
+          precio_mostrar = `$${precioUY.toLocaleString('es-UY')} pesos`;
         } else if (['US', 'EC', 'PA'].includes(pais)) {
           // Países dolarizados
-          return {
-            nombre: p.nombre,
-            precio: `$${precioUSD} USD`,
-            descripcion: p.descripcion?.substring(0, 100) || '',
-            url: p.url,
-            imagen: p.imagen
-          };
+          precio_mostrar = `$${precioUSD} USD`;
         } else {
           // Otros países: convertir
           const codigoMoneda = paisAMoneda[pais] || 'USD';
           const tasa = cotizaciones[codigoMoneda] || 1;
           const precioLocal = Math.round(precioUSD * tasa);
           const nombreMoneda = monedaNombres[codigoMoneda] || 'dólares';
-          return {
-            nombre: p.nombre,
-            precio: `$${precioUSD} USD (aprox. $${precioLocal.toLocaleString('es')} ${nombreMoneda})`,
-            descripcion: p.descripcion?.substring(0, 100) || '',
-            url: p.url,
-            imagen: p.imagen
-          };
+          precio_mostrar = `$${precioUSD} USD (~$${precioLocal.toLocaleString('es')} ${nombreMoneda})`;
         }
+
+        return {
+          nombre: p.nombre,
+          precio_usd: precioUSD,
+          precio_mostrar: precio_mostrar,
+          descripcion: p.descripcion?.substring(0, 100) || '',
+          url: p.url,
+          imagen: p.imagen
+        };
       });
     }
 
