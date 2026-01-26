@@ -22,7 +22,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const ticketId = searchParams.get('id');
-    const soloUrgentes = searchParams.get('urgentes') === 'true';
+    const tipo = searchParams.get('tipo'); // venta, pedido, queja, consulta, otro
 
     // Si piden un ticket específico
     if (ticketId) {
@@ -39,12 +39,13 @@ export async function GET(request) {
       }, { headers: CORS_HEADERS });
     }
 
-    // Lista de pendientes
-    let pendientes = await kv.get('escalamientos:pendientes') || [];
-
-    // Filtrar urgentes si se pide
-    if (soloUrgentes) {
-      pendientes = pendientes.filter(p => p.urgente);
+    // Lista de pendientes - filtrar por tipo si se especifica
+    let pendientes;
+    if (tipo) {
+      // Lista específica por tipo (venta, pedido, queja, etc.)
+      pendientes = await kv.get(`escalamientos:${tipo}`) || [];
+    } else {
+      pendientes = await kv.get('escalamientos:pendientes') || [];
     }
 
     // Obtener detalles completos de los primeros 20

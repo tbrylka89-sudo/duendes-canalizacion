@@ -835,18 +835,16 @@ function duendes_render_tienda_tarot() {
             ];
 
             foreach ($categorias as $cat):
-                // "Ver Todos" es especial - apunta a /shop/
+                $term = get_term_by('slug', $cat['slug'], 'product_cat');
+
+                // "Ver Todos" es especial - no tiene término real
                 if ($cat['slug'] === 'todos') {
-                    $term = null;
-                    $count = wp_count_posts('product')->publish ?: 0;
-                    $link = home_url('/shop/');
-                    $is_active = !$categoria_actual; // Activo si NO hay categoría seleccionada
-                } elseif (empty($cat['slug'])) {
-                    continue; // Saltar si no tiene slug
+                    $count = 50;
+                    $link = '/shop/';
+                    $is_active = !$categoria_actual;
                 } else {
-                    $term = get_term_by('slug', $cat['slug'], 'product_cat');
                     $count = $term ? $term->count : 0;
-                    $link = $term ? get_term_link($term) : '#';
+                    $link = $term ? get_term_link($term) : '/shop/';
                     $is_active = $categoria_actual && $categoria_actual->slug === $cat['slug'];
                 }
 
