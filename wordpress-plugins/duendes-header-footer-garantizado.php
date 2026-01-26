@@ -142,15 +142,78 @@ function duendes_footer_garantizado() {
     [data-elementor-type="footer"] img {
         display: none !important;
     }
+
+    /* PROTEGER TITO - Asegurar que siempre sea visible */
+    .tito-widget,
+    #titoWidget,
+    [class*="tito-"],
+    .tito-toggle,
+    .tito-panel {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    .tito-widget {
+        z-index: 9999999 !important;
+    }
     </style>
 
     <script>
+    // PROTECCIÓN GLOBAL DE TITO - Ejecutar INMEDIATAMENTE
+    (function protegerTitoGlobal() {
+        // Función que protege a Tito
+        function asegurarTito() {
+            var tito = document.querySelector('.tito-widget, #titoWidget');
+            if (tito) {
+                tito.setAttribute('data-protegido', 'si');
+                tito.style.setProperty('display', 'block', 'important');
+                tito.style.setProperty('visibility', 'visible', 'important');
+                tito.style.setProperty('opacity', '1', 'important');
+                tito.style.setProperty('z-index', '9999999', 'important');
+            }
+        }
+
+        // Ejecutar constantemente
+        setInterval(asegurarTito, 100);
+
+        // Observer para detectar si Tito es eliminado
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+                m.removedNodes.forEach(function(node) {
+                    if (node.classList && (node.classList.contains('tito-widget') || node.id === 'titoWidget')) {
+                        console.warn('[Footer] Tito fue eliminado! Restaurando...');
+                        // Reinsertar Tito al body
+                        document.body.appendChild(node);
+                        asegurarTito();
+                    }
+                });
+            });
+        });
+
+        // Observar el body
+        if (document.body) {
+            observer.observe(document.body, { childList: true, subtree: true });
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                observer.observe(document.body, { childList: true, subtree: true });
+            });
+        }
+    })();
+
     // Remover footers viejos por JavaScript
     function limpiarFootersViejos() {
-        // Buscar y eliminar todos los footers excepto el nuestro
+        // Buscar y OCULTAR (no eliminar) todos los footers excepto el nuestro
         document.querySelectorAll('footer, [data-elementor-type="footer"], .elementor-location-footer, .site-footer, #footer').forEach(function(f) {
+            // NO tocar nada que sea o contenga a Tito
+            if (f.classList.contains('tito-widget') || f.id === 'titoWidget' ||
+                f.querySelector('.tito-widget') || f.querySelector('#titoWidget') ||
+                f.closest('.tito-widget')) {
+                return;
+            }
             if (!f.classList.contains('duendes-footer-garantizado')) {
-                f.remove();
+                // OCULTAR en lugar de eliminar
+                f.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;visibility:hidden!important;';
             }
         });
 
@@ -163,7 +226,10 @@ function duendes_footer_garantizado() {
             'Atención al Cliente',
             'Suscríbete a nuestra newsletter',
             '© 2025 Duendes',
-            'Enter your email'
+            'Enter your email',
+            'Back to top',
+            'circulo de duendes',
+            'espacio que se ve el bosque'
         ];
 
         // Eliminar el footer negro duplicado (Elementor) que tiene MAYÚSCULAS
@@ -184,8 +250,11 @@ function duendes_footer_garantizado() {
             }
         });
 
-        // Buscar TODAS las secciones y elementos
+        // Buscar TODAS las secciones y elementos (pero proteger Tito)
         document.querySelectorAll('.elementor-section, .e-con, .e-con-inner, section, .elementor-element, .elementor-widget-wrap').forEach(function(el) {
+            // PROTEGER TITO
+            if (el.closest('.tito-widget') || el.closest('[class*="tito"]')) return;
+
             var text = el.textContent || '';
             for (var i = 0; i < textosProhibidos.length; i++) {
                 if (text.includes(textosProhibidos[i])) {
@@ -194,7 +263,8 @@ function duendes_footer_garantizado() {
                     while (parent.parentElement &&
                            parent.parentElement.tagName !== 'BODY' &&
                            parent.parentElement.tagName !== 'MAIN' &&
-                           !parent.parentElement.classList.contains('duendes-footer-garantizado')) {
+                           !parent.parentElement.classList.contains('duendes-footer-garantizado') &&
+                           !parent.parentElement.classList.contains('tito-widget')) {
                         if (parent.classList.contains('elementor-section') ||
                             parent.classList.contains('e-con') ||
                             parent.tagName === 'SECTION') {
@@ -202,19 +272,28 @@ function duendes_footer_garantizado() {
                         }
                         parent = parent.parentElement;
                     }
-                    parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;';
+                    // No ocultar si es parte de Tito
+                    if (!parent.closest('.tito-widget') && !parent.classList.contains('tito-widget')) {
+                        parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;';
+                    }
                     break;
                 }
             }
         });
 
-        // Específicamente buscar el gris con fondo
+        // Específicamente buscar el gris con fondo (pero NO tocar Tito)
         document.querySelectorAll('*').forEach(function(el) {
+            // PROTEGER TITO - nunca tocar elementos del widget
+            if (el.classList.contains('tito-widget') || el.closest('.tito-widget') ||
+                el.id && el.id.includes('tito') || el.closest('[id*="tito"]')) {
+                return;
+            }
             var style = window.getComputedStyle(el);
             var bg = style.backgroundColor;
             // Si tiene fondo gris y contiene texto de footer viejo
             if ((bg.includes('128') || bg.includes('169') || bg.includes('gray') || bg.includes('grey')) &&
-                el.textContent && el.textContent.includes('Piriápolis')) {
+                el.textContent && el.textContent.includes('Piriápolis') &&
+                !el.classList.contains('tito-footer')) {
                 el.style.cssText = 'display:none!important;';
             }
         });
@@ -226,18 +305,30 @@ function duendes_footer_garantizado() {
     setTimeout(limpiarFootersViejos, 1500);
     setTimeout(limpiarFootersViejos, 3000);
 
-    // SOLUCIÓN RADICAL: Eliminar todo lo que venga DESPUÉS de nuestro footer
+    // SOLUCIÓN RADICAL: OCULTAR (no eliminar) todo lo que venga DESPUÉS de nuestro footer
     function eliminarDespuesDeNuestroFooter() {
         var nuestroFooter = document.querySelector('.duendes-footer-garantizado');
         if (nuestroFooter) {
             var siguiente = nuestroFooter.nextElementSibling;
             while (siguiente) {
                 var temp = siguiente.nextElementSibling;
-                // No eliminar el widget de Tito ni los mensajes del guardián
-                if (!siguiente.classList.contains('tito-widget') &&
-                    !siguiente.id.includes('tito') &&
-                    !siguiente.id.includes('dmg-')) {
-                    siguiente.remove();
+
+                // PROTEGER TITO - verificar de múltiples formas
+                var esTito = siguiente.classList.contains('tito-widget') ||
+                             siguiente.id === 'titoWidget' ||
+                             (siguiente.id && siguiente.id.toLowerCase().includes('tito')) ||
+                             siguiente.querySelector('.tito-widget') ||
+                             siguiente.querySelector('#titoWidget') ||
+                             (siguiente.className && siguiente.className.toLowerCase && siguiente.className.toLowerCase().includes('tito'));
+
+                // PROTEGER MENSAJES DEL GUARDIAN
+                var esDMG = (siguiente.id && siguiente.id.includes('dmg')) ||
+                            siguiente.querySelector('#dmg-container') ||
+                            siguiente.querySelector('.dmg-notificacion');
+
+                if (!esTito && !esDMG) {
+                    // OCULTAR en lugar de eliminar
+                    siguiente.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;visibility:hidden!important;';
                 }
                 siguiente = temp;
             }
@@ -263,15 +354,45 @@ function duendes_footer_garantizado() {
                 var texto = el.textContent || '';
                 if (texto.includes('Explorar') || texto.includes('Colecciones') ||
                     texto.includes('newsletter') || texto.includes('2016') ||
-                    texto.includes('TÉRMINOS') || texto.includes('POLÍTICA')) {
+                    texto.includes('TÉRMINOS') || texto.includes('POLÍTICA') ||
+                    texto.includes('Back to top') || texto.includes('circulo')) {
                     el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
                 }
             }
         });
 
-        // Eliminar específicamente .ddu-footer-section si existe
+        // Ocultar específicamente .ddu-footer-section si existe
         document.querySelectorAll('.ddu-footer-section').forEach(function(el) {
-            el.remove();
+            el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+        });
+
+        // Eliminar elementos con "Back to top"
+        document.querySelectorAll('a, button, div').forEach(function(el) {
+            if (el.textContent && el.textContent.includes('Back to top')) {
+                var parent = el.closest('.elementor-section') || el.closest('section') || el.parentElement;
+                if (parent && !parent.classList.contains('duendes-footer-garantizado')) {
+                    parent.style.cssText = 'display:none!important;';
+                }
+            }
+        });
+
+        // Eliminar secciones con muchas imágenes circulares (típico de footer de productos)
+        document.querySelectorAll('.elementor-section, .e-con, section').forEach(function(el) {
+            var imgs = el.querySelectorAll('img');
+            var circulares = 0;
+            imgs.forEach(function(img) {
+                var style = window.getComputedStyle(img);
+                if (style.borderRadius === '50%' || style.borderRadius.includes('50%')) {
+                    circulares++;
+                }
+            });
+            // Si tiene 3+ imágenes circulares, probablemente es un footer de productos
+            if (circulares >= 3 &&
+                !el.closest('.prod-hero') &&
+                !el.closest('.duendes-footer-garantizado') &&
+                !el.classList.contains('tito-widget')) {
+                el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+            }
         });
     }
 
@@ -281,6 +402,58 @@ function duendes_footer_garantizado() {
     setTimeout(eliminarFootersConImagenes, 500);
     setTimeout(eliminarFootersConImagenes, 1500);
     setTimeout(eliminarFootersConImagenes, 3000);
+
+    // SOLUCIÓN MÁS AGRESIVA: Ocultar CUALQUIER contenido después del producto en páginas de producto
+    function limpiezaAgresiva() {
+        // Proteger Tito primero
+        var tito = document.querySelector('.tito-widget, #titoWidget');
+        if (tito) {
+            tito.style.cssText = 'display:block!important;visibility:visible!important;opacity:1!important;z-index:9999999!important;';
+        }
+
+        // Proteger mensajes del guardián
+        var dmg = document.querySelector('#dmg-container');
+        if (dmg) {
+            dmg.style.cssText = 'display:block!important;visibility:visible!important;';
+        }
+
+        // Buscar el footer garantizado y eliminar todo lo que venga después excepto Tito y DMG
+        var nuestroFooter = document.querySelector('.duendes-footer-garantizado');
+        if (nuestroFooter && nuestroFooter.parentElement) {
+            var hermanos = Array.from(nuestroFooter.parentElement.children);
+            var indiceFooter = hermanos.indexOf(nuestroFooter);
+
+            hermanos.forEach(function(el, idx) {
+                if (idx > indiceFooter &&
+                    !el.classList.contains('tito-widget') &&
+                    el.id !== 'titoWidget' &&
+                    !el.id.includes('tito') &&
+                    !el.id.includes('dmg-') &&
+                    !el.classList.contains('dmg-') &&
+                    el.id !== 'dmg-container') {
+                    el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+                }
+            });
+        }
+
+        // Buscar secciones con "Back to top" y ocultarlas
+        document.querySelectorAll('*').forEach(function(el) {
+            if (el.textContent &&
+                (el.textContent.includes('Back to top') || el.textContent.includes('circulo de duendes')) &&
+                !el.closest('.tito-widget') &&
+                !el.closest('#titoWidget')) {
+                var section = el.closest('.elementor-section') || el.closest('section') || el.closest('.e-con');
+                if (section) {
+                    section.style.cssText = 'display:none!important;height:0!important;';
+                }
+            }
+        });
+    }
+
+    setTimeout(limpiezaAgresiva, 300);
+    setTimeout(limpiezaAgresiva, 800);
+    setTimeout(limpiezaAgresiva, 2000);
+    setTimeout(limpiezaAgresiva, 4000);
     </script>
 
     <footer class="duendes-footer-garantizado">
@@ -465,11 +638,11 @@ function duendes_garantizar_header() {
 add_action('wp_footer', function() {
     ?>
     <script>
-    // Remover footer duplicado si existe
+    // Ocultar footer duplicado si existe
     document.addEventListener('DOMContentLoaded', function() {
         var oldFooter = document.querySelector('.ddu-footer-section');
         if (oldFooter) {
-            oldFooter.remove();
+            oldFooter.style.cssText = 'display:none!important;height:0!important;';
         }
     });
     </script>

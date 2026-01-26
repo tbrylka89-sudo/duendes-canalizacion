@@ -104,6 +104,38 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
   const racha = gamificacion?.racha || 0;
   const diasParaBonus = gamificacion?.diasParaBonus;
 
+  // Generar posiciones estables para elementos (ANTES de cualquier return condicional)
+  const estrellas = useMemo(() =>
+    [...Array(25)].map((_, i) => ({
+      top: `${5 + (i * 7) % 45}%`,
+      left: `${3 + (i * 13) % 94}%`,
+      size: 1.5 + (i % 3),
+      delay: (i * 0.3) % 4,
+      duration: 2 + (i % 3),
+    })), []);
+
+  const luciernagas = useMemo(() =>
+    [...Array(10)].map((_, i) => ({
+      top: `${25 + (i * 11) % 45}%`,
+      left: `${8 + (i * 17) % 84}%`,
+      delay: (i * 0.5) % 5,
+      moveDuration: 6 + (i % 5),
+    })), []);
+
+  const hierbas = useMemo(() =>
+    [...Array(20)].map((_, i) => ({
+      left: `${2 + i * 5}%`,
+      height: 8 + (i % 4) * 5,
+      rotation: -12 + (i % 5) * 6,
+      delay: (i * 0.1) % 2,
+    })), []);
+
+  const nubes = useMemo(() => [
+    { top: '10%', duration: 60, delay: 0, size: 1 },
+    { top: '25%', duration: 80, delay: 20, size: 0.7 },
+    { top: '5%', duration: 100, delay: 40, size: 0.5 },
+  ], []);
+
   // Colores según momento del día
   const coloresCielo = {
     noche: 'linear-gradient(180deg, #0a0a1a 0%, #1a1a3a 50%, #2a2a4a 100%)',
@@ -340,38 +372,6 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
       </div>
     );
   }
-
-  // Generar posiciones estables para elementos
-  const estrellas = useMemo(() =>
-    [...Array(25)].map((_, i) => ({
-      top: `${5 + (i * 7) % 45}%`,
-      left: `${3 + (i * 13) % 94}%`,
-      size: 1.5 + (i % 3),
-      delay: (i * 0.3) % 4,
-      duration: 2 + (i % 3),
-    })), []);
-
-  const luciernagas = useMemo(() =>
-    [...Array(10)].map((_, i) => ({
-      top: `${25 + (i * 11) % 45}%`,
-      left: `${8 + (i * 17) % 84}%`,
-      delay: (i * 0.5) % 5,
-      moveDuration: 6 + (i % 5),
-    })), []);
-
-  const hierbas = useMemo(() =>
-    [...Array(20)].map((_, i) => ({
-      left: `${2 + i * 5}%`,
-      height: 8 + (i % 4) * 5,
-      rotation: -12 + (i % 5) * 6,
-      delay: (i * 0.1) % 2,
-    })), []);
-
-  const nubes = useMemo(() => [
-    { top: '10%', duration: 60, delay: 0, size: 1 },
-    { top: '25%', duration: 80, delay: 20, size: 0.7 },
-    { top: '5%', duration: 100, delay: 40, size: 0.5 },
-  ], []);
 
   return (
     <div style={styles.container}>
