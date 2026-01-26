@@ -13,9 +13,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 import { TITO_TOOLS, getToolsParaContexto, getToolsParaManyChat } from '@/lib/tito/tools';
 import ejecutarTool from '@/lib/tito/tool-executor';
-// TEMPORALMENTE usando personalidad ORIGINAL para debug
-// TODO: volver a compacta cuando se arregle el bug de loop
-import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+// Personalidad MEDIA - balance entre tokens y funcionalidad
+import { PERSONALIDAD_TITO_MEDIA as PERSONALIDAD_TITO, CONTEXTO_MANYCHAT_MEDIA as CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad-media';
 import { prepararMensajesOptimizados } from '@/lib/tito/personalidad-compacta';
 import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
