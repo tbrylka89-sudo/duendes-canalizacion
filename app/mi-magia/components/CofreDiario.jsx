@@ -10,10 +10,11 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
   const [reclamando, setReclamando] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [animacion, setAnimacion] = useState('idle');
-  const [hora, setHora] = useState(new Date().getHours());
+  const [hora, setHora] = useState(12); // Default a mediodía para SSR
 
-  // Actualizar hora cada minuto
+  // Setear hora real solo en cliente
   useEffect(() => {
+    setHora(new Date().getHours());
     const interval = setInterval(() => {
       setHora(new Date().getHours());
     }, 60000);
