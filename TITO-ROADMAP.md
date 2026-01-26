@@ -1,6 +1,6 @@
 # TITO 4.0 - ROADMAP DE EVOLUCIÓN
 
-**Última actualización:** 25/01/2026 - 20:45hs
+**Última actualización:** 25/01/2026 - 21:30hs
 
 ---
 
@@ -181,52 +181,153 @@ Tito ahora sabe desde dónde habla y adapta su comportamiento:
 
 ---
 
-## FASES PENDIENTES
+### ✅ FASE 7: SISTEMA DE RECOMENDACIÓN INTELIGENTE
+**Completada 25/01/2026 - 21:15hs**
 
-### FASE 7: SISTEMA DE RECOMENDACIÓN INTELIGENTE
-**Prioridad:** MEDIA | **Estado:** PENDIENTE
+Sistema de matching guardián-cliente y cross-sell inteligente.
 
-**Objetivos:**
-- Matching guardián-cliente basado en conversación
-- Cross-sell: "¿Sabías que [guardián] y [otro] se potencian juntos?"
-- Upsell: Pack 3x2 promocional
-- Personalización para clientes repetidos
+**Cambios realizados:**
+- Nuevo archivo: `lib/tito/recomendaciones.js`
+- Nueva tool: `recomendar_guardian` en `tools.js`
+- Implementación en `tool-executor.js`
+- Detección de clientes repetidos via Vercel KV
 
-**Tareas:**
-- [ ] Crear sistema de scoring guardián-cliente
-- [ ] Implementar lógica de cross-sell por categoría
-- [ ] Detectar clientes repetidos y personalizar tono
-- [ ] Integrar con promoción 3x2 existente
+**Sistema de Scoring (0-100):**
+
+| Factor | Peso | Descripción |
+|--------|------|-------------|
+| Categoría match | 30 | Si busca protección → guardianes de protección |
+| Elemento match | 20 | Tierra, Agua, Fuego, Aire |
+| Precio adecuado | 15 | Según rango mencionado |
+| Disponibilidad | 15 | Stock > 0 |
+| Popularidad | 10 | Ventas recientes |
+| Novedad | 10 | Guardianes nuevos destacados |
+
+**Cross-sell por categorías complementarias:**
+
+| Categoría | Se complementa con |
+|-----------|-------------------|
+| Protección | Abundancia, Sabiduría |
+| Abundancia | Protección, Amor |
+| Amor | Sanación, Sabiduría |
+| Sanación | Protección, Amor |
+| Sabiduría | Protección, Abundancia |
+
+**Combos disponibles:**
+- Protección Total (Diana + Stan + Ekris)
+- Abundancia Completa (Fortuna + Próspero + Verde)
+- Sanación Profunda (Micelio + Moon + Izara)
+
+**Verificación:**
+- [x] Sistema de scoring funciona
+- [x] Cross-sell sugiere guardianes complementarios
+- [x] Detecta clientes repetidos y personaliza
+- [x] Integrado con promoción 3x2
 
 ---
 
-### FASE 8: WEBHOOKS DE WOOCOMMERCE
-**Prioridad:** BAJA | **Estado:** PENDIENTE
+### ✅ FASE 8: WEBHOOKS DE WOOCOMMERCE
+**Completada 25/01/2026 - 21:15hs**
 
-**Objetivos:**
-- Actualización instantánea cuando producto se agota
-- Notificación cuando hay nuevo pedido
-- Sincronización bidireccional
+Sincronización en tiempo real con WooCommerce.
 
-**Tareas:**
-- [ ] Crear endpoint `app/api/webhooks/woocommerce/route.js`
-- [ ] Configurar webhooks en WooCommerce
-- [ ] Invalidar caché cuando hay cambios
+**Cambios realizados:**
+- Nuevo endpoint: `app/api/webhooks/woocommerce/route.js`
+- Invalidación de caché en `lib/tito/conocimiento.js`
+- Sistema distribuido via Vercel KV
+
+**Eventos soportados:**
+
+| Evento | Acción |
+|--------|--------|
+| `product.created` | Invalida caché de productos |
+| `product.updated` | Invalida caché de productos |
+| `product.deleted` | Remueve de caché |
+| `order.created` | Procesa compra (guardianes, runas, membresías) |
+| `low_stock` | Marca producto como bajo stock |
+
+**Seguridad:**
+- Validación HMAC-SHA256 de firma
+- Header: `X-WC-Webhook-Signature`
+- Secret configurado en Vercel env vars
+
+**Sistema de caché:**
+- Caché local: 5 minutos
+- Invalidación distribuida: Vercel KV key `tito:productos:invalidacion`
+- Todas las instancias se sincronizan automáticamente
+
+**Configuración pendiente en WooCommerce:**
+1. WooCommerce > Settings > Advanced > Webhooks
+2. Crear webhooks para: `order.created`, `product.updated`, `product.created`, `product.deleted`
+3. Delivery URL: `https://duendes-vercel.vercel.app/api/webhooks/woocommerce`
+4. Agregar `WOOCOMMERCE_WEBHOOK_SECRET` en Vercel env vars
+
+**Verificación:**
+- [x] Endpoint creado y funcional
+- [x] Validación HMAC implementada
+- [x] Invalidación de caché distribuida
+- [ ] Configurar webhooks en WooCommerce (manual)
 
 ---
 
-### FASE 9: INTEGRACIÓN MANUAL DE PERSUASIÓN
-**Prioridad:** BAJA | **Estado:** PENDIENTE
+### ✅ FASE 9: SISTEMA DE PERSUASIÓN AVANZADA
+**Completada 25/01/2026 - 21:15hs**
 
-**Objetivos:**
-- Usar los 46KB de técnicas en `manual-persuasion.js`
-- Integrar técnicas FBI (mirroring, labeling)
-- Prueba social dinámica
+Técnicas de neuroventas y persuasión ética integradas.
 
-**Tareas:**
-- [ ] Revisar y seleccionar técnicas más efectivas
-- [ ] Integrar en personalidad.js
-- [ ] Crear sistema de prueba social con datos reales
+**Cambios realizados:**
+- Nuevo archivo: `lib/tito/persuasion.js`
+- Integración en `lib/tito/personalidad.js`
+- Integración en `app/api/tito/v3/route.js`
+
+**Técnicas FBI implementadas:**
+
+| Técnica | Descripción | Ejemplo |
+|---------|-------------|---------|
+| **Mirroring** | Repetir últimas palabras como pregunta | "¿Protección...?" |
+| **Labeling** | Nombrar la emoción detectada | "Parece que venís cargando algo pesado..." |
+| **Preguntas Calibradas** | "Cómo" y "Qué" (nunca "Por qué") | "¿Qué es lo que más te hace dudar?" |
+| **Acusación Anticipada** | Adelantarse a objeciones | "Probablemente pensés que es caro..." |
+
+**Prueba social para guardianes ÚNICOS:**
+
+⚠️ **REGLA DE ORO:** Cada guardián es ÚNICO. NUNCA decir "alguien compró el mismo".
+
+**Frases correctas:**
+- "Ayer una chica de México adoptó un guardián de protección como este"
+- "Esta semana 3 personas eligieron guardianes sanadores"
+- "Los guardianes de abundancia son los más buscados este mes"
+
+**Frases PROHIBIDAS:**
+- ❌ "Alguien compró este mismo"
+- ❌ "El último que quedaba" (si hay más de ese tipo)
+
+**Escasez real (no falsa):**
+- "Cuando se va, ese diseño desaparece del mundo"
+- "Cada guardián se crea una sola vez"
+
+**Detección de emociones:**
+
+| Emoción | Detectores |
+|---------|------------|
+| ansiedad | nervios, ansiedad, preocupad, estresad |
+| tristeza | triste, mal, dolor, sufr, llor |
+| miedo | miedo, asust, temor, insegur |
+| confusion | confund, no sé, perdid, dudas |
+| esperanza | esper, ilusión, quiero cambiar |
+| frustracion | hart, cansad, frustrad, no aguanto |
+
+**Verificación:**
+- [x] Técnicas FBI integradas en personalidad
+- [x] Prueba social respeta unicidad de guardianes
+- [x] Escasez real, no manipuladora
+- [x] Detección automática de emociones
+
+---
+
+## TODAS LAS FASES COMPLETADAS
+
+El roadmap de Tito 4.0 está **100% completado**. Todas las 9 fases implementadas.
 
 ---
 
@@ -240,6 +341,10 @@ Tito ahora sabe desde dónde habla y adapta su comportamiento:
 | Verifica stock en vivo | NO | SÍ | ✅ |
 | Detecta objeciones | NO | SÍ | ✅ |
 | Burbujas contextuales | NO | SÍ | ✅ |
+| Sistema multi-origen | NO | SÍ | ✅ |
+| Recomendaciones inteligentes | NO | SÍ | ✅ |
+| Webhooks WooCommerce | NO | SÍ | ✅ |
+| Técnicas de persuasión | NO | SÍ | ✅ |
 
 ---
 
@@ -249,24 +354,58 @@ Tito ahora sabe desde dónde habla y adapta su comportamiento:
 
 | Archivo | Cambios |
 |---------|---------|
-| `app/api/tito/v3/route.js` | Contexto producto, objeciones, geolocalización |
-| `lib/tito/tools.js` | +`obtener_guardian_completo`, +`verificar_stock` |
+| `app/api/tito/v3/route.js` | Contexto producto, objeciones, geolocalización, orígenes, persuasión |
+| `app/api/webhooks/woocommerce/route.js` | **NUEVO** - Webhooks WooCommerce (Fase 8) |
+| `lib/tito/tools.js` | +`obtener_guardian_completo`, +`verificar_stock`, +`recomendar_guardian` |
 | `lib/tito/tool-executor.js` | Implementación de nuevas tools |
-| `lib/tito/conocimiento.js` | Descripción completa, meta_data custom |
-| `lib/tito/personalidad.js` | Regla de stock |
-| `lib/tito/objeciones.js` | **NUEVO** - Sistema de objeciones |
+| `lib/tito/conocimiento.js` | Descripción completa, meta_data custom, invalidación de caché |
+| `lib/tito/personalidad.js` | Regla de stock, técnicas FBI, persuasión avanzada |
+| `lib/tito/objeciones.js` | **NUEVO** - Sistema de objeciones (Fase 5) |
+| `lib/tito/recomendaciones.js` | **NUEVO** - Sistema de recomendaciones (Fase 7) |
+| `lib/tito/persuasion.js` | **NUEVO** - Sistema de persuasión (Fase 9) |
 
 ### WordPress Plugins
 
 | Archivo | Cambios |
 |---------|---------|
-| `duendes-tito-widget.php` | Burbujas inteligentes, fix burbuja fantasma |
+| `duendes-tito-widget.php` | Burbujas inteligentes, fix burbuja fantasma, origen tienda |
 | `duendes-producto-epico.php` | Geolocalización de precios |
 | +24 archivos | Slug /tienda/ → /shop/ |
 
 ---
 
 ## CHANGELOG
+
+### 25/01/2026 - 21:15hs - FASES 7, 8, 9 COMPLETADAS ✅
+
+**ROADMAP 100% COMPLETADO**
+
+Implementadas las 3 fases finales usando agentes paralelos:
+
+**Fase 7 - Recomendaciones:**
+- Sistema de scoring guardián-cliente (0-100)
+- Cross-sell por categorías complementarias
+- Combos predefinidos (Protección Total, Abundancia Completa, etc.)
+- Detección de clientes repetidos via Vercel KV
+
+**Fase 8 - Webhooks WooCommerce:**
+- Endpoint `/api/webhooks/woocommerce`
+- Validación HMAC-SHA256
+- Invalidación distribuida de caché
+- Eventos: product.created/updated/deleted, order.created
+
+**Fase 9 - Persuasión:**
+- Técnicas FBI: mirroring, labeling, preguntas calibradas
+- Prueba social que respeta unicidad de guardianes
+- Escasez real (cada guardián es único)
+- Detección automática de emociones
+
+**Archivos nuevos:**
+- `lib/tito/recomendaciones.js`
+- `lib/tito/persuasion.js`
+- `app/api/webhooks/woocommerce/route.js`
+
+---
 
 ### 25/01/2026 - 20:30hs - SISTEMA DE ORÍGENES ✅ COMPLETO Y TESTEADO
 
@@ -351,11 +490,15 @@ Tito es empático pero no se queda de terapeuta gratis. Corta con elegancia.
 | Archivo | Función |
 |---------|---------|
 | `app/api/tito/v3/route.js` | Orquestador principal |
+| `app/api/tito/manychat/route.js` | Adaptador ManyChat |
+| `app/api/webhooks/woocommerce/route.js` | Webhooks WooCommerce |
 | `lib/tito/personalidad.js` | Personalidad y reglas |
 | `lib/tito/tools.js` | Definición de herramientas |
 | `lib/tito/tool-executor.js` | Ejecutor de tools |
 | `lib/tito/conocimiento.js` | Base de datos/WooCommerce |
 | `lib/tito/objeciones.js` | Sistema de objeciones |
+| `lib/tito/recomendaciones.js` | Sistema de recomendaciones |
+| `lib/tito/persuasion.js` | Técnicas de persuasión |
 | `lib/tito/cotizaciones.js` | Conversión de monedas |
 | `wordpress-plugins/duendes-tito-widget.php` | Widget frontend |
 
@@ -364,6 +507,8 @@ Tito es empático pero no se queda de terapeuta gratis. Corta con elegancia.
 | Endpoint | Función |
 |----------|---------|
 | `/api/tito/v3` | Chat principal |
+| `/api/tito/manychat` | Chat para ManyChat (IG/FB/WA) |
+| `/api/webhooks/woocommerce` | Webhooks de WooCommerce |
 | `/api/divisas` | Cotizaciones de monedas |
 | `/api/cotizaciones` | Alias de divisas |
 
@@ -372,6 +517,8 @@ Tito es empático pero no se queda de terapeuta gratis. Corta con elegancia.
 | Recurso | URL |
 |---------|-----|
 | API Tito | https://duendes-vercel.vercel.app/api/tito/v3 |
+| API ManyChat | https://duendes-vercel.vercel.app/api/tito/manychat |
+| Webhook WooCommerce | https://duendes-vercel.vercel.app/api/webhooks/woocommerce |
 | Tienda | https://duendesdeluruguay.com/shop/ |
 | Test del Guardián | https://duendesdeluruguay.com/descubri-que-duende-te-elige/ |
 
