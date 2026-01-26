@@ -16,11 +16,11 @@ import { WORDPRESS_URL } from '@/lib/config/urls';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const CATEGORIAS = [
-  { slug: 'proteccion', nombre: 'Protección', desc: 'Algo te drena', color: '#3b82f6', icono: '🛡️' },
-  { slug: 'amor', nombre: 'Amor', desc: 'El corazón pide', color: '#ec4899', icono: '💜' },
-  { slug: 'dinero-abundancia-negocios', nombre: 'Abundancia', desc: 'No alcanza', color: '#f59e0b', icono: '✨' },
-  { slug: 'salud', nombre: 'Sanación', desc: 'Necesitás sanar', color: '#22c55e', icono: '🌿' },
-  { slug: 'sabiduria-guia-claridad', nombre: 'Sabiduría', desc: 'Buscás respuestas', color: '#8b5cf6', icono: '🔮' },
+  { slug: 'proteccion', key: 'proteccion', nombre: 'Protección', desc: 'Algo te drena', color: '#3b82f6', icono: '🛡️' },
+  { slug: 'amor', key: 'amor', nombre: 'Amor', desc: 'El corazón pide', color: '#ec4899', icono: '💜' },
+  { slug: 'dinero-abundancia-negocios', key: 'abundancia', nombre: 'Abundancia', desc: 'No alcanza', color: '#f59e0b', icono: '✨' },
+  { slug: 'salud', key: 'salud', nombre: 'Sanación', desc: 'Necesitás sanar', color: '#22c55e', icono: '🌿' },
+  { slug: 'sabiduria-guia-claridad', key: 'sabiduria', nombre: 'Sabiduría', desc: 'Buscás respuestas', color: '#8b5cf6', icono: '🔮' },
 ];
 
 const PARTICULAS = {
@@ -168,8 +168,8 @@ export default function TiendaMagica() {
           </div>
 
           {CATEGORIAS.map((cat) => {
-            const cantidad = productos.filter(p => getCategoriaKey(p.categories) === cat.slug.split('-')[0]).length;
-            const catKey = cat.slug.split('-')[0];
+            const cantidad = productos.filter(p => getCategoriaKey(p.categories) === cat.key).length;
+            const catKey = cat.key;
             return (
               <div
                 key={cat.slug}
