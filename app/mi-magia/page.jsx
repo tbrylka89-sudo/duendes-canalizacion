@@ -2798,19 +2798,12 @@ function LoginMagicLink({ onLoginExitoso }) {
         <div style={styles.card}>
           <span style={styles.icono}>✨</span>
           <h1 style={styles.titulo}>¡Magia lista!</h1>
-          {linkDirecto ? (
-            <>
-              <p style={{color: '#ff9999', marginBottom: '1rem', fontSize: '0.9rem'}}>{mensaje || 'Error enviando email'}</p>
-              <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
-                ✨ Entrar a Mi Magia
-              </a>
-            </>
-          ) : (
-            <>
-              <p style={{color: '#fff'}}>Revisá tu email <strong>{email}</strong></p>
-              <p style={styles.subtitulo}>Te enviamos un enlace mágico para entrar. Revisá también la carpeta de spam.</p>
-            </>
-          )}
+          <>
+            <p style={{color: '#fff', marginBottom: '1rem'}}>Tocá el botón para entrar:</p>
+            <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
+              ✨ Entrar a Mi Magia
+            </a>
+          </>
           <button style={styles.btnSec} onClick={() => { setEstado('inicial'); setLinkDirecto(null); }}>
             Usar otro email
           </button>
