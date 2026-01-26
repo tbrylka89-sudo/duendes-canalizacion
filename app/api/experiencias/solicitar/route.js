@@ -730,6 +730,8 @@ export async function POST(request) {
       categoria: determinarCategoria(expId),
       runas: experiencia.runas,
       fecha: new Date().toISOString(),
+      fechaEntregaEstimada: fechaEntrega.toISOString(),
+      tiempoEstimadoMinutos: experiencia.tiempoMinMs ? Math.round((experiencia.tiempoMinMs + experiencia.tiempoMaxMs) / 2 / 60000) : 0,
       estado: 'procesando',
       contenido: null
     };

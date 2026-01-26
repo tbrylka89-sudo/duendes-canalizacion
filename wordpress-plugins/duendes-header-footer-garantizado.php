@@ -123,20 +123,30 @@ function duendes_footer_garantizado() {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
-        overflow: hidden !important;
+        max-height: 0 !important;
         opacity: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
-    /* OCULTAR SECCIÓN CON IMÁGENES GRANDES DE TITO (CTA viejo) */
-    .duendes-footer-garantizado ~ *:not(.tito-widget):not(#titoWidget):not(script):not(style),
-    .duendes-footer-garantizado ~ .elementor-section,
-    .duendes-footer-garantizado ~ .e-con,
-    .duendes-footer-garantizado ~ section,
-    .duendes-footer-garantizado ~ div:not(.tito-widget) {
+    /* ASEGURAR QUE EL BODY PUEDA HACER SCROLL */
+    html, body {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100% !important;
+    }
+
+    /* OCULTAR SECCIÓN CON IMÁGENES GRANDES DE TITO (CTA viejo) - SIN overflow hidden */
+    .duendes-footer-garantizado ~ .elementor-section:not(.tito-widget),
+    .duendes-footer-garantizado ~ .e-con:not(.tito-widget),
+    .duendes-footer-garantizado ~ section:not(.tito-widget) {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
-        overflow: hidden !important;
+        max-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     /* Ocultar secciones con imágenes gigantes al final */
@@ -233,7 +243,7 @@ function duendes_footer_garantizado() {
             }
             if (!f.classList.contains('duendes-footer-garantizado')) {
                 // OCULTAR en lugar de eliminar
-                f.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;visibility:hidden!important;';
+                f.style.cssText = 'display:none!important;height:0!important;max-height:0!important;visibility:hidden!important;padding:0!important;margin:0!important;';
             }
         });
 
@@ -294,7 +304,7 @@ function duendes_footer_garantizado() {
                     }
                     // No ocultar si es parte de Tito
                     if (!parent.closest('.tito-widget') && !parent.classList.contains('tito-widget')) {
-                        parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;';
+                        parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;padding:0!important;margin:0!important;';
                     }
                     break;
                 }
@@ -348,7 +358,7 @@ function duendes_footer_garantizado() {
 
                 if (!esTito && !esDMG) {
                     // OCULTAR en lugar de eliminar
-                    siguiente.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;visibility:hidden!important;';
+                    siguiente.style.cssText = 'display:none!important;height:0!important;max-height:0!important;visibility:hidden!important;padding:0!important;';
                 }
                 siguiente = temp;
             }
@@ -376,14 +386,14 @@ function duendes_footer_garantizado() {
                     texto.includes('newsletter') || texto.includes('2016') ||
                     texto.includes('TÉRMINOS') || texto.includes('POLÍTICA') ||
                     texto.includes('Back to top') || texto.includes('circulo')) {
-                    el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+                    el.style.cssText = 'display:none!important;height:0!important;max-height:0!important;padding:0!important;';
                 }
             }
         });
 
         // Ocultar específicamente .ddu-footer-section si existe
         document.querySelectorAll('.ddu-footer-section').forEach(function(el) {
-            el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+            el.style.cssText = 'display:none!important;height:0!important;max-height:0!important;padding:0!important;';
         });
 
         // Eliminar elementos con "Back to top"
@@ -411,7 +421,7 @@ function duendes_footer_garantizado() {
                 !el.closest('.prod-hero') &&
                 !el.closest('.duendes-footer-garantizado') &&
                 !el.classList.contains('tito-widget')) {
-                el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+                el.style.cssText = 'display:none!important;height:0!important;max-height:0!important;padding:0!important;';
             }
         });
     }
@@ -451,7 +461,7 @@ function duendes_footer_garantizado() {
                     !el.id.includes('dmg-') &&
                     !el.classList.contains('dmg-') &&
                     el.id !== 'dmg-container') {
-                    el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+                    el.style.cssText = 'display:none!important;height:0!important;max-height:0!important;padding:0!important;';
                 }
             });
         }

@@ -1104,6 +1104,28 @@ export function MisionesPanel({ token }) {
 // Lista de lecturas pasadas con acceso a releerlas
 // ═══════════════════════════════════════════════════════════════
 
+// Helper para calcular tiempo restante
+function calcularTiempoRestante(fechaEntregaEstimada) {
+  if (!fechaEntregaEstimada) return null;
+  const ahora = new Date();
+  const entrega = new Date(fechaEntregaEstimada);
+  const diffMs = entrega - ahora;
+
+  if (diffMs <= 0) return 'unos segundos';
+
+  const diffMins = Math.ceil(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins} min`;
+
+  const diffHoras = Math.floor(diffMins / 60);
+  const minsRestantes = diffMins % 60;
+  if (diffHoras < 24) {
+    return minsRestantes > 0 ? `${diffHoras}h ${minsRestantes}min` : `${diffHoras}h`;
+  }
+
+  const diffDias = Math.floor(diffHoras / 24);
+  return `${diffDias} día${diffDias > 1 ? 's' : ''}`;
+}
+
 export function HistorialLecturas({ token }) {
   const [historial, setHistorial] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -1204,27 +1226,40 @@ export function HistorialLecturas({ token }) {
 
       {/* Lista de lecturas */}
       <div className="historial-lista">
-        {historial.map((lectura, index) => (
-          <div
-            key={lectura.id || index}
-            className="historial-item"
-            onClick={() => abrirLectura(lectura.id)}
-          >
-            <div className="hist-icono">{lectura.icono || '📖'}</div>
-            <div className="hist-info">
-              <h5>{lectura.nombre}</h5>
-              <span className="hist-fecha">
-                {new Date(lectura.fecha).toLocaleDateString('es-UY', {
-                  day: 'numeric',
-                  month: 'short'
-                })}
-              </span>
+        {historial.map((lectura, index) => {
+          const esProcesando = lectura.estado === 'procesando' || lectura.estado === 'pendiente';
+          const tiempoRestante = calcularTiempoRestante(lectura.fechaEntregaEstimada);
+
+          return (
+            <div
+              key={lectura.id || index}
+              className={`historial-item ${esProcesando ? 'procesando' : ''}`}
+              onClick={() => !esProcesando && abrirLectura(lectura.id)}
+              style={{ cursor: esProcesando ? 'default' : 'pointer' }}
+            >
+              <div className="hist-icono">{lectura.icono || '📖'}</div>
+              <div className="hist-info">
+                <h5>{lectura.nombre}</h5>
+                {esProcesando ? (
+                  <span className="hist-estado-procesando">
+                    <span className="spinner-mini"></span>
+                    {tiempoRestante ? `Lista en ~${tiempoRestante}` : 'Generando...'}
+                  </span>
+                ) : (
+                  <span className="hist-fecha">
+                    {new Date(lectura.fecha).toLocaleDateString('es-UY', {
+                      day: 'numeric',
+                      month: 'short'
+                    })}
+                  </span>
+                )}
+              </div>
+              <div className={`hist-runas ${esProcesando ? 'procesando' : ''}`}>
+                {esProcesando ? '⏳' : `-${lectura.runas} ᚱ`}
+              </div>
             </div>
-            <div className="hist-runas">
-              -{lectura.runas} ᚱ
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <style jsx>{`
@@ -1306,6 +1341,37 @@ export function HistorialLecturas({ token }) {
         .hist-runas {
           font-size: 13px;
           color: rgba(212, 175, 55, 0.7);
+        }
+
+        .hist-runas.procesando {
+          font-size: 18px;
+        }
+
+        .historial-item.procesando {
+          border-color: rgba(147, 112, 219, 0.3);
+          background: linear-gradient(145deg, #1a1a2e 0%, #1e1e3f 100%);
+        }
+
+        .historial-item.procesando:hover {
+          transform: none;
+          border-color: rgba(147, 112, 219, 0.3);
+        }
+
+        .hist-estado-procesando {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          color: #9370db;
+        }
+
+        .spinner-mini {
+          width: 12px;
+          height: 12px;
+          border: 2px solid rgba(147, 112, 219, 0.2);
+          border-top-color: #9370db;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
         }
 
         /* Modal */
