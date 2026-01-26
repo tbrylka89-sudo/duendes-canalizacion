@@ -2822,6 +2822,10 @@ function LoginMagicLink({ onLoginExitoso }) {
 
   return (
     <div style={styles.container}>
+      <style>{`
+        .login-email-input { color: #fff !important; background: #0a0a0a !important; }
+        .login-email-input::placeholder { color: rgba(255,255,255,0.3) !important; }
+      `}</style>
       <div style={styles.card}>
         <span style={styles.icono}>🔮</span>
         <h1 style={styles.titulo}>Mi Magia</h1>
@@ -2837,6 +2841,7 @@ function LoginMagicLink({ onLoginExitoso }) {
               placeholder="tu@email.com"
               disabled={estado === 'enviando'}
               autoFocus
+              className="login-email-input"
               style={styles.input}
             />
           </div>
