@@ -3531,50 +3531,231 @@ function FormularioPerfil({ usuario, onComplete, onSkip }) {
     }));
   };
 
+  // Estilos inline para el formulario de perfil
+  const perfilStyles = {
+    container: {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      background: 'linear-gradient(135deg, #0a0a0f 0%, #141420 50%, #0a0a0f 100%)',
+    },
+    card: {
+      background: 'linear-gradient(145deg, #1a1a2e 0%, #16162a 100%)',
+      borderRadius: '20px',
+      padding: '2.5rem',
+      maxWidth: '500px',
+      width: '100%',
+      border: '1px solid rgba(212,175,55,0.2)',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+    },
+    header: {
+      textAlign: 'center',
+      marginBottom: '2rem',
+    },
+    icono: {
+      fontSize: '2.5rem',
+      color: '#d4af37',
+      display: 'block',
+      marginBottom: '1rem',
+    },
+    titulo: {
+      fontFamily: "'Cinzel', serif",
+      fontSize: '1.75rem',
+      color: '#fff',
+      margin: '0 0 0.5rem',
+    },
+    subtitulo: {
+      color: 'rgba(255,255,255,0.6)',
+      fontSize: '0.95rem',
+    },
+    progress: {
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '0.75rem',
+      marginTop: '1.5rem',
+    },
+    progressDot: (active) => ({
+      width: '32px',
+      height: '32px',
+      borderRadius: '50%',
+      background: active ? 'linear-gradient(135deg, #d4af37, #c4a030)' : 'rgba(255,255,255,0.1)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '0.8rem',
+      color: active ? '#1a1a2e' : 'rgba(255,255,255,0.4)',
+      fontWeight: active ? '600' : 'normal',
+    }),
+    paso: {
+      marginBottom: '2rem',
+    },
+    pasoTitulo: {
+      fontFamily: "'Cinzel', serif",
+      fontSize: '1.25rem',
+      color: '#fff',
+      margin: '0 0 0.5rem',
+      textAlign: 'center',
+    },
+    pasoSub: {
+      color: 'rgba(255,255,255,0.5)',
+      fontSize: '0.9rem',
+      textAlign: 'center',
+      marginBottom: '1.5rem',
+    },
+    dateInput: {
+      width: '100%',
+      padding: '1rem',
+      background: 'rgba(255,255,255,0.05)',
+      border: '1px solid rgba(212,175,55,0.3)',
+      borderRadius: '12px',
+      color: '#fff',
+      fontSize: '1rem',
+      textAlign: 'center',
+      boxSizing: 'border-box',
+    },
+    signoResultado: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '0.75rem',
+      marginTop: '1rem',
+      padding: '1rem',
+      background: 'rgba(212,175,55,0.1)',
+      borderRadius: '12px',
+      border: '1px solid rgba(212,175,55,0.2)',
+      color: 'rgba(255,255,255,0.8)',
+    },
+    busquedasGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: '0.75rem',
+    },
+    busquedaBtn: (active) => ({
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      padding: '0.9rem 1rem',
+      background: active ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)',
+      border: active ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '10px',
+      color: active ? '#d4af37' : 'rgba(255,255,255,0.7)',
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+    }),
+    momentosList: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.75rem',
+    },
+    momentoBtn: (active) => ({
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      padding: '1rem',
+      background: active ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)',
+      border: active ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '12px',
+      cursor: 'pointer',
+      textAlign: 'left',
+    }),
+    fuentesList: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '0.5rem',
+      justifyContent: 'center',
+    },
+    fuenteBtn: (active) => ({
+      padding: '0.6rem 1rem',
+      background: active ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)',
+      border: active ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '20px',
+      color: active ? '#d4af37' : 'rgba(255,255,255,0.6)',
+      cursor: 'pointer',
+      fontSize: '0.85rem',
+    }),
+    botones: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: '2rem',
+      paddingTop: '1.5rem',
+      borderTop: '1px solid rgba(255,255,255,0.1)',
+    },
+    btnSkip: {
+      background: 'transparent',
+      border: 'none',
+      color: 'rgba(255,255,255,0.5)',
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+    },
+    btnNav: {
+      padding: '0.75rem 1.5rem',
+      background: 'linear-gradient(135deg, #d4af37, #c4a030)',
+      color: '#1a1a2e',
+      border: 'none',
+      borderRadius: '25px',
+      fontFamily: "'Cinzel', serif",
+      fontSize: '0.95rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+    },
+    regalo: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem',
+      marginTop: '1.5rem',
+      padding: '1rem',
+      background: 'rgba(212,175,55,0.1)',
+      borderRadius: '12px',
+      border: '1px solid rgba(212,175,55,0.2)',
+    },
+  };
+
   return (
-    <div className="perfil-form-container">
-      <style jsx global>{loginStyles}</style>
-      <div className="perfil-form-card">
-        <div className="perfil-header">
-          <span className="perfil-icono">✦</span>
-          <h1>Para conocerte mejor</h1>
-          <p>Esta información nos ayuda a personalizar tus lecturas y experiencias</p>
-          <div className="perfil-progress">
+    <div style={perfilStyles.container}>
+      <div style={perfilStyles.card}>
+        <div style={perfilStyles.header}>
+          <span style={perfilStyles.icono}>✦</span>
+          <h1 style={perfilStyles.titulo}>Para conocerte mejor</h1>
+          <p style={perfilStyles.subtitulo}>Esta información nos ayuda a personalizar tus lecturas y experiencias</p>
+          <div style={perfilStyles.progress}>
             {[1,2,3,4].map(p => (
-              <div key={p} className={`progress-dot ${paso >= p ? 'active' : ''}`}>{p}</div>
+              <div key={p} style={perfilStyles.progressDot(paso >= p)}>{p}</div>
             ))}
           </div>
         </div>
 
         {paso === 1 && (
-          <div className="perfil-paso">
-            <h3>¿Cuándo naciste?</h3>
-            <p className="perfil-sub">Para numerología, carta astral y mensajes personalizados</p>
+          <div style={perfilStyles.paso}>
+            <h3 style={perfilStyles.pasoTitulo}>¿Cuándo naciste?</h3>
+            <p style={perfilStyles.pasoSub}>Para numerología, carta astral y mensajes personalizados</p>
             <input
               type="date"
               value={perfil.fechaNacimiento}
               onChange={e => setPerfil({...perfil, fechaNacimiento: e.target.value})}
-              className="perfil-date-input"
+              style={perfilStyles.dateInput}
               max={new Date().toISOString().split('T')[0]}
             />
             {signoCalculado && (
-              <div className="signo-resultado">
-                <span className="signo-icono">{signoCalculado.icono}</span>
-                <span>Tu signo es <strong>{signoCalculado.nombre}</strong></span>
+              <div style={perfilStyles.signoResultado}>
+                <span style={{fontSize: '1.5rem'}}>{signoCalculado.icono}</span>
+                <span>Tu signo es <strong style={{color: '#d4af37'}}>{signoCalculado.nombre}</strong></span>
               </div>
             )}
           </div>
         )}
 
         {paso === 2 && (
-          <div className="perfil-paso">
-            <h3>¿Qué estás buscando?</h3>
-            <p className="perfil-sub">Elegí todo lo que resuene con vos</p>
-            <div className="busquedas-grid">
+          <div style={perfilStyles.paso}>
+            <h3 style={perfilStyles.pasoTitulo}>¿Qué estás buscando?</h3>
+            <p style={perfilStyles.pasoSub}>Elegí todo lo que resuene con vos</p>
+            <div style={perfilStyles.busquedasGrid}>
               {BUSQUEDAS.map(b => (
                 <button
                   key={b.id}
-                  className={`busqueda-btn ${perfil.queBusca.includes(b.id) ? 'active' : ''}`}
+                  style={perfilStyles.busquedaBtn(perfil.queBusca.includes(b.id))}
                   onClick={() => toggleBusqueda(b.id)}
                 >
                   <span>{b.icono}</span>
@@ -3586,18 +3767,18 @@ function FormularioPerfil({ usuario, onComplete, onSkip }) {
         )}
 
         {paso === 3 && (
-          <div className="perfil-paso">
-            <h3>¿Qué momento estás atravesando?</h3>
-            <p className="perfil-sub">Para entender cómo acompañarte mejor</p>
-            <div className="momentos-list">
+          <div style={perfilStyles.paso}>
+            <h3 style={perfilStyles.pasoTitulo}>¿Qué momento estás atravesando?</h3>
+            <p style={perfilStyles.pasoSub}>Para entender cómo acompañarte mejor</p>
+            <div style={perfilStyles.momentosList}>
               {MOMENTOS.map(m => (
                 <button
                   key={m.id}
-                  className={`momento-btn ${perfil.momentoVida === m.id ? 'active' : ''}`}
+                  style={perfilStyles.momentoBtn(perfil.momentoVida === m.id)}
                   onClick={() => setPerfil({...perfil, momentoVida: m.id})}
                 >
-                  <strong>{m.label}</strong>
-                  <small>{m.desc}</small>
+                  <strong style={{color: perfil.momentoVida === m.id ? '#d4af37' : '#fff', margin: 0}}>{m.label}</strong>
+                  <small style={{color: 'rgba(255,255,255,0.5)', marginTop: '0.25rem'}}>{m.desc}</small>
                 </button>
               ))}
             </div>
@@ -3605,18 +3786,36 @@ function FormularioPerfil({ usuario, onComplete, onSkip }) {
         )}
 
         {paso === 4 && (
-          <div className="perfil-paso">
-            <h3>Últimas preguntas</h3>
+          <div style={perfilStyles.paso}>
+            <h3 style={perfilStyles.pasoTitulo}>Últimas preguntas</h3>
 
-            <div className="perfil-field">
-              <label>¿Tenés guardianes físicos (duendes)?</label>
-              <div className="radio-group">
+            <div style={{marginBottom: '1.5rem'}}>
+              <label style={{display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '0.75rem'}}>¿Tenés guardianes físicos (duendes)?</label>
+              <div style={{display: 'flex', gap: '0.75rem'}}>
                 <button
-                  className={`radio-btn ${perfil.tieneGuardianesFisicos === 'si' ? 'active' : ''}`}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    background: perfil.tieneGuardianesFisicos === 'si' ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)',
+                    border: perfil.tieneGuardianesFisicos === 'si' ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '10px',
+                    color: perfil.tieneGuardianesFisicos === 'si' ? '#d4af37' : 'rgba(255,255,255,0.6)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                  }}
                   onClick={() => setPerfil({...perfil, tieneGuardianesFisicos: 'si'})}
                 >Sí, tengo</button>
                 <button
-                  className={`radio-btn ${perfil.tieneGuardianesFisicos === 'no' ? 'active' : ''}`}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    background: perfil.tieneGuardianesFisicos === 'no' ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)',
+                    border: perfil.tieneGuardianesFisicos === 'no' ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '10px',
+                    color: perfil.tieneGuardianesFisicos === 'no' ? '#d4af37' : 'rgba(255,255,255,0.6)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                  }}
                   onClick={() => setPerfil({...perfil, tieneGuardianesFisicos: 'no', guardianesFisicos: ''})}
                 >No todavía</button>
               </div>
@@ -3626,18 +3825,28 @@ function FormularioPerfil({ usuario, onComplete, onSkip }) {
                   placeholder="¿Cuáles? (ej: Guardián del Hogar, Duende de la Abundancia)"
                   value={perfil.guardianesFisicos}
                   onChange={e => setPerfil({...perfil, guardianesFisicos: e.target.value})}
-                  className="perfil-text-input"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    marginTop: '0.75rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(212,175,55,0.3)',
+                    borderRadius: '10px',
+                    color: '#fff',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
                 />
               )}
             </div>
 
-            <div className="perfil-field">
-              <label>¿Cómo nos conociste?</label>
-              <div className="fuentes-grid">
+            <div style={{marginBottom: '1rem'}}>
+              <label style={{display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '0.75rem'}}>¿Cómo nos conociste?</label>
+              <div style={perfilStyles.fuentesList}>
                 {FUENTES.map(f => (
                   <button
                     key={f}
-                    className={`fuente-btn ${perfil.comoNosConociste === f ? 'active' : ''}`}
+                    style={perfilStyles.fuenteBtn(perfil.comoNosConociste === f)}
                     onClick={() => setPerfil({...perfil, comoNosConociste: f})}
                   >{f}</button>
                 ))}
@@ -3646,26 +3855,45 @@ function FormularioPerfil({ usuario, onComplete, onSkip }) {
           </div>
         )}
 
-        <div className="perfil-buttons">
+        <div style={perfilStyles.botones}>
           {paso > 1 && (
-            <button className="btn-sec" onClick={() => setPaso(paso - 1)}>Atrás</button>
+            <button
+              style={{
+                padding: '0.75rem 1.25rem',
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '25px',
+                color: 'rgba(255,255,255,0.6)',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}
+              onClick={() => setPaso(paso - 1)}
+            >Atrás</button>
           )}
           {paso === 1 && (
-            <button className="btn-skip" onClick={onSkip}>Completar después</button>
+            <button style={perfilStyles.btnSkip} onClick={onSkip}>Completar después</button>
           )}
           {paso < 4 && (
-            <button className="btn-pri" onClick={() => setPaso(paso + 1)}>Continuar</button>
+            <button style={perfilStyles.btnNav} onClick={() => setPaso(paso + 1)}>Continuar</button>
           )}
           {paso === 4 && (
-            <button className="btn-gold" onClick={guardar} disabled={guardando}>
+            <button
+              style={{
+                ...perfilStyles.btnNav,
+                opacity: guardando ? 0.7 : 1,
+                cursor: guardando ? 'not-allowed' : 'pointer'
+              }}
+              onClick={guardar}
+              disabled={guardando}
+            >
               {guardando ? 'Guardando...' : 'Guardar y continuar'}
             </button>
           )}
         </div>
 
-        <div className="perfil-bonus">
-          <span>🎁</span>
-          <p>Al completar tu perfil, tus lecturas serán mucho más precisas y personalizadas</p>
+        <div style={perfilStyles.regalo}>
+          <span style={{fontSize: '1.5rem'}}>🎁</span>
+          <p style={{margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem'}}>Al completar tu perfil, tus lecturas serán mucho más precisas y personalizadas</p>
         </div>
       </div>
     </div>
