@@ -924,7 +924,7 @@ function CatalogoLecturasGamificado({ usuario, token, setUsuario }) {
       {/* CTA para obtener runas */}
       <div className="cta-runas">
         <p>¿Necesitás más runas?</p>
-        <a href={`${WORDPRESS_URL}/producto-categoria/runas/`} target="_blank" rel="noopener" className="btn-gold-sm">
+        <a href={`${WORDPRESS_URL}/?s=runas&post_type=product`} target="_blank" rel="noopener" className="btn-gold-sm">
           Obtener Runas ↗
         </a>
       </div>
@@ -2205,11 +2205,11 @@ function TiendaMembresias({ usuario, circulo }) {
 // ═══════════════════════════════════════════════════════════════
 
 const PACKS_RUNAS = [
-  { nombre: 'Chispa', runas: 30, bonus: 0, precio: 5, url: `${WORDPRESS_URL}/producto/runas-chispa/`, desc: 'Para empezar a explorar (30 runas)' },
-  { nombre: 'Destello', runas: 80, bonus: 10, precio: 10, url: `${WORDPRESS_URL}/producto/runas-destello/`, desc: 'El más popular (80 + 10 bonus = 90 runas)' },
-  { nombre: 'Resplandor', runas: 200, bonus: 40, precio: 20, url: `${WORDPRESS_URL}/producto/runas-resplandor/`, desc: 'Para varias experiencias (200 + 40 bonus = 240 runas)' },
-  { nombre: 'Fulgor', runas: 550, bonus: 150, precio: 50, url: `${WORDPRESS_URL}/producto/runas-fulgor/`, desc: 'Pack potente (550 + 150 bonus = 700 runas)' },
-  { nombre: 'Aurora', runas: 1200, bonus: 400, precio: 100, url: `${WORDPRESS_URL}/producto/runas-aurora/`, desc: 'El mejor valor (1200 + 400 bonus = 1600 runas)' }
+  { nombre: 'Chispa', runas: 30, bonus: 0, precio: 5, url: `${WORDPRESS_URL}/product/paquete-runas-30/`, desc: 'Para empezar a explorar (30 runas)' },
+  { nombre: 'Destello', runas: 80, bonus: 10, precio: 10, url: `${WORDPRESS_URL}/product/paquete-runas-80/`, desc: 'El más popular (80 + 10 bonus = 90 runas)' },
+  { nombre: 'Resplandor', runas: 200, bonus: 40, precio: 20, url: `${WORDPRESS_URL}/product/paquete-runas-200/`, desc: 'Para varias experiencias (200 + 40 bonus = 240 runas)' },
+  { nombre: 'Fulgor', runas: 550, bonus: 150, precio: 50, url: `${WORDPRESS_URL}/product/paquete-runas-550/`, desc: 'Pack potente (550 + 150 bonus = 700 runas)' },
+  { nombre: 'Aurora', runas: 1200, bonus: 400, precio: 100, url: `${WORDPRESS_URL}/product/paquete-runas-1200/`, desc: 'El mejor valor (1200 + 400 bonus = 1600 runas)' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -2380,7 +2380,7 @@ const MEMBRESIAS = [
     precio: 50,
     precioUY: 2000,
     dias: 180,
-    url: `${WORDPRESS_URL}/producto/circulo-semestral/`,
+    url: `${WORDPRESS_URL}/product/circulo-seis-meses/`,
     beneficios: [
       'Contenido semanal exclusivo',
       '15 runas por mes',
@@ -2398,7 +2398,7 @@ const MEMBRESIAS = [
     dias: 365,
     ahorro: '20%',
     destacado: true,
-    url: `${WORDPRESS_URL}/producto/circulo-anual/`,
+    url: `${WORDPRESS_URL}/product/circulo-anual/`,
     beneficios: [
       'Todo lo del plan Semestral',
       '25 runas por mes',
@@ -4532,14 +4532,14 @@ function MiMagiaContent() {
                 </div>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                <a href={`${WORDPRESS_URL}/producto/runas-chispa/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>50 Runas</span><span style={{color:'#d4af37'}}>$7</span>
+                <a href={`${WORDPRESS_URL}/product/paquete-runas-30/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>30 Runas</span><span style={{color:'#d4af37'}}>$5</span>
                 </a>
-                <a href={`${WORDPRESS_URL}/producto/runas-destello/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>100 Runas</span><span style={{color:'#d4af37'}}>$12</span>
+                <a href={`${WORDPRESS_URL}/product/paquete-runas-80/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>90 Runas</span><span style={{color:'#d4af37'}}>$10</span>
                 </a>
-                <a href={`${WORDPRESS_URL}/producto/runas-fulgor/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>200 Runas</span><span style={{color:'#d4af37'}}>$18</span>
+                <a href={`${WORDPRESS_URL}/product/paquete-runas-550/`} target="_blank" rel="noopener" className="btn-outline-sm" style={{display:'flex',justifyContent:'space-between'}}>
+                  <span>700 Runas</span><span style={{color:'#d4af37'}}>$50</span>
                 </a>
               </div>
             </div>
@@ -5706,7 +5706,7 @@ function PromocionesMagicas({ usuario, ir }) {
       icono: 'ᚱ',
       color: '#7B1FA2',
       activa: true,
-      url: `${WORDPRESS_URL}/producto/runas-resplandor/`,
+      url: `${WORDPRESS_URL}/product/paquete-runas-200/`,
       textoBoton: 'Obtener $32 USD'
     }
   ];
@@ -6087,7 +6087,7 @@ function SeccionExperiencias({ usuario, setUsuario }) {
       
       <div className="runas-header">
         <div className="runas-balance"><span>ᚱ</span><strong>{usuario?.runas || 0}</strong><small>disponibles</small></div>
-        <a href={`${WORDPRESS_URL}/producto-categoria/runas/`} target="_blank" rel="noopener" className="btn-gold-sm">Obtener más ↗</a>
+        <a href={`${WORDPRESS_URL}/?s=runas&post_type=product`} target="_blank" rel="noopener" className="btn-gold-sm">Obtener más ↗</a>
       </div>
       
       <div className="exp-grid">
