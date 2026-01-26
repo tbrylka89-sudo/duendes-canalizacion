@@ -232,34 +232,59 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ## CHANGELOG
 
-### 25/01/2026 - 20:15hs - SISTEMA DE ORÍGENES ✅ TESTEADO
+### 25/01/2026 - 20:30hs - SISTEMA DE ORÍGENES ✅ COMPLETO Y TESTEADO
+
 Tito ahora sabe desde dónde habla y adapta su contexto:
 
 | Origen | Descripción | Estado |
 |--------|-------------|--------|
 | `tienda` | Widget en WordPress - visitantes de la tienda | ✅ Desplegado |
-| `mi-magia` | Portal de clientes que ya compraron | ✅ Listo |
-| `circulo` | Miembros del Círculo (VIP) | ✅ Listo |
+| `mi-magia` | Portal de clientes que ya compraron | ✅ Testeado |
+| `circulo` | Miembros del Círculo (VIP) | ✅ Testeado |
 | `manychat` | Instagram, Facebook, WhatsApp | ✅ Testeado |
 
-**Contexto que recibe Tito según origen:**
-- **tienda**: Objetivo VENDER, mostrar productos, cerrar ventas
-- **mi-magia**: Cliente existente, tiene runas/tréboles, fidelizar
-- **circulo**: VIP, plan/días restantes/tiradas gratis/descuentos
-- **manychat**: Respuestas cortas, redirigir a la web
+**Bug corregido:** El contexto de origen se perdía porque `contextoCliente =` sobrescribía en vez de `+=`.
+
+**Tests realizados:**
+
+| # | Origen | Escenario | Resultado |
+|---|--------|-----------|-----------|
+| 1 | tienda | Visitante busca protección | ✅ Mostró Diana, Stan, Ekris en UYU |
+| 2 | tienda | Pregunta precio Uruguay | ✅ Precios en pesos uruguayos |
+| 3 | tienda | Objeción "es caro" | ✅ Opciones accesibles + reserva 30% |
+| 4 | mi-magia | Cliente saluda | ✅ Usó nombre, preguntó por guardianes |
+| 5 | mi-magia | Pregunta sobre runas | ✅ Explicó usos de runas |
+| 6 | circulo | Miembro pregunta tiradas | ✅ "Tenés 3 tiradas gratis disponibles" |
+| 7 | manychat | Instagram - son reales? | ✅ Respuesta corta, pregunta al final |
+| 8 | manychat | Cómo comprar | ✅ 3 opciones + links a la web |
+| 9 | manychat | WhatsApp - envíos Argentina | ✅ DHL Express, 5-10 días |
+
+**Tests de "pichis" (personas que quieren desahogarse sin comprar):**
+
+| Escenario | Comportamiento de Tito |
+|-----------|------------------------|
+| Tienda - Primera vez | Valida brevemente, muestra guardianes de sanación |
+| Tienda - Persiste sin avanzar | Corta cortés: "te dejo el test, cuando estés lista" |
+| ManyChat - Desahogo | Respuesta corta, muestra 3 guardianes sanadores |
+| Mi Magia - Cliente triste | Más empático, pregunta por guardianes existentes |
+
+**Progresión con pichi insistente (10+ mensajes):**
+
+| Mensaje | Respuesta de Tito |
+|---------|-------------------|
+| 1-2 | Empatía + muestra guardianes sanadores (Micelio, Moon, Izara) |
+| 3-5 | Sigue mostrando productos, intenta redirigir |
+| 6-7 | "Te dejo el test cuando estés lista" + despedida cálida |
+| 8-10+ | "No soy psicólogo" + link al test + "¡Que estés bien!" |
+
+Tito es empático pero no se queda de terapeuta gratis. Corta con elegancia.
 
 **Archivos modificados:**
-- `app/api/tito/v3/route.js` - Función `getContextoOrigen()` + parámetro `origen`
+- `app/api/tito/v3/route.js` - Función `getContextoOrigen()` + fix del bug
 - `wordpress-plugins/duendes-tito-widget.php` - Envía `origen: 'tienda'` (subido a WP)
 - `app/mi-magia/components/Tito.jsx` - Acepta props `origen` y `datosCirculo`
 - `app/mi-magia/circulo/page.jsx` - Pasa `origen: 'circulo'` con datos membresía
 - `app/api/tito/manychat/route.js` - Unificado: usa v3 internamente
-
-**Test ManyChat exitoso:**
-```
-curl -X POST .../api/tito/manychat -d '{"mensaje":"quiero ver guardianes"}'
-→ Respuesta con productos reales (Violeta, Azucena, etc.)
-```
 
 ### 25/01/2026 - 19:30hs
 - Corregidos métodos de pago: eliminado PayPal (no disponible)
