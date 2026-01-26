@@ -627,34 +627,42 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           </div>
         ))}
 
-        {/* Sol (día) */}
+        {/* Sol (día) - clickeable */}
         {esDeDia && (
-          <div style={{
-            position: 'absolute',
-            top: '15px',
-            right: '25px',
-            width: '50px',
-            height: '50px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle at 30% 30%, #fff5d4, #ffd700, #ffa500)',
-            boxShadow: '0 0 40px rgba(255,215,0,0.8), 0 0 80px rgba(255,165,0,0.5)',
-            zIndex: 2,
-          }} />
+          <div
+            onClick={(e) => tocarElemento('sol', e)}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '25px',
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 30% 30%, #fff5d4, #ffd700, #ffa500)',
+              boxShadow: '0 0 40px rgba(255,215,0,0.8), 0 0 80px rgba(255,165,0,0.5)',
+              zIndex: 2,
+              cursor: 'pointer',
+            }}
+          />
         )}
 
-        {/* Luna (noche) */}
+        {/* Luna (noche) - clickeable */}
         {esDeNoche && (
-          <div style={{
-            position: 'absolute',
-            top: '15px',
-            right: '25px',
-            width: '45px',
-            height: '45px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle at 25% 25%, #fffef0, #f5f5dc, #e6e6b8)',
-            boxShadow: '0 0 30px rgba(255,255,240,0.6), 0 0 60px rgba(255,255,200,0.3)',
-            zIndex: 2,
-          }}>
+          <div
+            onClick={(e) => tocarElemento('luna', e)}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '25px',
+              width: '45px',
+              height: '45px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 25% 25%, #fffef0, #f5f5dc, #e6e6b8)',
+              boxShadow: '0 0 30px rgba(255,255,240,0.6), 0 0 60px rgba(255,255,200,0.3)',
+              zIndex: 2,
+              cursor: 'pointer',
+            }}
+          >
             {/* Cráteres de la luna */}
             <div style={{
               position: 'absolute',
@@ -677,10 +685,11 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           </div>
         )}
 
-        {/* Nubes (día) */}
+        {/* Nubes (día) - clickeables */}
         {esDeDia && nubes.map((cloud, i) => (
           <div
             key={`cloud-${i}`}
+            onClick={(e) => tocarElemento('nube', e)}
             style={{
               position: 'absolute',
               top: cloud.top,
@@ -690,6 +699,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
               animation: `cloudMove ${cloud.duration}s linear infinite`,
               animationDelay: `${cloud.delay}s`,
               zIndex: 1,
+              cursor: 'pointer',
             }}
           >
             <div style={{
@@ -713,10 +723,11 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           </div>
         ))}
 
-        {/* Pájaros (día) */}
+        {/* Pájaros (día) - clickeables */}
         {esDeDia && [0, 1].map(i => (
           <div
             key={`bird-${i}`}
+            onClick={(e) => tocarElemento('pajaro', e)}
             style={{
               position: 'absolute',
               top: `${15 + i * 20}%`,
@@ -724,6 +735,8 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
               animationDelay: `${i * 8}s`,
               zIndex: 3,
               fontSize: '12px',
+              cursor: 'pointer',
+              padding: '10px',
             }}
           >
             🐦
@@ -755,13 +768,14 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           ))}
         </div>
 
-        {/* Árboles */}
+        {/* Árboles - clickeables */}
         {[
           { left: '8%', height: 95, delay: 0 },
           { left: '85%', height: 75, delay: 0.5 },
         ].map((tree, i) => (
           <div
             key={`tree-${i}`}
+            onClick={(e) => tocarElemento('arbol', e)}
             style={{
               position: 'absolute',
               bottom: '0',
@@ -771,6 +785,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
               animation: 'sway 5s infinite ease-in-out',
               animationDelay: `${tree.delay}s`,
               '--base-rotation': '0deg',
+              cursor: 'pointer',
             }}
           >
             <div style={{
@@ -793,7 +808,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           </div>
         ))}
 
-        {/* Hongos */}
+        {/* Hongos - clickeables */}
         {[
           { left: '18%', size: 28, hue: 290 },
           { left: '72%', size: 22, hue: 350 },
@@ -801,6 +816,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
         ].map((mushroom, i) => (
           <div
             key={`mushroom-${i}`}
+            onClick={(e) => tocarElemento('hongo', e)}
             style={{
               position: 'absolute',
               bottom: '0',
@@ -808,6 +824,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
               width: `${mushroom.size}px`,
               height: `${mushroom.size * 1.2}px`,
               zIndex: 3,
+              cursor: 'pointer',
             }}
           >
             <div style={{
@@ -834,14 +851,25 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           </div>
         ))}
 
-        {/* Luciérnagas (noche y atardecer) */}
+        {/* Luciérnagas (noche y atardecer) - clickeables */}
         {(esDeNoche || momentoDia === 'atardecer') && luciernagas.map((fly, i) => (
           <div
             key={`firefly-${i}`}
+            onClick={(e) => tocarElemento('luciernaga', e)}
             style={{
               position: 'absolute',
               top: fly.top,
               left: fly.left,
+              width: '20px',
+              height: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 4,
+            }}
+          >
+            <div style={{
               width: '8px',
               height: '8px',
               background: `radial-gradient(circle, ${puedeReclamar ? amatista.claro : '#ffff88'} 0%, transparent 70%)`,
@@ -849,9 +877,8 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
               boxShadow: `0 0 12px ${puedeReclamar ? amatista.claro : '#ffff88'}, 0 0 25px ${puedeReclamar ? amatista.medio : '#ffff44'}`,
               animation: `firefly 2s infinite ease-in-out, fireflyMove ${fly.moveDuration}s infinite ease-in-out`,
               animationDelay: `${fly.delay}s`,
-              zIndex: 4,
-            }}
-          />
+            }} />
+          </div>
         ))}
 
         {/* Cristal de Amatista */}
