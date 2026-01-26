@@ -883,7 +883,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
             url: window.location.href
         };
         try {
-            const response = await fetch(CONFIG.API_BASE + '/api/tito/v3', {
+            const response = await fetch(CONFIG.API_BASE + '/api/tito/gpt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

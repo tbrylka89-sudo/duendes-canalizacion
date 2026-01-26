@@ -195,24 +195,41 @@ async function ejecutarTool(nombre, args, contexto) {
       const cotizaciones = await obtenerCotizaciones();
       const pais = contexto.pais || 'UY';
 
+      // Mapeo de país a moneda
+      const paisAMoneda = { 'AR': 'ARS', 'MX': 'MXN', 'CO': 'COP', 'CL': 'CLP', 'PE': 'PEN', 'BR': 'BRL', 'ES': 'EUR' };
+      const monedaNombres = { 'ARS': 'pesos argentinos', 'MXN': 'pesos mexicanos', 'COP': 'pesos colombianos', 'CLP': 'pesos chilenos', 'PEN': 'soles', 'BRL': 'reales', 'EUR': 'euros' };
+
       return seleccionados.map(p => {
         const precioUSD = parseFloat(p.precio) || 150;
-        let precioLocal;
 
         if (pais === 'UY') {
-          precioLocal = PRECIOS_URUGUAY[precioUSD] || Math.round(precioUSD * 43);
+          // Uruguay: precio fijo
+          const precioUY = PRECIOS_URUGUAY.convertir ? PRECIOS_URUGUAY.convertir(precioUSD) : Math.round(precioUSD * 43);
           return {
             nombre: p.nombre,
-            precio: `$${precioLocal.toLocaleString()} pesos`,
+            precio: `$${precioUY.toLocaleString('es-UY')} pesos uruguayos`,
+            descripcion: p.descripcion?.substring(0, 100) || '',
+            url: p.url,
+            imagen: p.imagen
+          };
+        } else if (['US', 'EC', 'PA'].includes(pais)) {
+          // Países dolarizados
+          return {
+            nombre: p.nombre,
+            precio: `$${precioUSD} USD`,
             descripcion: p.descripcion?.substring(0, 100) || '',
             url: p.url,
             imagen: p.imagen
           };
         } else {
-          const convertido = convertirPrecio(precioUSD, pais, cotizaciones);
+          // Otros países: convertir
+          const codigoMoneda = paisAMoneda[pais] || 'USD';
+          const tasa = cotizaciones[codigoMoneda] || 1;
+          const precioLocal = Math.round(precioUSD * tasa);
+          const nombreMoneda = monedaNombres[codigoMoneda] || 'dólares';
           return {
             nombre: p.nombre,
-            precio: `$${precioUSD} USD (${convertido.formateado})`,
+            precio: `$${precioUSD} USD (aprox. $${precioLocal.toLocaleString('es')} ${nombreMoneda})`,
             descripcion: p.descripcion?.substring(0, 100) || '',
             url: p.url,
             imagen: p.imagen
@@ -275,7 +292,12 @@ function detectarPais(mensaje) {
 
 export async function POST(request) {
   try {
-    const { mensaje, conversationHistory = [], pais: paisParam } = await request.json();
+    const body = await request.json();
+
+    // Aceptar parámetros del widget (message/history) o directos (mensaje/conversationHistory)
+    const mensaje = body.mensaje || body.message;
+    const conversationHistory = body.conversationHistory || body.history || [];
+    const paisParam = body.pais || body.pais_cliente;
 
     if (!mensaje) {
       return Response.json({ error: 'Mensaje requerido' }, { status: 400, headers: CORS_HEADERS });
