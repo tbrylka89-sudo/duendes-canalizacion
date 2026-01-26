@@ -232,22 +232,34 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ## CHANGELOG
 
-### 25/01/2026 - 20:00hs - SISTEMA DE ORÍGENES
+### 25/01/2026 - 20:15hs - SISTEMA DE ORÍGENES ✅ TESTEADO
 Tito ahora sabe desde dónde habla y adapta su contexto:
 
-| Origen | Descripción |
-|--------|-------------|
-| `tienda` | Widget en WordPress - visitantes de la tienda |
-| `mi-magia` | Portal de clientes que ya compraron |
-| `circulo` | Miembros del Círculo (VIP) |
-| `manychat` | Instagram, Facebook, WhatsApp |
+| Origen | Descripción | Estado |
+|--------|-------------|--------|
+| `tienda` | Widget en WordPress - visitantes de la tienda | ✅ Desplegado |
+| `mi-magia` | Portal de clientes que ya compraron | ✅ Listo |
+| `circulo` | Miembros del Círculo (VIP) | ✅ Listo |
+| `manychat` | Instagram, Facebook, WhatsApp | ✅ Testeado |
+
+**Contexto que recibe Tito según origen:**
+- **tienda**: Objetivo VENDER, mostrar productos, cerrar ventas
+- **mi-magia**: Cliente existente, tiene runas/tréboles, fidelizar
+- **circulo**: VIP, plan/días restantes/tiradas gratis/descuentos
+- **manychat**: Respuestas cortas, redirigir a la web
 
 **Archivos modificados:**
 - `app/api/tito/v3/route.js` - Función `getContextoOrigen()` + parámetro `origen`
-- `wordpress-plugins/duendes-tito-widget.php` - Envía `origen: 'tienda'`
+- `wordpress-plugins/duendes-tito-widget.php` - Envía `origen: 'tienda'` (subido a WP)
 - `app/mi-magia/components/Tito.jsx` - Acepta props `origen` y `datosCirculo`
 - `app/mi-magia/circulo/page.jsx` - Pasa `origen: 'circulo'` con datos membresía
-- `app/api/tito/manychat/route.js` - Unificado: redirige a v3 con `origen: 'manychat'`
+- `app/api/tito/manychat/route.js` - Unificado: usa v3 internamente
+
+**Test ManyChat exitoso:**
+```
+curl -X POST .../api/tito/manychat -d '{"mensaje":"quiero ver guardianes"}'
+→ Respuesta con productos reales (Violeta, Azucena, etc.)
+```
 
 ### 25/01/2026 - 19:30hs
 - Corregidos métodos de pago: eliminado PayPal (no disponible)
