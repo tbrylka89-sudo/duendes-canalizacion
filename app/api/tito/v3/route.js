@@ -864,7 +864,7 @@ ANÁLISIS DEL CLIENTE:
 
     // Llamar a Claude con tools
     let response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 500,
       system: systemPrompt,
       messages: mensajesParaClaude,
@@ -917,7 +917,7 @@ ANÁLISIS DEL CLIENTE:
 
       // Continuar la conversación con los resultados de las tools
       response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 500,
         system: systemPrompt,
         messages: [

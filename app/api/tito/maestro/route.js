@@ -211,7 +211,7 @@ Sos el asistente mas completo y capaz. No hay nada que no puedas resolver.`;
 
     // Llamar a Claude
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 4000,
       system: systemPrompt,
       messages
@@ -1520,7 +1520,7 @@ async function statsProductos(tipo = 'mas_vendidos') {
 async function generarContenido(tema, palabras = 3000, categoria = 'esoterico') {
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 8000,
       messages: [{
         role: 'user',
@@ -1564,7 +1564,7 @@ _Contenido completo disponible. Palabras totales: ${palabrasCount}_`
 async function generarEmailMarketing(objetivo, contexto) {
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 2000,
       messages: [{
         role: 'user',
@@ -1599,7 +1599,7 @@ CONTENIDO:
 async function generarPostRedes(plataforma, tema) {
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 1000,
       messages: [{
         role: 'user',
