@@ -4,17 +4,27 @@ import { useState, useRef, useEffect } from 'react';
 // ═══════════════════════════════════════════════════════════════
 // TOOLTIP INFO - Componente genérico para explicaciones
 // Funciona en desktop (hover) y celular (tap en ?)
+// Convertido a inline styles (styled-jsx no funciona en prod)
 // ═══════════════════════════════════════════════════════════════
 
 export default function TooltipInfo({
   children,        // El contenido que lleva el tooltip
   titulo,          // Título del tooltip
   contenido,       // Contenido del tooltip (puede ser JSX)
-  posicion = 'top' // top, bottom, left, right
+  posicion = 'bottom' // top, bottom, left, right
 }) {
   const [mostrar, setMostrar] = useState(false);
   const tooltipRef = useRef(null);
   const btnRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar móvil
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 500);
+    const handleResize = () => setIsMobile(window.innerWidth <= 500);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Cerrar al hacer click fuera
   useEffect(() => {
@@ -35,13 +45,100 @@ export default function TooltipInfo({
     };
   }, [mostrar]);
 
+  const styles = {
+    wrapper: {
+      position: 'relative',
+      display: 'inline-block',
+    },
+    trigger: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+    },
+    btn: {
+      width: '20px',
+      height: '20px',
+      borderRadius: '50%',
+      background: 'rgba(212, 175, 55, 0.25)',
+      border: '1px solid rgba(212, 175, 55, 0.5)',
+      color: '#d4af37',
+      fontSize: '12px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      transition: 'all 0.2s',
+      flexShrink: 0,
+      padding: 0,
+      lineHeight: 1,
+    },
+    box: {
+      position: isMobile ? 'fixed' : 'absolute',
+      zIndex: 10000,
+      width: isMobile ? '90vw' : '300px',
+      maxWidth: '320px',
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+      border: '1px solid rgba(212, 175, 55, 0.4)',
+      borderRadius: '16px',
+      padding: '18px',
+      boxShadow: '0 15px 50px rgba(0,0,0,0.5), 0 0 30px rgba(212,175,55,0.1)',
+      ...(isMobile ? {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+      } : {
+        ...(posicion === 'top' && { bottom: 'calc(100% + 12px)', left: '0' }),
+        ...(posicion === 'bottom' && { top: 'calc(100% + 12px)', left: '0' }),
+        ...(posicion === 'left' && { right: 'calc(100% + 12px)', top: '0' }),
+        ...(posicion === 'right' && { left: 'calc(100% + 12px)', top: '0' }),
+      }),
+    },
+    cerrar: {
+      position: 'absolute',
+      top: '10px',
+      right: '10px',
+      width: '26px',
+      height: '26px',
+      border: 'none',
+      background: 'rgba(255,255,255,0.1)',
+      borderRadius: '50%',
+      fontSize: '18px',
+      cursor: 'pointer',
+      color: 'rgba(255,255,255,0.6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 0,
+      lineHeight: 1,
+    },
+    titulo: {
+      fontFamily: "'Cinzel', serif",
+      fontSize: '15px',
+      color: '#d4af37',
+      margin: '0 0 12px',
+      paddingRight: '30px',
+    },
+    contenido: {
+      fontSize: '13px',
+      color: 'rgba(255,255,255,0.85)',
+      lineHeight: 1.6,
+    },
+    overlay: {
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.5)',
+      zIndex: 9999,
+    },
+  };
+
   return (
-    <div className="tooltip-wrapper">
-      <div className="tooltip-trigger">
+    <div style={styles.wrapper}>
+      <div style={styles.trigger}>
         {children}
         <button
           ref={btnRef}
-          className="tooltip-btn"
+          style={styles.btn}
           onClick={(e) => { e.stopPropagation(); setMostrar(!mostrar); }}
           aria-label="Más información"
         >
@@ -50,142 +147,17 @@ export default function TooltipInfo({
       </div>
 
       {mostrar && (
-        <div ref={tooltipRef} className={`tooltip-box tooltip-${posicion}`}>
-          <button className="tooltip-cerrar" onClick={() => setMostrar(false)}>×</button>
-          {titulo && <h4 className="tooltip-titulo">{titulo}</h4>}
-          <div className="tooltip-contenido">
-            {contenido}
+        <>
+          {isMobile && <div style={styles.overlay} onClick={() => setMostrar(false)} />}
+          <div ref={tooltipRef} style={styles.box}>
+            <button style={styles.cerrar} onClick={() => setMostrar(false)}>×</button>
+            {titulo && <h4 style={styles.titulo}>{titulo}</h4>}
+            <div style={styles.contenido}>
+              {contenido}
+            </div>
           </div>
-        </div>
+        </>
       )}
-
-      <style jsx>{`
-        .tooltip-wrapper {
-          position: relative;
-          display: inline-block;
-        }
-
-        .tooltip-trigger {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .tooltip-btn {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: rgba(212, 175, 55, 0.2);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          color: #d4af37;
-          font-size: 11px;
-          font-weight: bold;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s;
-          flex-shrink: 0;
-        }
-
-        .tooltip-btn:hover {
-          background: rgba(212, 175, 55, 0.3);
-          transform: scale(1.1);
-        }
-
-        .tooltip-box {
-          position: absolute;
-          z-index: 1000;
-          width: 280px;
-          background: #fff;
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          border-radius: 16px;
-          padding: 16px;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-          animation: fadeIn 0.2s ease;
-        }
-
-        .tooltip-top {
-          bottom: calc(100% + 10px);
-          left: 50%;
-          transform: translateX(-50%);
-        }
-
-        .tooltip-bottom {
-          top: calc(100% + 10px);
-          left: 50%;
-          transform: translateX(-50%);
-        }
-
-        .tooltip-left {
-          right: calc(100% + 10px);
-          top: 50%;
-          transform: translateY(-50%);
-        }
-
-        .tooltip-right {
-          left: calc(100% + 10px);
-          top: 50%;
-          transform: translateY(-50%);
-        }
-
-        .tooltip-cerrar {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          width: 24px;
-          height: 24px;
-          border: none;
-          background: rgba(0,0,0,0.05);
-          border-radius: 50%;
-          font-size: 18px;
-          cursor: pointer;
-          color: #666;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .tooltip-cerrar:hover {
-          background: rgba(0,0,0,0.1);
-        }
-
-        .tooltip-titulo {
-          font-family: 'Cinzel', serif;
-          font-size: 14px;
-          color: #d4af37;
-          margin: 0 0 10px;
-          padding-right: 20px;
-        }
-
-        .tooltip-contenido {
-          font-size: 13px;
-          color: #666;
-          line-height: 1.6;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateX(-50%) translateY(5px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-
-        @media (max-width: 400px) {
-          .tooltip-box {
-            width: 260px;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-          }
-          .tooltip-top, .tooltip-bottom, .tooltip-left, .tooltip-right {
-            top: 50%;
-            left: 50%;
-            right: auto;
-            bottom: auto;
-            transform: translate(-50%, -50%);
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -194,16 +166,19 @@ export default function TooltipInfo({
 // CONTENIDOS PREDEFINIDOS para Mi Magia
 // ═══════════════════════════════════════════════════════════════
 
+const listaStyle = { margin: '5px 0 0', paddingLeft: '18px', fontSize: '12px', color: 'rgba(255,255,255,0.8)' };
+const parrafoStyle = { marginBottom: '10px', color: 'rgba(255,255,255,0.85)' };
+
 export const TOOLTIPS = {
   runas: {
     titulo: '✨ Runas de Poder',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué son?</strong><br/>Tu moneda mágica para desbloquear experiencias, lecturas y rituales.</p>
-        <p style={{marginBottom: '10px'}}><strong>¿Cómo obtenerlas?</strong></p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué son?</strong><br/>Tu moneda mágica para desbloquear experiencias, lecturas y rituales.</p>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Cómo obtenerlas?</strong></p>
+        <ul style={listaStyle}>
           <li>🎁 100 de bienvenida</li>
-          <li>📦 Cofre diario</li>
+          <li>💎 Jardín Encantado (diario)</li>
           <li>📝 Completar perfil (+50)</li>
           <li>🎯 Cumplir misiones</li>
           <li>🛒 Comprar en tienda</li>
@@ -216,14 +191,14 @@ export const TOOLTIPS = {
     titulo: '🍀 Tréboles',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué son?</strong><br/>Puntos de suerte que acumulás con tus acciones en Mi Magia.</p>
-        <p style={{marginBottom: '10px'}}><strong>¿Cómo obtenerlos?</strong></p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué son?</strong><br/>Puntos de suerte que acumulás con tus acciones en Mi Magia.</p>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Cómo obtenerlos?</strong></p>
+        <ul style={listaStyle}>
           <li>Entrar cada día</li>
           <li>Completar experiencias</li>
           <li>Interactuar con tu guardián</li>
         </ul>
-        <p style={{marginTop: '10px'}}><strong>¿Para qué sirven?</strong><br/>Desbloquean recompensas especiales y mejoran tu rango.</p>
+        <p style={{...parrafoStyle, marginTop: '10px'}}><strong style={{color: '#d4af37'}}>¿Para qué sirven?</strong><br/>Desbloquean recompensas especiales y mejoran tu rango.</p>
       </div>
     )
   },
@@ -232,15 +207,15 @@ export const TOOLTIPS = {
     titulo: '⭐ Círculo de Duendes',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}>Membresía con beneficios exclusivos:</p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}>Membresía con beneficios exclusivos:</p>
+        <ul style={listaStyle}>
           <li>✨ Contenido semanal exclusivo</li>
           <li>💰 5-10% descuento en tienda</li>
           <li>🎁 100+ runas de regalo</li>
           <li>🌙 Guía lunar mensual</li>
           <li>🕯️ Rituales exclusivos</li>
         </ul>
-        <p style={{marginTop: '10px', fontWeight: '600', color: '#d4af37'}}>Probá 15 días gratis</p>
+        <p style={{marginTop: '12px', fontWeight: '600', color: '#d4af37'}}>Probá 15 días gratis</p>
       </div>
     )
   },
@@ -249,15 +224,15 @@ export const TOOLTIPS = {
     titulo: '🔮 Experiencias Mágicas',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}>Actividades interactivas que podés hacer con tus runas:</p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}>Actividades interactivas que podés hacer con tus runas:</p>
+        <ul style={listaStyle}>
           <li>🃏 Tiradas de tarot</li>
           <li>ᚱ Lectura de runas</li>
           <li>🔮 Bola de cristal</li>
           <li>🕯️ Rituales guiados</li>
           <li>📖 Estudios místicos</li>
         </ul>
-        <p style={{marginTop: '10px'}}>Cada experiencia tiene un costo en runas.</p>
+        <p style={{...parrafoStyle, marginTop: '10px'}}>Cada experiencia tiene un costo en runas.</p>
       </div>
     )
   },
@@ -266,14 +241,14 @@ export const TOOLTIPS = {
     titulo: '📜 Canalizaciones',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué es?</strong><br/>Un mensaje personal de tu guardián, escrito especialmente para vos.</p>
-        <p style={{marginBottom: '10px'}}><strong>¿Cómo funciona?</strong></p>
-        <ol style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué es?</strong><br/>Un mensaje personal de tu guardián, escrito especialmente para vos.</p>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Cómo funciona?</strong></p>
+        <ol style={listaStyle}>
           <li>Adoptás un guardián</li>
           <li>Completás un formulario</li>
           <li>Tu guardián te escribe</li>
         </ol>
-        <p style={{marginTop: '10px'}}>Cada guardián tiene un código QR que te lleva a su mensaje.</p>
+        <p style={{...parrafoStyle, marginTop: '10px'}}>Cada guardián tiene un código QR que te lleva a su mensaje.</p>
       </div>
     )
   },
@@ -282,9 +257,9 @@ export const TOOLTIPS = {
     titulo: '📔 Grimorio Personal',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué es?</strong><br/>Tu diario mágico personal donde podés escribir y reflexionar.</p>
-        <p><strong>Usos:</strong></p>
-        <ul style={{margin: '5px 0 0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué es?</strong><br/>Tu diario mágico personal donde podés escribir y reflexionar.</p>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>Usos:</strong></p>
+        <ul style={listaStyle}>
           <li>Escribir intenciones</li>
           <li>Registrar sueños</li>
           <li>Anotar señales</li>
@@ -295,17 +270,18 @@ export const TOOLTIPS = {
   },
 
   cofreDiario: {
-    titulo: '📦 Cofre Diario',
+    titulo: '💎 Jardín Encantado',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué es?</strong><br/>Un regalo que podés abrir cada día.</p>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué contiene?</strong></p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué es?</strong><br/>Un jardín mágico con un cristal de amatista que podés tocar cada día.</p>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué obtenés?</strong></p>
+        <ul style={listaStyle}>
           <li>Runas (5-50)</li>
           <li>Tréboles</li>
+          <li>Bonus por racha</li>
           <li>A veces sorpresas especiales</li>
         </ul>
-        <p style={{marginTop: '10px', fontWeight: '600', color: '#d4af37'}}>Entrá cada día para no perdértelo</p>
+        <p style={{marginTop: '12px', fontWeight: '600', color: '#d4af37'}}>Entrá cada día para mantener tu racha 🔥</p>
       </div>
     )
   },
@@ -314,15 +290,15 @@ export const TOOLTIPS = {
     titulo: '🏆 Rangos',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}>Tu nivel según cuánto compraste:</p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
+        <p style={parrafoStyle}>Tu nivel según cuánto compraste:</p>
+        <ul style={listaStyle}>
           <li>🌱 Semilla - Inicio</li>
           <li>🌿 Brote - $50+</li>
           <li>🌳 Árbol - $150+</li>
           <li>⭐ Guardián - $300+</li>
           <li>👑 Anciano - $500+</li>
         </ul>
-        <p style={{marginTop: '10px'}}>Cada rango tiene beneficios especiales.</p>
+        <p style={{...parrafoStyle, marginTop: '10px'}}>Cada rango tiene beneficios especiales.</p>
       </div>
     )
   },
@@ -331,15 +307,15 @@ export const TOOLTIPS = {
     titulo: '🎯 Misiones',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}><strong>¿Qué son?</strong><br/>Objetivos diarios y semanales para ganar recompensas.</p>
-        <p style={{marginBottom: '10px'}}><strong>Ejemplos:</strong></p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
-          <li>Abrir el cofre diario</li>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>¿Qué son?</strong><br/>Objetivos diarios y semanales para ganar recompensas.</p>
+        <p style={parrafoStyle}><strong style={{color: '#d4af37'}}>Ejemplos:</strong></p>
+        <ul style={listaStyle}>
+          <li>Tocar el cristal diario</li>
           <li>Hacer una tirada</li>
           <li>Escribir en el grimorio</li>
           <li>Visitar la tienda</li>
         </ul>
-        <p style={{marginTop: '10px', fontWeight: '600', color: '#d4af37'}}>Completalas para ganar runas</p>
+        <p style={{marginTop: '12px', fontWeight: '600', color: '#d4af37'}}>Completalas para ganar runas</p>
       </div>
     )
   },
@@ -348,13 +324,13 @@ export const TOOLTIPS = {
     titulo: '🔐 Niveles de Acceso',
     contenido: (
       <div>
-        <p style={{marginBottom: '10px'}}>Tu acceso depende de tus compras:</p>
-        <ul style={{margin: '0', paddingLeft: '18px', fontSize: '12px'}}>
-          <li><strong>🌱 Explorador</strong> - Sin compras (contenido limitado)</li>
-          <li><strong>🛡️ Guardián</strong> - Con compras (acceso completo)</li>
-          <li><strong>✨ Círculo</strong> - Con membresía (todo + exclusivo)</li>
+        <p style={parrafoStyle}>Tu acceso depende de tus compras:</p>
+        <ul style={listaStyle}>
+          <li><strong style={{color: '#d4af37'}}>🌱 Explorador</strong> - Sin compras (limitado)</li>
+          <li><strong style={{color: '#d4af37'}}>🛡️ Guardián</strong> - Con compras (completo)</li>
+          <li><strong style={{color: '#d4af37'}}>✨ Círculo</strong> - Con membresía (todo + exclusivo)</li>
         </ul>
-        <p style={{marginTop: '10px'}}>Adoptá un guardián para desbloquear todo.</p>
+        <p style={{...parrafoStyle, marginTop: '10px'}}>Adoptá un guardián para desbloquear todo.</p>
       </div>
     )
   }
@@ -364,7 +340,7 @@ export const TOOLTIPS = {
 // COMPONENTE HELPER - Para uso rápido con contenido predefinido
 // ═══════════════════════════════════════════════════════════════
 
-export function InfoTooltip({ tipo, children, posicion = 'top' }) {
+export function InfoTooltip({ tipo, children, posicion = 'bottom' }) {
   const tooltip = TOOLTIPS[tipo];
   if (!tooltip) return children;
 
