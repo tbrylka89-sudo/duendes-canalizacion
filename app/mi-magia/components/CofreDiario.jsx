@@ -515,6 +515,14 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           0%, 100% { filter: drop-shadow(0 0 15px rgba(255,100,150,0.5)); }
           50% { filter: drop-shadow(0 0 30px rgba(255,150,200,0.8)); }
         }
+        @keyframes elementFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
       `}</style>
 
       {/* Toast mensaje de elemento */}
@@ -580,10 +588,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
       )}
 
       {/* Jardín */}
-      <div
-        style={styles.jardin}
-        onClick={puedeReclamar ? reclamarRecompensa : undefined}
-      >
+      <div style={styles.jardin}>
         {/* Header */}
         <div style={styles.header}>
           <InfoTooltip tipo="cofreDiario">
@@ -881,185 +886,214 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           </div>
         ))}
 
-        {/* Cristal de Amatista */}
-        <div style={styles.cristalContainer}>
-          <svg width="110" height="130" viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Cristal central grande */}
-            <polygon
-              points="55,2 70,35 70,95 55,125 40,95 40,35"
-              fill={puedeReclamar ? "url(#amatista1)" : "#4a4a4a"}
-              stroke={puedeReclamar ? amatista.claro : "#666"}
-              strokeWidth="1"
-            />
-            {/* Faceta superior */}
-            <polygon
-              points="55,2 70,35 55,42 40,35"
-              fill={puedeReclamar ? `${amatista.claro}90` : "rgba(150,150,150,0.4)"}
-            />
-            {/* Faceta lateral izquierda */}
-            <polygon
-              points="40,35 55,42 55,125 40,95"
-              fill={puedeReclamar ? `${amatista.profundo}99` : "rgba(60,60,60,0.7)"}
-            />
-            {/* Brillo interno */}
-            {puedeReclamar && (
-              <polygon
-                points="55,20 62,40 55,100 48,40"
-                fill="url(#innerGlow)"
-                style={{ animation: 'innerGlow 2s infinite ease-in-out' }}
-              />
-            )}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* TRES OPCIONES MÁGICAS - Cristal, Hongo, Trébol */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        <div style={{
+          position: 'absolute',
+          bottom: '45px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'flex-end',
+          zIndex: 5,
+        }}>
+          {/* CRISTAL DE AMATISTA */}
+          <div
+            onClick={(e) => { e.stopPropagation(); if (puedeReclamar && !reclamando) reclamarRecompensa(); }}
+            style={{
+              cursor: puedeReclamar ? 'pointer' : 'default',
+              transition: 'transform 0.3s ease',
+              filter: `drop-shadow(0 0 15px ${amatista.medio}80)`,
+              animation: puedeReclamar ? 'elementFloat 3s infinite ease-in-out' : 'none',
+            }}
+          >
+            <svg width="55" height="75" viewBox="0 0 55 75" fill="none">
+              <polygon points="27,2 40,20 40,55 27,72 14,55 14,20" fill="url(#cristalGrad)" stroke={amatista.claro} strokeWidth="1"/>
+              <polygon points="27,2 40,20 27,25 14,20" fill={`${amatista.claro}90`}/>
+              <polygon points="14,20 27,25 27,72 14,55" fill={`${amatista.profundo}99`}/>
+              {puedeReclamar && <polygon points="27,12 32,25 27,60 22,25" fill="rgba(255,255,255,0.4)"><animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite"/></polygon>}
+              <defs>
+                <linearGradient id="cristalGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor={amatista.claro}/><stop offset="50%" stopColor={amatista.medio}/><stop offset="100%" stopColor={amatista.profundo}/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style={{textAlign: 'center', fontSize: '0.7rem', color: '#fff', marginTop: '4px', textShadow: '0 1px 3px rgba(0,0,0,0.8)'}}>Cristal</div>
+          </div>
 
-            {/* Cristal izquierdo */}
-            <polygon
-              points="25,28 38,52 38,98 25,115 12,98 12,52"
-              fill={puedeReclamar ? "url(#amatista2)" : "#3a3a3a"}
-              stroke={puedeReclamar ? amatista.medio : "#555"}
-              strokeWidth="1"
-            />
-            <polygon
-              points="25,28 38,52 25,58 12,52"
-              fill={puedeReclamar ? `${amatista.claro}70` : "rgba(120,120,120,0.3)"}
-            />
-            <polygon
-              points="12,52 25,58 25,115 12,98"
-              fill={puedeReclamar ? `${amatista.profundo}88` : "rgba(50,50,50,0.6)"}
-            />
+          {/* HONGO MÁGICO */}
+          <div
+            onClick={(e) => { e.stopPropagation(); if (puedeReclamar && !reclamando) reclamarRecompensa(); }}
+            style={{
+              cursor: puedeReclamar ? 'pointer' : 'default',
+              transition: 'transform 0.3s ease',
+              filter: 'drop-shadow(0 0 15px rgba(255,100,150,0.6))',
+              animation: puedeReclamar ? 'elementFloat 3s infinite ease-in-out 0.5s' : 'none',
+            }}
+          >
+            <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
+              {/* Sombrero del hongo */}
+              <ellipse cx="30" cy="35" rx="28" ry="22" fill="url(#hongoCapGrad)"/>
+              <ellipse cx="30" cy="32" rx="24" ry="18" fill="url(#hongoCapTop)"/>
+              {/* Manchas del hongo */}
+              <ellipse cx="20" cy="28" rx="5" ry="4" fill="rgba(255,255,255,0.85)"/>
+              <ellipse cx="38" cy="32" rx="6" ry="4.5" fill="rgba(255,255,255,0.85)"/>
+              <ellipse cx="28" cy="40" rx="4" ry="3" fill="rgba(255,255,255,0.7)"/>
+              <ellipse cx="42" cy="24" rx="3" ry="2.5" fill="rgba(255,255,255,0.6)"/>
+              {/* Tallo */}
+              <path d="M22 50 Q20 65 23 78 L37 78 Q40 65 38 50 Z" fill="url(#hongoStemGrad)"/>
+              <path d="M24 50 Q23 60 25 70" stroke="rgba(200,180,160,0.5)" strokeWidth="2" fill="none"/>
+              {/* Brillo */}
+              {puedeReclamar && <ellipse cx="18" cy="26" rx="3" ry="2" fill="rgba(255,255,255,0.8)"><animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></ellipse>}
+              <defs>
+                <linearGradient id="hongoCapGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#ff6b8a"/><stop offset="50%" stopColor="#e84a6f"/><stop offset="100%" stopColor="#c23a5a"/>
+                </linearGradient>
+                <radialGradient id="hongoCapTop" cx="40%" cy="30%">
+                  <stop offset="0%" stopColor="#ff8fa8"/><stop offset="100%" stopColor="#e84a6f"/>
+                </radialGradient>
+                <linearGradient id="hongoStemGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#f5e6d3"/><stop offset="100%" stopColor="#d4c4a8"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style={{textAlign: 'center', fontSize: '0.7rem', color: '#fff', marginTop: '4px', textShadow: '0 1px 3px rgba(0,0,0,0.8)'}}>Hongo</div>
+          </div>
 
-            {/* Cristal derecho */}
-            <polygon
-              points="85,22 98,48 98,95 85,118 72,95 72,48"
-              fill={puedeReclamar ? "url(#amatista2)" : "#3a3a3a"}
-              stroke={puedeReclamar ? amatista.medio : "#555"}
-              strokeWidth="1"
-            />
-            <polygon
-              points="85,22 98,48 85,54 72,48"
-              fill={puedeReclamar ? `${amatista.claro}70` : "rgba(120,120,120,0.3)"}
-            />
-            <polygon
-              points="98,48 85,54 85,118 98,95"
-              fill={puedeReclamar ? `${amatista.profundo}88` : "rgba(50,50,50,0.6)"}
-            />
-
-            {/* Cristal pequeño izquierda atrás */}
-            <polygon
-              points="8,50 16,68 16,100 8,112 0,100 0,68"
-              fill={puedeReclamar ? "url(#amatista3)" : "#2a2a2a"}
-              stroke={puedeReclamar ? amatista.oscuro : "#444"}
-              strokeWidth="0.5"
-            />
-
-            {/* Cristal pequeño derecha atrás */}
-            <polygon
-              points="102,45 110,65 110,95 102,108 94,95 94,65"
-              fill={puedeReclamar ? "url(#amatista3)" : "#2a2a2a"}
-              stroke={puedeReclamar ? amatista.oscuro : "#444"}
-              strokeWidth="0.5"
-            />
-
-            {/* Cristal inclinado izquierdo */}
-            <polygon
-              points="18,55 28,72 26,105 16,115 8,102 10,70"
-              fill={puedeReclamar ? "url(#amatista2)" : "#333"}
-              stroke={puedeReclamar ? amatista.medio : "#4a4a4a"}
-              strokeWidth="0.5"
-              transform="rotate(-12, 18, 85)"
-            />
-
-            {/* Cristal inclinado derecho */}
-            <polygon
-              points="92,52 102,70 100,102 90,112 82,100 84,68"
-              fill={puedeReclamar ? "url(#amatista2)" : "#333"}
-              stroke={puedeReclamar ? amatista.medio : "#4a4a4a"}
-              strokeWidth="0.5"
-              transform="rotate(12, 92, 82)"
-            />
-
-            {/* Brillos de luz */}
-            {puedeReclamar && (
-              <>
-                <line x1="48" y1="12" x2="48" y2="38" stroke="rgba(255,255,255,0.7)" strokeWidth="2.5" strokeLinecap="round">
-                  <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
-                </line>
-                <line x1="20" y1="38" x2="20" y2="56" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round">
-                  <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2.5s" repeatCount="indefinite"/>
-                </line>
-                <line x1="90" y1="32" x2="90" y2="52" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round">
-                  <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2.3s" repeatCount="indefinite"/>
-                </line>
-                {/* Destellos */}
-                <circle cx="52" cy="25" r="2" fill="white">
-                  <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
-                </circle>
-                <circle cx="80" cy="40" r="1.5" fill="white">
-                  <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite" begin="1s"/>
-                </circle>
-              </>
-            )}
-
-            {/* Gradientes de Amatista */}
-            <defs>
-              <linearGradient id="amatista1" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stopColor={amatista.claro}/>
-                <stop offset="30%" stopColor={amatista.medio}/>
-                <stop offset="60%" stopColor={amatista.principal}/>
-                <stop offset="100%" stopColor={amatista.profundo}/>
-              </linearGradient>
-              <linearGradient id="amatista2" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stopColor={amatista.medio}/>
-                <stop offset="50%" stopColor={amatista.principal}/>
-                <stop offset="100%" stopColor={amatista.oscuro}/>
-              </linearGradient>
-              <linearGradient id="amatista3" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stopColor={amatista.principal}/>
-                <stop offset="100%" stopColor={amatista.profundo}/>
-              </linearGradient>
-              <linearGradient id="innerGlow" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.5)"/>
-                <stop offset="50%" stopColor={`${amatista.brillante}60`}/>
-                <stop offset="100%" stopColor="rgba(255,255,255,0)"/>
-              </linearGradient>
-            </defs>
-          </svg>
-
-          {/* Partículas cuando está activando */}
-          {animacion === 'activando' && [...Array(12)].map((_, i) => (
-            <div
-              key={`particle-${i}`}
-              style={{
-                position: 'absolute',
-                bottom: '60px',
-                left: `${35 + (i * 7) % 40}px`,
-                width: '7px',
-                height: '7px',
-                background: i % 3 === 0 ? amatista.claro : i % 3 === 1 ? amatista.brillante : '#fff',
-                borderRadius: '50%',
-                boxShadow: `0 0 8px ${amatista.medio}`,
-                animation: 'particleRise 1.2s infinite',
-                animationDelay: `${i * 0.1}s`,
-              }}
-            />
-          ))}
+          {/* TRÉBOL DE 4 HOJAS */}
+          <div
+            onClick={(e) => { e.stopPropagation(); if (puedeReclamar && !reclamando) reclamarRecompensa(); }}
+            style={{
+              cursor: puedeReclamar ? 'pointer' : 'default',
+              transition: 'transform 0.3s ease',
+              filter: 'drop-shadow(0 0 15px rgba(100,200,100,0.6))',
+              animation: puedeReclamar ? 'elementFloat 3s infinite ease-in-out 1s' : 'none',
+            }}
+          >
+            <svg width="60" height="75" viewBox="0 0 60 75" fill="none">
+              {/* 4 hojas del trébol */}
+              <ellipse cx="30" cy="18" rx="12" ry="14" fill="url(#trebolGrad)" transform="rotate(0, 30, 30)"/>
+              <ellipse cx="42" cy="30" rx="12" ry="14" fill="url(#trebolGrad)" transform="rotate(90, 42, 30)"/>
+              <ellipse cx="30" cy="42" rx="12" ry="14" fill="url(#trebolGrad)" transform="rotate(180, 30, 30)"/>
+              <ellipse cx="18" cy="30" rx="12" ry="14" fill="url(#trebolGrad)" transform="rotate(270, 18, 30)"/>
+              {/* Hendiduras de las hojas */}
+              <path d="M30 8 Q30 18 30 24" stroke="#1a5a1a" strokeWidth="2" fill="none"/>
+              <path d="M52 30 Q42 30 36 30" stroke="#1a5a1a" strokeWidth="2" fill="none"/>
+              <path d="M30 52 Q30 42 30 36" stroke="#1a5a1a" strokeWidth="2" fill="none"/>
+              <path d="M8 30 Q18 30 24 30" stroke="#1a5a1a" strokeWidth="2" fill="none"/>
+              {/* Centro */}
+              <circle cx="30" cy="30" r="5" fill="#2a6a2a"/>
+              {/* Tallo */}
+              <path d="M30 35 Q28 50 30 70" stroke="url(#talloGrad)" strokeWidth="4" fill="none" strokeLinecap="round"/>
+              {/* Brillo */}
+              {puedeReclamar && <ellipse cx="24" cy="14" rx="4" ry="3" fill="rgba(255,255,255,0.5)"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.5s" repeatCount="indefinite"/></ellipse>}
+              <defs>
+                <radialGradient id="trebolGrad" cx="50%" cy="30%">
+                  <stop offset="0%" stopColor="#5cb85c"/><stop offset="70%" stopColor="#3a8a3a"/><stop offset="100%" stopColor="#2a6a2a"/>
+                </radialGradient>
+                <linearGradient id="talloGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#3a7a3a"/><stop offset="100%" stopColor="#2a5a2a"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style={{textAlign: 'center', fontSize: '0.7rem', color: '#fff', marginTop: '4px', textShadow: '0 1px 3px rgba(0,0,0,0.8)'}}>Trébol</div>
+          </div>
         </div>
 
-        {/* Info */}
-        <div style={styles.info}>
-          {puedeReclamar ? (
-            <button
-              style={{
-                ...styles.btnReclamar,
-                opacity: reclamando ? 0.7 : 1,
-              }}
-              onClick={(e) => { e.stopPropagation(); reclamarRecompensa(); }}
-              disabled={reclamando}
-            >
-              {reclamando ? '💎 Canalizando...' : '💎 Tocar la Amatista'}
-            </button>
-          ) : (
-            <p style={styles.msgReclamado}>Volvé mañana por más magia ✨</p>
-          )}
-        </div>
+        {/* Overlay cuando ya reclamó */}
+        {!puedeReclamar && !resultado && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0,0,0,0.7)',
+            borderRadius: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 20,
+            backdropFilter: 'blur(2px)',
+          }}>
+            <div style={{fontSize: '2.5rem', marginBottom: '10px'}}>🌙</div>
+            <p style={{
+              color: '#fff',
+              fontSize: '1rem',
+              textAlign: 'center',
+              margin: 0,
+              padding: '0 20px',
+              fontFamily: "'Cinzel', serif",
+            }}>
+              Ya elegiste tu magia de hoy
+            </p>
+            <p style={{
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: '0.85rem',
+              marginTop: '8px',
+            }}>
+              Volvé mañana a elegir de nuevo ✨
+            </p>
+            {racha > 0 && (
+              <div style={{
+                marginTop: '15px',
+                background: 'rgba(255,100,50,0.2)',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                color: '#ff6b35',
+                fontSize: '0.9rem',
+              }}>
+                🔥 Racha: {racha} días
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Instrucción cuando puede reclamar */}
+        {puedeReclamar && !reclamando && (
+          <div style={{
+            position: 'absolute',
+            bottom: '8px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.7)',
+            padding: '6px 16px',
+            borderRadius: '20px',
+            zIndex: 10,
+          }}>
+            <p style={{
+              color: '#d4af37',
+              fontSize: '0.8rem',
+              margin: 0,
+              whiteSpace: 'nowrap',
+            }}>
+              ✨ Elegí uno para recibir tu magia diaria
+            </p>
+          </div>
+        )}
+
+        {/* Animación de carga */}
+        {reclamando && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            borderRadius: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 20,
+          }}>
+            <div style={{
+              color: '#d4af37',
+              fontSize: '1.1rem',
+              fontFamily: "'Cinzel', serif",
+              animation: 'pulse 1s infinite',
+            }}>
+              ✨ Canalizando magia...
+            </div>
+          </div>
+        )}
 
         {/* Bonus próximo */}
         {diasParaBonus && diasParaBonus <= 7 && (
