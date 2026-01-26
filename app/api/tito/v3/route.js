@@ -580,9 +580,9 @@ export async function POST(request) {
     // PRIMERO: Contexto del ORIGEN (de dónde viene la conversación)
     contextoCliente += getContextoOrigen(origenNormalizado, usuario, datosCirculo);
 
-    // Info de usuario logueado en WordPress
+    // Info de usuario logueado en WordPress (ADICIONAL al contexto de origen)
     if (usuario && usuario.nombre) {
-      contextoCliente = `\n\n👤 USUARIO LOGUEADO EN LA WEB:\n`;
+      contextoCliente += `\n\n👤 USUARIO LOGUEADO EN LA WEB:\n`;
       contextoCliente += `- Nombre: ${usuario.nombre} (LLAMALA POR SU NOMBRE)\n`;
       if (usuario.esCliente) {
         contextoCliente += `- ES CLIENTE: Ya compró ${usuario.totalCompras || 'algunos'} guardián(es) antes ✨\n`;
