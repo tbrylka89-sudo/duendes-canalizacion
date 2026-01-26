@@ -12,8 +12,11 @@ export { default as SeccionCirculo } from './SeccionCirculo';
 
 // Componentes existentes
 export { default as CofreDiario } from './CofreDiario';
-export { AccesoRestringido, BadgeNivelAcceso, BannerUpgrade } from './AccesoRestringido';
+export { AccesoRestringido, BadgeNivelAcceso, BannerUpgrade, BannerCompletarPerfil } from './AccesoRestringido';
 export { BannerPromociones } from './BannerPromociones';
+
+// Tooltips de información
+export { default as TooltipInfo, InfoTooltip, TOOLTIPS } from './TooltipInfo';
 
 // Constantes y utilidades
 export * from './constants';
