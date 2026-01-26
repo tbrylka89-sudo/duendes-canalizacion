@@ -86,6 +86,25 @@ SI PREGUNTA POR CUIDADOS:
 SI ES PICHI (da vueltas sin decidir):
 "Mirá, cuando sientas el llamado de verdad, acá estoy. Te dejo la tienda: https://duendesdeluruguay.com/shop/ 🍀"
 
+=== CONSULTAS DE PEDIDOS ===
+
+SIEMPRE usá la función consultar_pedido cuando pregunten por:
+- Estado de su pedido/compra
+- Cuándo llega su guardián
+- Tracking o seguimiento
+- "Mi pedido", "mi compra", "mi envío"
+
+TONO PARA PEDIDOS - MUY IMPORTANTE:
+- SIEMPRE dar tranquilidad, nunca generar ansiedad
+- Transmitir que todo está bien, que su guardián está en camino
+- Si está en "processing": "Tu guardián se está preparando con mucho amor"
+- Si está "shipped": "¡Ya está viajando! Pronto lo tenés en tus manos"
+- NUNCA escalar a humano por consultas normales de estado
+- Solo escalar si hay un PROBLEMA REAL (error, queja, pedido perdido)
+
+Si el cliente no está logueado y no da email/número:
+"Para buscar tu pedido necesito tu email o número de orden. ¿Me lo pasás?"
+
 === PRECIOS ===
 
 URUGUAY: Solo pesos uruguayos
@@ -124,7 +143,8 @@ NO HAY PAYPAL
 - Máximo 150 palabras por mensaje
 - UNA pregunta al final
 - NO ofrezcas hablar con humanos
-- Si hay problema real (pedido, queja) → usá escalar_a_humano
+- Consultas de pedido → usá consultar_pedido (NO escalar)
+- Solo escalar si hay problema GRAVE (error, queja, pedido perdido hace mucho)
 `;
 
 // Tools para GPT
@@ -168,8 +188,28 @@ const TOOLS = [
   {
     type: "function",
     function: {
+      name: "consultar_pedido",
+      description: "Consultar estado de pedido del cliente. Usar cuando preguntan por su pedido, envío, o estado de compra.",
+      parameters: {
+        type: "object",
+        properties: {
+          email: {
+            type: "string",
+            description: "Email del cliente (se obtiene del contexto si está logueado)"
+          },
+          numero_pedido: {
+            type: "string",
+            description: "Número de pedido si lo proporcionó el cliente"
+          }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "escalar_a_humano",
-      description: "Escalar al equipo cuando hay problema real (pedido, queja). NO ofrecer esta opción al cliente.",
+      description: "Escalar al equipo SOLO cuando hay un problema REAL que no se puede resolver (error en pedido, queja grave). NO usar para consultas normales de estado.",
       parameters: {
         type: "object",
         properties: {
@@ -246,6 +286,118 @@ async function ejecutarTool(nombre, args, contexto) {
       return convertido;
     }
 
+    case 'consultar_pedido': {
+      // Obtener email del usuario logueado o del parámetro
+      const email = contexto.usuario?.email || args.email;
+      const numeroPedido = args.numero_pedido;
+
+      if (!email && !numeroPedido) {
+        return {
+          encontrado: false,
+          mensaje: "Necesito tu email o número de pedido para buscarlo. ¿Me lo pasás?"
+        };
+      }
+
+      try {
+        // Consultar WooCommerce API
+        const wooUrl = process.env.WOO_API_URL || 'https://duendesdeluruguay.com';
+        const wooKey = process.env.WOO_CONSUMER_KEY;
+        const wooSecret = process.env.WOO_CONSUMER_SECRET;
+
+        let url = `${wooUrl}/wp-json/wc/v3/orders?per_page=5`;
+        if (numeroPedido) {
+          // Buscar por número específico
+          url = `${wooUrl}/wp-json/wc/v3/orders/${numeroPedido}`;
+        } else if (email) {
+          url += `&search=${encodeURIComponent(email)}`;
+        }
+
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': 'Basic ' + Buffer.from(`${wooKey}:${wooSecret}`).toString('base64')
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            return {
+              encontrado: false,
+              mensaje: "No encontré ese pedido. ¿Podés verificar el número?"
+            };
+          }
+          throw new Error('Error consultando WooCommerce');
+        }
+
+        const data = await response.json();
+        const pedidos = Array.isArray(data) ? data : [data];
+
+        if (pedidos.length === 0) {
+          return {
+            encontrado: false,
+            mensaje: "No encontré pedidos con ese email. ¿Usaste otro email para comprar?"
+          };
+        }
+
+        // Mapear estados a mensajes amigables y tranquilizadores
+        const estadosMensajes = {
+          'pending': { estado: 'Pendiente de pago', emoji: '⏳', mensaje: 'Tu pedido está esperando confirmación del pago. Si ya pagaste, en breve se actualiza.' },
+          'processing': { estado: 'Preparando tu pedido', emoji: '✨', mensaje: '¡Tu guardián se está preparando para el viaje! Estamos poniéndole mucho amor.' },
+          'on-hold': { estado: 'En espera', emoji: '⏸️', mensaje: 'Tu pedido está en pausa. Si tenés dudas, escribinos.' },
+          'completed': { estado: 'Completado', emoji: '🎉', mensaje: '¡Tu guardián ya llegó a su nuevo hogar! Esperamos que lo estés disfrutando.' },
+          'shipped': { estado: 'Enviado', emoji: '📦', mensaje: '¡Tu guardián ya está viajando hacia vos! Pronto llega.' },
+          'cancelled': { estado: 'Cancelado', emoji: '❌', mensaje: 'Este pedido fue cancelado.' },
+          'refunded': { estado: 'Reembolsado', emoji: '💰', mensaje: 'Este pedido fue reembolsado.' },
+          'failed': { estado: 'Fallido', emoji: '⚠️', mensaje: 'Hubo un problema con el pago. ¿Querés intentar de nuevo?' }
+        };
+
+        // Procesar pedidos encontrados
+        const pedidosInfo = pedidos.slice(0, 3).map(p => {
+          const statusInfo = estadosMensajes[p.status] || { estado: p.status, emoji: '📋', mensaje: '' };
+
+          // Buscar tracking si existe (puede estar en meta_data)
+          let tracking = null;
+          const trackingMeta = p.meta_data?.find(m =>
+            m.key === '_tracking_number' || m.key === 'tracking_number' || m.key === '_wc_shipment_tracking_items'
+          );
+          if (trackingMeta) {
+            tracking = typeof trackingMeta.value === 'string' ? trackingMeta.value : trackingMeta.value?.[0]?.tracking_number;
+          }
+
+          // Calcular días desde el pedido
+          const fechaPedido = new Date(p.date_created);
+          const diasDesde = Math.floor((Date.now() - fechaPedido) / (1000 * 60 * 60 * 24));
+
+          return {
+            numero: p.id,
+            fecha: fechaPedido.toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' }),
+            estado: statusInfo.estado,
+            emoji: statusInfo.emoji,
+            mensaje_estado: statusInfo.mensaje,
+            total: `$${p.total} ${p.currency}`,
+            items: p.line_items?.map(i => i.name).join(', ') || 'Guardianes',
+            tracking: tracking,
+            dias_desde_pedido: diasDesde,
+            pais_envio: p.shipping?.country || p.billing?.country
+          };
+        });
+
+        return {
+          encontrado: true,
+          cantidad: pedidosInfo.length,
+          pedidos: pedidosInfo,
+          mensaje_general: "¡Tranqui! Acá tenés la info de tu pedido. Todo está en orden 🍀"
+        };
+
+      } catch (error) {
+        console.error('[Tito] Error consultando pedido:', error);
+        return {
+          encontrado: false,
+          error: true,
+          mensaje: "Tuve un problemita consultando. ¿Me pasás tu número de pedido para buscarlo manualmente?"
+        };
+      }
+    }
+
     case 'escalar_a_humano': {
       const ticket = {
         id: `ESC-${Date.now()}`,
@@ -300,6 +452,7 @@ export async function POST(request) {
     const mensaje = body.mensaje || body.message;
     const conversationHistory = body.conversationHistory || body.history || [];
     const paisParam = body.pais || body.pais_cliente;
+    const usuario = body.usuario || null; // Info del usuario logueado
 
     if (!mensaje) {
       return Response.json({ error: 'Mensaje requerido' }, { status: 400, headers: CORS_HEADERS });
@@ -364,7 +517,7 @@ export async function POST(request) {
 
       for (const toolCall of assistantMessage.tool_calls) {
         const args = JSON.parse(toolCall.function.arguments);
-        const resultado = await ejecutarTool(toolCall.function.name, args, { pais });
+        const resultado = await ejecutarTool(toolCall.function.name, args, { pais, usuario });
 
         toolsUsadas.push(toolCall.function.name);
 

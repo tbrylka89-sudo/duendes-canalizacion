@@ -768,6 +768,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
     const estado = {
         chatAbierto: false,
         conversationHistory: [],
+        mensajesUI: [], // Para restaurar la UI del chat
         isWaiting: false,
         visitorId: null,
         tiempoPagina: 0,
@@ -782,6 +783,40 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         paisCliente: null, // Se detectará por geolocalización
         acabaDeAgregar: false // Flag para evitar burbujas duplicadas al agregar al carrito
     };
+
+    // Cargar historial de conversación desde localStorage
+    function cargarHistorialGuardado() {
+        try {
+            const saved = localStorage.getItem('tito_chat_history');
+            if (saved) {
+                const data = JSON.parse(saved);
+                // Solo cargar si es del mismo día (expira a medianoche)
+                const hoy = new Date().toDateString();
+                if (data.fecha === hoy) {
+                    estado.conversationHistory = data.history || [];
+                    estado.mensajesUI = data.mensajesUI || [];
+                    estado.interactuoConTito = data.history.length > 0;
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.warn('Error cargando historial Tito:', e);
+        }
+        return false;
+    }
+
+    // Guardar historial en localStorage
+    function guardarHistorial() {
+        try {
+            localStorage.setItem('tito_chat_history', JSON.stringify({
+                fecha: new Date().toDateString(),
+                history: estado.conversationHistory.slice(-10), // Últimos 10 mensajes
+                mensajesUI: estado.mensajesUI.slice(-20) // Últimos 20 para la UI
+            }));
+        } catch (e) {
+            console.warn('Error guardando historial Tito:', e);
+        }
+    }
 
     // Geolocalizar al cliente por IP
     async function geolocalizarCliente() {
@@ -882,10 +917,16 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
             tiempoEnPagina: estado.tiempoPagina,
             url: window.location.href
         };
+
+        // Crear AbortController para timeout de 30 segundos
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
         try {
             const response = await fetch(CONFIG.API_BASE + '/api/tito/gpt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify({
                     message: mensaje,
                     origen: 'tienda', // Tito sabe que habla desde la tienda web
@@ -903,10 +944,15 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
                     } : null
                 })
             });
+            clearTimeout(timeoutId);
             return await response.json();
         } catch (error) {
+            clearTimeout(timeoutId);
             console.error('Error Tito:', error);
-            return { success: false, response: 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?' };
+            if (error.name === 'AbortError') {
+                return { success: false, respuesta: 'Uy, tardé mucho en responder. ¿Podés intentar de nuevo?' };
+            }
+            return { success: false, respuesta: 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?' };
         }
     }
 
@@ -1373,6 +1419,17 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         ocultarBurbuja();
         els.notif.style.display = 'none';
         els.input.focus();
+
+        // Si hay mensajes guardados de sesión anterior, restaurarlos
+        if (estado.mensajesUI.length > 0 && els.messages.children.length === 0) {
+            estado.mensajesUI.forEach(function(msg) {
+                agregarMensaje(msg.texto, msg.tipo, msg.productos);
+            });
+            // Ocultar sugerencias si ya hubo conversación
+            els.suggestions.style.display = 'none';
+            return;
+        }
+
         if (estado.conversationHistory.length === 0) {
             let saludo;
             const nombre = estado.usuario.nombre;
@@ -1397,6 +1454,8 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
             agregarMensaje(saludo, 'bot');
             // Guardar saludo en historial para que el backend sepa que no es primera interacción
             estado.conversationHistory.push({ role: 'assistant', content: saludo });
+            estado.mensajesUI.push({ tipo: 'bot', texto: saludo });
+            guardarHistorial();
         }
     }
 
@@ -1415,17 +1474,23 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         els.suggestions.style.display = 'none';
         agregarMensaje(mensaje, 'user');
         estado.conversationHistory.push({ role: 'user', content: mensaje });
+        estado.mensajesUI.push({ tipo: 'user', texto: mensaje });
         mostrarTyping();
         const response = await enviarMensaje(mensaje);
         ocultarTyping();
         if (response.success) {
             agregarMensaje(response.respuesta, 'bot', response.productos);
             estado.conversationHistory.push({ role: 'assistant', content: response.respuesta });
+            estado.mensajesUI.push({ tipo: 'bot', texto: response.respuesta, productos: response.productos });
         } else {
-            agregarMensaje(response.respuesta || 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?', 'bot');
+            const errorMsg = response.respuesta || 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?';
+            agregarMensaje(errorMsg, 'bot');
+            estado.mensajesUI.push({ tipo: 'bot', texto: errorMsg });
         }
         estado.isWaiting = false;
         els.send.disabled = false;
+        // Guardar en localStorage para persistencia entre páginas
+        guardarHistorial();
     }
 
     function initEventListeners() {
@@ -1492,11 +1557,16 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
             document.addEventListener('DOMContentLoaded', init);
             return;
         }
-        console.log('🍀 Tito Widget v4.0 iniciando...');
+        console.log('🍀 Tito Widget v4.1 iniciando...');
         initElements();
         estado.visitorId = getVisitorId();
         estado.paginaActual = detectarPagina();
         estado.productoActual = obtenerProductoActual();
+        // Cargar historial de conversación guardado
+        const tieneHistorial = cargarHistorialGuardado();
+        if (tieneHistorial) {
+            console.log('🍀 Historial de chat restaurado');
+        }
         console.log('🍀 Página detectada:', estado.paginaActual);
         initEventListeners();
         syncWooCommerce();
