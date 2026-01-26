@@ -1130,6 +1130,7 @@ export function HistorialLecturas({ token }) {
   const [historial, setHistorial] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [lecturaAbierta, setLecturaAbierta] = useState(null);
+  const [procesando, setProcesando] = useState(false);
 
   useEffect(() => {
     cargarHistorial();
@@ -1141,12 +1142,47 @@ export function HistorialLecturas({ token }) {
       const res = await fetch(`${API_BASE}/api/gamificacion/historial-lecturas?token=${token}`);
       const data = await res.json();
       if (data.success) {
-        setHistorial(data.lecturas || []);
+        const lecturas = data.lecturas || [];
+        setHistorial(lecturas);
+
+        // Verificar si hay lecturas trabadas (procesando con tiempo pasado)
+        const ahora = new Date();
+        const trabadas = lecturas.filter(l => {
+          if (l.estado !== 'procesando') return false;
+          if (!l.fechaEntregaEstimada) return true; // Sin fecha = trabada
+          const fechaEntrega = new Date(l.fechaEntregaEstimada);
+          return fechaEntrega < ahora; // Fecha pasada = trabada
+        });
+
+        // Si hay trabadas, procesarlas automáticamente
+        if (trabadas.length > 0 && !procesando) {
+          procesarPendientes();
+        }
       }
     } catch (e) {
       console.error('Error cargando historial:', e);
     }
     setCargando(false);
+  };
+
+  const procesarPendientes = async () => {
+    if (procesando) return;
+    setProcesando(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/experiencias/procesar-pendientes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json();
+      if (data.success && data.procesadas > 0) {
+        // Recargar historial después de procesar
+        setTimeout(() => cargarHistorial(), 1000);
+      }
+    } catch (e) {
+      console.error('Error procesando pendientes:', e);
+    }
+    setProcesando(false);
   };
 
   const abrirLectura = async (lecturaId) => {
@@ -1163,6 +1199,25 @@ export function HistorialLecturas({ token }) {
 
   if (cargando) {
     return <div className="historial-cargando"><div className="hist-spinner"></div></div>;
+  }
+
+  if (procesando) {
+    return (
+      <div className="historial-procesando">
+        <div className="hist-spinner"></div>
+        <p style={{ color: '#d4af37', marginTop: '15px' }}>Generando tus lecturas pendientes...</p>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Esto puede tardar unos segundos</p>
+        <style jsx>{`
+          .historial-procesando {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+          }
+        `}</style>
+      </div>
+    );
   }
 
   if (historial.length === 0) {

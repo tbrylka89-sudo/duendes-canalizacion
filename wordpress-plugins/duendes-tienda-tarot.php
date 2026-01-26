@@ -826,6 +826,7 @@ function duendes_render_tienda_tarot() {
             <?php
             // Definir particulas por categoria
             $particulas = [
+                'todos' => ['🌟', '✨', '💫', '⭐'],
                 'proteccion' => ['🛡️', '⚔️', '🔒', '🏰'],
                 'amor' => ['💜', '💗', '💕', '💝'],
                 'abundancia' => ['🪙', '💰', '✨', '⭐'],
@@ -849,7 +850,8 @@ function duendes_render_tienda_tarot() {
 
                 // Determinar key de categoria
                 $cat_key = 'proteccion';
-                if (strpos($cat['slug'], 'amor') !== false) $cat_key = 'amor';
+                if ($cat['slug'] === 'todos') $cat_key = 'todos';
+                elseif (strpos($cat['slug'], 'amor') !== false) $cat_key = 'amor';
                 elseif (strpos($cat['slug'], 'dinero') !== false || strpos($cat['slug'], 'abundan') !== false) $cat_key = 'abundancia';
                 elseif (strpos($cat['slug'], 'salud') !== false) $cat_key = 'salud';
                 elseif (strpos($cat['slug'], 'sabid') !== false) $cat_key = 'sabiduria';
