@@ -65,6 +65,17 @@
 
 ---
 
+## ✅ ARREGLADOS HOY
+
+| # | Problema | Estado |
+|---|----------|--------|
+| 1 | Link de términos en footer | ✅ Corregido - apunta a `/terminos/` |
+| 2 | Shortcode del Círculo no renderizaba | ✅ Plugin activado + CSS con !important |
+| 3 | Plugin ficha del guardián desactivado | ✅ Activado `duendes-ficha-guardian.php` |
+| 4 | Auto-completar ficha fallaba con productos nuevos | ✅ Ahora genera con IA aunque no esté en BD |
+
+---
+
 ## ✅ FUNCIONANDO CORRECTAMENTE
 
 | Página | Estado |
