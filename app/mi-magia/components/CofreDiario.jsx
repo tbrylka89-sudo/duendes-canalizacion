@@ -155,37 +155,18 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
     },
     cristalContainer: {
       position: 'absolute',
-      bottom: '60px',
+      bottom: '55px',
       left: '50%',
       transform: 'translateX(-50%)',
       zIndex: 5,
-    },
-    cristal: {
-      width: '60px',
-      height: '80px',
-      background: puedeReclamar
-        ? 'linear-gradient(180deg, rgba(180,130,255,0.9) 0%, rgba(130,80,200,0.9) 50%, rgba(100,60,180,0.9) 100%)'
-        : 'linear-gradient(180deg, rgba(100,100,100,0.7) 0%, rgba(70,70,70,0.7) 100%)',
-      clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-      boxShadow: puedeReclamar
-        ? '0 0 40px rgba(180,130,255,0.6), 0 0 80px rgba(180,130,255,0.3), inset 0 0 20px rgba(255,255,255,0.3)'
-        : '0 0 10px rgba(100,100,100,0.3)',
+      filter: puedeReclamar
+        ? 'drop-shadow(0 0 20px rgba(180,130,255,0.6)) drop-shadow(0 0 40px rgba(180,130,255,0.3))'
+        : 'drop-shadow(0 0 5px rgba(100,100,100,0.3))',
       animation: animacion === 'activando'
-        ? 'cristalShake 0.1s infinite, cristalGlow 0.5s infinite alternate'
+        ? 'cristalShake 0.1s infinite'
         : puedeReclamar
           ? 'cristalPulse 2s infinite ease-in-out'
           : 'none',
-      transition: 'all 0.3s ease',
-    },
-    cristalBrillo: {
-      position: 'absolute',
-      top: '10px',
-      left: '15px',
-      width: '8px',
-      height: '20px',
-      background: 'rgba(255,255,255,0.6)',
-      borderRadius: '4px',
-      transform: 'rotate(-20deg)',
     },
     hongo: (left, size, hue) => ({
       position: 'absolute',
@@ -383,17 +364,17 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
     <div style={styles.container}>
       <style>{`
         @keyframes cristalPulse {
-          0%, 100% { transform: scale(1); filter: brightness(1); }
-          50% { transform: scale(1.05); filter: brightness(1.2); }
+          0%, 100% { transform: translateX(-50%) scale(1); filter: brightness(1) drop-shadow(0 0 20px rgba(180,130,255,0.6)); }
+          50% { transform: translateX(-50%) scale(1.08); filter: brightness(1.3) drop-shadow(0 0 35px rgba(180,130,255,0.8)); }
         }
         @keyframes cristalShake {
-          0%, 100% { transform: translateX(0) rotate(0deg); }
-          25% { transform: translateX(-3px) rotate(-2deg); }
-          75% { transform: translateX(3px) rotate(2deg); }
+          0%, 100% { transform: translateX(-50%) rotate(0deg); }
+          25% { transform: translateX(calc(-50% - 4px)) rotate(-3deg); }
+          75% { transform: translateX(calc(-50% + 4px)) rotate(3deg); }
         }
         @keyframes cristalGlow {
-          from { box-shadow: 0 0 40px rgba(180,130,255,0.6), 0 0 80px rgba(180,130,255,0.3); }
-          to { box-shadow: 0 0 60px rgba(255,200,100,0.8), 0 0 120px rgba(255,200,100,0.4); }
+          from { filter: drop-shadow(0 0 20px rgba(180,130,255,0.6)) drop-shadow(0 0 40px rgba(180,130,255,0.3)); }
+          to { filter: drop-shadow(0 0 30px rgba(255,200,100,0.8)) drop-shadow(0 0 60px rgba(255,200,100,0.5)); }
         }
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -555,25 +536,141 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           />
         ))}
 
-        {/* Cristal central */}
+        {/* Cristal central - Cluster de cristales */}
         <div style={styles.cristalContainer}>
-          <div style={styles.cristal}>
-            <div style={styles.cristalBrillo} />
-          </div>
+          <svg width="100" height="120" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Cristal central grande */}
+            <polygon
+              points="50,5 62,35 62,85 50,115 38,85 38,35"
+              fill={puedeReclamar ? "url(#cristalGrad1)" : "#4a4a4a"}
+              stroke={puedeReclamar ? "#b8a0ff" : "#666"}
+              strokeWidth="1"
+            />
+            <polygon
+              points="50,5 62,35 50,40 38,35"
+              fill={puedeReclamar ? "rgba(220,200,255,0.4)" : "rgba(150,150,150,0.3)"}
+            />
+            <polygon
+              points="38,35 50,40 50,115 38,85"
+              fill={puedeReclamar ? "rgba(100,60,180,0.6)" : "rgba(60,60,60,0.6)"}
+            />
+
+            {/* Cristal izquierdo medio */}
+            <polygon
+              points="25,30 35,50 35,90 25,105 15,90 15,50"
+              fill={puedeReclamar ? "url(#cristalGrad2)" : "#3a3a3a"}
+              stroke={puedeReclamar ? "#9080cc" : "#555"}
+              strokeWidth="1"
+            />
+            <polygon
+              points="25,30 35,50 25,55 15,50"
+              fill={puedeReclamar ? "rgba(200,180,255,0.3)" : "rgba(120,120,120,0.3)"}
+            />
+            <polygon
+              points="15,50 25,55 25,105 15,90"
+              fill={puedeReclamar ? "rgba(80,50,150,0.5)" : "rgba(50,50,50,0.5)"}
+            />
+
+            {/* Cristal derecho medio */}
+            <polygon
+              points="75,25 85,48 85,88 75,108 65,88 65,48"
+              fill={puedeReclamar ? "url(#cristalGrad2)" : "#3a3a3a"}
+              stroke={puedeReclamar ? "#9080cc" : "#555"}
+              strokeWidth="1"
+            />
+            <polygon
+              points="75,25 85,48 75,52 65,48"
+              fill={puedeReclamar ? "rgba(200,180,255,0.3)" : "rgba(120,120,120,0.3)"}
+            />
+            <polygon
+              points="85,48 75,52 75,108 85,88"
+              fill={puedeReclamar ? "rgba(80,50,150,0.5)" : "rgba(50,50,50,0.5)"}
+            />
+
+            {/* Cristal pequeño izquierda */}
+            <polygon
+              points="8,55 14,68 14,95 8,105 2,95 2,68"
+              fill={puedeReclamar ? "url(#cristalGrad3)" : "#2a2a2a"}
+              stroke={puedeReclamar ? "#7060aa" : "#444"}
+              strokeWidth="0.5"
+            />
+            <polygon
+              points="2,68 8,72 8,105 2,95"
+              fill={puedeReclamar ? "rgba(70,40,140,0.5)" : "rgba(40,40,40,0.5)"}
+            />
+
+            {/* Cristal pequeño derecha */}
+            <polygon
+              points="92,50 98,65 98,92 92,103 86,92 86,65"
+              fill={puedeReclamar ? "url(#cristalGrad3)" : "#2a2a2a"}
+              stroke={puedeReclamar ? "#7060aa" : "#444"}
+              strokeWidth="0.5"
+            />
+            <polygon
+              points="98,65 92,70 92,103 98,92"
+              fill={puedeReclamar ? "rgba(70,40,140,0.5)" : "rgba(40,40,40,0.5)"}
+            />
+
+            {/* Cristal diagonal izquierdo */}
+            <polygon
+              points="20,60 28,72 26,100 18,108 12,98 14,70"
+              fill={puedeReclamar ? "url(#cristalGrad2)" : "#333"}
+              stroke={puedeReclamar ? "#8070bb" : "#4a4a4a"}
+              strokeWidth="0.5"
+              transform="rotate(-15, 20, 85)"
+            />
+
+            {/* Cristal diagonal derecho */}
+            <polygon
+              points="80,58 88,70 86,98 78,106 72,96 74,68"
+              fill={puedeReclamar ? "url(#cristalGrad2)" : "#333"}
+              stroke={puedeReclamar ? "#8070bb" : "#4a4a4a"}
+              strokeWidth="0.5"
+              transform="rotate(15, 80, 82)"
+            />
+
+            {/* Brillos */}
+            {puedeReclamar && (
+              <>
+                <line x1="44" y1="15" x2="44" y2="35" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="22" y1="40" x2="22" y2="55" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round"/>
+                <line x1="78" y1="35" x2="78" y2="52" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round"/>
+              </>
+            )}
+
+            {/* Gradientes */}
+            <defs>
+              <linearGradient id="cristalGrad1" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stopColor="#c8b0ff"/>
+                <stop offset="50%" stopColor="#9070dd"/>
+                <stop offset="100%" stopColor="#6040aa"/>
+              </linearGradient>
+              <linearGradient id="cristalGrad2" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stopColor="#b098ee"/>
+                <stop offset="50%" stopColor="#8060cc"/>
+                <stop offset="100%" stopColor="#503090"/>
+              </linearGradient>
+              <linearGradient id="cristalGrad3" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stopColor="#9080dd"/>
+                <stop offset="100%" stopColor="#403088"/>
+              </linearGradient>
+            </defs>
+          </svg>
+
           {/* Partículas cuando está activando */}
-          {animacion === 'activando' && [...Array(8)].map((_, i) => (
+          {animacion === 'activando' && [...Array(10)].map((_, i) => (
             <div
               key={i}
               style={{
                 position: 'absolute',
-                bottom: '40px',
-                left: `${20 + Math.random() * 20}px`,
-                width: '8px',
-                height: '8px',
-                background: '#d4af37',
+                bottom: '50px',
+                left: `${30 + Math.random() * 40}px`,
+                width: '6px',
+                height: '6px',
+                background: i % 2 === 0 ? '#d4af37' : '#b8a0ff',
                 borderRadius: '50%',
                 animation: 'particleRise 1s infinite',
-                animationDelay: `${i * 0.1}s`,
+                animationDelay: `${i * 0.08}s`,
               }}
             />
           ))}
