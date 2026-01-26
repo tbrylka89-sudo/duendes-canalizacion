@@ -146,12 +146,15 @@ export async function POST(request) {
 
     // Si el email falló, devolver el link directo como fallback
     const emailFallo = emailResult?.error;
+    console.log('📧 Email fallo?:', emailFallo, 'Result:', JSON.stringify(emailResult));
 
     return Response.json({
       success: true,
-      mensaje: emailFallo ? 'Enlace generado (email no configurado)' : 'Enlace mágico enviado',
+      mensaje: emailFallo ? `Error: ${emailResult?.error?.message || 'desconocido'}` : 'Enlace mágico enviado',
       // Solo devolver link directo si el email falló
-      ...(emailFallo && { linkDirecto: magicLinkUrl })
+      ...(emailFallo && { linkDirecto: magicLinkUrl }),
+      // Debug info
+      debug: { error: emailResult?.error, hasApiKey: !!process.env.RESEND_API_KEY }
     });
 
   } catch (error) {
