@@ -13,7 +13,12 @@ import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 import { TITO_TOOLS, getToolsParaContexto, getToolsParaManyChat } from '@/lib/tito/tools';
 import ejecutarTool from '@/lib/tito/tool-executor';
-import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+// Usar personalidad compacta para reducir tokens (~80% menos)
+import {
+  PERSONALIDAD_TITO_COMPACTA as PERSONALIDAD_TITO,
+  CONTEXTO_MANYCHAT_COMPACTO as CONTEXTO_MANYCHAT,
+  prepararMensajesOptimizados
+} from '@/lib/tito/personalidad-compacta';
 import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 import { detectarObjecion, getInstruccionesObjecion } from '@/lib/tito/objeciones';
@@ -86,9 +91,19 @@ function analizarCliente(mensajes, infoCliente = {}) {
   // Si ya sabemos que es de un país específico, más chance de compra
   if (infoCliente.pais) puntosCompra += 1;
 
-  // Muchos mensajes sin avanzar = pichi
-  if (totalMensajes > 6 && puntosCompra < 2) puntosPichi += 3;
-  if (totalMensajes > 10 && puntosCompra < 3) puntosPichi += 5;
+  // Detectar si ya se mostraron precios (signo de que ya vio productos)
+  const todosLosMensajes = mensajes.map(m => m.content || '').join(' ');
+  const yaVioPrecio = /\$\d+/.test(todosLosMensajes);
+
+  // DETECCIÓN RÁPIDA DE PICHIS:
+  // Si ya vio precios y siguen 3-4 mensajes sin avanzar → pichi
+  if (yaVioPrecio) {
+    if (totalMensajes > 4 && puntosCompra < 3) puntosPichi += 4;
+    if (totalMensajes > 6 && puntosCompra < 4) puntosPichi += 5;
+  } else {
+    // Si todavía no vio precios, ser un poco más paciente
+    if (totalMensajes > 6 && puntosCompra < 2) puntosPichi += 3;
+  }
 
   // Clasificar
   let tipoCliente = 'explorando';
@@ -123,8 +138,13 @@ function analizarCliente(mensajes, infoCliente = {}) {
     puntosCompra,
     puntosPichi,
     totalMensajes,
-    debeRedirigir: puntosPichi > puntosCompra && totalMensajes > 4,
-    debeCortar: puntosPichi >= 6 && totalMensajes > 8,
+    yaVioPrecio,
+    debeRedirigir: puntosPichi > puntosCompra && totalMensajes > 3,
+    // Si ya vio precios, cortar más rápido (4+ msgs sin avanzar)
+    // Si no vio precios, ser más paciente (6+ msgs)
+    debeCortar: yaVioPrecio
+      ? (puntosPichi >= 4 && totalMensajes > 4)
+      : (puntosPichi >= 5 && totalMensajes > 6),
     emocionDetectada
   };
 }
@@ -580,21 +600,19 @@ export async function POST(request) {
       infoCliente.paisNombre = geoData.paisNombre;
     }
 
-    // Construir mensajes para Claude
-    const mensajesParaClaude = [];
+    // Construir mensajes para Claude con sistema de resumen optimizado
+    // Solo mantener últimos 4 mensajes completos, resumir el resto
+    const historialFormateado = conversationHistory.map(h => ({
+      role: h.role || (h.r === 'u' ? 'user' : 'assistant'),
+      content: h.content || h.t || h.texto
+    }));
 
-    // Historial previo
-    if (conversationHistory.length > 0) {
-      conversationHistory.slice(-8).forEach(h => {
-        mensajesParaClaude.push({
-          role: h.role || (h.r === 'u' ? 'user' : 'assistant'),
-          content: h.content || h.t || h.texto
-        });
-      });
-    }
+    const { mensajes: mensajesOptimizados, contextoResumen } = prepararMensajesOptimizados(
+      historialFormateado,
+      msg
+    );
 
-    // Mensaje actual
-    mensajesParaClaude.push({ role: 'user', content: msg });
+    const mensajesParaClaude = mensajesOptimizados;
 
     // Analizar tipo de cliente
     const analisis = analizarCliente(mensajesParaClaude, infoCliente);
@@ -842,19 +860,18 @@ export async function POST(request) {
       instruccionEspecifica = `\n\n🛑 CORTÁ CORTÉSMENTE: Ya van muchos mensajes sin avanzar. Despedite y dejá el link al test.`;
     }
 
-    const systemPrompt = `${PERSONALIDAD_TITO}
+    // Incluir resumen del historial si existe (para contexto sin gastar tokens)
+    const resumenHistorial = contextoResumen ? `\n${contextoResumen}\n` : '';
 
+    const systemPrompt = `${PERSONALIDAD_TITO}
+${resumenHistorial}
 ${instruccionesConversion}
 
 ${contextoCliente}
 
 ${instruccionEspecifica}
 
-ANÁLISIS DEL CLIENTE:
-- Tipo: ${analisis.tipo}
-- Mensajes: ${analisis.totalMensajes}
-- Puntos compra: ${analisis.puntosCompra}
-- Puntos pichi: ${analisis.puntosPichi}
+ANÁLISIS: ${analisis.tipo} | ${analisis.totalMensajes} msgs | compra:${analisis.puntosCompra} pichi:${analisis.puntosPichi}
 `;
 
     // Seleccionar tools según contexto (ManyChat tiene tools limitadas)
