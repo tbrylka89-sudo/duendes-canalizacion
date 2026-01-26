@@ -2477,7 +2477,21 @@ function CirculoPageInterno() {
   return (
     <>
       {renderContenidoEstado()}
-      {estado !== 'verificando' && <Tito usuario={usuario} abierto={chatAbierto} setAbierto={setChatAbierto} />}
+      {estado !== 'verificando' && (
+        <Tito
+          usuario={usuario}
+          abierto={chatAbierto}
+          setAbierto={setChatAbierto}
+          origen={estado === 'dashboard' || estado === 'portal' ? 'circulo' : 'mi-magia'}
+          datosCirculo={usuario?.membresia ? {
+            plan: usuario.membresia.esTrial ? 'Trial' : usuario.membresia.plan || 'Activo',
+            diasRestantes: diasTrial || null,
+            tiradasGratis: usuario.membresia.tiradasGratis || 0,
+            descuento: usuario.membresia.descuento || 0,
+            esTrial: usuario.membresia.esTrial || false
+          } : null}
+        />
+      )}
     </>
   );
 }

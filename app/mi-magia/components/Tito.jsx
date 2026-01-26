@@ -173,7 +173,7 @@ export function TitoBurbuja({ usuario, onAbrir }) {
 // TITO CHAT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 
-export function Tito({ usuario, abierto, setAbierto }) {
+export function Tito({ usuario, abierto, setAbierto, origen = 'mi-magia', datosCirculo = null }) {
   const [msgs, setMsgs] = useState([]);
   const [input, setInput] = useState('');
   const [env, setEnv] = useState(false);
@@ -198,13 +198,30 @@ export function Tito({ usuario, abierto, setAbierto }) {
         role: msg.r === 'u' ? 'user' : 'assistant',
         content: msg.t
       }));
-      const contexto = `[CONTEXTO MI MAGIA: Usuario con ${usuario?.runas||0} runas, ${usuario?.treboles||0} tréboles. Secciones: Canalizaciones (guardianes, lecturas, regalos), Jardín de Tréboles (tréboles/runas), Experiencias (lecturas mágicas), Regalos, Reino Elemental, Cuidados, Cristales, Círculo (membresía), Grimorio (lecturas y diario). 1 trébol = $10 USD. Runas para experiencias.]
-IMPORTANTE: Mantené el contexto de la conversación. Si el usuario dice "ayudame" o "sí" o "dale", referite a lo que acabás de decir/ofrecer.
-FORMATO: Usá párrafos cortos separados por líneas en blanco. NO escribas todo junto. Hacé el texto fácil de leer.
-Mensaje actual: ${m}`;
-      const res = await fetch(`${API_BASE}/api/tito/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: contexto, email: usuario?.email, history: historial }) });
+
+      // Usar Tito v3 con origen dinámico (mi-magia o circulo)
+      const res = await fetch(`${API_BASE}/api/tito/v3`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: m,
+          origen, // Puede ser 'mi-magia' o 'circulo'
+          history: historial,
+          // Datos del usuario para contexto
+          usuario: {
+            nombre: usuario?.nombrePreferido || usuario?.nombre,
+            email: usuario?.email,
+            runas: usuario?.runas || 0,
+            treboles: usuario?.treboles || 0,
+            guardianes: usuario?.guardianes?.map(g => g.nombre) || [],
+            esCliente: true // Si está en Mi Magia, ya es cliente
+          },
+          // Datos del Círculo (si es miembro)
+          datosCirculo: datosCirculo || null
+        })
+      });
       const data = await res.json();
-      setMsgs(prev => [...prev, { r: 't', t: data.response || 'Hubo un error, intentá de nuevo.' }]);
+      setMsgs(prev => [...prev, { r: 't', t: data.respuesta || data.response || 'Hubo un error, intentá de nuevo.' }]);
     } catch(e) { setMsgs(prev => [...prev, { r: 't', t: 'Error de conexión.' }]); }
     setEnv(false);
   };

@@ -888,6 +888,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: mensaje,
+                    origen: 'tienda', // Tito sabe que habla desde la tienda web
                     history: estado.conversationHistory.slice(-8),
                     contexto,
                     visitorId: estado.visitorId,

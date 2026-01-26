@@ -232,6 +232,23 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ## CHANGELOG
 
+### 25/01/2026 - 20:00hs - SISTEMA DE ORÍGENES
+Tito ahora sabe desde dónde habla y adapta su contexto:
+
+| Origen | Descripción |
+|--------|-------------|
+| `tienda` | Widget en WordPress - visitantes de la tienda |
+| `mi-magia` | Portal de clientes que ya compraron |
+| `circulo` | Miembros del Círculo (VIP) |
+| `manychat` | Instagram, Facebook, WhatsApp |
+
+**Archivos modificados:**
+- `app/api/tito/v3/route.js` - Función `getContextoOrigen()` + parámetro `origen`
+- `wordpress-plugins/duendes-tito-widget.php` - Envía `origen: 'tienda'`
+- `app/mi-magia/components/Tito.jsx` - Acepta props `origen` y `datosCirculo`
+- `app/mi-magia/circulo/page.jsx` - Pasa `origen: 'circulo'` con datos membresía
+- `app/api/tito/manychat/route.js` - Unificado: redirige a v3 con `origen: 'manychat'`
+
 ### 25/01/2026 - 19:30hs
 - Corregidos métodos de pago: eliminado PayPal (no disponible)
 - Agregado Mercado Pago para Uruguay

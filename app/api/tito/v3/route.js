@@ -322,6 +322,115 @@ const INFO_PAISES = {
   'PA': { moneda: 'dólares', emoji: '🇵🇦', saludo: '¡Genial!', codigoMoneda: 'USD', nombre: 'Panamá' }
 };
 
+// ═══════════════════════════════════════════════════════════════
+// CONTEXTO SEGÚN ORIGEN - Tito sabe desde dónde habla
+// ═══════════════════════════════════════════════════════════════
+
+function getContextoOrigen(origen, usuario = null, datosCirculo = null) {
+  let contexto = '\n\n═══════════════════════════════════════════════════════════════\n';
+  contexto += '                    📍 ORIGEN DE LA CONVERSACIÓN\n';
+  contexto += '═══════════════════════════════════════════════════════════════\n\n';
+
+  switch (origen) {
+    case 'tienda':
+      contexto += `🛒 ESTÁS EN: LA TIENDA (duendesdeluruguay.com/shop/)
+
+Tu objetivo principal: VENDER guardianes.
+- Hablás con visitantes que están explorando la tienda
+- Pueden ser nuevos o clientes que vuelven
+- Mostrá productos, contá historias, generá conexión
+- Si tienen dudas de pago/envío, resolvelas rápido
+- Cerrá ventas: "¿Te lo llevás?" "¿Cuál te llamó más?"
+
+HERRAMIENTAS DISPONIBLES:
+- mostrar_productos: Para mostrar guardianes
+- verificar_stock: Para confirmar disponibilidad
+- calcular_precio: Para convertir a moneda local
+- obtener_guardian_completo: Para contar historia detallada
+`;
+      break;
+
+    case 'mi-magia':
+      contexto += `✨ ESTÁS EN: MI MAGIA (Portal de Clientes)
+
+Esta persona YA COMPRÓ al menos un guardián. Es parte de la familia.
+${usuario?.nombre ? `- Se llama: ${usuario.nombre} (USALO)` : ''}
+${usuario?.runas ? `- Tiene ${usuario.runas} runas disponibles` : ''}
+${usuario?.treboles ? `- Tiene ${usuario.treboles} tréboles` : ''}
+${usuario?.guardianes ? `- Sus guardianes: ${usuario.guardianes.join(', ')}` : ''}
+
+Tu objetivo: ACOMPAÑAR y FIDELIZAR (también vender, pero con más cariño)
+- Preguntá cómo le va con su(s) guardián(es)
+- Ofrecé experiencias que puede canjear con runas
+- Si tiene tréboles, puede convertirlos (1 trébol = $10 USD)
+- Mencioná El Círculo si parece interesada en más magia
+
+SECCIONES DE MI MAGIA que podés mencionar:
+- Canalizaciones: Ver sus guardianes y lecturas
+- Jardín de Tréboles: Tréboles y runas acumuladas
+- Experiencias: Lecturas mágicas, rituales
+- El Círculo: Membresía premium con beneficios
+- Grimorio: Diario mágico personal
+`;
+      break;
+
+    case 'circulo':
+      contexto += `🌙 ESTÁS EN: EL CÍRCULO (Membresía Premium)
+
+Esta persona es MIEMBRO DEL CÍRCULO. Es VIP, tratala como tal.
+${usuario?.nombre ? `- Se llama: ${usuario.nombre}` : ''}
+${datosCirculo?.plan ? `- Plan: ${datosCirculo.plan}` : ''}
+${datosCirculo?.diasRestantes ? `- Le quedan ${datosCirculo.diasRestantes} días de membresía` : ''}
+${datosCirculo?.tiradasGratis ? `- Tiradas gratis disponibles: ${datosCirculo.tiradasGratis}` : ''}
+${datosCirculo?.descuento ? `- Tiene ${datosCirculo.descuento}% de descuento en compras` : ''}
+
+Tu objetivo: SERVIR a la miembro VIP
+- Tiene acceso a contenido exclusivo semanal
+- Guía lunar mensual personalizada
+- Comunidad privada / foro
+- Tiradas de runas gratis según su plan
+- Descuentos especiales en guardianes
+
+BENEFICIOS DEL CÍRCULO que podés mencionar:
+- Guardián de la Semana: Guardián destacado con historia especial
+- Rituales semanales: Prácticas guiadas
+- Lecturas del alma: Si tiene disponibles
+- Ciclos celtas: Contenido estacional
+`;
+      break;
+
+    case 'manychat':
+      contexto += `📱 ESTÁS EN: MANYCHAT (Instagram/Facebook/WhatsApp)
+
+Esta persona te escribe desde REDES SOCIALES.
+- Probablemente vio algo en Instagram y quiere saber más
+- Las respuestas deben ser MÁS CORTAS (es chat de redes)
+- No tenés galería de productos, solo podés describir
+- El objetivo es llevarla a la TIENDA o al TEST
+
+REGLAS ESPECIALES PARA REDES:
+- Respuestas de máximo 3-4 oraciones
+- No uses formato markdown elaborado
+- Usá emojis con moderación (1-2 por mensaje)
+- Si quiere ver productos: "Mirá todo en duendesdeluruguay.com/shop/ 🍀"
+- Si no sabe cuál elegir: "Hacé el test: duendesdeluruguay.com/descubri-que-duende-te-elige/"
+- Si quiere comprar: Redirigí a la web, no se puede vender por DM
+
+OBJETIVO: Generar interés y llevar a la web.
+No te quedes charlando infinito, son redes, todo es rápido.
+`;
+      break;
+
+    default:
+      contexto += `🌐 ORIGEN: ${origen || 'desconocido'}
+No hay contexto específico para este origen.
+Tratá la conversación como si fuera desde la tienda.
+`;
+  }
+
+  return contexto;
+}
+
 async function geolocalizarIP(request) {
   try {
     // Obtener IP de headers de Vercel/CloudFlare
@@ -390,14 +499,19 @@ export async function POST(request) {
       nombre,
       first_name,
       subscriber_id,
-      canal = 'web', // web, manychat, mimagia
+      canal = 'web', // DEPRECADO - usar 'origen' en su lugar
+      origen = null, // tienda, mi-magia, circulo, manychat
       historial = [],
       history,
       esAdmin = false,
       usuario = null, // Info del usuario logueado en WordPress
+      datosCirculo = null, // Info de membresía del Círculo (si aplica)
       pais_cliente = null, // País enviado desde el frontend (si ya geolocalizó)
       contexto = null // Contexto del producto que está viendo (FASE 1 del roadmap)
     } = body;
+
+    // Normalizar origen (fallback a canal por retrocompatibilidad)
+    const origenNormalizado = origen || (canal === 'mimagia' ? 'mi-magia' : canal === 'manychat' ? 'manychat' : 'tienda');
 
     const msg = mensaje || message || '';
     const userName = nombre || first_name || usuario?.nombre || '';
@@ -462,6 +576,9 @@ export async function POST(request) {
 
     // Info del cliente para contexto
     let contextoCliente = '';
+
+    // PRIMERO: Contexto del ORIGEN (de dónde viene la conversación)
+    contextoCliente += getContextoOrigen(origenNormalizado, usuario, datosCirculo);
 
     // Info de usuario logueado en WordPress
     if (usuario && usuario.nombre) {
@@ -667,8 +784,8 @@ ANÁLISIS DEL CLIENTE:
 - Puntos pichi: ${analisis.puntosPichi}
 `;
 
-    // Seleccionar tools según contexto
-    const tools = canal === 'manychat'
+    // Seleccionar tools según contexto (ManyChat tiene tools limitadas)
+    const tools = origenNormalizado === 'manychat'
       ? getToolsParaManyChat()
       : getToolsParaContexto(esAdmin);
 
@@ -769,9 +886,9 @@ ANÁLISIS DEL CLIENTE:
 
     console.log(`[Tito v3] Respuesta en ${Date.now() - startTime}ms | Cliente: ${analisis.tipo} | Tools: ${toolsEjecutadas.map(t => t.name).join(', ') || 'ninguna'}`);
 
-    // Formato de respuesta según canal
-    if (canal === 'manychat') {
-      // Formato ManyChat con galería
+    // Formato de respuesta según origen
+    if (origenNormalizado === 'manychat') {
+      // Formato ManyChat con galería (para IG/FB/WA)
       return Response.json({
         respuesta: respuestaFinal,
         hay_productos: productosParaMostrar.length > 0 ? 'si' : 'no',
@@ -779,17 +896,19 @@ ANÁLISIS DEL CLIENTE:
         imagen_2: productosParaMostrar[1]?.imagen || '',
         imagen_3: productosParaMostrar[2]?.imagen || '',
         total_productos: productosParaMostrar.length,
+        origen: origenNormalizado,
         // Campos extra para debug
         _tipo_cliente: analisis.tipo,
         _tools: toolsEjecutadas.map(t => t.name)
       }, { headers: CORS_HEADERS });
     }
 
-    // Formato estándar (web, mi magia)
+    // Formato estándar (tienda, mi-magia, circulo)
     return Response.json({
       success: true,
       respuesta: respuestaFinal,
       productos: productosParaMostrar,
+      origen: origenNormalizado,
       analisis: {
         tipoCliente: analisis.tipo,
         totalMensajes: analisis.totalMensajes
