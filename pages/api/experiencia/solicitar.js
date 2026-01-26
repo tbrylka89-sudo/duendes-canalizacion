@@ -1,4 +1,9 @@
 import { kv } from '@vercel/kv';
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -138,7 +143,7 @@ export default async function handler(req, res) {
       runasUsadas: experiencia.runas
     };
 
-    // Guardar en solicitudes pendientes
+    // Guardar en solicitudes pendientes (por compatibilidad)
     if (!elegido.solicitudesPendientes) {
       elegido.solicitudesPendientes = [];
     }
@@ -147,15 +152,275 @@ export default async function handler(req, res) {
     elegido.updatedAt = new Date().toISOString();
     await kv.set(elegidoKey, elegido);
 
+    // ═══════════════════════════════════════════════════════════════
+    // GENERAR CONTENIDO CON IA INMEDIATAMENTE
+    // ═══════════════════════════════════════════════════════════════
+    let contenidoGenerado = null;
+    try {
+      contenidoGenerado = await generarContenidoExperiencia({
+        tipo: experienciaId,
+        nombre: experiencia.nombre,
+        nombreUsuario: elegido.nombre || elegido.nombrePreferido || 'Alma luminosa',
+        pronombre: elegido.pronombre || 'ella',
+        datos: datos || {}
+      });
+
+      solicitud.estado = 'completado';
+      solicitud.contenido = contenidoGenerado;
+      solicitud.fechaCompletado = new Date().toISOString();
+
+      // Actualizar la solicitud pendiente con el contenido
+      elegido.solicitudesPendientes[0] = solicitud;
+      await kv.set(elegidoKey, elegido);
+    } catch (iaError) {
+      console.error('Error generando con IA:', iaError);
+      // Si falla la IA, la solicitud queda pendiente
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // GUARDAR EN HISTORIAL (para que aparezca en "Mis Lecturas")
+    // ═══════════════════════════════════════════════════════════════
+    const historial = await kv.get(`historial:${email}`) || [];
+    historial.unshift({
+      id: solicitud.id,
+      lecturaId: experienciaId,
+      nombre: experiencia.nombre,
+      icono: obtenerIconoExperiencia(experienciaId),
+      categoria: obtenerCategoriaExperiencia(experienciaId),
+      runas: experiencia.runas,
+      fecha: new Date().toISOString(),
+      estado: solicitud.estado,
+      contenido: contenidoGenerado
+    });
+    // Mantener solo las últimas 100
+    await kv.set(`historial:${email}`, historial.slice(0, 100));
+
+    // También guardar en lecturas:${email} por compatibilidad
+    const lecturas = await kv.get(`lecturas:${email}`) || [];
+    lecturas.unshift({
+      id: solicitud.id,
+      lecturaId: experienciaId,
+      nombre: experiencia.nombre,
+      categoria: obtenerCategoriaExperiencia(experienciaId),
+      runas: experiencia.runas,
+      fecha: new Date().toISOString(),
+      estado: solicitud.estado
+    });
+    await kv.set(`lecturas:${email}`, lecturas.slice(0, 100));
+
+    // Guardar lectura individual para poder recuperarla al hacer click
+    // (compatible con formato de ejecutar-lectura y con el modal del historial)
+    await kv.set(`lectura:${solicitud.id}`, {
+      id: solicitud.id,
+      lecturaId: experienciaId,
+      lecturaNombre: experiencia.nombre,
+      nombre: experiencia.nombre, // Para el modal del historial
+      email: email,
+      nombreUsuario: elegido.nombre || elegido.nombrePreferido || 'Alma luminosa',
+      icono: obtenerIconoExperiencia(experienciaId),
+      categoria: obtenerCategoriaExperiencia(experienciaId),
+      runasGastadas: experiencia.runas,
+      runas: experiencia.runas,
+      fecha: solicitud.fechaSolicitud,
+      fechaSolicitud: solicitud.fechaSolicitud,
+      estado: solicitud.estado,
+      contenido: contenidoGenerado, // Para el modal del historial
+      resultado: contenidoGenerado ? {
+        titulo: experiencia.nombre,
+        contenido: contenidoGenerado,
+        fechaGeneracion: new Date().toISOString()
+      } : null
+    });
+
     return res.status(200).json({
       success: true,
       solicitud,
       runasRestantes: elegido.runas,
-      mensaje: `Tu ${experiencia.nombre} está siendo preparada. Recibirás una notificación cuando esté lista.`
+      contenido: contenidoGenerado,
+      mensaje: contenidoGenerado
+        ? `Tu ${experiencia.nombre} está lista.`
+        : `Tu ${experiencia.nombre} está siendo preparada. Recibirás una notificación cuando esté lista.`
     });
 
   } catch (error) {
     console.error('Error en solicitud de experiencia:', error);
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Generar contenido con IA
+// ═══════════════════════════════════════════════════════════════
+async function generarContenidoExperiencia({ tipo, nombre, nombreUsuario, pronombre, datos }) {
+  const prompts = {
+    'susurro_guardian': {
+      system: `Sos un guardián mágico del Bosque de Duendes del Uruguay que tiene un mensaje personal para ${nombreUsuario}. Escribís en primera persona como el guardián. Español rioplatense (vos, tenés). Tono protector, amoroso.`,
+      user: `Generá un susurro del guardián para ${nombreUsuario}. ${datos.pregunta ? `Pregunta: ${datos.pregunta}` : 'Mensaje general de guía.'}. Máximo 500 palabras. Empezá con impacto emocional.`
+    },
+    'mensaje_universo': {
+      system: `Sos el Universo hablando directamente a ${nombreUsuario}. Tu voz es cósmica pero cercana. Español rioplatense.`,
+      user: `Canalizá un mensaje del Universo para ${nombreUsuario}. ${datos.contexto ? `Contexto: ${datos.contexto}` : ''}. 600 palabras máximo.`
+    },
+    'carta_ancestros': {
+      system: `Sos la voz colectiva de los ancestros de ${nombreUsuario}. Transmitís sabiduría de generaciones. Español rioplatense. Tono sabio y amoroso.`,
+      user: `Escribí una carta de los ancestros para ${nombreUsuario}. ${datos.pregunta ? `Tema: ${datos.pregunta}` : 'Mensaje de guía y protección.'}. 800 palabras.`
+    },
+    'estado_guardian': {
+      system: `Sos un canalizador que percibe la energía de los guardianes. Español rioplatense.`,
+      user: `Describí el estado energético del guardián de ${nombreUsuario}. Cómo se siente, qué necesita, qué mensaje tiene. 500 palabras.`
+    },
+    'tirada_runas_3': {
+      system: `Sos una maestra runista del Bosque de Duendes. Canalizás la sabiduría de las runas nórdicas. Español rioplatense.`,
+      user: `Tirada de 3 runas para ${nombreUsuario}. ${datos.pregunta ? `Pregunta: ${datos.pregunta}` : 'Guía general.'}. Incluí nombre de cada runa, significado y consejo. 800 palabras.`
+    },
+    'tirada-runas': {
+      system: `Sos una maestra runista. Canalizás la sabiduría de las runas nórdicas. Español rioplatense.`,
+      user: `Tirada de runas para ${nombreUsuario}. ${datos.pregunta ? `Pregunta: ${datos.pregunta}` : 'Guía general.'}. 800 palabras.`
+    },
+    'lectura_aura': {
+      system: `Sos una lectora de auras del Bosque de Duendes. Percibís los campos energéticos con claridad. Español rioplatense.`,
+      user: `Lectura de aura para ${nombreUsuario}. ${datos.contexto ? `Contexto: ${datos.contexto}` : ''}. Describí colores, estado energético, consejos. 1000 palabras.`
+    },
+    'mision_alma': {
+      system: `Sos una guía espiritual especializada en misión de alma. Español rioplatense. Profundo pero esperanzador.`,
+      user: `Revelá la misión del alma de ${nombreUsuario}. ${datos.fechaNacimiento ? `Nacimiento: ${datos.fechaNacimiento}` : ''}. Incluí propósito, dones, desafíos, guía práctica. 2000 palabras.`
+    }
+  };
+
+  // Prompt genérico si no hay específico
+  const defaultPrompt = {
+    system: `Sos una canalizadora de energía del Bosque de Duendes del Uruguay. Escribís en español rioplatense (vos, tenés). Tu tono es cálido, profundo y empoderador. Pronombre del usuario: ${pronombre}.`,
+    user: `Generá "${nombre}" para ${nombreUsuario}. ${datos.pregunta ? `Pregunta: ${datos.pregunta}` : ''} ${datos.contexto ? `Contexto: ${datos.contexto}` : ''} ${datos.fechaNacimiento ? `Fecha nacimiento: ${datos.fechaNacimiento}` : ''}. Mínimo 600 palabras. Que sea profundo, personal y memorable.`
+  };
+
+  const prompt = prompts[tipo] || defaultPrompt;
+
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4000,
+    system: prompt.system,
+    messages: [{ role: 'user', content: prompt.user }]
+  });
+
+  return response.content[0]?.text || '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Obtener icono de experiencia
+// ═══════════════════════════════════════════════════════════════
+function obtenerIconoExperiencia(tipo) {
+  const iconos = {
+    'susurro_guardian': '👂',
+    'mensaje_universo': '🌌',
+    'carta_ancestros': '📜',
+    'estado_guardian': '✨',
+    'mision_guardian': '🎯',
+    'comunicacion_guardian': '💬',
+    'historia_guardian': '📖',
+    'elemento_dominante': '🌍',
+    'sanacion_elemental': '💚',
+    'elemental_personal': '🌀',
+    'cristal_alma': '💎',
+    'grid_cristales': '💠',
+    'limpieza_cristales': '🧹',
+    'tarot_profundo': '🎴',
+    'oraculo_duendes': '🔮',
+    'carta_año': '📅',
+    'tirada_runas_3': 'ᚱ',
+    'tirada_runas_9': 'ᚱᛏ',
+    'tirada-runas': 'ᚱ',
+    'runa_personal': 'ᚠ',
+    'luna_personal': '🌙',
+    'ciclo_lunar_mes': '🌕',
+    'lectura_aura': '🌈',
+    'corte_cordones': '✂️',
+    'chakras_estado': '🔴',
+    'mision_alma': '🎯',
+    'contratos_alma': '📝',
+    'vidas_pasadas': '🔄',
+    'escudo_protector': '🛡️',
+    'limpieza_casa': '🏠',
+    'deteccion_influencias': '👁️',
+    'lectura_amor_actual': '💕',
+    'compatibilidad_pareja': '💑',
+    'sanar_corazon_roto': '💔',
+    'atraer_amor': '💘',
+    'perfil_numerologico': '🔢',
+    'año_personal_num': '📊',
+    'numerologia_nombre': '#️⃣',
+    'interpretar_sueno': '💭',
+    'diario_onirico': '🌙',
+    'suenos_profeticos': '🔮',
+    'bloqueos_abundancia': '🚧',
+    'ritual_abundancia': '💰',
+    'lectura_prosperidad': '🌟',
+    'lectura_akashicos': '📜',
+    'origen_alma': '⭐',
+    'limpieza_akashica': '✨',
+    'nino_interior': '👶',
+    'sombra_personal': '🌑',
+    'sanacion_linaje': '🌳',
+    'perdon_profundo': '🕊️'
+  };
+  return iconos[tipo] || '✨';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Obtener categoría de experiencia
+// ═══════════════════════════════════════════════════════════════
+function obtenerCategoriaExperiencia(tipo) {
+  const categorias = {
+    'susurro_guardian': 'mensajes',
+    'mensaje_universo': 'mensajes',
+    'carta_ancestros': 'mensajes',
+    'estado_guardian': 'guardianes',
+    'mision_guardian': 'guardianes',
+    'comunicacion_guardian': 'guardianes',
+    'historia_guardian': 'guardianes',
+    'elemento_dominante': 'elementales',
+    'sanacion_elemental': 'elementales',
+    'elemental_personal': 'elementales',
+    'cristal_alma': 'cristales',
+    'grid_cristales': 'cristales',
+    'limpieza_cristales': 'cristales',
+    'tarot_profundo': 'tiradas',
+    'oraculo_duendes': 'tiradas',
+    'carta_año': 'tiradas',
+    'tirada_runas_3': 'tiradas',
+    'tirada_runas_9': 'tiradas',
+    'tirada-runas': 'tiradas',
+    'runa_personal': 'tiradas',
+    'luna_personal': 'astrologia',
+    'ciclo_lunar_mes': 'astrologia',
+    'lectura_aura': 'energia',
+    'corte_cordones': 'energia',
+    'chakras_estado': 'energia',
+    'mision_alma': 'estudios',
+    'contratos_alma': 'estudios',
+    'vidas_pasadas': 'estudios',
+    'escudo_protector': 'proteccion',
+    'limpieza_casa': 'proteccion',
+    'deteccion_influencias': 'proteccion',
+    'lectura_amor_actual': 'amor',
+    'compatibilidad_pareja': 'amor',
+    'sanar_corazon_roto': 'amor',
+    'atraer_amor': 'amor',
+    'perfil_numerologico': 'numerologia',
+    'año_personal_num': 'numerologia',
+    'numerologia_nombre': 'numerologia',
+    'interpretar_sueno': 'suenos',
+    'diario_onirico': 'suenos',
+    'suenos_profeticos': 'suenos',
+    'bloqueos_abundancia': 'abundancia',
+    'ritual_abundancia': 'abundancia',
+    'lectura_prosperidad': 'abundancia',
+    'lectura_akashicos': 'akashicos',
+    'origen_alma': 'akashicos',
+    'limpieza_akashica': 'akashicos',
+    'nino_interior': 'sanacion',
+    'sombra_personal': 'sanacion',
+    'sanacion_linaje': 'sanacion',
+    'perdon_profundo': 'sanacion'
+  };
+  return categorias[tipo] || 'otros';
 }
