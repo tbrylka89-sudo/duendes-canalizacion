@@ -485,3 +485,42 @@ body {
 .error p {
   color: var(--color-texto-suave);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   MI MAGIA - Inputs con fondo oscuro
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Forzar texto claro en todos los inputs de Mi Magia */
+[class*="mi-magia"] input,
+[class*="mi-magia"] textarea,
+[class*="mi-magia"] select,
+body:has([data-page="mi-magia"]) input,
+body:has([data-page="mi-magia"]) textarea,
+body:has([data-page="mi-magia"]) select {
+  color: #fff !important;
+  caret-color: #d4af37 !important;
+}
+
+/* Placeholder más visible */
+[class*="mi-magia"] input::placeholder,
+[class*="mi-magia"] textarea::placeholder,
+body:has([data-page="mi-magia"]) input::placeholder,
+body:has([data-page="mi-magia"]) textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Select options */
+[class*="mi-magia"] select option,
+body:has([data-page="mi-magia"]) select option {
+  background: #1a1a2e !important;
+  color: #fff !important;
+}
+
+/* Autofill fix */
+[class*="mi-magia"] input:-webkit-autofill,
+[class*="mi-magia"] textarea:-webkit-autofill,
+body:has([data-page="mi-magia"]) input:-webkit-autofill,
+body:has([data-page="mi-magia"]) textarea:-webkit-autofill {
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: 0 0 0 1000px rgba(0,0,0,0.35) inset !important;
+}

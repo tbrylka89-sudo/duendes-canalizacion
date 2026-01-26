@@ -3,6 +3,68 @@ import { useState, useEffect, useMemo } from 'react';
 import { API_BASE } from './constants';
 import { InfoTooltip } from './TooltipInfo';
 
+// Mensajes al tocar elementos del jardín
+const MENSAJES_JARDIN = {
+  arbol: [
+    { tipo: 'mistico', texto: '🌳 Los árboles susurran secretos antiguos... pero solo a quienes saben escuchar.' },
+    { tipo: 'gracioso', texto: '🌳 "¿Me rascás la corteza?" - pidió el árbol, pero nadie lo escuchó.' },
+    { tipo: 'senal', texto: '🌳 Cuando un árbol cruza tu camino... bueno, técnicamente vos cruzaste el suyo.' },
+    { tipo: 'mistico', texto: '🌳 Las raíces recuerdan lo que las hojas olvidan.' },
+    { tipo: 'gracioso', texto: '🌳 Este árbol tiene más años que tu última relación estable.' },
+    { tipo: 'senal', texto: '🌳 Señal: Es momento de echar raíces en algo importante.' },
+  ],
+  hongo: [
+    { tipo: 'mistico', texto: '🍄 Los hongos son los mensajeros del bosque... y este tiene algo que decirte.' },
+    { tipo: 'gracioso', texto: '🍄 No, no es ESE tipo de hongo. Pero igual te hace viajar.' },
+    { tipo: 'senal', texto: '🍄 Señal: Lo que buscás está más cerca de lo que pensás.' },
+    { tipo: 'mistico', texto: '🍄 En la oscuridad, los hongos brillan. Como vos en tus peores días.' },
+    { tipo: 'gracioso', texto: '🍄 Fun fact: Los hongos tienen más en común con vos que con las plantas. Piénsalo.' },
+    { tipo: 'senal', texto: '🍄 Este hongo creció justo donde hacía falta. Vos también.' },
+  ],
+  luciernaga: [
+    { tipo: 'mistico', texto: '✨ Las luciérnagas son almas que eligieron seguir brillando.' },
+    { tipo: 'gracioso', texto: '✨ Esta luciérnaga cobra por hora. Aceptá que la magia tiene costos operativos.' },
+    { tipo: 'senal', texto: '✨ Señal: Tu luz interior está más fuerte de lo que creés.' },
+    { tipo: 'mistico', texto: '✨ Cada destello es un deseo que alguien pidió. ¿Cuál es el tuyo?' },
+    { tipo: 'gracioso', texto: '✨ POV: Sos una luciérnaga presumiendo tu LED natural.' },
+    { tipo: 'senal', texto: '✨ Alguien está pensando en vos en este momento. La luciérnaga lo confirma.' },
+  ],
+  luna: [
+    { tipo: 'mistico', texto: '🌙 La luna ve todo. Y te guiña un ojo cómplice.' },
+    { tipo: 'gracioso', texto: '🌙 La luna: literalmente una roca flotante que controla los océanos y tu humor.' },
+    { tipo: 'senal', texto: '🌙 Señal: Lo que sembraste en luna nueva está por florecer.' },
+    { tipo: 'mistico', texto: '🌙 Cada fase lunar es un recordatorio: todo cambia, incluso vos.' },
+  ],
+  sol: [
+    { tipo: 'mistico', texto: '☀️ El sol no pide permiso para brillar. Vos tampoco deberías.' },
+    { tipo: 'gracioso', texto: '☀️ El sol: quemándote mientras te da vitamina D. Relación tóxica pero necesaria.' },
+    { tipo: 'senal', texto: '☀️ Señal: Hoy es un buen día para empezar eso que venís postergando.' },
+    { tipo: 'mistico', texto: '☀️ Cada amanecer es el universo diciendo: "Dale, otra oportunidad".' },
+  ],
+  estrella: [
+    { tipo: 'mistico', texto: '⭐ Esa estrella brilló hace millones de años solo para que vos la vieras ahora.' },
+    { tipo: 'gracioso', texto: '⭐ Las estrellas: básicamente chismes del universo que llegan con delay.' },
+    { tipo: 'senal', texto: '⭐ Señal: Pedí un deseo. Rápido. No, ya pasó. Bueno, la próxima.' },
+    { tipo: 'mistico', texto: '⭐ Tu nombre está escrito en una constelación que todavía no descubrieron.' },
+  ],
+  nube: [
+    { tipo: 'mistico', texto: '☁️ Las nubes son pensamientos del cielo. Este parece un buen día.' },
+    { tipo: 'gracioso', texto: '☁️ Esa nube tiene forma de... nube. Profundo, ¿no?' },
+    { tipo: 'senal', texto: '☁️ Señal: Dejá ir lo que no podés controlar. Como las nubes, que se van solas.' },
+  ],
+  pajaro: [
+    { tipo: 'mistico', texto: '🐦 Los pájaros llevan mensajes entre mundos. Este trae uno para vos.' },
+    { tipo: 'gracioso', texto: '🐦 Este pájaro está juzgando tu outfit. No te lo tomes personal.' },
+    { tipo: 'senal', texto: '🐦 Señal: Libertad. Es hora de soltar algo que te ata.' },
+  ],
+};
+
+const getMensajeRandom = (tipo) => {
+  const mensajes = MENSAJES_JARDIN[tipo];
+  if (!mensajes) return null;
+  return mensajes[Math.floor(Math.random() * mensajes.length)];
+};
+
 export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
   const [gamificacion, setGamificacion] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -11,6 +73,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
   const [resultado, setResultado] = useState(null);
   const [animacion, setAnimacion] = useState('idle');
   const [hora, setHora] = useState(12); // Default a mediodía para SSR
+  const [mensajeElemento, setMensajeElemento] = useState(null); // Mensaje al tocar elementos
 
   // Setear hora real solo en cliente
   useEffect(() => {
@@ -98,6 +161,16 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
   const cerrarResultado = () => {
     setResultado(null);
     setAnimacion('idle');
+  };
+
+  // Handler para tocar elementos del jardín
+  const tocarElemento = (tipo, e) => {
+    e?.stopPropagation();
+    const mensaje = getMensajeRandom(tipo);
+    if (mensaje) {
+      setMensajeElemento(mensaje);
+      setTimeout(() => setMensajeElemento(null), 4000);
+    }
   };
 
   const puedeReclamar = gamificacion?.puedeReclamarCofre;
@@ -428,7 +501,48 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.8; }
         }
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+          15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+        @keyframes mushroomBounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(-6px); }
+        }
+        @keyframes mushroomGlow {
+          0%, 100% { filter: drop-shadow(0 0 15px rgba(255,100,150,0.5)); }
+          50% { filter: drop-shadow(0 0 30px rgba(255,150,200,0.8)); }
+        }
       `}</style>
+
+      {/* Toast mensaje de elemento */}
+      {mensajeElemento && (
+        <div style={{
+          position: 'absolute',
+          top: '50px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: mensajeElemento.tipo === 'gracioso'
+            ? 'linear-gradient(135deg, rgba(255,200,100,0.95) 0%, rgba(255,150,50,0.95) 100%)'
+            : mensajeElemento.tipo === 'senal'
+              ? 'linear-gradient(135deg, rgba(100,200,255,0.95) 0%, rgba(50,150,255,0.95) 100%)'
+              : 'linear-gradient(135deg, rgba(150,100,200,0.95) 0%, rgba(100,50,150,0.95) 100%)',
+          color: '#fff',
+          padding: '12px 20px',
+          borderRadius: '16px',
+          fontSize: '0.85rem',
+          maxWidth: '90%',
+          textAlign: 'center',
+          zIndex: 100,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          animation: 'fadeInOut 4s ease-in-out',
+          lineHeight: 1.4,
+        }}>
+          {mensajeElemento.texto}
+        </div>
+      )}
 
       {/* Modal de resultado */}
       {resultado && !resultado.error && (
@@ -487,10 +601,21 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
         {(esDeNoche || momentoDia === 'amanecer' || momentoDia === 'atardecer') && estrellas.map((star, i) => (
           <div
             key={`star-${i}`}
+            onClick={(e) => tocarElemento('estrella', e)}
             style={{
               position: 'absolute',
               top: star.top,
               left: star.left,
+              width: `${star.size * 3}px`,
+              height: `${star.size * 3}px`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 1,
+            }}
+          >
+            <div style={{
               width: `${star.size}px`,
               height: `${star.size}px`,
               background: '#fff',
@@ -498,9 +623,8 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
               opacity: momentoDia === 'noche' ? 1 : 0.5,
               animation: `twinkle ${star.duration}s infinite`,
               animationDelay: `${star.delay}s`,
-              zIndex: 1,
-            }}
-          />
+            }} />
+          </div>
         ))}
 
         {/* Sol (día) */}
