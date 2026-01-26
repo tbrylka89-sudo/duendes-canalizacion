@@ -945,9 +945,10 @@ export async function POST(request) {
       resultado: null
     });
 
-    // Si es instantáneo o se pidió generación inmediata, generar ahora
+    // SIEMPRE generar el contenido con IA inmediatamente
+    // (El tiempo de espera es solo para la experiencia del usuario, pero el contenido se genera ahora)
     let resultado = null;
-    if ((experiencia.tiempoMs === 0 || generarInmediato) && experiencia.generaIA) {
+    if (experiencia.generaIA) {
       try {
         resultado = await generarExperienciaIA(solicitud, experiencia);
         solicitud.estado = 'listo';

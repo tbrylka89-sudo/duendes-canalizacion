@@ -47,6 +47,7 @@ function duendes_render_tienda_tarot() {
 
     // Categorias principales - con textos neuroventa
     $categorias = [
+        ['slug' => 'todos', 'nombre' => 'Ver Todos', 'desc' => 'Todos los guardianes', 'color' => '#c9a227', 'icono' => '🌟'],
         ['slug' => 'proteccion', 'nombre' => 'Protección', 'desc' => 'Algo te drena', 'color' => '#3b82f6', 'icono' => '🛡️'],
         ['slug' => 'amor', 'nombre' => 'Amor', 'desc' => 'El corazón pide', 'color' => '#ec4899', 'icono' => '💜'],
         ['slug' => 'dinero-abundancia-negocios', 'nombre' => 'Abundancia', 'desc' => 'No alcanza', 'color' => '#f59e0b', 'icono' => '✨'],
@@ -833,10 +834,18 @@ function duendes_render_tienda_tarot() {
             ];
 
             foreach ($categorias as $cat):
-                $term = get_term_by('slug', $cat['slug'], 'product_cat');
-                $count = $term ? $term->count : 0;
-                $link = $term ? get_term_link($term) : '#';
-                $is_active = $categoria_actual && $categoria_actual->slug === $cat['slug'];
+                // "Ver Todos" es especial - apunta a /shop/
+                if ($cat['slug'] === 'todos') {
+                    $term = null;
+                    $count = wp_count_posts('product')->publish;
+                    $link = get_permalink(wc_get_page_id('shop'));
+                    $is_active = !$categoria_actual; // Activo si NO hay categoría seleccionada
+                } else {
+                    $term = get_term_by('slug', $cat['slug'], 'product_cat');
+                    $count = $term ? $term->count : 0;
+                    $link = $term ? get_term_link($term) : '#';
+                    $is_active = $categoria_actual && $categoria_actual->slug === $cat['slug'];
+                }
 
                 // Determinar key de categoria
                 $cat_key = 'proteccion';
