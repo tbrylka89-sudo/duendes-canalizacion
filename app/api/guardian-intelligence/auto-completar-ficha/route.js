@@ -125,58 +125,97 @@ export async function POST(request) {
     // Buscar en base de datos
     const productoEncontrado = buscarProducto(nombre);
 
-    if (!productoEncontrado) {
-      return NextResponse.json({
-        success: false,
-        error: `No se encontró "${nombre}" en la base de datos. Verificá el nombre.`,
-        sugerencia: 'Podés completar los campos manualmente o agregar el producto a la base de datos.'
-      }, { status: 404, headers: corsHeaders });
+    let datosBasicos;
+    let fuenteDatos = 'bd';
+
+    if (productoEncontrado) {
+      // Construir datos básicos desde BD
+      const especie = inferirEspecie(productoEncontrado, nombre);
+      const esUnico = determinarUnico({ ...productoEncontrado, especie });
+
+      datosBasicos = {
+        genero: productoEncontrado.genero,
+        especie: especie,
+        familia: productoEncontrado.familia || '',
+        categoria: productoEncontrado.categoria,
+        tipo_tamano: productoEncontrado.tipo_tamano,
+        tamano_cm: productoEncontrado.tamano_cm,
+        es_unico: esUnico,
+        accesorios: productoEncontrado.accesorios || ''
+      };
+    } else {
+      // NO está en BD - inferir datos básicos del nombre e historia
+      fuenteDatos = 'inferido';
+      const nombreLower = nombre.toLowerCase();
+
+      // Inferir género del nombre
+      let generoInferido = 'M';
+      if (nombreLower.includes('pixie') || nombreLower.match(/a$/) && !nombreLower.match(/(ra|la|na|ta|da|sa)$/)) {
+        generoInferido = 'F';
+      }
+
+      // Inferir especie
+      let especieInferida = 'duende';
+      if (nombreLower.includes('pixie')) especieInferida = 'pixie';
+      else if (nombreLower.includes('vikingo') || nombreLower.includes('vikinga')) especieInferida = 'vikingo';
+      else if (nombreLower.includes('bruja') || nombreLower.includes('brujo')) especieInferida = 'bruja';
+      else if (nombreLower.includes('hada')) especieInferida = 'hada';
+      else if (nombreLower.includes('elfo') || nombreLower.includes('elfa')) especieInferida = 'elfo';
+
+      // Inferir categoría de la historia si existe
+      let categoriaInferida = 'proteccion';
+      if (historia) {
+        const historiaLower = historia.toLowerCase();
+        if (historiaLower.includes('abundancia') || historiaLower.includes('prosperidad') || historiaLower.includes('dinero')) categoriaInferida = 'abundancia';
+        else if (historiaLower.includes('amor') || historiaLower.includes('corazón') || historiaLower.includes('pareja')) categoriaInferida = 'amor';
+        else if (historiaLower.includes('sanación') || historiaLower.includes('sanar') || historiaLower.includes('curar')) categoriaInferida = 'sanacion';
+        else if (historiaLower.includes('sabiduría') || historiaLower.includes('conocimiento')) categoriaInferida = 'sabiduria';
+      }
+
+      datosBasicos = {
+        genero: generoInferido,
+        especie: especieInferida,
+        familia: '',
+        categoria: categoriaInferida,
+        tipo_tamano: 'mediano',
+        tamano_cm: 23,
+        es_unico: 'unico',
+        accesorios: ''
+      };
     }
-
-    // Construir datos básicos
-    const especie = inferirEspecie(productoEncontrado, nombre);
-    const esUnico = determinarUnico({ ...productoEncontrado, especie });
-
-    const datosBasicos = {
-      genero: productoEncontrado.genero,
-      especie: especie,
-      familia: productoEncontrado.familia || '',
-      categoria: productoEncontrado.categoria,
-      tipo_tamano: productoEncontrado.tipo_tamano,
-      tamano_cm: productoEncontrado.tamano_cm,
-      es_unico: esUnico,
-      accesorios: productoEncontrado.accesorios || ''
-    };
 
     // Si solo quieren datos de base de datos, retornar ahora
     if (soloBaseDatos || !historia) {
       return NextResponse.json({
         success: true,
-        encontrado: true,
-        producto_db: productoEncontrado.nombre,
+        encontrado: !!productoEncontrado,
+        producto_db: productoEncontrado?.nombre || nombre,
         datosBasicos,
-        mensaje: 'Datos encontrados en base de datos. Para generar ficha IA, incluí la historia.'
+        fuente: fuenteDatos,
+        mensaje: productoEncontrado
+          ? 'Datos encontrados en base de datos. Para generar ficha IA, incluí la historia.'
+          : 'Producto no encontrado en BD, datos inferidos. Completá manualmente los campos básicos y luego usá "Solo Ficha IA".'
       }, { headers: corsHeaders });
     }
 
     // Generar ficha IA
     const anthropic = new Anthropic();
 
-    const infoEspecie = fichaConfig.especies.clasicas.find(e => e.id === especie) ||
-                        fichaConfig.especies.exclusivas.find(e => e.id === especie);
-    const infoCategoria = fichaConfig.categorias[productoEncontrado.categoria];
+    const infoEspecie = fichaConfig.especies?.clasicas?.find(e => e.id === datosBasicos.especie) ||
+                        fichaConfig.especies?.exclusivas?.find(e => e.id === datosBasicos.especie);
+    const infoCategoria = fichaConfig.categorias?.[datosBasicos.categoria];
 
     const prompt = `Sos un experto en crear fichas de personalidad para guardianes místicos de "Duendes del Uruguay".
 Basándote en la historia y datos de este guardián, generá una ficha coherente con su esencia.
 
 GUARDIÁN:
 - Nombre: ${nombre}
-- Especie: ${especie} ${infoEspecie ? `(${infoEspecie.descripcion})` : ''}
-- Familia/Estilo: ${productoEncontrado.familia || 'N/A'}
-- Categoría: ${productoEncontrado.categoria} ${infoCategoria ? `(${infoCategoria.descripcion})` : ''}
-- Género: ${productoEncontrado.genero === 'F' ? 'Femenino' : 'Masculino'}
-- Tamaño: ${productoEncontrado.tamano_cm} cm
-- Accesorios: ${productoEncontrado.accesorios || 'No especificados'}
+- Especie: ${datosBasicos.especie} ${infoEspecie ? `(${infoEspecie.descripcion || ''})` : ''}
+- Familia/Estilo: ${datosBasicos.familia || 'N/A'}
+- Categoría: ${datosBasicos.categoria} ${infoCategoria ? `(${infoCategoria.descripcion || ''})` : ''}
+- Género: ${datosBasicos.genero === 'F' ? 'Femenino' : 'Masculino'}
+- Tamaño: ${datosBasicos.tamano_cm} cm
+- Accesorios: ${datosBasicos.accesorios || 'No especificados'}
 
 HISTORIA:
 ${historia}
@@ -228,9 +267,10 @@ Respondé SOLO con el JSON.`;
     } catch (parseError) {
       return NextResponse.json({
         success: true,
-        encontrado: true,
+        encontrado: !!productoEncontrado,
         datosBasicos,
         fichaIA: null,
+        fuente: fuenteDatos,
         error_ia: 'Error parseando respuesta de IA'
       }, { headers: corsHeaders });
     }
@@ -245,11 +285,14 @@ Respondé SOLO con el JSON.`;
 
     return NextResponse.json({
       success: true,
-      encontrado: true,
-      producto_db: productoEncontrado.nombre,
+      encontrado: !!productoEncontrado,
+      producto_db: productoEncontrado?.nombre || nombre,
       datosBasicos,
       fichaIA,
-      mensaje: 'Ficha completada automáticamente'
+      fuente: fuenteDatos,
+      mensaje: productoEncontrado
+        ? 'Ficha completada automáticamente desde BD + IA'
+        : 'Ficha generada con IA (producto no estaba en BD)'
     }, { headers: corsHeaders });
 
   } catch (error) {
