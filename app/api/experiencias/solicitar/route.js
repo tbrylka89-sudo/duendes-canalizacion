@@ -609,11 +609,12 @@ export async function POST(request) {
     const contextoCompleto = contexto || datos?.contexto || datos?.pregunta || '';
     const preguntaCompleta = preguntaEspecifica || datos?.pregunta || '';
 
-    // Buscar usuario en ambas keys
-    let userKey = `user:${emailNorm}`;
+    // Buscar usuario PRIMERO en elegido: (que es lo que muestra el frontend)
+    // Luego en user: como fallback para compatibilidad
+    let userKey = `elegido:${emailNorm}`;
     let usuario = await kv.get(userKey);
     if (!usuario) {
-      userKey = `elegido:${emailNorm}`;
+      userKey = `user:${emailNorm}`;
       usuario = await kv.get(userKey);
     }
 
@@ -753,6 +754,42 @@ export async function POST(request) {
           // No fallar la solicitud por error de gamificación
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // GUARDAR EN HISTORIAL (para que aparezca en "Mis Lecturas")
+        // ═══════════════════════════════════════════════════════════════
+        try {
+          const historial = await kv.get(`historial:${emailNorm}`) || [];
+          historial.unshift({
+            id: solicitudId,
+            lecturaId: expId,
+            nombre: experiencia.nombre,
+            icono: obtenerIconoExperiencia(expId),
+            categoria: determinarCategoria(expId),
+            runas: experiencia.runas,
+            fecha: new Date().toISOString(),
+            estado: 'completado',
+            contenido: resultado?.contenido || null
+          });
+          await kv.set(`historial:${emailNorm}`, historial.slice(0, 100));
+
+          // También guardar lectura individual para el modal
+          await kv.set(`lectura:${solicitudId}`, {
+            id: solicitudId,
+            lecturaId: expId,
+            nombre: experiencia.nombre,
+            icono: obtenerIconoExperiencia(expId),
+            categoria: determinarCategoria(expId),
+            email: emailNorm,
+            runas: experiencia.runas,
+            fecha: new Date().toISOString(),
+            estado: 'completado',
+            contenido: resultado?.contenido || null,
+            resultado: resultado
+          });
+        } catch (histError) {
+          console.error('Error guardando en historial:', histError);
+        }
+
       } catch (iaError) {
         console.error('Error generando con IA:', iaError);
         solicitud.estado = 'pendiente_revision';
@@ -846,11 +883,11 @@ export async function GET(request) {
       }, { headers: CORS_HEADERS });
     }
 
-    // Buscar usuario para historial
-    let userKey = `user:${emailNorm}`;
+    // Buscar usuario para historial (primero elegido: que es lo que muestra el frontend)
+    let userKey = `elegido:${emailNorm}`;
     let usuario = await kv.get(userKey);
     if (!usuario) {
-      userKey = `elegido:${emailNorm}`;
+      userKey = `user:${emailNorm}`;
       usuario = await kv.get(userKey);
     }
 
@@ -1404,4 +1441,72 @@ Que sea útil, sanador y memorable para quien lo recibe.`;
     palabras,
     fechaGeneracion: new Date().toISOString()
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Obtener icono de experiencia
+// ═══════════════════════════════════════════════════════════════
+function obtenerIconoExperiencia(tipo) {
+  const iconos = {
+    'susurro_guardian': '👂',
+    'mensaje_universo': '🌌',
+    'carta_ancestros': '📜',
+    'estado_guardian': '✨',
+    'mision_guardian': '🎯',
+    'comunicacion_guardian': '💬',
+    'historia_guardian': '📖',
+    'elemento_dominante': '🌍',
+    'sanacion_elemental': '💚',
+    'elemental_personal': '🌀',
+    'cristal_alma': '💎',
+    'grid_cristales': '💠',
+    'limpieza_cristales': '🧹',
+    'tarot_profundo': '🎴',
+    'oraculo_duendes': '🔮',
+    'carta_año': '📅',
+    'tirada_3_runas': 'ᚱ',
+    'tirada_runas_3': 'ᚱ',
+    'tirada_5_runas': 'ᚱᛏ',
+    'tirada_7_runas': 'ᚱᛏᚠ',
+    'tirada_runas_9': 'ᚱᛏ',
+    'tirada-runas': 'ᚱ',
+    'runa_personal': 'ᚠ',
+    'luna_personal': '🌙',
+    'ciclo_lunar_mes': '🌕',
+    'lectura_aura': '🌈',
+    'corte_cordones': '✂️',
+    'chakras_estado': '🔴',
+    'mision_alma': '🎯',
+    'contratos_alma': '📝',
+    'vidas_pasadas': '🔄',
+    'escudo_protector': '🛡️',
+    'limpieza_casa': '🏠',
+    'deteccion_influencias': '👁️',
+    'consejo_bosque': '🌲',
+    'energia_dia': '☀️',
+    'mensaje_dia': '📨',
+    'oraculo_elementales': '🌍',
+    'mapa_energia': '🗺️',
+    'ritual_mes': '🕯️',
+    'numerologia_personal': '🔢',
+    'tarot_simple': '🃏',
+    'mensaje_guardian': '💬',
+    'carta_astral_esencial': '⭐',
+    'lectura_año_personal': '📅',
+    'conexion_guardian': '💚',
+    'estudio_alma': '👁️',
+    'conexion_ancestros': '🌳',
+    'registros_akashicos': '📜',
+    'proposito_vida': '🎯',
+    'gran_estudio_anual': '📚',
+    'susurro-guardian': '👂',
+    'oraculo-mes': '🔮',
+    'gran-oraculo': '🌟',
+    'lectura-alma': '👁️',
+    'registros-akashicos': '📜',
+    'carta-ancestral': '🌳',
+    'mapa-energetico': '🗺️',
+    'pregunta-especifica': '❓'
+  };
+  return iconos[tipo] || '✨';
 }
