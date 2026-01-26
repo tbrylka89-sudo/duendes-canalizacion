@@ -139,54 +139,226 @@ const estilos = `
   font-size: 0.9rem;
 }
 
-.cofre-icono {
-  font-size: 4rem;
-  margin: 1rem 0;
+/* ═══════════════════════════════════════════════════════════════ */
+/* COFRE VISUAL - Diseño CSS de cofre de tesoro */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.cofre-visual {
+  width: 100px;
+  height: 80px;
+  margin: 1.5rem auto;
+  position: relative;
+  perspective: 500px;
+  transition: transform 0.3s ease;
+}
+
+.cofre-visual.clickeable {
   cursor: pointer;
-  transition: all 0.3s ease;
+}
+
+.cofre-visual.clickeable:hover {
+  transform: scale(1.05);
+}
+
+/* Tapa del cofre */
+.cofre-tapa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 35px;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+  z-index: 2;
+}
+
+.cofre-tapa-frente {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #c9a227 0%, #8b6914 50%, #6b5210 100%);
+  border-radius: 50% 50% 0 0;
+  border: 3px solid #d4af37;
+  border-bottom: none;
+  box-shadow: inset 0 10px 20px rgba(255,255,255,0.2), inset 0 -5px 10px rgba(0,0,0,0.3);
   position: relative;
 }
 
-.cofre-icono.cerrado:hover {
-  transform: scale(1.1);
+.cofre-tapa-frente::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 15px;
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+  border-radius: 3px;
+  border: 2px solid #8b6914;
 }
 
-.cofre-icono .cofre-cerrado {
-  display: inline-block;
-  animation: float 2s ease-in-out infinite;
-}
-
-.cofre-icono .cofre-abierto {
-  opacity: 0.5;
-}
-
-.cofre-icono.girando .cofre-rueda {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto;
-  background: conic-gradient(
-    #d4af37 0deg 72deg,
-    #1a1a2e 72deg 144deg,
-    #d4af37 144deg 216deg,
-    #1a1a2e 216deg 288deg,
-    #d4af37 288deg 360deg
-  );
+.cofre-tapa-top {
+  position: absolute;
+  top: -15px;
+  left: 10%;
+  width: 80%;
+  height: 20px;
+  background: linear-gradient(180deg, #d4af37, #a08020);
   border-radius: 50%;
-  animation: spinWheel 2s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid var(--color-dorado);
-  box-shadow: 0 0 20px rgba(212,175,55,0.5);
+  transform: rotateX(70deg);
 }
 
-@keyframes spinWheel {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(1440deg); }
+/* Cuerpo del cofre */
+.cofre-cuerpo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(180deg, #8b6914 0%, #6b5210 30%, #4a3a0e 100%);
+  border: 3px solid #d4af37;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: inset 0 5px 15px rgba(255,255,255,0.1), inset 0 -10px 20px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.3);
 }
 
-.rueda-inner {
-  display: none;
+.cofre-cerradura {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 20px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border-radius: 3px 3px 8px 8px;
+  border: 2px solid #d4af37;
+}
+
+.cofre-cerradura::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #d4af37;
+  border-radius: 50%;
+}
+
+.cofre-brillo {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  width: 25px;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  border-radius: 50%;
+  transform: rotate(-20deg);
+}
+
+/* Animación de apertura */
+.cofre-visual.abierto .cofre-tapa,
+.cofre-visual.girando .cofre-tapa {
+  transform: rotateX(-110deg);
+}
+
+/* Luz saliendo del cofre abierto */
+.cofre-luz {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 80px;
+  background: linear-gradient(180deg, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0) 100%);
+  clip-path: polygon(20% 100%, 80% 100%, 100% 0%, 0% 0%);
+  animation: luzPulso 1s ease-in-out infinite;
+}
+
+@keyframes luzPulso {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Partículas mágicas */
+.cofre-particulas {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cofre-particulas span {
+  position: absolute;
+  font-size: 1.2rem;
+  animation: particula 2s ease-out infinite;
+}
+
+.cofre-particulas span:nth-child(1) { left: 20%; animation-delay: 0s; }
+.cofre-particulas span:nth-child(2) { left: 40%; animation-delay: 0.2s; }
+.cofre-particulas span:nth-child(3) { left: 60%; animation-delay: 0.4s; }
+.cofre-particulas span:nth-child(4) { left: 30%; animation-delay: 0.6s; }
+.cofre-particulas span:nth-child(5) { left: 70%; animation-delay: 0.8s; }
+
+@keyframes particula {
+  0% { top: 50%; opacity: 1; transform: scale(0.5); }
+  100% { top: -30px; opacity: 0; transform: scale(1); }
+}
+
+/* Efecto de shake cuando está disponible */
+.cofre-visual.cerrado.clickeable {
+  animation: cofreShake 3s ease-in-out infinite;
+}
+
+@keyframes cofreShake {
+  0%, 90%, 100% { transform: rotate(0deg); }
+  92% { transform: rotate(-3deg); }
+  94% { transform: rotate(3deg); }
+  96% { transform: rotate(-2deg); }
+  98% { transform: rotate(2deg); }
+}
+
+/* Cofre reclamado (gris) */
+.cofre-box.reclamado .cofre-tapa-frente {
+  background: linear-gradient(180deg, #888 0%, #666 50%, #555 100%);
+  border-color: #999;
+}
+
+.cofre-box.reclamado .cofre-cuerpo {
+  background: linear-gradient(180deg, #666 0%, #555 30%, #444 100%);
+  border-color: #999;
+}
+
+.cofre-box.reclamado .cofre-cerradura {
+  border-color: #999;
+}
+
+.cofre-box.reclamado .cofre-visual {
+  opacity: 0.6;
+}
+
+/* Mini cofre para el modal */
+.cofre-mini {
+  width: 60px;
+  height: 50px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cofre-mini .cofre-tapa {
+  height: 22px;
+}
+
+.cofre-mini .cofre-cuerpo {
+  height: 30px;
+}
+
+.cofre-mini.abierto .cofre-tapa {
+  transform: rotateX(-110deg);
 }
 
 .cofre-info {
@@ -336,9 +508,21 @@ const estilos = `
 }
 
 .cofre-icono-grande {
-  font-size: 4rem;
   margin-bottom: 1rem;
   animation: bounce 0.6s ease;
+}
+
+.cofre-icono-grande .cofre-mini {
+  width: 80px;
+  height: 65px;
+}
+
+.cofre-icono-grande .cofre-mini .cofre-tapa {
+  height: 28px;
+}
+
+.cofre-icono-grande .cofre-mini .cofre-cuerpo {
+  height: 40px;
 }
 
 @keyframes bounce {

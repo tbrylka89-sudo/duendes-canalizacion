@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { API_BASE } from './constants';
+import { InfoTooltip } from './TooltipInfo';
 
 export default function CofreDiario({ usuario, token, onRunasGanadas }) {
   const [gamificacion, setGamificacion] = useState(null);
@@ -112,7 +113,12 @@ export default function CofreDiario({ usuario, token, onRunasGanadas }) {
           <div className="cofre-modal" onClick={e => e.stopPropagation()}>
             <div className="cofre-modal-glow"></div>
             <div className="cofre-modal-content">
-              <div className="cofre-icono-grande cofre-abierto-icono">📦</div>
+              <div className="cofre-icono-grande cofre-abierto-icono">
+                <div className="cofre-mini abierto">
+                  <div className="cofre-tapa"><div className="cofre-tapa-frente"></div></div>
+                  <div className="cofre-cuerpo"></div>
+                </div>
+              </div>
               <h3>¡Cofre Abierto!</h3>
               <div className="cofre-recompensas">
                 <div className="cofre-recompensa principal">
@@ -152,7 +158,9 @@ export default function CofreDiario({ usuario, token, onRunasGanadas }) {
 
       <div className={`cofre-box ${puedeReclamar ? 'disponible' : 'reclamado'} ${animacion}`}>
         <div className="cofre-header">
-          <h3>Cofre Diario</h3>
+          <InfoTooltip tipo="cofreDiario">
+            <h3>Cofre Diario</h3>
+          </InfoTooltip>
           {racha > 0 && (
             <div className="cofre-racha">
               <span className="racha-fuego">🔥</span>
@@ -160,15 +168,31 @@ export default function CofreDiario({ usuario, token, onRunasGanadas }) {
             </div>
           )}
         </div>
-        <div className={`cofre-icono ${animacion}`} onClick={puedeReclamar ? reclamarCofre : undefined}>
-          {animacion === 'girando' ? (
-            <div className="cofre-rueda"><div className="rueda-inner"><span>1</span><span>2</span><span>3</span><span>5</span><span>10</span></div></div>
-          ) : puedeReclamar ? (
-            <span className="cofre-cerrado">📦</span>
-          ) : (
-            <span className="cofre-abierto">📭</span>
+
+        {/* Cofre visual CSS */}
+        <div
+          className={`cofre-visual ${animacion} ${puedeReclamar ? 'clickeable' : ''}`}
+          onClick={puedeReclamar ? reclamarCofre : undefined}
+        >
+          <div className="cofre-tapa">
+            <div className="cofre-tapa-frente"></div>
+            <div className="cofre-tapa-top"></div>
+          </div>
+          <div className="cofre-cuerpo">
+            <div className="cofre-cerradura"></div>
+            <div className="cofre-brillo"></div>
+          </div>
+          {animacion === 'girando' && (
+            <div className="cofre-particulas">
+              <span>✨</span><span>✨</span><span>✨</span>
+              <span>⭐</span><span>⭐</span>
+            </div>
+          )}
+          {animacion === 'abierto' && (
+            <div className="cofre-luz"></div>
           )}
         </div>
+
         <div className="cofre-info">
           {puedeReclamar ? (
             <>
