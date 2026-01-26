@@ -952,17 +952,18 @@ function duendes_render_producto_epico() {
 
             <!-- INFO PRODUCTO -->
             <div class="info-producto">
-                <div class="producto-precio">
-                    <div class="precio-principal" id="precio-mostrar">$<?php echo number_format($precio_uyu, 0, ',', '.'); ?> UYU</div>
-                    <div class="precio-secundario">o $<?php echo number_format($precio_usd, 0); ?> USD</div>
+                <div class="producto-precio" data-precio-usd="<?php echo $precio_usd; ?>" data-precio-uyu="<?php echo intval($precio_uyu); ?>">
+                    <!-- Precio por defecto USD, el JS lo cambiará según geolocalización -->
+                    <div class="precio-principal" id="precio-mostrar">$<?php echo number_format($precio_usd, 0); ?> USD</div>
+                    <div class="precio-secundario" style="display:none;">Calculando precio local...</div>
                 </div>
 
                 <a href="<?php echo esc_url($product->add_to_cart_url()); ?>" class="btn-sellar-pacto">
                     Sellar el Pacto
                 </a>
 
-                <button class="btn-sena" onclick="mostrarModalSena()">
-                    Reservar con seña (30% = $<?php echo number_format($precio_uyu * 0.3, 0, ',', '.'); ?>)
+                <button class="btn-sena" onclick="mostrarModalSena()" data-sena-usd="<?php echo round($precio_usd * 0.3); ?>" data-sena-uyu="<?php echo round($precio_uyu * 0.3); ?>">
+                    Reservar con seña (30% = $<?php echo number_format($precio_usd * 0.3, 0); ?> USD)
                 </button>
 
                 <div class="garantias">
@@ -1238,15 +1239,19 @@ function duendes_render_producto_epico() {
     // Geolocalizar precio
     (async function() {
         try {
+            console.log('[Duendes] Iniciando geolocalización...');
             const res = await fetch('https://ipapi.co/json/');
             const data = await res.json();
             const pais = data.country_code;
+            console.log('[Duendes] País detectado:', pais);
 
             const precioUSD = <?php echo $precio_usd; ?>;
             const precioUYU_real = <?php echo intval($precio_uyu); ?>; // Precio REAL del producto
+            console.log('[Duendes] Precios - USD:', precioUSD, 'UYU:', precioUYU_real);
 
             // Si es Uruguay: mostrar precio en pesos (el real del producto)
             if (pais === 'UY') {
+                console.log('[Duendes] Mostrando precio en pesos uruguayos');
                 document.getElementById('precio-mostrar').textContent =
                     '$' + precioUYU_real.toLocaleString('es-UY') + ' pesos';
 

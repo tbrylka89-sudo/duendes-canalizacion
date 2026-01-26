@@ -16,6 +16,7 @@ import ejecutarTool from '@/lib/tito/tool-executor';
 import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
 import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
+import { detectarObjecion, getInstruccionesObjecion } from '@/lib/tito/objeciones';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -394,7 +395,8 @@ export async function POST(request) {
       history,
       esAdmin = false,
       usuario = null, // Info del usuario logueado en WordPress
-      pais_cliente = null // País enviado desde el frontend (si ya geolocalizó)
+      pais_cliente = null, // País enviado desde el frontend (si ya geolocalizó)
+      contexto = null // Contexto del producto que está viendo (FASE 1 del roadmap)
     } = body;
 
     const msg = mensaje || message || '';
@@ -491,6 +493,41 @@ export async function POST(request) {
       contextoCliente += `- Moneda: ${infoPaisGeo.moneda}\n`;
       contextoCliente += `- IMPORTANTE: YA SABÉS DE QUÉ PAÍS ES. Cuando muestres productos, usa "precio_mostrar" que ya viene en la moneda correcta.\n`;
       contextoCliente += `- NO preguntes "¿de qué país sos?" - YA LO DETECTASTE.\n`;
+    }
+
+    // Información del producto que está mirando AHORA
+    if (contexto?.producto) {
+      contextoCliente += `\n📍 PRODUCTO QUE ESTÁ VIENDO AHORA:\n`;
+      contextoCliente += `- Guardián: ${contexto.producto.nombre}\n`;
+      if (contexto.producto.precio) {
+        contextoCliente += `- Precio: ${contexto.producto.precio}\n`;
+      }
+      if (contexto.producto.url) {
+        contextoCliente += `- URL: ${contexto.producto.url}\n`;
+      }
+      contextoCliente += `\n⚡ INSTRUCCIÓN CRÍTICA: Este cliente está MIRANDO este guardián específico.\n`;
+      contextoCliente += `- Cuando pregunte "contame más" o similar, HABLÁ DE ESTE GUARDIÁN.\n`;
+      contextoCliente += `- NO preguntes "¿cuál te interesa?" o "¿de cuál me hablás?" - YA SABÉS CUÁL.\n`;
+      contextoCliente += `- Aprovechá para crear conexión emocional con ESTE guardián específico.\n`;
+    }
+
+    // Información de la página actual
+    if (contexto?.pagina) {
+      contextoCliente += `\n🌐 Página actual: ${contexto.pagina}\n`;
+      if (contexto.pagina === 'carrito' && contexto.carrito > 0) {
+        contextoCliente += `🛒 TIENE ${contexto.carrito} PRODUCTO(S) EN CARRITO - ¡Oportunidad de cierre!\n`;
+      }
+      if (contexto.pagina === 'checkout') {
+        contextoCliente += `💳 ESTÁ EN CHECKOUT - Solo ayudá si tiene dudas, no interrumpas.\n`;
+      }
+    }
+
+    // Detectar objeciones en el mensaje actual
+    const objecionDetectada = detectarObjecion(msg);
+    if (objecionDetectada) {
+      contextoCliente += `\n⚠️ OBJECIÓN DETECTADA: ${objecionDetectada.tipo.toUpperCase()}\n`;
+      contextoCliente += getInstruccionesObjecion(objecionDetectada.tipo);
+      contextoCliente += `\nRespuesta sugerida: "${objecionDetectada.respuestaSugerida}"\n`;
     }
 
     // Determinar si es primera interacción
@@ -660,7 +697,8 @@ ANÁLISIS DEL CLIENTE:
         const resultado = await ejecutarTool(toolUse.name, toolUse.input, {
           subscriberId,
           esAdmin,
-          paisCliente: infoCliente.pais || geoData?.pais || null
+          paisCliente: infoCliente.pais || geoData?.pais || null,
+          contextoProducto: contexto?.producto || null
         });
 
         toolsEjecutadas.push({
