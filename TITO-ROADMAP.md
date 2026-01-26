@@ -1,6 +1,6 @@
 # TITO 4.0 - ROADMAP DE EVOLUCIÓN
 
-**Última actualización:** 25/01/2026 - 19:00hs
+**Última actualización:** 25/01/2026 - 20:45hs
 
 ---
 
@@ -145,9 +145,45 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ---
 
+### ✅ FASE 6: SISTEMA DE ORÍGENES (MULTI-CANAL)
+**Completada 25/01/2026 - 20:30hs**
+
+Tito ahora sabe desde dónde habla y adapta su comportamiento:
+
+| Origen | Contexto | Objetivo |
+|--------|----------|----------|
+| `tienda` | Widget WordPress | VENDER guardianes |
+| `mi-magia` | Portal clientes | FIDELIZAR, ofrecer experiencias |
+| `circulo` | Membresía VIP | SERVIR, info de beneficios |
+| `manychat` | IG/FB/WA | Respuestas cortas, redirigir a web |
+
+**Cambios realizados:**
+- `route.js`: Función `getContextoOrigen()` + parámetro `origen`
+- `widget.php`: Envía `origen: 'tienda'`
+- `Tito.jsx`: Props `origen` y `datosCirculo`
+- `circulo/page.jsx`: Pasa datos de membresía
+- `manychat/route.js`: Unificado con v3
+
+**Manejo de "pichis" (personas que solo quieren desahogarse):**
+
+| Mensaje | Comportamiento |
+|---------|----------------|
+| 1-2 | Empatía + guardianes de sanación |
+| 3-5 | Sigue mostrando productos |
+| 6-7 | "Te dejo el test cuando estés lista" |
+| 8-10+ | "No soy psicólogo" + despedida |
+
+**Verificación:**
+- [x] Cada origen recibe contexto específico
+- [x] Círculo reconoce tiradas gratis y descuentos
+- [x] ManyChat redirige a la web
+- [x] Pichis se cortan con elegancia
+
+---
+
 ## FASES PENDIENTES
 
-### FASE 6: SISTEMA DE RECOMENDACIÓN INTELIGENTE
+### FASE 7: SISTEMA DE RECOMENDACIÓN INTELIGENTE
 **Prioridad:** MEDIA | **Estado:** PENDIENTE
 
 **Objetivos:**
@@ -164,7 +200,7 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ---
 
-### FASE 7: WEBHOOKS DE WOOCOMMERCE
+### FASE 8: WEBHOOKS DE WOOCOMMERCE
 **Prioridad:** BAJA | **Estado:** PENDIENTE
 
 **Objetivos:**
@@ -179,7 +215,7 @@ Transformar a Tito de un chatbot básico a un **vendedor experto con consciencia
 
 ---
 
-### FASE 8: INTEGRACIÓN MANUAL DE PERSUASIÓN
+### FASE 9: INTEGRACIÓN MANUAL DE PERSUASIÓN
 **Prioridad:** BAJA | **Estado:** PENDIENTE
 
 **Objetivos:**
