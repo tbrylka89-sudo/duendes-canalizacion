@@ -1629,6 +1629,12 @@ class Duendes_Fabrica_Banners {
     public function get_active_banners($ubicacion, $limite = 1) {
         global $wpdb;
 
+        // Verificar si la tabla existe antes de hacer la query
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->table_banners}'");
+        if (!$table_exists) {
+            return []; // Tabla no existe, retornar array vacío sin error
+        }
+
         $now = current_time('mysql');
         $dismissed = isset($_COOKIE['dfb_dismissed']) ? json_decode(stripslashes($_COOKIE['dfb_dismissed']), true) : [];
 
