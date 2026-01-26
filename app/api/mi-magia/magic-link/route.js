@@ -144,14 +144,14 @@ export async function POST(request) {
       creado: new Date().toISOString()
     }, { ex: 30 * 24 * 60 * 60 }); // 30 días
 
-    // En modo desarrollo o si el email falló, devolver el link directo
+    // Si el email falló, devolver el link directo como fallback
     const emailFallo = emailResult?.error;
 
     return Response.json({
       success: true,
       mensaje: emailFallo ? 'Enlace generado (email no configurado)' : 'Enlace mágico enviado',
-      // Devolver link para testing (quitar en producción con dominio verificado)
-      linkDirecto: magicLinkUrl
+      // Solo devolver link directo si el email falló
+      ...(emailFallo && { linkDirecto: magicLinkUrl })
     });
 
   } catch (error) {

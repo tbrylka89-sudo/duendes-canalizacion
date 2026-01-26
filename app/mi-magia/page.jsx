@@ -2798,13 +2798,10 @@ function LoginMagicLink({ onLoginExitoso }) {
           <h1 style={styles.titulo}>¡Magia lista!</h1>
           {linkDirecto ? (
             <>
-              <p style={{color: '#fff', marginBottom: '1rem'}}>Tocá el botón para entrar:</p>
+              <p style={{color: '#fff', marginBottom: '1rem'}}>Hubo un problema enviando el email. Usá este botón:</p>
               <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
                 ✨ Entrar a Mi Magia
               </a>
-              <p style={{...styles.subtitulo, marginTop: '1.5rem', fontSize: '0.85rem'}}>
-                (Cuando el dominio esté configurado, esto llegará por email)
-              </p>
             </>
           ) : (
             <>
