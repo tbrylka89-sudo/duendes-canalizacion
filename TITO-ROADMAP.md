@@ -446,12 +446,47 @@ Si es cliente repetido:
 
 ## CHANGELOG
 
-### 25/01/2026
+### 25/01/2026 - 18:30hs - IMPLEMENTACIÓN COMPLETA
+**Fases 1-5 implementadas en paralelo:**
+
+✅ **FASE 1 - Contexto del producto** - COMPLETADA
+- `route.js` ahora extrae `body.contexto`
+- Tito sabe qué guardián está mirando el cliente
+- Instrucciones específicas en system prompt
+- No pregunta "¿cuál te interesa?" cuando ya sabe
+
+✅ **FASE 2 - Conocimiento de guardianes** - COMPLETADA
+- Descripción ya no se trunca a 500 chars
+- Nuevos meta_data: historia_completa, sincrodestino, dones, elemento
+- Nueva tool: `obtener_guardian_completo`
+- Tito puede contar la historia completa
+
+✅ **FASE 3 - Verificación de stock** - COMPLETADA
+- Nueva tool: `verificar_stock`
+- Consulta WooCommerce en tiempo real
+- Mensaje apropiado si guardián ya fue adoptado
+
+✅ **FASE 4 - Burbujas inteligentes** - COMPLETADA
+- Burbujas contextuales por página
+- No interrumpe en checkout
+- Burbuja post-compra para formulario
+- Persistencia en localStorage
+
+✅ **FASE 5 - Sistema de objeciones** - COMPLETADA
+- Nuevo archivo `objeciones.js`
+- 5 tipos: precio, tiempo, desconfianza, envío, regalo
+- Detección automática con regex
+- Respuestas sugeridas y estrategias
+
+**Bug fixes:**
+- Corregido bug de burbuja fantasma "agregado al carrito"
+- Cambiado slug `/tienda/` a `/shop/` en 25+ archivos
+
+### 25/01/2026 - 15:00hs
 - Documento creado
 - Diagnóstico inicial completado
 - Identificados 6 problemas críticos
 - Planificadas 6 fases de desarrollo
-- Prioridad inmediata: Fase 1 (contexto del producto)
 
 ---
 
