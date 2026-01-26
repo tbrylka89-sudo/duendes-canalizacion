@@ -2644,6 +2644,120 @@ function LoginMagicLink({ onLoginExitoso }) {
   const [mensaje, setMensaje] = useState('');
   const [linkDirecto, setLinkDirecto] = useState(null);
 
+  // Estilos inline para garantizar que siempre se apliquen
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%)',
+      padding: '20px',
+      fontFamily: "'Cormorant Garamond', Georgia, serif",
+    },
+    card: {
+      background: '#111',
+      borderRadius: '20px',
+      padding: '3rem 2.5rem',
+      maxWidth: '420px',
+      width: '100%',
+      textAlign: 'center',
+      border: '1px solid #222',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+    },
+    icono: {
+      fontSize: '4rem',
+      display: 'block',
+      marginBottom: '1rem',
+      filter: 'drop-shadow(0 0 20px rgba(212,175,55,0.3))',
+    },
+    titulo: {
+      fontFamily: "'Cinzel', serif",
+      fontSize: '2.5rem',
+      color: '#fff',
+      margin: '0 0 0.5rem',
+    },
+    subtitulo: {
+      color: 'rgba(255,255,255,0.6)',
+      fontSize: '1.1rem',
+      marginBottom: '2rem',
+    },
+    campo: {
+      textAlign: 'left',
+      marginBottom: '1.5rem',
+    },
+    label: {
+      display: 'block',
+      color: 'rgba(255,255,255,0.7)',
+      fontSize: '0.9rem',
+      marginBottom: '0.5rem',
+      fontFamily: "'Cinzel', serif",
+    },
+    input: {
+      width: '100%',
+      padding: '14px 16px',
+      background: '#0a0a0a',
+      border: '1px solid #333',
+      borderRadius: '10px',
+      color: '#fff',
+      fontSize: '1.1rem',
+      fontFamily: 'inherit',
+      boxSizing: 'border-box',
+    },
+    btn: {
+      width: '100%',
+      padding: '16px',
+      background: 'linear-gradient(135deg, #d4af37 0%, #b8972e 100%)',
+      color: '#0a0a0a',
+      border: 'none',
+      borderRadius: '10px',
+      fontFamily: "'Cinzel', serif",
+      fontSize: '1rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+    },
+    btnSec: {
+      background: 'transparent',
+      color: 'rgba(255,255,255,0.6)',
+      border: '1px solid #333',
+      padding: '12px 24px',
+      borderRadius: '8px',
+      fontSize: '0.9rem',
+      cursor: 'pointer',
+      marginTop: '1.5rem',
+    },
+    error: {
+      background: 'rgba(255,100,100,0.1)',
+      border: '1px solid rgba(255,100,100,0.3)',
+      color: '#ff9999',
+      padding: '12px',
+      borderRadius: '8px',
+      marginBottom: '1rem',
+      fontSize: '0.9rem',
+    },
+    info: {
+      background: '#0a0a0a',
+      padding: '1rem',
+      borderRadius: '10px',
+      marginTop: '1.5rem',
+    },
+    infoText: {
+      color: 'rgba(255,255,255,0.5)',
+      fontSize: '0.85rem',
+      margin: '0.3rem 0',
+    },
+    ayuda: {
+      paddingTop: '1rem',
+      marginTop: '1.5rem',
+      borderTop: '1px solid #222',
+    },
+    link: {
+      color: 'rgba(255,255,255,0.5)',
+      textDecoration: 'none',
+      fontSize: '0.9rem',
+    },
+  };
+
   const enviarMagicLink = async (e) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
@@ -2678,47 +2792,44 @@ function LoginMagicLink({ onLoginExitoso }) {
 
   if (estado === 'enviado') {
     return (
-      <div className="login-container">
-        <div className="login-card">
-          <div className="login-success">
-            <span className="login-icono">✨</span>
-            <h1>¡Magia lista!</h1>
-            {linkDirecto ? (
-              <>
-                <p>Tocá el botón para entrar:</p>
-                <a href={linkDirecto} className="login-btn" style={{display: 'inline-block', marginTop: '1rem', textDecoration: 'none'}}>
-                  ✨ Entrar a Mi Magia
-                </a>
-                <p className="login-sub" style={{marginTop: '1.5rem', fontSize: '0.85rem'}}>
-                  (Cuando el dominio esté configurado, esto llegará por email)
-                </p>
-              </>
-            ) : (
-              <>
-                <p>Revisá tu email <strong>{email}</strong></p>
-                <p className="login-sub">Te enviamos un enlace mágico para entrar. Revisá también la carpeta de spam.</p>
-              </>
-            )}
-            <button className="login-btn-sec" onClick={() => { setEstado('inicial'); setLinkDirecto(null); }}>
-              Usar otro email
-            </button>
-          </div>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <span style={styles.icono}>✨</span>
+          <h1 style={styles.titulo}>¡Magia lista!</h1>
+          {linkDirecto ? (
+            <>
+              <p style={{color: '#fff', marginBottom: '1rem'}}>Tocá el botón para entrar:</p>
+              <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
+                ✨ Entrar a Mi Magia
+              </a>
+              <p style={{...styles.subtitulo, marginTop: '1.5rem', fontSize: '0.85rem'}}>
+                (Cuando el dominio esté configurado, esto llegará por email)
+              </p>
+            </>
+          ) : (
+            <>
+              <p style={{color: '#fff'}}>Revisá tu email <strong>{email}</strong></p>
+              <p style={styles.subtitulo}>Te enviamos un enlace mágico para entrar. Revisá también la carpeta de spam.</p>
+            </>
+          )}
+          <button style={styles.btnSec} onClick={() => { setEstado('inicial'); setLinkDirecto(null); }}>
+            Usar otro email
+          </button>
         </div>
-        <style jsx>{loginStyles}</style>
       </div>
     );
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <span className="login-icono">🔮</span>
-        <h1>Mi Magia</h1>
-        <p className="login-sub">Tu portal personal en Duendes del Uruguay</p>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <span style={styles.icono}>🔮</span>
+        <h1 style={styles.titulo}>Mi Magia</h1>
+        <p style={styles.subtitulo}>Tu portal personal en Duendes del Uruguay</p>
 
-        <form onSubmit={enviarMagicLink} className="login-form">
-          <div className="login-campo">
-            <label>Tu email</label>
+        <form onSubmit={enviarMagicLink}>
+          <div style={styles.campo}>
+            <label style={styles.label}>Tu email</label>
             <input
               type="email"
               value={email}
@@ -2726,34 +2837,34 @@ function LoginMagicLink({ onLoginExitoso }) {
               placeholder="tu@email.com"
               disabled={estado === 'enviando'}
               autoFocus
+              style={styles.input}
             />
           </div>
 
           {estado === 'error' && (
-            <div className="login-error">{mensaje}</div>
+            <div style={styles.error}>{mensaje}</div>
           )}
 
           <button
             type="submit"
-            className="login-btn"
+            style={{...styles.btn, opacity: estado === 'enviando' ? 0.6 : 1}}
             disabled={estado === 'enviando'}
           >
             {estado === 'enviando' ? 'Enviando...' : '✨ Enviar enlace mágico'}
           </button>
         </form>
 
-        <div className="login-info">
-          <p>Te enviaremos un enlace a tu email para entrar sin contraseña.</p>
-          <p>¿Primera vez? Se creará tu cuenta automáticamente.</p>
+        <div style={styles.info}>
+          <p style={styles.infoText}>Te enviaremos un enlace a tu email para entrar sin contraseña.</p>
+          <p style={styles.infoText}>¿Primera vez? Se creará tu cuenta automáticamente.</p>
         </div>
 
-        <div className="login-ayuda">
-          <a href={`${WORDPRESS_URL}`} className="login-link">
+        <div style={styles.ayuda}>
+          <a href={`${WORDPRESS_URL}`} style={styles.link}>
             ← Volver a la tienda
           </a>
         </div>
       </div>
-      <style jsx>{loginStyles}</style>
     </div>
   );
 }
