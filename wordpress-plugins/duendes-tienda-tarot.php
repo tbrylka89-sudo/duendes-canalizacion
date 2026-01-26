@@ -1191,7 +1191,7 @@ function duendes_render_tienda_tarot() {
             if (tipo === 'uy') {
                 hero.innerHTML += '<br><span style="color:#C6A962;font-size:14px;">🇺🇾 Envío a todo Uruguay · Hasta 12 cuotas sin interés</span>';
             } else {
-                hero.innerHTML += '<br><span style="color:#C6A962;font-size:14px;">🌎 Envío Express Internacional · PayPal & Tarjetas</span>';
+                hero.innerHTML += '<br><span style="color:#C6A962;font-size:14px;">🌎 Envío Express Internacional · Visa, MasterCard, AmEx</span>';
             }
         }
 
