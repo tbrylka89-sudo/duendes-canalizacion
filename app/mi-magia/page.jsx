@@ -2823,7 +2823,19 @@ function LoginMagicLink({ onLoginExitoso }) {
   return (
     <div style={styles.container}>
       <style>{`
-        .login-email-input { color: #fff !important; background: #0a0a0a !important; }
+        .login-email-input,
+        .login-email-input:focus,
+        .login-email-input:active,
+        .login-email-input:-webkit-autofill,
+        .login-email-input:-webkit-autofill:hover,
+        .login-email-input:-webkit-autofill:focus,
+        .login-email-input:-webkit-autofill:active {
+          color: #fff !important;
+          background: #0a0a0a !important;
+          -webkit-text-fill-color: #fff !important;
+          -webkit-box-shadow: 0 0 0 1000px #0a0a0a inset !important;
+          caret-color: #fff !important;
+        }
         .login-email-input::placeholder { color: rgba(255,255,255,0.3) !important; }
       `}</style>
       <div style={styles.card}>
