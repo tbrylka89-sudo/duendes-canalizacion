@@ -901,13 +901,45 @@ add_shortcode('circulo_pagina_completa', function() {
     --blue: #1e40af;
     --orange: #c2410c;
     --white: #ffffff;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    background: var(--black-deep);
-    color: var(--white);
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    background: var(--black-deep) !important;
+    color: #ffffff !important;
     line-height: 1.6;
 }
 
-.circulo-landing a { text-decoration: none; color: inherit; }
+/* Forzar texto blanco en TODOS los elementos */
+.circulo-landing,
+.circulo-landing *,
+.circulo-landing h1,
+.circulo-landing h2,
+.circulo-landing h3,
+.circulo-landing h4,
+.circulo-landing h5,
+.circulo-landing h6,
+.circulo-landing p,
+.circulo-landing span,
+.circulo-landing li,
+.circulo-landing div {
+    color: #ffffff !important;
+}
+
+/* Excepciones: elementos que deben ser dorados */
+.circulo-landing .cl-gold-text,
+.circulo-landing .cl-section-label,
+.circulo-landing .cl-hero-badge span,
+.circulo-landing .cl-hero-hook,
+.circulo-landing .cl-precio-valor,
+.circulo-landing .cl-portal-fecha {
+    color: var(--gold) !important;
+}
+
+/* Botones primarios: texto negro sobre dorado */
+.circulo-landing .cl-btn-primary,
+.circulo-landing .cl-plan-badge {
+    color: #0a0a0a !important;
+}
+
+.circulo-landing a { text-decoration: none; color: inherit !important; }
 
 @keyframes clFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 @keyframes clPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }

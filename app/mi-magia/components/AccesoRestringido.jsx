@@ -515,4 +515,88 @@ export function BannerUpgrade({ usuario, onActivarTrial }) {
   );
 }
 
+// ═══════════════════════════════════════════════════════════════
+// BANNER COMPLETAR PERFIL (+50 RUNAS)
+// ═══════════════════════════════════════════════════════════════
+
+export function BannerCompletarPerfil({ usuario, onCompletar }) {
+  // Solo mostrar si el perfil está incompleto
+  if (!usuario?.perfilIncompleto) {
+    return null;
+  }
+
+  return (
+    <div className="banner-completar-perfil">
+      <div className="banner-contenido">
+        <span className="banner-icono">🎁</span>
+        <div className="banner-texto">
+          <h4>Completá tu perfil y ganá 50 runas</h4>
+          <p>Contanos más sobre vos para personalizar tu experiencia mágica.</p>
+        </div>
+        <button className="banner-btn" onClick={onCompletar}>
+          Completar ahora
+        </button>
+      </div>
+
+      <style jsx>{`
+        .banner-completar-perfil {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 15px;
+          padding: 20px;
+          margin-bottom: 25px;
+        }
+
+        .banner-contenido {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          flex-wrap: wrap;
+        }
+
+        .banner-icono {
+          font-size: 36px;
+        }
+
+        .banner-texto {
+          flex: 1;
+          min-width: 200px;
+        }
+
+        .banner-texto h4 {
+          color: #d4af37;
+          margin: 0 0 5px 0;
+          font-size: 16px;
+          font-family: 'Cinzel', serif;
+        }
+
+        .banner-texto p {
+          color: rgba(0, 0, 0, 0.6);
+          margin: 0;
+          font-size: 13px;
+        }
+
+        .banner-btn {
+          padding: 10px 25px;
+          background: linear-gradient(135deg, #d4af37, #b8962e);
+          color: #fff;
+          text-decoration: none;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: 'Cinzel', serif;
+        }
+
+        .banner-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default AccesoRestringido;

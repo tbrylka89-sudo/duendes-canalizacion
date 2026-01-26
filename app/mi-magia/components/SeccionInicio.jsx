@@ -3,7 +3,7 @@ import { WORDPRESS_URL, getRango, getSiguienteRango } from './constants';
 import { SenalDelDia } from '../nuevas-funciones';
 import TestGuardian from '../test-guardian';
 import { DashboardGamificacion, ColeccionBadges, MisionesPanel, LeaderboardRachas } from '../gamificacion-components';
-import { BadgeNivelAcceso, BannerUpgrade } from './AccesoRestringido';
+import { BadgeNivelAcceso, BannerUpgrade, BannerCompletarPerfil } from './AccesoRestringido';
 import { BannerPromociones } from './BannerPromociones';
 import CofreDiario from './CofreDiario';
 import Referidos from '../referidos';
@@ -70,6 +70,12 @@ export default function SeccionInicio({ usuario, ir, token, setUsuario }) {
             }));
           }
         }}
+      />
+
+      {/* ══════ BANNER COMPLETAR PERFIL (si perfil incompleto) ══════ */}
+      <BannerCompletarPerfil
+        usuario={usuario}
+        onCompletar={() => ir('completar_perfil')}
       />
 
       {/* SEÑAL DEL DÍA */}

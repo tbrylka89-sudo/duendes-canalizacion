@@ -4235,105 +4235,131 @@ function Carga() {
 }
 
 function Onboarding({ usuario, token, onDone }) {
-  const [paso, setPaso] = useState(0);
-  const [datos, setDatos] = useState({ nombrePreferido: usuario?.nombre || '', pronombre: 'ella', intereses: [], moneda: 'USD', cumpleanos: '' });
-  const ints = ['Me siento sola', 'Nada me alcanza', 'Repito patrones', 'Quiero sanar', 'Busco protección', 'Necesito claridad', 'Quiero paz', 'Busco amor'];
+  const [guardando, setGuardando] = useState(false);
+  const [datos, setDatos] = useState({
+    nombrePreferido: usuario?.nombre || '',
+    genero: '', // 'femenino' o 'masculino'
+    pais: '',
+    moneda: 'USD'
+  });
+
+  const paises = [
+    { codigo: 'uruguay', nombre: 'Uruguay', bandera: '🇺🇾', moneda: 'UYU' },
+    { codigo: 'argentina', nombre: 'Argentina', bandera: '🇦🇷', moneda: 'USD' },
+    { codigo: 'mexico', nombre: 'México', bandera: '🇲🇽', moneda: 'USD' },
+    { codigo: 'espana', nombre: 'España', bandera: '🇪🇸', moneda: 'USD' },
+    { codigo: 'chile', nombre: 'Chile', bandera: '🇨🇱', moneda: 'USD' },
+    { codigo: 'colombia', nombre: 'Colombia', bandera: '🇨🇴', moneda: 'USD' },
+    { codigo: 'peru', nombre: 'Perú', bandera: '🇵🇪', moneda: 'USD' },
+    { codigo: 'usa', nombre: 'Estados Unidos', bandera: '🇺🇸', moneda: 'USD' },
+    { codigo: 'otro', nombre: 'Otro país', bandera: '🌎', moneda: 'USD' },
+  ];
+
+  const seleccionarPais = (p) => {
+    setDatos({...datos, pais: p.codigo, moneda: p.moneda});
+  };
 
   const guardar = async () => {
-    try { await fetch(`${API_BASE}/api/mi-magia/onboarding`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, ...datos }) }); } catch(e) {}
+    setGuardando(true);
+    try {
+      await fetch(`${API_BASE}/api/mi-magia/onboarding`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          ...datos,
+          pronombre: datos.genero === 'femenino' ? 'ella' : 'el',
+          perfilIncompleto: true // Flag para mostrar banner de completar después
+        })
+      });
+    } catch(e) {}
     onDone(datos);
   };
+
+  const puedeEntrar = datos.nombrePreferido && datos.genero && datos.pais;
 
   return (
     <div className="onb"><style jsx global>{estilos}</style>
       <div className="onb-card">
-        {paso === 0 ? (
-          <div className="onb-hero">
-            <div className="onb-hero-glow"></div>
-            <span className="onb-hero-runa">ᛉ</span>
-            <h1>Ya te estaba esperando.</h1>
-            <p className="onb-hero-sub">Antes de que llegaras a esta página, un guardián empezó a soñar con vos.</p>
-            <div className="onb-validation">
-              <p>Llevás tiempo sintiendo que algo falta.</p>
-              <p>Que das más de lo que recibís.</p>
-              <p>Que nadie termina de entenderte.</p>
-              <p className="onb-validation-reveal">No estás loca. Estás despierta.</p>
-            </div>
-            <button className="btn-gold btn-hero-cta" onClick={() => setPaso(1)}>
-              Descubrir quién me eligió
-            </button>
-            <small className="onb-hero-note">Solo 4 preguntas para personalizar tu experiencia</small>
+        <div className="onb-hero onb-hero-simple">
+          <div className="onb-hero-glow"></div>
+          <span className="onb-hero-runa">ᛉ</span>
+          <h1>¡Bienvenida a Mi Magia!</h1>
+          <p className="onb-hero-sub">Solo 3 cositas para personalizar tu experiencia</p>
+
+          {/* Nombre */}
+          <div className="onb-campo">
+            <label>¿Cómo te llamás?</label>
+            <input
+              type="text"
+              value={datos.nombrePreferido}
+              onChange={e => setDatos({...datos, nombrePreferido: e.target.value})}
+              placeholder="Tu nombre o apodo"
+            />
           </div>
-        ) : (
-          <>
-            <div className="onb-header"><span>✦</span><h2>Tu espacio mágico</h2><p>Paso {paso} de 4</p></div>
-            <div className="onb-prog">{[1,2,3,4].map(p => <div key={p} className={`prog-p ${paso >= p ? 'act' : ''}`}>{p}</div>)}</div>
 
-            {paso === 1 && (
-              <div className="onb-paso">
-                <h3>¿Cómo te llama tu guardián?</h3>
-                <p className="onb-sub">Este nombre resonará en cada mensaje que recibas</p>
-                <input type="text" value={datos.nombrePreferido} onChange={e => setDatos({...datos, nombrePreferido: e.target.value})} placeholder="Tu nombre verdadero" />
-              </div>
-            )}
-
-            {paso === 2 && (
-              <div className="onb-paso">
-                <h3>¿Qué te trajo hasta acá?</h3>
-                <p className="onb-sub">Elegí todo lo que resuene en tu corazón</p>
-                <div className="ints ints-dolor">
-                  {ints.map(i => (
-                    <button key={i} className={`int ${datos.intereses.includes(i) ? 'act' : ''}`} onClick={() => setDatos({...datos, intereses: datos.intereses.includes(i) ? datos.intereses.filter(x=>x!==i) : [...datos.intereses, i]})}>
-                      {i}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {paso === 3 && (
-              <div className="onb-paso">
-                <h3>¿Desde dónde nos conectamos?</h3>
-                <p className="onb-sub">Para mostrarte precios en tu moneda</p>
-                <div className="monedas">
-                  <button className={`moneda ${datos.moneda === 'UYU' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'UYU'})}>
-                    <span>🇺🇾</span>
-                    <strong>Uruguay</strong>
-                    <small>Pesos</small>
-                  </button>
-                  <button className={`moneda ${datos.moneda === 'USD' ? 'act' : ''}`} onClick={() => setDatos({...datos, moneda: 'USD'})}>
-                    <span>🌎</span>
-                    <strong>Otro país</strong>
-                    <small>Dólares</small>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {paso === 4 && (
-              <div className="onb-paso onb-final">
-                <div className="onb-final-glow"></div>
-                <h3>{datos.nombrePreferido}, tu guardián ya sabe que llegaste.</h3>
-                <div className="regalo-box regalo-box-new">
-                  <span className="regalo-runa">ᚱ</span>
-                  <p>Tu regalo de bienvenida:</p>
-                  <strong>100 Runas de Poder</strong>
-                  <small>Para que descubras las experiencias que te esperan</small>
-                </div>
-                <div className="onb-fomo">
-                  <p>349 personas ya encontraron a su guardián.</p>
-                  <p className="onb-fomo-question">¿Estás lista para conocer al tuyo?</p>
-                </div>
-              </div>
-            )}
-
-            <div className="onb-btns">
-              {paso > 1 && <button className="btn-sec" onClick={() => setPaso(paso-1)}>Atrás</button>}
-              {paso < 4 && <button className="btn-pri" onClick={() => setPaso(paso+1)} disabled={paso === 1 && !datos.nombrePreferido}>Continuar</button>}
-              {paso === 4 && <button className="btn-gold btn-enter" onClick={guardar}>Entrar a Mi Magia</button>}
+          {/* Género */}
+          <div className="onb-campo">
+            <label>¿Cómo preferís que te hablemos?</label>
+            <div className="onb-genero-btns">
+              <button
+                type="button"
+                className={`onb-genero-btn ${datos.genero === 'femenino' ? 'act' : ''}`}
+                onClick={() => setDatos({...datos, genero: 'femenino'})}
+              >
+                <span className="onb-genero-emoji">👩</span>
+                <strong>Femenino</strong>
+                <small>querida, ella</small>
+              </button>
+              <button
+                type="button"
+                className={`onb-genero-btn ${datos.genero === 'masculino' ? 'act' : ''}`}
+                onClick={() => setDatos({...datos, genero: 'masculino'})}
+              >
+                <span className="onb-genero-emoji">👨</span>
+                <strong>Masculino</strong>
+                <small>querido, él</small>
+              </button>
             </div>
-          </>
-        )}
+          </div>
+
+          {/* País */}
+          <div className="onb-campo">
+            <label>¿De dónde sos?</label>
+            <div className="onb-paises">
+              {paises.map(p => (
+                <button
+                  key={p.codigo}
+                  type="button"
+                  className={`onb-pais-btn ${datos.pais === p.codigo ? 'act' : ''}`}
+                  onClick={() => seleccionarPais(p)}
+                >
+                  <span>{p.bandera}</span>
+                  <span>{p.nombre}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Regalo */}
+          {puedeEntrar && (
+            <div className="onb-regalo-mini">
+              <span className="regalo-runa">ᚱ</span>
+              <div>
+                <strong>Tu regalo: 100 Runas de Poder</strong>
+                <small>Para descubrir las experiencias mágicas</small>
+              </div>
+            </div>
+          )}
+
+          <button
+            className="btn-gold btn-enter"
+            onClick={guardar}
+            disabled={!puedeEntrar || guardando}
+          >
+            {guardando ? 'Entrando...' : 'Entrar a Mi Magia ✨'}
+          </button>
+        </div>
       </div>
     </div>
   );

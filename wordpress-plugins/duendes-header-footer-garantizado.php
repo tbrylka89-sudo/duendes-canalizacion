@@ -136,49 +136,106 @@ function duendes_footer_garantizado() {
 
     <script>
     // Remover footers viejos por JavaScript
-    document.addEventListener('DOMContentLoaded', function() {
-        // Buscar y ocultar todos los footers excepto el nuestro
-        var allFooters = document.querySelectorAll('footer, [data-elementor-type="footer"], .elementor-location-footer, .site-footer, #footer');
-        allFooters.forEach(function(f) {
+    function limpiarFootersViejos() {
+        // Buscar y eliminar todos los footers excepto el nuestro
+        document.querySelectorAll('footer, [data-elementor-type="footer"], .elementor-location-footer, .site-footer, #footer').forEach(function(f) {
             if (!f.classList.contains('duendes-footer-garantizado')) {
-                f.style.display = 'none';
                 f.remove();
             }
         });
 
-        // Buscar secciones con "Explorar", "Colecciones", "newsletter" y ocultarlas
-        var sections = document.querySelectorAll('.elementor-section, .e-con, section');
-        sections.forEach(function(sec) {
-            var text = sec.textContent || '';
-            if (text.includes('Explorar') && text.includes('Colecciones') ||
-                text.includes('Suscríbete a nuestra newsletter') ||
-                text.includes('© 2025 Duendes') ||
-                (text.includes('TÉRMINOS Y CONDICIONES') && text.includes('2016'))) {
-                sec.style.display = 'none';
-                sec.remove();
+        // Textos que indican footer viejo
+        var textosProhibidos = [
+            'Nacidos en Piriápolis',
+            'Destinados a encontrarte',
+            'Explorar',
+            'Colecciones',
+            'Atención al Cliente',
+            'Suscríbete a nuestra newsletter',
+            '© 2025 Duendes',
+            'Enter your email'
+        ];
+
+        // Eliminar el footer negro duplicado (Elementor) que tiene MAYÚSCULAS
+        document.querySelectorAll('.elementor-section, .e-con, section, div').forEach(function(el) {
+            var text = el.textContent || '';
+            // El footer de Elementor usa mayúsculas, el nuestro no
+            if (text.includes('TÉRMINOS Y CONDICIONES') && text.includes('POLÍTICA DE PRIVACIDAD') &&
+                !el.classList.contains('duendes-footer-garantizado') &&
+                !el.closest('.duendes-footer-garantizado')) {
+                el.style.cssText = 'display:none!important;';
+            }
+            // También el que dice "2016 — 2026" pero no está en nuestro footer
+            if (text.includes('2016') && text.includes('2026') &&
+                !el.classList.contains('duendes-footer-garantizado') &&
+                !el.closest('.duendes-footer-garantizado') &&
+                el.querySelectorAll('*').length < 20) {
+                el.style.cssText = 'display:none!important;';
             }
         });
-    });
 
-    // Observer para elementos cargados dinámicamente
-    var footerObserver = new MutationObserver(function(mutations) {
-        mutations.forEach(function(m) {
-            m.addedNodes.forEach(function(node) {
-                if (node.nodeType === 1) {
-                    if (node.tagName === 'FOOTER' && !node.classList.contains('duendes-footer-garantizado')) {
-                        node.remove();
+        // Buscar TODAS las secciones y elementos
+        document.querySelectorAll('.elementor-section, .e-con, .e-con-inner, section, .elementor-element, .elementor-widget-wrap').forEach(function(el) {
+            var text = el.textContent || '';
+            for (var i = 0; i < textosProhibidos.length; i++) {
+                if (text.includes(textosProhibidos[i])) {
+                    // Subir al contenedor padre más grande
+                    var parent = el;
+                    while (parent.parentElement &&
+                           parent.parentElement.tagName !== 'BODY' &&
+                           parent.parentElement.tagName !== 'MAIN' &&
+                           !parent.parentElement.classList.contains('duendes-footer-garantizado')) {
+                        if (parent.classList.contains('elementor-section') ||
+                            parent.classList.contains('e-con') ||
+                            parent.tagName === 'SECTION') {
+                            break;
+                        }
+                        parent = parent.parentElement;
                     }
-                    var text = node.textContent || '';
-                    if (text.includes('Explorar') && text.includes('Colecciones')) {
-                        node.style.display = 'none';
-                    }
+                    parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;';
+                    break;
                 }
-            });
+            }
         });
-    });
-    setTimeout(function() {
-        footerObserver.observe(document.body, { childList: true, subtree: true });
-    }, 500);
+
+        // Específicamente buscar el gris con fondo
+        document.querySelectorAll('*').forEach(function(el) {
+            var style = window.getComputedStyle(el);
+            var bg = style.backgroundColor;
+            // Si tiene fondo gris y contiene texto de footer viejo
+            if ((bg.includes('128') || bg.includes('169') || bg.includes('gray') || bg.includes('grey')) &&
+                el.textContent && el.textContent.includes('Piriápolis')) {
+                el.style.cssText = 'display:none!important;';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', limpiarFootersViejos);
+    window.addEventListener('load', limpiarFootersViejos);
+    setTimeout(limpiarFootersViejos, 500);
+    setTimeout(limpiarFootersViejos, 1500);
+    setTimeout(limpiarFootersViejos, 3000);
+
+    // SOLUCIÓN RADICAL: Eliminar todo lo que venga DESPUÉS de nuestro footer
+    function eliminarDespuesDeNuestroFooter() {
+        var nuestroFooter = document.querySelector('.duendes-footer-garantizado');
+        if (nuestroFooter) {
+            var siguiente = nuestroFooter.nextElementSibling;
+            while (siguiente) {
+                var temp = siguiente.nextElementSibling;
+                // No eliminar el widget de Tito
+                if (!siguiente.classList.contains('tito-widget') &&
+                    !siguiente.id.includes('tito')) {
+                    siguiente.remove();
+                }
+                siguiente = temp;
+            }
+        }
+    }
+
+    setTimeout(eliminarDespuesDeNuestroFooter, 100);
+    setTimeout(eliminarDespuesDeNuestroFooter, 1000);
+    setTimeout(eliminarDespuesDeNuestroFooter, 2000);
     </script>
 
     <footer class="duendes-footer-garantizado">
@@ -187,7 +244,7 @@ function duendes_footer_garantizado() {
                 <h3 class="duendes-footer-nombre">Duendes del Uruguay</h3>
 
                 <div class="duendes-footer-legal">
-                    <a href="/terminos-y-condiciones/">Términos y Condiciones</a>
+                    <a href="/terminos/">Términos y Condiciones</a>
                     <span class="duendes-footer-sep">•</span>
                     <a href="/politica-de-privacidad/">Política de Privacidad</a>
                 </div>

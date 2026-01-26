@@ -4292,20 +4292,39 @@ function SeccionCursos({ usuario }) {
         }
 
         .modulo-card {
-          display: grid;
-          grid-template-columns: 80px 1fr auto;
-          gap: 25px;
-          padding: 25px;
-          background: rgba(45, 55, 40, 0.3);
-          border: 1px solid rgba(85, 107, 47, 0.3);
+          background: rgba(10, 10, 18, 0.8);
+          border: 1px solid rgba(255, 0, 255, 0.2);
           border-radius: 16px;
-          margin-bottom: 20px;
+          margin-bottom: 15px;
+          overflow: hidden;
           transition: all 0.3s ease;
         }
 
         .modulo-card:hover {
-          border-color: rgba(212, 175, 55, 0.4);
-          background: rgba(85, 107, 47, 0.2);
+          border-color: rgba(255, 0, 255, 0.4);
+        }
+
+        .modulo-card.abierto {
+          border-color: var(--neon-magenta);
+          box-shadow: 0 0 20px var(--neon-magenta-glow);
+        }
+
+        .modulo-header {
+          display: grid;
+          grid-template-columns: 70px 1fr 40px;
+          gap: 20px;
+          padding: 20px;
+          background: transparent;
+          border: none;
+          width: 100%;
+          cursor: pointer;
+          text-align: left;
+          color: inherit;
+          font-family: inherit;
+        }
+
+        .modulo-header:hover {
+          background: rgba(255, 0, 255, 0.05);
         }
 
         .modulo-numero {
@@ -4317,101 +4336,201 @@ function SeccionCursos({ usuario }) {
         }
 
         .numero-semana {
-          font-size: 10px;
+          font-size: 9px;
           text-transform: uppercase;
           letter-spacing: 1px;
           color: rgba(255, 255, 255, 0.5);
-          margin-bottom: 5px;
+          margin-bottom: 3px;
         }
 
         .numero-big {
           font-family: 'Tangerine', cursive;
-          font-size: 48px;
-          color: #d4af37;
+          font-size: 42px;
+          color: var(--neon-magenta);
           line-height: 1;
         }
 
-        .modulo-info h5 {
+        .modulo-info-header h5 {
           font-family: 'Cinzel', serif;
-          font-size: 18px;
+          font-size: 16px;
           color: #ffffff;
-          margin: 0 0 15px;
+          margin: 0 0 8px;
         }
 
-        .modulo-duende {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 15px;
-          padding: 12px;
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 12px;
+        .modulo-duende-mini {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
         }
 
-        .duende-avatar-mini {
-          width: 45px;
-          height: 45px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #d4af37, #8b6914);
+        .modulo-expand {
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
-        .avatar-placeholder {
-          font-size: 24px;
-        }
-
-        .duende-datos {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .duende-nombre {
-          font-family: 'Cinzel', serif;
-          font-size: 15px;
-          color: #ffffff;
-        }
-
-        .duende-categoria {
+        .expand-icon {
           font-size: 12px;
-          color: rgba(212, 175, 55, 0.8);
+          color: var(--neon-magenta);
+          transition: transform 0.3s ease;
         }
 
-        .modulo-preview {
-          font-size: 14px;
-          color: rgba(255, 255, 255, 0.6);
+        .expand-icon.rotado {
+          transform: rotate(180deg);
+        }
+
+        /* Contenido expandido */
+        .modulo-contenido-expandido {
+          padding: 0 20px 25px;
+          border-top: 1px solid rgba(255, 0, 255, 0.15);
+          animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+          from { opacity: 0; max-height: 0; }
+          to { opacity: 1; max-height: 2000px; }
+        }
+
+        .modulo-duende-full {
+          display: flex;
+          gap: 20px;
+          padding: 20px;
+          margin: 20px 0;
+          background: rgba(255, 0, 255, 0.05);
+          border-radius: 12px;
+          border: 1px solid rgba(255, 0, 255, 0.1);
+        }
+
+        .duende-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--neon-magenta), var(--neon-blue));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .avatar-emoji {
+          font-size: 30px;
+        }
+
+        .duende-info-full h6 {
+          font-family: 'Cinzel', serif;
+          font-size: 18px;
+          color: #ffffff;
+          margin: 0 0 5px;
+        }
+
+        .duende-cat {
+          display: block;
+          font-size: 12px;
+          color: var(--neon-magenta);
+          margin-bottom: 10px;
+        }
+
+        .duende-personalidad {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.7);
           line-height: 1.6;
           margin: 0 0 15px;
         }
 
         .modulo-cristales {
           display: flex;
-          gap: 10px;
+          gap: 8px;
           flex-wrap: wrap;
         }
 
         .cristal-tag {
           font-size: 11px;
-          color: rgba(212, 175, 55, 0.7);
-          background: rgba(212, 175, 55, 0.1);
+          color: var(--neon-blue);
+          background: rgba(0, 240, 255, 0.1);
           padding: 4px 10px;
           border-radius: 12px;
-          border: 1px solid rgba(212, 175, 55, 0.2);
+          border: 1px solid rgba(0, 240, 255, 0.2);
         }
 
-        .modulo-duracion {
+        .modulo-texto {
+          margin: 20px 0;
+        }
+
+        .modulo-texto p {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.85);
+          line-height: 1.8;
+          margin: 0 0 15px;
+        }
+
+        .modulo-lecciones {
+          margin: 20px 0;
+          padding: 15px;
+          background: rgba(0, 240, 255, 0.05);
+          border-radius: 12px;
+        }
+
+        .modulo-lecciones h6 {
+          font-size: 13px;
+          color: var(--neon-blue);
+          margin: 0 0 15px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .modulo-lecciones ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .modulo-lecciones li {
           display: flex;
-          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .modulo-lecciones li:last-child {
+          border-bottom: none;
+        }
+
+        .leccion-numero {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: rgba(0, 240, 255, 0.2);
+          color: var(--neon-blue);
+          font-size: 12px;
+          display: flex;
           align-items: center;
           justify-content: center;
-          gap: 5px;
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 12px;
         }
 
-        .duracion-icono {
-          font-size: 20px;
+        .leccion-titulo {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 14px;
+        }
+
+        .modulo-ejercicio {
+          margin: 20px 0;
+          padding: 20px;
+          background: rgba(57, 255, 20, 0.05);
+          border-left: 3px solid var(--neon-green);
+          border-radius: 0 12px 12px 0;
+        }
+
+        .modulo-ejercicio h6 {
+          font-size: 13px;
+          color: var(--neon-green);
+          margin: 0 0 10px;
+        }
+
+        .modulo-ejercicio p {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 1.7;
+          margin: 0;
         }
 
         /* CTA */

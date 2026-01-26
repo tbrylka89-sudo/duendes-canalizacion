@@ -2679,6 +2679,51 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   .onb-hero-sub{font-size:1rem}
   .micro-highlight{font-size:1rem!important}
 }
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ONBOARDING SIMPLIFICADO - 1 PANTALLA */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.onb-hero-simple{padding:2rem 1.5rem;max-width:500px;margin:0 auto}
+.onb-hero-simple h1{font-size:1.8rem;margin-bottom:0.5rem}
+.onb-hero-simple .onb-hero-sub{margin-bottom:1.5rem}
+
+.onb-campo{text-align:left;margin-bottom:1.5rem}
+.onb-campo label{display:block;font-family:'Cinzel',serif;font-size:0.95rem;color:#1a1a1a;margin-bottom:0.5rem}
+.onb-campo input[type="text"]{width:100%;padding:0.9rem 1rem;border:2px solid #e8e8e8;border-radius:12px;font-size:1rem;font-family:'Cormorant Garamond',serif;transition:border-color 0.2s}
+.onb-campo input[type="text"]:focus{outline:none;border-color:#d4af37}
+
+/* Género buttons */
+.onb-genero-btns{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.onb-genero-btn{display:flex;flex-direction:column;align-items:center;padding:1.25rem 1rem;background:#faf8f5;border:2px solid #e8e8e8;border-radius:16px;cursor:pointer;transition:all 0.2s}
+.onb-genero-btn:hover{border-color:#d4af37;background:#fdf9f0}
+.onb-genero-btn.act{border-color:#d4af37;background:linear-gradient(135deg,#fdf9f0,#fff);box-shadow:0 4px 15px rgba(212,175,55,0.15)}
+.onb-genero-emoji{font-size:2rem;margin-bottom:0.5rem}
+.onb-genero-btn strong{font-family:'Cinzel',serif;font-size:1rem;color:#1a1a1a}
+.onb-genero-btn small{color:#888;font-size:0.85rem}
+.onb-genero-btn.act strong{color:#d4af37}
+
+/* País buttons */
+.onb-paises{display:flex;flex-wrap:wrap;gap:0.5rem}
+.onb-pais-btn{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;background:#faf8f5;border:1px solid #e8e8e8;border-radius:50px;cursor:pointer;font-size:0.9rem;transition:all 0.2s}
+.onb-pais-btn:hover{border-color:#d4af37;background:#fdf9f0}
+.onb-pais-btn.act{border-color:#d4af37;background:#d4af37;color:#fff}
+.onb-pais-btn.act span:last-child{color:#fff}
+
+/* Regalo mini */
+.onb-regalo-mini{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:16px;padding:1rem 1.25rem;margin:1.5rem 0;animation:fadeIn 0.3s ease}
+.onb-regalo-mini .regalo-runa{font-size:2rem;color:#d4af37}
+.onb-regalo-mini strong{display:block;color:#d4af37;font-family:'Cinzel',serif;font-size:1rem}
+.onb-regalo-mini small{color:rgba(255,255,255,0.7);font-size:0.85rem}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:500px){
+  .onb-hero-simple{padding:1.5rem 1rem}
+  .onb-hero-simple h1{font-size:1.5rem}
+  .onb-genero-btns{grid-template-columns:1fr}
+  .onb-paises{justify-content:center}
+}
 `;
 
 export { estilos };

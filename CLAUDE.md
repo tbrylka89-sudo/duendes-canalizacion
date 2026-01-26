@@ -1237,4 +1237,72 @@ git add -A && git commit -m "mensaje" && git push
 
 ---
 
+## ACTUALIZACIONES 25/01/2026 - SESIÓN TARDE (19:00hs)
+
+### ✅ Tito actualizado con envío gratis y 3x2 - 25/01/2026 19:00hs
+- **Archivos modificados:**
+  - `lib/tito/conocimiento.js` - Nuevos umbrales de envío gratis
+  - `lib/tito/personalidad.js` - Info de promo 3x2 y envíos
+- **Cambios:**
+  - Envío gratis internacional: USD$1000+
+  - Envío gratis Uruguay: $10.000 UYU+
+  - Promo 3x2: Por cada 2 guardianes, 1 mini gratis
+
+### ✅ Plugin avisos dinámicos en carrito - 25/01/2026 19:15hs
+- **Archivo:** `wordpress-plugins/duendes-avisos-carrito.php`
+- **Subido a:** `mu-plugins/duendes-avisos-carrito.php`
+- **Funcionalidad:**
+  - Aviso de progreso 3x2 ("TE FALTA 1 GUARDIÁN", "TENÉS X MINIS DE REGALO")
+  - Aviso de envío gratis con detección de país (UY vs internacional)
+  - Barra de progreso visual hacia envío gratis
+  - Actualización AJAX cuando cambia el carrito
+  - Define: `DUENDES_ENVIO_GRATIS_USD=1000`, `DUENDES_ENVIO_GRATIS_UYU=10000`
+
+### ✅ Webhooks WooCommerce configurados via API - 25/01/2026 19:30hs
+- **Webhooks creados en WooCommerce:**
+  - ID 4: Vercel - Producto Actualizado (`product.updated`)
+  - ID 5: Vercel - Producto Creado (`product.created`)
+  - ID 6: Vercel - Producto Eliminado (`product.deleted`)
+- **Delivery URL:** `https://duendes-vercel.vercel.app/api/webhooks/woocommerce`
+- **Secret:** `duendes_wh_2026_x7Kp9mNqR3sT5vW8yB2dF4gH6jL` (configurado en Vercel)
+- **Método:** Curl directo a WooCommerce REST API con credenciales
+- **Script auxiliar:** `scripts/configure-webhooks.js` (para referencia futura)
+
+### ✅ Emails de formulario de contacto arreglados - 25/01/2026 19:45hs
+- **Problema:** Los emails del formulario de contacto no llegaban
+- **Causa:** Plugin `duendes-elementor-emails.php` estaba deshabilitado (renombrado a `.OLD`)
+- **Solución:** Renombrado de vuelta a `duendes-elementor-emails.php` via SFTP
+- **Funcionamiento:**
+  - Intercepta formularios de Elementor Pro via hook `elementor_pro/forms/new_record`
+  - Envía emails bonitos a `duendesdeluruguay@gmail.com`
+  - Usa wp_mail + backup via Resend API
+- **Dónde ver respuestas:**
+  - Emails van a `duendesdeluruguay@gmail.com`
+  - Si Elementor tiene "Collect Submissions" habilitado: Elementor > Submissions
+
+### ✅ Certificado automático arreglado - 25/01/2026 20:00hs
+- **Problema:** El endpoint `/api/certificado?order=X` mostraba datos de ejemplo porque no se guardaban los datos reales
+- **Causa:** El sistema de canalizaciones (`/api/admin/canalizaciones`) y el de certificados (`/api/certificado`) estaban desconectados
+- **Solución:** Modificado `app/api/admin/canalizaciones/route.js`:
+  - Cuando una canalización se marca como "enviada" (PUT con `accion: 'enviar'`)
+  - Ahora también guarda los datos en `orden:${ordenId}` con el formato que espera el certificado
+  - Incluye: nombre_humano, guardian_nombre, guardian_genero, mensaje_guardian, sincrodestino, categoria
+- **Flujo completo ahora:**
+  1. Orden llega via webhook → genera canalización pendiente
+  2. Admin aprueba canalización en panel
+  3. Admin envía canalización → se guarda en `lecturas:${email}` Y `orden:${ordenId}`
+  4. Cliente accede a `/api/certificado?order=X` → ve su certificado personalizado
+
+---
+
+### TAREAS PENDIENTES - 25/01/2026 20:00hs
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Fix "Mi Magia" en página principal | ⏳ Pendiente | Usuario debe indicar qué hay que arreglar |
+| Editar HTML secciones (inicio, envíos, FAQ) | ⏳ Pendiente | Esperando HTML del usuario - actualizar montos de envío gratis |
+| Crear herramienta HTML → secciones editables | ⏳ Pendiente | Para transformar HTML publicado |
+
+---
+
 *Este documento es la guía viva de cómo creamos magia real en Duendes del Uruguay. Cada palabra cuenta. Cada mensaje importa. Cada persona merece sentirse única.*
