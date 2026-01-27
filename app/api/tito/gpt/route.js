@@ -550,7 +550,7 @@ export async function POST(request) {
       tools: TOOLS,
       tool_choice: 'auto',
       max_tokens: 500,
-      temperature: 0.7
+      temperature: 0.4
     });
 
     let assistantMessage = response.choices[0].message;
@@ -590,7 +590,7 @@ export async function POST(request) {
         tools: TOOLS,
         tool_choice: 'auto',
         max_tokens: 500,
-        temperature: 0.7
+        temperature: 0.4
       });
 
       assistantMessage = response.choices[0].message;
