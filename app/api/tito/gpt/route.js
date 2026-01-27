@@ -1,9 +1,11 @@
 /**
- * TITO con GPT-4o-mini
- * Optimizado para ventas, bajo costo
+ * TITO Híbrido: GPT-4o-mini + Claude Sonnet
+ * - GPT para consultas simples (barato)
+ * - Claude para situaciones importantes (inteligente)
  */
 
 import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 import { obtenerCotizaciones, PRECIOS_URUGUAY, convertirPrecio } from '@/lib/tito/cotizaciones';
@@ -11,6 +13,63 @@ import { obtenerCotizaciones, PRECIOS_URUGUAY, convertirPrecio } from '@/lib/tit
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+// Detectar si el mensaje requiere Claude (más inteligente)
+function necesitaClaude(mensaje, historial = []) {
+  const msg = mensaje.toLowerCase();
+  const historialTexto = historial.map(h => h.content || '').join(' ').toLowerCase();
+  const contexto = msg + ' ' + historialTexto;
+
+  // Palabras que indican situación importante
+  const palabrasProblema = [
+    'problema', 'queja', 'mal', 'error', 'no llegó', 'no llego',
+    'dañado', 'roto', 'equivocado', 'incorrecto', 'devolver',
+    'reembolso', 'cancelar', 'enojad', 'frustrad', 'molest'
+  ];
+
+  const palabrasPedido = [
+    'mi pedido', 'mi compra', 'mi orden', 'estado de mi',
+    'donde está', 'donde esta', 'tracking', 'seguimiento',
+    'cuando llega', 'cuando envian', 'cuando envían'
+  ];
+
+  const palabrasObjecion = [
+    'es caro', 'muy caro', 'no sé', 'no se', 'lo pienso',
+    'después', 'despues', 'no puedo', 'no tengo plata',
+    'dudando', 'no estoy segur'
+  ];
+
+  const palabrasCierre = [
+    'quiero comprar', 'cómo compro', 'como compro',
+    'cómo pago', 'como pago', 'métodos de pago',
+    'cuanto sale', 'cuánto sale', 'precio final'
+  ];
+
+  // Verificar cada categoría
+  for (const palabra of palabrasProblema) {
+    if (contexto.includes(palabra)) return { usar: true, razon: 'problema' };
+  }
+  for (const palabra of palabrasPedido) {
+    if (msg.includes(palabra)) return { usar: true, razon: 'pedido' };
+  }
+  for (const palabra of palabrasObjecion) {
+    if (msg.includes(palabra)) return { usar: true, razon: 'objecion' };
+  }
+  for (const palabra of palabrasCierre) {
+    if (msg.includes(palabra)) return { usar: true, razon: 'cierre' };
+  }
+
+  // Si el historial menciona productos y el usuario parece interesado
+  if (historialTexto.includes('precio') && (msg.includes('si') || msg.includes('ese') || msg.includes('me gusta'))) {
+    return { usar: true, razon: 'interes_compra' };
+  }
+
+  return { usar: false, razon: null };
+}
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -506,6 +565,13 @@ export async function POST(request) {
       return Response.json({ error: 'Mensaje requerido' }, { status: 400, headers: CORS_HEADERS });
     }
 
+    // Detectar si necesita Claude (más inteligente) o GPT (más barato)
+    const deteccion = necesitaClaude(mensaje, conversationHistory);
+    const usarClaude = deteccion.usar;
+    const modeloUsado = usarClaude ? 'claude-sonnet' : 'gpt-4o-mini';
+
+    console.log(`[Tito] Modelo: ${modeloUsado} (razón: ${deteccion.razon || 'simple'})`);
+
     // Detectar país
     let pais = paisParam || detectarPais(mensaje);
 
@@ -596,7 +662,42 @@ export async function POST(request) {
       assistantMessage = response.choices[0].message;
     }
 
-    const respuestaFinal = assistantMessage.content || '';
+    let respuestaFinal = assistantMessage.content || '';
+    let modeloFinal = 'gpt-4o-mini';
+
+    // Si es situación importante, usar Claude para respuesta final más inteligente
+    if (usarClaude && process.env.ANTHROPIC_API_KEY) {
+      try {
+        // Construir contexto para Claude
+        const contextoParaClaude = messages.map(m => {
+          if (m.role === 'system') return { role: 'user', content: `[INSTRUCCIONES DEL SISTEMA]\n${m.content}` };
+          if (m.role === 'tool') return { role: 'user', content: `[RESULTADO DE HERRAMIENTA]\n${m.content}` };
+          return { role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content || JSON.stringify(m) };
+        }).filter(m => m.content);
+
+        // Agregar la respuesta de GPT como contexto
+        if (respuestaFinal) {
+          contextoParaClaude.push({
+            role: 'user',
+            content: `[GPT sugirió esta respuesta, mejorala si es necesario]: ${respuestaFinal}`
+          });
+        }
+
+        const claudeResponse = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 500,
+          messages: contextoParaClaude
+        });
+
+        if (claudeResponse.content && claudeResponse.content[0]) {
+          respuestaFinal = claudeResponse.content[0].text;
+          modeloFinal = 'claude-sonnet';
+        }
+      } catch (claudeError) {
+        console.error('[Tito] Error con Claude, usando GPT:', claudeError.message);
+        // Mantener respuesta de GPT como fallback
+      }
+    }
 
     // Agregar UTM a los links para tracking
     const respuestaConTracking = respuestaFinal
@@ -609,7 +710,8 @@ export async function POST(request) {
       productos: productosParaMostrar,
       pais,
       tools: toolsUsadas,
-      modelo: 'gpt-4o-mini'
+      modelo: modeloFinal,
+      razon_modelo: deteccion.razon
     }, { headers: CORS_HEADERS });
 
   } catch (error) {
