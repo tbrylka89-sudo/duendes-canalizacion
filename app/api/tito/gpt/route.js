@@ -304,19 +304,33 @@ async function ejecutarTool(nombre, args, contexto) {
         const wooKey = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
         const wooSecret = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
+        if (!wooKey || !wooSecret) {
+          console.error('[Tito] Faltan credenciales WooCommerce');
+          return {
+            encontrado: false,
+            error: true,
+            mensaje: "Tuve un problema técnico. ¿Me pasás tu email para buscarlo de otra forma?"
+          };
+        }
+
         let url = `${wooUrl}/wp-json/wc/v3/orders?per_page=5`;
         if (numeroPedido) {
-          // Buscar por número específico
-          url = `${wooUrl}/wp-json/wc/v3/orders/${numeroPedido}`;
+          // Buscar por número específico - limpiar el número
+          const numLimpio = numeroPedido.toString().replace(/[^0-9]/g, '');
+          url = `${wooUrl}/wp-json/wc/v3/orders/${numLimpio}`;
         } else if (email) {
           url += `&search=${encodeURIComponent(email)}`;
         }
+
+        console.log('[Tito] Consultando pedido:', url.replace(wooUrl, ''));
 
         const response = await fetch(url, {
           headers: {
             'Authorization': 'Basic ' + Buffer.from(`${wooKey}:${wooSecret}`).toString('base64')
           }
         });
+
+        console.log('[Tito] Respuesta WooCommerce:', response.status);
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -325,7 +339,9 @@ async function ejecutarTool(nombre, args, contexto) {
               mensaje: "No encontré ese pedido. ¿Podés verificar el número?"
             };
           }
-          throw new Error('Error consultando WooCommerce');
+          const errorText = await response.text();
+          console.error('[Tito] Error WooCommerce:', response.status, errorText);
+          throw new Error(`Error WooCommerce: ${response.status}`);
         }
 
         const data = await response.json();
