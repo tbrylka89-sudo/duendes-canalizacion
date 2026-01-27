@@ -273,11 +273,25 @@ function duendes_precio_inteligente_html($price_html, $product) {
     }
     $procesando[$product_id] = true;
 
-    // Obtener precio base en USD
-    $precio_usd = floatval($product->get_price());
-    if ($precio_usd <= 0) {
+    // Obtener precio del producto
+    $precio_raw = floatval($product->get_price());
+    if ($precio_raw <= 0) {
         unset($procesando[$product_id]);
         return $price_html;
+    }
+
+    // DETECTAR SI EL PRECIO ESTÁ EN UYU O USD
+    // Si el precio es mayor a 1500, probablemente está en UYU (convertir a USD)
+    // Precios USD típicos: 70, 150, 200, 450, 1050
+    // Precios UYU típicos: 2500, 5500, 8000, 16500, 39800
+    $tasa_uyu_usd = 43; // Tasa aproximada UYU/USD
+
+    if ($precio_raw > 1500) {
+        // El precio está en UYU, convertir a USD
+        $precio_usd = round($precio_raw / $tasa_uyu_usd);
+    } else {
+        // El precio ya está en USD
+        $precio_usd = $precio_raw;
     }
 
     $pais = duendes_detectar_pais();

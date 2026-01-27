@@ -579,6 +579,8 @@ export async function POST(request) {
     const conversationHistory = body.conversationHistory || body.history || [];
     const paisParam = body.pais || body.pais_cliente;
     const usuario = body.usuario || null; // Info del usuario logueado
+    const contextoWidget = body.contexto || {}; // Contexto de la página (producto actual, etc.)
+    const productoActual = contextoWidget.producto || null; // Producto que está viendo
 
     if (!mensaje) {
       return Response.json({ error: 'Mensaje requerido' }, { status: 400, headers: CORS_HEADERS });
@@ -609,6 +611,73 @@ export async function POST(request) {
         razon_modelo: razon
       }, { headers: CORS_HEADERS });
     };
+
+    // ─────────────────────────────────────────────────────────────
+    // "ESTE GUARDIÁN" - Cuando están en página de producto
+    // ─────────────────────────────────────────────────────────────
+    const preguntaPorEste = /este guardi[aá]n|contame m[aá]s|cont[aá]me sobre|este duende|m[aá]s sobre este|cu[eé]ntame/i.test(msgLower);
+
+    if (preguntaPorEste && productoActual && productoActual.nombre) {
+      try {
+        // Buscar el producto en WooCommerce para obtener datos completos
+        const productos = await obtenerProductosWoo();
+        const productoEncontrado = productos.find(p =>
+          p.nombre.toLowerCase().includes(productoActual.nombre.toLowerCase()) ||
+          productoActual.nombre.toLowerCase().includes(p.nombre.toLowerCase())
+        );
+
+        if (productoEncontrado && process.env.ANTHROPIC_API_KEY) {
+          const precioUSD = parseFloat(productoEncontrado.precio) || 150;
+          let precioMostrar = `$${precioUSD} USD`;
+
+          const pais = paisDetectado || 'US';
+          if (pais === 'UY') {
+            const precioUY = PRECIOS_URUGUAY.convertir ? PRECIOS_URUGUAY.convertir(precioUSD) : Math.round(precioUSD * 43);
+            precioMostrar = `$${precioUY.toLocaleString('es-UY')} pesos`;
+          }
+
+          const promptClaude = `Sos Tito, un duende vendedor de Piriápolis. Hablás uruguayo.
+
+El cliente está en la página del guardián "${productoEncontrado.nombre}" y quiere saber más.
+
+DATOS DEL GUARDIÁN:
+- Nombre: ${productoEncontrado.nombre}
+- Precio: ${precioMostrar}
+- Categoría: ${productoEncontrado.categorias?.join(', ') || 'Guardián'}
+- Descripción: ${productoEncontrado.descripcion || productoEncontrado.descripcionCorta || ''}
+
+INSTRUCCIONES:
+- Contale sobre ESTE guardián específico (${productoEncontrado.nombre})
+- Usá la descripción que te di, no inventes
+- Mencioná el precio: ${precioMostrar}
+- Hacelo sentir especial, conectá emocionalmente
+- Preguntá si quiere adoptarlo
+- Máximo 120 palabras`;
+
+          const claudeResponse = await anthropic.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 350,
+            messages: [{ role: 'user', content: promptClaude }]
+          });
+
+          return Response.json({
+            success: true,
+            respuesta: claudeResponse.content[0]?.text || '',
+            productos: [{
+              nombre: productoEncontrado.nombre,
+              precio_mostrar: precioMostrar,
+              imagen: productoEncontrado.imagen,
+              url: productoEncontrado.url
+            }],
+            pais: pais,
+            modelo: 'claude-sonnet',
+            razon_modelo: 'producto_actual'
+          }, { headers: CORS_HEADERS });
+        }
+      } catch (e) {
+        console.error('[Tito] Error con producto actual:', e);
+      }
+    }
 
     // ─────────────────────────────────────────────────────────────
     // SPAM - "amén", lotería, solo emojis
