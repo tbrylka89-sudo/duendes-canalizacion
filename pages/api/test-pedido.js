@@ -2,19 +2,19 @@
  * Test endpoint para verificar consulta de pedidos WooCommerce
  */
 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const orderId = searchParams.get('order') || '5687';
+export default async function handler(req, res) {
+  const orderId = req.query.order || '5687';
 
   const wooUrl = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesdeluruguay.com';
   const wooKey = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
   const wooSecret = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
   if (!wooKey || !wooSecret) {
-    return Response.json({
+    return res.json({
       error: 'Faltan credenciales',
       hasKey: !!wooKey,
-      hasSecret: !!wooSecret
+      hasSecret: !!wooSecret,
+      keyPrefix: wooKey ? wooKey.substring(0, 5) : null
     });
   }
 
@@ -29,7 +29,7 @@ export async function GET(request) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return Response.json({
+      return res.json({
         error: true,
         status: response.status,
         url: url.replace(wooUrl, '[WOO]'),
@@ -39,7 +39,7 @@ export async function GET(request) {
 
     const data = await response.json();
 
-    return Response.json({
+    return res.json({
       success: true,
       order: {
         id: data.id,
@@ -54,7 +54,7 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    return Response.json({
+    return res.json({
       error: true,
       message: error.message
     });
