@@ -566,29 +566,214 @@ export async function POST(request) {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // DETECTAR SPAM / MENSAJES VACÍOS - NO GASTAR TOKENS
+    // RESPUESTAS RÁPIDAS SIN IA - AHORRA TOKENS
     // ═══════════════════════════════════════════════════════════════
     const msgLower = mensaje.toLowerCase().trim();
 
-    // Patrones de spam/mensajes vacíos
-    const esSpam = (
-      /^(amen|amén|bendiciones?|bendecido)$/i.test(msgLower) ||
-      /^(dame suerte|buena vibra|buenas vibras|suerte)$/i.test(msgLower) ||
-      /^(dame los n[uú]meros|5 de oro|loter[ií]a|quiniela|n[uú]meros de la suerte)/i.test(msgLower) ||
-      /^[\p{Emoji}\s]+$/u.test(mensaje.trim()) || // Solo emojis
-      /^(hola|hey|ey|hi)[\s!?.]*$/i.test(msgLower) && conversationHistory.length > 2 || // "Hola" repetido
-      msgLower.length < 3 // Mensajes muy cortos
-    );
+    // Detectar país del historial si existe
+    let paisDelHistorial = null;
+    for (const h of conversationHistory) {
+      const p = detectarPais(h.content || '');
+      if (p) { paisDelHistorial = p; break; }
+    }
+    const paisDetectado = paisParam || detectarPais(mensaje) || paisDelHistorial;
 
-    if (esSpam) {
-      console.log('[Tito] Mensaje spam detectado, respuesta rápida');
+    // Función helper para respuesta rápida
+    const respuestaRapida = (texto, razon) => {
+      console.log(`[Tito] Respuesta rápida: ${razon}`);
       return Response.json({
         success: true,
-        respuesta: '¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.',
+        respuesta: texto,
         productos: [],
+        pais: paisDetectado,
         modelo: 'ninguno',
-        razon_modelo: 'spam'
+        razon_modelo: razon
       }, { headers: CORS_HEADERS });
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // SPAM - "amén", lotería, solo emojis
+    // ─────────────────────────────────────────────────────────────
+    if (
+      /^(amen|amén|bendiciones?|bendecido)$/i.test(msgLower) ||
+      /^(dame suerte|buena vibra|buenas vibras|suerte)$/i.test(msgLower) ||
+      /^(dame los n[uú]meros|5 de oro|loter[ií]a|quiniela|n[uú]meros)/i.test(msgLower) ||
+      /^[\p{Emoji}\s]+$/u.test(mensaje.trim()) ||
+      msgLower.length < 3
+    ) {
+      return respuestaRapida(
+        '¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.',
+        'spam'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // SALUDO INICIAL - "hola", "buenas"
+    // ─────────────────────────────────────────────────────────────
+    if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello)[\s!?.]*$/i.test(msgLower) && conversationHistory.length <= 1) {
+      return respuestaRapida(
+        '¡Ey! Soy Tito 🍀 ¿De qué país me escribís? Así te paso los precios en tu moneda.',
+        'saludo'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PRECIOS GENÉRICOS - "cuánto cuestan", "precios"
+    // ─────────────────────────────────────────────────────────────
+    if (/^(cu[aá]nto cuestan?|precios?|cu[aá]nto valen?|cu[aá]nto salen?)[\s?]*$/i.test(msgLower) && !paisDetectado) {
+      return respuestaRapida(
+        '¿De qué país me escribís? Así te paso los precios en tu moneda 🍀',
+        'precio_sin_pais'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DE DÓNDE SON / DÓNDE ESTÁN
+    // ─────────────────────────────────────────────────────────────
+    if (/de d[oó]nde son|d[oó]nde est[aá]n|d[oó]nde queda|de qu[eé] pa[ií]s|ubicaci[oó]n/i.test(msgLower)) {
+      return respuestaRapida(
+        'Somos de Piriápolis, Uruguay 🇺🇾 Nacemos en el bosque, pero viajamos a todo el mundo.',
+        'ubicacion'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ENVÍOS
+    // ─────────────────────────────────────────────────────────────
+    if (/hacen env[ií]os?|env[ií]an a|llegan? a|mandan a|shipping/i.test(msgLower)) {
+      return respuestaRapida(
+        'Sí, enviamos a todo el mundo 🌎 Por DHL Express, llega en 5-10 días con tracking. ¿De qué país sos?',
+        'envios'
+      );
+    }
+
+    if (/cu[aá]nto (tarda|demora|tiempo)|d[ií]as de env[ií]o|tiempo de entrega/i.test(msgLower)) {
+      const respEnvio = paisDetectado === 'UY'
+        ? 'En Uruguay: 3-7 días hábiles por DAC 📦'
+        : 'Internacional: 5-10 días hábiles por DHL Express 📦 Con tracking completo.';
+      return respuestaRapida(respEnvio, 'tiempo_envio');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MÉTODOS DE PAGO
+    // ─────────────────────────────────────────────────────────────
+    if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago|pagan con|aceptan/i.test(msgLower)) {
+      const respPago = paisDetectado === 'UY'
+        ? 'En Uruguay: Visa, Master, Amex, OCA, PassCard, Cabal, Anda, Club del Este, Redpagos, Itaú, Mercado Pago, y transferencia bancaria (BROU, Bandes, BBVA, Scotiabank) 💳'
+        : 'Internacional: Visa, MasterCard, American Express 💳 Tu banco convierte automáticamente a tu moneda.';
+      return respuestaRapida(respPago, 'metodos_pago');
+    }
+
+    if (/paypal|pay pal/i.test(msgLower)) {
+      return respuestaRapida(
+        'No tenemos PayPal, pero sí Visa, MasterCard y Amex. En Uruguay también Mercado Pago y transferencia 💳',
+        'paypal'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // SEGURIDAD / CONFIANZA
+    // ─────────────────────────────────────────────────────────────
+    if (/es (seguro|confiable)|puedo confiar|es real|no es estafa|ser[aá] verdad/i.test(msgLower)) {
+      return respuestaRapida(
+        'Llevamos años enviando guardianes a más de 30 países 🌎 Pago seguro, envío con tracking, y miles de personas felices con su guardián. Podés ver reseñas en nuestra página.',
+        'confianza'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PERSONALIZADOS / ENCARGOS
+    // ─────────────────────────────────────────────────────────────
+    if (/personalizado|encargo|me (hacen|pueden hacer)|hagan uno|a pedido|custom/i.test(msgLower)) {
+      return respuestaRapida(
+        'No hacemos encargos ni personalizados. Cada guardián nace cuando tiene que nacer, no se puede apurar una canalización. Los que ves en la tienda son los que están listos para encontrar su humano 🍀',
+        'personalizados'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // TIENDA FÍSICA
+    // ─────────────────────────────────────────────────────────────
+    if (/tienda f[ií]sica|local|puedo ir|visitarlos|showroom|conocer el lugar/i.test(msgLower)) {
+      return respuestaRapida(
+        'Estamos en Piriápolis, Uruguay, pero por ahora solo vendemos online. ¡Los guardianes viajan a todo el mundo! 🌎',
+        'tienda_fisica'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // TAMAÑOS / MEDIDAS
+    // ─────────────────────────────────────────────────────────────
+    if (/cu[aá]nto mide|tama[ñn]o|medida|qu[eé] tan grande|dimensiones/i.test(msgLower)) {
+      return respuestaRapida(
+        'Cada guardián tiene su medida exacta en la web. Van desde minis (~10cm) hasta gigantes (~50cm+). El precio es por el trabajo completo, no por tamaño 🍀',
+        'medidas'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DESCUENTOS / PROMOS
+    // ─────────────────────────────────────────────────────────────
+    if (/descuento|promo|oferta|rebaja|cupon|cup[oó]n|c[oó]digo/i.test(msgLower)) {
+      return respuestaRapida(
+        '¡Sí! Tenemos el 3x2: llevás 2 guardianes y te regalamos 1 mini 🎁 Y envío gratis en compras grandes.',
+        'promos'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // CÓMO FUNCIONA
+    // ─────────────────────────────────────────────────────────────
+    if (/c[oó]mo funciona|qu[eé] es esto|de qu[eé] se trata|explicame|expl[ií]came/i.test(msgLower)) {
+      return respuestaRapida(
+        `Los guardianes son seres mágicos únicos, creados a mano con cristales naturales. Cada uno tiene su energía y propósito.
+
+✨ Cómo encontrar el tuyo:
+1. Hacé el Test del Guardián para descubrir cuál resuena con vos: https://duendesdeluruguay.com/descubri-que-duende-te-elige/
+2. O mirá los guardianes en la tienda - el que te llame la atención, ese te eligió
+3. Lo adoptás y te llega con su canalización personalizada (un mensaje único para vos)
+4. En "Mi Magia" vas a encontrar su historia, ritual de bienvenida y cómo cuidarlo
+
+¿Querés hacer el test o que te muestre algunos guardianes? 🍀`,
+        'como_funciona'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // TEST DEL GUARDIÁN
+    // ─────────────────────────────────────────────────────────────
+    if (/test|cu[aá]l (es para m[ií]|me corresponde|es el m[ií]o)|no s[eé] cu[aá]l elegir|ay[uú]dame a elegir|cu[aá]l me recomiend/i.test(msgLower)) {
+      return respuestaRapida(
+        '¡Tenemos un test para eso! Te hace preguntas y te dice qué guardián resuena con tu energía: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀',
+        'test'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DESPEDIDAS / AGRADECIMIENTOS
+    // ─────────────────────────────────────────────────────────────
+    if (/^(gracias|muchas gracias|thanks|thx|grax|ty)[\s!.]*$/i.test(msgLower)) {
+      return respuestaRapida(
+        '¡A vos! 🍀 Cuando sientas el llamado de un guardián, acá estoy.',
+        'gracias'
+      );
+    }
+
+    if (/^(chau|adi[oó]s|bye|nos vemos|hasta luego)[\s!.]*$/i.test(msgLower)) {
+      return respuestaRapida(
+        '¡Hasta pronto! 🍀 Que la magia te acompañe.',
+        'despedida'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RESPUESTAS VACÍAS - "ok", "dale", "sí" sin contexto
+    // ─────────────────────────────────────────────────────────────
+    if (/^(ok|dale|si|sí|ya|bien|bueno|ta|está bien|listo)[\s!.]*$/i.test(msgLower) && conversationHistory.length <= 1) {
+      return respuestaRapida(
+        '¿En qué te puedo ayudar? 🍀',
+        'confirmacion_vacia'
+      );
     }
 
     // Detectar si necesita Claude (más inteligente) o GPT (más barato)
