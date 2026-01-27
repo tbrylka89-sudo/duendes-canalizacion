@@ -565,6 +565,32 @@ export async function POST(request) {
       return Response.json({ error: 'Mensaje requerido' }, { status: 400, headers: CORS_HEADERS });
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // DETECTAR SPAM / MENSAJES VACÍOS - NO GASTAR TOKENS
+    // ═══════════════════════════════════════════════════════════════
+    const msgLower = mensaje.toLowerCase().trim();
+
+    // Patrones de spam/mensajes vacíos
+    const esSpam = (
+      /^(amen|amén|bendiciones?|bendecido)$/i.test(msgLower) ||
+      /^(dame suerte|buena vibra|buenas vibras|suerte)$/i.test(msgLower) ||
+      /^(dame los n[uú]meros|5 de oro|loter[ií]a|quiniela|n[uú]meros de la suerte)/i.test(msgLower) ||
+      /^[\p{Emoji}\s]+$/u.test(mensaje.trim()) || // Solo emojis
+      /^(hola|hey|ey|hi)[\s!?.]*$/i.test(msgLower) && conversationHistory.length > 2 || // "Hola" repetido
+      msgLower.length < 3 // Mensajes muy cortos
+    );
+
+    if (esSpam) {
+      console.log('[Tito] Mensaje spam detectado, respuesta rápida');
+      return Response.json({
+        success: true,
+        respuesta: '¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.',
+        productos: [],
+        modelo: 'ninguno',
+        razon_modelo: 'spam'
+      }, { headers: CORS_HEADERS });
+    }
+
     // Detectar si necesita Claude (más inteligente) o GPT (más barato)
     const deteccion = necesitaClaude(mensaje, conversationHistory);
     const usarClaude = deteccion.usar;
