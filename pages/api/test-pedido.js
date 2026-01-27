@@ -49,6 +49,8 @@ export default async function handler(req, res) {
         currency: data.currency,
         billing_email: data.billing?.email,
         billing_name: `${data.billing?.first_name} ${data.billing?.last_name}`,
+        billing_country: data.billing?.country,
+        shipping_country: data.shipping?.country,
         items: data.line_items?.map(i => i.name)
       }
     });
