@@ -750,6 +750,20 @@ export async function POST(request) {
     }
 
     // ─────────────────────────────────────────────────────────────
+    // QUÉ SIGNIFICA CANALIZADO (también confunden con "personalizado")
+    // ─────────────────────────────────────────────────────────────
+    if (/qu[eé] (significa|es|quiere decir).*(canaliza|personaliza)|canaliza.*para m[ií]|personaliza.*para m[ií]|c[oó]mo.*canaliza|mensaje.*(personal|canaliza)/i.test(msgLower)) {
+      return respuestaRapida(
+        `Cada guardián viene con una CANALIZACIÓN: un mensaje único que tu guardián tiene para vos.
+
+Cuando comprás, te pedimos que compartas un poco de vos (sin contar todo, para que la magia funcione). Con eso, el guardián te envía un mensaje personal que solo vos vas a recibir.
+
+No es un texto genérico - es SU mensaje para VOS. Por eso cada canalización es diferente y muchas personas se emocionan al leerla 🍀`,
+        'canalizacion'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // DESPEDIDAS / AGRADECIMIENTOS
     // ─────────────────────────────────────────────────────────────
     if (/^(gracias|muchas gracias|thanks|thx|grax|ty)[\s!.]*$/i.test(msgLower)) {
