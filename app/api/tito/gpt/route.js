@@ -637,13 +637,79 @@ export async function POST(request) {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PRECIOS GENÉRICOS - "cuánto cuestan", "precios"
+    // PRECIOS - Respuesta DIRECTA con productos reales (sin GPT)
     // ─────────────────────────────────────────────────────────────
-    if (/^(cu[aá]nto cuestan?|precios?|cu[aá]nto valen?|cu[aá]nto salen?)[\s?]*$/i.test(msgLower) && !paisDetectado) {
+    const preguntaPorPrecios = /cu[aá]nto cuestan?|precios?|cu[aá]nto valen?|cu[aá]nto salen?|qu[eé] precios|ver guardianes|mostrame|quiero ver/i.test(msgLower);
+
+    if (preguntaPorPrecios && !paisDetectado) {
       return respuestaRapida(
         '¿De qué país me escribís? Así te paso los precios en tu moneda 🍀',
         'precio_sin_pais'
       );
+    }
+
+    // Si pregunta por precios Y tenemos país → mostrar productos REALES directamente
+    if (preguntaPorPrecios && paisDetectado) {
+      try {
+        const productos = await obtenerProductosWoo();
+        const disponibles = productos.filter(p => p.disponible).slice(0, 4);
+
+        if (disponibles.length > 0) {
+          const cotizaciones = await obtenerCotizaciones();
+          const paisAMoneda = { 'AR': 'ARS', 'MX': 'MXN', 'CO': 'COP', 'CL': 'CLP', 'PE': 'PEN', 'BR': 'BRL', 'ES': 'EUR' };
+          const monedaNombres = { 'ARS': 'pesos argentinos', 'MXN': 'pesos mexicanos', 'COP': 'pesos colombianos', 'CLP': 'pesos chilenos', 'PEN': 'soles', 'BRL': 'reales', 'EUR': 'euros' };
+
+          // Armar respuesta con datos REALES
+          let respuesta = '¡Acá tenés algunos guardianes! 🍀\n\n';
+          const productosParaMostrar = [];
+
+          for (const p of disponibles) {
+            const precioUSD = parseFloat(p.precio) || 150;
+            let precioMostrar;
+
+            if (paisDetectado === 'UY') {
+              const precioUY = PRECIOS_URUGUAY.convertir ? PRECIOS_URUGUAY.convertir(precioUSD) : Math.round(precioUSD * 43);
+              precioMostrar = `$${precioUY.toLocaleString('es-UY')} pesos`;
+            } else if (['US', 'EC', 'PA'].includes(paisDetectado)) {
+              precioMostrar = `$${precioUSD} USD`;
+            } else {
+              const codigoMoneda = paisAMoneda[paisDetectado] || 'USD';
+              const tasa = cotizaciones[codigoMoneda] || 1;
+              const precioLocal = Math.round(precioUSD * tasa);
+              const nombreMoneda = monedaNombres[codigoMoneda] || 'dólares';
+              precioMostrar = `$${precioUSD} USD (~$${precioLocal.toLocaleString('es')} ${nombreMoneda})`;
+            }
+
+            respuesta += `**${p.nombre}** - ${precioMostrar}\n`;
+            if (p.descripcionCorta) {
+              respuesta += `${p.descripcionCorta.substring(0, 80)}...\n`;
+            }
+            respuesta += '\n';
+
+            productosParaMostrar.push({
+              nombre: p.nombre,
+              precio_usd: precioUSD,
+              precio_mostrar: precioMostrar,
+              imagen: p.imagen,
+              url: p.url
+            });
+          }
+
+          respuesta += '¿Cuál te llamó la atención?';
+
+          return Response.json({
+            success: true,
+            respuesta,
+            productos: productosParaMostrar,
+            pais: paisDetectado,
+            modelo: 'directo',
+            razon_modelo: 'precios_reales'
+          }, { headers: CORS_HEADERS });
+        }
+      } catch (e) {
+        console.error('[Tito] Error obteniendo productos:', e);
+        // Si falla, continúa con GPT
+      }
     }
 
     // ─────────────────────────────────────────────────────────────
