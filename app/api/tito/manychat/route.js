@@ -1,8 +1,9 @@
 /**
  * TITO para ManyChat - Instagram, Facebook, WhatsApp
  *
- * Este endpoint ahora redirige internamente a /api/tito/v3 con origen: 'manychat'
- * para aprovechar toda la inteligencia de Tito v3 (tools, objeciones, etc.)
+ * Usa el modelo HÍBRIDO (GPT-4o-mini + Claude Sonnet):
+ * - GPT para consultas simples (rápido y barato)
+ * - Claude Sonnet para situaciones importantes (pedidos, quejas, cierres)
  *
  * Mantiene el formato de respuesta ManyChat Dynamic Block v2
  */
@@ -80,7 +81,7 @@ function crearRespuestaConProducto(texto, producto) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HANDLER PRINCIPAL - Redirige a v3
+// HANDLER PRINCIPAL - Usa modelo híbrido (GPT + Claude)
 // ═══════════════════════════════════════════════════════════════
 
 export async function POST(request) {
@@ -110,35 +111,30 @@ export async function POST(request) {
       });
     }
 
-    // Llamar a Tito v3 con origen manychat
-    // Usar la URL del request para construir la URL de v3
+    // Llamar a Tito GPT (híbrido) con origen manychat
     const requestUrl = new URL(request.url);
     const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
 
-    const v3Response = await fetch(`${baseUrl}/api/tito/v3`, {
+    const gptResponse = await fetch(`${baseUrl}/api/tito/gpt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         mensaje: msg,
         nombre: userName,
-        origen: 'manychat', // Tito sabe que viene de redes sociales
+        origen: 'manychat',
         subscriber_id,
-        historial: conversationHistory.map(h => ({
+        conversationHistory: conversationHistory.map(h => ({
           role: h.rol === 'usuario' ? 'user' : (h.role || 'assistant'),
           content: h.contenido || h.content || h.texto
-        })),
-        // Info adicional para contexto
-        contexto: {
-          plataforma: plataforma || 'instagram'
-        }
+        }))
       })
     });
 
-    const v3Data = await v3Response.json();
+    const gptData = await gptResponse.json();
 
     // Extraer respuesta y productos de v3
-    const respuestaTexto = v3Data.respuesta || v3Data.response || 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?';
-    const productos = v3Data.productos || [];
+    const respuestaTexto = gptData.respuesta || gptData.response || 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?';
+    const productos = gptData.productos || [];
 
     // Construir respuesta en formato ManyChat
     let respuestaManychat;
@@ -157,9 +153,10 @@ export async function POST(request) {
     respuestaManychat.metadata = {
       success: true,
       origen: 'manychat',
+      modelo: gptData.modelo || 'gpt-4o-mini',
+      razon_modelo: gptData.razon_modelo || 'simple',
       productos_mostrados: productos.length,
-      analisis: v3Data.analisis || null,
-      tools: v3Data.tools || []
+      tools: gptData.tools || []
     };
 
     // También incluir respuesta simple para compatibilidad
@@ -172,11 +169,12 @@ export async function POST(request) {
     if (productos.length >= 3) respuestaManychat.imagen_3 = productos[2]?.imagen || '';
     respuestaManychat.total_productos = productos.length;
 
-    console.log('[TITO MANYCHAT v3]', {
+    console.log('[TITO MANYCHAT HÍBRIDO]', {
       plataforma,
       nombre: userName,
       productos: productos.length,
-      analisis: v3Data.analisis?.tipoCliente
+      modelo: gptData.modelo || 'gpt-4o-mini',
+      razon: gptData.razon_modelo
     });
 
     return Response.json(respuestaManychat);
@@ -201,11 +199,16 @@ export async function POST(request) {
 export async function GET() {
   return Response.json({
     status: 'ok',
-    endpoint: 'Tito ManyChat v3 - Unificado con Tito principal',
-    descripcion: 'Este endpoint ahora usa /api/tito/v3 internamente con origen: manychat',
+    endpoint: 'Tito ManyChat HÍBRIDO (GPT + Claude)',
+    descripcion: 'Usa GPT-4o-mini para consultas simples, Claude Sonnet para situaciones importantes',
     formato: 'ManyChat Dynamic Block v2',
+    modelo: {
+      simple: 'GPT-4o-mini (saludos, ver productos)',
+      importante: 'Claude Sonnet (pedidos, quejas, objeciones, cierres)'
+    },
     capacidades: [
-      'Usa la inteligencia de Tito v3 (tools, objeciones, geolocalización)',
+      'Modelo híbrido inteligente según contexto',
+      'Consulta de pedidos con país de envío correcto',
       'Mantiene formato ManyChat para compatibilidad',
       'Soporta Instagram, Facebook y WhatsApp via ManyChat'
     ],
