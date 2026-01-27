@@ -299,10 +299,10 @@ async function ejecutarTool(nombre, args, contexto) {
       }
 
       try {
-        // Consultar WooCommerce API
-        const wooUrl = process.env.WOO_API_URL || 'https://duendesdeluruguay.com';
-        const wooKey = process.env.WOO_CONSUMER_KEY;
-        const wooSecret = process.env.WOO_CONSUMER_SECRET;
+        // Consultar WooCommerce API (usar mismas variables que el resto del sistema)
+        const wooUrl = process.env.WORDPRESS_URL || process.env.WOO_URL || 'https://duendesdeluruguay.com';
+        const wooKey = process.env.WC_CONSUMER_KEY || process.env.WOO_CONSUMER_KEY;
+        const wooSecret = process.env.WC_CONSUMER_SECRET || process.env.WOO_CONSUMER_SECRET;
 
         let url = `${wooUrl}/wp-json/wc/v3/orders?per_page=5`;
         if (numeroPedido) {
