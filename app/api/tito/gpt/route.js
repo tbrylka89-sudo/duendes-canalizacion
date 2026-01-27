@@ -639,7 +639,8 @@ export async function POST(request) {
     // ─────────────────────────────────────────────────────────────
     // PRECIOS - Respuesta DIRECTA con productos reales (sin GPT)
     // ─────────────────────────────────────────────────────────────
-    const preguntaPorPrecios = /cu[aá]nto cuestan?|precios?|cu[aá]nto valen?|cu[aá]nto salen?|qu[eé] precios|ver guardianes|mostrame|quiero ver/i.test(msgLower);
+    // Detectar si piden ver productos (precios, categorías, o quieren ver guardianes)
+    const preguntaPorPrecios = /cu[aá]nto cuestan?|precios?|cu[aá]nto valen?|cu[aá]nto salen?|qu[eé] precios|ver guardianes|mostrame|quiero ver|tienen de|busco|necesito|abundancia|protecci[oó]n|amor|sanaci[oó]n/i.test(msgLower);
 
     if (preguntaPorPrecios && !paisDetectado) {
       return respuestaRapida(
@@ -648,11 +649,43 @@ export async function POST(request) {
       );
     }
 
-    // Si pregunta por precios Y tenemos país → usar CLAUDE con datos REALES
+    // Si pregunta por precios/productos Y tenemos país → CLAUDE con datos REALES
     if (preguntaPorPrecios && paisDetectado) {
       try {
         const productos = await obtenerProductosWoo();
-        const disponibles = productos.filter(p => p.disponible).slice(0, 4);
+        let disponibles = productos.filter(p => p.disponible);
+
+        // Detectar si piden categoría específica
+        const categoriaMap = {
+          'abundancia': /abundancia|dinero|prosperidad|negocio|plata|trabajo/i,
+          'proteccion': /protecci[oó]n|proteger|escudo|defensa|malo|negativ/i,
+          'amor': /amor|pareja|coraz[oó]n|relaci[oó]n|soledad/i,
+          'sanacion': /sanaci[oó]n|salud|sanar|bienestar|curar/i
+        };
+
+        let categoriaDetectada = null;
+        for (const [cat, regex] of Object.entries(categoriaMap)) {
+          if (regex.test(msgLower)) {
+            categoriaDetectada = cat;
+            break;
+          }
+        }
+
+        // Filtrar por categoría si se detectó
+        if (categoriaDetectada) {
+          const filtrados = disponibles.filter(p => {
+            const cats = (p.categorias || []).join(' ').toLowerCase();
+            const desc = (p.descripcion || '').toLowerCase();
+            const nombre = (p.nombre || '').toLowerCase();
+            return categoriaMap[categoriaDetectada].test(cats + ' ' + desc + ' ' + nombre);
+          });
+          if (filtrados.length > 0) {
+            disponibles = filtrados;
+          }
+        }
+
+        // Tomar hasta 4 productos
+        disponibles = disponibles.slice(0, 4);
 
         if (disponibles.length > 0 && process.env.ANTHROPIC_API_KEY) {
           const cotizaciones = await obtenerCotizaciones();

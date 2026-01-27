@@ -402,6 +402,105 @@ function duendes_header_universal() {
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       SELECTOR DE PAÍS EN HEADER
+       ═══════════════════════════════════════════════════════════════ */
+
+    .dh-pais-selector {
+        position: relative;
+    }
+
+    .dh-pais-btn {
+        width: 36px;
+        height: 36px;
+        background: #0a0a0a !important;
+        border: 2px solid rgba(212,175,55,0.5) !important;
+        border-radius: 50% !important;
+        cursor: pointer;
+        font-size: 20px;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s;
+        padding: 0 !important;
+        line-height: 1;
+        overflow: hidden;
+    }
+
+    .dh-pais-btn:hover {
+        border-color: #d4af37 !important;
+        transform: scale(1.1);
+    }
+
+    .dh-bandera-emoji {
+        font-size: 20px;
+        line-height: 1;
+        display: block;
+    }
+
+    .dh-pais-dropdown {
+        position: absolute;
+        top: 45px;
+        right: 0;
+        background: #0a0a0a;
+        border: 1px solid rgba(212,175,55,0.4);
+        border-radius: 12px;
+        padding: 10px 0;
+        display: none;
+        min-width: 180px;
+        max-height: 350px;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        z-index: 9999999;
+    }
+
+    .dh-pais-dropdown.visible {
+        display: block;
+    }
+
+    .dh-pais-titulo {
+        padding: 8px 15px 10px;
+        font-size: 11px;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .dh-pais-dropdown a {
+        display: block;
+        padding: 8px 15px;
+        color: rgba(255,255,255,0.85);
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .dh-pais-dropdown a:hover {
+        background: rgba(212,175,55,0.15);
+        color: #d4af37;
+    }
+
+    .dh-pais-dropdown a.active {
+        color: #d4af37;
+        font-weight: 600;
+        background: rgba(212,175,55,0.1);
+    }
+
+    /* Scrollbar del dropdown */
+    .dh-pais-dropdown::-webkit-scrollbar {
+        width: 6px;
+    }
+    .dh-pais-dropdown::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.05);
+    }
+    .dh-pais-dropdown::-webkit-scrollbar-thumb {
+        background: rgba(212,175,55,0.4);
+        border-radius: 3px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        iOS Safe Area
        ═══════════════════════════════════════════════════════════════ */
 
@@ -460,6 +559,95 @@ function duendes_header_universal() {
         <!-- DERECHA - Iconos + Hamburguesa -->
         <div class="dh-right">
             <a href="https://mimagia.duendesdeluruguay.com" class="dh-text-link dh-desktop-only">Mi Magia</a>
+
+            <!-- Selector de País -->
+            <?php
+            // Obtener país de cookie o detectar por IP
+            $pais_actual = isset($_COOKIE['duendes_pais']) ? sanitize_text_field($_COOKIE['duendes_pais']) : '';
+
+            // Si no hay cookie, intentar detectar (el plugin de precios lo hace)
+            if (empty($pais_actual) && function_exists('duendes_detectar_pais')) {
+                $pais_actual = duendes_detectar_pais();
+            }
+            if (empty($pais_actual)) {
+                $pais_actual = 'US';
+            }
+
+            // Banderas con imágenes SVG para evitar problemas de renderizado de emojis
+            $banderas_header = [
+                'UY' => ['emoji' => '🇺🇾', 'img' => 'uy'],
+                'AR' => ['emoji' => '🇦🇷', 'img' => 'ar'],
+                'MX' => ['emoji' => '🇲🇽', 'img' => 'mx'],
+                'CO' => ['emoji' => '🇨🇴', 'img' => 'co'],
+                'CL' => ['emoji' => '🇨🇱', 'img' => 'cl'],
+                'PE' => ['emoji' => '🇵🇪', 'img' => 'pe'],
+                'BR' => ['emoji' => '🇧🇷', 'img' => 'br'],
+                'ES' => ['emoji' => '🇪🇸', 'img' => 'es'],
+                'US' => ['emoji' => '🇺🇸', 'img' => 'us'],
+                'CA' => ['emoji' => '🇨🇦', 'img' => 'ca'],
+                'GB' => ['emoji' => '🇬🇧', 'img' => 'gb'],
+                'FR' => ['emoji' => '🇫🇷', 'img' => 'fr'],
+                'DE' => ['emoji' => '🇩🇪', 'img' => 'de'],
+                'IT' => ['emoji' => '🇮🇹', 'img' => 'it'],
+                'PT' => ['emoji' => '🇵🇹', 'img' => 'pt'],
+                'EC' => ['emoji' => '🇪🇨', 'img' => 'ec'],
+                'VE' => ['emoji' => '🇻🇪', 'img' => 've'],
+                'BO' => ['emoji' => '🇧🇴', 'img' => 'bo'],
+                'PY' => ['emoji' => '🇵🇾', 'img' => 'py'],
+                'CR' => ['emoji' => '🇨🇷', 'img' => 'cr'],
+                'PA' => ['emoji' => '🇵🇦', 'img' => 'pa'],
+                'GT' => ['emoji' => '🇬🇹', 'img' => 'gt'],
+                'DO' => ['emoji' => '🇩🇴', 'img' => 'do'],
+                'PR' => ['emoji' => '🇵🇷', 'img' => 'pr'],
+                'CU' => ['emoji' => '🇨🇺', 'img' => 'cu'],
+                'XX' => ['emoji' => '🌎', 'img' => 'world'],
+            ];
+            $nombres_paises = [
+                'UY' => 'Uruguay',
+                'AR' => 'Argentina',
+                'MX' => 'México',
+                'CO' => 'Colombia',
+                'CL' => 'Chile',
+                'PE' => 'Perú',
+                'BR' => 'Brasil',
+                'ES' => 'España',
+                'US' => 'Estados Unidos',
+                'CA' => 'Canadá',
+                'GB' => 'Reino Unido',
+                'FR' => 'Francia',
+                'DE' => 'Alemania',
+                'IT' => 'Italia',
+                'PT' => 'Portugal',
+                'EC' => 'Ecuador',
+                'VE' => 'Venezuela',
+                'BO' => 'Bolivia',
+                'PY' => 'Paraguay',
+                'CR' => 'Costa Rica',
+                'PA' => 'Panamá',
+                'GT' => 'Guatemala',
+                'DO' => 'Rep. Dominicana',
+                'PR' => 'Puerto Rico',
+                'CU' => 'Cuba',
+                'XX' => 'Otro país',
+            ];
+
+            $bandera_actual = $banderas_header[$pais_actual]['emoji'] ?? '🌎';
+            ?>
+            <div class="dh-pais-selector">
+                <button class="dh-pais-btn" id="dhPaisBtn" title="Cambiar país">
+                    <span class="dh-bandera-emoji"><?php echo $bandera_actual; ?></span>
+                </button>
+                <div class="dh-pais-dropdown" id="dhPaisDropdown">
+                    <div class="dh-pais-titulo">Elegí tu país</div>
+                    <?php foreach ($nombres_paises as $codigo => $nombre):
+                        $bandera = $banderas_header[$codigo]['emoji'] ?? '🌎';
+                    ?>
+                        <a href="#" data-pais="<?php echo $codigo; ?>" class="<?php echo $codigo === $pais_actual ? 'active' : ''; ?>">
+                            <?php echo $bandera . ' ' . $nombre; ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
             <a href="<?php echo esc_url($account); ?>" class="dh-icon-link dh-desktop-only" title="Mi Cuenta">
                 <svg class="dh-icon" viewBox="0 0 24 24" stroke-width="1.5">
@@ -557,6 +745,33 @@ function duendes_header_universal() {
                         badge.dataset.count = count;
                     }
                 });
+            });
+        }
+
+        // Selector de país
+        var paisBtn = document.getElementById('dhPaisBtn');
+        var paisDropdown = document.getElementById('dhPaisDropdown');
+
+        if (paisBtn && paisDropdown) {
+            paisBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                paisDropdown.classList.toggle('visible');
+            });
+
+            paisDropdown.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var pais = this.dataset.pais;
+                    document.cookie = 'duendes_pais=' + pais + '; path=/; max-age=' + (365*24*60*60);
+                    location.reload();
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dh-pais-selector')) {
+                    paisDropdown.classList.remove('visible');
+                }
             });
         }
     })();
