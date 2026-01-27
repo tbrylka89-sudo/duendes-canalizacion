@@ -648,22 +648,19 @@ export async function POST(request) {
       );
     }
 
-    // Si pregunta por precios Y tenemos país → mostrar productos REALES directamente
+    // Si pregunta por precios Y tenemos país → usar CLAUDE con datos REALES
     if (preguntaPorPrecios && paisDetectado) {
       try {
         const productos = await obtenerProductosWoo();
         const disponibles = productos.filter(p => p.disponible).slice(0, 4);
 
-        if (disponibles.length > 0) {
+        if (disponibles.length > 0 && process.env.ANTHROPIC_API_KEY) {
           const cotizaciones = await obtenerCotizaciones();
           const paisAMoneda = { 'AR': 'ARS', 'MX': 'MXN', 'CO': 'COP', 'CL': 'CLP', 'PE': 'PEN', 'BR': 'BRL', 'ES': 'EUR' };
           const monedaNombres = { 'ARS': 'pesos argentinos', 'MXN': 'pesos mexicanos', 'COP': 'pesos colombianos', 'CLP': 'pesos chilenos', 'PEN': 'soles', 'BRL': 'reales', 'EUR': 'euros' };
 
-          // Armar respuesta con datos REALES
-          let respuesta = '¡Acá tenés algunos guardianes! 🍀\n\n';
-          const productosParaMostrar = [];
-
-          for (const p of disponibles) {
+          // Preparar datos REALES de productos
+          const productosConPrecios = disponibles.map(p => {
             const precioUSD = parseFloat(p.precio) || 150;
             let precioMostrar;
 
@@ -680,34 +677,58 @@ export async function POST(request) {
               precioMostrar = `$${precioUSD} USD (~$${precioLocal.toLocaleString('es')} ${nombreMoneda})`;
             }
 
-            respuesta += `**${p.nombre}** - ${precioMostrar}\n`;
-            if (p.descripcionCorta) {
-              respuesta += `${p.descripcionCorta.substring(0, 80)}...\n`;
-            }
-            respuesta += '\n';
-
-            productosParaMostrar.push({
+            return {
               nombre: p.nombre,
-              precio_usd: precioUSD,
-              precio_mostrar: precioMostrar,
+              precio: precioMostrar,
+              descripcion: p.descripcionCorta || p.descripcion?.substring(0, 150) || '',
+              categoria: p.categorias?.join(', ') || '',
               imagen: p.imagen,
               url: p.url
-            });
-          }
+            };
+          });
 
-          respuesta += '¿Cuál te llamó la atención?';
+          // Claude escribe la respuesta usando SOLO estos datos
+          const promptClaude = `Sos Tito, un duende vendedor de Piriápolis. Hablás uruguayo (vos, tenés).
+
+El cliente preguntó por precios/guardianes. Acá están los datos REALES de la tienda:
+
+${productosConPrecios.map((p, i) => `${i+1}. ${p.nombre}
+   Precio: ${p.precio}
+   ${p.descripcion}`).join('\n\n')}
+
+REGLAS:
+- Presentá estos guardianes de forma cálida y vendedora
+- Usá EXACTAMENTE los precios que te di (no inventes otros)
+- Mencioná el nombre y precio de cada uno
+- Agregá una descripción breve basada en lo que te di
+- Terminá preguntando cuál le llamó la atención
+- Máximo 150 palabras
+- NO pongas links ni URLs`;
+
+          const claudeResponse = await anthropic.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 400,
+            messages: [{ role: 'user', content: promptClaude }]
+          });
+
+          const respuestaClaude = claudeResponse.content[0]?.text || '';
 
           return Response.json({
             success: true,
-            respuesta,
-            productos: productosParaMostrar,
+            respuesta: respuestaClaude,
+            productos: productosConPrecios.map(p => ({
+              nombre: p.nombre,
+              precio_mostrar: p.precio,
+              imagen: p.imagen,
+              url: p.url
+            })),
             pais: paisDetectado,
-            modelo: 'directo',
-            razon_modelo: 'precios_reales'
+            modelo: 'claude-sonnet',
+            razon_modelo: 'venta_productos'
           }, { headers: CORS_HEADERS });
         }
       } catch (e) {
-        console.error('[Tito] Error obteniendo productos:', e);
+        console.error('[Tito] Error con Claude para productos:', e);
         // Si falla, continúa con GPT
       }
     }
