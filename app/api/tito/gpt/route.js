@@ -668,24 +668,58 @@ export async function POST(request) {
     // Si es situación importante, usar Claude para respuesta final más inteligente
     if (usarClaude && process.env.ANTHROPIC_API_KEY) {
       try {
-        // Construir contexto para Claude
-        const contextoParaClaude = messages.map(m => {
-          if (m.role === 'system') return { role: 'user', content: `[INSTRUCCIONES DEL SISTEMA]\n${m.content}` };
-          if (m.role === 'tool') return { role: 'user', content: `[RESULTADO DE HERRAMIENTA]\n${m.content}` };
-          return { role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content || JSON.stringify(m) };
-        }).filter(m => m.content);
-
-        // Agregar la respuesta de GPT como contexto
-        if (respuestaFinal) {
-          contextoParaClaude.push({
-            role: 'user',
-            content: `[GPT sugirió esta respuesta, mejorala si es necesario]: ${respuestaFinal}`
-          });
+        // Extraer datos importantes de los resultados de herramientas
+        let datosDelPedido = null;
+        for (const m of messages) {
+          if (m.role === 'tool' && m.content) {
+            try {
+              const toolData = JSON.parse(m.content);
+              if (toolData.pedidos && toolData.pedidos[0]) {
+                datosDelPedido = toolData.pedidos[0];
+              }
+            } catch (e) {}
+          }
         }
+
+        // Construir contexto claro para Claude
+        let instruccionClaude = PERSONALIDAD_TITO + '\n\n';
+        instruccionClaude += `IMPORTANTE - DATOS DEL CONTEXTO:\n`;
+        instruccionClaude += `- País del cliente: ${pais || 'no detectado'}\n`;
+
+        if (datosDelPedido) {
+          instruccionClaude += `\nDATOS DEL PEDIDO CONSULTADO:\n`;
+          instruccionClaude += `- Número: ${datosDelPedido.numero}\n`;
+          instruccionClaude += `- Estado: ${datosDelPedido.estado}\n`;
+          instruccionClaude += `- Items: ${datosDelPedido.items}\n`;
+          instruccionClaude += `- País de envío: ${datosDelPedido.pais_envio}\n`;
+          instruccionClaude += `- Total: ${datosDelPedido.total}\n`;
+          instruccionClaude += `\nTIEMPOS DE ENVÍO SEGÚN PAÍS:\n`;
+          instruccionClaude += `- Si pais_envio es UY: "3-7 días por DAC"\n`;
+          instruccionClaude += `- Si pais_envio es OTRO (${datosDelPedido.pais_envio}): "5-10 días por DHL Express"\n`;
+        }
+
+        // Construir mensajes para Claude
+        const contextoParaClaude = [];
+
+        // Agregar historial relevante (sin el system prompt que ya está en instruccionClaude)
+        for (const m of messages) {
+          if (m.role === 'user' && !m.content.startsWith('[INSTRUCCIONES')) {
+            contextoParaClaude.push({ role: 'user', content: m.content });
+          } else if (m.role === 'assistant' && m.content) {
+            contextoParaClaude.push({ role: 'assistant', content: m.content });
+          }
+        }
+
+        // Mensaje final pidiendo respuesta
+        contextoParaClaude.push({
+          role: 'user',
+          content: `Basándote en los datos del pedido, respondé al cliente. Recordá usar el país de envío correcto (${datosDelPedido?.pais_envio || pais || 'verificar'}) para los tiempos de entrega.`
+        });
 
         const claudeResponse = await anthropic.messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 500,
+          system: instruccionClaude,
           messages: contextoParaClaude
         });
 
