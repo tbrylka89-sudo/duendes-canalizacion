@@ -1,0 +1,39 @@
+<?php
+/**
+ * Plugin Name: ZZZ - SCROLL DEFINITIVO
+ * Version: 2.0
+ */
+if (!defined('ABSPATH')) exit;
+
+add_action('wp_head', function() {
+    echo '<style>
+    html, body, #page, #content, .site, .elementor, [data-elementor-type] {
+        overflow: visible !important;
+        overflow-y: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        position: static !important;
+    }
+    html { overflow-y: scroll !important; }
+    .duendes-header { position: fixed !important; top: 0 !important; z-index: 999999 !important; }
+    body { padding-top: 70px !important; }
+    </style>';
+}, 999999);
+
+add_action('wp_footer', function() {
+    echo '<script>
+    (function(){
+        var all = document.querySelectorAll("html, body, #page, #content, .site, main, .elementor, [data-elementor-type], .e-con, .elementor-section");
+        all.forEach(function(el){
+            el.style.setProperty("overflow","visible","important");
+            el.style.setProperty("height","auto","important");
+            el.style.setProperty("max-height","none","important");
+            el.style.setProperty("position","static","important");
+        });
+        document.documentElement.style.setProperty("overflow-y","scroll","important");
+        var h = document.querySelector(".duendes-header");
+        if(h) h.style.cssText = "position:fixed!important;top:0!important;z-index:999999!important;";
+    })();
+    </script>';
+}, 999999);

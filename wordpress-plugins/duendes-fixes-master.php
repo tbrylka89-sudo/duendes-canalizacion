@@ -41,10 +41,132 @@ add_action('template_redirect', function() {
 // 2. ELIMINAR GRIMORIO PUBLICO DE TODO EL SITIO
 // ═══════════════════════════════════════════════════════════════════════════
 
+// FORZAR ocultar overlay de intro (por si hay caché)
+add_action('wp_head', function() {
+    ?>
+    <style id="fix-pantalla-negra">
+    #duendes-intro-overlay { display: none !important; opacity: 0 !important; visibility: hidden !important; }
+    </style>
+    <?php
+}, -999);
+
+// JavaScript para eliminar header de 10Web (NO el de Duendes)
+add_action('wp_head', function() {
+    ?>
+    <script>
+    (function(){
+        function eliminarHeaderMalo(){
+            // Solo eliminar el header de 10Web/Elementor, NO el de Duendes
+            var headers = document.querySelectorAll('[data-elementor-type="twbb_header"]');
+            headers.forEach(function(h){
+                // No eliminar si es el header de Duendes
+                if(!h.classList.contains('duendes-header') && !h.querySelector('.duendes-header') && !h.querySelector('#duendesHeader')){
+                    h.remove();
+                }
+            });
+        }
+        eliminarHeaderMalo();
+        document.addEventListener('DOMContentLoaded', eliminarHeaderMalo);
+        setTimeout(eliminarHeaderMalo, 100);
+        setTimeout(eliminarHeaderMalo, 500);
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // FIX iOS SIMPLE - Solo asegurar header visible
+    // ═══════════════════════════════════════════════════════════════
+    (function(){
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        if (!isIOS) return;
+
+        console.log('[Duendes] iOS detectado');
+
+        // Solo asegurar que el header tenga fondo negro
+        function fixHeader() {
+            var header = document.querySelector('.duendes-header, #duendesHeader');
+            if (header) {
+                header.style.background = '#0a0a0a';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fixHeader);
+        window.addEventListener('load', fixHeader);
+    })();
+    </script>
+    <?php
+}, 0);
+
 // CSS global para ocultar enlaces al Grimorio
 add_action('wp_head', function() {
     ?>
     <style id="duendes-ocultar-grimorio">
+    /* Ocultar barra superior de envío gratis (ya no se usa) */
+    .top-bar-premium,
+    .top-bar,
+    .topbar,
+    .shipping-bar,
+    .envio-gratis-bar,
+    [class*="top-bar"],
+    .elementor-location-header + .elementor-section:first-of-type,
+    body > .elementor-section:first-child[style*="background: #fff"],
+    body > .elementor-section:first-child[style*="background:#fff"],
+    body > .elementor-section:first-child[style*="background-color: #fff"],
+    body > .elementor-section:first-child[style*="background-color:#fff"],
+    body > div:first-child:not(#page):not(.duendes-header):not(#duendesHeader) {
+        display: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Ya no forzamos estilos del header - ahora usamos duendes-header-universal.php */
+
+
+    /* ═══════════════════════════════════════════════════════════════
+       FIX PRODUCTO MÓVIL - Imágenes no tan gigantes
+       ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        /* Limitar altura de imagen principal del producto */
+        .woocommerce-product-gallery__image img,
+        .prod-hero img,
+        .producto-imagen img,
+        .contenido-principal img,
+        section.contenido-principal img {
+            max-height: 50vh !important;
+            width: auto !important;
+            object-fit: contain !important;
+            margin: 0 auto !important;
+        }
+
+        /* Nombre del producto más pequeño en móvil */
+        .product_title,
+        h1.product_title,
+        .prod-nombre,
+        .elementor-widget-html h1 {
+            font-size: 1.8rem !important;
+            line-height: 1.2 !important;
+        }
+
+        /* Galería de thumbnails más compacta */
+        .woocommerce-product-gallery__wrapper,
+        .flex-control-thumbs {
+            gap: 5px !important;
+        }
+
+        .flex-control-thumbs li {
+            width: 60px !important;
+            height: 60px !important;
+        }
+
+        .flex-control-thumbs img {
+            width: 60px !important;
+            height: 60px !important;
+            object-fit: cover !important;
+        }
+    }
+
     /* Ocultar Grimorio en menus y enlaces */
     .menu-item a[href*="grimorio"],
     .menu-item a[href*="Grimorio"],
@@ -1065,9 +1187,75 @@ add_action('wp_head', function() {
     .menu-item-mi-magia a:hover::after {
         width: 80%;
     }
+    /* Mi Magia en menú móvil */
+    .mobile-menu a[href*="mi-magia"],
+    #mobileMenu a[href*="mi-magia"] {
+        background: linear-gradient(90deg, rgba(147,112,219,0.15), rgba(212,175,55,0.15)) !important;
+        border-left: 3px solid #9370db !important;
+    }
     </style>
     <?php
 }, 20);
+
+// Agregar Mi Magia al menú MÓVIL via JavaScript (porque está hardcodeado)
+add_action('wp_footer', function() {
+    ?>
+    <script id="duendes-mi-magia-mobile-menu">
+    (function() {
+        function agregarMiMagiaAlMenuMovil() {
+            // Buscar el menú móvil
+            var menuMovil = document.getElementById('mobileMenu') ||
+                           document.querySelector('.mobile-menu') ||
+                           document.querySelector('.menu-movil') ||
+                           document.querySelector('.mobile-menu-contenido');
+
+            if (!menuMovil) return;
+
+            // Verificar si ya existe el link
+            if (menuMovil.querySelector('a[href*="mi-magia"]')) return;
+
+            // Crear el link de Mi Magia
+            var miMagiaLink = document.createElement('a');
+            miMagiaLink.href = '/mi-magia/';
+            miMagiaLink.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9370db" stroke-width="1.5"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5-6.5-4.5-6.5 4.5 2-7.5L2 9h7l3-7z"/></svg> Mi Magia';
+            miMagiaLink.style.cssText = 'display:flex !important; align-items:center !important; gap:12px !important;';
+
+            // Buscar dónde insertarlo - después de Contacto o antes del último link
+            var contactoLink = menuMovil.querySelector('a[href*="contacto"]');
+            var faqLink = menuMovil.querySelector('a[href*="faq"]');
+            var cuentaLink = menuMovil.querySelector('a[href*="cuenta"]') || menuMovil.querySelector('a[href*="account"]');
+
+            if (contactoLink && contactoLink.nextSibling) {
+                contactoLink.parentNode.insertBefore(miMagiaLink, contactoLink.nextSibling);
+            } else if (cuentaLink) {
+                cuentaLink.parentNode.insertBefore(miMagiaLink, cuentaLink);
+            } else if (faqLink && faqLink.nextSibling) {
+                faqLink.parentNode.insertBefore(miMagiaLink, faqLink.nextSibling);
+            } else {
+                // Agregar al final
+                var links = menuMovil.querySelectorAll('a');
+                if (links.length > 0) {
+                    links[links.length - 1].parentNode.appendChild(miMagiaLink);
+                }
+            }
+
+            console.log('[Duendes] Link Mi Magia agregado al menú móvil');
+        }
+
+        // Ejecutar cuando DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', agregarMiMagiaAlMenuMovil);
+        } else {
+            agregarMiMagiaAlMenuMovil();
+        }
+
+        // También ejecutar después de un delay por si el menú se crea dinámicamente
+        setTimeout(agregarMiMagiaAlMenuMovil, 500);
+        setTimeout(agregarMiMagiaAlMenuMovil, 1500);
+    })();
+    </script>
+    <?php
+}, 100);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FIN DEL PLUGIN

@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) exit;
 
 add_action('wp_head', 'duendes_neuro_css', 9999);
 add_action('wp_footer', 'duendes_neuro_js', 9999);
-add_action('wp_footer', 'duendes_intro_cinematica', 1);
+// add_action('wp_footer', 'duendes_intro_cinematica', 1); // DESACTIVADO
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AJAX ENDPOINT: PRODUCTOS REALES DE WOOCOMMERCE
@@ -168,7 +168,7 @@ function duendes_neuro_css() {
         100% { transform: translateX(100%) rotate(45deg); }
     }
 
-    /* BANNER SUPERIOR SUTIL - NO TAPA NADA */
+    /* BANNER DEBAJO DEL HEADER - scrollea con la página */
     .neuro-banner-top {
         background: linear-gradient(90deg, #0a0a0a, #151515, #0a0a0a);
         color: #fff;
@@ -181,6 +181,15 @@ function duendes_neuro_css() {
         justify-content: center;
         align-items: center;
         gap: 30px;
+        position: relative;
+        z-index: 1;
+    }
+    @media (max-width: 768px) {
+        .neuro-banner-top {
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            gap: 10px;
+        }
     }
     .neuro-banner-top .gold { color: #d4af37; }
     .neuro-banner-top .sep { opacity: 0.2; }
@@ -435,7 +444,7 @@ function duendes_neuro_js() {
             crearParticulas();
 
             if (esHome) {
-                agregarBannerTop();
+                // agregarBannerTop(); // DESACTIVADO - causaba problemas en iOS
                 agregarValidacion();
                 agregarSeccionMiMagia();
                 mostrarSocialProof();
@@ -480,7 +489,11 @@ function duendes_neuro_js() {
         function agregarBannerTop() {
             if (document.querySelector('.neuro-banner-top')) return;
 
-            var header = document.querySelector('header, .elementor-location-header');
+            // Buscar el header de Duendes (el bueno)
+            var header = document.querySelector('.duendes-header, #duendesHeader, header.duendes-header');
+            if (!header) {
+                header = document.querySelector('header, .elementor-location-header');
+            }
             if (!header) return;
 
             var banner = document.createElement('div');
@@ -493,7 +506,8 @@ function duendes_neuro_js() {
                 <span>Envíos a <span class="gold">todo el mundo</span></span>\
             ';
 
-            header.parentNode.insertBefore(banner, header);
+            // Insertar DESPUÉS del header, no antes
+            header.after(banner);
         }
 
         function agregarValidacion() {
@@ -646,8 +660,8 @@ function duendes_neuro_js() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_intro_cinematica() {
-    // Solo en homepage
-    if (!is_front_page() && !is_home()) return;
+    // DESACTIVADO - causaba pantalla negra en iOS
+    return;
     ?>
     <div id="duendes-intro-overlay" style="
         position: fixed;

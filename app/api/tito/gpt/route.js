@@ -97,6 +97,13 @@ FORMATO DE PRODUCTOS - MUY IMPORTANTE:
 - Solo escribí: nombre, precio y descripción breve de cada guardián
 - Terminá preguntando: "¿Cuál te llamó la atención?"
 
+REGLA CRÍTICA - NO INVENTAR:
+- Cuando mostrar_productos te devuelve guardianes, usá SOLO la información que viene en los datos
+- NO inventes historias, características o propiedades que no están en la descripción
+- Si la descripción es corta, mantenela corta - NO la "expandas" inventando
+- Si no sabés algo de un guardián, NO lo digas - solo compartí lo que SÍ sabés
+- Cada guardián es ÚNICO y tiene su propia historia - no generalices
+
 === MISIÓN: VENDER ===
 
 Tu trabajo es generar ventas. Cada conversación debe terminar en:
@@ -360,11 +367,21 @@ async function ejecutarTool(nombre, args, contexto) {
           precio_mostrar = `$${precioUSD} USD (~$${precioLocal.toLocaleString('es')} ${nombreMoneda})`;
         }
 
+        // Descripción real del guardián (más completa para evitar que GPT invente)
+        const descripcionReal = p.descripcion || p.descripcionCorta || '';
+        // Limitar a 300 chars pero mantener info útil
+        const descripcionFinal = descripcionReal.length > 300
+          ? descripcionReal.substring(0, 300) + '...'
+          : descripcionReal;
+
         return {
           nombre: p.nombre,
           precio_usd: precioUSD,
           precio_mostrar: precio_mostrar,
-          descripcion: p.descripcion?.substring(0, 100) || '',
+          descripcion: descripcionFinal,
+          // Info adicional para que GPT no invente
+          categoria: p.categorias?.join(', ') || '',
+          tipo: p.tipo || 'guardián',
           url: p.url,
           imagen: p.imagen
         };
