@@ -27,9 +27,12 @@ add_filter('wc_price_args', function($args) {
     return $args;
 }, 999999);
 
-// Los filtros de moneda arriba usan prioridad 999999
-// que se ejecuta DESPUÉS de cualquier plugin de moneda
-// No necesitamos remove_all_filters (que puede romper cosas)
+// Remover cualquier filtro de otros plugins de moneda
+add_action('init', function() {
+    // Remover filtros que puedan cambiar la moneda
+    remove_all_filters('woocommerce_currency', 10);
+    remove_all_filters('woocommerce_currency_symbol', 10);
+}, 0);
 
 // Ocultar selectores de moneda de otros plugins
 add_action('wp_head', function() {

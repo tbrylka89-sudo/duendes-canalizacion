@@ -10,7 +10,6 @@ import { generateProductMetadata } from '@/lib/seo/metadata';
 import { generateProductoSchemas } from '@/lib/seo/schema';
 import SchemaMarkup from '@/app/components/SchemaMarkup';
 import { WORDPRESS_URL } from '@/lib/config/urls';
-import PrecioProducto from '@/app/components/PrecioProducto';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GENERATE METADATA - SEO Dinamico
@@ -156,12 +155,17 @@ function ProductInfo({ producto }) {
         {producto.name}
       </h1>
 
-      {/* Precio - Dinámico según país del usuario */}
-      <PrecioProducto
-        precioUSD={producto.price}
-        precioRegular={producto.regularPrice}
-        enOferta={producto.onSale}
-      />
+      {/* Precio */}
+      <div className="flex items-baseline gap-3">
+        <span className="text-3xl font-serif text-stone-900">
+          ${producto.price} USD
+        </span>
+        {producto.onSale && producto.regularPrice && (
+          <span className="text-lg text-stone-400 line-through">
+            ${producto.regularPrice} USD
+          </span>
+        )}
+      </div>
 
       {/* Descripcion corta */}
       {producto.shortDescription && (
@@ -272,12 +276,9 @@ function RelatedProducts({ productos }) {
             <h3 className="font-serif text-stone-800 group-hover:text-amber-700 transition-colors line-clamp-2">
               {producto.name}
             </h3>
-            <div className="mt-1">
-              <PrecioProducto
-                precioUSD={producto.price}
-                className="text-amber-600 font-medium [&>span]:text-base [&>span]:font-medium"
-              />
-            </div>
+            <p className="text-amber-600 font-medium mt-1">
+              ${producto.price} USD
+            </p>
           </Link>
         ))}
       </div>
