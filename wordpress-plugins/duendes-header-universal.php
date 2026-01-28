@@ -554,6 +554,7 @@ function duendes_header_universal() {
             </div>
 
             <a href="<?php echo esc_url(home_url('/descubri-que-duende-te-elige/')); ?>" class="dh-desktop-only dh-nav-link">Test</a>
+            <a href="<?php echo esc_url(home_url('/nosotros/')); ?>" class="dh-desktop-only dh-nav-link">Nosotros</a>
         </div>
 
         <!-- DERECHA - Iconos + Hamburguesa -->
@@ -690,6 +691,7 @@ function duendes_header_universal() {
         <a href="<?php echo esc_url(home_url('/descubri-que-duende-te-elige/')); ?>">Descubrí qué Duende te elige</a>
         <a href="<?php echo esc_url(home_url('/testimonios/')); ?>">Experiencias Mágicas</a>
         <a href="<?php echo esc_url(home_url('/como-funciona/')); ?>">Cómo Funciona</a>
+        <a href="<?php echo esc_url(home_url('/nosotros/')); ?>">Nosotros</a>
         <a href="<?php echo esc_url(home_url('/faq/')); ?>">Preguntas Frecuentes</a>
         <a href="<?php echo esc_url(home_url('/contacto/')); ?>">Contacto</a>
         <a href="https://mimagia.duendesdeluruguay.com" class="dh-mi-magia-link">Mi Magia</a>
@@ -774,6 +776,10 @@ function duendes_header_universal() {
                 }
             });
         }
+        // Sync bandera
+        var bm={'UY':'🇺🇾','AR':'🇦🇷','MX':'🇲🇽','CO':'🇨🇴','CL':'🇨🇱','PE':'🇵🇪','BR':'🇧🇷','ES':'🇪🇸','US':'🇺🇸','XX':'🌎'};
+        var cm=document.cookie.match(/duendes_pais=([^;]+)/);
+        if(cm){var be=document.querySelector('.dh-bandera-emoji');if(be)be.textContent=bm[cm[1]]||'🌎';}
     })();
     </script>
     <?php
@@ -848,3 +854,168 @@ add_action('wp_footer', function() {
     </script>
     <?php
 }, 1);
+
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OVERLAY DE BIENVENIDA - SIMPLE Y ROBUSTO
+// ═══════════════════════════════════════════════════════════════════════════
+
+add_action('wp_footer', 'duendes_overlay_bienvenida', 5);
+
+function duendes_overlay_bienvenida() {
+    if (!empty($_COOKIE['duendes_pais'])) {
+        return;
+    }
+    ?>
+    <div id="dob-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:9999999;display:flex;align-items:center;justify-content:center;">
+
+        <!-- Fase 1: Texto -->
+        <div id="dob-texto" style="text-align:center;padding:40px;">
+            <p style="color:#d4af37;font-family:Cinzel,serif;font-size:clamp(1.4rem,5vw,2.4rem);margin:0;opacity:0;animation:dobFade 1s ease .3s forwards;">Sentiste el llamado.</p>
+            <p style="color:rgba(255,255,255,.7);font-family:Cormorant Garamond,serif;font-size:clamp(1rem,3vw,1.4rem);margin-top:20px;font-style:italic;opacity:0;animation:dobFade 1s ease 1.3s forwards;">Y tu guardián ya lo sabe.</p>
+        </div>
+
+        <!-- Fase 2: Confirmación -->
+        <div id="dob-confirmar" style="text-align:center;padding:40px;display:none;">
+            <p style="color:rgba(255,255,255,.5);font-family:Cormorant Garamond,serif;font-size:1rem;margin:0 0 15px;font-style:italic;">Detectamos que estás en</p>
+            <p style="color:#d4af37;font-family:Cinzel,serif;font-size:clamp(1.8rem,7vw,3rem);margin:0 0 45px;"><span id="dob-bandera">🌎</span> <span id="dob-pais">...</span></p>
+            <div style="display:flex;flex-direction:column;gap:12px;max-width:260px;margin:0 auto;">
+                <a href="#" id="dob-si" style="display:block;padding:14px 28px;background:transparent;border:1px solid #d4af37;color:#d4af37;font-family:Cinzel,serif;font-size:.85rem;letter-spacing:2px;text-transform:uppercase;text-decoration:none;text-align:center;">Sí, es correcto</a>
+                <a href="#" id="dob-cambiar" style="display:block;padding:10px 20px;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-family:Cinzel,serif;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;text-decoration:none;text-align:center;">Cambiar país</a>
+            </div>
+        </div>
+
+        <!-- Fase 3: Buscador -->
+        <div id="dob-buscar" style="text-align:center;padding:40px;display:none;width:100%;max-width:400px;">
+            <p style="color:#d4af37;font-family:Cinzel,serif;font-size:clamp(1.1rem,4vw,1.5rem);margin:0 0 25px;">¿Desde dónde nos visitás?</p>
+            <input type="text" id="dob-input" placeholder="Escribí tu país..." style="width:100%;max-width:300px;padding:14px;background:transparent;border:1px solid rgba(212,175,55,.3);color:#fff;font-family:Cormorant Garamond,serif;font-size:1.1rem;text-align:center;outline:none;">
+            <div id="dob-lista" style="max-height:260px;overflow-y:auto;margin-top:15px;"></div>
+            <p style="color:rgba(255,255,255,.25);font-family:Cormorant Garamond,serif;font-size:.8rem;margin-top:25px;font-style:italic;">Esto nos ayuda a mostrarte precios en tu moneda</p>
+        </div>
+    </div>
+
+    <style>
+    @keyframes dobFade { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+    #dob-si:hover { background:#d4af37 !important; color:#0a0a0a !important; }
+    #dob-cambiar:hover { border-color:rgba(255,255,255,.3) !important; color:rgba(255,255,255,.7) !important; }
+    #dob-input:focus { border-color:#d4af37 !important; }
+    .dob-item { padding:12px 18px; background:transparent; border:1px solid rgba(212,175,55,.12); color:rgba(255,255,255,.8); font-family:Cormorant Garamond,serif; font-size:1rem; cursor:pointer; display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+    .dob-item:hover { border-color:#d4af37; background:rgba(212,175,55,.05); }
+    </style>
+
+    <script>
+    (function(){
+        // Si ya tiene cookie, ocultar y salir
+        if (document.cookie.indexOf('duendes_pais=') !== -1) {
+            var o = document.getElementById('dob-overlay');
+            if (o) o.style.display = 'none';
+            return;
+        }
+
+        var paises = [
+            ['UY','Uruguay','🇺🇾'],['AR','Argentina','🇦🇷'],['MX','México','🇲🇽'],
+            ['CO','Colombia','🇨🇴'],['CL','Chile','🇨🇱'],['PE','Perú','🇵🇪'],
+            ['BR','Brasil','🇧🇷'],['EC','Ecuador','🇪🇨'],['VE','Venezuela','🇻🇪'],
+            ['BO','Bolivia','🇧🇴'],['PY','Paraguay','🇵🇾'],['ES','España','🇪🇸'],
+            ['US','Estados Unidos','🇺🇸'],['CA','Canadá','🇨🇦'],['FR','Francia','🇫🇷'],
+            ['DE','Alemania','🇩🇪'],['IT','Italia','🇮🇹'],['PT','Portugal','🇵🇹'],
+            ['GB','Reino Unido','🇬🇧'],['AU','Australia','🇦🇺'],['XX','Otro país','🌎']
+        ];
+
+        var paisesObj = {};
+        paises.forEach(function(p) { paisesObj[p[0]] = p; });
+
+        var paisElegido = null;
+
+        function guardar(codigo) {
+            var d = new Date();
+            d.setFullYear(d.getFullYear() + 1);
+            document.cookie = 'duendes_pais=' + codigo + '; expires=' + d.toUTCString() + '; path=/';
+
+            // Ocultar overlay
+            var o = document.getElementById('dob-overlay');
+            if (o) o.style.display = 'none';
+            document.body.style.overflow = '';
+
+            // Recargar
+            window.location.href = window.location.href;
+        }
+
+        function mostrar(id) {
+            ['dob-texto','dob-confirmar','dob-buscar'].forEach(function(x) {
+                var el = document.getElementById(x);
+                if (el) el.style.display = 'none';
+            });
+            var el = document.getElementById(id);
+            if (el) el.style.display = 'block';
+        }
+
+        function confirmar(codigo, nombre, bandera) {
+            paisElegido = codigo;
+            document.getElementById('dob-bandera').textContent = bandera;
+            document.getElementById('dob-pais').textContent = nombre;
+            mostrar('dob-confirmar');
+        }
+
+        function listar(filtro) {
+            var html = '';
+            var f = (filtro || '').toLowerCase();
+            paises.forEach(function(p) {
+                if (!f || p[1].toLowerCase().indexOf(f) !== -1) {
+                    html += '<div class="dob-item" data-c="'+p[0]+'"><span style="font-size:1.3rem">'+p[2]+'</span>'+p[1]+'</div>';
+                }
+            });
+            document.getElementById('dob-lista').innerHTML = html;
+            document.querySelectorAll('.dob-item').forEach(function(el) {
+                el.onclick = function() { guardar(this.dataset.c); };
+            });
+        }
+
+        // Eventos
+        document.getElementById('dob-si').onclick = function(e) {
+            e.preventDefault();
+            if (paisElegido) guardar(paisElegido);
+        };
+
+        document.getElementById('dob-cambiar').onclick = function(e) {
+            e.preventDefault();
+            mostrar('dob-buscar');
+            listar('');
+            document.getElementById('dob-input').focus();
+        };
+
+        document.getElementById('dob-input').oninput = function() {
+            listar(this.value);
+        };
+
+        // Bloquear scroll
+        document.body.style.overflow = 'hidden';
+
+        // Después de 3s, detectar país
+        setTimeout(function() {
+            mostrar('dob-confirmar');
+
+            // Detectar con ipinfo.io
+            fetch('https://ipinfo.io/json')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var p = paisesObj[data.country];
+                if (p) {
+                    confirmar(p[0], p[1], p[2]);
+                } else {
+                    mostrar('dob-buscar');
+                    listar('');
+                }
+            })
+            .catch(function() {
+                mostrar('dob-buscar');
+                listar('');
+            });
+        }, 3000);
+    })();
+    </script>
+    <?php
+}
