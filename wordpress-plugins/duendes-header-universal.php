@@ -559,7 +559,7 @@ function duendes_header_universal() {
 
         <!-- DERECHA - Iconos + Hamburguesa -->
         <div class="dh-right">
-            <a href="https://mimagia.duendesdeluruguay.com" class="dh-text-link dh-desktop-only">Mi Magia</a>
+            <a href="https://magia.duendesdeluruguay.com" class="dh-text-link dh-desktop-only">Mi Magia</a>
 
             <!-- Selector de País -->
             <?php
@@ -694,7 +694,7 @@ function duendes_header_universal() {
         <a href="<?php echo esc_url(home_url('/nosotros/')); ?>">Nosotros</a>
         <a href="<?php echo esc_url(home_url('/faq/')); ?>">Preguntas Frecuentes</a>
         <a href="<?php echo esc_url(home_url('/contacto/')); ?>">Contacto</a>
-        <a href="https://mimagia.duendesdeluruguay.com" class="dh-mi-magia-link">Mi Magia</a>
+        <a href="https://magia.duendesdeluruguay.com" class="dh-mi-magia-link">Mi Magia</a>
 
         <div class="dh-mobile-divider"></div>
 

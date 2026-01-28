@@ -58,7 +58,7 @@
       "has": [
         {
           "type": "host",
-          "value": "mimagia.duendesdeluruguay.com"
+          "value": "magia.duendesdeluruguay.com"
         }
       ],
       "destination": "/mi-magia/:path*"
