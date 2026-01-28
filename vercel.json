@@ -52,6 +52,16 @@
     {
       "source": "/circulo",
       "destination": "/circulo/landing"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "mimagia.duendesdeluruguay.com"
+        }
+      ],
+      "destination": "/mi-magia/:path*"
     }
   ]
 }
