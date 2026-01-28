@@ -21,13 +21,10 @@ add_filter('wmc_change_raw_price', function($price) { return $price; }, 999999);
 add_filter('wmc_enable', '__return_false', 999999);
 add_filter('curcy_enable', '__return_false', 999999);
 
-// Remover filtros de precio de otros plugins
-add_action('init', function() {
-    // Remover filtros de WMC si existe
-    remove_all_filters('woocommerce_product_get_price', 10);
-    remove_all_filters('woocommerce_product_get_regular_price', 10);
-    remove_all_filters('woocommerce_product_get_sale_price', 10);
-}, 1);
+// Desactivar plugins de moneda de forma segura (sin romper WooCommerce core)
+// NOTA: Ya no usamos remove_all_filters porque puede romper WooCommerce
+// En su lugar, los filtros de woocommerce_get_price_html tienen prioridad 999999
+// que se ejecuta DESPUÉS de cualquier plugin de moneda
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN

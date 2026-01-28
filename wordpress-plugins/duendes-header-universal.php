@@ -445,16 +445,25 @@ function duendes_header_universal() {
         border: 1px solid rgba(212,175,55,0.4);
         border-radius: 12px;
         padding: 10px 0;
-        display: none;
         min-width: 180px;
         max-height: 350px;
         overflow-y: auto;
         box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        z-index: 9999999;
+        z-index: 99999;
+        /* Transiciones */
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        pointer-events: none;
     }
 
     .dh-pais-dropdown.visible {
-        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
     }
 
     .dh-pais-titulo {
@@ -848,3 +857,223 @@ add_action('wp_footer', function() {
     </script>
     <?php
 }, 1);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OVERLAY DE BIENVENIDA - SELECTOR DE PAÍS INICIAL
+// Solo aparece si el usuario NO tiene cookie duendes_pais
+// ═══════════════════════════════════════════════════════════════════════════
+
+add_action('wp_footer', 'duendes_overlay_bienvenida', 5);
+
+function duendes_overlay_bienvenida() {
+    // Si ya tiene cookie de país, no mostrar overlay
+    if (isset($_COOKIE['duendes_pais']) && !empty($_COOKIE['duendes_pais'])) {
+        return;
+    }
+
+    // Si ya vio el overlay y lo cerró, no volver a mostrar
+    if (isset($_COOKIE['duendes_overlay_visto'])) {
+        return;
+    }
+
+    $paises_principales = [
+        'UY' => ['emoji' => '🇺🇾', 'nombre' => 'Uruguay'],
+        'AR' => ['emoji' => '🇦🇷', 'nombre' => 'Argentina'],
+        'MX' => ['emoji' => '🇲🇽', 'nombre' => 'México'],
+        'CO' => ['emoji' => '🇨🇴', 'nombre' => 'Colombia'],
+        'CL' => ['emoji' => '🇨🇱', 'nombre' => 'Chile'],
+        'PE' => ['emoji' => '🇵🇪', 'nombre' => 'Perú'],
+        'ES' => ['emoji' => '🇪🇸', 'nombre' => 'España'],
+        'US' => ['emoji' => '🇺🇸', 'nombre' => 'USA / Otro'],
+    ];
+    ?>
+
+    <style id="duendes-overlay-bienvenida-css">
+    /* Overlay de bienvenida */
+    .dh-overlay-bienvenida {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 10, 10, 0.97);
+        z-index: 9999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        animation: dhOverlayFadeIn 0.5s ease forwards;
+        animation-delay: 0.3s;
+    }
+
+    @keyframes dhOverlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .dh-overlay-content {
+        background: #0a0a0a;
+        border: 2px solid rgba(212, 175, 55, 0.4);
+        border-radius: 20px;
+        padding: 40px 30px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        transform: translateY(20px);
+        animation: dhContentSlideUp 0.5s ease forwards;
+        animation-delay: 0.5s;
+    }
+
+    @keyframes dhContentSlideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .dh-overlay-titulo {
+        font-family: 'Cinzel', serif;
+        color: #d4af37;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+    }
+
+    .dh-overlay-subtitulo {
+        font-family: 'Cormorant Garamond', serif;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+
+    .dh-overlay-paises {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    @media (min-width: 400px) {
+        .dh-overlay-paises {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    .dh-pais-opcion {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: 12px;
+        padding: 15px 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dh-pais-opcion:hover {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: #d4af37;
+        transform: translateY(-2px);
+    }
+
+    .dh-pais-opcion .emoji {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .dh-pais-opcion .nombre {
+        color: rgba(255, 255, 255, 0.85);
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 0.8rem;
+    }
+
+    .dh-overlay-cerrar {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+        padding: 10px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+    }
+
+    .dh-overlay-cerrar:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .dh-overlay-nota {
+        margin-top: 20px;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.75rem;
+        font-family: 'Cormorant Garamond', serif;
+    }
+    </style>
+
+    <div class="dh-overlay-bienvenida" id="dhOverlayBienvenida">
+        <div class="dh-overlay-content">
+            <h2 class="dh-overlay-titulo">Bienvenido/a</h2>
+            <p class="dh-overlay-subtitulo">¿Desde dónde nos visitás?</p>
+
+            <div class="dh-overlay-paises">
+                <?php foreach ($paises_principales as $codigo => $data): ?>
+                    <a href="#" class="dh-pais-opcion" data-pais="<?php echo $codigo; ?>">
+                        <span class="emoji"><?php echo $data['emoji']; ?></span>
+                        <span class="nombre"><?php echo $data['nombre']; ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+
+            <button class="dh-overlay-cerrar" id="dhOverlayCerrar">
+                Seguir sin elegir
+            </button>
+
+            <p class="dh-overlay-nota">
+                Esto nos ayuda a mostrarte precios en tu moneda
+            </p>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var overlay = document.getElementById('dhOverlayBienvenida');
+        if (!overlay) return;
+
+        // Seleccionar país
+        overlay.querySelectorAll('.dh-pais-opcion').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var pais = this.dataset.pais;
+                document.cookie = 'duendes_pais=' + pais + '; path=/; max-age=' + (365*24*60*60) + '; SameSite=Lax';
+                location.reload();
+            });
+        });
+
+        // Cerrar sin elegir (asume USD)
+        var cerrarBtn = document.getElementById('dhOverlayCerrar');
+        if (cerrarBtn) {
+            cerrarBtn.addEventListener('click', function() {
+                document.cookie = 'duendes_pais=US; path=/; max-age=' + (365*24*60*60) + '; SameSite=Lax';
+                document.cookie = 'duendes_overlay_visto=1; path=/; max-age=' + (7*24*60*60) + '; SameSite=Lax';
+                overlay.style.opacity = '0';
+                overlay.style.transition = 'opacity 0.3s';
+                setTimeout(function() {
+                    overlay.remove();
+                }, 300);
+            });
+        }
+
+        // Prevenir scroll del body mientras el overlay está abierto
+        document.body.style.overflow = 'hidden';
+
+        // Limpiar al cerrar
+        overlay.addEventListener('transitionend', function() {
+            document.body.style.overflow = '';
+        });
+    })();
+    </script>
+    <?php
+}
