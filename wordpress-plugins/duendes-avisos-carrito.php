@@ -17,6 +17,24 @@ define('DUENDES_ENVIO_GRATIS_UYU', 10000);     // $10.000 UYU para Uruguay
 define('DUENDES_PROMO_3X2_MIN', 2);            // Mínimo 2 guardianes para 3x2
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TABLA DE PRECIOS USD → UYU (fijos, no conversión)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function duendes_avisos_usd_a_uyu($precio_usd) {
+    // Si el precio viene muy alto, probablemente ya está en UYU
+    if ($precio_usd > 1500) {
+        $precio_usd = round($precio_usd / 43);
+    }
+
+    // Tabla de precios fijos
+    if ($precio_usd <= 100) return 2500;       // Mini clásico ~$70 USD
+    if ($precio_usd <= 175) return 5500;       // Pixie, Mini especial ~$150 USD
+    if ($precio_usd <= 350) return 8000;       // Mediano ~$200 USD
+    if ($precio_usd <= 800) return 16500;      // Grande ~$450 USD
+    return 39800;                               // Gigante ~$1050 USD
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // HOOK PARA MOSTRAR AVISOS EN CARRITO
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -53,14 +71,27 @@ function duendes_mostrar_avisos_carrito_inferior() {
 
 function duendes_calcular_info_carrito() {
     $cart = WC()->cart;
-    $total_usd = floatval($cart->get_subtotal());
+    $subtotal = floatval($cart->get_subtotal()); // Siempre en USD
 
     // Detectar país del cliente
     $pais = duendes_detectar_pais_cliente();
     $es_uruguay = ($pais === 'UY');
 
-    // Calcular total en UYU si es Uruguay (aproximado)
-    $total_uyu = $es_uruguay ? ($total_usd * 45) : 0;
+    // WooCommerce SIEMPRE opera en USD internamente
+    // Para Uruguay, calcular el total UYU sumando cada producto con la tabla fija
+    $total_usd = $subtotal;
+    $total_uyu = 0;
+
+    if ($es_uruguay) {
+        // Calcular total UYU usando la tabla de precios fijos
+        foreach ($cart->get_cart() as $item) {
+            $product = $item['data'];
+            $precio_usd = floatval($product->get_price());
+            // Convertir a UYU con tabla fija
+            $precio_uyu = duendes_avisos_usd_a_uyu($precio_usd);
+            $total_uyu += $precio_uyu * $item['quantity'];
+        }
+    }
 
     // Contar guardianes (excluyendo minis gratis)
     $guardianes = 0;
@@ -107,13 +138,18 @@ function duendes_calcular_info_carrito() {
 }
 
 function duendes_detectar_pais_cliente() {
-    // Primero intentar desde la dirección de envío/facturación
+    // PRIMERO: usar la cookie de geolocalización (la más confiable)
+    if (!empty($_COOKIE['duendes_pais'])) {
+        return strtoupper(sanitize_text_field($_COOKIE['duendes_pais']));
+    }
+
+    // Segundo: desde la dirección de envío/facturación
     $pais = WC()->customer ? WC()->customer->get_billing_country() : '';
     if (empty($pais)) {
         $pais = WC()->customer ? WC()->customer->get_shipping_country() : '';
     }
 
-    // Si aún no hay país, intentar geolocalización
+    // Si aún no hay país, intentar geolocalización de WC
     if (empty($pais) && class_exists('WC_Geolocation')) {
         $geo = WC_Geolocation::geolocate_ip();
         $pais = $geo['country'] ?? '';
