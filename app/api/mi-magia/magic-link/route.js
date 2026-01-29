@@ -80,14 +80,18 @@ export async function POST(request) {
     // Enviar email con Resend
     let emailEnviado = false;
     try {
-      await resend.emails.send({
+      const { data, error } = await resend.emails.send({
         from: 'Duendes del Uruguay <magia@duendesdeluruguay.com>',
         to: emailLower,
         subject: esNuevo ? '✨ Tu portal Mi Magia te espera' : '✨ Tu acceso a Mi Magia',
         html: generarEmailHTML(magicLinkUrl, nombreUsuario, esNuevo)
       });
-      emailEnviado = true;
-      console.log(`📧 Magic Link enviado a ${emailLower}`);
+      if (error) {
+        console.error('Error Resend:', error);
+      } else {
+        emailEnviado = true;
+        console.log(`📧 Magic Link enviado a ${emailLower}, id: ${data?.id}`);
+      }
     } catch (emailError) {
       console.error('Error enviando email:', emailError);
       // Fallback: devolver link directo si falla el email
