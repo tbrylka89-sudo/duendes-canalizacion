@@ -340,6 +340,7 @@ export async function POST(request) {
 
     // Detectar intención
     const intencion = detectarIntencion(msg);
+    const msgLower = msg.toLowerCase();
 
     console.log('[MC-DIRECT] Intención:', {
       quiereComprar: intencion.quiereComprar,
@@ -347,6 +348,107 @@ export async function POST(request) {
       quiereVer: intencion.quiereVer,
       necesidad: intencion.necesidad
     });
+
+    // ─────────────────────────────────────────────────────────────
+    // RESPUESTAS RÁPIDAS SIN IA - Ahorro de tokens
+    // ─────────────────────────────────────────────────────────────
+
+    // SPAM / Mensajes genéricos
+    if (
+      /^(amen|amén|bendiciones?|bendecido)$/i.test(msgLower) ||
+      /^(dame suerte|buena vibra|buenas vibras|suerte)$/i.test(msgLower) ||
+      /^[\p{Emoji}\s]+$/u.test(msg.trim())
+    ) {
+      const contenido = crearContenidoManychat('¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_spam' });
+    }
+
+    // DRAMA / Desahogo emocional - Sin intención de compra
+    const esDrama = /estoy (muy )?(mal|triste|destru[ií]d|deprimi|perdid)|no puedo m[aá]s|todo me sale mal|mi vida es un|nadie me (quiere|entiende)|me siento (sol[oa]|vac[ií]|perdid)|no s[eé] qu[eé] hacer con mi vida|estoy en crisis|mi ex me|me dejaron|estoy rota|coraz[oó]n roto|no tengo fuerzas|quiero llorar|me quiero morir/i.test(msgLower);
+    const tieneIntencionCompra = /precio|cu[aá]nto|guard|duende|compr|quiero (uno|ver|un)|env[ií]o|tienda/i.test(msgLower);
+
+    if (esDrama && !tieneIntencionCompra) {
+      const contenido = crearContenidoManychat('Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. Si querés, te muestro algunos.');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_drama' });
+    }
+
+    // GRACIAS / DESPEDIDA
+    if (/^(gracias|muchas gracias|thanks|thx|grax|ty)[\s!.]*$/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('¡A vos! 🍀 Cuando sientas el llamado de un guardián, acá estoy.');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_gracias' });
+    }
+
+    if (/^(chau|adi[oó]s|bye|nos vemos|hasta luego)[\s!.]*$/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('¡Hasta pronto! 🍀 Que la magia te acompañe.');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_despedida' });
+    }
+
+    // ENVÍOS
+    if (/hacen env[ií]os?|env[ií]an a|llegan? a|mandan a|shipping/i.test(msgLower) && !/cu[aá]nto|d[ií]as|tarda/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('Sí, enviamos a todo el mundo 🌎 Por DHL Express, llega en 5-10 días con tracking. ¿De qué país sos?');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_envios' });
+    }
+
+    // TIEMPOS DE ENVÍO
+    if (/cu[aá]nto (tarda|demora) en llegar|d[ií]as.*llegar|tiempo de env[ií]o/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('📦 Uruguay: 5-7 días hábiles (DAC)\n✈️ Internacional: 5-10 días hábiles (DHL Express)\n\nTodos van con tracking 🍀');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_tiempo_envio' });
+    }
+
+    // MÉTODOS DE PAGO
+    if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('Visa, MasterCard, Amex 💳\n\nInternacional: también Western Union y MoneyGram\nUruguay: + OCA, Redpagos, transferencia bancaria');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_pagos' });
+    }
+
+    // PAYPAL
+    if (/paypal|pay pal/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('No tenemos PayPal, pero sí Visa, MasterCard y Amex. También Western Union y MoneyGram para pagos internacionales 💳');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_paypal' });
+    }
+
+    // GARANTÍA / DEVOLUCIONES
+    if (/garant[ií]a|devoluci[oó]n|devolver|reembolso/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('No aceptamos devoluciones por arrepentimiento (cada pieza es única).\n\nSi llega dañado: contactás a DHL o DAC para el reclamo. El envío va asegurado 🍀');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_garantia' });
+    }
+
+    // MATERIALES
+    if (/material|de qu[eé] (est[aá]n|son|hechos)|porcelana|cristal/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('Cada guardián está hecho con:\n• Porcelana fría profesional\n• Cristales 100% naturales\n• Ropa cosida a mano\n\n100% artesanal, sin moldes 🍀');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_materiales' });
+    }
+
+    // PROMO 3x2
+    if (/3x2|tres por dos|promo|descuento|oferta/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('¡Sí! Tenemos el 3x2: llevás 2 guardianes y te regalamos 1 mini 🎁\n\nY envío gratis en compras grandes.');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_promo' });
+    }
+
+    // EL CÍRCULO
+    if (/el c[ií]rculo|membres[ií]a|suscripci[oó]n/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('El Círculo está siendo preparado con algo muy especial 🔮\n\nSi querés ser de los primeros, dejá tu email en: magia.duendesdeluruguay.com/circulo');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_circulo' });
+    }
+
+    // MI MAGIA
+    if (/mi magia|portal.*compra/i.test(msgLower)) {
+      const contenido = crearContenidoManychat('Mi Magia es tu portal exclusivo post-compra 🔮\n\nAhí encontrás tu canalización, la historia de tu guardián, ritual de bienvenida y más.\n\nAccedés en: magia.duendesdeluruguay.com');
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'quick_mimagia' });
+    }
 
     // Datos
     const datos = {
