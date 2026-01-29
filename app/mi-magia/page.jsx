@@ -2643,6 +2643,7 @@ function LoginMagicLink({ onLoginExitoso }) {
   const [estado, setEstado] = useState('inicial'); // inicial, enviando, enviado, error
   const [mensaje, setMensaje] = useState('');
   const [linkDirecto, setLinkDirecto] = useState(null);
+  const [emailFueEnviado, setEmailFueEnviado] = useState(false);
 
   // Estilos inline para garantizar que siempre se apliquen
   const styles = {
@@ -2777,10 +2778,13 @@ function LoginMagicLink({ onLoginExitoso }) {
 
       if (data.success) {
         setEstado('enviado');
-        if (data.linkDirecto) {
+        if (data.emailEnviado) {
+          setEmailFueEnviado(true);
+          setMensaje(data.mensaje || 'Revisá tu email para acceder');
+        } else if (data.linkDirecto) {
+          setEmailFueEnviado(false);
           setLinkDirecto(data.linkDirecto);
-          setMensaje(data.mensaje || 'Error enviando email');
-          console.log('Debug Resend:', data.debug);
+          setMensaje(data.mensaje || 'Usá este enlace directo');
         }
       } else {
         setMensaje(data.error || 'Error al enviar el enlace');
@@ -2796,15 +2800,36 @@ function LoginMagicLink({ onLoginExitoso }) {
     return (
       <div style={styles.container}>
         <div style={styles.card}>
-          <span style={styles.icono}>✨</span>
-          <h1 style={styles.titulo}>¡Magia lista!</h1>
-          <>
-            <p style={{color: '#fff', marginBottom: '1rem'}}>Tocá el botón para entrar:</p>
-            <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
-              ✨ Entrar a Mi Magia
-            </a>
-          </>
-          <button style={styles.btnSec} onClick={() => { setEstado('inicial'); setLinkDirecto(null); }}>
+          {emailFueEnviado ? (
+            <>
+              <span style={styles.icono}>📧</span>
+              <h1 style={styles.titulo}>Revisá tu email</h1>
+              <p style={{color: 'rgba(255,255,255,0.7)', marginBottom: '0.5rem', fontSize: '1.1rem'}}>
+                Enviamos un enlace mágico a:
+              </p>
+              <p style={{color: '#d4af37', marginBottom: '1.5rem', fontSize: '1.1rem', fontWeight: '600'}}>
+                {email}
+              </p>
+              <div style={{background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '10px', padding: '16px', marginBottom: '1rem'}}>
+                <p style={{color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', margin: 0, lineHeight: '1.5'}}>
+                  El enlace expira en 30 minutos.<br/>
+                  Si no lo ves, revisá tu carpeta de spam.
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <span style={styles.icono}>✨</span>
+              <h1 style={styles.titulo}>Magia lista</h1>
+              <p style={{color: 'rgba(255,255,255,0.7)', marginBottom: '1rem', fontSize: '1rem'}}>
+                {mensaje}
+              </p>
+              <a href={linkDirecto} style={{...styles.btn, display: 'inline-block', textDecoration: 'none', padding: '16px 32px'}}>
+                Entrar a Mi Magia
+              </a>
+            </>
+          )}
+          <button style={styles.btnSec} onClick={() => { setEstado('inicial'); setLinkDirecto(null); setEmailFueEnviado(false); }}>
             Usar otro email
           </button>
         </div>
