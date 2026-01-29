@@ -867,14 +867,14 @@ REGLAS:
     // ─────────────────────────────────────────────────────────────
     if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago|pagan con|aceptan/i.test(msgLower)) {
       const respPago = paisDetectado === 'UY'
-        ? 'En Uruguay: Visa, Master, Amex, OCA, PassCard, Cabal, Anda, Club del Este, Redpagos, Itaú, y transferencia bancaria vía Plexo 💳'
-        : 'Internacional: Visa, MasterCard, American Express, y transferencia bancaria vía Plexo 💳 Tu banco convierte automáticamente.';
+        ? 'En Uruguay: Visa, Master, Amex, OCA, PassCard, Cabal, Anda, Club del Este, Redpagos, Itaú, BROU, Bandes, BBVA, Scotiabank 💳'
+        : 'Internacional: Visa, MasterCard, Amex, Western Union, MoneyGram 💳';
       return respuestaRapida(respPago, 'metodos_pago');
     }
 
     if (/paypal|pay pal/i.test(msgLower)) {
       return respuestaRapida(
-        'No tenemos PayPal, pero sí Visa, MasterCard y Amex. También transferencia bancaria vía Plexo (funciona para Uruguay y exterior) 💳',
+        'No tenemos PayPal, pero sí Visa, MasterCard y Amex. También Western Union y MoneyGram para pagos internacionales 💳',
         'paypal'
       );
     }
@@ -976,13 +976,11 @@ No es un texto genérico - es SU mensaje para VOS. Por eso cada canalización es
     // ─────────────────────────────────────────────────────────────
     if (/embalaje|empaque|empaquetado|packaging|c[oó]mo (llega|viene|env[ií]an)|protecci[oó]n del env[ií]o/i.test(msgLower)) {
       return respuestaRapida(
-        `Cada guardián va protegido con mucho amor:
-• Protección individual con materiales suaves
-• Caja resistente
-• Relleno contra golpes
-• Años perfeccionando el sistema
+        `Cada guardián se empaca con cuidado para que llegue perfecto.
 
-Llevamos años enviando a todo el mundo y es MUY raro que lleguen dañados. Y si pasara algo, lo resolvemos 🍀`,
+El envío va asegurado y siempre recibís número de seguimiento.
+
+Si llegara dañado (muy raro): contactás a DHL o DAC según corresponda para el reclamo 🍀`,
         'embalaje'
       );
     }
@@ -993,10 +991,11 @@ Llevamos años enviando a todo el mundo y es MUY raro que lleguen dañados. Y si
     if (/garant[ií]a|devoluci[oó]n|devolver|reembolso|cambio|arrepent/i.test(msgLower)) {
       return respuestaRapida(
         `Te cuento cómo funciona:
-• NO aceptamos devoluciones ni reembolsos (cada pieza es única e irrepetible)
-• Si llegara dañado por el envío: documentás con fotos dentro de 48hs y lo evaluamos
 
-Por eso es importante estar 100% seguro antes de adoptar. El guardián que te eligió ya es tuyo 🍀`,
+• **NO** aceptamos devoluciones por arrepentimiento (cada pieza es única e irrepetible)
+• **Si llega dañado:** contactás a DHL (internacional) o DAC (Uruguay) para iniciar el reclamo. El envío va asegurado.
+
+Por eso es importante estar 100% seguro antes de adoptar 🍀`,
         'garantia'
       );
     }
@@ -1076,11 +1075,10 @@ Todo el trabajo es artesanal, por eso cada uno tarda días en nacer 🍀`,
     // ─────────────────────────────────────────────────────────────
     if (/cu[aá]nto (tarda|demora) en llegar|d[ií]as.*llegar|tiempo de env[ií]o|llega.*d[ií]as/i.test(msgLower)) {
       const respEnvio = `Tiempos de envío:
-📦 **Uruguay (DAC):** 3-7 días hábiles
-✈️ **Internacional (DHL Express):** 5-10 días hábiles
+📦 **Uruguay (DAC):** 5-7 días hábiles
+✈️ **Internacional (DHL):** 5-10 días hábiles
 
-Todos los envíos van con tracking para que puedas seguirlo.
-El guardián se prepara con amor antes de viajar 🍀`;
+Todos los envíos van con tracking para que puedas seguirlo 🍀`;
       return respuestaRapida(respEnvio, 'tiempo_envio_detallado');
     }
 
