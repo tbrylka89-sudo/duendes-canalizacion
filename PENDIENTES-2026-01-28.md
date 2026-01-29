@@ -23,17 +23,17 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | **Nosotros en menú** | La página "Nosotros" no aparece en el menú | Fácil | ⏳ |
+| 1 | ~~**Nosotros en menú**~~ | Ya está en el menú | Fácil | ✅ |
 | 2 | **Redirect mi magia** | mi-magia → magia.duendesdeluruguay.com | Fácil | ⏳ |
-| 3 | **HTMLs para mejorar** | Hay HTMLs de la web para mejorar/cambiar | Media | ⏳ Esperando archivos |
-| 4 | ~~**Emails automáticos**~~ | Sistema Brevo completo (13 plantillas) | ~~Media~~ | ✅ COMPLETADO 29/01 |
+| 3 | ~~**HTMLs para mejorar**~~ | Ya se mejoraron | Media | ✅ |
+| 4 | ~~**Emails automáticos**~~ | Sistema Brevo completo (13 plantillas) | Media | ✅ |
 | 5 | **Tito (el chat)** | Revisar funcionamiento en web, Mi Magia y ManyChat | Compleja | ⏳ |
 | 6 | **Generador de historias** | Verificar que siga funcionando | Media | ⏳ |
 | 7 | **Generador de canalizaciones** | Verificar conexión con formulario de compra | Media | ⏳ |
 | 8 | **Mi Magia + WooCommerce** | Verificar carga automática de guardianes comprados | Compleja | ⏳ |
-| 9 | **Mi Círculo (suscripción)** | Investigar y perfeccionar para que sea administrable | Compleja | ⏳ |
-| 10 | **Testear emails Brevo** | Probar "pedido enviado" y "seguimiento 3 días" con orden real | Fácil | ⏳ |
-| 11 | **DMARC** | Configurar para mejor entregabilidad de emails | Media | ⏳ |
+| 9 | ~~**Mi Círculo (suscripción)**~~ | Cartel "en construcción" con captura de emails | Compleja | ✅ PAUSADO |
+| 10 | ~~**Testear emails Brevo**~~ | Ya se testearon todos | Fácil | ✅ |
+| 11 | **DMARC** | Configurar para mejor entregabilidad (opcional) | Media | 🔵 Bajo prioridad |
 
 ---
 

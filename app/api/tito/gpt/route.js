@@ -696,6 +696,20 @@ INSTRUCCIONES:
     }
 
     // ─────────────────────────────────────────────────────────────
+    // DRAMA / DESAHOGO EMOCIONAL - Respuesta corta, no gastar tokens
+    // ─────────────────────────────────────────────────────────────
+    // Detectar mensajes de desahogo SIN intención de compra
+    const esDrama = /estoy (muy )?(mal|triste|destru[ií]d|deprimi|perdid)|no puedo m[aá]s|todo me sale mal|mi vida es un|nadie me (quiere|entiende)|me siento (sol[oa]|vac[ií]|perdid)|no s[eé] qu[eé] hacer con mi vida|estoy en crisis|mi ex me|me dejaron|estoy rota|coraz[oó]n roto|no tengo fuerzas|quiero llorar|me quiero morir/i.test(msgLower);
+    const tieneIntencionCompra = /precio|cu[aá]nto|guard|duende|compr|quiero (uno|ver|un)|env[ií]o|tienda/i.test(msgLower);
+
+    if (esDrama && !tieneIntencionCompra) {
+      return respuestaRapida(
+        'Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. Si querés, te muestro algunos.',
+        'drama_emocional'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // SALUDO INICIAL - "hola", "buenas"
     // ─────────────────────────────────────────────────────────────
     if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello)[\s!?.]*$/i.test(msgLower) && conversationHistory.length <= 1) {
