@@ -41,14 +41,7 @@ add_action('template_redirect', function() {
 // 2. ELIMINAR GRIMORIO PUBLICO DE TODO EL SITIO
 // ═══════════════════════════════════════════════════════════════════════════
 
-// FORZAR ocultar overlay de intro (por si hay caché)
-add_action('wp_head', function() {
-    ?>
-    <style id="fix-pantalla-negra">
-    #duendes-intro-overlay { display: none !important; opacity: 0 !important; visibility: hidden !important; }
-    </style>
-    <?php
-}, -999);
+// Overlay de intro ACTIVO (no ocultar)
 
 // JavaScript para eliminar header de 10Web (NO el de Duendes)
 add_action('wp_head', function() {
@@ -181,6 +174,22 @@ add_action('wp_head', function() {
     section[class*="grimorio"],
     .duendes-ocultar-grimorio {
         display: none !important;
+    }
+
+    /* Fix: Evitar que productos tapen el footer */
+    .woocommerce ul.products,
+    ul.products,
+    .products,
+    .elementor-widget-woocommerce-products {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    footer,
+    .elementor-location-footer,
+    [data-elementor-type="footer"],
+    .site-footer {
+        position: relative !important;
+        z-index: 10 !important;
     }
     </style>
     <?php

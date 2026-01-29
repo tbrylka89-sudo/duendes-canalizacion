@@ -1,0 +1,466 @@
+<!-- SECCIÓN MI MAGIA - Tu Portal Personal Mágico -->
+<style>
+.mi-magia-promo {
+    background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+    padding: 80px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mi-magia-promo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.05'%3E%3Cpath d='M30 30l15-15M30 30l-15 15M30 30l15 15M30 30l-15-15'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.mi-magia-promo * {
+    position: relative;
+    z-index: 1;
+}
+
+.mi-magia-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.mi-magia-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.mi-magia-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #d4af37, #f4d03f, #d4af37);
+    color: #1a0a2e;
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.6); }
+}
+
+.mi-magia-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 3.5rem;
+    color: #fff;
+    margin-bottom: 16px;
+    line-height: 1.1;
+}
+
+.mi-magia-title span {
+    background: linear-gradient(90deg, #d4af37, #f4d03f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mi-magia-subtitle {
+    font-size: 1.3rem;
+    color: #c9b8db;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    line-height: 1.6;
+}
+
+.mi-magia-exclusive {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 12px 28px;
+    border-radius: 50px;
+    color: #d4af37;
+    font-size: 14px;
+}
+
+.mi-magia-exclusive svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Features Grid */
+.mi-magia-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+}
+
+.mi-magia-feature {
+    background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 20px;
+    padding: 32px 28px;
+    transition: all 0.4s ease;
+}
+
+.mi-magia-feature:hover {
+    transform: translateY(-8px);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.mi-magia-feature-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #d4af37 0%, #8b6914 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.mi-magia-feature h3 {
+    color: #fff;
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.mi-magia-feature p {
+    color: #a89bb8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Highlight Section */
+.mi-magia-highlight {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 24px;
+    padding: 48px;
+    margin-bottom: 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.mi-magia-highlight-content h3 {
+    color: #d4af37;
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.mi-magia-highlight-content p {
+    color: #c9b8db;
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+.mi-magia-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mi-magia-benefit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.mi-magia-benefit svg {
+    width: 20px;
+    height: 20px;
+    color: #d4af37;
+    flex-shrink: 0;
+}
+
+.mi-magia-visual {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.mi-magia-stat {
+    background: rgba(26, 10, 46, 0.6);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+}
+
+.mi-magia-stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #d4af37, #f4d03f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mi-magia-stat-label {
+    color: #a89bb8;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+/* CTA Section */
+.mi-magia-cta {
+    text-align: center;
+    padding: 48px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.mi-magia-cta h3 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 16px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.mi-magia-cta p {
+    color: #c9b8db;
+    margin-bottom: 32px;
+    font-size: 1.1rem;
+}
+
+.mi-magia-form {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.mi-magia-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 16px 24px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.mi-magia-input::placeholder {
+    color: #8b7a9e;
+}
+
+.mi-magia-input:focus {
+    border-color: #d4af37;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mi-magia-btn {
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a0a2e;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.mi-magia-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+}
+
+.mi-magia-note {
+    margin-top: 20px;
+    color: #8b7a9e;
+    font-size: 0.85rem;
+}
+
+.mi-magia-note svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .mi-magia-highlight {
+        grid-template-columns: 1fr;
+        padding: 32px;
+    }
+
+    .mi-magia-title {
+        font-size: 2.5rem;
+    }
+
+    .mi-magia-visual {
+        order: -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .mi-magia-promo {
+        padding: 50px 16px;
+    }
+
+    .mi-magia-title {
+        font-size: 2rem;
+    }
+
+    .mi-magia-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .mi-magia-feature {
+        padding: 24px 20px;
+    }
+
+    .mi-magia-form {
+        flex-direction: column;
+    }
+
+    .mi-magia-input, .mi-magia-btn {
+        width: 100%;
+    }
+}
+</style>
+
+<section class="mi-magia-promo">
+    <div class="mi-magia-container">
+
+        <!-- Header -->
+        <div class="mi-magia-header">
+            <div class="mi-magia-badge">Exclusivo para ti</div>
+            <h2 class="mi-magia-title">Tu Espacio Personal de <span>Magia</span></h2>
+            <p class="mi-magia-subtitle">
+                Por primera vez, cada guardián tiene su propio santuario digital.
+                Un lugar íntimo donde toda tu energía, tus compras, tus lecturas y tu camino
+                espiritual se unen en una experiencia que nadie más puede ver ni tocar.
+            </p>
+            <div class="mi-magia-exclusive">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                Solo para clientes de Duendes del Uruguay
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="mi-magia-features">
+            <div class="mi-magia-feature">
+                <div class="mi-magia-feature-icon">📖</div>
+                <h3>Tu Grimorio Personal</h3>
+                <p>Todos tus Guardianes reunidos en un libro mágico único. Accede a sus historias, significados profundos y mensajes exclusivos cuando los necesites.</p>
+            </div>
+
+            <div class="mi-magia-feature">
+                <div class="mi-magia-feature-icon">🔮</div>
+                <h3>Lecturas y Canalizaciones</h3>
+                <p>Recibe mensajes personalizados de tus Guardianes. Cada lectura es única, creada especialmente para tu camino y momento actual.</p>
+            </div>
+
+            <div class="mi-magia-feature">
+                <div class="mi-magia-feature-icon">✨</div>
+                <h3>Cofre Diario</h3>
+                <p>Cada día te espera una sorpresa mágica. Runas, tréboles y recompensas especiales que alimentan tu energía y desbloquean experiencias.</p>
+            </div>
+
+            <div class="mi-magia-feature">
+                <div class="mi-magia-feature-icon">🌟</div>
+                <h3>Señal del Día</h3>
+                <p>Un mensaje del universo pensado solo para ti. Comienza cada mañana con la guía que tu alma necesita escuchar.</p>
+            </div>
+
+            <div class="mi-magia-feature">
+                <div class="mi-magia-feature-icon">🏆</div>
+                <h3>Tu Camino de Evolución</h3>
+                <p>De Semilla a Guardiana Suprema. Cumple misiones, gana insignias y observa cómo tu energía mágica crece con cada paso que das.</p>
+            </div>
+
+            <div class="mi-magia-feature">
+                <div class="mi-magia-feature-icon">💎</div>
+                <h3>Experiencias Mágicas</h3>
+                <p>Accede a rituales exclusivos, ceremonias y conocimientos ancestrales que solo los guardianes más dedicados pueden experimentar.</p>
+            </div>
+        </div>
+
+        <!-- Highlight Section -->
+        <div class="mi-magia-highlight">
+            <div class="mi-magia-highlight-content">
+                <h3>Todo lo que has comprado, todo lo que eres</h3>
+                <p>
+                    Mi Magia no es solo una plataforma. Es el reflejo de tu viaje espiritual.
+                    Cada Guardián que has elegido, cada canalización recibida, cada momento
+                    de conexión queda guardado aquí para siempre.
+                </p>
+                <div class="mi-magia-benefits">
+                    <div class="mi-magia-benefit">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Historial completo de tus compras y Guardianes
+                    </div>
+                    <div class="mi-magia-benefit">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Todas tus canalizaciones guardadas para siempre
+                    </div>
+                    <div class="mi-magia-benefit">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Guías de cristales, runas y numerología
+                    </div>
+                    <div class="mi-magia-benefit">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Contenido que evoluciona contigo cada día
+                    </div>
+                </div>
+            </div>
+            <div class="mi-magia-visual">
+                <div class="mi-magia-stat">
+                    <div class="mi-magia-stat-number">∞</div>
+                    <div class="mi-magia-stat-label">Acceso ilimitado</div>
+                </div>
+                <div class="mi-magia-stat">
+                    <div class="mi-magia-stat-number">24/7</div>
+                    <div class="mi-magia-stat-label">Siempre disponible</div>
+                </div>
+                <div class="mi-magia-stat">
+                    <div class="mi-magia-stat-number">100%</div>
+                    <div class="mi-magia-stat-label">Personal y privado</div>
+                </div>
+                <div class="mi-magia-stat">
+                    <div class="mi-magia-stat-number">🔒</div>
+                    <div class="mi-magia-stat-label">Solo para ti</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="mi-magia-cta">
+            <h3>Ingresa a Tu Espacio Mágico</h3>
+            <p>Sin contraseñas, sin complicaciones. Solo tu email y la magia hace el resto.</p>
+            <form class="mi-magia-form" action="https://magia.duendesdeluruguay.com/login" method="GET">
+                <input type="email" name="email" class="mi-magia-input" placeholder="Tu correo electrónico" required>
+                <button type="submit" class="mi-magia-btn">Entrar a Mi Magia</button>
+            </form>
+            <p class="mi-magia-note">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                Recibirás un enlace mágico en tu correo. Un clic y estarás dentro.
+            </p>
+        </div>
+
+    </div>
+</section>

@@ -385,22 +385,24 @@ function duendes_subtotal_carrito($subtotal, $cart_item, $cart_item_key) {
 
 add_action('wp_head', 'duendes_precios_estilos');
 function duendes_precios_estilos() {
-    $pais = duendes_detectar_pais();
-    $es_uruguay = ($pais === 'UY');
     ?>
     <script>
-    // Datos de precios para JavaScript
-    window.DUENDES_PRECIOS = {
-        pais: '<?php echo esc_js($pais); ?>',
-        esUruguay: <?php echo $es_uruguay ? 'true' : 'false'; ?>,
-        tablaUYU: {
-            70: 2500,
-            150: 5500,
-            200: 8000,
-            450: 16500,
-            1050: 39800
-        }
-    };
+    // Datos de precios para JavaScript - Lee cookie directamente para evitar problemas de caché
+    (function() {
+        var match = document.cookie.match(/(^| )duendes_pais=([^;]+)/);
+        var pais = match ? match[2] : 'US';
+        window.DUENDES_PRECIOS = {
+            pais: pais,
+            esUruguay: pais === 'UY',
+            tablaUYU: {
+                70: 2500,
+                150: 5500,
+                200: 8000,
+                450: 16500,
+                1050: 39800
+            }
+        };
+    })();
     </script>
     <style id="duendes-precios-inteligentes">
     .duendes-precio {
@@ -423,7 +425,7 @@ function duendes_precios_estilos() {
 
     .duendes-precio .precio-aproximado {
         font-size: 0.8em;
-        color: rgba(255,255,255,0.6);
+        color: #9a8866;
         font-style: italic;
     }
 
@@ -664,111 +666,115 @@ function duendes_ajax_get_precio() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SOBRESCRIBIR PRECIOS DE ELEMENTOR (que muestran "$X PESOS")
+// SOBRESCRIBIR PRECIOS INCORRECTOS
 // ═══════════════════════════════════════════════════════════════════════════
 
 add_action('wp_footer', 'duendes_corregir_precios_elementor', 999);
 function duendes_corregir_precios_elementor() {
-    $pais = duendes_detectar_pais();
-    $es_uruguay = ($pais === 'UY');
     ?>
     <script>
     (function() {
-        // Tabla de conversión USD → UYU
-        var tablaUYU = [
-            {min: 0, max: 100, uyu: 2500},      // Mini clásicos ($70)
-            {min: 100, max: 175, uyu: 5500},    // Mini especiales y Pixies ($150)
-            {min: 175, max: 350, uyu: 8000},    // Medianos especiales ($200)
-            {min: 350, max: 800, uyu: 16500},   // Grandes ($450)
-            {min: 800, max: 99999, uyu: 39800}  // Gigantes ($1050)
+        // Leer país desde cookie
+        var m = document.cookie.match(/duendes_pais=([^;]+)/);
+        var pais = m ? m[1] : null;
+        var esUY = pais === 'UY';
+
+        // Monedas por país
+        var monedas = {
+            'AR': {nombre: 'pesos argentinos', simbolo: '$', tasa: 1000},
+            'MX': {nombre: 'pesos mexicanos', simbolo: '$', tasa: 17},
+            'CO': {nombre: 'pesos colombianos', simbolo: '$', tasa: 4000},
+            'CL': {nombre: 'pesos chilenos', simbolo: '$', tasa: 900},
+            'PE': {nombre: 'soles', simbolo: 'S/', tasa: 3.7},
+            'BR': {nombre: 'reales', simbolo: 'R$', tasa: 5},
+            'ES': {nombre: 'euros', simbolo: '€', tasa: 0.92},
+            'FR': {nombre: 'euros', simbolo: '€', tasa: 0.92},
+            'DE': {nombre: 'euros', simbolo: '€', tasa: 0.92},
+            'IT': {nombre: 'euros', simbolo: '€', tasa: 0.92},
+            'GB': {nombre: 'libras', simbolo: '£', tasa: 0.79},
+            'US': {nombre: 'dólares', simbolo: '$', tasa: 1}
+        };
+
+        // Tabla USD → UYU fijo
+        var tablaUY = [
+            [0, 100, 2500],
+            [100, 175, 5500],
+            [175, 350, 8000],
+            [350, 800, 16500],
+            [800, 99999, 39800]
         ];
 
-        function obtenerPrecioUYU(usd) {
-            for (var i = 0; i < tablaUYU.length; i++) {
-                if (usd >= tablaUYU[i].min && usd < tablaUYU[i].max) {
-                    return tablaUYU[i].uyu;
-                }
+        function usdToUyu(usd) {
+            for (var i = 0; i < tablaUY.length; i++) {
+                if (usd >= tablaUY[i][0] && usd < tablaUY[i][1]) return tablaUY[i][2];
             }
             return Math.round(usd * 40);
         }
 
-        function formatearNumero(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        function fmt(n) {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        function corregirPrecios() {
-            var esUruguay = <?php echo $es_uruguay ? 'true' : 'false'; ?>;
+        function fix() {
+            var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            var node;
+            var nodesToFix = [];
 
-            // Buscar elementos con precios en formato "$X.XXX PESOS" o "$X,XXX PESOS"
-            var elementos = document.querySelectorAll('*');
-            elementos.forEach(function(el) {
-                if (el.children.length === 0 || el.classList.contains('duendes-precio')) {
-                    var texto = el.textContent || el.innerText;
-                    // Detectar formato "$6.450 PESOS" o similar
-                    var matchPesos = texto.match(/\$\s*([\d.,]+)\s*PESOS/i);
-                    if (matchPesos) {
-                        // Extraer el número
-                        var numStr = matchPesos[1].replace(/\./g, '').replace(/,/g, '');
-                        var num = parseInt(numStr);
-
-                        // Esto viene del plugin Multi Currency que convierte USD a UYU con tasa incorrecta
-                        // Necesitamos volver a USD y luego aplicar nuestra tabla
-                        // Asumimos que usaban tasa ~43, entonces $6,450 / 43 ≈ $150 USD
-                        var tasaAproximada = 43;
-                        var usdAproximado = Math.round(num / tasaAproximada);
-
-                        if (esUruguay) {
-                            var precioUYU = obtenerPrecioUYU(usdAproximado);
-                            el.innerHTML = '<span class="duendes-precio duendes-precio-uy"><span class="precio-principal">$' + formatearNumero(precioUYU) + ' <small>UYU</small></span></span>';
-                        } else {
-                            el.innerHTML = '<span class="duendes-precio duendes-precio-usd"><span class="precio-principal">$' + usdAproximado + ' <small>USD</small></span></span>';
-                        }
-                    }
+            while (node = walker.nextNode()) {
+                var t = node.textContent;
+                // Buscar: PESOS, DÓLARES, USD ARGENTINOS, USD MEXICANOS, etc
+                if (t.match(/PESOS|DÓLARES|USD\s+(ARGENTINOS|MEXICANOS|COLOMBIANOS|CHILENOS)/i)) {
+                    nodesToFix.push(node);
                 }
-            });
+            }
 
-            // También buscar elementos específicos de Elementor con clase de precio
-            document.querySelectorAll('.elementor-widget-woocommerce-products .price, .woocommerce-Price-amount').forEach(function(el) {
-                if (el.classList.contains('duendes-corregido')) return;
+            nodesToFix.forEach(function(textNode) {
+                var txt = textNode.textContent;
 
-                var texto = el.textContent || el.innerText;
-                var matchPesos = texto.match(/\$\s*([\d.,]+)\s*(?:PESOS|pesos)?/i);
-                if (matchPesos && texto.toLowerCase().includes('pesos')) {
-                    var numStr = matchPesos[1].replace(/\./g, '').replace(/,/g, '');
-                    var num = parseInt(numStr);
-                    var tasaAproximada = 43;
-                    var usdAproximado = Math.round(num / tasaAproximada);
+                // Caso 1: "$X PESOS" → corregir para UY o resto
+                if (txt.match(/\$([\d.,]+)\s*PESOS/i)) {
+                    var match = txt.match(/\$([\d.,]+)\s*PESOS/i);
+                    var numStr = match[1].replace(/\./g, '').replace(/,/g, '');
+                    var pesos = parseInt(numStr);
+                    var usd = Math.round(pesos / 43);
 
-                    if (esUruguay) {
-                        var precioUYU = obtenerPrecioUYU(usdAproximado);
-                        el.innerHTML = '$' + formatearNumero(precioUYU) + ' <small>UYU</small>';
+                    if (esUY) {
+                        var uyu = usdToUyu(usd);
+                        txt = txt.replace(/\$[\d.,]+\s*PESOS/i, '$' + fmt(uyu) + ' UYU');
                     } else {
-                        el.innerHTML = '$' + usdAproximado + ' <small>USD</small>';
+                        txt = txt.replace(/\$[\d.,]+\s*PESOS/i, '$' + usd + ' USD');
                     }
-                    el.classList.add('duendes-corregido');
                 }
+
+                // Caso 2: "DÓLARES" → "USD"
+                txt = txt.replace(/DÓLARES/gi, 'USD');
+
+                // Caso 3: "USD ARGENTINOS" → "pesos argentinos"
+                txt = txt.replace(/USD\s+ARGENTINOS/gi, 'pesos argentinos');
+                txt = txt.replace(/USD\s+MEXICANOS/gi, 'pesos mexicanos');
+                txt = txt.replace(/USD\s+COLOMBIANOS/gi, 'pesos colombianos');
+                txt = txt.replace(/USD\s+CHILENOS/gi, 'pesos chilenos');
+                txt = txt.replace(/USD\s+PERUANOS/gi, 'soles');
+                txt = txt.replace(/USD\s+BRASILEÑOS/gi, 'reales');
+
+                textNode.textContent = txt;
             });
         }
 
-        // Ejecutar al cargar
+        // Ejecutar múltiples veces
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', corregirPrecios);
+            document.addEventListener('DOMContentLoaded', fix);
         } else {
-            corregirPrecios();
+            fix();
         }
+        setTimeout(fix, 300);
+        setTimeout(fix, 800);
+        setTimeout(fix, 1500);
+        setTimeout(fix, 3000);
 
-        // También ejecutar después de un delay para elementos cargados dinámicamente
-        setTimeout(corregirPrecios, 500);
-        setTimeout(corregirPrecios, 1500);
-        setTimeout(corregirPrecios, 3000);
-
-        // Observer para elementos nuevos
-        if (typeof MutationObserver !== 'undefined') {
-            var observer = new MutationObserver(function(mutations) {
-                corregirPrecios();
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-        }
+        // Observer
+        var obs = new MutationObserver(fix);
+        obs.observe(document.body, {childList: true, subtree: true, characterData: true});
     })();
     </script>
     <?php

@@ -118,165 +118,24 @@ add_action('wp_footer', function() {
                 }
             });
 
-            // Cambiar botón "Update cart" - SIEMPRE poner texto
+            // Cambiar botón "Update cart"
             document.querySelectorAll('button[name="update_cart"]').forEach(function(btn) {
-                if (!btn.textContent.trim() && !btn.value.trim()) {
-                    btn.textContent = 'ACTUALIZAR CARRITO';
-                } else if (btn.value === 'Update cart' || btn.textContent.trim() === 'Update cart') {
-                    btn.textContent = 'ACTUALIZAR CARRITO';
+                if (btn.value === 'Update cart') {
                     btn.value = 'Actualizar carrito';
                 }
             });
 
-            // Cambiar botón "Proceed to checkout" o crearlo si no existe
-            var checkoutBtn = document.querySelector('.checkout-button, .wc-proceed-to-checkout a');
-            if (checkoutBtn) {
-                if (checkoutBtn.textContent.trim() === 'Proceed to checkout' || !checkoutBtn.textContent.trim()) {
-                    checkoutBtn.textContent = 'FINALIZAR COMPRA';
+            // Cambiar botón "Proceed to checkout"
+            document.querySelectorAll('.checkout-button, .wc-proceed-to-checkout a').forEach(function(btn) {
+                if (btn.textContent.trim() === 'Proceed to checkout') {
+                    btn.textContent = 'Finalizar Compra';
                 }
-            } else {
-                // Crear botón de checkout si no existe
-                var cartTotals = document.querySelector('.cart_totals');
-                if (cartTotals && !document.querySelector('.duendes-checkout-btn')) {
-                    var btnContainer = document.createElement('div');
-                    btnContainer.className = 'wc-proceed-to-checkout';
-                    btnContainer.innerHTML = '<a href="/caja/" class="checkout-button button alt wc-forward duendes-checkout-btn">FINALIZAR COMPRA</a>';
-                    cartTotals.appendChild(btnContainer);
-                }
-            }
+            });
 
             // Cambiar "View cart"
             document.querySelectorAll('.wc-forward').forEach(function(btn) {
                 if (btn.textContent.trim() === 'View cart') {
                     btn.textContent = 'Ver carrito';
-                }
-            });
-
-            // ═══════════════════════════════════════════════════════════════
-            // TRADUCCIONES DEL CHECKOUT
-            // ═══════════════════════════════════════════════════════════════
-
-            // "Order Summary" -> "Resumen del Pedido"
-            document.querySelectorAll('h2, h3, .wc-block-components-title, .wp-block-woocommerce-checkout-order-summary-block h2').forEach(function(el) {
-                if (el.textContent.trim() === 'Order Summary' || el.textContent.trim() === 'Order summary') {
-                    el.textContent = 'Resumen del Pedido';
-                }
-            });
-
-            // "Company Name (optional)" -> "Empresa (opcional)"
-            document.querySelectorAll('label, .wc-block-components-text-input label, .components-base-control__label').forEach(function(el) {
-                var texto = el.textContent.trim();
-                if (texto === 'Company Name (optional)' || texto === 'Company name (optional)' || texto === 'Company (optional)') {
-                    el.textContent = 'Empresa (opcional)';
-                }
-            });
-
-            // Eliminar "(optional)" duplicado en campos como "Apto, oficina (opcional) (optional)"
-            document.querySelectorAll('label, .wc-block-components-text-input label').forEach(function(el) {
-                if (el.innerHTML.includes('(opcional) (optional)')) {
-                    el.innerHTML = el.innerHTML.replace('(opcional) (optional)', '(opcional)');
-                }
-                if (el.innerHTML.includes('(optional) (opcional)')) {
-                    el.innerHTML = el.innerHTML.replace('(optional) (opcional)', '(opcional)');
-                }
-                // También manejar variantes
-                if (el.textContent.includes('(optional)') && el.textContent.includes('(opcional)')) {
-                    el.innerHTML = el.innerHTML.replace(/\s*\(optional\)/gi, '');
-                }
-            });
-
-            // "Use shipping address as billing address" -> traducir
-            document.querySelectorAll('label, span, .wc-block-components-checkbox__label, .wc-block-checkout__use-address-for-billing label').forEach(function(el) {
-                var texto = el.textContent.trim();
-                if (texto === 'Use shipping address as billing address' || texto === 'Use same address for billing') {
-                    el.textContent = 'Usar direccion de envio como direccion de facturacion';
-                }
-            });
-
-            // "SHIPPING METHODS" -> "METODOS DE ENVIO"
-            document.querySelectorAll('h2, h3, .wc-block-components-title, legend, .wc-block-components-shipping-rates-control__package-title').forEach(function(el) {
-                var texto = el.textContent.trim().toUpperCase();
-                if (texto === 'SHIPPING METHODS' || texto === 'SHIPPING OPTIONS' || texto === 'SHIPPING METHOD') {
-                    el.textContent = 'METODOS DE ENVIO';
-                }
-            });
-
-            // "Tax" -> ocultar si es $0 o traducir a "Impuestos"
-            document.querySelectorAll('tr.tax-rate, .wc-block-components-totals-taxes, tr.woocommerce-shipping-totals').forEach(function(row) {
-                var amountEl = row.querySelector('.woocommerce-Price-amount, .amount, .wc-block-formatted-money-amount');
-                if (amountEl) {
-                    var amount = amountEl.textContent.trim();
-                    // Si es $0.00 o $0, ocultar la fila
-                    if (amount === '$0.00' || amount === '$0' || amount === '0' || amount === 'US$0.00' || amount === 'US$0') {
-                        row.style.display = 'none';
-                    }
-                }
-            });
-            // Traducir "Tax" a "Impuestos" en labels
-            document.querySelectorAll('th, .wc-block-components-totals-item__label').forEach(function(el) {
-                if (el.textContent.trim() === 'Tax' || el.textContent.trim() === 'Taxes') {
-                    el.textContent = 'Impuestos';
-                }
-            });
-
-            // "By placing this order, I agree to the Terms & Privacy Policy" -> traducir
-            document.querySelectorAll('label, span, p, .wc-block-checkout__terms, .woocommerce-terms-and-conditions-checkbox-text').forEach(function(el) {
-                var texto = el.textContent.trim();
-                if (texto.includes('By placing this order') && texto.includes('Terms')) {
-                    el.innerHTML = el.innerHTML
-                        .replace(/By placing this order,?\s*I agree to the/gi, 'Al realizar este pedido, acepto los')
-                        .replace(/Terms\s*&\s*Privacy Policy/gi, 'Terminos y Politica de Privacidad')
-                        .replace(/Terms and Privacy Policy/gi, 'Terminos y Politica de Privacidad')
-                        .replace(/Terms & Conditions/gi, 'Terminos y Condiciones')
-                        .replace(/Privacy Policy/gi, 'Politica de Privacidad');
-                }
-            });
-
-            // ═══════════════════════════════════════════════════════════════
-            // FIX: Shipping Calculator - evitar que se trabe
-            // ═══════════════════════════════════════════════════════════════
-            var shippingCalcBtn = document.querySelector('.shipping-calculator-button');
-            if (shippingCalcBtn) {
-                shippingCalcBtn.addEventListener('click', function(e) {
-                    var form = document.querySelector('.shipping-calculator-form');
-                    if (form) {
-                        // Forzar mostrar/ocultar sin depender del AJAX
-                        if (form.style.display === 'none' || !form.style.display) {
-                            form.style.display = 'block';
-                            this.setAttribute('aria-expanded', 'true');
-                        } else {
-                            form.style.display = 'none';
-                            this.setAttribute('aria-expanded', 'false');
-                        }
-                    }
-                });
-            }
-
-            // Timeout para el botón de calcular envío
-            var calcShippingBtn = document.querySelector('button[name="calc_shipping"]');
-            if (calcShippingBtn) {
-                calcShippingBtn.addEventListener('click', function() {
-                    var btn = this;
-                    var originalText = btn.textContent;
-                    btn.textContent = 'Calculando...';
-                    btn.disabled = true;
-
-                    // Timeout de seguridad - si tarda más de 10 segundos, restaurar
-                    setTimeout(function() {
-                        if (btn.disabled) {
-                            btn.textContent = originalText;
-                            btn.disabled = false;
-                        }
-                    }, 10000);
-                });
-            }
-
-            // Traducir placeholders de campos opcionales
-            document.querySelectorAll('input, textarea').forEach(function(input) {
-                if (input.placeholder) {
-                    if (input.placeholder.includes('(optional)')) {
-                        input.placeholder = input.placeholder.replace('(optional)', '(opcional)');
-                    }
                 }
             });
 
@@ -298,32 +157,12 @@ add_action('wp_footer', function() {
 
         // Re-ejecutar después de actualizaciones AJAX del carrito
         if (typeof jQuery !== 'undefined') {
-            jQuery(document.body).on('updated_cart_totals updated_shipping_method updated_checkout', traducirCarrito);
+            jQuery(document.body).on('updated_cart_totals updated_shipping_method', traducirCarrito);
         }
 
         // También ejecutar con delay por si hay carga lenta
         setTimeout(traducirCarrito, 500);
         setTimeout(traducirCarrito, 1500);
-        setTimeout(traducirCarrito, 3000);
-
-        // Observer para detectar cambios dinamicos en el DOM (checkout de bloques)
-        var observer = new MutationObserver(function(mutations) {
-            traducirCarrito();
-        });
-
-        // Observar cambios en el body
-        if (document.body) {
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-                characterData: true
-            });
-        }
-
-        // Detener observer despues de 30 segundos para no afectar rendimiento
-        setTimeout(function() {
-            observer.disconnect();
-        }, 30000);
     })();
     </script>
     <?php
@@ -547,35 +386,17 @@ body.woocommerce-checkout {
     background: linear-gradient(135deg, #d4bc7a 0%, #C6A962 100%) !important;
 }
 
-/* Botón "Actualizar carrito" - DORADO VISIBLE */
-.woocommerce button[name="update_cart"],
-.woocommerce button[name="update_cart"]:disabled,
-.woocommerce button.button[name="update_cart"],
-.woocommerce-cart button[name="update_cart"],
-button[name="update_cart"],
-.woocommerce-cart .actions button,
-.cart_totals button,
-input[name="update_cart"] {
-    background: linear-gradient(135deg, #C6A962, #a8893d) !important;
-    color: #000 !important;
-    border: none !important;
-    padding: 12px 25px !important;
-    font-weight: 700 !important;
-    opacity: 1 !important;
-    cursor: pointer !important;
+/* Botón "Actualizar carrito" - secundario */
+.woocommerce button[name="update_cart"] {
+    background: transparent !important;
+    color: #8B7355 !important;
+    border: 2px solid #C6A962 !important;
+    box-shadow: none !important;
 }
 
-.woocommerce button[name="update_cart"]:hover:not(:disabled) {
-    background: linear-gradient(135deg, #d4bc7a, #C6A962) !important;
-    color: #000 !important;
-}
-
-.woocommerce button[name="update_cart"]:disabled,
-button[name="update_cart"]:disabled {
-    background: #666 !important;
-    color: #999 !important;
-    opacity: 0.7 !important;
-    cursor: not-allowed !important;
+.woocommerce button[name="update_cart"]:hover {
+    background: #C6A962 !important;
+    color: #1a1a1a !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -691,17 +512,7 @@ button[name="update_cart"]:disabled {
     border-radius: 0 0 20px 20px !important;
 }
 
-/* Order review - Espacio arriba del resumen */
-.woocommerce-checkout #order_review_heading,
-.woocommerce-checkout h3#order_review_heading,
-.wc-block-components-order-summary,
-.wp-block-woocommerce-checkout-order-summary-block,
-#order_review h3,
-#order_review > h3:first-child {
-    padding-top: 30px !important;
-    margin-top: 20px !important;
-}
-
+/* Order review */
 .woocommerce-checkout-review-order-table {
     background: transparent !important;
 }
@@ -996,48 +807,6 @@ button[name="update_cart"]:disabled {
 .woocommerce table.shop_table img:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 25px rgba(198, 169, 98, 0.25) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   CHECKOUT BLOQUES - ESPACIADO Y ESTILOS
-═══════════════════════════════════════════════════════════════ */
-
-/* Espacio arriba del Order Summary / Resumen del Pedido */
-.wc-block-components-sidebar .wc-block-components-panel,
-.wp-block-woocommerce-checkout-order-summary-block,
-.wc-block-checkout__sidebar,
-.wc-block-components-order-summary {
-    padding-top: 30px !important;
-}
-
-/* Titulo Order Summary */
-.wc-block-components-order-summary .wc-block-components-panel__button,
-.wc-block-components-order-summary > h2,
-.wp-block-woocommerce-checkout-order-summary-block h2 {
-    padding-top: 20px !important;
-    margin-top: 15px !important;
-}
-
-/* Checkout clasico - espacio arriba de Order Summary */
-#order_review_heading {
-    padding-top: 30px !important;
-    margin-top: 20px !important;
-}
-
-/* Fix para boton Actualizar carrito - DORADO SIEMPRE VISIBLE */
-.woocommerce-cart table.cart td.actions button[name="update_cart"],
-button.button[name="update_cart"],
-input.button[name="update_cart"],
-.woocommerce-cart .actions button {
-    color: #000 !important;
-    background: linear-gradient(135deg, #C6A962, #a8893d) !important;
-    border: none !important;
-    font-weight: 700 !important;
-}
-
-/* Asegurar visibilidad del value del boton */
-.woocommerce button[name="update_cart"]::after {
-    content: none !important;
 }
 </style>
 <?php

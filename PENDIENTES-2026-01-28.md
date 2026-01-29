@@ -17,21 +17,23 @@
 
 ---
 
-## 🔴 TAREAS PENDIENTES (Nueva lista)
+## 🔴 TAREAS PENDIENTES (Actualizado 29/01/2026)
 
 ### Orden sugerido de trabajo:
 
-| # | Tarea | Descripción | Complejidad |
-|---|-------|-------------|-------------|
-| 1 | **Nosotros en menú** | La página "Nosotros" no aparece en el menú, pero el contenido ya existe | Fácil |
-| 2 | **Redirect mi magia** | Que mi-magia de Vercel redirija a mimagia.duendesdeluruguay.com | Fácil |
-| 3 | **HTMLs para mejorar** | Hay HTMLs de la web para mejorar/cambiar | Media |
-| 4 | **Emails automáticos** | Verificar que todos los emails funcionen (Resend + Google Workspace) | Media |
-| 5 | **Tito (el chat)** | Revisar a fondo que tenga info correcta, funcione en web, Mi Magia y ManyChat | Compleja |
-| 6 | **Generador de historias** | Verificar que siga funcionando | Media |
-| 7 | **Generador de canalizaciones** | Verificar conexión con formulario de compra | Media |
-| 8 | **Mi Magia + WooCommerce** | Verificar que se carguen los guardianes comprados automáticamente | Compleja |
-| 9 | **Mi Círculo (suscripción)** | Investigar y perfeccionar para que sea administrable | Compleja |
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 1 | **Nosotros en menú** | La página "Nosotros" no aparece en el menú | Fácil | ⏳ |
+| 2 | **Redirect mi magia** | mi-magia → magia.duendesdeluruguay.com | Fácil | ⏳ |
+| 3 | **HTMLs para mejorar** | Hay HTMLs de la web para mejorar/cambiar | Media | ⏳ Esperando archivos |
+| 4 | ~~**Emails automáticos**~~ | Sistema Brevo completo (13 plantillas) | ~~Media~~ | ✅ COMPLETADO 29/01 |
+| 5 | **Tito (el chat)** | Revisar funcionamiento en web, Mi Magia y ManyChat | Compleja | ⏳ |
+| 6 | **Generador de historias** | Verificar que siga funcionando | Media | ⏳ |
+| 7 | **Generador de canalizaciones** | Verificar conexión con formulario de compra | Media | ⏳ |
+| 8 | **Mi Magia + WooCommerce** | Verificar carga automática de guardianes comprados | Compleja | ⏳ |
+| 9 | **Mi Círculo (suscripción)** | Investigar y perfeccionar para que sea administrable | Compleja | ⏳ |
+| 10 | **Testear emails Brevo** | Probar "pedido enviado" y "seguimiento 3 días" con orden real | Fácil | ⏳ |
+| 11 | **DMARC** | Configurar para mejor entregabilidad de emails | Media | ⏳ |
 
 ---
 
@@ -51,13 +53,12 @@
 - **Esperando:** Usuario debe compartir los HTMLs
 - **Acción:** Integrar en WordPress o Vercel según corresponda
 
-#### 4. Emails automáticos
-- **Providers:** Resend (backup), Google Workspace (principal)
-- **Tipos de email:** Post-compra, carrito abandonado, formulario contacto, canalizaciones
-- **Archivos clave:**
-  - `lib/emails.js`
-  - `lib/email-templates.js`
-  - `wordpress-plugins/duendes-emails-*.php`
+#### 4. Emails automáticos - ✅ COMPLETADO 29/01/2026
+- **Provider:** Brevo (ex-Sendinblue)
+- **API Key:** Configurada en WordPress y Vercel
+- **Plantillas:** 13 templates configurados (ver SESION-2026-01-29.md)
+- **Plugin WordPress:** `mu-plugins/duendes-brevo-emails.php`
+- **Archivos locales:** `/Users/usuario/Desktop/emails-duendes/`
 
 #### 5. Tito (el chat)
 - **Ubicaciones donde debe funcionar:**

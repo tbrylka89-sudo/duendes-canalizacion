@@ -422,6 +422,51 @@ function duendes_neuro_css() {
     }
     @media (max-width: 480px) {
         .neuro-banner-top .hide-mobile { display: none; }
+
+        /* Mi Magia - móvil pequeño */
+        .mi-magia-section {
+            padding: 50px 12px;
+            box-sizing: border-box;
+        }
+        .mi-magia-section * {
+            box-sizing: border-box;
+        }
+        .mi-magia-inner {
+            max-width: 100%;
+            padding: 0 5px;
+        }
+        .mi-magia-badge {
+            font-size: 0.65rem;
+            padding: 6px 14px;
+            letter-spacing: 1px;
+        }
+        .mi-magia-title {
+            font-size: 24px;
+        }
+        .mi-magia-subtitle {
+            font-size: 1rem;
+            padding: 0 5px;
+        }
+        .mi-magia-features {
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .mi-magia-feature {
+            width: 100%;
+            max-width: 280px;
+            justify-content: center;
+            font-size: 0.75rem;
+            padding: 10px 12px;
+        }
+        .mi-magia-cta {
+            padding: 14px 28px;
+            font-size: 0.8rem;
+        }
+        .mi-magia-note {
+            font-size: 0.85rem;
+            padding: 0 10px;
+        }
     }
     </style>
     <?php
@@ -446,7 +491,7 @@ function duendes_neuro_js() {
             if (esHome) {
                 // agregarBannerTop(); // DESACTIVADO - causaba problemas en iOS
                 agregarValidacion();
-                agregarSeccionMiMagia();
+                // agregarSeccionMiMagia(); // DESACTIVADO - ahora se usa la de Elementor
                 mostrarSocialProof();
             }
         }

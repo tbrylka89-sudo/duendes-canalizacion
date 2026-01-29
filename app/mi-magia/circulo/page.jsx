@@ -11,7 +11,7 @@ import { Tito } from '../components/Tito';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // MODO MANTENIMIENTO - Cambiar a false cuando esté todo funcionando
-const MODO_MANTENIMIENTO = false;
+const MODO_MANTENIMIENTO = true;
 
 // Helper para renderizar valores de forma segura (evita React error #31)
 function safeRender(value) {
@@ -75,16 +75,48 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Página de mantenimiento elegante
+// Página de mantenimiento elegante con captura de email
 function PaginaMantenimiento() {
+  const [email, setEmail] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [enviado, setEnviado] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setEnviando(true);
+    setError(null);
+
+    try {
+      // Guardar en KV el interesado
+      const res = await fetch('/api/circulo/lista-espera', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, nombre, fecha: new Date().toISOString() })
+      });
+
+      if (res.ok) {
+        setEnviado(true);
+      } else {
+        setError('Hubo un error. Intentá de nuevo.');
+      }
+    } catch (err) {
+      console.error('Error guardando interesado:', err);
+      setError('Error de conexión. Intentá de nuevo.');
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   return (
     <div className="mantenimiento-page">
       <div className="mantenimiento-content">
         <div className="mantenimiento-glow"></div>
 
-        <div className="mantenimiento-icono">✨</div>
+        <div className="mantenimiento-icono">🔮</div>
 
-        <h1>El Círculo está en transformación</h1>
+        <h1>El Círculo está en construcción</h1>
 
         <p className="mantenimiento-subtitulo">
           Estamos preparando algo mágico para vos
@@ -92,14 +124,48 @@ function PaginaMantenimiento() {
 
         <div className="mantenimiento-mensaje">
           <p>
-            Los guardianes están trabajando en mejoras especiales para el Círculo.
-            Muy pronto vas a poder disfrutar de una experiencia renovada.
+            Los guardianes están trabajando en una experiencia única:
+            contenido semanal canalizado, rituales exclusivos, guía lunar
+            y mucho más.
           </p>
           <p>
-            Mientras tanto, podés explorar nuestros guardianes en la tienda
-            o contactarnos si tenés alguna consulta.
+            Si querés ser de los primeros en probarlo,
+            dejanos tu email y te avisamos cuando esté listo.
           </p>
         </div>
+
+        {/* FORMULARIO DE CAPTURA */}
+        {!enviado ? (
+          <form onSubmit={handleSubmit} className="formulario-espera">
+            <div className="campo-grupo">
+              <input
+                type="text"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                placeholder="Tu nombre"
+                required
+                className="campo-input"
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Tu email"
+                required
+                className="campo-input"
+              />
+            </div>
+            {error && <p className="error-msg">{error}</p>}
+            <button type="submit" className="btn-avisar" disabled={enviando}>
+              {enviando ? 'Guardando...' : '✨ Avisame cuando esté listo'}
+            </button>
+          </form>
+        ) : (
+          <div className="confirmacion-espera">
+            <div className="check-icono">✓</div>
+            <p>¡Listo! Te avisaremos cuando el Círculo esté disponible.</p>
+          </div>
+        )}
 
         <div className="mantenimiento-acciones">
           <a href="https://duendesdeluruguay.com/tienda" className="btn-tienda">
@@ -111,7 +177,7 @@ function PaginaMantenimiento() {
         </div>
 
         <div className="mantenimiento-contacto">
-          <p>¿Tenés una membresía activa y necesitás ayuda?</p>
+          <p>¿Tenés alguna consulta?</p>
           <a href="mailto:info@duendesdeluruguay.com">info@duendesdeluruguay.com</a>
         </div>
       </div>
@@ -251,6 +317,110 @@ function PaginaMantenimiento() {
 
         .mantenimiento-contacto a:hover {
           text-decoration: underline;
+        }
+
+        /* FORMULARIO DE ESPERA */
+        .formulario-espera {
+          margin-bottom: 40px;
+        }
+
+        .campo-grupo {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 15px;
+          flex-wrap: wrap;
+        }
+
+        .campo-input {
+          flex: 1;
+          min-width: 200px;
+          padding: 16px 20px;
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 12px;
+          color: #fff;
+          font-size: 16px;
+          font-family: 'Cormorant Garamond', serif;
+          transition: all 0.3s ease;
+        }
+
+        .campo-input:focus {
+          outline: none;
+          border-color: #d4af37;
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .campo-input::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-avisar {
+          width: 100%;
+          background: linear-gradient(135deg, #d4af37, #b8972e);
+          color: #0a0a0a;
+          border: none;
+          padding: 18px 30px;
+          border-radius: 50px;
+          font-family: 'Cinzel', serif;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .btn-avisar:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-avisar:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .error-msg {
+          color: #ff6b6b;
+          font-size: 14px;
+          margin-bottom: 15px;
+          text-align: center;
+        }
+
+        .confirmacion-espera {
+          background: rgba(74, 222, 128, 0.1);
+          border: 1px solid rgba(74, 222, 128, 0.3);
+          border-radius: 20px;
+          padding: 30px;
+          margin-bottom: 40px;
+          text-align: center;
+        }
+
+        .check-icono {
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, #4ade80, #22c55e);
+          color: #0a0a0a;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 30px;
+          font-weight: bold;
+          margin: 0 auto 15px;
+        }
+
+        .confirmacion-espera p {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 18px;
+          margin: 0;
+        }
+
+        @media (max-width: 500px) {
+          .campo-grupo {
+            flex-direction: column;
+          }
+          .campo-input {
+            min-width: auto;
+          }
         }
       `}</style>
     </div>
