@@ -301,6 +301,58 @@ Los cierres varían según el perfil del lector, pero SIEMPRE son del guardián 
 - Entre 250-400 palabras
 `;
 
+/**
+ * PROMPT PARA PRODUCTOS NO-GUARDIAN
+ *
+ * Genera descripciones de venta para talismanes, varitas, altares, cristales, etc.
+ * Sin arco emocional de conversión ni scoring de guardianes.
+ */
+const PROMPT_OTRO_PRODUCTO = `
+# GENERADOR DE CONTENIDO PARA PRODUCTOS ARTESANALES
+
+Generás descripciones atractivas de venta para productos artesanales de Duendes del Uruguay.
+
+NO son guardianes ni duendes. Son productos complementarios del universo mágico: talismanes, varitas canalizadoras, altares, estudios energéticos, cristales, accesorios rituales, sahúmos, velas, kits, etc.
+
+## TONO DE MARCA
+- Español rioplatense (vos, tenés, podés)
+- Cercano pero no infantil
+- Místico pero con los pies en la tierra
+- Cálido, como una amiga que sabe cosas
+- Nunca vendedor ni agresivo
+
+## ESTRUCTURA DEL TEXTO (flexible, variá el orden)
+
+1. **Apertura**: Qué es este objeto, por qué existe, qué lo hace especial
+2. **Significado energético**: Qué energía trae, para qué sirve, cómo funciona
+3. **Descripción física**: Materiales, colores, tamaño, detalles artesanales
+4. **Conexión personal**: Para quién es, en qué momento de vida, qué resuelve
+5. **Cierre**: Invitación suave, sin presión
+
+## REGLAS ABSOLUTAS
+
+1. **ORTOGRAFÍA PERFECTA** - Revisá cada palabra
+2. **NO uses frases de IA genéricas:**
+   - "Desde tiempos inmemoriales", "brumas ancestrales", "velo entre mundos"
+   - "Vibraciones cósmicas", "campo energético", "danza de las hojas"
+3. **SÍ sé específico:** Describí materiales, texturas, colores reales
+4. **SÍ conectá con necesidades reales:** No fantasías abstractas
+5. **Largo:** 200-350 palabras
+6. **Formato:** Párrafos cortos (2-3 líneas), negritas solo para el nombre del producto
+7. **VOZ PASIVA para la creación:** "fue creado", "se preparó", nunca "lo hice/hicimos"
+8. **NO menciones guardianes ni duendes** salvo que el producto se relacione con ellos
+
+## TIPOS DE PRODUCTO Y ENFOQUE
+
+- **Talismán**: Objeto cargado con intención. Enfocate en el propósito y los materiales.
+- **Varita canalizadora**: Herramienta energética. Explicá cómo se usa y qué cristal lleva.
+- **Altar**: Espacio sagrado portátil. Describí los elementos y cómo armar el ritual.
+- **Estudio energético**: Servicio de lectura/análisis. Explicá qué incluye y qué descubre.
+- **Cristal**: Piedra con propiedades. Describí el cristal, su origen, sus propiedades.
+- **Accesorio**: Complemento (sahúmo, vela, kit). Describí uso práctico y significado.
+- **Otro**: Adaptate al producto que te describan.
+`;
+
 // POST - Generar historia con sistema experto
 export async function POST(request) {
   try {
@@ -312,6 +364,68 @@ export async function POST(request) {
         success: false,
         error: `La acción "${body.action}" debe usar GET, no POST. Usá: GET /api/admin/historias?accion=${body.action}`
       }, { status: 400 });
+    }
+
+    // === FLUJO ALTERNATIVO: PRODUCTOS NO-GUARDIAN ===
+    if (body.tipoProducto && body.tipoProducto !== 'guardian') {
+      const { tipoProducto, nombre, referencia, analisisImagen } = body;
+
+      if (!nombre && !referencia) {
+        return NextResponse.json({
+          success: false,
+          error: 'Se requiere al menos un nombre o referencia del producto'
+        }, { status: 400 });
+      }
+
+      // Construir prompt para producto no-guardian
+      let promptFinal = PROMPT_OTRO_PRODUCTO;
+
+      promptFinal += `\n\n---\n\n# DATOS DEL PRODUCTO\n\n`;
+      promptFinal += `**Tipo:** ${tipoProducto}\n`;
+      if (nombre) promptFinal += `**Nombre:** ${nombre}\n`;
+
+      if (referencia) {
+        promptFinal += `\n**Referencia del creador:**\n${referencia}\n`;
+        promptFinal += `\nUsá esta referencia como base principal para el contenido. Respetá los datos que da el creador.\n`;
+      }
+
+      if (analisisImagen) {
+        promptFinal += `\n**Análisis visual de la foto:**\n${analisisImagen}\n`;
+        promptFinal += `\nIncorporá los detalles visuales en la descripción.\n`;
+      }
+
+      promptFinal += `\n---\n\nGENERÁ LA DESCRIPCIÓN DE VENTA PARA ESTE PRODUCTO.
+Recordá: tono Duendes del Uruguay, cercano, místico pero real, sin frases de IA.
+Si el creador dio datos específicos (materiales, cristales, propósito), usalos.`;
+
+      // Generar con Claude
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        temperature: 0.6,
+        messages: [{ role: 'user', content: promptFinal }]
+      });
+
+      let contenido = response.content[0].text;
+
+      // Corrección ortográfica básica (reutilizar las correcciones comunes)
+      const correccionesBasicas = {
+        'aveces': 'a veces', 'enserio': 'en serio', 'envez': 'en vez',
+        'talvez': 'tal vez', 'osea': 'o sea', 'ósea': 'o sea',
+        'conciente': 'consciente', 'travez': 'través', 'atravez': 'a través',
+        'a el ': 'al ', 'de el ': 'del '
+      };
+
+      Object.entries(correccionesBasicas).forEach(([mal, bien]) => {
+        contenido = contenido.replace(new RegExp(mal, 'gi'), bien);
+      });
+
+      return NextResponse.json({
+        success: true,
+        historia: contenido,
+        tipoProducto,
+        esOtroProducto: true
+      });
     }
 
     const {

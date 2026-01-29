@@ -178,7 +178,11 @@ function GeneradorHistoriasContent() {
     publicando: false,
     progresoPublicacion: { paso: '', porcentaje: 0 },
     productoCreado: null,
-    imagenesSubidas: []
+    imagenesSubidas: [],
+
+    // === PRODUCTO NO-GUARDIAN ===
+    tipoProducto: '', // 'talisman', 'varita', 'altar', 'estudio', 'cristal', 'accesorio', 'otro'
+    referencia: '' // texto libre del usuario describiendo el producto
   });
 
   // Categorías de WooCommerce
@@ -968,6 +972,169 @@ Necesito conocer algunos datos. Empecemos:
           productoCreado: dataProducto.producto
         }));
         setPaso(23); // Ir a confirmación
+      } else {
+        throw new Error(dataProducto.error || 'Error creando producto');
+      }
+
+    } catch (e) {
+      setError(e.message);
+      setCreadorProducto(prev => ({
+        ...prev,
+        publicando: false,
+        progresoPublicacion: { paso: 'Error', porcentaje: 0 }
+      }));
+    }
+  };
+
+  // === FUNCIONES PARA OTRO PRODUCTO (no-guardian) ===
+
+  // Generar contenido para producto no-guardian
+  const generarContenidoOtroProducto = async () => {
+    setCargando(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/admin/historias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipoProducto: creadorProducto.tipoProducto,
+          nombre: creadorProducto.datosParseados.nombre,
+          referencia: creadorProducto.referencia,
+          analisisImagen: creadorProducto.analisisVision
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setCreadorProducto(prev => ({
+          ...prev,
+          historiaGenerada: data.historia
+        }));
+        setPaso(32); // Ir a editar contenido
+      } else {
+        setError(data.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    }
+    setCargando(false);
+  };
+
+  // Publicar otro producto a WooCommerce
+  const publicarOtroProductoWC = async () => {
+    setCreadorProducto(prev => ({
+      ...prev,
+      publicando: true,
+      progresoPublicacion: { paso: 'Subiendo imágenes...', porcentaje: 10 }
+    }));
+
+    try {
+      // 1. Subir fotos a WP Media Library
+      const imagenesSubidas = [];
+      for (let i = 0; i < creadorProducto.fotos.length; i++) {
+        const foto = creadorProducto.fotos[i];
+        setCreadorProducto(prev => ({
+          ...prev,
+          progresoPublicacion: {
+            paso: `Subiendo imagen ${i + 1} de ${creadorProducto.fotos.length}...`,
+            porcentaje: 10 + (i / creadorProducto.fotos.length) * 40
+          }
+        }));
+
+        const formData = new FormData();
+        formData.append('archivo', foto.file);
+        formData.append('titulo', `${creadorProducto.datosParseados.nombre || creadorProducto.tipoProducto} - ${i + 1}`);
+
+        const res = await fetch('/api/admin/woocommerce/media', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          imagenesSubidas.push({
+            id: data.medio.id,
+            src: data.medio.url,
+            position: foto.esPrincipal ? 0 : i + 1
+          });
+        }
+      }
+
+      imagenesSubidas.sort((a, b) => a.position - b.position);
+
+      setCreadorProducto(prev => ({
+        ...prev,
+        imagenesSubidas,
+        progresoPublicacion: { paso: 'Creando producto...', porcentaje: 60 }
+      }));
+
+      // 2. Crear producto en WooCommerce
+      const datosWC = creadorProducto.datosWooCommerce;
+      const nombreProducto = creadorProducto.datosParseados.nombre || `${creadorProducto.tipoProducto} artesanal`;
+
+      // Convertir contenido a HTML
+      const contenidoHTML = creadorProducto.historiaGenerada
+        .split('\n\n')
+        .map(p => `<p>${p}</p>`)
+        .join('\n');
+
+      // SKU genérico
+      const tipoAbrev = {
+        talisman: 'TL', varita: 'VR', altar: 'AL', estudio: 'ES',
+        cristal: 'CR', accesorio: 'AC', otro: 'OT'
+      };
+      const prefSku = tipoAbrev[creadorProducto.tipoProducto] || 'PR';
+      const nomSku = nombreProducto.substring(0, 3).toUpperCase();
+      const tsSku = Date.now().toString().slice(-6);
+      const skuAuto = `${prefSku}-${nomSku}-${tsSku}`;
+
+      const productoWC = {
+        name: nombreProducto,
+        type: 'simple',
+        status: 'publish',
+        description: contenidoHTML,
+        short_description: creadorProducto.datosParseados.accesorios || `${creadorProducto.tipoProducto} artesanal - Duendes del Uruguay`,
+        regular_price: datosWC.precioRegular,
+        sale_price: datosWC.precioOferta || undefined,
+        sku: datosWC.sku || skuAuto,
+        stock_quantity: datosWC.stock,
+        stock_status: datosWC.estadoStock,
+        manage_stock: true,
+        categories: datosWC.categoriaWC.map(id => ({ id })),
+        images: imagenesSubidas.map(img => ({
+          id: img.id,
+          position: img.position
+        })),
+        attributes: [
+          { name: 'Tipo', options: [creadorProducto.tipoProducto], visible: true }
+        ]
+      };
+
+      setCreadorProducto(prev => ({
+        ...prev,
+        progresoPublicacion: { paso: 'Guardando en WooCommerce...', porcentaje: 80 }
+      }));
+
+      const resProducto = await fetch('/api/admin/woocommerce/productos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'crear',
+          producto: productoWC
+        })
+      });
+
+      const dataProducto = await resProducto.json();
+
+      if (dataProducto.success) {
+        setCreadorProducto(prev => ({
+          ...prev,
+          publicando: false,
+          progresoPublicacion: { paso: '¡Completado!', porcentaje: 100 },
+          productoCreado: dataProducto.producto
+        }));
+        setPaso(34); // Confirmación
       } else {
         throw new Error(dataProducto.error || 'Error creando producto');
       }
@@ -1938,7 +2105,9 @@ Necesito conocer algunos datos. Empecemos:
                   publicando: false,
                   progresoPublicacion: { paso: '', porcentaje: 0 },
                   productoCreado: null,
-                  imagenesSubidas: []
+                  imagenesSubidas: [],
+                  tipoProducto: '',
+                  referencia: ''
                 });
                 cargarCategoriasWC();
               }}>
@@ -1946,6 +2115,50 @@ Necesito conocer algunos datos. Empecemos:
                 <h3>Crear Producto Nuevo</h3>
                 <p>Subí fotos, la IA analiza, genera historia y publica directo a WooCommerce</p>
                 <span className="badge destacado">NUEVO - TODO EN UNO</span>
+              </div>
+
+              <div className="modo-card otro-producto" onClick={() => {
+                setModo('otro-producto');
+                setPaso(30);
+                setCreadorProducto({
+                  fotos: [],
+                  fotosProcesando: false,
+                  analisisVision: null,
+                  analizando: false,
+                  textoLibre: '',
+                  datosParseados: {
+                    nombre: '',
+                    especie: '',
+                    genero: '',
+                    categoria: '',
+                    tamano: '',
+                    tamanoCm: 0,
+                    accesorios: '',
+                    esUnico: true
+                  },
+                  historiaGenerada: '',
+                  datosConversion: null,
+                  datosWooCommerce: {
+                    precioRegular: '',
+                    precioOferta: '',
+                    categoriaWC: [],
+                    stock: 1,
+                    estadoStock: 'instock',
+                    sku: ''
+                  },
+                  publicando: false,
+                  progresoPublicacion: { paso: '', porcentaje: 0 },
+                  productoCreado: null,
+                  imagenesSubidas: [],
+                  tipoProducto: '',
+                  referencia: ''
+                });
+                cargarCategoriasWC();
+              }}>
+                <div className="icono">🔮</div>
+                <h3>Crear Otro Producto</h3>
+                <p>Talismanes, varitas, altares, cristales... Subí foto + referencia y se crea todo</p>
+                <span className="badge destacado">NO GUARDIAN</span>
               </div>
             </div>
           </div>
@@ -4344,7 +4557,509 @@ Necesito conocer algunos datos. Empecemos:
                   publicando: false,
                   progresoPublicacion: { paso: '', porcentaje: 0 },
                   productoCreado: null,
-                  imagenesSubidas: []
+                  imagenesSubidas: [],
+                  tipoProducto: '',
+                  referencia: ''
+                });
+              }}
+            >
+              ➕ Crear otro producto
+            </button>
+
+            <button
+              className="btn-secondary volver-inicio"
+              onClick={() => { setPaso(1); setModo(null); }}
+            >
+              Volver al inicio
+            </button>
+          </div>
+        )}
+
+        {/* ========================================== */}
+        {/* PASOS 30-34: CREAR OTRO PRODUCTO (NO GUARDIAN) */}
+        {/* ========================================== */}
+
+        {/* PASO 30: Tipo, Fotos y Referencia */}
+        {paso === 30 && modo === 'otro-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>🔮 Crear Otro Producto</h2>
+            <p className="subtitulo">Talismanes, varitas, altares, cristales... todo lo que no sea un guardián</p>
+
+            <div className="datos-producto-form">
+              <div className="campo">
+                <label>Tipo de producto *</label>
+                <select
+                  value={creadorProducto.tipoProducto}
+                  onChange={(e) => setCreadorProducto(prev => ({ ...prev, tipoProducto: e.target.value }))}
+                >
+                  <option value="">-- Elegí el tipo --</option>
+                  <option value="talisman">Talismán</option>
+                  <option value="varita">Varita Canalizadora</option>
+                  <option value="altar">Altar</option>
+                  <option value="estudio">Estudio Energético</option>
+                  <option value="cristal">Cristal / Piedra</option>
+                  <option value="accesorio">Accesorio (sahúmo, vela, kit)</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+
+              <div className="campo">
+                <label>Nombre del producto (opcional, se puede completar después)</label>
+                <input
+                  type="text"
+                  value={creadorProducto.datosParseados.nombre}
+                  onChange={(e) => setCreadorProducto(prev => ({
+                    ...prev,
+                    datosParseados: { ...prev.datosParseados, nombre: e.target.value }
+                  }))}
+                  placeholder="Ej: Varita de Cuarzo Rosa, Altar de Protección..."
+                />
+              </div>
+
+              <div className="campo">
+                <label>Referencia / Descripción *</label>
+                <textarea
+                  value={creadorProducto.referencia}
+                  onChange={(e) => setCreadorProducto(prev => ({ ...prev, referencia: e.target.value }))}
+                  placeholder="Describí el producto: materiales, cristales, para qué sirve, tamaño, cualquier detalle que quieras incluir en la descripción de venta..."
+                  rows={5}
+                />
+              </div>
+            </div>
+
+            <h3 style={{ marginTop: '2rem', marginBottom: '1rem' }}>📸 Fotos del producto</h3>
+            <div
+              className="dropzone"
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove('dragover'); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                handleFotosUpload(e.dataTransfer.files);
+              }}
+              onClick={() => document.getElementById('input-fotos-otro').click()}
+            >
+              <input
+                id="input-fotos-otro"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                style={{ display: 'none' }}
+                onChange={(e) => handleFotosUpload(e.target.files)}
+              />
+              <div className="dropzone-content">
+                <span className="icono">📷</span>
+                <p>Arrastrá fotos acá o hacé click para seleccionar</p>
+                <span className="formatos">JPG, PNG, WEBP - Máximo 10MB por foto</span>
+              </div>
+            </div>
+
+            {creadorProducto.fotos.length > 0 && (
+              <div className="fotos-preview">
+                <h4>Fotos subidas ({creadorProducto.fotos.length})</h4>
+                <div className="fotos-grid">
+                  {creadorProducto.fotos.map((foto, index) => (
+                    <div key={index} className={`foto-item ${foto.esPrincipal ? 'principal' : ''}`}>
+                      <img src={foto.preview} alt={foto.nombre} />
+                      <div className="foto-overlay">
+                        <button
+                          className="btn-principal"
+                          onClick={(e) => { e.stopPropagation(); marcarFotoPrincipal(index); }}
+                          title="Hacer principal"
+                        >
+                          {foto.esPrincipal ? '⭐' : '☆'}
+                        </button>
+                        <button
+                          className="btn-eliminar"
+                          onClick={(e) => { e.stopPropagation(); eliminarFoto(index); }}
+                          title="Eliminar"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      {foto.esPrincipal && <span className="badge-principal">Principal</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="acciones-paso">
+              <button
+                className="btn-secondary"
+                onClick={() => { setPaso(1); setModo(null); }}
+              >
+                ← Volver
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  setPaso(31);
+                  if (creadorProducto.fotos.length > 0) {
+                    analizarFotoConVision();
+                  }
+                }}
+                disabled={!creadorProducto.tipoProducto || (!creadorProducto.referencia && creadorProducto.fotos.length === 0)}
+              >
+                Continuar →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 31: Análisis Vision + Datos editables */}
+        {paso === 31 && modo === 'otro-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>🤖 Análisis y datos del producto</h2>
+
+            {creadorProducto.fotos.length > 0 && (
+              <div className="analisis-container">
+                <div className="foto-analizada">
+                  {creadorProducto.fotos.find(f => f.esPrincipal) && (
+                    <img
+                      src={creadorProducto.fotos.find(f => f.esPrincipal)?.preview}
+                      alt="Foto principal"
+                    />
+                  )}
+                </div>
+
+                <div className="resultado-analisis">
+                  {creadorProducto.analizando ? (
+                    <div className="analizando">
+                      <div className="spinner"></div>
+                      <p>Analizando imagen con Claude Vision...</p>
+                    </div>
+                  ) : creadorProducto.analisisVision ? (
+                    <div className="analisis-texto">
+                      <h4>🔍 Esto detecté:</h4>
+                      <div className="analisis-contenido">
+                        {creadorProducto.analisisVision}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="sin-analisis">
+                      <button className="btn-primary" onClick={analizarFotoConVision}>
+                        🔍 Analizar imagen
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="datos-producto-form" style={{ marginTop: '1.5rem' }}>
+              <div className="campo">
+                <label>Nombre del producto *</label>
+                <input
+                  type="text"
+                  value={creadorProducto.datosParseados.nombre}
+                  onChange={(e) => setCreadorProducto(prev => ({
+                    ...prev,
+                    datosParseados: { ...prev.datosParseados, nombre: e.target.value }
+                  }))}
+                  placeholder="Nombre que aparecerá en la tienda"
+                />
+              </div>
+
+              <div className="campo">
+                <label>Descripción corta (para el listado de la tienda)</label>
+                <input
+                  type="text"
+                  value={creadorProducto.datosParseados.accesorios}
+                  onChange={(e) => setCreadorProducto(prev => ({
+                    ...prev,
+                    datosParseados: { ...prev.datosParseados, accesorios: e.target.value }
+                  }))}
+                  placeholder="Ej: Varita de cuarzo rosa con base de madera de cedro"
+                />
+              </div>
+
+              <div className="campo">
+                <label>Referencia / notas (podés editar)</label>
+                <textarea
+                  value={creadorProducto.referencia}
+                  onChange={(e) => setCreadorProducto(prev => ({ ...prev, referencia: e.target.value }))}
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {error && <div className="error-msg">{error}</div>}
+
+            <div className="acciones-paso">
+              <button className="btn-secondary" onClick={() => setPaso(30)}>
+                ← Volver
+              </button>
+              <button
+                className="btn-primary"
+                onClick={generarContenidoOtroProducto}
+                disabled={cargando || (!creadorProducto.datosParseados.nombre && !creadorProducto.referencia)}
+              >
+                {cargando ? 'Generando...' : '✨ Generar Contenido'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 32: Contenido generado (editable) */}
+        {paso === 32 && modo === 'otro-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>📝 Contenido generado</h2>
+            <p className="subtitulo">Revisá y editá el texto antes de publicar</p>
+
+            <div className="historia-editable">
+              <textarea
+                value={creadorProducto.historiaGenerada}
+                onChange={(e) => setCreadorProducto(prev => ({ ...prev, historiaGenerada: e.target.value }))}
+                rows={15}
+                style={{
+                  width: '100%',
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '8px',
+                  color: '#fff',
+                  padding: '1rem',
+                  fontFamily: 'inherit',
+                  fontSize: '0.95rem',
+                  lineHeight: '1.6',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+
+            {error && <div className="error-msg">{error}</div>}
+
+            <div className="acciones-paso">
+              <button className="btn-secondary" onClick={() => setPaso(31)}>
+                ← Volver
+              </button>
+              <button
+                className="btn-regenerar"
+                onClick={generarContenidoOtroProducto}
+                disabled={cargando}
+                style={{ marginRight: '1rem' }}
+              >
+                {cargando ? 'Regenerando...' : '🔄 Regenerar'}
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => setPaso(33)}
+              >
+                Continuar a WooCommerce →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 33: Configurar WooCommerce */}
+        {paso === 33 && modo === 'otro-producto' && (
+          <div className="paso-content creador-producto">
+            <h2>🛒 Configurar para WooCommerce</h2>
+
+            <div className="historia-preview">
+              <h4>Contenido generado</h4>
+              <div className="historia-texto" style={{ maxHeight: '200px', overflow: 'auto' }}>
+                {creadorProducto.historiaGenerada}
+              </div>
+              <button
+                className="btn-regenerar"
+                onClick={() => setPaso(32)}
+              >
+                ✏️ Editar contenido
+              </button>
+            </div>
+
+            <div className="woocommerce-form">
+              <h4>💰 Precio</h4>
+              <div className="campo-row">
+                <div className="campo">
+                  <label>Precio regular (UYU) *</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosWooCommerce.precioRegular}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, precioRegular: e.target.value }
+                    }))}
+                    placeholder="3000"
+                  />
+                </div>
+                <div className="campo">
+                  <label>Precio oferta (opcional)</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosWooCommerce.precioOferta}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, precioOferta: e.target.value }
+                    }))}
+                    placeholder="2500"
+                  />
+                </div>
+              </div>
+
+              <h4>📦 Inventario</h4>
+              <div className="campo-row">
+                <div className="campo">
+                  <label>SKU (automático si vacío)</label>
+                  <input
+                    type="text"
+                    value={creadorProducto.datosWooCommerce.sku}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, sku: e.target.value }
+                    }))}
+                    placeholder="Auto-generado"
+                  />
+                </div>
+                <div className="campo">
+                  <label>Stock</label>
+                  <input
+                    type="number"
+                    value={creadorProducto.datosWooCommerce.stock}
+                    onChange={(e) => setCreadorProducto(prev => ({
+                      ...prev,
+                      datosWooCommerce: { ...prev.datosWooCommerce, stock: parseInt(e.target.value) || 1 }
+                    }))}
+                    min={0}
+                  />
+                </div>
+              </div>
+
+              <h4>📁 Categorías WooCommerce</h4>
+              {categoriasWC.length > 0 ? (
+                <div className="categorias-wc-grid">
+                  {categoriasWC.map(cat => (
+                    <label key={cat.id} className="categoria-check">
+                      <input
+                        type="checkbox"
+                        checked={creadorProducto.datosWooCommerce.categoriaWC.includes(cat.id)}
+                        onChange={(e) => {
+                          setCreadorProducto(prev => ({
+                            ...prev,
+                            datosWooCommerce: {
+                              ...prev.datosWooCommerce,
+                              categoriaWC: e.target.checked
+                                ? [...prev.datosWooCommerce.categoriaWC, cat.id]
+                                : prev.datosWooCommerce.categoriaWC.filter(id => id !== cat.id)
+                            }
+                          }));
+                        }}
+                      />
+                      {cat.nombre} {cat.cantidad ? `(${cat.cantidad})` : ''}
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="cargando-cats">Cargando categorías...</p>
+              )}
+            </div>
+
+            {error && <div className="error-msg">{error}</div>}
+
+            <div className="acciones-paso">
+              <button className="btn-secondary" onClick={() => setPaso(32)}>
+                ← Volver
+              </button>
+              <button
+                className="btn-primary publicar"
+                onClick={publicarOtroProductoWC}
+                disabled={creadorProducto.publicando || !creadorProducto.datosWooCommerce.precioRegular}
+              >
+                {creadorProducto.publicando ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    {creadorProducto.progresoPublicacion.paso}
+                  </>
+                ) : (
+                  '🚀 Publicar en WooCommerce'
+                )}
+              </button>
+            </div>
+
+            {creadorProducto.publicando && (
+              <div className="progreso-publicacion">
+                <div
+                  className="progreso-bar"
+                  style={{ width: `${creadorProducto.progresoPublicacion.porcentaje}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PASO 34: Confirmación */}
+        {paso === 34 && modo === 'otro-producto' && (
+          <div className="paso-content creador-producto confirmacion">
+            <div className="exito-icon">🎉</div>
+            <h2>¡Producto creado exitosamente!</h2>
+
+            {creadorProducto.productoCreado && (
+              <div className="producto-creado-info">
+                <p><strong>Nombre:</strong> {creadorProducto.productoCreado.nombre}</p>
+                <p><strong>ID:</strong> {creadorProducto.productoCreado.id}</p>
+                <p><strong>Tipo:</strong> {creadorProducto.tipoProducto}</p>
+                <p><strong>Precio:</strong> ${creadorProducto.datosWooCommerce.precioRegular}</p>
+                <p><strong>Imágenes subidas:</strong> {creadorProducto.imagenesSubidas.length}</p>
+
+                <div className="acciones-producto">
+                  <a
+                    href={`https://duendesdeluruguay.com/?p=${creadorProducto.productoCreado.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary"
+                  >
+                    Ver producto en la tienda →
+                  </a>
+                  <a
+                    href={`https://duendesdeluruguay.com/wp-admin/post.php?post=${creadorProducto.productoCreado.id}&action=edit`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                  >
+                    Editar en WordPress
+                  </a>
+                </div>
+              </div>
+            )}
+
+            <button
+              className="btn-nuevo"
+              onClick={() => {
+                setModo('otro-producto');
+                setPaso(30);
+                setCreadorProducto({
+                  fotos: [],
+                  fotosProcesando: false,
+                  analisisVision: null,
+                  analizando: false,
+                  textoLibre: '',
+                  datosParseados: {
+                    nombre: '',
+                    especie: '',
+                    genero: '',
+                    categoria: '',
+                    tamano: '',
+                    tamanoCm: 0,
+                    accesorios: '',
+                    esUnico: true
+                  },
+                  historiaGenerada: '',
+                  datosConversion: null,
+                  datosWooCommerce: {
+                    precioRegular: '',
+                    precioOferta: '',
+                    categoriaWC: [],
+                    stock: 1,
+                    estadoStock: 'instock',
+                    sku: ''
+                  },
+                  publicando: false,
+                  progresoPublicacion: { paso: '', porcentaje: 0 },
+                  productoCreado: null,
+                  imagenesSubidas: [],
+                  tipoProducto: '',
+                  referencia: ''
                 });
               }}
             >
@@ -6741,6 +7456,16 @@ Necesito conocer algunos datos. Empecemos:
         .modo-card.creador-producto:hover {
           border-color: rgba(168, 85, 247, 0.6);
           background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+        }
+
+        .modo-card.otro-producto {
+          border-color: rgba(59, 130, 246, 0.3);
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+
+        .modo-card.otro-producto:hover {
+          border-color: rgba(59, 130, 246, 0.6);
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
         }
 
         .creador-producto .subtitulo {
