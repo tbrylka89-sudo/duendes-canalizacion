@@ -487,8 +487,37 @@ export async function PUT(request) {
 
       console.log(`[CANALIZACION] Certificado guardado para orden ${canalizacion.ordenId}`);
 
-      // TODO: Aquí se podría enviar email también
-      // Por ahora queda disponible en Mi Magia
+      // ═══════════════════════════════════════════════════════════════
+      // ENVIAR EMAIL "TU CANALIZACIÓN ESTÁ LISTA" VIA BREVO
+      // ═══════════════════════════════════════════════════════════════
+      try {
+        const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': process.env.BREVO_API_KEY,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            sender: { name: 'Duendes del Uruguay', email: 'info@duendesdeluruguay.com' },
+            to: [{ email: canalizacion.email, name: canalizacion.nombreDestinatario || canalizacion.nombreCliente }],
+            templateId: 15, // Template "Canalización Lista"
+            params: {
+              CUSTOMER_NAME: canalizacion.nombreDestinatario || canalizacion.nombreCliente,
+              GUARDIAN_NAME: canalizacion.guardian?.nombre || 'Tu Guardián',
+            }
+          })
+        });
+
+        if (brevoResponse.ok) {
+          console.log(`[CANALIZACION] Email "canalización lista" enviado a ${canalizacion.email}`);
+        } else {
+          console.error(`[CANALIZACION] Error enviando email:`, await brevoResponse.text());
+        }
+      } catch (emailError) {
+        console.error(`[CANALIZACION] Error enviando email:`, emailError);
+        // No fallar la operación si el email falla
+      }
 
     } else if (accion === 'editar' && body.contenido) {
       canalizacion.contenido = body.contenido;
