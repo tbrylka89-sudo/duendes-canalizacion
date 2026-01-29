@@ -1099,7 +1099,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
         {diasParaBonus && diasParaBonus <= 7 && (
           <div style={{
             position: 'absolute',
-            bottom: '42px',
+            bottom: '150px',
             left: '50%',
             transform: 'translateX(-50%)',
             background: 'rgba(0,0,0,0.7)',
@@ -1109,6 +1109,7 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
             color: amatista.brillante,
             whiteSpace: 'nowrap',
             border: `1px solid ${amatista.medio}40`,
+            zIndex: 8,
           }}>
             🎁 {diasParaBonus === 1 ? '¡Mañana bonus!' : `${diasParaBonus} días para bonus`}
           </div>
