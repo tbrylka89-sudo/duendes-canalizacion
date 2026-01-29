@@ -867,14 +867,14 @@ REGLAS:
     // ─────────────────────────────────────────────────────────────
     if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago|pagan con|aceptan/i.test(msgLower)) {
       const respPago = paisDetectado === 'UY'
-        ? 'En Uruguay: Visa, Master, Amex, OCA, PassCard, Cabal, Anda, Club del Este, Redpagos, Itaú, Mercado Pago, y transferencia bancaria (BROU, Bandes, BBVA, Scotiabank) 💳'
-        : 'Internacional: Visa, MasterCard, American Express 💳 Tu banco convierte automáticamente a tu moneda.';
+        ? 'En Uruguay: Visa, Master, Amex, OCA, PassCard, Cabal, Anda, Club del Este, Redpagos, Itaú, y transferencia bancaria vía Plexo 💳'
+        : 'Internacional: Visa, MasterCard, American Express, y transferencia bancaria vía Plexo 💳 Tu banco convierte automáticamente.';
       return respuestaRapida(respPago, 'metodos_pago');
     }
 
     if (/paypal|pay pal/i.test(msgLower)) {
       return respuestaRapida(
-        'No tenemos PayPal, pero sí Visa, MasterCard y Amex. En Uruguay también Mercado Pago y transferencia 💳',
+        'No tenemos PayPal, pero sí Visa, MasterCard y Amex. También transferencia bancaria vía Plexo (funciona para Uruguay y exterior) 💳',
         'paypal'
       );
     }
