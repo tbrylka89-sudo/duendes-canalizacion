@@ -355,9 +355,10 @@ export async function POST(request) {
 
     // SPAM / Mensajes genéricos
     if (
-      /^(amen|amén|bendiciones?|bendecido)$/i.test(msgLower) ||
-      /^(dame suerte|buena vibra|buenas vibras|suerte)$/i.test(msgLower) ||
-      /^[\p{Emoji}\s]+$/u.test(msg.trim())
+      /^(amen|amén|bendiciones?|bendecido|amen bendiciones?|bendiciones? amen|dios te bendiga|que dios|la virgen)[\s!.]*$/i.test(msgLower) ||
+      /^(dame suerte|buena vibra|buenas vibras|suerte|buenas energias|buenas energías)[\s!.]*$/i.test(msgLower) ||
+      /^[\p{Emoji}\s!.]+$/u.test(msg.trim()) ||
+      msgLower.length < 3
     ) {
       const contenido = crearContenidoManychat('¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.');
       await enviarMensajeManychat(subscriberId, contenido);

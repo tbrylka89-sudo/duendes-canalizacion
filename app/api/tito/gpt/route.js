@@ -683,10 +683,10 @@ INSTRUCCIONES:
     // SPAM - "amén", lotería, solo emojis
     // ─────────────────────────────────────────────────────────────
     if (
-      /^(amen|amén|bendiciones?|bendecido)$/i.test(msgLower) ||
-      /^(dame suerte|buena vibra|buenas vibras|suerte)$/i.test(msgLower) ||
+      /^(amen|amén|bendiciones?|bendecido|amen bendiciones?|bendiciones? amen|dios te bendiga|que dios|la virgen)[\s!.]*$/i.test(msgLower) ||
+      /^(dame suerte|buena vibra|buenas vibras|suerte|buenas energias|buenas energías)[\s!.]*$/i.test(msgLower) ||
       /^(dame los n[uú]meros|5 de oro|loter[ií]a|quiniela|n[uú]meros)/i.test(msgLower) ||
-      /^[\p{Emoji}\s]+$/u.test(mensaje.trim()) ||
+      /^[\p{Emoji}\s!.]+$/u.test(mensaje.trim()) ||
       msgLower.length < 3
     ) {
       return respuestaRapida(
