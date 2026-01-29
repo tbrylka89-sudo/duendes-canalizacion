@@ -972,6 +972,171 @@ No es un texto genérico - es SU mensaje para VOS. Por eso cada canalización es
     }
 
     // ─────────────────────────────────────────────────────────────
+    // EMBALAJE / PACKAGING
+    // ─────────────────────────────────────────────────────────────
+    if (/embalaje|empaque|empaquetado|packaging|c[oó]mo (llega|viene|env[ií]an)|protecci[oó]n del env[ií]o/i.test(msgLower)) {
+      return respuestaRapida(
+        `Cada guardián va protegido con mucho amor:
+• Protección individual con materiales suaves
+• Caja resistente
+• Relleno contra golpes
+• Años perfeccionando el sistema
+
+Llevamos años enviando a todo el mundo y es MUY raro que lleguen dañados. Y si pasara algo, lo resolvemos 🍀`,
+        'embalaje'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GARANTÍA / DEVOLUCIONES
+    // ─────────────────────────────────────────────────────────────
+    if (/garant[ií]a|devoluci[oó]n|devolver|reembolso|cambio|arrepent/i.test(msgLower)) {
+      return respuestaRapida(
+        `Te cuento cómo funciona:
+• NO aceptamos devoluciones ni reembolsos (cada pieza es única e irrepetible)
+• Si llegara dañado por el envío: documentás con fotos dentro de 48hs y lo evaluamos
+
+Por eso es importante estar 100% seguro antes de adoptar. El guardián que te eligió ya es tuyo 🍀`,
+        'garantia'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // QUÉ INCLUYE LA COMPRA
+    // ─────────────────────────────────────────────────────────────
+    if (/qu[eé] (incluye|viene|trae|recibo)|viene con|trae con|incluido/i.test(msgLower)) {
+      return respuestaRapida(
+        `Cuando adoptás un guardián recibís:
+✨ El guardián único (hecho 100% a mano)
+📜 Certificado de Originalidad firmado
+🔮 Canalización personal - un mensaje único de tu guardián para VOS
+📱 Acceso a Mi Magia - portal exclusivo con rituales, cuidados y contenido
+📦 Packaging especial de protección
+
+Todo incluido en el precio, sin sorpresas 🍀`,
+        'incluye'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DIFERENCIA DE TAMAÑOS
+    // ─────────────────────────────────────────────────────────────
+    if (/diferencia.*(tama[ñn]o|mini|mediano|grande|gigante)|mini vs|tama[ñn]os|cual.*tama[ñn]o/i.test(msgLower)) {
+      return respuestaRapida(
+        `Te explico los tamaños:
+
+🌿 **Mini** (7-10cm) - $70 USD - Perfectos para empezar, ideales para espacios pequeños
+✨ **Mini Especial/Pixie** (10-15cm) - $150 USD - Con cristales y detalles únicos
+🍀 **Mediano** (20-25cm) - $200 USD - El más elegido, presencia sin ocupar mucho
+💚 **Grande** (30-40cm) - $450 USD - Presencia imponente
+🐉 **Gigante** (50-70cm) - $1.050 USD - Para espacios amplios o coleccionistas
+
+El precio es por la complejidad y trabajo, no solo por tamaño 🍀`,
+        'tamanos'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // CÓMO ELEGIR EL GUARDIÁN
+    // ─────────────────────────────────────────────────────────────
+    if (/c[oó]mo (elijo|elegir|s[eé] cu[aá]l)|cu[aá]l (elijo|elegir|es para m[ií])|no s[eé] (cual|cu[aá]l)|ayud.*(elegir|decidir)/i.test(msgLower)) {
+      return respuestaRapida(
+        `Te cuento el secreto: **vos no elegís al guardián, él te elige a vos** 🔮
+
+¿Cómo sabés cuál es el tuyo?
+• El que te llamó la atención primero, ese es
+• Si volvés a mirar el mismo una y otra vez, ahí está
+• Si sentís algo al verlo (cosquilleo, emoción), es señal
+
+También tenemos un Test del Guardián que te ayuda: https://duendesdeluruguay.com/descubri-que-duende-te-elige/
+
+¿Querés que te muestre algunos para ver cuál te llama? 🍀`,
+        'como_elegir'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MATERIALES
+    // ─────────────────────────────────────────────────────────────
+    if (/material(es)?|de qu[eé] (est[aá]n|son|hechos)|porcelana|cristal/i.test(msgLower)) {
+      return respuestaRapida(
+        `Cada guardián está hecho con:
+• **Porcelana fría profesional** - flexible y dura años
+• **Cristales 100% naturales** - amatista, cuarzo rosa, citrino, labradorita, turmalina
+• **Ropa de verdad** - lanas, fieltros, telas naturales cosidas a mano
+• **100% esculpido a mano** - SIN moldes, cada uno es único
+
+Todo el trabajo es artesanal, por eso cada uno tarda días en nacer 🍀`,
+        'materiales'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // TIEMPO DE ENVÍO DETALLADO
+    // ─────────────────────────────────────────────────────────────
+    if (/cu[aá]nto (tarda|demora) en llegar|d[ií]as.*llegar|tiempo de env[ií]o|llega.*d[ií]as/i.test(msgLower)) {
+      const respEnvio = `Tiempos de envío:
+📦 **Uruguay (DAC):** 3-7 días hábiles
+✈️ **Internacional (DHL Express):** 5-10 días hábiles
+
+Todos los envíos van con tracking para que puedas seguirlo.
+El guardián se prepara con amor antes de viajar 🍀`;
+      return respuestaRapida(respEnvio, 'tiempo_envio_detallado');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PROMO 3x2 ESPECÍFICO
+    // ─────────────────────────────────────────────────────────────
+    if (/3x2|tres por dos|3 por 2|llev[aá]s.*regala|promo.*mini/i.test(msgLower)) {
+      return respuestaRapida(
+        `¡Sí! Tenemos la promo **3x2** 🎁
+
+Por cada 2 guardianes que adoptes, te **regalamos 1 mini**.
+• Llevás 2 → 1 mini gratis
+• Llevás 4 → 2 minis gratis
+• Y así sucesivamente...
+
+Es la mejor forma de empezar tu comunidad de guardianes 🍀`,
+        'promo_3x2'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // EL CÍRCULO
+    // ─────────────────────────────────────────────────────────────
+    if (/el c[ií]rculo|membres[ií]a|suscripci[oó]n|club/i.test(msgLower)) {
+      return respuestaRapida(
+        `El Círculo está siendo preparado con algo muy especial 🔮
+
+Es nuestra membresía exclusiva que va a incluir contenido y experiencias únicas.
+
+Si querés ser de los primeros en enterarte cuando esté listo, podés dejarnos tu email en: magia.duendesdeluruguay.com/circulo
+
+¡Te avisamos cuando abra! 🍀`,
+        'el_circulo'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MI MAGIA
+    // ─────────────────────────────────────────────────────────────
+    if (/mi magia|portal.*compra|acceso.*exclusivo|contenido.*compra/i.test(msgLower)) {
+      return respuestaRapida(
+        `**Mi Magia** es tu portal exclusivo post-compra 🔮
+
+Cuando adoptes a tu guardián, vas a tener acceso a:
+✨ Tu canalización personalizada - un mensaje único de tu guardián
+📜 Su historia completa - de dónde viene, qué vivió
+🎁 Sus dones especiales y cómo trabaja
+🕯️ Ritual de bienvenida para cuando llegue
+🌿 Cómo cuidarlo - dónde ponerlo, limpieza energética
+
+Accedés en: magia.duendesdeluruguay.com 🍀`,
+        'mi_magia'
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // DESPEDIDAS / AGRADECIMIENTOS
     // ─────────────────────────────────────────────────────────────
     if (/^(gracias|muchas gracias|thanks|thx|grax|ty)[\s!.]*$/i.test(msgLower)) {

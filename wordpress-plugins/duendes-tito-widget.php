@@ -1178,28 +1178,29 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         // ============================================
         producto: [
             {
-                delay: 15000, // 15 segundos
+                delay: 12000, // 12 segundos
                 key: 'producto_contextual',
                 config: function() {
                     const nombreProducto = estado.productoActual ? estado.productoActual.nombre : 'este guardián';
                     return {
-                        texto: '✨ ¿Querés saber más de <strong>' + nombreProducto + '</strong>? Puedo contarte su historia y sus dones especiales.',
+                        texto: '🔮 <strong>' + nombreProducto + '</strong> me pidió que te hable. ¿Te cuento qué vino a ofrecerte?',
                         botones: [
                             { texto: '💜 Sí, contame', primary: true, accion: 'chat', mensaje: 'Contame más sobre ' + nombreProducto },
-                            { texto: 'Sigo mirando', accion: 'cerrar' }
+                            { texto: 'Después', accion: 'cerrar' }
                         ]
                     };
                 }
             },
             {
-                delay: 45000, // 45 segundos
-                key: 'producto_historia',
+                delay: 40000, // 40 segundos
+                key: 'producto_escasez',
                 config: function() {
+                    const nombreProducto = estado.productoActual ? estado.productoActual.nombre : 'Este guardián';
                     return {
-                        texto: '🔮 Cada guardián tiene una historia única. Si sentiste algo al verlo, <strong>no es casualidad</strong>.',
+                        texto: '⚡ <strong>' + nombreProducto + '</strong> es único. Cuando alguien lo adopte, este diseño desaparece para siempre...',
                         botones: [
-                            { texto: '¿Cuál es su historia?', primary: true, accion: 'chat', mensaje: '¿Cuál es la historia de este guardián?' },
-                            { texto: 'Después', accion: 'cerrar' }
+                            { texto: '💚 Quiero adoptarlo', primary: true, accion: 'chat', mensaje: 'Quiero adoptar a ' + nombreProducto },
+                            { texto: 'Tengo dudas', accion: 'chat', mensaje: 'Tengo una duda sobre ' + nombreProducto }
                         ]
                     };
                 }
@@ -1211,28 +1212,27 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         // ============================================
         tienda: [
             {
-                delay: 20000, // 20 segundos
+                delay: 18000, // 18 segundos
                 key: 'tienda_ayuda',
                 config: function() {
                     return {
-                        texto: '🔮 ¿Buscás algo en particular? Puedo ayudarte a encontrar <strong>tu guardián ideal</strong>.',
+                        texto: '🔮 ¿Sabías que <strong>el guardián te elige a vos</strong>, no al revés? Puedo ayudarte a descubrir cuál ya te está llamando.',
                         botones: [
-                            { texto: 'Sí, ayudame', primary: true, accion: 'chat', mensaje: 'Ayudame a encontrar mi guardián ideal' },
-                            { texto: 'Solo miro', accion: 'cerrar' }
+                            { texto: '✨ Descubrir mi guardián', primary: true, accion: 'chat', mensaje: 'Ayudame a encontrar mi guardián ideal' },
+                            { texto: 'Sigo mirando', accion: 'cerrar' }
                         ]
                     };
                 }
             },
             {
-                delay: 50000, // 50 segundos
-                key: 'tienda_categorias',
+                delay: 45000, // 45 segundos
+                key: 'tienda_test',
                 config: function() {
                     return {
-                        texto: '✨ ¿Protección, abundancia, amor o sanación? Cada guardián tiene un propósito especial...',
+                        texto: '🎯 ¿No sabés cuál es para vos? Tenemos un <strong>Test del Guardián</strong> que te lo revela...',
                         botones: [
-                            { texto: '🛡️ Protección', accion: 'chat', mensaje: 'Busco un guardián de protección' },
-                            { texto: '💰 Abundancia', accion: 'chat', mensaje: 'Busco un guardián de abundancia' },
-                            { texto: '💜 Amor', accion: 'chat', mensaje: 'Busco un guardián de amor' }
+                            { texto: '🔮 Hacer el test', primary: true, accion: 'url', url: 'https://duendesdeluruguay.com/descubri-que-duende-te-elige/' },
+                            { texto: 'Ver categorías', accion: 'chat', mensaje: '¿Qué categorías de guardianes tienen?' }
                         ]
                     };
                 }
@@ -1300,13 +1300,13 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         // ============================================
         general: [
             {
-                delay: 30000, // 30 segundos
+                delay: 25000, // 25 segundos
                 key: 'general_saludo',
                 config: function() {
                     return {
-                        texto: '✨ ¡Hola! Soy Tito, el guardián digital. Si llegaste hasta acá, <strong>no es casualidad</strong>...',
+                        texto: '🍀 Si llegaste hasta acá, <strong>no es casualidad</strong>. Algo te trajo. ¿Querés descubrir qué guardián te está llamando?',
                         botones: [
-                            { texto: 'Contame más', primary: true, accion: 'chat' },
+                            { texto: '✨ Sí, descubrir', primary: true, accion: 'chat', mensaje: '¿Qué guardián me corresponde?' },
                             { texto: 'Ver tienda', accion: 'url', url: CONFIG.URL_TIENDA }
                         ]
                     };
