@@ -183,11 +183,9 @@ export async function POST(request) {
           config: membresiaConfig // Info de gamificación si existe
         });
       }
-      // 3. Guardianes
+      // 3. Guardianes - detectar por categorías del line_item O consultando WooCommerce
       else if (categoriasArray.some(c => ['proteccion', 'abundancia', 'amor', 'salud', 'sanacion'].includes(c))) {
-        // Obtener datos COMPLETOS del producto desde WooCommerce
         const datosCompletos = await obtenerDatosCompletoProducto(item.product_id);
-
         guardianes.push({
           id: item.product_id,
           nombre: item.name,
@@ -195,9 +193,33 @@ export async function POST(request) {
           precio: parseFloat(item.total) || 0,
           fecha: new Date().toISOString(),
           imagen: item.image?.src || null,
-          // Datos completos del producto (personalidad, historia, etc.)
           ...datosCompletos
         });
+      }
+      // 4. Fallback: si no matcheó nada, consultar producto en WooCommerce para ver si es guardián
+      else if (item.product_id) {
+        const datosCompletos = await obtenerDatosCompletoProducto(item.product_id);
+        const categoriasProducto = datosCompletos.categorias || [];
+        const categoriaSlugs = datosCompletos.categoriaSlugs || [];
+        const CATS_GUARDIAN = ['proteccion', 'abundancia', 'amor', 'salud', 'sanacion', 'protección', 'sanación'];
+        const esGuardian = categoriaSlugs.some(c => CATS_GUARDIAN.includes(c)) ||
+          categoriasProducto.some(c => CATS_GUARDIAN.some(cg => c.toLowerCase().includes(cg)));
+
+        if (esGuardian) {
+          const catDetectada = categoriaSlugs.find(c => CATS_GUARDIAN.includes(c)) || categoriasProducto[0] || 'proteccion';
+          guardianes.push({
+            id: item.product_id,
+            nombre: item.name,
+            categoria: catDetectada,
+            precio: parseFloat(item.total) || 0,
+            fecha: new Date().toISOString(),
+            imagen: item.image?.src || null,
+            ...datosCompletos
+          });
+          console.log(`[WEBHOOK-WOO] Guardián detectado via WooCommerce API: ${item.name} (${catDetectada})`);
+        } else {
+          otros.push(item);
+        }
       }
       else {
         otros.push(item);
@@ -881,6 +903,7 @@ async function obtenerDatosCompletoProducto(productId) {
 
       // Categorías completas
       categorias: producto.categories?.map(c => c.name) || [],
+      categoriaSlugs: producto.categories?.map(c => c.slug) || [],
 
       // Tags
       tags: producto.tags?.map(t => t.name) || [],
