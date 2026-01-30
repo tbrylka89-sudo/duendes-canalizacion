@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Duendes Hub de Control
  * Description: Centro de control con todos los accesos a la app de Vercel
- * Version: 4.0
+ * Version: 5.0
  * Author: Duendes del Uruguay
  */
 
@@ -76,7 +76,7 @@ class DuendesHubControl {
         <div class="hub-container">
             <div class="hub-header">
                 <h1>🎮 Hub de Control - Duendes del Uruguay</h1>
-                <p>Todos tus accesos en un solo lugar. Version 4.0 - Enero 2026</p>
+                <p>Todos tus accesos en un solo lugar. Version 5.0 - Enero 2026</p>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -246,36 +246,48 @@ class DuendesHubControl {
             <!-- CANALIZACIONES - ACTUALIZADO v4.0 -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
             <div class="hub-section" style="border: 2px solid #9370DB; background: linear-gradient(135deg, rgba(147,112,219,0.1), rgba(107,78,159,0.05));">
-                <h2>📜 Sistema de Canalizaciones <span class="badge badge-new">v4.0</span></h2>
-                <p style="margin-bottom: 20px; color: #555;">Flujo completo: compra/manual → formulario al cliente → IA genera → admin aprueba → cliente recibe en Mi Magia.</p>
+                <h2>📜 Sistema de Canalizaciones <span class="badge badge-new">v7.0</span></h2>
+
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card" style="border-color: #9370DB;">
-                        <div class="hub-card-title" style="color: #6B4E9F;">📜 Panel de Canalizaciones</div>
-                        <div class="hub-card-url">/admin/canalizaciones</div>
-                        <div class="hub-card-desc">Lista de canalizaciones con tabs: Pendientes, Aprobadas, Enviadas, Borradores. Boton "+" para enviar formulario o crear canalizacion manual.</div>
-                        <div class="hub-card-uso"><strong>Tabs:</strong> Pendientes | Aprobadas | Enviadas | Borradores</div>
+                        <div class="hub-card-title" style="color: #6B4E9F;">🔍 Buscar Pedido</div>
+                        <div class="hub-card-url">/admin/canalizaciones → arriba</div>
+                        <div class="hub-card-desc"><strong>Usa esto si:</strong> alguien compro en la web y necesitas enviarle el formulario. Pones el numero de pedido, te muestra los guardianes que compro, y le mandas el formulario. Vos NO elegis el tipo — el cliente elige cuando abre el formulario.</div>
+                        <div class="hub-card-uso"><strong>Resultado:</strong> Se crea un borrador + le llega email con formulario. El cliente elige si es para el/ella, regalo, sorpresa, nino o reconexion. Cuando lo completa, la IA genera automaticamente.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/canalizaciones/nueva" target="_blank" class="hub-card" style="border-color: #9370DB;">
-                        <div class="hub-card-title" style="color: #6B4E9F;">➕ Nueva Canalizacion Manual</div>
+                        <div class="hub-card-title" style="color: #6B4E9F;">➕ Nueva Canalizacion</div>
                         <div class="hub-card-url">/admin/canalizaciones/nueva</div>
-                        <div class="hub-card-desc">Subir foto de CUALQUIER producto (no necesita estar en la tienda). Ingresar info del producto y cliente. Enviar formulario o ingresar contexto manualmente.</div>
-                        <div class="hub-card-uso"><strong>Usalo para:</strong> Productos que no estan en WooCommerce, pedidos especiales, regalos.</div>
+                        <div class="hub-card-desc"><strong>Usa esto si:</strong> vendiste un guardian fuera de la web (feria, WhatsApp, en persona) o alguien quiere una reconexion. Pones email, nombre y nota opcional para la IA. El tipo de formulario lo elige el cliente cuando abre el link.</div>
+                        <div class="hub-card-uso"><strong>Resultado:</strong> Se crea un borrador + le llega email con formulario. Cuando lo completa, la IA genera automaticamente.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card" style="border-color: #9370DB;">
+                        <div class="hub-card-title" style="color: #6B4E9F;">📋 Tabs: Borradores / Pendientes / Aprobadas / Enviadas</div>
+                        <div class="hub-card-url">/admin/canalizaciones → abajo</div>
+                        <div class="hub-card-desc"><strong>Borradores:</strong> esperando que el cliente llene el formulario.<br><strong>Pendientes:</strong> la IA ya genero la carta, revisala y aproba.<br><strong>Aprobadas:</strong> listas para enviar al cliente.<br><strong>Enviadas:</strong> el cliente ya las recibio en Mi Magia.</div>
                     </a>
                     <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📧 Enviar Formulario</div>
-                        <div class="hub-card-url">/admin/canalizaciones → Boton "+"</div>
-                        <div class="hub-card-desc">Enviar formulario estetico por email a cualquier persona. 4 tipos: para mi, regalo que sabe, sorpresa, para nino/a.</div>
-                        <div class="hub-card-uso"><strong>El cliente recibe:</strong> Email branded con link → formulario multi-paso → datos vuelven al sistema.</div>
+                        <div class="hub-card-title">📄 Detalle de Canalizacion</div>
+                        <div class="hub-card-url">/admin/canalizaciones/{id}</div>
+                        <div class="hub-card-desc">Aca ves la carta completa que escribio la IA. Tenes 4 botones:</div>
+                        <div class="hub-card-uso">
+                            <strong>Generar con IA:</strong> el cliente ya lleno el formulario, toca para que la IA escriba la carta.<br>
+                            <strong>Regenerar:</strong> no te gusto la carta, toca para que la IA escriba otra. La anterior se guarda, podes comparar y restaurar.<br>
+                            <strong>Aprobar:</strong> la carta esta bien, aprobala.<br>
+                            <strong>Enviar al Cliente:</strong> manda la carta, el cliente la ve en Mi Magia.
+                        </div>
                     </a>
                     <a href="<?php echo $url; ?>/formulario/EJEMPLO" target="_blank" class="hub-card">
-                        <div class="hub-card-title">📝 Formulario Publico</div>
+                        <div class="hub-card-title">📝 Formulario del Cliente</div>
                         <div class="hub-card-url">/formulario/{token}</div>
-                        <div class="hub-card-desc">Pagina publica donde el cliente llena su formulario. Diseño oscuro, dorado, mobile-first, multi-paso con transiciones.</div>
-                        <div class="hub-card-uso"><strong>4 vias:</strong> Para mi | Regalo (sabe) | Sorpresa | Para nino/a</div>
+                        <div class="hub-card-desc">Esto es lo que ve el cliente cuando abre el link del email. <strong>Primero elige para quien es</strong> (para mi, regalo, sorpresa, nino, reconexion). Despues sube la foto de su guardian y completa los datos segun lo que eligio.</div>
+                        <div class="hub-card-uso"><strong>Importante:</strong> El cliente elige el tipo, no vos. Si el tipo ya viene del checkout de la web, se salta la seleccion y va directo al formulario.</div>
                     </a>
                 </div>
                 <div style="margin-top: 16px; padding: 12px 16px; background: rgba(147,112,219,0.1); border-radius: 8px; font-size: 13px; color: #555;">
-                    <strong style="color: #6B4E9F;">Flujo completo:</strong> Compra/Manual → Formulario al cliente (email branded) → Cliente llena (4 vias) → IA genera con vision (foto + datos) → Admin revisa con chat editor → Aprueba → Envia → Cliente ve en Mi Magia + recibe email.
+                    <strong style="color: #6B4E9F;">Flujo 1 — Compra en la web:</strong> Cliente compra → vos buscas el pedido → le mandas formulario → el cliente elige el tipo y lo completa → IA genera → vos aprobas → envias.<br>
+                    <strong style="color: #6B4E9F;">Flujo 2 — Venta fuera de la web:</strong> Vos vas a "+ Nueva Canalizacion" → pones email y nombre → le llega formulario → el cliente elige el tipo y lo completa → IA genera → vos aprobas → envias.<br>
+                    <strong style="color: #6B4E9F;">Importante:</strong> Vos nunca elegis el tipo de formulario. El cliente lo elige cuando abre el link. Asi no tenes que adivinar si es para el/ella o un regalo.
                 </div>
             </div>
 
@@ -435,12 +447,16 @@ class DuendesHubControl {
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code></td>
                     </tr>
                     <tr style="background: #f3e5f5;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Crear canalizacion manual</strong></td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones/nueva</code></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Compro en la web, mandar formulario</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code> → Buscar Pedido</td>
                     </tr>
                     <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Enviar formulario a cliente</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code> → Boton "+" → Enviar Formulario</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Vendio fuera de web / reconexion</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones/nueva</code></td>
+                    </tr>
+                    <tr style="background: #f3e5f5;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">No me gusto la carta, reescribir</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones/{id}</code> → Boton "Regenerar" (guarda versiones)</td>
                     </tr>
                     <tr style="background: #f8f9fa;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">Dar runas a usuario</td>
@@ -493,7 +509,7 @@ class DuendesHubControl {
 
             <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
                 URL base: <strong><?php echo $url; ?></strong><br>
-                Hub v4.0 - Sistema Canalizaciones Completo + Circulo - Enero 2026
+                Hub v7.0 - Cliente elige tipo de formulario + versiones + Cuidados - Enero 2026
             </div>
 
         </div>
