@@ -37,7 +37,9 @@ export async function POST(request) {
     if (!nombre) {
       return Response.json({ success: false, error: 'Nombre requerido' }, { status: 400 });
     }
-    if (!formType || !['para_mi', 'regalo_sabe', 'regalo_sorpresa', 'para_nino', 'reconexion'].includes(formType)) {
+    // formType es opcional — si es null, el cliente lo elige al abrir el formulario
+    const tiposValidos = ['para_mi', 'regalo_sabe', 'regalo_sorpresa', 'para_nino', 'reconexion'];
+    if (formType && !tiposValidos.includes(formType)) {
       return Response.json({ success: false, error: 'Tipo de formulario inválido' }, { status: 400 });
     }
 
@@ -48,7 +50,7 @@ export async function POST(request) {
     // Guardar invitación en KV
     const invite = {
       token,
-      formType,
+      formType: formType || null,
       customerEmail: email.toLowerCase().trim(),
       customerName: nombre,
       productName: productName || null,
@@ -104,7 +106,7 @@ export async function POST(request) {
           body: JSON.stringify({
             sender: { name: 'Duendes del Uruguay', email: 'info@duendesdeluruguay.com' },
             to: [{ email: email.toLowerCase().trim(), name: nombre }],
-            subject: subjects[formType] || 'Tu guardián te espera',
+            subject: (formType && subjects[formType]) || 'Tu guardián te espera',
             htmlContent: emailHtml
           })
         });

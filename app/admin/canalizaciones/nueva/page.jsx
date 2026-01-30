@@ -12,7 +12,6 @@ export default function NuevaCanalizacion() {
 
   const [clienteNombre, setClienteNombre] = useState('');
   const [clienteEmail, setClienteEmail] = useState('');
-  const [formType, setFormType] = useState('para_mi');
   const [notaAdmin, setNotaAdmin] = useState('');
 
   const [creando, setCreando] = useState(false);
@@ -39,7 +38,7 @@ export default function NuevaCanalizacion() {
           nombreCliente: clienteNombre,
           productoManual: { nombre: 'Pendiente de formulario', tipo: 'guardian', categoria: 'proteccion' },
           modoContexto: 'formulario',
-          formType,
+          formType: null,
           notaAdmin: notaAdmin || null
         })
       });
@@ -59,7 +58,7 @@ export default function NuevaCanalizacion() {
         body: JSON.stringify({
           email: clienteEmail.toLowerCase().trim(),
           nombre: clienteNombre,
-          formType,
+          formType: null,
           notaAdmin: notaAdmin || null,
           canalizacionId: dataBorrador.id
         })
@@ -136,17 +135,6 @@ export default function NuevaCanalizacion() {
         <div className="campo">
           <label className="label">Nombre</label>
           <input className="input" value={clienteNombre} onChange={e => setClienteNombre(e.target.value)} placeholder="Nombre del cliente" />
-        </div>
-
-        <div className="campo">
-          <label className="label">Tipo de formulario</label>
-          <select className="input" value={formType} onChange={e => setFormType(e.target.value)}>
-            <option value="para_mi">Para mí (la persona lo llena)</option>
-            <option value="regalo_sabe">Regalo — la persona lo sabe</option>
-            <option value="regalo_sorpresa">Regalo sorpresa (comprador llena)</option>
-            <option value="para_nino">Para un niño/a</option>
-            <option value="reconexion">Reconexión (ya tiene guardián)</option>
-          </select>
         </div>
 
         <div className="campo">

@@ -78,11 +78,11 @@ export default function CanalizacionesAdmin() {
     setBuscandoPedido(false);
   }
 
-  async function enviarFormItem(item, formType) {
+  async function enviarFormItem(item) {
     if (!pedido) return;
     setEnviandoFormItem(item.product_id);
     try {
-      // 1. Crear borrador vinculado a la orden
+      // 1. Crear borrador vinculado a la orden (sin formType — el cliente elige)
       const resBorrador = await fetch('/api/admin/canalizaciones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,7 +98,7 @@ export default function CanalizacionesAdmin() {
             productId: item.product_id,
             imagenUrl: item.imagen || null
           },
-          formType,
+          formType: null,
           notaAdmin: `Pedido #${pedido.numero}`
         })
       });
@@ -110,14 +110,14 @@ export default function CanalizacionesAdmin() {
         return;
       }
 
-      // 2. Enviar formulario vinculado al borrador
+      // 2. Enviar formulario vinculado al borrador (sin formType — el cliente elige)
       const res = await fetch('/api/admin/formularios/enviar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: pedido.email,
           nombre: pedido.nombre,
-          formType,
+          formType: null,
           ordenId: pedido.id,
           productName: item.nombre,
           canalizacionId: dataBorrador.id
@@ -230,25 +230,13 @@ export default function CanalizacionesAdmin() {
                           </button>
                         </>
                       ) : (
-                        <div className="pedido-item-enviar">
-                          <select className="form-input-sm" id={`tipo-${item.product_id}`} defaultValue={pedido.tipoDestinatario || 'para_mi'}>
-                            <option value="para_mi">Para mí</option>
-                            <option value="regalo_sabe">Regalo (sabe)</option>
-                            <option value="regalo_sorpresa">Sorpresa</option>
-                            <option value="para_nino">Niño/a</option>
-                            <option value="reconexion">Reconexión</option>
-                          </select>
-                          <button
-                            className="btn-enviar-sm"
-                            disabled={enviandoFormItem === item.product_id}
-                            onClick={() => {
-                              const sel = document.getElementById(`tipo-${item.product_id}`);
-                              enviarFormItem(item, sel.value);
-                            }}
-                          >
-                            {enviandoFormItem === item.product_id ? '...' : 'Enviar Form'}
-                          </button>
-                        </div>
+                        <button
+                          className="btn-enviar-sm"
+                          disabled={enviandoFormItem === item.product_id}
+                          onClick={() => enviarFormItem(item)}
+                        >
+                          {enviandoFormItem === item.product_id ? '...' : '📧 Enviar formulario'}
+                        </button>
                       )}
                     </div>
                   </div>

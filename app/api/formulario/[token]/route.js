@@ -63,12 +63,21 @@ export async function POST(request, { params }) {
       return Response.json({ success: false, error: 'Este formulario ya fue completado' }, { status: 400 });
     }
 
+    // Si el cliente eligió formType (porque el invite no tenía), usarlo
+    const resolvedFormType = body.formType || invite.formType || 'para_mi';
+
+    // Actualizar invite con el tipo elegido por el cliente
+    if (!invite.formType && body.formType) {
+      invite.formType = body.formType;
+      await kv.set(`form_invite:${token}`, invite, { ex: 30 * 24 * 60 * 60 });
+    }
+
     // Guardar respuestas
     const formData = {
       token,
       email: invite.customerEmail,
       nombre: invite.customerName,
-      formType: invite.formType,
+      formType: resolvedFormType,
       completedAt: new Date().toISOString(),
       respuestas: {
         // Campos del producto/guardián (todos los tipos)

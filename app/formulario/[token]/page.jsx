@@ -18,6 +18,7 @@ export default function FormularioPage() {
   const [completado, setCompletado] = useState(false);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [subiendoFotoProducto, setSubiendoFotoProducto] = useState(false);
+  const [tipoElegido, setTipoElegido] = useState(null);
 
   // Estado del formulario (campos universales)
   const [datos, setDatos] = useState({
@@ -58,6 +59,10 @@ export default function FormularioPage() {
             setCompletado(true);
           } else {
             setConfig(data);
+            // Si ya tiene formType (del checkout web), saltar selección
+            if (data.formType) {
+              setTipoElegido(data.formType);
+            }
             if (data.customerName) {
               setDatos(d => ({ ...d, nombre_preferido: data.customerName }));
             }
@@ -112,7 +117,7 @@ export default function FormularioPage() {
       const res = await fetch(`/api/formulario/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos)
+        body: JSON.stringify({ ...datos, formType: tipoElegido })
       });
       const data = await res.json();
       if (data.success) {
@@ -189,7 +194,59 @@ export default function FormularioPage() {
     </div>
   );
 
-  const formType = config?.formType || 'para_mi';
+  // ═══════════ SELECCIÓN DE TIPO (si no viene predefinido) ═══════════
+  if (!tipoElegido) {
+    const opciones = [
+      { value: 'para_mi', icon: '✦', label: 'Es para mí', desc: 'Este guardián viene a acompañarme' },
+      { value: 'regalo_sabe', icon: '🎁', label: 'Es un regalo', desc: 'Y la persona lo sabe' },
+      { value: 'regalo_sorpresa', icon: '🎁', label: 'Es un regalo sorpresa', desc: 'La persona no sabe que lo recibirá' },
+      { value: 'para_nino', icon: '🧸', label: 'Es para un niño/a', desc: 'Menor de 18 años' },
+      { value: 'reconexion', icon: '🔮', label: 'Es una reconexión', desc: 'Ya tengo este guardián y quiero reconectar' },
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={{ ...s.card, maxWidth: '520px' }}>
+          <div style={s.icon}>✨</div>
+          <h1 style={s.title}>¿Quién recibirá la magia?</h1>
+          <p style={s.subtitle}>Antes de empezar, contanos para quién es este guardián.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {opciones.map(op => (
+              <div
+                key={op.value}
+                onClick={() => setTipoElegido(op.value)}
+                style={{
+                  padding: '16px 18px',
+                  borderRadius: '12px',
+                  border: '1px solid #333',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: 'transparent',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#d4af37'; e.currentTarget.style.background = 'rgba(212,175,55,0.08)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.background = 'transparent'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '1.4rem' }}>{op.icon}</span>
+                  <div>
+                    <div style={{ color: '#fff', fontSize: '1rem', fontFamily: "'Cinzel', serif", marginBottom: '2px' }}>{op.label}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>{op.desc}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {config?.productName && (
+            <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontSize: '0.85rem', marginTop: '1.5rem' }}>
+              Guardián: <span style={{ color: '#d4af37' }}>{config.productName}</span>
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const formType = tipoElegido;
   const totalPasos = 4;
 
   // ═══════════ COMPONENTES COMPARTIDOS ═══════════
