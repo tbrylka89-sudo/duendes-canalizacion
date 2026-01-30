@@ -555,10 +555,11 @@ function filtroPreAPI(msg, historial, paisDetectado) {
         return { interceptado: false };
       }
 
-      // B) Tito hizo una pregunta → respuestas cortas afirmativas no son spam
+      // B) Tito hizo una pregunta u oferta → respuestas afirmativas no son spam
       const titoHizoPregunta = /\?/.test(ultimoBot.content || '');
+      const titoOfreció = /te muestro|quer[eé]s (ver|que)|te cuento|te interesa|te gustaria|te gustaría|mostrar(te|los)|ayudan con eso/i.test(textoBot);
       const esAfirmativo = /^(s[ií]|si+|ok|dale|bueno|va|vamos|claro|por favor|porfa|obvio|seguro|manda|mostr[aá]|quer[ií]a|quiero|me interesa|por supuesto)[\s!.]*$/i.test(msgLower);
-      if (titoHizoPregunta && esAfirmativo) {
+      if ((titoHizoPregunta || titoOfreció) && esAfirmativo) {
         return { interceptado: false };
       }
     }
