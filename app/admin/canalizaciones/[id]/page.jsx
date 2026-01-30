@@ -17,6 +17,7 @@ export default function CanalizacionDetalle() {
   const [cargando, setCargando] = useState(true);
   const [cargandoResumen, setCargandoResumen] = useState(false);
   const [cargandoAccion, setCargandoAccion] = useState(false);
+  const [generando, setGenerando] = useState(false);
 
   // Chat state
   const [mensajes, setMensajes] = useState([]);
@@ -234,6 +235,54 @@ export default function CanalizacionDetalle() {
     setCargandoAccion(false);
   }
 
+  async function generarConIA() {
+    if (generando) return;
+    setGenerando(true);
+
+    setMensajes(prev => [...prev, {
+      rol: 'sistema',
+      contenido: 'Generando canalización con IA... esto puede tomar un momento.',
+      timestamp: new Date().toISOString()
+    }]);
+
+    try {
+      const res = await fetch('/api/admin/canalizaciones', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: canalizacionId,
+          accion: 'generar'
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Recargar la canalización completa
+        await cargarCanalizacion();
+        setMensajes(prev => [...prev, {
+          rol: 'sistema',
+          contenido: 'Canalización generada exitosamente. Ahora está pendiente de revisión.',
+          timestamp: new Date().toISOString()
+        }]);
+      } else {
+        setMensajes(prev => [...prev, {
+          rol: 'asistente',
+          contenido: `Error generando: ${data.error}`,
+          timestamp: new Date().toISOString()
+        }]);
+      }
+    } catch (error) {
+      setMensajes(prev => [...prev, {
+        rol: 'asistente',
+        contenido: `Error de conexión: ${error.message}`,
+        timestamp: new Date().toISOString()
+      }]);
+    }
+
+    setGenerando(false);
+  }
+
   if (cargando) {
     return (
       <div className="cargando-container">
@@ -309,9 +358,9 @@ export default function CanalizacionDetalle() {
             &#8592;
           </button>
           <div className="header-info">
-            <h1 className="titulo">{canalizacion.guardian?.nombre} para {canalizacion.nombreDestinatario || canalizacion.nombreCliente}</h1>
+            <h1 className="titulo">{canalizacion.guardian?.nombre || canalizacion.productoManual?.nombre || 'Guardián'} para {canalizacion.nombreDestinatario || canalizacion.nombreCliente}</h1>
             <p className="subtitulo">
-              Orden #{canalizacion.ordenId?.toString().slice(-4)} &bull;
+              {canalizacion.ordenId ? `Orden #${canalizacion.ordenId?.toString().slice(-4)}` : canalizacion.esManual ? 'Manual' : 'Sin orden'} &bull;
               <span className={`estado ${canalizacion.estado}`}>
                 {canalizacion.estado}
               </span>
@@ -319,6 +368,15 @@ export default function CanalizacionDetalle() {
           </div>
         </div>
         <div className="header-actions">
+          {canalizacion.estado === 'borrador' && (
+            <button
+              onClick={generarConIA}
+              className="btn-generar"
+              disabled={generando}
+            >
+              {generando ? 'Generando...' : 'Generar con IA'}
+            </button>
+          )}
           {canalizacion.estado === 'pendiente' && (
             <button
               onClick={() => cambiarEstado('aprobar')}
@@ -342,8 +400,69 @@ export default function CanalizacionDetalle() {
 
       {/* Main Content - 2 columnas */}
       <div className="main-content">
-        {/* Columna izquierda - Resumen IA */}
+        {/* Columna izquierda - Info + Resumen IA */}
         <aside className="columna-resumen">
+          {/* Datos del producto manual */}
+          {canalizacion.productoManual && (
+            <div className="panel info-panel">
+              <h2 className="panel-titulo">Producto</h2>
+              {canalizacion.productoManual.imagenUrl && (
+                <img src={canalizacion.productoManual.imagenUrl} alt="" className="producto-img" />
+              )}
+              <p className="info-nombre">{canalizacion.productoManual.nombre}</p>
+              {canalizacion.productoManual.tipo && <p className="info-meta">Tipo: {canalizacion.productoManual.tipo}</p>}
+              {canalizacion.productoManual.categoria && <p className="info-meta">Categoría: {canalizacion.productoManual.categoria}</p>}
+              {canalizacion.productoManual.descripcion && <p className="info-desc">{canalizacion.productoManual.descripcion}</p>}
+            </div>
+          )}
+
+          {/* Datos del formulario */}
+          {canalizacion.formData?.respuestas && (
+            <div className="panel info-panel">
+              <h2 className="panel-titulo">Datos del Formulario</h2>
+              <div className="form-data-list">
+                {canalizacion.formData.respuestas.nombre_preferido && (
+                  <div className="form-item"><label>Nombre</label><p>{canalizacion.formData.respuestas.nombre_preferido}</p></div>
+                )}
+                {canalizacion.formData.respuestas.momento_vida && (
+                  <div className="form-item"><label>Momento</label><p>{canalizacion.formData.respuestas.momento_vida}</p></div>
+                )}
+                {canalizacion.formData.respuestas.necesidades?.length > 0 && (
+                  <div className="form-item"><label>Necesita</label><p>{canalizacion.formData.respuestas.necesidades.join(', ')}</p></div>
+                )}
+                {canalizacion.formData.respuestas.mensaje_guardian && (
+                  <div className="form-item"><label>Mensaje</label><p className="form-mensaje">"{canalizacion.formData.respuestas.mensaje_guardian}"</p></div>
+                )}
+                {canalizacion.formData.respuestas.relacion && (
+                  <div className="form-item"><label>Relación</label><p>{canalizacion.formData.respuestas.relacion}</p></div>
+                )}
+                {canalizacion.formData.respuestas.personalidad?.length > 0 && (
+                  <div className="form-item"><label>Personalidad</label><p>{canalizacion.formData.respuestas.personalidad.join(', ')}</p></div>
+                )}
+                {canalizacion.formData.respuestas.foto_url && (
+                  <div className="form-item"><label>Foto</label><img src={canalizacion.formData.respuestas.foto_url} alt="" className="foto-cliente" /></div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Contexto manual */}
+          {canalizacion.contextoManual && !canalizacion.formData && (
+            <div className="panel info-panel">
+              <h2 className="panel-titulo">Contexto</h2>
+              <p className="info-desc">{canalizacion.contextoManual}</p>
+            </div>
+          )}
+
+          {/* Form token pendiente */}
+          {canalizacion.formToken && !canalizacion.formData && (
+            <div className="panel info-panel">
+              <h2 className="panel-titulo">Formulario</h2>
+              <p className="info-meta">Esperando que el cliente complete el formulario.</p>
+              <p className="info-meta" style={{ fontSize: '0.7rem', wordBreak: 'break-all', marginTop: '0.5rem' }}>Token: {canalizacion.formToken}</p>
+            </div>
+          )}
+
           <div className="panel resumen-panel">
             <h2 className="panel-titulo">Resumen IA</h2>
 
@@ -425,9 +544,21 @@ export default function CanalizacionDetalle() {
         <main className="columna-preview">
           <div className="panel preview-panel">
             <h2 className="panel-titulo">Vista Previa</h2>
-            <div className="preview-content" dangerouslySetInnerHTML={{
-              __html: formatearContenido(canalizacion.contenido)
-            }} />
+            {canalizacion.contenido ? (
+              <div className="preview-content" dangerouslySetInnerHTML={{
+                __html: formatearContenido(canalizacion.contenido)
+              }} />
+            ) : (
+              <div className="preview-vacio">
+                <div className="preview-vacio-icon">&#9998;</div>
+                <p>Esta canalización aún no tiene contenido generado.</p>
+                {canalizacion.estado === 'borrador' && (
+                  <button onClick={generarConIA} className="btn-generar-grande" disabled={generando}>
+                    {generando ? 'Generando...' : 'Generar con IA'}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -598,6 +729,7 @@ export default function CanalizacionDetalle() {
           font-weight: 600;
         }
 
+        .estado.borrador { background: rgba(150,150,150,0.2); color: #aaa; }
         .estado.pendiente { background: rgba(255,180,50,0.2); color: #ffb432; }
         .estado.aprobada { background: rgba(100,200,100,0.2); color: #6c6; }
         .estado.enviada { background: rgba(100,150,255,0.2); color: #7af; }
@@ -605,6 +737,32 @@ export default function CanalizacionDetalle() {
         .header-actions {
           display: flex;
           gap: 0.75rem;
+        }
+
+        .btn-generar {
+          padding: 0.6rem 1.25rem;
+          background: linear-gradient(135deg, #9370db, #7b5ec7);
+          border: none;
+          color: #fff;
+          font-family: 'Cinzel', serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+          z-index: 100;
+        }
+
+        .btn-generar:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(147,112,219,0.3);
+        }
+
+        .btn-generar:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          transform: none;
         }
 
         .btn-aprobar, .btn-enviar {
@@ -1129,6 +1287,122 @@ export default function CanalizacionDetalle() {
             padding-left: 1rem;
             padding-right: 1rem;
           }
+        }
+
+        /* Info panels */
+        .info-panel {
+          margin-bottom: 1rem;
+        }
+
+        .producto-img {
+          width: 100%;
+          max-height: 200px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 0.75rem;
+        }
+
+        .info-nombre {
+          font-size: 1rem;
+          color: #e8e0d5;
+          margin: 0 0 0.25rem;
+        }
+
+        .info-meta {
+          font-size: 0.8rem;
+          color: #888;
+          margin: 0.15rem 0;
+        }
+
+        .info-desc {
+          font-size: 0.85rem;
+          color: #aaa;
+          margin: 0.5rem 0 0;
+          line-height: 1.5;
+        }
+
+        .form-data-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .form-item {
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .form-item label {
+          display: block;
+          font-size: 0.65rem;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .form-item p {
+          font-size: 0.85rem;
+          color: #ccc;
+          margin: 0.15rem 0 0;
+        }
+
+        .form-mensaje {
+          font-style: italic;
+          color: #d4af37 !important;
+        }
+
+        .foto-cliente {
+          width: 100%;
+          max-height: 150px;
+          object-fit: cover;
+          border-radius: 6px;
+          margin-top: 0.25rem;
+        }
+
+        /* Preview vacío (borrador) */
+        .preview-vacio {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          color: #666;
+          text-align: center;
+          gap: 1rem;
+        }
+
+        .preview-vacio-icon {
+          font-size: 3rem;
+          opacity: 0.3;
+        }
+
+        .preview-vacio p {
+          margin: 0;
+          font-size: 0.95rem;
+        }
+
+        .btn-generar-grande {
+          padding: 0.75rem 2rem;
+          background: linear-gradient(135deg, #9370db, #7b5ec7);
+          border: none;
+          color: #fff;
+          font-family: 'Cinzel', serif;
+          font-size: 1rem;
+          font-weight: 600;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 0.5rem;
+        }
+
+        .btn-generar-grande:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 20px rgba(147,112,219,0.4);
+        }
+
+        .btn-generar-grande:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       `}</style>
     </div>

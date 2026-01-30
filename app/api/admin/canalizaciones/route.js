@@ -119,6 +119,8 @@ export async function GET(request) {
       listaKey = 'canalizaciones:aprobadas';
     } else if (estado === 'enviada') {
       listaKey = 'canalizaciones:enviadas';
+    } else if (estado === 'borrador') {
+      listaKey = 'canalizaciones:borradores';
     } else {
       listaKey = 'canalizaciones:todas';
     }
@@ -142,7 +144,11 @@ export async function GET(request) {
           fechaAprobada: canalizacion.fechaAprobada,
           fechaEnviada: canalizacion.fechaEnviada,
           resumen: canalizacion.resumen,
-          datosCheckout: canalizacion.datosCheckout
+          datosCheckout: canalizacion.datosCheckout,
+          esManual: canalizacion.esManual || false,
+          formToken: canalizacion.formToken || null,
+          productoManual: canalizacion.productoManual || null,
+          creadoEn: canalizacion.creadoEn || null
         });
       }
     }
@@ -169,8 +175,67 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { ordenId, email, nombreCliente, guardian, datosCheckout } = body;
+    const { ordenId, email, nombreCliente, guardian, datosCheckout, esManual, productoManual, formToken, contextoManual } = body;
 
+    // ═══════════════════════════════════════════════════════════════
+    // RAMA MANUAL: Crear canalización desde admin sin orden
+    // ═══════════════════════════════════════════════════════════════
+    if (esManual) {
+      const id = `manual_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const fecha = new Date();
+
+      const canalizacion = {
+        id,
+        esManual: true,
+        ordenId: null,
+        email: email || null,
+        nombreCliente: nombreCliente || 'Sin nombre',
+        nombreDestinatario: nombreCliente || 'Sin nombre',
+        guardian: productoManual ? {
+          id: null,
+          nombre: productoManual.nombre || 'Guardián Manual',
+          tipo: productoManual.tipo || null,
+          categoria: productoManual.categoria || null,
+          imagen: productoManual.imagenUrl || null
+        } : null,
+        productoManual: productoManual || null,
+        formToken: formToken || null,
+        formData: null,
+        contextoManual: contextoManual || null,
+        datosCheckout: null,
+        contenido: null,
+        resumen: null,
+        estado: 'borrador',
+        fechaCompra: null,
+        fechaGenerada: null,
+        fechaAprobada: null,
+        fechaEnviada: null,
+        creadoEn: fecha.toISOString()
+      };
+
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      // Agregar a lista de borradores
+      const borradores = await kv.get('canalizaciones:borradores') || [];
+      borradores.unshift(id);
+      await kv.set('canalizaciones:borradores', borradores);
+
+      // Agregar a lista general
+      const todas = await kv.get('canalizaciones:todas') || [];
+      todas.unshift(id);
+      await kv.set('canalizaciones:todas', todas);
+
+      console.log(`[CANALIZACION] Borrador manual creado: ${id}`);
+
+      return Response.json({
+        success: true,
+        canalizacion: { id, estado: 'borrador' }
+      }, { headers: corsHeaders });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // RAMA WEBHOOK: Crear canalización desde compra (flujo original)
+    // ═══════════════════════════════════════════════════════════════
     if (!ordenId || !guardian) {
       return Response.json({
         success: false,
@@ -194,6 +259,54 @@ export async function POST(request) {
     const esRegalo = paraQuien === 'regalo' || paraQuien === 'sorpresa';
 
     const nombreReal = esRegalo ? nombreDestinatario : nombreCliente;
+
+    // Buscar datos de formulario si hay un token vinculado
+    let formDataWebhook = null;
+    if (body.formToken) {
+      formDataWebhook = await kv.get(`form_data:${body.formToken}`);
+    }
+    // También buscar por email del cliente
+    if (!formDataWebhook && email) {
+      const invites = await kv.get(`form_invites:${email.toLowerCase().trim()}`) || [];
+      for (const invToken of invites.slice(0, 5)) {
+        const fd = await kv.get(`form_data:${invToken}`);
+        if (fd && fd.respuestas) {
+          formDataWebhook = fd;
+          break;
+        }
+      }
+    }
+
+    // Construir sección de datos del formulario
+    let seccionFormWebhook = '';
+    if (formDataWebhook && formDataWebhook.respuestas) {
+      const r = formDataWebhook.respuestas;
+      const lines = [];
+      if (r.nombre_preferido) lines.push(`Cómo quiere que la llamen: ${r.nombre_preferido}`);
+      if (r.momento_vida) lines.push(`Momento de vida: ${r.momento_vida}`);
+      if (r.necesidades && r.necesidades.length) lines.push(`Lo que necesita: ${r.necesidades.join(', ')}`);
+      if (r.mensaje_guardian) lines.push(`Mensaje al guardián: "${r.mensaje_guardian}"`);
+      if (r.relacion) lines.push(`Relación con el destinatario: ${r.relacion}`);
+      if (r.nombre_destinatario) lines.push(`Nombre del destinatario: ${r.nombre_destinatario}`);
+      if (r.personalidad && r.personalidad.length) lines.push(`Personalidad: ${r.personalidad.join(', ')}`);
+      if (r.que_le_hace_brillar) lines.push(`Lo que le hace brillar: ${r.que_le_hace_brillar}`);
+      if (r.que_necesita_escuchar) lines.push(`Lo que necesita escuchar: ${r.que_necesita_escuchar}`);
+      if (r.mensaje_personal) lines.push(`Mensaje personal del comprador: "${r.mensaje_personal}"`);
+      if (r.es_anonimo) lines.push(`El regalo es anónimo`);
+      if (r.edad_nino) lines.push(`Edad del niño/a: ${r.edad_nino}`);
+      if (r.gustos_nino) lines.push(`Le gusta: ${r.gustos_nino}`);
+      if (r.necesidades_nino && r.necesidades_nino.length) lines.push(`Necesita: ${r.necesidades_nino.join(', ')}`);
+      if (r.info_adicional) lines.push(`Info adicional: ${r.info_adicional}`);
+
+      if (lines.length > 0) {
+        seccionFormWebhook = `\n═══════════════════════════════════════════════════════════════
+DATOS DEL FORMULARIO (lo que la persona compartió):
+═══════════════════════════════════════════════════════════════
+${lines.join('\n')}
+
+ESTO ES SAGRADO. Tu carta debe RESPONDER a esto. Que sienta que la escuchaste.\n`;
+      }
+    }
 
     // Construir datos del guardián para el prompt
     const datosGuardian = construirDatosGuardian(guardian);
@@ -227,7 +340,7 @@ LO QUE ${nombreReal.toUpperCase()} COMPARTIÓ AL COMPRARTE:
 ${contexto ? `"${contexto}"
 
 ESTO ES SAGRADO. Tu carta debe RESPONDER a esto. Que sienta que la escuchaste.` : 'No compartió contexto específico. Conectá con tu esencia y categoría.'}
-
+${seccionFormWebhook}
 ${esSorpresa ? `\n⚠️ ES SORPRESA: Alguien que la quiere te eligió para ella. Mencionalo sutilmente.\n` : ''}
 
 ═══════════════════════════════════════════════════════════════════
@@ -296,12 +409,46 @@ Antes de terminar, preguntate:
 
 Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
 
+    // Construir content blocks (con imágenes si hay)
+    const webhookContentBlocks = [];
+
+    // Imagen del guardián (vision)
+    if (guardian.imagen) {
+      webhookContentBlocks.push({
+        type: 'image',
+        source: { type: 'url', url: guardian.imagen }
+      });
+      webhookContentBlocks.push({
+        type: 'text',
+        text: 'Esta es la imagen del guardián. Observala bien — tu personalidad, colores, rasgos y expresión deben reflejarse en la carta.'
+      });
+    }
+
+    // Foto del cliente desde formulario (vision)
+    const fotoClienteWebhook = formDataWebhook?.respuestas?.foto_url;
+    if (fotoClienteWebhook) {
+      webhookContentBlocks.push({
+        type: 'image',
+        source: { type: 'url', url: fotoClienteWebhook }
+      });
+      webhookContentBlocks.push({
+        type: 'text',
+        text: 'Esta es la foto que la persona compartió. Usala para conectar con su energía (no describas la foto literalmente).'
+      });
+    }
+
+    // Mensaje principal
+    webhookContentBlocks.push({
+      type: 'text',
+      text: `Escribí tu canalización personal completa para ${nombreReal}. Recordá: sos ${guardian.nombre}, hablando en primera persona.`
+    });
+
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 8000,
       messages: [{
         role: 'user',
-        content: `Escribí tu canalización personal completa para ${nombreReal}. Recordá: sos ${guardian.nombre}, hablando en primera persona.`
+        content: webhookContentBlocks
       }],
       system: systemPrompt
     });
@@ -344,7 +491,10 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
       },
       contenido: contenidoCompleto,
       resumen,
-      estado: 'pendiente', // pendiente, aprobada, enviada
+      estado: 'pendiente', // borrador, pendiente, aprobada, enviada
+      esManual: false,
+      formToken: body.formToken || null,
+      formData: formDataWebhook || null,
       fechaCompra: fecha.toISOString(),
       fechaGenerada: fecha.toISOString(),
       fechaAprobada: null,
@@ -407,6 +557,294 @@ export async function PUT(request) {
 
     const fecha = new Date();
 
+    // ═══════════════════════════════════════════════════════════════
+    // ACCIÓN: GENERAR (desde borrador, con datos del formulario + IA)
+    // ═══════════════════════════════════════════════════════════════
+    if (accion === 'generar') {
+      if (canalizacion.estado !== 'borrador') {
+        return Response.json({
+          success: false,
+          error: 'Solo se puede generar desde estado borrador'
+        }, { status: 400, headers: corsHeaders });
+      }
+
+      // Buscar datos del formulario si hay formToken
+      let formData = null;
+      if (canalizacion.formToken) {
+        formData = await kv.get(`form_data:${canalizacion.formToken}`);
+        if (formData) {
+          canalizacion.formData = formData;
+        }
+      }
+
+      // Si viene formToken actualizado en el body
+      if (body.formToken && body.formToken !== canalizacion.formToken) {
+        canalizacion.formToken = body.formToken;
+        formData = await kv.get(`form_data:${body.formToken}`);
+        if (formData) {
+          canalizacion.formData = formData;
+        }
+      }
+
+      // Datos del producto (manual o de webhook)
+      const guardianInfo = canalizacion.productoManual || canalizacion.guardian || {};
+      const nombreGuardian = guardianInfo.nombre || 'Guardián';
+      const categoriaGuardian = guardianInfo.categoria || 'protección';
+      const descripcionProducto = guardianInfo.descripcion || '';
+      const tipoProducto = guardianInfo.tipo || '';
+      const imagenProducto = guardianInfo.imagenUrl || guardianInfo.imagen || null;
+
+      const nombreReal = canalizacion.nombreDestinatario || canalizacion.nombreCliente || 'la persona';
+
+      // Construir sección de datos del formulario para el prompt
+      let seccionFormulario = '';
+      if (formData && formData.respuestas) {
+        const r = formData.respuestas;
+        const lines = [];
+
+        if (r.nombre_preferido) lines.push(`Cómo quiere que la llamen: ${r.nombre_preferido}`);
+        if (r.momento_vida) lines.push(`Momento de vida: ${r.momento_vida}`);
+        if (r.necesidades && r.necesidades.length) lines.push(`Lo que necesita: ${r.necesidades.join(', ')}`);
+        if (r.mensaje_guardian) lines.push(`Mensaje al guardián: "${r.mensaje_guardian}"`);
+        if (r.relacion) lines.push(`Relación con el destinatario: ${r.relacion}`);
+        if (r.nombre_destinatario) lines.push(`Nombre del destinatario: ${r.nombre_destinatario}`);
+        if (r.personalidad && r.personalidad.length) lines.push(`Personalidad: ${r.personalidad.join(', ')}`);
+        if (r.que_le_hace_brillar) lines.push(`Lo que le hace brillar: ${r.que_le_hace_brillar}`);
+        if (r.que_necesita_escuchar) lines.push(`Lo que necesita escuchar: ${r.que_necesita_escuchar}`);
+        if (r.mensaje_personal) lines.push(`Mensaje personal del comprador: "${r.mensaje_personal}"`);
+        if (r.es_anonimo) lines.push(`El regalo es anónimo`);
+        // Para niños
+        if (r.edad_nino) lines.push(`Edad del niño/a: ${r.edad_nino}`);
+        if (r.gustos_nino) lines.push(`Le gusta: ${r.gustos_nino}`);
+        if (r.necesidades_nino && r.necesidades_nino.length) lines.push(`Necesita: ${r.necesidades_nino.join(', ')}`);
+        if (r.info_adicional) lines.push(`Info adicional: ${r.info_adicional}`);
+
+        if (lines.length > 0) {
+          seccionFormulario = `
+═══════════════════════════════════════════════════════════════
+DATOS DEL FORMULARIO (lo que la persona compartió):
+═══════════════════════════════════════════════════════════════
+${lines.join('\n')}
+
+ESTO ES SAGRADO. Tu carta debe RESPONDER a esto. Que sienta que la escuchaste.`;
+        }
+      }
+
+      // Construir sección de contexto manual
+      let seccionContexto = '';
+      if (canalizacion.contextoManual) {
+        seccionContexto = `
+═══════════════════════════════════════════════════════════════
+CONTEXTO QUE EL ADMIN PROPORCIONÓ:
+═══════════════════════════════════════════════════════════════
+"${canalizacion.contextoManual}"
+
+Usá esta información para personalizar la carta.`;
+      }
+
+      // Construir datos del guardián
+      let datosGuardian = '';
+      if (canalizacion.guardian && !canalizacion.esManual) {
+        datosGuardian = construirDatosGuardian(canalizacion.guardian);
+      } else {
+        // Producto manual
+        const lineas = [];
+        lineas.push(`Nombre: ${nombreGuardian}`);
+        lineas.push(`Categoría/Esencia: ${categoriaGuardian}`);
+        if (tipoProducto) lineas.push(`Tipo: ${tipoProducto}`);
+        if (descripcionProducto) lineas.push(`Descripción: ${descripcionProducto}`);
+        datosGuardian = lineas.join('\n');
+      }
+
+      // Determinar tipo de formulario para adaptar el tono
+      const formType = formData?.formType || canalizacion.formToken ? 'para_mi' : '';
+      const esNino = formType === 'para_nino';
+      const esSorpresa = formType === 'regalo_sorpresa';
+      const esRegalo = formType === 'regalo_sabe' || esSorpresa;
+
+      let tonoEdad = 'Escribí para un adulto: profundo, genuino, que toque el corazón.';
+      if (esNino) {
+        const edad = formData?.respuestas?.edad_nino || '';
+        if (edad.includes('3-6')) {
+          tonoEdad = 'Escribí como si le hablaras a un niño pequeño que querés mucho. Simple, tierno, con asombro genuino.';
+        } else if (edad.includes('7-10')) {
+          tonoEdad = 'Escribí para un niño: cálido, con sentido de aventura, mágico pero comprensible.';
+        } else if (edad.includes('11-14') || edad.includes('15-17')) {
+          tonoEdad = 'Escribí para un adolescente: auténtico, sin ser condescendiente.';
+        } else {
+          tonoEdad = 'Escribí para un niño/adolescente: cálido, auténtico, mágico.';
+        }
+      }
+
+      const systemPrompt = `Vas a escribir una carta personal como ${nombreGuardian} para ${nombreReal}.
+
+═══════════════════════════════════════════════════════════════════
+REGLA #1: ESTO ES UNA CARTA DE ALGUIEN QUE TE QUIERE
+═══════════════════════════════════════════════════════════════════
+
+NO es un texto místico. NO es prosa poética. NO es un horóscopo.
+ES una carta de un ser que leyó lo que la persona compartió y le habla al corazón.
+
+Imaginá: tu mejor amigo que además tiene poderes mágicos te escribe después de leer tu diario. Esa intimidad. Esa calidez. Ese "te veo".
+${seccionFormulario}
+${seccionContexto}
+${esSorpresa ? '\n⚠️ ES SORPRESA: Alguien que la quiere te eligió para ella. Mencionalo sutilmente.\n' : ''}
+═══════════════════════════════════════════════════════════════════
+QUIÉN SOS VOS (${nombreGuardian.toUpperCase()})
+═══════════════════════════════════════════════════════════════════
+${datosGuardian}
+${imagenProducto ? '\n(También recibiste una imagen del producto/guardián — usá lo que ves para darle personalidad a tu carta)\n' : ''}
+USA TODA ESTA INFORMACIÓN para darle personalidad a tu carta. Si tenés historia, contala. Si tenés color favorito, mencionalo. Si tenés forma de hablar, usala. Cada dato hace tu carta más REAL y ÚNICA.
+
+═══════════════════════════════════════════════════════════════════
+CÓMO ESCRIBIR
+═══════════════════════════════════════════════════════════════════
+
+${tonoEdad}
+
+❌ PROHIBIDO ABSOLUTO (si escribís esto, fallaste):
+- "Desde las profundidades del bosque..."
+- "Las brumas ancestrales..."
+- "Los antiguos charrúas..."
+- "El velo entre mundos..."
+- "Tu campo energético..."
+- "Vibraciones cósmicas..."
+- Cualquier frase de horóscopo genérico
+- Relleno poético vacío
+- Palabras que puedan ofender: "boluda/o", "pelotuda/o", "jodida/o", "idiota", etc.
+
+✅ ASÍ SÍ:
+- Como un amigo que te quiere escribiéndote
+- Cada oración APORTA algo
+- Específico a ESTA persona
+- Si lo podés copiar para otra persona, está mal
+
+═══════════════════════════════════════════════════════════════════
+ESTRUCTURA (flexible, no rígida)
+═══════════════════════════════════════════════════════════════════
+
+1. **Te escuché** - Demostrar que leíste lo que compartió
+2. **Quién soy** - Tu personalidad real, no un cuento épico
+3. **Lo que vine a hacer** - Específico a su situación
+4. **Cómo voy a estar presente** - Señales concretas
+5. **Un momento juntos** - Algo simple para conectar
+6. **Mi lugar** - Dónde querés estar en su casa
+7. **Otros compañeros** - Mencioná de forma natural y mágica
+8. **Lo importante** - Tu mensaje final del corazón
+
+Usá ## y emoji solo para títulos. Nada de emojis en el texto.
+
+═══════════════════════════════════════════════════════════════════
+PERSPECTIVAS IMPORTANTES
+═══════════════════════════════════════════════════════════════════
+
+**Sobre familia:** La sangre NO hace la familia. NUNCA empujes a alguien a estar con personas que le hacen mal solo porque comparten ADN.
+
+**Cierre importante:** Incluí naturalmente algo así: "Esto es mi forma de acompañarte. No soy terapeuta ni pretendo reemplazar eso - soy un compañero que cree en vos."
+
+═══════════════════════════════════════════════════════════════════
+VERIFICACIÓN FINAL
+═══════════════════════════════════════════════════════════════════
+
+- ¿Si cambio el nombre, funciona igual? → Si sí, REESCRIBIR
+- ¿Responde a lo que compartió? → Si no, REESCRIBIR
+- ¿Suena a IA genérica? → Si sí, REESCRIBIR
+- ¿Me emocionaría recibirlo? → Si no, REESCRIBIR
+
+Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
+
+      // Construir content blocks (con imágenes si hay)
+      const contentBlocks = [];
+
+      // Imagen del producto (vision)
+      if (imagenProducto) {
+        contentBlocks.push({
+          type: 'image',
+          source: { type: 'url', url: imagenProducto }
+        });
+        contentBlocks.push({
+          type: 'text',
+          text: `Esta es la imagen del guardián/producto. Observala bien — tu personalidad, colores, rasgos y expresión deben reflejarse en la carta.`
+        });
+      }
+
+      // Imagen del cliente desde formulario (vision)
+      const fotoCliente = formData?.respuestas?.foto_url;
+      if (fotoCliente) {
+        contentBlocks.push({
+          type: 'image',
+          source: { type: 'url', url: fotoCliente }
+        });
+        contentBlocks.push({
+          type: 'text',
+          text: `Esta es la foto que la persona compartió. Usala para conectar con su energía (no describas la foto literalmente, pero dejá que influya en tu tono).`
+        });
+      }
+
+      // Mensaje principal
+      contentBlocks.push({
+        type: 'text',
+        text: `Escribí tu canalización personal completa para ${nombreReal}. Recordá: sos ${nombreGuardian}, hablando en primera persona.`
+      });
+
+      const anthropic = new Anthropic();
+
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        messages: [{
+          role: 'user',
+          content: contentBlocks
+        }],
+        system: systemPrompt
+      });
+
+      const contenidoCompleto = response.content[0].text;
+
+      // Generar resumen automático
+      const resumenResponse = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{
+          role: 'user',
+          content: `Resumí esta canalización en 2-3 oraciones para que un admin pueda entender rápidamente de qué trata:\n\n${contenidoCompleto.substring(0, 3000)}...`
+        }]
+      });
+
+      const resumen = resumenResponse.content[0].text;
+
+      // Actualizar canalización
+      canalizacion.contenido = contenidoCompleto;
+      canalizacion.resumen = resumen;
+      canalizacion.estado = 'pendiente';
+      canalizacion.fechaGenerada = fecha.toISOString();
+      if (formData) {
+        canalizacion.formData = formData;
+      }
+
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      // Mover de borradores a pendientes
+      const borradores = await kv.get('canalizaciones:borradores') || [];
+      await kv.set('canalizaciones:borradores', borradores.filter(bid => bid !== id));
+
+      const pendientes = await kv.get('canalizaciones:pendientes') || [];
+      pendientes.unshift(id);
+      await kv.set('canalizaciones:pendientes', pendientes);
+
+      console.log(`[CANALIZACION] Generada desde borrador: ${id}`);
+
+      return Response.json({
+        success: true,
+        canalizacion: {
+          id: canalizacion.id,
+          estado: 'pendiente',
+          resumen,
+          fechaGenerada: canalizacion.fechaGenerada
+        }
+      }, { headers: corsHeaders });
+    }
+
     if (accion === 'aprobar') {
       canalizacion.estado = 'aprobada';
       canalizacion.fechaAprobada = fecha.toISOString();
@@ -444,11 +882,11 @@ export async function PUT(request) {
       lecturas.unshift({
         id: canalizacion.id,
         tipo: 'canalizacion-guardian',
-        titulo: `Canalización de ${canalizacion.guardian.nombre}`,
-        guardian: canalizacion.guardian,
+        titulo: `Canalización de ${canalizacion.guardian?.nombre || canalizacion.productoManual?.nombre || 'Tu Guardián'}`,
+        guardian: canalizacion.guardian || canalizacion.productoManual || null,
         contenido: canalizacion.contenido,
         fecha: fecha.toISOString(),
-        ordenId: canalizacion.ordenId
+        ordenId: canalizacion.ordenId || null
       });
 
       await kv.set(lecturasKey, lecturas);
@@ -456,36 +894,44 @@ export async function PUT(request) {
       // ═══════════════════════════════════════════════════════════════
       // GUARDAR DATOS DEL CERTIFICADO
       // Necesario para que /api/certificado?order=X funcione
+      // Solo si hay ordenId (canalizaciones de compra)
       // ═══════════════════════════════════════════════════════════════
+      if (canalizacion.ordenId) {
+        // Extraer un mensaje corto del contenido de la canalización
+        let mensajeCorto = canalizacion.contenido || '';
+        // Buscar la primera sección significativa (después del saludo)
+        const primerParrafo = mensajeCorto.split('\n\n').find(p =>
+          p.length > 50 &&
+          !p.startsWith('#') &&
+          !p.includes(canalizacion.nombreDestinatario + ',')
+        ) || mensajeCorto.substring(0, 500);
+        mensajeCorto = primerParrafo.substring(0, 300).replace(/[#*]/g, '').trim();
+        if (mensajeCorto.length >= 297) mensajeCorto += '...';
 
-      // Extraer un mensaje corto del contenido de la canalización
-      let mensajeCorto = canalizacion.contenido || '';
-      // Buscar la primera sección significativa (después del saludo)
-      const primerParrafo = mensajeCorto.split('\n\n').find(p =>
-        p.length > 50 &&
-        !p.startsWith('#') &&
-        !p.includes(canalizacion.nombreDestinatario + ',')
-      ) || mensajeCorto.substring(0, 500);
-      mensajeCorto = primerParrafo.substring(0, 300).replace(/[#*]/g, '').trim();
-      if (mensajeCorto.length >= 297) mensajeCorto += '...';
+        // Determinar género del guardián
+        const nombreGuardianCert = canalizacion.guardian?.nombre || '';
+        const esGeneroFemenino = nombreGuardianCert.toLowerCase().endsWith('a') ||
+                                nombreGuardianCert.toLowerCase().includes('duenda');
 
-      // Determinar género del guardián
-      const nombreGuardian = canalizacion.guardian?.nombre || '';
-      const esGeneroFemenino = nombreGuardian.toLowerCase().endsWith('a') ||
-                              nombreGuardian.toLowerCase().includes('duenda');
+        await kv.set(`orden:${canalizacion.ordenId}`, {
+          orden_id: canalizacion.ordenId,
+          nombre_humano: canalizacion.nombreDestinatario || canalizacion.nombreCliente,
+          guardian_nombre: canalizacion.guardian?.nombre || 'Guardián',
+          guardian_genero: esGeneroFemenino ? 'f' : 'm',
+          fecha_canalizacion: fecha.toISOString(),
+          mensaje_guardian: mensajeCorto,
+          sincrodestino: 'Canalizado con amor desde el Bosque Ancestral de Piriápolis',
+          categoria: canalizacion.guardian?.categoria || 'Protección'
+        }, { ex: 60 * 60 * 24 * 365 }); // 1 año TTL
 
-      await kv.set(`orden:${canalizacion.ordenId}`, {
-        orden_id: canalizacion.ordenId,
-        nombre_humano: canalizacion.nombreDestinatario || canalizacion.nombreCliente,
-        guardian_nombre: canalizacion.guardian?.nombre || 'Guardián',
-        guardian_genero: esGeneroFemenino ? 'f' : 'm',
-        fecha_canalizacion: fecha.toISOString(),
-        mensaje_guardian: mensajeCorto,
-        sincrodestino: 'Canalizado con amor desde el Bosque Ancestral de Piriápolis',
-        categoria: canalizacion.guardian?.categoria || 'Protección'
-      }, { ex: 60 * 60 * 24 * 365 }); // 1 año TTL
+        console.log(`[CANALIZACION] Certificado guardado para orden ${canalizacion.ordenId}`);
+      }
 
-      console.log(`[CANALIZACION] Certificado guardado para orden ${canalizacion.ordenId}`);
+      // Mover de borradores también (para manuales que se saltan aprobada)
+      const borradores = await kv.get('canalizaciones:borradores') || [];
+      if (borradores.includes(id)) {
+        await kv.set('canalizaciones:borradores', borradores.filter(bid => bid !== id));
+      }
 
       // ═══════════════════════════════════════════════════════════════
       // ENVIAR EMAIL "TU CANALIZACIÓN ESTÁ LISTA" VIA BREVO
@@ -573,11 +1019,13 @@ export async function DELETE(request) {
     const pendientes = await kv.get('canalizaciones:pendientes') || [];
     const aprobadas = await kv.get('canalizaciones:aprobadas') || [];
     const enviadas = await kv.get('canalizaciones:enviadas') || [];
+    const borradores = await kv.get('canalizaciones:borradores') || [];
     const todas = await kv.get('canalizaciones:todas') || [];
 
     await kv.set('canalizaciones:pendientes', pendientes.filter(pid => pid !== id));
     await kv.set('canalizaciones:aprobadas', aprobadas.filter(aid => aid !== id));
     await kv.set('canalizaciones:enviadas', enviadas.filter(eid => eid !== id));
+    await kv.set('canalizaciones:borradores', borradores.filter(bid => bid !== id));
     await kv.set('canalizaciones:todas', todas.filter(tid => tid !== id));
 
     // Eliminar la canalización
