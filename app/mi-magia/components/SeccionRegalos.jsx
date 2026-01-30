@@ -287,11 +287,11 @@ export default function SeccionRegalos({ ir, usuario, setUsuario }) {
           <small>Ver membresías ↗</small>
         </div>
 
-        <div className="regalo-card" onClick={() => window.open('/product/paquete-runas-80/', '_blank')}>
-          <span>ᚱ</span>
-          <h3>Regalar Runas</h3>
-          <p>Que elija qué experiencia mágica quiere tener.</p>
-          <small>Ver paquetes ↗</small>
+        <div className="regalo-card" onClick={() => window.open('https://duendesdeluruguay.com/shop/', '_blank')}>
+          <span>🎁</span>
+          <h3>Regalar un Guardián</h3>
+          <p>Que alguien especial reciba su propio guardián.</p>
+          <small>Ver tienda ↗</small>
         </div>
       </div>
 

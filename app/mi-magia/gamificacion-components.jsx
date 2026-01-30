@@ -1013,7 +1013,7 @@ export function MisionesPanel({ token }) {
           align-items: center;
           gap: 16px;
           background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 16px;
           padding: 16px;
           transition: all 0.3s;
@@ -1031,7 +1031,8 @@ export function MisionesPanel({ token }) {
         .mision-icono {
           width: 44px;
           height: 44px;
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.2);
           border-radius: 12px;
           display: flex;
           align-items: center;

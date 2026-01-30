@@ -4459,7 +4459,7 @@ function MiMagiaContent() {
         )}
         <div className="nav-links-externos">
           <a href="/mi-magia/circulo" className="nav-volver nav-circulo">★ Entrar al Círculo</a>
-          <a href="/tienda" className="nav-volver nav-tienda">🃏 Tienda Mágica</a>
+          <a href="https://duendesdeluruguay.com/shop/" target="_blank" rel="noopener" className="nav-volver nav-tienda">🃏 Tienda Mágica</a>
         </div>
       </nav>
       
@@ -5692,16 +5692,16 @@ function PromocionesMagicas({ usuario, ir }) {
       textoBoton: 'Probar gratis 15 días'
     },
     {
-      id: 'runas-especial',
-      titulo: 'Pack de Runas Resplandor',
-      subtitulo: '350 runas = mejor valor',
-      descripcion: 'El pack más conveniente. 350 runas para múltiples experiencias mágicas: tiradas, oráculos, lecturas del alma y más.',
-      beneficios: ['350 runas de poder', 'El mejor precio por runa', 'Para 15-50 experiencias', 'No vencen nunca'],
-      icono: 'ᚱ',
-      color: '#7B1FA2',
+      id: 'promo-3x2',
+      titulo: 'Llevá 3, pagá 2',
+      subtitulo: '1 mini guardián de regalo',
+      descripcion: 'Por cada 2 guardianes que compres, te regalamos 1 mini guardián. La familia crece y la magia se multiplica.',
+      beneficios: ['Comprá 2 guardianes', 'Recibí 1 mini de regalo', 'Válido para toda la tienda', 'Combinable con envío gratis'],
+      icono: '🎁',
+      color: '#d4af37',
       activa: true,
-      url: `${WORDPRESS_URL}/product/paquete-runas-200/`,
-      textoBoton: 'Obtener $32 USD'
+      url: `${WORDPRESS_URL}/shop/`,
+      textoBoton: 'Ver guardianes'
     }
   ];
 
@@ -6384,7 +6384,7 @@ function RegalosLocal({ ir, usuario, setUsuario }) {
           <small>Ver membresías ↗</small>
         </div>
 
-        <div className="regalo-card" onClick={() => window.open('/product/paquete-runas-80/', '_blank')}>
+        <div className="regalo-card" onClick={() => window.open('https://duendesdeluruguay.com/shop/', '_blank')}>
           <span>ᚱ</span>
           <h3>Regalar Runas</h3>
           <p>Que elija qué experiencia mágica quiere tener.</p>

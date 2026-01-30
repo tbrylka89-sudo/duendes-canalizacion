@@ -417,11 +417,13 @@ export default function JardinEncantado({ usuario, token, onRunasGanadas }) {
     rachaHitos: {
       display: 'flex',
       justifyContent: 'space-between',
+      fontSize: '0.85rem',
       fontSize: '0.75rem',
-      color: 'rgba(255,255,255,0.4)',
+      color: 'rgba(255,255,255,0.7)',
     },
     rachaHitoActivo: {
       color: amatista.brillante,
+      fontWeight: 'bold',
     },
   };
 
