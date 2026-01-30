@@ -20,6 +20,13 @@ export default function FormularioPage() {
   const [subiendoFotoProducto, setSubiendoFotoProducto] = useState(false);
   const [tipoElegido, setTipoElegido] = useState(null);
 
+  // Multi-item states
+  const [multiMode, setMultiMode] = useState(false);
+  const [multiPhase, setMultiPhase] = useState('assign'); // 'assign' | 'fill'
+  const [itemTypes, setItemTypes] = useState({});
+  const [currentItemIdx, setCurrentItemIdx] = useState(0);
+  const [allItemsDatos, setAllItemsDatos] = useState([]);
+
   // Estado del formulario (campos universales)
   const [datos, setDatos] = useState({
     // Producto/guardián (Step 0 — todas las vías)
@@ -71,6 +78,10 @@ export default function FormularioPage() {
             setCompletado(true);
           } else {
             setConfig(data);
+            // Multi-item: si el invite trae items, activar modo multi
+            if (data.items && data.items.length > 0) {
+              setMultiMode(true);
+            }
             // Si ya tiene formType (del checkout web), saltar selección
             if (data.formType) {
               setTipoElegido(data.formType);
@@ -124,6 +135,63 @@ export default function FormularioPage() {
   };
 
   const enviar = async () => {
+    // Multi-item: guardar item actual y avanzar o enviar todo
+    if (multiMode) {
+      const newAllDatos = [...allItemsDatos];
+      newAllDatos[currentItemIdx] = { ...datos };
+
+      const nextIdx = currentItemIdx + 1;
+      if (nextIdx < config.items.length) {
+        // Más items por completar — avanzar al siguiente
+        setAllItemsDatos(newAllDatos);
+        setCurrentItemIdx(nextIdx);
+        setPaso(0);
+        setTipoElegido(itemTypes[nextIdx]);
+        const nextItem = config.items[nextIdx];
+        setDatos({
+          tipo_producto: '', nombre_producto: nextItem.nombre || '', foto_producto_url: nextItem.imagen || null,
+          nombre_preferido: config.customerName || '',
+          momento_vida: '', necesidades: [], mensaje_guardian: '', foto_url: null, es_mayor_18: false,
+          relacion: '', que_necesita_escuchar: '', personalidad: [],
+          que_le_hace_brillar: '', mensaje_personal: '', es_anonimo: false,
+          edad_nino: '', relacion_nino: '', gustos_nino: '',
+          personalidad_nino: [], necesidades_nino: [], info_extra_nino: '',
+          nombre_pareja: '', tiempo_juntos: '', momento_pareja: '',
+          necesidades_pareja: [], mensaje_pareja: '',
+          miembros_familia: '', momento_familia: '',
+          necesidades_familia: [], dinamica_familia: '', mensaje_familia: '',
+        });
+        return;
+      }
+
+      // Último item — enviar todo
+      setEnviando(true);
+      try {
+        const itemsData = config.items.map((item, i) => ({
+          canalizacionId: item.canalizacionId,
+          formType: itemTypes[i],
+          datos: newAllDatos[i]
+        }));
+        const res = await fetch(`/api/formulario/${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...newAllDatos[0],
+            formType: itemTypes[0],
+            itemsData
+          })
+        });
+        const data = await res.json();
+        if (data.success) setCompletado(true);
+        else alert(data.error || 'Error al enviar');
+      } catch {
+        alert('Error de conexión');
+      }
+      setEnviando(false);
+      return;
+    }
+
+    // Single-item submission
     setEnviando(true);
     try {
       const res = await fetch(`/api/formulario/${token}`, {
@@ -206,8 +274,91 @@ export default function FormularioPage() {
     </div>
   );
 
-  // ═══════════ SELECCIÓN DE TIPO (si no viene predefinido) ═══════════
-  if (!tipoElegido) {
+  // ═══════════ MULTI-ITEM: ASIGNACIÓN DE TIPOS ═══════════
+  if (multiMode && multiPhase === 'assign') {
+    const opcionesMulti = [
+      { value: 'para_mi', label: 'Para mí' },
+      { value: 'pareja', label: 'Para mi pareja y yo' },
+      { value: 'familia', label: 'Para mi familia' },
+      { value: 'regalo_sabe', label: 'Regalo (lo sabe)' },
+      { value: 'regalo_sorpresa', label: 'Regalo sorpresa' },
+      { value: 'para_nino', label: 'Para un niño/a' },
+      { value: 'reconexion', label: 'Reconexión' },
+    ];
+    const todosAsignados = config.items.every((_, i) => itemTypes[i]);
+
+    return (
+      <div style={s.page}>
+        <div style={{ ...s.card, maxWidth: '560px' }}>
+          <div style={s.icon}>✨</div>
+          <h1 style={s.title}>Tu pedido tiene {config.items.length} guardianes</h1>
+          <p style={s.subtitle}>Contanos para quién es cada uno.</p>
+
+          {config.items.map((item, idx) => (
+            <div key={idx} style={{
+              marginBottom: '1rem', padding: '16px', borderRadius: '12px',
+              border: `1px solid ${itemTypes[idx] ? 'rgba(212,175,55,0.4)' : '#333'}`,
+              background: itemTypes[idx] ? 'rgba(212,175,55,0.05)' : 'transparent',
+              transition: 'all 0.2s'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                {item.imagen && (
+                  <img src={item.imagen} alt={item.nombre} style={{ width: '50px', height: '50px', borderRadius: '10px', objectFit: 'cover', border: '1px solid #333' }} />
+                )}
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#fff', fontFamily: "'Cinzel', serif", fontSize: '1rem' }}>{item.nombre}</div>
+                </div>
+              </div>
+              <select
+                value={itemTypes[idx] || ''}
+                onChange={e => setItemTypes(prev => ({ ...prev, [idx]: e.target.value }))}
+                style={{
+                  width: '100%', padding: '12px 14px', background: '#0a0a0a',
+                  border: `1px solid ${itemTypes[idx] ? '#d4af37' : '#333'}`, borderRadius: '10px',
+                  color: itemTypes[idx] ? '#d4af37' : 'rgba(255,255,255,0.5)',
+                  fontSize: '0.95rem', fontFamily: 'inherit', outline: 'none',
+                  appearance: 'none', WebkitAppearance: 'none',
+                  backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' fill=\'%23999\' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M8 11L3 6h10z\'/%3E%3C/svg%3E")',
+                  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center',
+                }}
+              >
+                <option value="">¿Para quién es?</option>
+                {opcionesMulti.map(op => (
+                  <option key={op.value} value={op.value}>{op.label}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+
+          <button
+            style={{ ...s.btn, opacity: todosAsignados ? 1 : 0.4, marginTop: '1rem' }}
+            disabled={!todosAsignados}
+            onClick={() => {
+              setMultiPhase('fill');
+              setTipoElegido(itemTypes[0]);
+              const firstItem = config.items[0];
+              setDatos(d => ({
+                ...d,
+                nombre_producto: firstItem.nombre || '',
+                foto_producto_url: firstItem.imagen || null,
+              }));
+            }}
+          >
+            Comenzar
+          </button>
+
+          {config?.personalMessage && (
+            <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontSize: '0.85rem', marginTop: '1.5rem', fontStyle: 'italic' }}>
+              {config.personalMessage}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════ SELECCIÓN DE TIPO (si no viene predefinido — single item) ═══════════
+  if (!multiMode && !tipoElegido) {
     const opciones = [
       { value: 'para_mi', icon: '✦', label: 'Es para mí', desc: 'Este guardián viene a acompañarme' },
       { value: 'pareja', icon: '💑', label: 'Para mi pareja y yo', desc: 'Nos va a acompañar a los dos' },
@@ -266,29 +417,64 @@ export default function FormularioPage() {
   // ═══════════ COMPONENTES COMPARTIDOS ═══════════
 
   const ProgressBar = () => (
-    <div style={s.progress}>
-      {Array.from({ length: totalPasos }).map((_, i) => (
-        <div key={i} style={{ ...s.dot, ...(i <= paso ? s.dotActive : {}) }} />
-      ))}
-    </div>
+    <>
+      {multiMode && config?.items && (
+        <div style={{
+          textAlign: 'center', marginBottom: '1rem', padding: '10px 16px',
+          background: 'rgba(212,175,55,0.06)', borderRadius: '10px',
+          border: '1px solid rgba(212,175,55,0.15)'
+        }}>
+          <span style={{ color: '#d4af37', fontFamily: "'Cinzel', serif", fontSize: '0.85rem' }}>
+            {config.items[currentItemIdx]?.nombre}
+          </span>
+          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginLeft: '8px' }}>
+            ({currentItemIdx + 1} de {config.items.length})
+          </span>
+          <span
+            onClick={() => {
+              const newAll = [...allItemsDatos];
+              newAll[currentItemIdx] = { ...datos };
+              setAllItemsDatos(newAll);
+              setMultiPhase('assign');
+              setTipoElegido(null);
+            }}
+            style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem', cursor: 'pointer', marginLeft: '10px', textDecoration: 'underline' }}
+          >
+            cambiar
+          </span>
+        </div>
+      )}
+      <div style={s.progress}>
+        {Array.from({ length: totalPasos }).map((_, i) => (
+          <div key={i} style={{ ...s.dot, ...(i <= paso ? s.dotActive : {}) }} />
+        ))}
+      </div>
+    </>
   );
 
-  const NavButtons = ({ canNext = true, onNext }) => (
-    <div style={{ marginTop: '1.5rem' }}>
-      {paso < totalPasos - 1 ? (
-        <button style={{ ...s.btn, opacity: canNext ? 1 : 0.5 }} disabled={!canNext} onClick={onNext || (() => setPaso(p => p + 1))}>
-          Continuar
-        </button>
-      ) : (
-        <button style={{ ...s.btn, opacity: enviando ? 0.6 : 1 }} disabled={enviando} onClick={enviar}>
-          {enviando ? 'Enviando...' : 'Completar conexión'}
-        </button>
-      )}
-      {paso > 0 && (
-        <button style={s.btnSec} onClick={() => setPaso(p => p - 1)}>Atrás</button>
-      )}
-    </div>
-  );
+  const NavButtons = ({ canNext = true, onNext }) => {
+    const isLastItem = !multiMode || currentItemIdx >= (config?.items?.length || 1) - 1;
+    const lastStepLabel = isLastItem
+      ? 'Completar conexión'
+      : `Siguiente: ${config.items[currentItemIdx + 1]?.nombre || 'guardián'} →`;
+
+    return (
+      <div style={{ marginTop: '1.5rem' }}>
+        {paso < totalPasos - 1 ? (
+          <button style={{ ...s.btn, opacity: canNext ? 1 : 0.5 }} disabled={!canNext} onClick={onNext || (() => setPaso(p => p + 1))}>
+            Continuar
+          </button>
+        ) : (
+          <button style={{ ...s.btn, opacity: enviando ? 0.6 : 1 }} disabled={enviando} onClick={enviar}>
+            {enviando ? 'Enviando...' : lastStepLabel}
+          </button>
+        )}
+        {paso > 0 && (
+          <button style={s.btnSec} onClick={() => setPaso(p => p - 1)}>Atrás</button>
+        )}
+      </div>
+    );
+  };
 
   const Chips = ({ options, field, max }) => (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
