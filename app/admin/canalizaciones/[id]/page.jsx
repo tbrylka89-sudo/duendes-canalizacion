@@ -19,6 +19,8 @@ export default function CanalizacionDetalle() {
   const [cargandoAccion, setCargandoAccion] = useState(false);
   const [generando, setGenerando] = useState(false);
   const [regenerando, setRegenerando] = useState(false);
+  const [versionViendo, setVersionViendo] = useState(null); // null = actual, number = index de versionesAnteriores
+  const [restaurando, setRestaurando] = useState(false);
 
   // Chat state
   const [mensajes, setMensajes] = useState([]);
@@ -332,6 +334,37 @@ export default function CanalizacionDetalle() {
     setRegenerando(false);
   }
 
+  async function restaurarVersion(index) {
+    if (restaurando) return;
+    if (!window.confirm('¿Restaurar esta versión? La versión actual se guardará como anterior.')) return;
+    setRestaurando(true);
+
+    try {
+      const res = await fetch('/api/admin/canalizaciones', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: canalizacionId,
+          accion: 'restaurar',
+          versionIndex: index
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setVersionViendo(null);
+        await cargarCanalizacion();
+        setMensajes(prev => [...prev, {
+          rol: 'sistema',
+          contenido: `Versión ${index + 1} restaurada. Ahora es la versión actual.`,
+          timestamp: new Date().toISOString()
+        }]);
+      }
+    } catch (error) {
+      console.error('Error restaurando:', error);
+    }
+    setRestaurando(false);
+  }
+
   if (cargando) {
     return (
       <div className="cargando-container">
@@ -626,22 +659,60 @@ export default function CanalizacionDetalle() {
         {/* Columna derecha - Preview */}
         <main className="columna-preview">
           <div className="panel preview-panel">
-            <h2 className="panel-titulo">Vista Previa</h2>
-            {canalizacion.contenido ? (
-              <div className="preview-content" dangerouslySetInnerHTML={{
-                __html: formatearContenido(canalizacion.contenido)
-              }} />
-            ) : (
-              <div className="preview-vacio">
-                <div className="preview-vacio-icon">&#9998;</div>
-                <p>Esta canalización aún no tiene contenido generado.</p>
-                {canalizacion.estado === 'borrador' && (
-                  <button onClick={generarConIA} className="btn-generar-grande" disabled={generando}>
-                    {generando ? 'Generando...' : 'Generar con IA'}
+            <div className="preview-header-row">
+              <h2 className="panel-titulo" style={{ margin: 0, paddingBottom: 0, borderBottom: 'none' }}>Vista Previa</h2>
+              {canalizacion.versionesAnteriores?.length > 0 && (
+                <div className="version-tabs">
+                  {canalizacion.versionesAnteriores.map((v, i) => (
+                    <button
+                      key={i}
+                      className={`version-tab ${versionViendo === i ? 'activa' : ''}`}
+                      onClick={() => setVersionViendo(versionViendo === i ? null : i)}
+                    >
+                      V{v.version}
+                    </button>
+                  ))}
+                  <button
+                    className={`version-tab actual ${versionViendo === null ? 'activa' : ''}`}
+                    onClick={() => setVersionViendo(null)}
+                  >
+                    Actual
                   </button>
-                )}
+                </div>
+              )}
+            </div>
+            {versionViendo !== null && canalizacion.versionesAnteriores?.[versionViendo] && (
+              <div className="version-banner">
+                <span>Viendo versión {canalizacion.versionesAnteriores[versionViendo].version} — {new Date(canalizacion.versionesAnteriores[versionViendo].fechaGenerada).toLocaleDateString('es-UY')}</span>
+                <button
+                  className="btn-restaurar"
+                  onClick={() => restaurarVersion(versionViendo)}
+                  disabled={restaurando}
+                >
+                  {restaurando ? 'Restaurando...' : 'Restaurar esta versión'}
+                </button>
               </div>
             )}
+            {(() => {
+              const contenidoMostrar = versionViendo !== null && canalizacion.versionesAnteriores?.[versionViendo]
+                ? canalizacion.versionesAnteriores[versionViendo].contenido
+                : canalizacion.contenido;
+              return contenidoMostrar ? (
+                <div className="preview-content" dangerouslySetInnerHTML={{
+                  __html: formatearContenido(contenidoMostrar)
+                }} />
+              ) : (
+                <div className="preview-vacio">
+                  <div className="preview-vacio-icon">&#9998;</div>
+                  <p>Esta canalización aún no tiene contenido generado.</p>
+                  {canalizacion.estado === 'borrador' && (
+                    <button onClick={generarConIA} className="btn-generar-grande" disabled={generando}>
+                      {generando ? 'Generando...' : 'Generar con IA'}
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </main>
       </div>
@@ -1474,6 +1545,86 @@ export default function CanalizacionDetalle() {
         .nota-admin-text {
           color: #ffb432 !important;
           font-style: italic;
+        }
+
+        /* Version tabs */
+        .preview-header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(212,175,55,0.1);
+          margin-bottom: 1rem;
+        }
+
+        .version-tabs {
+          display: flex;
+          gap: 0.35rem;
+        }
+
+        .version-tab {
+          padding: 0.3rem 0.6rem;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: #888;
+          font-family: 'Cinzel', serif;
+          font-size: 0.7rem;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .version-tab:hover {
+          background: rgba(255,255,255,0.08);
+          color: #ccc;
+        }
+
+        .version-tab.activa {
+          background: rgba(212,175,55,0.15);
+          border-color: rgba(212,175,55,0.3);
+          color: #d4af37;
+        }
+
+        .version-tab.actual.activa {
+          background: rgba(100,200,100,0.15);
+          border-color: rgba(100,200,100,0.3);
+          color: #6c6;
+        }
+
+        .version-banner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.6rem 1rem;
+          background: rgba(255,180,50,0.1);
+          border: 1px solid rgba(255,180,50,0.2);
+          border-radius: 8px;
+          margin-bottom: 1rem;
+          font-size: 0.8rem;
+          color: #ffb432;
+        }
+
+        .btn-restaurar {
+          padding: 0.35rem 0.75rem;
+          background: rgba(255,180,50,0.2);
+          border: 1px solid rgba(255,180,50,0.3);
+          color: #ffb432;
+          font-family: 'Cinzel', serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .btn-restaurar:hover:not(:disabled) {
+          background: rgba(255,180,50,0.3);
+        }
+
+        .btn-restaurar:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         /* Preview vacío (borrador) */

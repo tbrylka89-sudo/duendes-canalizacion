@@ -981,8 +981,20 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
         messages: [{ role: 'user', content: `Resumí esta canalización en 2-3 oraciones:\n\n${contenidoR.substring(0, 3000)}...` }]
       });
 
-      // Actualizar — volver a pendiente
+      // Guardar versión anterior antes de sobrescribir
       const estadoAnterior = canalizacion.estado;
+      if (canalizacion.contenido) {
+        const versionAnterior = {
+          contenido: canalizacion.contenido,
+          resumen: canalizacion.resumen,
+          fechaGenerada: canalizacion.fechaGenerada,
+          version: (canalizacion.regeneraciones || 0) + 1
+        };
+        canalizacion.versionesAnteriores = canalizacion.versionesAnteriores || [];
+        canalizacion.versionesAnteriores.push(versionAnterior);
+      }
+
+      // Actualizar — volver a pendiente
       canalizacion.contenido = contenidoR;
       canalizacion.resumen = resumenRR.content[0].text;
       canalizacion.estado = 'pendiente';
@@ -1013,6 +1025,57 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
           resumen: canalizacion.resumen,
           fechaGenerada: canalizacion.fechaGenerada,
           regeneraciones: canalizacion.regeneraciones
+        }
+      }, { headers: corsHeaders });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // RESTAURAR versión anterior
+    // ═══════════════════════════════════════════════════════════════
+    if (accion === 'restaurar') {
+      const { versionIndex } = body;
+      const versiones = canalizacion.versionesAnteriores || [];
+
+      if (versionIndex == null || !versiones[versionIndex]) {
+        return Response.json({ success: false, error: 'Versión no encontrada' }, { status: 400, headers: corsHeaders });
+      }
+
+      const versionElegida = versiones[versionIndex];
+
+      // Guardar la actual como versión anterior también
+      if (canalizacion.contenido) {
+        versiones.push({
+          contenido: canalizacion.contenido,
+          resumen: canalizacion.resumen,
+          fechaGenerada: canalizacion.fechaGenerada,
+          version: (canalizacion.regeneraciones || 0) + 1
+        });
+      }
+
+      // Restaurar la elegida
+      canalizacion.contenido = versionElegida.contenido;
+      canalizacion.resumen = versionElegida.resumen;
+      canalizacion.fechaGenerada = versionElegida.fechaGenerada;
+
+      // Quitar la versión restaurada del array (ya es la actual)
+      versiones.splice(versionIndex, 1);
+      canalizacion.versionesAnteriores = versiones;
+
+      canalizacion.estado = 'pendiente';
+      canalizacion.fechaAprobada = null;
+
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      console.log(`[CANALIZACION] Restaurada versión ${versionIndex + 1}: ${id}`);
+
+      return Response.json({
+        success: true,
+        canalizacion: {
+          id: canalizacion.id,
+          estado: 'pendiente',
+          contenido: canalizacion.contenido,
+          resumen: canalizacion.resumen,
+          versionesAnteriores: canalizacion.versionesAnteriores
         }
       }, { headers: corsHeaders });
     }
