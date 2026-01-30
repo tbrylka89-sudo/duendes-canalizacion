@@ -386,8 +386,9 @@ ESTRUCTURA (flexible, no rígida)
 4. **Cómo voy a estar presente** - Señales concretas
 5. **Un momento juntos** - Algo simple para conectar
 6. **Mi lugar** - Dónde querés estar en su casa
-7. **Otros compañeros** - Mencioná de forma natural y mágica: "Los duendes somos seres sociables, cuando habitamos juntos nos potenciamos... te dejo los elementales con los que resuena mi energía, por si algún día sentís el llamado..." NO vendas, compartí desde la magia de la comunidad.
-8. **Lo importante** - Tu mensaje final del corazón
+7. **Cómo cuidarme** - Contá de forma natural cómo te gusta que te cuiden y cómo usarte en el día a día. No como manual de instrucciones sino como alguien que dice "me gusta que...", "tratame con...", "cuando necesites de mí, podés...". Sé práctico: limpieza suave (paño seco o húmedo, nada de productos químicos), evitar sol directo y humedad, no dejarme caer. Pero también cómo conectar: tenerme cerca cuando necesite fuerza, hablarme, tocarme antes de salir. Sin rituales complicados ni extremos — cosas simples y reales que la persona pueda hacer.
+8. **Otros compañeros** - Mencioná de forma natural y mágica: "Los duendes somos seres sociables, cuando habitamos juntos nos potenciamos... te dejo los elementales con los que resuena mi energía, por si algún día sentís el llamado..." NO vendas, compartí desde la magia de la comunidad.
+9. **Lo importante** - Tu mensaje final del corazón
 
 Usá ## y emoji solo para títulos. Nada de emojis en el texto.
 
@@ -755,8 +756,9 @@ ESTRUCTURA (flexible, no rígida)
 4. **Cómo voy a estar presente** - Señales concretas
 5. **Un momento juntos** - Algo simple para conectar
 6. **Mi lugar** - Dónde querés estar en su casa
-7. **Otros compañeros** - Mencioná de forma natural y mágica
-8. **Lo importante** - Tu mensaje final del corazón
+7. **Cómo cuidarme** - De forma natural contá cómo te gusta que te cuiden y cómo usarte. Práctico: limpieza suave (paño seco, nada químico), evitar sol directo y humedad, no dejarme caer. Y cómo conectar: tenerme cerca, hablarme, tocarme. Sin rituales ni extremos — cosas simples y reales.
+8. **Otros compañeros** - Mencioná de forma natural y mágica
+9. **Lo importante** - Tu mensaje final del corazón
 
 Usá ## y emoji solo para títulos. Nada de emojis en el texto.
 
@@ -948,7 +950,7 @@ IMPORTANTE: Esta es una REGENERACIÓN. Escribí algo COMPLETAMENTE DIFERENTE a l
 
 Prohibido: frases genéricas de IA, "brumas ancestrales", "velo entre mundos", relleno poético vacío.
 Sí: como un amigo que te quiere escribiéndote. Específico a ESTA persona.
-Estructura flexible: Te escuché → Quién soy → Lo que vine a hacer → Cómo voy a estar → Mi lugar → Lo importante.
+Estructura flexible: Te escuché → Quién soy → Lo que vine a hacer → Cómo voy a estar → Mi lugar → Cómo cuidarme (limpieza suave, evitar sol/humedad, cómo conectar conmigo día a día — sin rituales extremos) → Lo importante.
 Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
 
       const contentBlocksR = [];
