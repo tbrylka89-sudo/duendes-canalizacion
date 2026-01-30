@@ -12,7 +12,12 @@ export default function CanalizacionesAdmin() {
   const [tabActiva, setTabActiva] = useState('pendiente');
   const [canalizaciones, setCanalizaciones] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [contadores, setContadores] = useState({ pendiente: 0, aprobada: 0, enviada: 0 });
+  const [contadores, setContadores] = useState({ borrador: 0, pendiente: 0, aprobada: 0, enviada: 0 });
+  const [showMenu, setShowMenu] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [formEnvio, setFormEnvio] = useState({ email: '', nombre: '', formType: 'para_mi', productName: '', personalMessage: '' });
+  const [enviandoForm, setEnviandoForm] = useState(false);
+  const [formResult, setFormResult] = useState(null);
 
   useEffect(() => {
     cargarCanalizaciones(tabActiva);
@@ -35,13 +40,15 @@ export default function CanalizacionesAdmin() {
 
   async function cargarContadores() {
     try {
-      const [pendientes, aprobadas, enviadas] = await Promise.all([
+      const [borradores, pendientes, aprobadas, enviadas] = await Promise.all([
+        fetch('/api/admin/canalizaciones?estado=borrador').then(r => r.json()),
         fetch('/api/admin/canalizaciones?estado=pendiente').then(r => r.json()),
         fetch('/api/admin/canalizaciones?estado=aprobada').then(r => r.json()),
         fetch('/api/admin/canalizaciones?estado=enviada').then(r => r.json())
       ]);
 
       setContadores({
+        borrador: borradores.canalizaciones?.length || 0,
         pendiente: pendientes.canalizaciones?.length || 0,
         aprobada: aprobadas.canalizaciones?.length || 0,
         enviada: enviadas.canalizaciones?.length || 0
@@ -49,6 +56,27 @@ export default function CanalizacionesAdmin() {
     } catch (error) {
       console.error('Error cargando contadores:', error);
     }
+  }
+
+  async function enviarFormulario() {
+    if (!formEnvio.email || !formEnvio.nombre) return;
+    setEnviandoForm(true);
+    setFormResult(null);
+    try {
+      const res = await fetch('/api/admin/formularios/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formEnvio)
+      });
+      const data = await res.json();
+      setFormResult(data);
+      if (data.success) {
+        setTimeout(() => { setShowFormModal(false); setFormResult(null); setFormEnvio({ email: '', nombre: '', formType: 'para_mi', productName: '', personalMessage: '' }); }, 3000);
+      }
+    } catch {
+      setFormResult({ success: false, error: 'Error de conexión' });
+    }
+    setEnviandoForm(false);
   }
 
   function formatearFecha(fecha) {
@@ -66,6 +94,7 @@ export default function CanalizacionesAdmin() {
   }
 
   const tabs = [
+    { id: 'borrador', label: 'Borradores', count: contadores.borrador },
     { id: 'pendiente', label: 'Pendientes', count: contadores.pendiente },
     { id: 'aprobada', label: 'Aprobadas', count: contadores.aprobada },
     { id: 'enviada', label: 'Enviadas', count: contadores.enviada }
@@ -82,9 +111,24 @@ export default function CanalizacionesAdmin() {
             <p className="subtitulo">Panel de aprobación</p>
           </div>
         </div>
-        <button onClick={() => router.push('/admin/circulo')} className="btn-volver">
-          Volver al Hub
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <div style={{ position: 'relative' }}>
+            <button className="btn-nuevo" onClick={() => setShowMenu(!showMenu)}>+ Nuevo</button>
+            {showMenu && (
+              <div className="menu-nuevo">
+                <button className="menu-item" onClick={() => { setShowMenu(false); setShowFormModal(true); }}>
+                  📧 Enviar Formulario
+                </button>
+                <button className="menu-item" onClick={() => { setShowMenu(false); router.push('/admin/canalizaciones/nueva'); }}>
+                  ✨ Nueva Canalización
+                </button>
+              </div>
+            )}
+          </div>
+          <button onClick={() => window.history.length > 1 ? window.history.back() : window.close()} className="btn-volver">
+            ← Volver
+          </button>
+        </div>
       </header>
 
       {/* Tabs */}
@@ -138,11 +182,13 @@ export default function CanalizacionesAdmin() {
                 </div>
                 <div className="card-acciones">
                   <span className={`estado ${c.estado}`}>
-                    {c.estado === 'pendiente' ? 'Pendiente' :
+                    {c.estado === 'borrador' ? 'Borrador' :
+                     c.estado === 'pendiente' ? 'Pendiente' :
                      c.estado === 'aprobada' ? 'Aprobada' : 'Enviada'}
                   </span>
                   <button className="btn-ver">
-                    {c.estado === 'pendiente' ? 'Ver y Aprobar' : 'Ver detalle'}
+                    {c.estado === 'borrador' ? 'Editar' :
+                     c.estado === 'pendiente' ? 'Ver y Aprobar' : 'Ver detalle'}
                   </button>
                 </div>
               </div>
@@ -150,6 +196,60 @@ export default function CanalizacionesAdmin() {
           </div>
         )}
       </main>
+
+      {/* Modal Enviar Formulario */}
+      {showFormModal && (
+        <div className="modal-overlay" onClick={() => setShowFormModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2 style={{ fontFamily: "'MedievalSharp', cursive", color: '#d4af37', margin: '0 0 1.5rem', fontSize: '1.3rem' }}>Enviar Formulario</h2>
+
+            {formResult?.success ? (
+              <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
+                <p style={{ color: '#6c6' }}>{formResult.mensaje}</p>
+                {formResult.linkFormulario && (
+                  <p style={{ color: '#888', fontSize: '0.8rem', wordBreak: 'break-all', marginTop: '1rem' }}>
+                    Link: <a href={formResult.linkFormulario} target="_blank" rel="noreferrer" style={{ color: '#d4af37' }}>{formResult.linkFormulario}</a>
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label className="form-label">Email del cliente</label>
+                  <input className="form-input" type="email" value={formEnvio.email} onChange={e => setFormEnvio(f => ({ ...f, email: e.target.value }))} placeholder="cliente@email.com" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Nombre</label>
+                  <input className="form-input" value={formEnvio.nombre} onChange={e => setFormEnvio(f => ({ ...f, nombre: e.target.value }))} placeholder="Nombre del cliente" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Tipo de formulario</label>
+                  <select className="form-input" value={formEnvio.formType} onChange={e => setFormEnvio(f => ({ ...f, formType: e.target.value }))}>
+                    <option value="para_mi">Para mí (la persona lo llena)</option>
+                    <option value="regalo_sabe">Regalo — la persona lo sabe</option>
+                    <option value="regalo_sorpresa">Regalo sorpresa (comprador llena)</option>
+                    <option value="para_nino">Para un niño/a</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Producto (opcional)</label>
+                  <input className="form-input" value={formEnvio.productName} onChange={e => setFormEnvio(f => ({ ...f, productName: e.target.value }))} placeholder="Nombre del guardián o producto" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Mensaje personal (opcional)</label>
+                  <textarea className="form-textarea" value={formEnvio.personalMessage} onChange={e => setFormEnvio(f => ({ ...f, personalMessage: e.target.value }))} placeholder="Mensaje que aparecerá en el email..." />
+                </div>
+                {formResult?.error && <p style={{ color: '#f66', fontSize: '0.85rem' }}>{formResult.error}</p>}
+                <button className="btn-enviar-form" onClick={enviarFormulario} disabled={enviandoForm || !formEnvio.email || !formEnvio.nombre}>
+                  {enviandoForm ? 'Enviando...' : '📧 Enviar formulario'}
+                </button>
+                <button className="btn-cancelar" onClick={() => setShowFormModal(false)}>Cancelar</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=MedievalSharp&display=swap');
@@ -465,6 +565,141 @@ export default function CanalizacionesAdmin() {
             padding-top: 0.75rem;
             border-top: 1px solid rgba(255,255,255,0.05);
           }
+        }
+
+        /* Botón Nuevo */
+        .btn-nuevo {
+          padding: 0.6rem 1.25rem;
+          background: linear-gradient(135deg, #d4af37, #aa8a2e);
+          border: none;
+          color: #0a0a0a;
+          font-family: 'Cinzel', serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .btn-nuevo:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+        }
+
+        .menu-nuevo {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 0.5rem;
+          background: #1a1a1a;
+          border: 1px solid rgba(212,175,55,0.2);
+          border-radius: 10px;
+          padding: 0.5rem;
+          min-width: 220px;
+          z-index: 100;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .menu-item {
+          display: block;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          background: transparent;
+          border: none;
+          color: #e8e0d5;
+          font-family: 'Cinzel', serif;
+          font-size: 0.85rem;
+          text-align: left;
+          cursor: pointer;
+          border-radius: 6px;
+          transition: background 0.2s;
+        }
+        .menu-item:hover {
+          background: rgba(212,175,55,0.1);
+        }
+
+        /* Estado borrador */
+        .estado.borrador {
+          background: rgba(150,100,255,0.15);
+          color: #b89aff;
+        }
+
+        /* Modal */
+        .modal-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 20px;
+        }
+        .modal-content {
+          background: #111;
+          border: 1px solid rgba(212,175,55,0.2);
+          border-radius: 16px;
+          padding: 2rem;
+          max-width: 480px;
+          width: 100%;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+        .form-group {
+          margin-bottom: 1.25rem;
+        }
+        .form-label {
+          display: block;
+          color: rgba(255,255,255,0.7);
+          font-size: 0.8rem;
+          margin-bottom: 0.4rem;
+          font-weight: 500;
+        }
+        .form-input, .form-textarea {
+          width: 100%;
+          padding: 12px 14px;
+          background: #0a0a0a;
+          border: 1px solid #333;
+          border-radius: 8px;
+          color: #fff;
+          font-size: 0.95rem;
+          font-family: inherit;
+          box-sizing: border-box;
+          outline: none;
+        }
+        .form-input:focus, .form-textarea:focus {
+          border-color: rgba(212,175,55,0.5);
+        }
+        .form-textarea {
+          min-height: 80px;
+          resize: vertical;
+        }
+        .btn-enviar-form {
+          width: 100%;
+          padding: 14px;
+          background: linear-gradient(135deg, #d4af37, #aa8a2e);
+          border: none;
+          color: #0a0a0a;
+          font-family: 'Cinzel', serif;
+          font-size: 0.95rem;
+          font-weight: 600;
+          border-radius: 8px;
+          cursor: pointer;
+          margin-top: 0.5rem;
+        }
+        .btn-enviar-form:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .btn-cancelar {
+          width: 100%;
+          padding: 12px;
+          background: transparent;
+          border: 1px solid #333;
+          color: #888;
+          font-family: inherit;
+          font-size: 0.9rem;
+          border-radius: 8px;
+          cursor: pointer;
+          margin-top: 0.5rem;
         }
       `}</style>
     </div>
