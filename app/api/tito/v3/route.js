@@ -537,8 +537,24 @@ async function geolocalizarIP(request) {
 // Ahorra ~40-60% de llamadas API
 // ═══════════════════════════════════════════════════════════════
 
-function filtroPreAPI(msg, historialLength, paisDetectado) {
+function filtroPreAPI(msg, historial, paisDetectado) {
   const msgLower = msg.toLowerCase().trim();
+  const historialLength = Array.isArray(historial) ? historial.length : historial;
+
+  // ── 0) CONTEXTO: Si Tito acaba de pedir datos, NO filtrar ──
+  // Cuando Tito pidió número de pedido/email/nombre, la respuesta corta
+  // o numérica del cliente NO es spam — es la respuesta que se pidió.
+  if (Array.isArray(historial) && historial.length > 0) {
+    const ultimoMsg = historial[historial.length - 1];
+    const esDeBot = ultimoMsg.role === 'assistant';
+    if (esDeBot) {
+      const textoBot = (ultimoMsg.content || '').toLowerCase();
+      const pideDatos = /n[uú]mero de pedido|n[uú]mero de orden|tu (n[uú]mero|email|nombre|mail|correo)|pas[aá]me (el|tu)|decime (tu|el)|necesito (tu|el|que me)|con qu[eé] (nombre|email|mail)|datos del pedido/i.test(textoBot);
+      if (pideDatos) {
+        return { interceptado: false };
+      }
+    }
+  }
 
   // ── A) SPAM ──
   if (
@@ -821,7 +837,7 @@ export async function POST(request) {
     // FILTRO PRE-API: Responder sin gastar tokens de Claude
     // ═══════════════════════════════════════════════════════════════
     const paisParaFiltro = pais_cliente || geoData?.pais || null;
-    const filtro = filtroPreAPI(msg, conversationHistory.length, paisParaFiltro);
+    const filtro = filtroPreAPI(msg, conversationHistory, paisParaFiltro);
 
     if (filtro.interceptado) {
       console.log(`[Tito v3] Filtro pre-API: ${filtro.razon} | "${ msg.substring(0, 50) }"`);
