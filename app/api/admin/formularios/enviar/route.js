@@ -27,7 +27,8 @@ export async function POST(request) {
       ordenId,
       canalizacionId,
       personalMessage,
-      notaAdmin
+      notaAdmin,
+      items // Array opcional: [{ nombre, product_id, imagen, canalizacionId }]
     } = body;
 
     // Validar campos requeridos
@@ -58,6 +59,7 @@ export async function POST(request) {
       canalizacionId: canalizacionId || null,
       personalMessage: personalMessage || null,
       notaAdmin: notaAdmin || null,
+      items: items || null, // Multi-item: array de { nombre, product_id, imagen, canalizacionId }
       status: 'pending',
       createdAt: new Date().toISOString(),
       completedAt: null

@@ -33,7 +33,8 @@ export async function GET(request, { params }) {
       customerName: invite.customerName,
       productName: invite.productName || null,
       personalMessage: invite.personalMessage || null,
-      notaAdmin: invite.notaAdmin || null
+      notaAdmin: invite.notaAdmin || null,
+      items: invite.items || null // Multi-item: array de { nombre, product_id, imagen, canalizacionId }
     });
 
   } catch (error) {
@@ -133,8 +134,42 @@ export async function POST(request, { params }) {
     submissions.unshift(token);
     await kv.set(`form_submissions:${invite.customerEmail}`, submissions.slice(0, 50));
 
-    // Si hay una canalización vinculada, adjuntar los datos y auto-generar
-    if (invite.canalizacionId) {
+    // Multi-item: si el body trae itemsData, procesar cada item
+    const itemsData = body.itemsData; // Array: [{ canalizacionId, formType, datos: {...} }]
+
+    if (itemsData && Array.isArray(itemsData) && itemsData.length > 0) {
+      const baseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'https://duendes-vercel.vercel.app';
+
+      for (const itemEntry of itemsData) {
+        if (!itemEntry.canalizacionId) continue;
+        const canal = await kv.get(`canalizacion:${itemEntry.canalizacionId}`);
+        if (!canal) continue;
+
+        canal.formToken = token;
+        canal.formData = itemEntry.datos || {};
+        canal.formCompletado = true;
+        canal.formType = itemEntry.formType || 'para_mi';
+        await kv.set(`canalizacion:${itemEntry.canalizacionId}`, canal);
+
+        // Auto-generar si está en borrador
+        if (canal.estado === 'borrador') {
+          try {
+            await fetch(`${baseUrl}/api/admin/canalizaciones`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: itemEntry.canalizacionId, accion: 'generar' })
+            });
+            console.log(`[FORMULARIO] Auto-generación multi-item: ${itemEntry.canalizacionId}`);
+          } catch (e) {
+            console.error('[FORMULARIO] Error auto-gen multi-item:', e.message);
+          }
+        }
+      }
+    }
+    // Single-item: si hay una canalización vinculada directamente
+    else if (invite.canalizacionId) {
       const canal = await kv.get(`canalizacion:${invite.canalizacionId}`);
       if (canal) {
         canal.formToken = token;
@@ -164,7 +199,7 @@ export async function POST(request, { params }) {
       }
     }
 
-    console.log(`[FORMULARIO] Completado: ${invite.customerEmail} (${invite.formType})`);
+    console.log(`[FORMULARIO] Completado: ${invite.customerEmail} (${resolvedFormType}) ${itemsData ? `[${itemsData.length} items]` : ''}`);
 
     return Response.json({
       success: true,

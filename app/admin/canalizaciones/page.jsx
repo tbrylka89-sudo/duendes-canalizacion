@@ -19,6 +19,7 @@ export default function CanalizacionesAdmin() {
   const [pedido, setPedido] = useState(null);
   const [errorPedido, setErrorPedido] = useState(null);
   const [enviandoFormItem, setEnviandoFormItem] = useState(null);
+  const [enviandoTodos, setEnviandoTodos] = useState(false);
 
   useEffect(() => {
     cargarCanalizaciones(tabActiva);
@@ -134,6 +135,74 @@ export default function CanalizacionesAdmin() {
     setEnviandoFormItem(null);
   }
 
+  async function enviarFormTodos() {
+    if (!pedido) return;
+    const sinCanal = pedido.items.filter(item =>
+      !pedido.canalizaciones.find(c => String(c.productId) === String(item.product_id))
+    );
+    if (sinCanal.length === 0) return;
+
+    setEnviandoTodos(true);
+    try {
+      // 1. Crear borradores para cada item
+      const itemsConCanal = [];
+      for (const item of sinCanal) {
+        const resBorrador = await fetch('/api/admin/canalizaciones', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            esManual: true,
+            ordenId: pedido.id,
+            email: pedido.email,
+            nombreCliente: pedido.nombre,
+            productoManual: {
+              nombre: item.nombre,
+              tipo: 'guardian',
+              categoria: 'proteccion',
+              productId: item.product_id,
+              imagenUrl: item.imagen || null
+            },
+            formType: null,
+            notaAdmin: `Pedido #${pedido.numero}`
+          })
+        });
+        const dataBorrador = await resBorrador.json();
+        if (dataBorrador.success) {
+          itemsConCanal.push({
+            nombre: item.nombre,
+            product_id: item.product_id,
+            imagen: item.imagen || null,
+            canalizacionId: dataBorrador.id
+          });
+        }
+      }
+
+      // 2. Enviar UN formulario multi-item
+      if (itemsConCanal.length > 0) {
+        const res = await fetch('/api/admin/formularios/enviar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: pedido.email,
+            nombre: pedido.nombre,
+            formType: null,
+            ordenId: pedido.id,
+            productName: itemsConCanal.map(i => i.nombre).join(', '),
+            items: itemsConCanal
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          buscarPedido();
+          cargarContadores();
+        }
+      }
+    } catch {
+      // silenciar
+    }
+    setEnviandoTodos(false);
+  }
+
   function formatearFecha(fecha) {
     if (!fecha) return '';
     const d = new Date(fecha);
@@ -243,6 +312,19 @@ export default function CanalizacionesAdmin() {
                 );
               })}
             </div>
+            {/* Botón enviar todos — solo si hay items sin canalización */}
+            {pedido.items.filter(item => !pedido.canalizaciones.find(c => String(c.productId) === String(item.product_id))).length > 1 && (
+              <div className="pedido-enviar-todos">
+                <button
+                  className="btn-enviar-todos"
+                  disabled={enviandoTodos}
+                  onClick={enviarFormTodos}
+                >
+                  {enviandoTodos ? 'Enviando...' : `📧 Enviar UN formulario para los ${pedido.items.filter(item => !pedido.canalizaciones.find(c => String(c.productId) === String(item.product_id))).length} productos`}
+                </button>
+                <p className="enviar-todos-hint">Le llega UN solo email. El cliente elige para quién es cada guardián y llena todo en un formulario.</p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -788,6 +870,30 @@ export default function CanalizacionesAdmin() {
         }
         .btn-enviar-sm:disabled {
           opacity: 0.5;
+        }
+        .pedido-enviar-todos {
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(212,175,55,0.15);
+          text-align: center;
+        }
+        .btn-enviar-todos {
+          padding: 10px 20px;
+          background: linear-gradient(135deg, #d4af37, #aa8a2e);
+          border: none;
+          color: #0a0a0a;
+          font-family: 'Cinzel', serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          border-radius: 8px;
+          cursor: pointer;
+          width: 100%;
+        }
+        .btn-enviar-todos:disabled { opacity: 0.5; cursor: not-allowed; }
+        .enviar-todos-hint {
+          font-size: 0.75rem;
+          color: #666;
+          margin-top: 0.5rem;
         }
         .btn-ver-sm {
           padding: 6px 12px;
