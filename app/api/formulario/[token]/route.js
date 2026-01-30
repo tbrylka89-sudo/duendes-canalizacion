@@ -112,7 +112,7 @@ export async function POST(request, { params }) {
     submissions.unshift(token);
     await kv.set(`form_submissions:${invite.customerEmail}`, submissions.slice(0, 50));
 
-    // Si hay una canalización vinculada, adjuntar los datos
+    // Si hay una canalización vinculada, adjuntar los datos y auto-generar
     if (invite.canalizacionId) {
       const canal = await kv.get(`canalizacion:${invite.canalizacionId}`);
       if (canal) {
@@ -120,6 +120,26 @@ export async function POST(request, { params }) {
         canal.formData = formData.respuestas;
         canal.formCompletado = true;
         await kv.set(`canalizacion:${invite.canalizacionId}`, canal);
+
+        // Auto-generar canalización si está en borrador y tiene datos completos
+        if (canal.estado === 'borrador') {
+          try {
+            const baseUrl = process.env.VERCEL_URL
+              ? `https://${process.env.VERCEL_URL}`
+              : 'https://duendes-vercel.vercel.app';
+            await fetch(`${baseUrl}/api/admin/canalizaciones`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id: invite.canalizacionId,
+                accion: 'generar'
+              })
+            });
+            console.log(`[FORMULARIO] Auto-generación disparada para canalización ${invite.canalizacionId}`);
+          } catch (e) {
+            console.error('[FORMULARIO] Error en auto-generación (admin puede generar manual):', e.message);
+          }
+        }
       }
     }
 

@@ -386,10 +386,45 @@ export async function POST(request) {
       // Obtener datos de canalización del formulario de checkout
       const datosCanalizacion = orden.datos_canalizacion || {};
 
+      // Extraer tipo de destinatario y datos de canalización del meta_data
+      const tipoDestinatarioMeta = orden.meta_data?.find(m => m.key === '_duendes_tipo_destinatario');
+      const tipoDestinatario = tipoDestinatarioMeta?.value || null;
+      const datosCanalizacionMeta = orden.meta_data?.find(m => m.key === '_duendes_datos_canalizacion');
+      let datosCanalizacionParsed = null;
+      if (datosCanalizacionMeta?.value) {
+        try {
+          datosCanalizacionParsed = typeof datosCanalizacionMeta.value === 'string'
+            ? JSON.parse(datosCanalizacionMeta.value)
+            : datosCanalizacionMeta.value;
+        } catch { /* ignorar parse errors */ }
+      }
+
       // Generar guía de canalización y tarjeta QR para cada guardián
-      for (const guardian of guardianes) {
-        await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion, ordenId);
-        await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
+      if (tipoDestinatario === 'mixto' && datosCanalizacionParsed?.items) {
+        // Pedido mixto: cada item tiene su propio tipo de destinatario
+        for (const guardian of guardianes) {
+          // Buscar el item mixto que corresponde a este guardián por product_id
+          const itemMixto = datosCanalizacionParsed.items.find(
+            it => String(it.product_id) === String(guardian.id)
+          );
+          const formType = itemMixto?.tipo_destinatario || 'para_mi';
+          const datosItem = itemMixto?.datos || {};
+
+          await programarCanalizacion(kv, email, guardian, elegido, {
+            ...datosCanalizacion,
+            ...datosItem,
+            tipo_destinatario: formType,
+            es_mixto: true
+          }, ordenId);
+          await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
+        }
+        console.log(`[WEBHOOK-WOO] Pedido mixto #${ordenId}: ${guardianes.length} canalizaciones creadas con tipos individuales`);
+      } else {
+        // Pedido normal: todos los guardianes con el mismo tipo
+        for (const guardian of guardianes) {
+          await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion, ordenId);
+          await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
+        }
       }
 
       // Enviar email de compra confirmada (ahora incluye QR y link con token)

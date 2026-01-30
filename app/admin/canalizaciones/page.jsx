@@ -19,6 +19,13 @@ export default function CanalizacionesAdmin() {
   const [enviandoForm, setEnviandoForm] = useState(false);
   const [formResult, setFormResult] = useState(null);
 
+  // Buscar por pedido
+  const [numeroPedido, setNumeroPedido] = useState('');
+  const [buscandoPedido, setBuscandoPedido] = useState(false);
+  const [pedido, setPedido] = useState(null);
+  const [errorPedido, setErrorPedido] = useState(null);
+  const [enviandoFormItem, setEnviandoFormItem] = useState(null);
+
   useEffect(() => {
     cargarCanalizaciones(tabActiva);
     cargarContadores();
@@ -79,6 +86,51 @@ export default function CanalizacionesAdmin() {
     setEnviandoForm(false);
   }
 
+  async function buscarPedido() {
+    if (!numeroPedido.trim()) return;
+    setBuscandoPedido(true);
+    setErrorPedido(null);
+    setPedido(null);
+    try {
+      const res = await fetch(`/api/admin/canalizaciones/por-pedido?orden=${numeroPedido.trim()}`);
+      const data = await res.json();
+      if (data.success) {
+        setPedido(data.pedido);
+      } else {
+        setErrorPedido(data.error || 'Pedido no encontrado');
+      }
+    } catch {
+      setErrorPedido('Error de conexión');
+    }
+    setBuscandoPedido(false);
+  }
+
+  async function enviarFormItem(item, formType) {
+    if (!pedido) return;
+    setEnviandoFormItem(item.product_id);
+    try {
+      const res = await fetch('/api/admin/formularios/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: pedido.email,
+          nombre: pedido.nombre,
+          formType,
+          ordenId: pedido.id,
+          productName: item.nombre
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Recargar pedido para ver estado actualizado
+        buscarPedido();
+      }
+    } catch {
+      // silenciar
+    }
+    setEnviandoFormItem(null);
+  }
+
   function formatearFecha(fecha) {
     if (!fecha) return '';
     const d = new Date(fecha);
@@ -130,6 +182,86 @@ export default function CanalizacionesAdmin() {
           </button>
         </div>
       </header>
+
+      {/* Buscar por Pedido */}
+      <div className="buscar-pedido-container">
+        <div className="buscar-pedido-row">
+          <input
+            className="buscar-input"
+            type="text"
+            value={numeroPedido}
+            onChange={e => setNumeroPedido(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && buscarPedido()}
+            placeholder="Nro de pedido (ej: 1234)"
+          />
+          <button className="btn-buscar" onClick={buscarPedido} disabled={buscandoPedido || !numeroPedido.trim()}>
+            {buscandoPedido ? 'Buscando...' : 'Buscar Pedido'}
+          </button>
+          {pedido && (
+            <button className="btn-cerrar-pedido" onClick={() => { setPedido(null); setNumeroPedido(''); }}>Cerrar</button>
+          )}
+        </div>
+        {errorPedido && <p className="error-pedido">{errorPedido}</p>}
+        {pedido && (
+          <div className="pedido-panel">
+            <div className="pedido-header">
+              <div>
+                <h3 className="pedido-titulo">Pedido #{pedido.numero} — {pedido.nombre}</h3>
+                <p className="pedido-meta">{pedido.email} | {pedido.estado} | ${pedido.total} {pedido.moneda} | Tipo: {pedido.tipoDestinatario || 'no definido'}</p>
+              </div>
+            </div>
+            <div className="pedido-items">
+              {pedido.items.map(item => {
+                const canalExistente = pedido.canalizaciones.find(c => String(c.productId) === String(item.product_id));
+                const invExistente = pedido.invitaciones.find(i => i.formType);
+                return (
+                  <div key={item.id} className="pedido-item">
+                    <div className="pedido-item-img">
+                      {item.imagen ? <img src={item.imagen} alt={item.nombre} /> : <span className="placeholder-img">&#10022;</span>}
+                    </div>
+                    <div className="pedido-item-info">
+                      <h4 className="pedido-item-nombre">{item.nombre}</h4>
+                      <p className="pedido-item-meta">x{item.cantidad} — ${item.total}</p>
+                    </div>
+                    <div className="pedido-item-acciones">
+                      {canalExistente ? (
+                        <>
+                          <span className={`estado ${canalExistente.estado}`}>
+                            {canalExistente.estado === 'borrador' ? 'Borrador' : canalExistente.estado === 'pendiente' ? 'Pendiente' : canalExistente.estado === 'aprobada' ? 'Aprobada' : 'Enviada'}
+                          </span>
+                          <button className="btn-ver-sm" onClick={() => router.push(`/admin/canalizaciones/${encodeURIComponent(canalExistente.id)}`)}>
+                            Ver
+                          </button>
+                        </>
+                      ) : (
+                        <div className="pedido-item-enviar">
+                          <select className="form-input-sm" id={`tipo-${item.product_id}`} defaultValue={pedido.tipoDestinatario || 'para_mi'}>
+                            <option value="para_mi">Para mí</option>
+                            <option value="regalo_sabe">Regalo (sabe)</option>
+                            <option value="regalo_sorpresa">Sorpresa</option>
+                            <option value="para_nino">Niño/a</option>
+                            <option value="reconexion">Reconexión</option>
+                          </select>
+                          <button
+                            className="btn-enviar-sm"
+                            disabled={enviandoFormItem === item.product_id}
+                            onClick={() => {
+                              const sel = document.getElementById(`tipo-${item.product_id}`);
+                              enviarFormItem(item, sel.value);
+                            }}
+                          >
+                            {enviandoFormItem === item.product_id ? '...' : 'Enviar Form'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Tabs */}
       <div className="tabs-container">
@@ -562,6 +694,176 @@ export default function CanalizacionesAdmin() {
             padding-top: 0.75rem;
             border-top: 1px solid rgba(255,255,255,0.05);
           }
+        }
+
+        /* Buscar por Pedido */
+        .buscar-pedido-container {
+          padding: 1rem 2rem;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .buscar-pedido-row {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+        }
+        .buscar-input {
+          padding: 10px 14px;
+          background: #111;
+          border: 1px solid #333;
+          border-radius: 8px;
+          color: #fff;
+          font-size: 0.9rem;
+          font-family: inherit;
+          width: 200px;
+          outline: none;
+        }
+        .buscar-input:focus {
+          border-color: rgba(212,175,55,0.5);
+        }
+        .btn-buscar {
+          padding: 10px 18px;
+          background: rgba(212,175,55,0.15);
+          border: 1px solid rgba(212,175,55,0.3);
+          color: #d4af37;
+          font-family: 'Cinzel', serif;
+          font-size: 0.85rem;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-buscar:hover:not(:disabled) {
+          background: rgba(212,175,55,0.25);
+        }
+        .btn-buscar:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .btn-cerrar-pedido {
+          padding: 10px 14px;
+          background: transparent;
+          border: 1px solid #444;
+          color: #888;
+          font-family: inherit;
+          font-size: 0.85rem;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+        .error-pedido {
+          color: #f66;
+          font-size: 0.85rem;
+          margin: 0.5rem 0 0;
+        }
+        .pedido-panel {
+          margin-top: 1rem;
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(212,175,55,0.15);
+          border-radius: 12px;
+          padding: 1.25rem;
+        }
+        .pedido-header {
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .pedido-titulo {
+          font-family: 'MedievalSharp', cursive;
+          color: #d4af37;
+          font-size: 1.1rem;
+          margin: 0 0 0.25rem;
+        }
+        .pedido-meta {
+          color: #888;
+          font-size: 0.8rem;
+          margin: 0;
+        }
+        .pedido-items {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+        .pedido-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.75rem;
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.05);
+          border-radius: 8px;
+        }
+        .pedido-item-img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          overflow: hidden;
+          flex-shrink: 0;
+          background: rgba(212,175,55,0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .pedido-item-img img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .pedido-item-info {
+          flex: 1;
+          min-width: 0;
+        }
+        .pedido-item-nombre {
+          font-size: 0.95rem;
+          color: #e8e0d5;
+          margin: 0 0 0.15rem;
+        }
+        .pedido-item-meta {
+          font-size: 0.8rem;
+          color: #666;
+          margin: 0;
+        }
+        .pedido-item-acciones {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-shrink: 0;
+        }
+        .pedido-item-enviar {
+          display: flex;
+          gap: 0.4rem;
+          align-items: center;
+        }
+        .form-input-sm {
+          padding: 6px 8px;
+          background: #0a0a0a;
+          border: 1px solid #333;
+          border-radius: 6px;
+          color: #fff;
+          font-size: 0.8rem;
+          font-family: inherit;
+        }
+        .btn-enviar-sm {
+          padding: 6px 12px;
+          background: linear-gradient(135deg, #d4af37, #aa8a2e);
+          border: none;
+          color: #0a0a0a;
+          font-family: 'Cinzel', serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          border-radius: 6px;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+        .btn-enviar-sm:disabled {
+          opacity: 0.5;
+        }
+        .btn-ver-sm {
+          padding: 6px 12px;
+          background: rgba(212,175,55,0.15);
+          border: 1px solid rgba(212,175,55,0.3);
+          color: #d4af37;
+          font-family: 'Cinzel', serif;
+          font-size: 0.75rem;
+          border-radius: 6px;
+          cursor: pointer;
         }
 
         /* Botón Nuevo */
