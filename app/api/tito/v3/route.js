@@ -268,7 +268,7 @@ REGLA 4: SIEMPRE REDIRIGIR A ACCIÓN
 
 REGLA 5: SI YA PREGUNTÓ PRECIO O VIO PRODUCTOS
 - No dar vueltas, avanzar al cierre
-- "¿Te lo reservamos?" "¿Querés que te pase los datos de pago?"
+- "¿Lo llevamos?" "¿Querés que te pase los datos de pago?"
 
 REGLA 6: MANTENER EL HILO DE LA CONVERSACIÓN (CRÍTICO)
 Si ya mostraste productos y el usuario dice su país:
