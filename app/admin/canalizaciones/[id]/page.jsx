@@ -456,40 +456,48 @@ export default function CanalizacionDetalle() {
         </div>
         <div className="header-actions">
           {canalizacion.estado === 'borrador' && (
-            <button
-              onClick={generarConIA}
-              className="btn-generar"
-              disabled={generando}
-            >
-              {generando ? 'Generando...' : 'Generar con IA'}
-            </button>
+            <div className="action-wrap" title="El cliente ya llenó el formulario. Tocá para que la IA escriba la carta.">
+              <button
+                onClick={generarConIA}
+                className="btn-generar"
+                disabled={generando}
+              >
+                {generando ? 'Generando...' : 'Generar con IA'}
+              </button>
+            </div>
           )}
           {(canalizacion.estado === 'pendiente' || canalizacion.estado === 'aprobada') && (
-            <button
-              onClick={regenerarConIA}
-              className="btn-regenerar-header"
-              disabled={regenerando}
-            >
-              {regenerando ? 'Regenerando...' : 'Regenerar'}
-            </button>
+            <div className="action-wrap" title="No te gustó la carta. Tocá para que la IA escriba otra versión. La anterior se guarda para comparar.">
+              <button
+                onClick={regenerarConIA}
+                className="btn-regenerar-header"
+                disabled={regenerando}
+              >
+                {regenerando ? 'Regenerando...' : 'Regenerar'}
+              </button>
+            </div>
           )}
           {canalizacion.estado === 'pendiente' && (
-            <button
-              onClick={() => cambiarEstado('aprobar')}
-              className="btn-aprobar"
-              disabled={cargandoAccion}
-            >
-              {cargandoAccion ? 'Aprobando...' : 'Aprobar'}
-            </button>
+            <div className="action-wrap" title="Leíste la carta y está bien. Aprobala para poder enviarla.">
+              <button
+                onClick={() => cambiarEstado('aprobar')}
+                className="btn-aprobar"
+                disabled={cargandoAccion}
+              >
+                {cargandoAccion ? 'Aprobando...' : 'Aprobar'}
+              </button>
+            </div>
           )}
           {(canalizacion.estado === 'pendiente' || canalizacion.estado === 'aprobada') && (
-            <button
-              onClick={() => cambiarEstado('enviar')}
-              className="btn-enviar"
-              disabled={cargandoAccion}
-            >
-              {cargandoAccion ? 'Enviando...' : 'Enviar al Cliente'}
-            </button>
+            <div className="action-wrap" title="Enviar la carta al cliente. Va a poder verla en Mi Magia.">
+              <button
+                onClick={() => cambiarEstado('enviar')}
+                className="btn-enviar"
+                disabled={cargandoAccion}
+              >
+                {cargandoAccion ? 'Enviando...' : 'Enviar al Cliente'}
+              </button>
+            </div>
           )}
         </div>
       </header>
@@ -891,6 +899,10 @@ export default function CanalizacionDetalle() {
         .header-actions {
           display: flex;
           gap: 0.75rem;
+        }
+
+        .action-wrap {
+          position: relative;
         }
 
         .btn-generar {

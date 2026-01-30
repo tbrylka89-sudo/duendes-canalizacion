@@ -123,8 +123,9 @@ export default function NuevaCanalizacion() {
       </header>
 
       <div className="form-card">
-        <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-          El cliente recibirá un email con el formulario. Ahí sube la foto de su guardián, indica qué tipo es, y completa sus datos personales.
+        <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+          Usá esto si vendiste un guardián fuera de la web (en una feria, por WhatsApp, en persona) o si alguien quiere una reconexión con un guardián que ya tiene.<br /><br />
+          Ponés el email y nombre del cliente, elegís el tipo de formulario, y le llega un email con un link para que complete sus datos y suba la foto del guardián. Cuando lo complete, la IA genera la canalización automáticamente.
         </p>
 
         <div className="campo">

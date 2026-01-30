@@ -167,7 +167,10 @@ export default function CanalizacionesAdmin() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <button className="btn-nuevo" onClick={() => router.push('/admin/canalizaciones/nueva')}>+ Nueva Canalización</button>
+          <div style={{ position: 'relative' }}>
+            <button className="btn-nuevo" onClick={() => router.push('/admin/canalizaciones/nueva')}>+ Nueva Canalización</button>
+            <span className="btn-nuevo-hint">Ventas fuera de la web</span>
+          </div>
           <button onClick={() => window.history.length > 1 ? window.history.back() : window.close()} className="btn-volver">
             ← Volver
           </button>
@@ -176,7 +179,8 @@ export default function CanalizacionesAdmin() {
 
       {/* Buscar por Pedido — para ventas web */}
       <div className="buscar-pedido-container">
-        <p className="seccion-desc">Compras de la web: buscá el pedido para enviar el formulario a cada guardián.</p>
+        <h3 className="seccion-titulo">Buscar Pedido</h3>
+        <p className="seccion-desc">Usá esto si alguien compró en la web y necesitás enviarle el formulario de canalización. Ponés el número de pedido, te muestra los guardianes que compró, y desde ahí le mandás el formulario a cada uno.</p>
         <div className="buscar-pedido-row">
           <input
             className="buscar-input"
@@ -256,6 +260,7 @@ export default function CanalizacionesAdmin() {
       </div>
 
       {/* Tabs */}
+      <p className="tabs-desc">Acá abajo están todas las canalizaciones. Borradores = esperando que el cliente llene el formulario. Pendientes = la IA ya generó, revisá y aprobá. Aprobadas = listas para enviar. Enviadas = el cliente ya las recibió.</p>
       <div className="tabs-container">
         {tabs.map(tab => (
           <button
@@ -826,11 +831,32 @@ export default function CanalizacionesAdmin() {
         }
 
         /* Descripción de sección */
+        .seccion-titulo {
+          font-family: 'MedievalSharp', cursive;
+          color: #d4af37;
+          font-size: 1rem;
+          margin: 0 0 0.4rem;
+        }
         .seccion-desc {
           color: #777;
           font-size: 0.8rem;
           margin: 0 0 0.75rem;
           font-weight: 400;
+          line-height: 1.5;
+        }
+        .tabs-desc {
+          color: #555;
+          font-size: 0.75rem;
+          margin: 0;
+          padding: 0.75rem 2rem 0;
+          line-height: 1.5;
+        }
+        .btn-nuevo-hint {
+          display: block;
+          text-align: center;
+          font-size: 0.65rem;
+          color: #666;
+          margin-top: 0.25rem;
         }
 
         /* Estado borrador */
