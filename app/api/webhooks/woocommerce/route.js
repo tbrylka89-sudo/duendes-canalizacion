@@ -399,32 +399,24 @@ export async function POST(request) {
         } catch { /* ignorar parse errors */ }
       }
 
-      // Generar guía de canalización y tarjeta QR para cada guardián
-      if (tipoDestinatario === 'mixto' && datosCanalizacionParsed?.items) {
-        // Pedido mixto: cada item tiene su propio tipo de destinatario
-        for (const guardian of guardianes) {
-          // Buscar el item mixto que corresponde a este guardián por product_id
-          const itemMixto = datosCanalizacionParsed.items.find(
-            it => String(it.product_id) === String(guardian.id)
-          );
-          const formType = itemMixto?.tipo_destinatario || 'para_mi';
-          const datosItem = itemMixto?.datos || {};
+      // Crear borradores de canalización y enviar formulario al cliente
+      const itemsConCanal = [];
+      for (const guardian of guardianes) {
+        const borradorId = await crearBorradorCanalizacion(email, nombre, guardian, ordenId);
+        if (borradorId) {
+          itemsConCanal.push({
+            nombre: guardian.nombre,
+            product_id: guardian.id,
+            imagen: guardian.imagen || null,
+            canalizacionId: borradorId
+          });
+        }
+        await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
+      }
 
-          await programarCanalizacion(kv, email, guardian, elegido, {
-            ...datosCanalizacion,
-            ...datosItem,
-            tipo_destinatario: formType,
-            es_mixto: true
-          }, ordenId);
-          await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
-        }
-        console.log(`[WEBHOOK-WOO] Pedido mixto #${ordenId}: ${guardianes.length} canalizaciones creadas con tipos individuales`);
-      } else {
-        // Pedido normal: todos los guardianes con el mismo tipo
-        for (const guardian of guardianes) {
-          await programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion, ordenId);
-          await generarTarjetaQR(kv, ordenId, email, nombre, guardian);
-        }
+      // Enviar formulario de Vercel al cliente
+      if (itemsConCanal.length > 0) {
+        await enviarFormularioAlCliente(email, nombre, ordenId, itemsConCanal);
       }
 
       // Enviar email de compra confirmada (ahora incluye QR y link con token)
@@ -941,37 +933,68 @@ function generarToken() {
   return token;
 }
 
-async function programarCanalizacion(kv, email, guardian, elegido, datosCanalizacion = {}, ordenId) {
-  // Llamar a la API de canalizaciones para generar inmediatamente
-  // La canalización quedará pendiente de aprobación en el panel admin
-
+async function crearBorradorCanalizacion(email, nombre, guardian, ordenId) {
+  // Crear borrador de canalización (sin generar con IA todavía)
+  // El cliente llenará el formulario primero, después Claude genera la carta
   try {
-    const nombreCliente = elegido.nombrePreferido || elegido.nombre;
-
-    // Auto-traducir campos de texto si están en otro idioma
-    const datosTraducidos = await traducirDatosCanalizacion(datosCanalizacion);
-
     const response = await fetch('https://duendes-vercel.vercel.app/api/admin/canalizaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        esManual: true,
         ordenId,
         email,
-        nombreCliente,
-        guardian,
-        datosCheckout: datosTraducidos
+        nombreCliente: nombre,
+        productoManual: {
+          nombre: guardian.nombre,
+          tipo: 'guardian',
+          categoria: guardian.categoria || 'proteccion',
+          productId: guardian.id,
+          imagenUrl: guardian.imagen || null
+        },
+        formType: null,
+        notaAdmin: `Auto - Pedido #${ordenId}`
       })
     });
 
     const result = await response.json();
-
     if (result.success) {
-      console.log(`Canalización generada para ${guardian.nombre} - pendiente de aprobación`);
+      console.log(`[WEBHOOK-WOO] Borrador creado para ${guardian.nombre}: ${result.id}`);
+      return result.id;
     } else {
-      console.error('Error generando canalización:', result.error);
+      console.error('[WEBHOOK-WOO] Error creando borrador:', result.error);
+      return null;
     }
   } catch (error) {
-    console.error('Error llamando API de canalizaciones:', error);
+    console.error('[WEBHOOK-WOO] Error creando borrador:', error);
+    return null;
+  }
+}
+
+async function enviarFormularioAlCliente(email, nombre, ordenId, itemsConCanal) {
+  // Enviar UN email con formulario para todos los guardianes del pedido
+  try {
+    const response = await fetch('https://duendes-vercel.vercel.app/api/admin/formularios/enviar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        nombre,
+        formType: null, // El cliente elige el tipo
+        ordenId,
+        productName: itemsConCanal.map(i => i.nombre).join(', '),
+        items: itemsConCanal
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      console.log(`[WEBHOOK-WOO] Formulario enviado a ${email} para ${itemsConCanal.length} guardianes`);
+    } else {
+      console.error('[WEBHOOK-WOO] Error enviando formulario:', result.error);
+    }
+  } catch (error) {
+    console.error('[WEBHOOK-WOO] Error enviando formulario:', error);
   }
 }
 
