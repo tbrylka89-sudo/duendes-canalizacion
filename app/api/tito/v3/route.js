@@ -562,7 +562,7 @@ function filtroPreAPI(msg, historial, paisDetectado) {
     /^(amen|amén|bendiciones?|bendecido|am[eé]n bendiciones?|bendiciones? am[eé]n|dios te bendiga|que dios|la virgen)[\s!.]*$/i.test(msgLower) ||
     /^(dame suerte|buena vibra|buenas vibras|suerte|buenas energias|buenas energías)[\s!.]*$/i.test(msgLower) ||
     /^(dame los n[uú]meros|5 de oro|loter[ií]a|quiniela|n[uú]meros)/i.test(msgLower) ||
-    /^[\p{Emoji}\s!.]+$/u.test(msg.trim()) ||
+    (/^[\p{Emoji}\s!.]+$/u.test(msg.trim()) && !/\d/.test(msg)) ||
     msgLower.length < 3
   ) {
     return {
