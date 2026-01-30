@@ -115,7 +115,7 @@ export default function NuevaCanalizacion() {
       <header className="header">
         <div>
           <h1 className="titulo">Nueva Canalización</h1>
-          <p className="subtitulo">Enviar formulario al cliente</p>
+          <p className="subtitulo">Para ventas fuera de la web (ferias, WhatsApp, reconexiones)</p>
         </div>
         <button className="btn-sec" onClick={() => router.push('/admin/canalizaciones')}>
           Cancelar

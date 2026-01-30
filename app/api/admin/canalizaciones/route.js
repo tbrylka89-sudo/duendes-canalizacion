@@ -187,7 +187,7 @@ export async function POST(request) {
       const canalizacion = {
         id,
         esManual: true,
-        ordenId: null,
+        ordenId: ordenId || null,
         email: email || null,
         nombreCliente: nombreCliente || 'Sin nombre',
         nombreDestinatario: nombreCliente || 'Sin nombre',
@@ -230,6 +230,7 @@ export async function POST(request) {
 
       return Response.json({
         success: true,
+        id,
         canalizacion: { id, estado: 'borrador' }
       }, { headers: corsHeaders });
     }
