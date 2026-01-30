@@ -291,7 +291,7 @@ export default function FormularioPage() {
       <div style={s.page}>
         <div style={{ ...s.card, maxWidth: '560px' }}>
           <div style={s.icon}>✨</div>
-          <h1 style={s.title}>Tu pedido tiene {config.items.length} guardianes</h1>
+          <h1 style={s.title}>Tu pedido tiene {config.items.length} productos</h1>
           <p style={s.subtitle}>Contanos para quién es cada uno.</p>
 
           {config.items.map((item, idx) => (
@@ -456,7 +456,7 @@ export default function FormularioPage() {
     const isLastItem = !multiMode || currentItemIdx >= (config?.items?.length || 1) - 1;
     const lastStepLabel = isLastItem
       ? 'Completar conexión'
-      : `Siguiente: ${config.items[currentItemIdx + 1]?.nombre || 'guardián'} →`;
+      : `Siguiente: ${config.items[currentItemIdx + 1]?.nombre || 'producto'} →`;
 
     return (
       <div style={{ marginTop: '1.5rem' }}>
