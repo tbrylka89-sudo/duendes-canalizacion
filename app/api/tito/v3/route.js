@@ -541,17 +541,24 @@ function filtroPreAPI(msg, historial, paisDetectado) {
   const msgLower = msg.toLowerCase().trim();
   const historialLength = Array.isArray(historial) ? historial.length : historial;
 
-  // ── 0) CONTEXTO: Si Tito acaba de pedir datos, NO filtrar ──
-  // Cuando Tito pidió número de pedido/email/nombre, la respuesta corta
-  // o numérica del cliente NO es spam — es la respuesta que se pidió.
-  // NOTA: El widget pushea el mensaje del user al history ANTES de enviar,
-  // así que buscamos el último mensaje de role "assistant", no el último en general.
+  // ── 0) CONTEXTO: No filtrar respuestas a preguntas de Tito ──
+  // El widget pushea el user msg al history ANTES de enviar,
+  // así que buscamos el último mensaje de role "assistant".
   if (Array.isArray(historial) && historial.length > 0) {
     const ultimoBot = [...historial].reverse().find(m => m.role === 'assistant');
     if (ultimoBot) {
       const textoBot = (ultimoBot.content || '').toLowerCase();
+
+      // A) Tito pidió datos (pedido, email, nombre) → dejar pasar todo
       const pideDatos = /n[uú]mero de pedido|n[uú]mero de orden|tu (n[uú]mero|email|nombre|mail|correo)|pas[aá]me (el|tu)|decime (tu|el)|necesito (tu|el|que me)|con qu[eé] (nombre|email|mail)|datos del pedido/i.test(textoBot);
       if (pideDatos) {
+        return { interceptado: false };
+      }
+
+      // B) Tito hizo una pregunta → respuestas cortas afirmativas no son spam
+      const titoHizoPregunta = /\?/.test(ultimoBot.content || '');
+      const esAfirmativo = /^(s[ií]|si+|ok|dale|bueno|va|vamos|claro|por favor|porfa|obvio|seguro|manda|mostr[aá]|quer[ií]a|quiero|me interesa|por supuesto)[\s!.]*$/i.test(msgLower);
+      if (titoHizoPregunta && esAfirmativo) {
         return { interceptado: false };
       }
     }
