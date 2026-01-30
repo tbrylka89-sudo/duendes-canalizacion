@@ -70,7 +70,12 @@ function analizarCliente(mensajes, infoCliente = {}) {
     /me siento|estoy triste|tengo problemas|mi vida|necesito desahogar/i,
     /no tengo plata|no puedo|después|algún día|cuando pueda/i,
     /contame de vos|qué sos|sos real|sos humano|sos robot/i,
-    /^(hola|hey|ey|buenas)$/i // Solo saluda sin intención
+    /^(hola|hey|ey|buenas)$/i, // Solo saluda sin intención
+    /solo (quiero|quería) (hablar|charlar|conversar)/i,
+    /sos (lindo|tierno|gracioso|divertido)/i,
+    /te (quiero|amo|adoro)/i,
+    /podemos ser amigos/i,
+    /qué (hacés|haces) en tu tiempo libre/i
   ];
 
   let puntosCompra = 0;
@@ -93,13 +98,13 @@ function analizarCliente(mensajes, infoCliente = {}) {
   const yaVioPrecio = /\$\d+/.test(todosLosMensajes);
 
   // DETECCIÓN RÁPIDA DE PICHIS:
-  // Si ya vio precios y siguen 3-4 mensajes sin avanzar → pichi
+  // Umbrales más agresivos para cortar antes
   if (yaVioPrecio) {
-    if (totalMensajes > 4 && puntosCompra < 3) puntosPichi += 4;
-    if (totalMensajes > 6 && puntosCompra < 4) puntosPichi += 5;
+    if (totalMensajes > 3 && puntosCompra < 2) puntosPichi += 4;
+    if (totalMensajes > 5 && puntosCompra < 3) puntosPichi += 5;
   } else {
-    // Si todavía no vio precios, ser un poco más paciente
-    if (totalMensajes > 6 && puntosCompra < 2) puntosPichi += 3;
+    if (totalMensajes > 4 && puntosCompra < 2) puntosPichi += 3;
+    if (totalMensajes > 6 && puntosCompra < 2) puntosPichi += 5;
   }
 
   // Clasificar
@@ -136,12 +141,11 @@ function analizarCliente(mensajes, infoCliente = {}) {
     puntosPichi,
     totalMensajes,
     yaVioPrecio,
-    debeRedirigir: puntosPichi > puntosCompra && totalMensajes > 3,
-    // Si ya vio precios, cortar más rápido (4+ msgs sin avanzar)
-    // Si no vio precios, ser más paciente (6+ msgs)
+    debeRedirigir: puntosPichi > puntosCompra && totalMensajes > 2,
+    // Umbrales más agresivos para no gastar API
     debeCortar: yaVioPrecio
-      ? (puntosPichi >= 4 && totalMensajes > 4)
-      : (puntosPichi >= 5 && totalMensajes > 6),
+      ? (puntosPichi >= 3 && totalMensajes > 3)
+      : (puntosPichi >= 4 && totalMensajes > 4),
     emocionDetectada
   };
 }
@@ -529,6 +533,236 @@ async function geolocalizarIP(request) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// FILTRO PRE-API: Respuestas sin llamar a Claude
+// Ahorra ~40-60% de llamadas API
+// ═══════════════════════════════════════════════════════════════
+
+function filtroPreAPI(msg, historialLength, paisDetectado) {
+  const msgLower = msg.toLowerCase().trim();
+
+  // ── A) SPAM ──
+  if (
+    /^(amen|amén|bendiciones?|bendecido|am[eé]n bendiciones?|bendiciones? am[eé]n|dios te bendiga|que dios|la virgen)[\s!.]*$/i.test(msgLower) ||
+    /^(dame suerte|buena vibra|buenas vibras|suerte|buenas energias|buenas energías)[\s!.]*$/i.test(msgLower) ||
+    /^(dame los n[uú]meros|5 de oro|loter[ií]a|quiniela|n[uú]meros)/i.test(msgLower) ||
+    /^[\p{Emoji}\s!.]+$/u.test(msg.trim()) ||
+    msgLower.length < 3
+  ) {
+    return {
+      interceptado: true,
+      respuesta: '¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.',
+      razon: 'spam'
+    };
+  }
+
+  // ── B) SALUDOS SIMPLES (solo si es inicio de conversación) ──
+  if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello|que tal|qué tal)[\s!?.]*$/i.test(msgLower) && historialLength <= 1) {
+    return {
+      interceptado: true,
+      respuesta: '¡Ey! ¿Qué andás buscando? 🍀',
+      razon: 'saludo'
+    };
+  }
+
+  // ── C) DRAMA EMOCIONAL SIN INTENCIÓN DE COMPRA ──
+  const esDrama = /estoy (muy )?(mal|triste|destru[ií]d|deprimi|perdid)|no puedo m[aá]s|todo me sale mal|nadie me (quiere|entiende)|me siento (sol[oa]|vac[ií]|perdid)|no s[eé] qu[eé] hacer con mi vida|estoy en crisis|me dejaron|coraz[oó]n roto|no tengo fuerzas|quiero llorar/i.test(msgLower);
+  const tieneIntencionCompra = /precio|cu[aá]nto|guard|duende|compr|quiero (uno|ver|un)|env[ií]o|tienda|protecci|abundancia|amor|sanaci/i.test(msgLower);
+
+  if (esDrama && !tieneIntencionCompra) {
+    return {
+      interceptado: true,
+      respuesta: 'Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. Si querés, te muestro algunos que ayudan con eso.',
+      razon: 'drama_sin_compra'
+    };
+  }
+
+  // ── D) FAQ DIRECTAS (las más comunes) ──
+
+  // Ubicación
+  if (/de d[oó]nde son|d[oó]nde est[aá]n|d[oó]nde queda|ubicaci[oó]n/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'Somos de Piriápolis, Uruguay 🇺🇾 Nacemos en el bosque, pero viajamos a todo el mundo. ¿Querés que te muestre algunos guardianes?',
+      razon: 'ubicacion'
+    };
+  }
+
+  // Envíos
+  if (/hacen env[ií]os?|env[ií]an a|llegan? a|mandan a|shipping/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'Sí, enviamos a todo el mundo 🌎 Por DHL Express, llega en 5-10 días con tracking. ¿De qué país sos?',
+      razon: 'envios'
+    };
+  }
+
+  // Tiempo de envío
+  if (/cu[aá]nto (tarda|demora|tiempo)|d[ií]as de env[ií]o|tiempo de entrega|cu[aá]nto.*llegar/i.test(msgLower)) {
+    const resp = paisDetectado === 'UY'
+      ? 'En Uruguay: 3-7 días hábiles por DAC 📦 ¿Querés que te muestre guardianes?'
+      : 'Internacional: 5-10 días hábiles por DHL Express 📦 Con tracking completo. ¿Querés ver guardianes?';
+    return { interceptado: true, respuesta: resp, razon: 'tiempo_envio' };
+  }
+
+  // Métodos de pago
+  if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago|aceptan/i.test(msgLower)) {
+    const resp = paisDetectado === 'UY'
+      ? 'En Uruguay: Visa, Master, Amex, OCA, PassCard, Cabal, Anda, Redpagos, Itaú, BROU, BBVA, Scotiabank 💳 Todo en la web.'
+      : 'Internacional: Visa, MasterCard, Amex, Western Union, MoneyGram 💳 Todo se paga directo en la web.';
+    return { interceptado: true, respuesta: resp, razon: 'pagos' };
+  }
+
+  // PayPal
+  if (/paypal|pay pal/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'No tenemos PayPal, pero sí Visa, MasterCard y Amex. También Western Union y MoneyGram para pagos internacionales 💳',
+      razon: 'paypal'
+    };
+  }
+
+  // Personalizados
+  if (/personalizado|encargo|me (hacen|pueden hacer)|hagan uno|a pedido|custom/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'No hacemos encargos ni personalizados. Cada guardián nace cuando tiene que nacer, no se puede apurar una canalización 🍀 Los que ves en la tienda son los que están listos.',
+      razon: 'personalizados'
+    };
+  }
+
+  // Garantía / Devoluciones
+  if (/garant[ií]a|devoluci[oó]n|devolver|reembolso|cambio|arrepent/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'No aceptamos devoluciones porque cada pieza es única e irrepetible. Si llega dañado (muy raro), contactás al courier con fotos dentro de 48hs. Por eso es importante estar seguro antes de adoptar 🍀',
+      razon: 'garantia'
+    };
+  }
+
+  // Qué incluye
+  if (/qu[eé] (incluye|viene|trae|recibo)|viene con|trae con|incluido/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: `Cuando adoptás un guardián recibís:
+✨ El guardián único (100% a mano)
+📜 Certificado de Originalidad
+🔮 Canalización personal - un mensaje único para VOS
+📱 Acceso a Mi Magia (portal exclusivo)
+📦 Packaging de protección
+
+Todo incluido, sin sorpresas 🍀`,
+      razon: 'incluye'
+    };
+  }
+
+  // Materiales
+  if (/material(es)?|de qu[eé] (est[aá]n|son|hechos)|porcelana|cristal(es)?/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: `Cada guardián está hecho con:
+• Porcelana fría profesional (flexible y dura años)
+• Cristales 100% naturales (amatista, cuarzo rosa, citrino)
+• Ropa de verdad cosida a mano
+• 100% esculpido a mano, SIN moldes
+
+Por eso cada uno tarda días en nacer 🍀`,
+      razon: 'materiales'
+    };
+  }
+
+  // Confianza / Seguridad
+  if (/es (seguro|confiable)|puedo confiar|es real|no es estafa|ser[aá] verdad/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'Llevamos años enviando guardianes a más de 30 países 🌎 Pago seguro con certificado SSL, envío con tracking, y miles de personas felices. ¿Querés ver algunos guardianes?',
+      razon: 'confianza'
+    };
+  }
+
+  // Cómo funciona
+  if (/c[oó]mo funciona|qu[eé] es esto|de qu[eé] se trata|explicame|expl[ií]came/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: `Los guardianes son seres mágicos únicos, creados a mano con cristales naturales.
+
+✨ Cómo encontrar el tuyo:
+1. Hacé el Test: https://duendesdeluruguay.com/descubri-que-duende-te-elige/
+2. O mirá la tienda - el que te llame, ese te eligió
+3. Lo adoptás y te llega con su canalización personalizada
+
+¿Querés hacer el test o que te muestre guardianes? 🍀`,
+      razon: 'como_funciona'
+    };
+  }
+
+  // Test / Cuál me recomiendas
+  if (/^(test|quiz)[\s!?.]*$/i.test(msgLower) || /cu[aá]l (es para m[ií]|me corresponde|es el m[ií]o)|no s[eé] cu[aá]l elegir|ay[uú]dame a elegir|cu[aá]l me recomiend/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: '¡Tenemos un test para eso! Te hace preguntas y te dice qué guardián resuena con tu energía: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀',
+      razon: 'test'
+    };
+  }
+
+  // Cómo elegir
+  if (/c[oó]mo (elijo|elegir|s[eé] cu[aá]l)|cu[aá]l (elijo|elegir)/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: `El secreto: vos no elegís al guardián, él te elige a vos 🔮
+
+¿Cómo sabés cuál es el tuyo?
+• El que te llamó la atención primero, ese es
+• Si volvés a mirar el mismo, ahí está
+• Si sentís algo al verlo, es señal
+
+Hacé el Test: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀`,
+      razon: 'como_elegir'
+    };
+  }
+
+  // Tienda física
+  if (/tienda f[ií]sica|local|puedo ir|visitarlos|showroom/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'Estamos en Piriápolis, Uruguay, pero por ahora solo vendemos online. ¡Los guardianes viajan a todo el mundo! 🌎',
+      razon: 'tienda_fisica'
+    };
+  }
+
+  // Descuentos / Promos
+  if (/descuento|promo|oferta|rebaja|cupon|cup[oó]n|c[oó]digo/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: '¡Sí! Tenemos el 3x2: llevás 2 guardianes y te regalamos 1 mini 🎁 Y envío gratis en compras grandes. ¿Querés que te muestre guardianes?',
+      razon: 'promos'
+    };
+  }
+
+  // Canalización
+  if (/qu[eé] (significa|es|quiere decir).*(canaliza|personaliza)|canaliza.*para m[ií]/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: `Cada guardián viene con una CANALIZACIÓN: un mensaje único que tu guardián tiene para vos.
+
+Después de comprar completás un formulario breve. Con eso, el guardián te envía un mensaje personal que solo vos vas a recibir. No es genérico - es SU mensaje para VOS 🍀`,
+      razon: 'canalizacion'
+    };
+  }
+
+  // Reventa / Mayorista
+  if (/reventa|mayorista|al por mayor|distribuidor|vender.*duendes/i.test(msgLower)) {
+    return {
+      interceptado: true,
+      respuesta: 'No vendemos para reventa. Cada guardián llega directo de nuestras manos a las tuyas, sin intermediarios 🍀',
+      razon: 'reventa'
+    };
+  }
+
+  // NO interceptado → necesita Claude
+  return { interceptado: false };
+}
+
+// ═══════════════════════════════════════════════════════════════
 // HANDLER PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 
@@ -580,6 +814,22 @@ export async function POST(request) {
         respuesta: `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀 ¿Qué andás buscando?`,
         hay_productos: 'no',
         geo: geoData // Enviar info de geolocalización al frontend
+      }, { headers: CORS_HEADERS });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // FILTRO PRE-API: Responder sin gastar tokens de Claude
+    // ═══════════════════════════════════════════════════════════════
+    const paisParaFiltro = pais_cliente || geoData?.pais || null;
+    const filtro = filtroPreAPI(msg, conversationHistory.length, paisParaFiltro);
+
+    if (filtro.interceptado) {
+      console.log(`[Tito v3] Filtro pre-API: ${filtro.razon} | "${ msg.substring(0, 50) }"`);
+      return Response.json({
+        success: true,
+        respuesta: filtro.respuesta,
+        productos: [],
+        analisis: { tipoCliente: 'filtro_pre_api', razon: filtro.razon }
       }, { headers: CORS_HEADERS });
     }
 
