@@ -38,7 +38,7 @@ export async function POST(request) {
       return Response.json({ success: false, error: 'Nombre requerido' }, { status: 400 });
     }
     // formType es opcional — si es null, el cliente lo elige al abrir el formulario
-    const tiposValidos = ['para_mi', 'regalo_sabe', 'regalo_sorpresa', 'para_nino', 'reconexion'];
+    const tiposValidos = ['para_mi', 'regalo_sabe', 'regalo_sorpresa', 'para_nino', 'reconexion', 'pareja', 'familia'];
     if (formType && !tiposValidos.includes(formType)) {
       return Response.json({ success: false, error: 'Tipo de formulario inválido' }, { status: 400 });
     }
@@ -93,7 +93,9 @@ export async function POST(request) {
           regalo_sabe: 'Alguien te regaló algo especial',
           regalo_sorpresa: 'Contanos sobre esa persona especial',
           para_nino: 'Un guardián quiere conocer a un pequeño/a',
-          reconexion: 'Tu guardián quiere reconectarse'
+          reconexion: 'Tu guardián quiere reconectarse',
+          pareja: 'Un guardián quiere conocerlos',
+          familia: 'Un guardián quiere conocer a tu familia'
         };
 
         const res = await fetch('https://api.brevo.com/v3/smtp/email', {

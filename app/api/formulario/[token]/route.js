@@ -105,6 +105,18 @@ export async function POST(request, { params }) {
         personalidad_nino: body.personalidad_nino || [],
         necesidades_nino: body.necesidades_nino || [],
         info_extra_nino: body.info_extra_nino || null,
+        // Campos de pareja
+        nombre_pareja: body.nombre_pareja || null,
+        tiempo_juntos: body.tiempo_juntos || null,
+        momento_pareja: body.momento_pareja || null,
+        necesidades_pareja: body.necesidades_pareja || [],
+        mensaje_pareja: body.mensaje_pareja || null,
+        // Campos de familia
+        miembros_familia: body.miembros_familia || null,
+        momento_familia: body.momento_familia || null,
+        necesidades_familia: body.necesidades_familia || [],
+        dinamica_familia: body.dinamica_familia || null,
+        mensaje_familia: body.mensaje_familia || null,
       }
     };
 

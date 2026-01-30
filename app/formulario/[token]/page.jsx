@@ -47,6 +47,18 @@ export default function FormularioPage() {
     personalidad_nino: [],
     necesidades_nino: [],
     info_extra_nino: '',
+    // Pareja
+    nombre_pareja: '',
+    tiempo_juntos: '',
+    momento_pareja: '',
+    necesidades_pareja: [],
+    mensaje_pareja: '',
+    // Familia
+    miembros_familia: '',
+    momento_familia: '',
+    necesidades_familia: [],
+    dinamica_familia: '',
+    mensaje_familia: '',
   });
 
   useEffect(() => {
@@ -198,6 +210,8 @@ export default function FormularioPage() {
   if (!tipoElegido) {
     const opciones = [
       { value: 'para_mi', icon: '✦', label: 'Es para mí', desc: 'Este guardián viene a acompañarme' },
+      { value: 'pareja', icon: '💑', label: 'Para mi pareja y yo', desc: 'Nos va a acompañar a los dos' },
+      { value: 'familia', icon: '🏠', label: 'Para mi familia', desc: 'Va a cuidar a toda la familia' },
       { value: 'regalo_sabe', icon: '🎁', label: 'Es un regalo', desc: 'Y la persona lo sabe' },
       { value: 'regalo_sorpresa', icon: '🎁', label: 'Es un regalo sorpresa', desc: 'La persona no sabe que lo recibirá' },
       { value: 'para_nino', icon: '🧸', label: 'Es para un niño/a', desc: 'Menor de 18 años' },
@@ -629,7 +643,199 @@ export default function FormularioPage() {
     );
   }
 
-  // ═══════════ VÍA 5: RECONEXIÓN ═══════════
+  // ═══════════ VÍA 5: PAREJA ═══════════
+  if (formType === 'pareja') {
+    const necesidadesParejaOpts = [
+      { value: 'comunicacion', label: 'Comunicarnos mejor' },
+      { value: 'reconectar', label: 'Reconectarnos' },
+      { value: 'crisis', label: 'Atravesar una crisis juntos' },
+      { value: 'celebrar', label: 'Celebrar lo que somos' },
+      { value: 'proteccion', label: 'Proteger lo que construimos' },
+      { value: 'nuevo_comienzo', label: 'Un nuevo comienzo juntos' },
+    ];
+
+    const pasos = [
+      // Paso 0: Producto/guardián
+      <>
+        <div style={s.icon}>💑</div>
+        <h1 style={s.title}>Su guardián de pareja</h1>
+        <p style={s.subtitle}>Mostranos al guardián que los va a acompañar.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué tipo de guardián es?</label>
+          <SingleChips field="tipo_producto" options={tipoProductoOpts} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Tiene nombre? (si lo saben)</label>
+          <input style={s.input} value={datos.nombre_producto} onChange={e => updateDato('nombre_producto', e.target.value)} placeholder="El nombre del guardián" />
+        </div>
+        {datos.foto_producto_url && <img src={datos.foto_producto_url} alt="El guardián" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_producto_url" labelText={datos.foto_producto_url ? 'Cambiar foto' : '📷 Subir foto del guardián'} uploading={subiendoFotoProducto} />
+        <NavButtons />
+      </>,
+
+      // Paso 1: Sobre la pareja
+      <>
+        <div style={s.icon}>💑</div>
+        <h1 style={s.title}>Sobre ustedes dos</h1>
+        <p style={s.subtitle}>Tu guardián quiere conocerlos como pareja.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo te llamás vos?</label>
+          <input style={s.input} value={datos.nombre_preferido} onChange={e => updateDato('nombre_preferido', e.target.value)} placeholder="Tu nombre" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo se llama tu pareja?</label>
+          <input style={s.input} value={datos.nombre_pareja} onChange={e => updateDato('nombre_pareja', e.target.value)} placeholder="Su nombre" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cuánto tiempo llevan juntos?</label>
+          {['Menos de 1 año', '1-3 años', '3-10 años', 'Más de 10 años'].map(t => (
+            <div key={t} style={{ ...s.radio, ...(datos.tiempo_juntos === t ? s.radioActive : {}) }} onClick={() => updateDato('tiempo_juntos', t)}>
+              {t}
+            </div>
+          ))}
+        </div>
+        <NavButtons canNext={datos.nombre_preferido.trim() && datos.nombre_pareja.trim()} />
+      </>,
+
+      // Paso 2: Su momento como pareja
+      <>
+        <div style={s.icon}>✦</div>
+        <h1 style={s.title}>Su momento juntos</h1>
+        <p style={s.subtitle}>¿Qué están viviendo como pareja?</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué momento están atravesando juntos?</label>
+          <textarea style={s.textarea} value={datos.momento_pareja} onChange={e => updateDato('momento_pareja', e.target.value)} placeholder="Un cambio, una mudanza, un duelo, una celebración, una crisis..." />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué necesitan como pareja?</label>
+          <Chips field="necesidades_pareja" options={necesidadesParejaOpts} />
+        </div>
+        <NavButtons />
+      </>,
+
+      // Paso 3: Mensaje + foto + confirmación
+      <>
+        <div style={s.icon}>💬</div>
+        <h1 style={s.title}>Un mensaje y su imagen</h1>
+        <p style={s.subtitle}>Si pudieran decirle algo a alguien que realmente los escucha...</p>
+        <div style={s.campo}>
+          <textarea style={s.textarea} value={datos.mensaje_pareja} onChange={e => updateDato('mensaje_pareja', e.target.value)} placeholder="Lo que necesitan como pareja, lo que sueñan juntos, lo que les cuesta..." />
+        </div>
+        <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', fontSize: '0.95rem', margin: '1.5rem 0 1rem' }}>
+          Una foto de ustedes juntos ayuda al guardián a reconocerlos.
+        </p>
+        {datos.foto_url && <img src={datos.foto_url} alt="Foto de pareja" style={{ ...s.fotoPreview, width: '140px', height: '100px', borderRadius: '12px' }} />}
+        <FotoBtn campo="foto_url" labelText={datos.foto_url ? 'Cambiar foto' : '📷 Subir foto de ustedes'} uploading={subiendoFoto} />
+        <Check checked={datos.es_mayor_18} onToggle={() => updateDato('es_mayor_18', !datos.es_mayor_18)} label="Confirmamos que ambos somos mayores de 18 años" />
+        <NavButtons canNext={datos.es_mayor_18} />
+      </>
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <ProgressBar />
+          {pasos[paso]}
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════ VÍA 6: FAMILIA ═══════════
+  if (formType === 'familia') {
+    const necesidadesFamiliaOpts = [
+      { value: 'union', label: 'Unión / Estar más juntos' },
+      { value: 'proteccion', label: 'Protección para la familia' },
+      { value: 'sanacion', label: 'Sanar heridas familiares' },
+      { value: 'transicion', label: 'Atravesar un cambio juntos' },
+      { value: 'armonia', label: 'Armonía en casa' },
+      { value: 'celebrar', label: 'Celebrar lo que somos' },
+    ];
+
+    const pasos = [
+      // Paso 0: Producto/guardián
+      <>
+        <div style={s.icon}>🏠</div>
+        <h1 style={s.title}>El guardián de la familia</h1>
+        <p style={s.subtitle}>Mostranos al guardián que va a cuidar a toda la familia.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué tipo de guardián es?</label>
+          <SingleChips field="tipo_producto" options={tipoProductoOpts} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Tiene nombre? (si lo saben)</label>
+          <input style={s.input} value={datos.nombre_producto} onChange={e => updateDato('nombre_producto', e.target.value)} placeholder="El nombre del guardián" />
+        </div>
+        {datos.foto_producto_url && <img src={datos.foto_producto_url} alt="El guardián" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_producto_url" labelText={datos.foto_producto_url ? 'Cambiar foto' : '📷 Subir foto del guardián'} uploading={subiendoFotoProducto} />
+        <NavButtons />
+      </>,
+
+      // Paso 1: Sobre la familia
+      <>
+        <div style={s.icon}>🏠</div>
+        <h1 style={s.title}>Sobre tu familia</h1>
+        <p style={s.subtitle}>Tu guardián quiere conocerlos a todos.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo te llamás vos?</label>
+          <input style={s.input} value={datos.nombre_preferido} onChange={e => updateDato('nombre_preferido', e.target.value)} placeholder="Tu nombre" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Quiénes forman tu familia?</label>
+          <textarea style={s.textarea} value={datos.miembros_familia} onChange={e => updateDato('miembros_familia', e.target.value)} placeholder="Ej: mi pareja Juan, mis hijos Lucía (8) y Mateo (5), mi mamá Rosa..." />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo es la dinámica de tu familia?</label>
+          <textarea style={s.textarea} value={datos.dinamica_familia} onChange={e => updateDato('dinamica_familia', e.target.value)} placeholder="Cómo se llevan, qué los une, qué los hace especiales..." />
+        </div>
+        <NavButtons canNext={datos.nombre_preferido.trim() && datos.miembros_familia.trim()} />
+      </>,
+
+      // Paso 2: Su momento como familia
+      <>
+        <div style={s.icon}>✦</div>
+        <h1 style={s.title}>Su momento familiar</h1>
+        <p style={s.subtitle}>¿Qué están viviendo como familia?</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué momento están atravesando?</label>
+          <textarea style={s.textarea} value={datos.momento_familia} onChange={e => updateDato('momento_familia', e.target.value)} placeholder="Una mudanza, la llegada de alguien nuevo, una pérdida, un nuevo comienzo..." />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué necesita tu familia?</label>
+          <Chips field="necesidades_familia" options={necesidadesFamiliaOpts} />
+        </div>
+        <NavButtons />
+      </>,
+
+      // Paso 3: Mensaje + foto + confirmación
+      <>
+        <div style={s.icon}>💬</div>
+        <h1 style={s.title}>Un mensaje y una imagen</h1>
+        <p style={s.subtitle}>Si tu familia pudiera hablarle a alguien que realmente los escucha...</p>
+        <div style={s.campo}>
+          <textarea style={s.textarea} value={datos.mensaje_familia} onChange={e => updateDato('mensaje_familia', e.target.value)} placeholder="Lo que necesitan como familia, lo que sueñan juntos, lo que quieren sanar..." />
+        </div>
+        <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', fontSize: '0.95rem', margin: '1.5rem 0 1rem' }}>
+          Una foto familiar ayuda al guardián a reconocerlos.
+        </p>
+        {datos.foto_url && <img src={datos.foto_url} alt="Foto familiar" style={{ ...s.fotoPreview, width: '140px', height: '100px', borderRadius: '12px' }} />}
+        <FotoBtn campo="foto_url" labelText={datos.foto_url ? 'Cambiar foto' : '📷 Subir foto familiar'} uploading={subiendoFoto} />
+        <Check checked={datos.es_mayor_18} onToggle={() => updateDato('es_mayor_18', !datos.es_mayor_18)} label="Confirmo que soy mayor de 18 años" />
+        <NavButtons canNext={datos.es_mayor_18} />
+      </>
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <ProgressBar />
+          {pasos[paso]}
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════ VÍA 7: RECONEXIÓN ═══════════
   if (formType === 'reconexion') {
     const pasos = [
       // Paso 0: Producto/guardián — reconexión
