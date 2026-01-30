@@ -923,7 +923,7 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         try {
-            const response = await fetch(CONFIG.API_BASE + '/api/tito/gpt', {
+            const response = await fetch(CONFIG.API_BASE + '/api/tito/v3', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 signal: controller.signal,
