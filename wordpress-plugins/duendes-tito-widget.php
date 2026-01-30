@@ -1485,6 +1485,10 @@ window.titoUsuario = <?php echo json_encode($usuario_data); ?>;
         } else {
             const errorMsg = response.respuesta || 'Disculpá, tuve un problemita. ¿Podés intentar de nuevo?';
             agregarMensaje(errorMsg, 'bot');
+            // IMPORTANTE: También guardar en conversationHistory para que el contexto
+            // no se pierda. Si no, la siguiente respuesta corta del usuario puede
+            // ser filtrada como spam porque falta el mensaje de Tito en el historial.
+            estado.conversationHistory.push({ role: 'assistant', content: errorMsg });
             estado.mensajesUI.push({ tipo: 'bot', texto: errorMsg });
         }
         estado.isWaiting = false;

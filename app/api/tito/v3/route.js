@@ -617,6 +617,14 @@ async function filtroPreAPI(msg, historial, paisDetectado, sessionId) {
         if (sessionState) { sessionState.contadorMensajes++; sessionState.contadorSinProgreso = 0; await guardarSesion(sessionId, sessionState); }
         return { interceptado: false };
       }
+
+      // C) Mensaje corto en conversación activa → no es spam, es respuesta contextual
+      // Números de pedido cortos (ej: "42"), respuestas "no", datos sueltos...
+      // En mid-conversación, todo mensaje corto tiene contexto implícito.
+      if (msgLower.length < 3) {
+        if (sessionState) { sessionState.contadorMensajes++; await guardarSesion(sessionId, sessionState); }
+        return { interceptado: false };
+      }
     }
   }
 
