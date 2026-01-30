@@ -15,7 +15,7 @@ export default function CanalizacionesAdmin() {
   const [contadores, setContadores] = useState({ borrador: 0, pendiente: 0, aprobada: 0, enviada: 0 });
   const [showMenu, setShowMenu] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [formEnvio, setFormEnvio] = useState({ email: '', nombre: '', formType: 'para_mi', productName: '', personalMessage: '' });
+  const [formEnvio, setFormEnvio] = useState({ email: '', nombre: '', formType: 'para_mi', notaAdmin: '' });
   const [enviandoForm, setEnviandoForm] = useState(false);
   const [formResult, setFormResult] = useState(null);
 
@@ -71,7 +71,7 @@ export default function CanalizacionesAdmin() {
       const data = await res.json();
       setFormResult(data);
       if (data.success) {
-        setTimeout(() => { setShowFormModal(false); setFormResult(null); setFormEnvio({ email: '', nombre: '', formType: 'para_mi', productName: '', personalMessage: '' }); }, 3000);
+        setTimeout(() => { setShowFormModal(false); setFormResult(null); setFormEnvio({ email: '', nombre: '', formType: 'para_mi', notaAdmin: '' }); }, 3000);
       }
     } catch {
       setFormResult({ success: false, error: 'Error de conexión' });
@@ -230,15 +230,12 @@ export default function CanalizacionesAdmin() {
                     <option value="regalo_sabe">Regalo — la persona lo sabe</option>
                     <option value="regalo_sorpresa">Regalo sorpresa (comprador llena)</option>
                     <option value="para_nino">Para un niño/a</option>
+                    <option value="reconexion">Reconexión (ya tiene guardián)</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Producto (opcional)</label>
-                  <input className="form-input" value={formEnvio.productName} onChange={e => setFormEnvio(f => ({ ...f, productName: e.target.value }))} placeholder="Nombre del guardián o producto" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Mensaje personal (opcional)</label>
-                  <textarea className="form-textarea" value={formEnvio.personalMessage} onChange={e => setFormEnvio(f => ({ ...f, personalMessage: e.target.value }))} placeholder="Mensaje que aparecerá en el email..." />
+                  <label className="form-label">Nota para la IA (opcional)</label>
+                  <textarea className="form-textarea" value={formEnvio.notaAdmin} onChange={e => setFormEnvio(f => ({ ...f, notaAdmin: e.target.value }))} placeholder="Ej: compró en la feria de Piriápolis, mencionar la conexión con el lugar..." />
                 </div>
                 {formResult?.error && <p style={{ color: '#f66', fontSize: '0.85rem' }}>{formResult.error}</p>}
                 <button className="btn-enviar-form" onClick={enviarFormulario} disabled={enviandoForm || !formEnvio.email || !formEnvio.nombre}>

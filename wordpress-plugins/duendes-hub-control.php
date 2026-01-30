@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Duendes Hub de Control
  * Description: Centro de control con todos los accesos a la app de Vercel
- * Version: 3.0
+ * Version: 4.0
  * Author: Duendes del Uruguay
  */
 
@@ -76,7 +76,7 @@ class DuendesHubControl {
         <div class="hub-container">
             <div class="hub-header">
                 <h1>🎮 Hub de Control - Duendes del Uruguay</h1>
-                <p>Todos tus accesos en un solo lugar. Version 3.0 - Enero 2026</p>
+                <p>Todos tus accesos en un solo lugar. Version 4.0 - Enero 2026</p>
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -88,6 +88,7 @@ class DuendesHubControl {
                 <a href="<?php echo $url; ?>/admin/circulo" target="_blank" class="quick-btn">🏠 Hub Circulo</a>
                 <a href="<?php echo $url; ?>/admin/circulo/maestro" target="_blank" class="quick-btn jade">🎓 Panel Maestro</a>
                 <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="quick-btn purple">📜 Canalizaciones</a>
+                <a href="<?php echo $url; ?>/admin/canalizaciones/nueva" target="_blank" class="quick-btn purple">➕ Nueva Canalizacion</a>
                 <a href="<?php echo $url; ?>/admin/gamificacion" target="_blank" class="quick-btn secondary">🎮 Gamificacion</a>
             </div>
 
@@ -242,17 +243,39 @@ class DuendesHubControl {
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <!-- CANALIZACIONES -->
+            <!-- CANALIZACIONES - ACTUALIZADO v4.0 -->
             <!-- ═══════════════════════════════════════════════════════════════════════ -->
-            <div class="hub-section" style="border-left: 4px solid #9370DB;">
-                <h2>📜 Panel de Canalizaciones <span class="badge badge-admin">ADMIN</span></h2>
+            <div class="hub-section" style="border: 2px solid #9370DB; background: linear-gradient(135deg, rgba(147,112,219,0.1), rgba(107,78,159,0.05));">
+                <h2>📜 Sistema de Canalizaciones <span class="badge badge-new">v4.0</span></h2>
+                <p style="margin-bottom: 20px; color: #555;">Flujo completo: compra/manual → formulario al cliente → IA genera → admin aprueba → cliente recibe en Mi Magia.</p>
                 <div class="hub-grid">
                     <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card" style="border-color: #9370DB;">
-                        <div class="hub-card-title" style="color: #6B4E9F;">📜 Panel de Aprobacion</div>
+                        <div class="hub-card-title" style="color: #6B4E9F;">📜 Panel de Canalizaciones</div>
                         <div class="hub-card-url">/admin/canalizaciones</div>
-                        <div class="hub-card-desc">Revisar, editar y aprobar canalizaciones antes de enviar. Con resumen IA y chat editor.</div>
-                        <div class="hub-card-uso"><strong>Flujo:</strong> Cliente compra → Pendiente → Revisas → Aprobas → Cliente ve en Mi Magia</div>
+                        <div class="hub-card-desc">Lista de canalizaciones con tabs: Pendientes, Aprobadas, Enviadas, Borradores. Boton "+" para enviar formulario o crear canalizacion manual.</div>
+                        <div class="hub-card-uso"><strong>Tabs:</strong> Pendientes | Aprobadas | Enviadas | Borradores</div>
                     </a>
+                    <a href="<?php echo $url; ?>/admin/canalizaciones/nueva" target="_blank" class="hub-card" style="border-color: #9370DB;">
+                        <div class="hub-card-title" style="color: #6B4E9F;">➕ Nueva Canalizacion Manual</div>
+                        <div class="hub-card-url">/admin/canalizaciones/nueva</div>
+                        <div class="hub-card-desc">Subir foto de CUALQUIER producto (no necesita estar en la tienda). Ingresar info del producto y cliente. Enviar formulario o ingresar contexto manualmente.</div>
+                        <div class="hub-card-uso"><strong>Usalo para:</strong> Productos que no estan en WooCommerce, pedidos especiales, regalos.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/admin/canalizaciones" target="_blank" class="hub-card">
+                        <div class="hub-card-title">📧 Enviar Formulario</div>
+                        <div class="hub-card-url">/admin/canalizaciones → Boton "+"</div>
+                        <div class="hub-card-desc">Enviar formulario estetico por email a cualquier persona. 4 tipos: para mi, regalo que sabe, sorpresa, para nino/a.</div>
+                        <div class="hub-card-uso"><strong>El cliente recibe:</strong> Email branded con link → formulario multi-paso → datos vuelven al sistema.</div>
+                    </a>
+                    <a href="<?php echo $url; ?>/formulario/EJEMPLO" target="_blank" class="hub-card">
+                        <div class="hub-card-title">📝 Formulario Publico</div>
+                        <div class="hub-card-url">/formulario/{token}</div>
+                        <div class="hub-card-desc">Pagina publica donde el cliente llena su formulario. Diseño oscuro, dorado, mobile-first, multi-paso con transiciones.</div>
+                        <div class="hub-card-uso"><strong>4 vias:</strong> Para mi | Regalo (sabe) | Sorpresa | Para nino/a</div>
+                    </a>
+                </div>
+                <div style="margin-top: 16px; padding: 12px 16px; background: rgba(147,112,219,0.1); border-radius: 8px; font-size: 13px; color: #555;">
+                    <strong style="color: #6B4E9F;">Flujo completo:</strong> Compra/Manual → Formulario al cliente (email branded) → Cliente llena (4 vias) → IA genera con vision (foto + datos) → Admin revisa con chat editor → Aprueba → Envia → Cliente ve en Mi Magia + recibe email.
                 </div>
             </div>
 
@@ -408,8 +431,16 @@ class DuendesHubControl {
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/generador-historias</code></td>
                     </tr>
                     <tr style="background: white;">
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Aprobar canalizaciones</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Ver/aprobar canalizaciones</td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code></td>
+                    </tr>
+                    <tr style="background: #f3e5f5;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Crear canalizacion manual</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones/nueva</code></td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Enviar formulario a cliente</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;"><code>/admin/canalizaciones</code> → Boton "+" → Enviar Formulario</td>
                     </tr>
                     <tr style="background: #f8f9fa;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">Dar runas a usuario</td>
@@ -439,8 +470,8 @@ class DuendesHubControl {
                     </tr>
                     <tr style="background: white;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Claude</strong></td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">claude-sonnet-4</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Historias, canalizaciones, contenido circulo</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">claude-sonnet-4 (vision)</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">Historias, canalizaciones (con foto producto/cliente), contenido circulo, chat editor</td>
                     </tr>
                     <tr style="background: #f8f9fa;">
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>OpenAI</strong></td>
@@ -462,7 +493,7 @@ class DuendesHubControl {
 
             <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
                 URL base: <strong><?php echo $url; ?></strong><br>
-                Hub v3.0 - Sistema Circulo de Duendes Completo - Enero 2026
+                Hub v4.0 - Sistema Canalizaciones Completo + Circulo - Enero 2026
             </div>
 
         </div>

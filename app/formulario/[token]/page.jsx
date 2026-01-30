@@ -1,0 +1,657 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+
+// ═══════════════════════════════════════════════════════════════
+// FORMULARIO DE CANALIZACIÓN — Página pública
+// Acceso por token, sin login. 5 vías según tipo de formulario.
+// Step 0 siempre es sobre el guardián/producto.
+// ═══════════════════════════════════════════════════════════════
+
+export default function FormularioPage() {
+  const { token } = useParams();
+  const [config, setConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [paso, setPaso] = useState(0);
+  const [enviando, setEnviando] = useState(false);
+  const [completado, setCompletado] = useState(false);
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
+  const [subiendoFotoProducto, setSubiendoFotoProducto] = useState(false);
+
+  // Estado del formulario (campos universales)
+  const [datos, setDatos] = useState({
+    // Producto/guardián (Step 0 — todas las vías)
+    tipo_producto: '',
+    nombre_producto: '',
+    foto_producto_url: null,
+    // Campos personales
+    nombre_preferido: '',
+    momento_vida: '',
+    necesidades: [],
+    mensaje_guardian: '',
+    foto_url: null,
+    es_mayor_18: false,
+    // Regalo/sorpresa
+    relacion: '',
+    que_necesita_escuchar: '',
+    personalidad: [],
+    que_le_hace_brillar: '',
+    mensaje_personal: '',
+    es_anonimo: false,
+    // Niño
+    edad_nino: '',
+    relacion_nino: '',
+    gustos_nino: '',
+    personalidad_nino: [],
+    necesidades_nino: [],
+    info_extra_nino: '',
+  });
+
+  useEffect(() => {
+    if (!token) return;
+    fetch(`/api/formulario/${token}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          if (data.completed) {
+            setCompletado(true);
+          } else {
+            setConfig(data);
+            if (data.customerName) {
+              setDatos(d => ({ ...d, nombre_preferido: data.customerName }));
+            }
+          }
+        } else {
+          setError(data.error || 'Formulario no encontrado');
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Error de conexión');
+        setLoading(false);
+      });
+  }, [token]);
+
+  const updateDato = (key, value) => {
+    setDatos(d => ({ ...d, [key]: value }));
+  };
+
+  const toggleArray = (key, value) => {
+    setDatos(d => {
+      const arr = d[key] || [];
+      return { ...d, [key]: arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value] };
+    });
+  };
+
+  const subirFoto = async (e, campo) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const setSubiendo = campo === 'foto_producto_url' ? setSubiendoFotoProducto : setSubiendoFoto;
+    setSubiendo(true);
+    try {
+      const fd = new FormData();
+      fd.append('token', token);
+      fd.append('archivo', file);
+      const res = await fetch('/api/formulario/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.success) {
+        updateDato(campo, data.url);
+      } else {
+        alert(data.error || 'Error subiendo foto');
+      }
+    } catch {
+      alert('Error subiendo foto');
+    }
+    setSubiendo(false);
+  };
+
+  const enviar = async () => {
+    setEnviando(true);
+    try {
+      const res = await fetch(`/api/formulario/${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCompletado(true);
+      } else {
+        alert(data.error || 'Error al enviar');
+      }
+    } catch {
+      alert('Error de conexión');
+    }
+    setEnviando(false);
+  };
+
+  // ═══════════ ESTILOS ═══════════
+  const s = {
+    page: { minHeight: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: "'Cormorant Garamond', Georgia, serif", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' },
+    card: { maxWidth: '480px', width: '100%', background: '#111', borderRadius: '20px', padding: '2.5rem 2rem', border: '1px solid #222', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' },
+    icon: { fontSize: '3rem', display: 'block', textAlign: 'center', marginBottom: '1rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.3))' },
+    title: { fontFamily: "'Cinzel', serif", fontSize: '1.8rem', color: '#fff', textAlign: 'center', margin: '0 0 0.5rem' },
+    subtitle: { color: 'rgba(255,255,255,0.6)', textAlign: 'center', fontSize: '1rem', marginBottom: '2rem', lineHeight: '1.5' },
+    label: { display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0.5rem', fontFamily: "'Cinzel', serif" },
+    input: { width: '100%', padding: '14px 16px', background: '#0a0a0a', border: '1px solid #333', borderRadius: '10px', color: '#fff', fontSize: '1.05rem', fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none' },
+    textarea: { width: '100%', padding: '14px 16px', background: '#0a0a0a', border: '1px solid #333', borderRadius: '10px', color: '#fff', fontSize: '1.05rem', fontFamily: 'inherit', boxSizing: 'border-box', minHeight: '120px', resize: 'vertical', outline: 'none' },
+    campo: { marginBottom: '1.5rem' },
+    btn: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #d4af37 0%, #b8972e 100%)', color: '#0a0a0a', border: 'none', borderRadius: '10px', fontFamily: "'Cinzel', serif", fontSize: '1rem', fontWeight: '600', cursor: 'pointer' },
+    btnSec: { width: '100%', padding: '14px', background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid #333', borderRadius: '10px', fontSize: '0.95rem', cursor: 'pointer', marginTop: '0.75rem', fontFamily: 'inherit' },
+    chip: { display: 'inline-block', padding: '10px 18px', margin: '4px', borderRadius: '20px', border: '1px solid #333', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', background: 'transparent' },
+    chipActive: { background: 'rgba(212,175,55,0.15)', borderColor: '#d4af37', color: '#d4af37' },
+    radio: { display: 'block', padding: '12px 16px', margin: '6px 0', borderRadius: '10px', border: '1px solid #333', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', transition: 'all 0.2s' },
+    radioActive: { background: 'rgba(212,175,55,0.1)', borderColor: '#d4af37', color: '#d4af37' },
+    progress: { display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '2rem' },
+    dot: { width: '8px', height: '8px', borderRadius: '50%', background: '#333', transition: 'all 0.3s' },
+    dotActive: { background: '#d4af37', boxShadow: '0 0 8px rgba(212,175,55,0.5)' },
+    highlight: { background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '12px', padding: '16px', marginBottom: '1.5rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: '1.5' },
+    fotoPreview: { width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #d4af37', margin: '1rem auto', display: 'block' },
+    check: { display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '1rem', cursor: 'pointer' },
+  };
+
+  // ═══════════ LOADING / ERROR / COMPLETED ═══════════
+  if (loading) return (
+    <div style={s.page}>
+      <div style={s.card}>
+        <div style={s.icon}>✨</div>
+        <h1 style={s.title}>Cargando...</h1>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div style={s.page}>
+      <div style={s.card}>
+        <div style={s.icon}>🔮</div>
+        <h1 style={s.title}>Enlace no válido</h1>
+        <p style={s.subtitle}>{error}</p>
+      </div>
+    </div>
+  );
+
+  if (completado) return (
+    <div style={s.page}>
+      <div style={s.card}>
+        <div style={s.icon}>✨</div>
+        <h1 style={s.title}>Gracias</h1>
+        <p style={s.subtitle}>
+          Tu guardián ya te escuchó.<br/>
+          Pronto recibirás una carta que fue escrita solo para vos.
+        </p>
+        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <a href="https://duendesdeluruguay.com" style={{ color: '#d4af37', textDecoration: 'none', fontFamily: "'Cinzel', serif" }}>
+            Visitar Duendes del Uruguay
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+
+  const formType = config?.formType || 'para_mi';
+  const totalPasos = 4;
+
+  // ═══════════ COMPONENTES COMPARTIDOS ═══════════
+
+  const ProgressBar = () => (
+    <div style={s.progress}>
+      {Array.from({ length: totalPasos }).map((_, i) => (
+        <div key={i} style={{ ...s.dot, ...(i <= paso ? s.dotActive : {}) }} />
+      ))}
+    </div>
+  );
+
+  const NavButtons = ({ canNext = true, onNext }) => (
+    <div style={{ marginTop: '1.5rem' }}>
+      {paso < totalPasos - 1 ? (
+        <button style={{ ...s.btn, opacity: canNext ? 1 : 0.5 }} disabled={!canNext} onClick={onNext || (() => setPaso(p => p + 1))}>
+          Continuar
+        </button>
+      ) : (
+        <button style={{ ...s.btn, opacity: enviando ? 0.6 : 1 }} disabled={enviando} onClick={enviar}>
+          {enviando ? 'Enviando...' : 'Completar conexión'}
+        </button>
+      )}
+      {paso > 0 && (
+        <button style={s.btnSec} onClick={() => setPaso(p => p - 1)}>Atrás</button>
+      )}
+    </div>
+  );
+
+  const Chips = ({ options, field, max }) => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+      {options.map(opt => {
+        const selected = (datos[field] || []).includes(opt.value);
+        const atMax = max && (datos[field] || []).length >= max && !selected;
+        return (
+          <div key={opt.value}
+            style={{ ...s.chip, ...(selected ? s.chipActive : {}), opacity: atMax ? 0.4 : 1, cursor: atMax ? 'default' : 'pointer' }}
+            onClick={() => !atMax && toggleArray(field, opt.value)}>
+            {opt.label}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // Chips de selección única
+  const SingleChips = ({ options, field }) => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+      {options.map(opt => {
+        const selected = datos[field] === opt.value;
+        return (
+          <div key={opt.value}
+            style={{ ...s.chip, ...(selected ? s.chipActive : {}) }}
+            onClick={() => updateDato(field, selected ? '' : opt.value)}>
+            {opt.label}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const tipoProductoOpts = [
+    { value: 'duende', label: 'Duende' },
+    { value: 'talisman', label: 'Talismán' },
+    { value: 'cristal', label: 'Cristal' },
+    { value: 'set', label: 'Set' },
+    { value: 'otro', label: 'Otro' },
+  ];
+
+  const necesidadesOpts = [
+    { value: 'proteccion', label: 'Protección / Sentirme segura' },
+    { value: 'claridad', label: 'Claridad / Saber qué hacer' },
+    { value: 'abundancia', label: 'Abundancia / Desbloquear lo que merezco' },
+    { value: 'sanacion', label: 'Sanación / Soltar lo que me pesa' },
+    { value: 'amor', label: 'Amor / Conexión genuina' },
+    { value: 'fuerza', label: 'Fuerza / Seguir adelante' },
+  ];
+
+  // Checkbox reutilizable
+  const Check = ({ checked, onToggle, label }) => (
+    <div style={s.check} onClick={onToggle}>
+      <div style={{ width: '22px', height: '22px', borderRadius: '4px', border: `2px solid ${checked ? '#d4af37' : '#555'}`, background: checked ? 'rgba(212,175,55,0.2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', fontSize: '14px', color: '#d4af37' }}>
+        {checked ? '✓' : ''}
+      </div>
+      <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', lineHeight: '1.4' }}>{label}</span>
+    </div>
+  );
+
+  // Botón upload de foto
+  const FotoBtn = ({ campo, labelText, uploading }) => (
+    <div style={s.campo}>
+      <label style={{ ...s.btn, display: 'block', textAlign: 'center', background: 'transparent', border: '1px dashed #d4af37', color: '#d4af37', opacity: uploading ? 0.6 : 1 }}>
+        {uploading ? 'Subiendo...' : labelText}
+        <input type="file" accept="image/*" onChange={e => subirFoto(e, campo)} disabled={uploading} style={{ display: 'none' }} />
+      </label>
+    </div>
+  );
+
+  // ═══════════ VÍA 1: PARA MÍ / VÍA 2: REGALO QUE SABE ═══════════
+  if (formType === 'para_mi' || formType === 'regalo_sabe') {
+    const esRegalo = formType === 'regalo_sabe';
+
+    const pasos = [
+      // Paso 0: Producto/guardián
+      <>
+        <div style={s.icon}>🔮</div>
+        <h1 style={s.title}>Mostranos a tu guardián</h1>
+        <p style={s.subtitle}>Una foto nos ayuda a canalizar mejor.</p>
+        {esRegalo && <div style={s.highlight}>Alguien que te quiere eligió un guardián para vos.</div>}
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué tipo de guardián es?</label>
+          <SingleChips field="tipo_producto" options={tipoProductoOpts} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Tiene nombre? (si lo sabés)</label>
+          <input style={s.input} value={datos.nombre_producto} onChange={e => updateDato('nombre_producto', e.target.value)} placeholder="El nombre de tu guardián" />
+        </div>
+        {datos.foto_producto_url && <img src={datos.foto_producto_url} alt="Tu guardián" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_producto_url" labelText={datos.foto_producto_url ? 'Cambiar foto' : '📷 Subir foto del guardián'} uploading={subiendoFotoProducto} />
+        <NavButtons />
+      </>,
+
+      // Paso 1: Nombre + momento
+      <>
+        <div style={s.icon}>{esRegalo ? '🎁' : '✦'}</div>
+        <h1 style={s.title}>Tu guardián quiere conocerte</h1>
+        <p style={s.subtitle}>No hay respuestas correctas — solo tu verdad.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo te llamás?</label>
+          <input style={s.input} value={datos.nombre_preferido} onChange={e => updateDato('nombre_preferido', e.target.value)} placeholder="Tu nombre o cómo te gustaría que te llame" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué momento de tu vida estás atravesando?</label>
+          <textarea style={s.textarea} value={datos.momento_vida} onChange={e => updateDato('momento_vida', e.target.value)} placeholder="Un cambio, una pérdida, un nuevo comienzo, una búsqueda..." />
+        </div>
+        <NavButtons canNext={datos.nombre_preferido.trim().length > 0} />
+      </>,
+
+      // Paso 2: Necesidades
+      <>
+        <div style={s.icon}>✦</div>
+        <h1 style={s.title}>¿Qué necesitás?</h1>
+        <p style={s.subtitle}>A veces lo que más necesitamos es lo que más nos cuesta pedir.</p>
+        <Chips field="necesidades" options={necesidadesOpts} />
+        <NavButtons />
+      </>,
+
+      // Paso 3: Mensaje + foto personal + confirmación
+      <>
+        <div style={s.icon}>💬</div>
+        <h1 style={s.title}>Un mensaje y tu imagen</h1>
+        <p style={s.subtitle}>Si pudieras decirle algo a alguien que realmente te escucha...</p>
+        <div style={s.campo}>
+          <textarea style={s.textarea} value={datos.mensaje_guardian} onChange={e => updateDato('mensaje_guardian', e.target.value)} placeholder="Algo que no le contás a nadie, algo que te pesa, algo que soñás..." />
+        </div>
+        <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', fontSize: '0.95rem', margin: '1.5rem 0 1rem' }}>
+          Una imagen tuya ayuda a tu guardián a reconocerte.
+        </p>
+        {datos.foto_url && <img src={datos.foto_url} alt="Tu foto" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_url" labelText={datos.foto_url ? 'Cambiar foto' : '📷 Subir tu foto'} uploading={subiendoFoto} />
+        <Check checked={datos.es_mayor_18} onToggle={() => updateDato('es_mayor_18', !datos.es_mayor_18)} label="Confirmo que soy mayor de 18 años" />
+        <NavButtons canNext={datos.es_mayor_18} />
+      </>
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <ProgressBar />
+          {pasos[paso]}
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════ VÍA 3: REGALO SORPRESA ═══════════
+  if (formType === 'regalo_sorpresa') {
+    const pasos = [
+      // Paso 0: Producto/guardián
+      <>
+        <div style={s.icon}>🎁</div>
+        <h1 style={s.title}>Lo que elegiste</h1>
+        <p style={s.subtitle}>Mostranos lo que elegiste para esa persona especial.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué tipo de guardián es?</label>
+          <SingleChips field="tipo_producto" options={tipoProductoOpts} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Tiene nombre? (si lo sabés)</label>
+          <input style={s.input} value={datos.nombre_producto} onChange={e => updateDato('nombre_producto', e.target.value)} placeholder="El nombre del guardián" />
+        </div>
+        {datos.foto_producto_url && <img src={datos.foto_producto_url} alt="El guardián" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_producto_url" labelText={datos.foto_producto_url ? 'Cambiar foto' : '📷 Subir foto del guardián'} uploading={subiendoFotoProducto} />
+        <NavButtons />
+      </>,
+
+      // Paso 1: Sobre la persona
+      <>
+        <div style={s.icon}>💭</div>
+        <h1 style={s.title}>Sobre esa persona</h1>
+        <p style={s.subtitle}>Conocés a esta persona. Eso es valioso.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo se llama?</label>
+          <input style={s.input} value={datos.nombre_preferido} onChange={e => updateDato('nombre_preferido', e.target.value)} placeholder="Su nombre" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cuál es tu relación?</label>
+          {['Pareja', 'Mamá', 'Papá', 'Hermana/o', 'Hija/o', 'Amiga/o', 'Otro'].map(r => (
+            <div key={r} style={{ ...s.radio, ...(datos.relacion === r ? s.radioActive : {}) }} onClick={() => updateDato('relacion', r)}>
+              {r}
+            </div>
+          ))}
+        </div>
+        <NavButtons canNext={datos.nombre_preferido.trim() && datos.relacion} />
+      </>,
+
+      // Paso 2: Su momento y esencia
+      <>
+        <div style={s.icon}>✦</div>
+        <h1 style={s.title}>Su momento y esencia</h1>
+        <p style={s.subtitle}>Pensá en {datos.nombre_preferido || 'esa persona'}. ¿Qué ves?</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué momento está atravesando?</label>
+          <textarea style={s.textarea} value={datos.momento_vida} onChange={e => updateDato('momento_vida', e.target.value)} placeholder="Una separación, un duelo, un logro, una crisis..." />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué creés que necesita escuchar?</label>
+          <textarea style={s.textarea} value={datos.que_necesita_escuchar} onChange={e => updateDato('que_necesita_escuchar', e.target.value)} placeholder="Algo que vos le dirías si pudieras..." />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>Su personalidad (elegí hasta 3)</label>
+          <Chips field="personalidad" max={3} options={[
+            { value: 'sensible', label: 'Sensible' }, { value: 'fuerte', label: 'Fuerte' },
+            { value: 'soñadora', label: 'Soñadora' }, { value: 'practica', label: 'Práctica' },
+            { value: 'reservada', label: 'Reservada' }, { value: 'expresiva', label: 'Expresiva' },
+            { value: 'luchadora', label: 'Luchadora' }, { value: 'tranquila', label: 'Tranquila' },
+          ]} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué le hace brillar los ojos?</label>
+          <textarea style={s.textarea} value={datos.que_le_hace_brillar} onChange={e => updateDato('que_le_hace_brillar', e.target.value)} placeholder="¿Qué la apasiona, qué la hace feliz?" />
+        </div>
+        <NavButtons />
+      </>,
+
+      // Paso 3: Foto + mensaje
+      <>
+        <div style={s.icon}>📷</div>
+        <h1 style={s.title}>Foto y mensaje</h1>
+        <p style={s.subtitle}>Si tenés una foto, ayuda. Si no, el amor que ponés ya dice mucho.</p>
+        {datos.foto_url && <img src={datos.foto_url} alt="Foto" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_url" labelText={datos.foto_url ? 'Cambiar foto' : '📷 Subir foto de la persona'} uploading={subiendoFoto} />
+        {datos.foto_url && (
+          <Check checked={datos.es_mayor_18} onToggle={() => updateDato('es_mayor_18', !datos.es_mayor_18)} label="Confirmo que la persona es mayor de 18 años" />
+        )}
+        <div style={{ ...s.campo, marginTop: '1.5rem' }}>
+          <label style={s.label}>¿Querés incluir un mensaje tuyo?</label>
+          <textarea style={s.textarea} value={datos.mensaje_personal} onChange={e => updateDato('mensaje_personal', e.target.value)} placeholder="Un mensaje para incluir..." />
+        </div>
+        <Check checked={datos.es_anonimo} onToggle={() => updateDato('es_anonimo', !datos.es_anonimo)} label="Prefiero que sea anónimo" />
+        <NavButtons canNext={!datos.foto_url || datos.es_mayor_18} />
+      </>
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <ProgressBar />
+          {pasos[paso]}
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════ VÍA 4: PARA NIÑO/A ═══════════
+  if (formType === 'para_nino') {
+    const pasos = [
+      // Paso 0: Producto/guardián
+      <>
+        <div style={s.icon}>🧸</div>
+        <h1 style={s.title}>El guardián del pequeño/a</h1>
+        <p style={s.subtitle}>Mostranos al guardián del pequeño/a.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué tipo de guardián es?</label>
+          <SingleChips field="tipo_producto" options={tipoProductoOpts} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Tiene nombre? (si lo sabés)</label>
+          <input style={s.input} value={datos.nombre_producto} onChange={e => updateDato('nombre_producto', e.target.value)} placeholder="El nombre del guardián" />
+        </div>
+        {datos.foto_producto_url && <img src={datos.foto_producto_url} alt="El guardián" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_producto_url" labelText={datos.foto_producto_url ? 'Cambiar foto' : '📷 Subir foto del guardián'} uploading={subiendoFotoProducto} />
+        <NavButtons />
+      </>,
+
+      // Paso 1: Datos del niño
+      <>
+        <div style={s.icon}>🌈</div>
+        <h1 style={s.title}>Sobre el niño/a</h1>
+        <p style={s.subtitle}>Los guardianes aman a los más pequeños.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo se llama el niño/a?</label>
+          <input style={s.input} value={datos.nombre_preferido} onChange={e => updateDato('nombre_preferido', e.target.value)} placeholder="Su nombre" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué edad tiene?</label>
+          {['3-6 años', '7-10 años', '11-14 años', '15-17 años'].map(e => (
+            <div key={e} style={{ ...s.radio, ...(datos.edad_nino === e ? s.radioActive : {}) }} onClick={() => updateDato('edad_nino', e)}>
+              {e}
+            </div>
+          ))}
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cuál es tu relación?</label>
+          {['Mamá', 'Papá', 'Abuela/o', 'Tía/o', 'Madrina/Padrino', 'Otro'].map(r => (
+            <div key={r} style={{ ...s.radio, ...(datos.relacion_nino === r ? s.radioActive : {}) }} onClick={() => updateDato('relacion_nino', r)}>
+              {r}
+            </div>
+          ))}
+        </div>
+        <NavButtons canNext={datos.nombre_preferido.trim() && datos.edad_nino && datos.relacion_nino} />
+      </>,
+
+      // Paso 2: Su mundo
+      <>
+        <div style={s.icon}>🌟</div>
+        <h1 style={s.title}>Su mundo</h1>
+        <p style={s.subtitle}>Contanos sobre {datos.nombre_preferido || 'el niño/a'}. ¿Cómo es?</p>
+        <div style={s.campo}>
+          <label style={s.label}>Personalidad</label>
+          <Chips field="personalidad_nino" options={[
+            { value: 'timido', label: 'Tímido/a' }, { value: 'sociable', label: 'Sociable' },
+            { value: 'sensible', label: 'Sensible' }, { value: 'aventurero', label: 'Aventurero/a' },
+            { value: 'creativo', label: 'Creativo/a' }, { value: 'curioso', label: 'Curioso/a' },
+            { value: 'tranquilo', label: 'Tranquilo/a' },
+          ]} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué le gusta hacer?</label>
+          <textarea style={s.textarea} value={datos.gustos_nino} onChange={e => updateDato('gustos_nino', e.target.value)} placeholder="Dibujar, jugar, leer, los animales..." />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Hay algo que esté necesitando?</label>
+          <Chips field="necesidades_nino" options={[
+            { value: 'miedos_nocturnos', label: 'Miedos nocturnos' },
+            { value: 'cambios_familia', label: 'Cambios en la familia' },
+            { value: 'escuela', label: 'Dificultades en la escuela' },
+            { value: 'confianza', label: 'Necesita confianza' },
+            { value: 'sensible', label: 'Está muy sensible' },
+            { value: 'amigo_magico', label: 'Solo quiero que tenga un amigo mágico' },
+          ]} />
+        </div>
+        <NavButtons />
+      </>,
+
+      // Paso 3: Confirmación (sin foto)
+      <>
+        <div style={s.icon}>🛡️</div>
+        <h1 style={s.title}>Confirmación</h1>
+        <div style={s.highlight}>
+          Para proteger a los más pequeños, no pedimos fotos de menores.<br/>
+          El guardián se conectará a través de tu amor y lo que nos contaste.
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Algo más que el guardián debería saber?</label>
+          <textarea style={s.textarea} value={datos.info_extra_nino} onChange={e => updateDato('info_extra_nino', e.target.value)} placeholder="Cualquier cosa que ayude..." />
+        </div>
+        <Check checked={datos.es_mayor_18} onToggle={() => updateDato('es_mayor_18', !datos.es_mayor_18)} label="Entiendo y confirmo" />
+        <NavButtons canNext={datos.es_mayor_18} />
+      </>
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <ProgressBar />
+          {pasos[paso]}
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════ VÍA 5: RECONEXIÓN ═══════════
+  if (formType === 'reconexion') {
+    const pasos = [
+      // Paso 0: Producto/guardián — reconexión
+      <>
+        <div style={s.icon}>🔮</div>
+        <h1 style={s.title}>Tu guardián quiere reconectarse</h1>
+        <p style={s.subtitle}>Mostranos cómo está tu guardián hoy — nos encanta ver cómo viven en sus nuevos hogares.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué tipo de guardián es?</label>
+          <SingleChips field="tipo_producto" options={tipoProductoOpts} />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo se llama?</label>
+          <input style={s.input} value={datos.nombre_producto} onChange={e => updateDato('nombre_producto', e.target.value)} placeholder="El nombre de tu guardián" />
+        </div>
+        {datos.foto_producto_url && <img src={datos.foto_producto_url} alt="Tu guardián" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_producto_url" labelText={datos.foto_producto_url ? 'Cambiar foto' : '📷 Subir foto de tu guardián'} uploading={subiendoFotoProducto} />
+        <NavButtons />
+      </>,
+
+      // Paso 1: ¿Qué está pasando ahora?
+      <>
+        <div style={s.icon}>✦</div>
+        <h1 style={s.title}>¿Qué está pasando ahora?</h1>
+        <p style={s.subtitle}>Ha pasado un tiempo... contanos cómo estás.</p>
+        <div style={s.campo}>
+          <label style={s.label}>¿Cómo te llamás?</label>
+          <input style={s.input} value={datos.nombre_preferido} onChange={e => updateDato('nombre_preferido', e.target.value)} placeholder="Tu nombre o cómo te gustaría que te llame" />
+        </div>
+        <div style={s.campo}>
+          <label style={s.label}>¿Qué cambió desde la última vez?</label>
+          <textarea style={s.textarea} value={datos.momento_vida} onChange={e => updateDato('momento_vida', e.target.value)} placeholder="Nuevas situaciones, cambios, lo que estás viviendo ahora..." />
+        </div>
+        <NavButtons canNext={datos.nombre_preferido.trim().length > 0} />
+      </>,
+
+      // Paso 2: ¿Qué necesitás hoy?
+      <>
+        <div style={s.icon}>💬</div>
+        <h1 style={s.title}>¿Qué necesitás hoy?</h1>
+        <p style={s.subtitle}>Tu guardián quiere saber cómo acompañarte ahora.</p>
+        <Chips field="necesidades" options={necesidadesOpts} />
+        <div style={{ ...s.campo, marginTop: '1.5rem' }}>
+          <label style={s.label}>¿Qué le dirías hoy a tu guardián?</label>
+          <textarea style={s.textarea} value={datos.mensaje_guardian} onChange={e => updateDato('mensaje_guardian', e.target.value)} placeholder="Lo que necesitás decirle, lo que querés que sepa..." />
+        </div>
+        <NavButtons />
+      </>,
+
+      // Paso 3: Tu imagen
+      <>
+        <div style={s.icon}>📷</div>
+        <h1 style={s.title}>Tu imagen</h1>
+        <p style={s.subtitle}>Una foto tuya ayuda a tu guardián a reconectarse con vos.</p>
+        {datos.foto_url && <img src={datos.foto_url} alt="Tu foto" style={s.fotoPreview} />}
+        <FotoBtn campo="foto_url" labelText={datos.foto_url ? 'Cambiar foto' : '📷 Subir tu foto'} uploading={subiendoFoto} />
+        <Check checked={datos.es_mayor_18} onToggle={() => updateDato('es_mayor_18', !datos.es_mayor_18)} label="Confirmo que soy mayor de 18 años" />
+        <NavButtons canNext={datos.es_mayor_18} />
+      </>
+    ];
+
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <ProgressBar />
+          {pasos[paso]}
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback
+  return (
+    <div style={s.page}>
+      <div style={s.card}>
+        <div style={s.icon}>🔮</div>
+        <h1 style={s.title}>Formulario no disponible</h1>
+        <p style={s.subtitle}>Tipo de formulario no reconocido.</p>
+      </div>
+    </div>
+  );
+}

@@ -175,7 +175,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { ordenId, email, nombreCliente, guardian, datosCheckout, esManual, productoManual, formToken, contextoManual } = body;
+    const { ordenId, email, nombreCliente, guardian, datosCheckout, esManual, productoManual, formToken, contextoManual, notaAdmin: notaAdminBody } = body;
 
     // ═══════════════════════════════════════════════════════════════
     // RAMA MANUAL: Crear canalización desde admin sin orden
@@ -202,6 +202,7 @@ export async function POST(request) {
         formToken: formToken || null,
         formData: null,
         contextoManual: contextoManual || null,
+        notaAdmin: notaAdminBody || null,
         datosCheckout: null,
         contenido: null,
         resumen: null,
@@ -586,13 +587,24 @@ export async function PUT(request) {
         }
       }
 
-      // Datos del producto (manual o de webhook)
+      // Buscar nota del admin desde la invitación o la canalizacion
+      let notaAdmin = canalizacion.notaAdmin || null;
+      if (!notaAdmin && canalizacion.formToken) {
+        const invite = await kv.get(`form_invite:${canalizacion.formToken}`);
+        if (invite?.notaAdmin) {
+          notaAdmin = invite.notaAdmin;
+          canalizacion.notaAdmin = notaAdmin; // persistir en la canalizacion
+        }
+      }
+
+      // Datos del producto — prioridad: formulario del cliente > productoManual > guardian
+      const formProducto = formData?.respuestas || {};
       const guardianInfo = canalizacion.productoManual || canalizacion.guardian || {};
-      const nombreGuardian = guardianInfo.nombre || 'Guardián';
+      const nombreGuardian = formProducto.nombre_producto || guardianInfo.nombre || 'Guardián';
       const categoriaGuardian = guardianInfo.categoria || 'protección';
       const descripcionProducto = guardianInfo.descripcion || '';
-      const tipoProducto = guardianInfo.tipo || '';
-      const imagenProducto = guardianInfo.imagenUrl || guardianInfo.imagen || null;
+      const tipoProducto = formProducto.tipo_producto || guardianInfo.tipo || '';
+      const imagenProducto = formProducto.foto_producto_url || guardianInfo.imagenUrl || guardianInfo.imagen || null;
 
       const nombreReal = canalizacion.nombreDestinatario || canalizacion.nombreCliente || 'la persona';
 
@@ -642,6 +654,18 @@ CONTEXTO QUE EL ADMIN PROPORCIONÓ:
 Usá esta información para personalizar la carta.`;
       }
 
+      // Nota del admin (indicación extra)
+      let seccionNota = '';
+      if (notaAdmin) {
+        seccionNota = `
+═══════════════════════════════════════════════════════════════
+INDICACIÓN DEL ADMIN:
+═══════════════════════════════════════════════════════════════
+"${notaAdmin}"
+
+Tené en cuenta esta indicación al escribir la carta.`;
+      }
+
       // Construir datos del guardián
       let datosGuardian = '';
       if (canalizacion.guardian && !canalizacion.esManual) {
@@ -688,6 +712,7 @@ ES una carta de un ser que leyó lo que la persona compartió y le habla al cora
 Imaginá: tu mejor amigo que además tiene poderes mágicos te escribe después de leer tu diario. Esa intimidad. Esa calidez. Ese "te veo".
 ${seccionFormulario}
 ${seccionContexto}
+${seccionNota}
 ${esSorpresa ? '\n⚠️ ES SORPRESA: Alguien que la quiere te eligió para ella. Mencionalo sutilmente.\n' : ''}
 ═══════════════════════════════════════════════════════════════════
 QUIÉN SOS VOS (${nombreGuardian.toUpperCase()})
@@ -841,6 +866,150 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
           estado: 'pendiente',
           resumen,
           fechaGenerada: canalizacion.fechaGenerada
+        }
+      }, { headers: corsHeaders });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ACCIÓN: REGENERAR (desde pendiente/aprobada, vuelve a generar)
+    // ═══════════════════════════════════════════════════════════════
+    if (accion === 'regenerar') {
+      if (!['pendiente', 'aprobada'].includes(canalizacion.estado)) {
+        return Response.json({
+          success: false,
+          error: 'Solo se puede regenerar desde estado pendiente o aprobada'
+        }, { status: 400, headers: corsHeaders });
+      }
+
+      // Reutilizar los mismos datos que ya tiene la canalización
+      let formData = canalizacion.formData || null;
+      if (!formData && canalizacion.formToken) {
+        formData = await kv.get(`form_data:${canalizacion.formToken}`);
+      }
+
+      // Buscar nota del admin
+      let notaAdmin = null;
+      if (canalizacion.formToken) {
+        const invite = await kv.get(`form_invite:${canalizacion.formToken}`);
+        if (invite?.notaAdmin) notaAdmin = invite.notaAdmin;
+      }
+
+      // Datos del producto
+      const formProductoR = formData?.respuestas || {};
+      const guardianInfoR = canalizacion.productoManual || canalizacion.guardian || {};
+      const nombreGuardianR = formProductoR.nombre_producto || guardianInfoR.nombre || 'Guardián';
+      const categoriaGuardianR = guardianInfoR.categoria || 'protección';
+      const tipoProductoR = formProductoR.tipo_producto || guardianInfoR.tipo || '';
+      const imagenProductoR = formProductoR.foto_producto_url || guardianInfoR.imagenUrl || guardianInfoR.imagen || null;
+      const nombreRealR = canalizacion.nombreDestinatario || canalizacion.nombreCliente || 'la persona';
+
+      // Construir secciones del prompt
+      let seccionFormR = '';
+      if (formData?.respuestas) {
+        const r = formData.respuestas;
+        const lines = [];
+        if (r.nombre_preferido) lines.push(`Cómo quiere que la llamen: ${r.nombre_preferido}`);
+        if (r.momento_vida) lines.push(`Momento de vida: ${r.momento_vida}`);
+        if (r.necesidades?.length) lines.push(`Lo que necesita: ${r.necesidades.join(', ')}`);
+        if (r.mensaje_guardian) lines.push(`Mensaje al guardián: "${r.mensaje_guardian}"`);
+        if (r.relacion) lines.push(`Relación: ${r.relacion}`);
+        if (r.personalidad?.length) lines.push(`Personalidad: ${r.personalidad.join(', ')}`);
+        if (r.que_le_hace_brillar) lines.push(`Lo que le hace brillar: ${r.que_le_hace_brillar}`);
+        if (r.que_necesita_escuchar) lines.push(`Lo que necesita escuchar: ${r.que_necesita_escuchar}`);
+        if (r.mensaje_personal) lines.push(`Mensaje personal: "${r.mensaje_personal}"`);
+        if (r.es_anonimo) lines.push(`El regalo es anónimo`);
+        if (r.edad_nino) lines.push(`Edad del niño/a: ${r.edad_nino}`);
+        if (r.gustos_nino) lines.push(`Le gusta: ${r.gustos_nino}`);
+        if (r.necesidades_nino?.length) lines.push(`Necesita: ${r.necesidades_nino.join(', ')}`);
+        if (lines.length > 0) {
+          seccionFormR = `\nDATOS DEL FORMULARIO:\n${lines.join('\n')}\n\nESTO ES SAGRADO. Respondé a lo que compartió.\n`;
+        }
+      }
+
+      let seccionNotaR = notaAdmin ? `\nINDICACIÓN DEL ADMIN: "${notaAdmin}"\n` : '';
+      let seccionContextoR = canalizacion.contextoManual ? `\nCONTEXTO: "${canalizacion.contextoManual}"\n` : '';
+
+      // Datos del guardián
+      let datosGuardianR = `Nombre: ${nombreGuardianR}\nCategoría: ${categoriaGuardianR}`;
+      if (tipoProductoR) datosGuardianR += `\nTipo: ${tipoProductoR}`;
+      if (!canalizacion.esManual && canalizacion.guardian) {
+        datosGuardianR = construirDatosGuardian(canalizacion.guardian);
+      }
+
+      const systemPromptR = `Vas a escribir una carta personal como ${nombreGuardianR} para ${nombreRealR}.
+
+REGLA #1: ESTO ES UNA CARTA DE ALGUIEN QUE TE QUIERE. NO un texto místico. ES una carta de un ser que le habla al corazón.
+${seccionFormR}${seccionContextoR}${seccionNotaR}
+QUIÉN SOS VOS (${nombreGuardianR.toUpperCase()}):
+${datosGuardianR}
+
+IMPORTANTE: Esta es una REGENERACIÓN. Escribí algo COMPLETAMENTE DIFERENTE a la versión anterior. Nuevo enfoque, nuevas metáforas, nueva estructura.
+
+Prohibido: frases genéricas de IA, "brumas ancestrales", "velo entre mundos", relleno poético vacío.
+Sí: como un amigo que te quiere escribiéndote. Específico a ESTA persona.
+Estructura flexible: Te escuché → Quién soy → Lo que vine a hacer → Cómo voy a estar → Mi lugar → Lo importante.
+Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
+
+      const contentBlocksR = [];
+      if (imagenProductoR) {
+        contentBlocksR.push({ type: 'image', source: { type: 'url', url: imagenProductoR } });
+        contentBlocksR.push({ type: 'text', text: 'Imagen del guardián/producto. Reflejá su personalidad en la carta.' });
+      }
+      const fotoClienteR = formData?.respuestas?.foto_url;
+      if (fotoClienteR) {
+        contentBlocksR.push({ type: 'image', source: { type: 'url', url: fotoClienteR } });
+        contentBlocksR.push({ type: 'text', text: 'Foto de la persona. Dejá que influya en tu tono.' });
+      }
+      contentBlocksR.push({ type: 'text', text: `Escribí tu canalización personal completa para ${nombreRealR}. Sos ${nombreGuardianR}, hablando en primera persona.` });
+
+      const anthropic = new Anthropic();
+      const responseR = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        messages: [{ role: 'user', content: contentBlocksR }],
+        system: systemPromptR
+      });
+
+      const contenidoR = responseR.content[0].text;
+
+      const resumenRR = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: `Resumí esta canalización en 2-3 oraciones:\n\n${contenidoR.substring(0, 3000)}...` }]
+      });
+
+      // Actualizar — volver a pendiente
+      const estadoAnterior = canalizacion.estado;
+      canalizacion.contenido = contenidoR;
+      canalizacion.resumen = resumenRR.content[0].text;
+      canalizacion.estado = 'pendiente';
+      canalizacion.fechaGenerada = fecha.toISOString();
+      canalizacion.fechaAprobada = null;
+      canalizacion.regeneraciones = (canalizacion.regeneraciones || 0) + 1;
+
+      await kv.set(`canalizacion:${id}`, canalizacion);
+
+      // Mover a pendientes si estaba en aprobadas
+      if (estadoAnterior === 'aprobada') {
+        const aprobadas = await kv.get('canalizaciones:aprobadas') || [];
+        await kv.set('canalizaciones:aprobadas', aprobadas.filter(aid => aid !== id));
+        const pendientes = await kv.get('canalizaciones:pendientes') || [];
+        if (!pendientes.includes(id)) {
+          pendientes.unshift(id);
+          await kv.set('canalizaciones:pendientes', pendientes);
+        }
+      }
+
+      console.log(`[CANALIZACION] Regenerada: ${id} (vez #${canalizacion.regeneraciones})`);
+
+      return Response.json({
+        success: true,
+        canalizacion: {
+          id: canalizacion.id,
+          estado: 'pendiente',
+          resumen: canalizacion.resumen,
+          fechaGenerada: canalizacion.fechaGenerada,
+          regeneraciones: canalizacion.regeneraciones
         }
       }, { headers: corsHeaders });
     }

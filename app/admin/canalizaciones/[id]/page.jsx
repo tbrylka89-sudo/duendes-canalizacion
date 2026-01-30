@@ -18,6 +18,7 @@ export default function CanalizacionDetalle() {
   const [cargandoResumen, setCargandoResumen] = useState(false);
   const [cargandoAccion, setCargandoAccion] = useState(false);
   const [generando, setGenerando] = useState(false);
+  const [regenerando, setRegenerando] = useState(false);
 
   // Chat state
   const [mensajes, setMensajes] = useState([]);
@@ -283,6 +284,54 @@ export default function CanalizacionDetalle() {
     setGenerando(false);
   }
 
+  async function regenerarConIA() {
+    if (regenerando) return;
+    if (!window.confirm('¿Regenerar la canalización? Se creará un contenido completamente nuevo.')) return;
+    setRegenerando(true);
+
+    setMensajes(prev => [...prev, {
+      rol: 'sistema',
+      contenido: 'Regenerando canalización con IA... esto puede tomar un momento.',
+      timestamp: new Date().toISOString()
+    }]);
+
+    try {
+      const res = await fetch('/api/admin/canalizaciones', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: canalizacionId,
+          accion: 'regenerar'
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        await cargarCanalizacion();
+        setMensajes(prev => [...prev, {
+          rol: 'sistema',
+          contenido: 'Canalización regenerada. Nueva versión pendiente de revisión.',
+          timestamp: new Date().toISOString()
+        }]);
+      } else {
+        setMensajes(prev => [...prev, {
+          rol: 'asistente',
+          contenido: `Error regenerando: ${data.error}`,
+          timestamp: new Date().toISOString()
+        }]);
+      }
+    } catch (error) {
+      setMensajes(prev => [...prev, {
+        rol: 'asistente',
+        contenido: `Error de conexión: ${error.message}`,
+        timestamp: new Date().toISOString()
+      }]);
+    }
+
+    setRegenerando(false);
+  }
+
   if (cargando) {
     return (
       <div className="cargando-container">
@@ -364,6 +413,11 @@ export default function CanalizacionDetalle() {
               <span className={`estado ${canalizacion.estado}`}>
                 {canalizacion.estado}
               </span>
+              {canalizacion.regeneraciones > 0 && (
+                <span style={{ color: '#ffb432', fontSize: '0.7rem', marginLeft: '0.5rem' }}>
+                  (v{canalizacion.regeneraciones + 1})
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -375,6 +429,15 @@ export default function CanalizacionDetalle() {
               disabled={generando}
             >
               {generando ? 'Generando...' : 'Generar con IA'}
+            </button>
+          )}
+          {(canalizacion.estado === 'pendiente' || canalizacion.estado === 'aprobada') && (
+            <button
+              onClick={regenerarConIA}
+              className="btn-regenerar-header"
+              disabled={regenerando}
+            >
+              {regenerando ? 'Regenerando...' : 'Regenerar'}
             </button>
           )}
           {canalizacion.estado === 'pendiente' && (
@@ -413,6 +476,26 @@ export default function CanalizacionDetalle() {
               {canalizacion.productoManual.tipo && <p className="info-meta">Tipo: {canalizacion.productoManual.tipo}</p>}
               {canalizacion.productoManual.categoria && <p className="info-meta">Categoría: {canalizacion.productoManual.categoria}</p>}
               {canalizacion.productoManual.descripcion && <p className="info-desc">{canalizacion.productoManual.descripcion}</p>}
+            </div>
+          )}
+
+          {/* Nota del admin */}
+          {canalizacion.notaAdmin && (
+            <div className="panel info-panel nota-admin-panel">
+              <h2 className="panel-titulo">Nota para la IA</h2>
+              <p className="info-desc nota-admin-text">{canalizacion.notaAdmin}</p>
+            </div>
+          )}
+
+          {/* Producto del formulario (foto + tipo del cliente) */}
+          {canalizacion.formData?.respuestas?.tipo_producto && (
+            <div className="panel info-panel">
+              <h2 className="panel-titulo">Guardián (del formulario)</h2>
+              {canalizacion.formData.respuestas.foto_producto_url && (
+                <img src={canalizacion.formData.respuestas.foto_producto_url} alt="" className="producto-img" />
+              )}
+              <p className="info-nombre">{canalizacion.formData.respuestas.nombre_producto || 'Sin nombre'}</p>
+              <p className="info-meta">Tipo: {canalizacion.formData.respuestas.tipo_producto}</p>
             </div>
           )}
 
@@ -763,6 +846,30 @@ export default function CanalizacionDetalle() {
           opacity: 0.5;
           cursor: not-allowed;
           transform: none;
+        }
+
+        .btn-regenerar-header {
+          padding: 0.6rem 1.25rem;
+          background: rgba(255,180,50,0.15);
+          border: 1px solid rgba(255,180,50,0.3);
+          color: #ffb432;
+          font-family: 'Cinzel', serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+          z-index: 100;
+        }
+
+        .btn-regenerar-header:hover:not(:disabled) {
+          background: rgba(255,180,50,0.25);
+        }
+
+        .btn-regenerar-header:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         .btn-aprobar, .btn-enviar {
@@ -1357,6 +1464,16 @@ export default function CanalizacionDetalle() {
           object-fit: cover;
           border-radius: 6px;
           margin-top: 0.25rem;
+        }
+
+        .nota-admin-panel {
+          border-color: rgba(255,180,50,0.2);
+          background: rgba(255,180,50,0.05);
+        }
+
+        .nota-admin-text {
+          color: #ffb432 !important;
+          font-style: italic;
         }
 
         /* Preview vacío (borrador) */
