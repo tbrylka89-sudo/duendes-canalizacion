@@ -106,7 +106,7 @@ export async function POST(request) {
           body: JSON.stringify({
             sender: { name: 'Duendes del Uruguay', email: 'info@duendesdeluruguay.com' },
             to: [{ email: email.toLowerCase().trim(), name: nombre }],
-            subject: (formType && subjects[formType]) || 'Tu guardián te espera',
+            subject: (formType && subjects[formType]) || 'Hay mensajes que esperan ser recibidos',
             htmlContent: emailHtml
           })
         });
