@@ -8,6 +8,89 @@ const corsHeaders = {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// Buscar canalizaciones paralelas/previas del mismo cliente
+// Para dar contexto y consistencia entre guardianes
+// ═══════════════════════════════════════════════════════════════
+async function obtenerContextoParalelo(email, ordenId, idActual) {
+  const paralelas = [];
+
+  try {
+    // Buscar todas las canalizaciones de este email
+    const todasIds = await kv.get('canalizaciones:todas') || [];
+    // También borradores y pendientes
+    const borradoresIds = await kv.get('canalizaciones:borradores') || [];
+    const pendientesIds = await kv.get('canalizaciones:pendientes') || [];
+    const enviadasIds = await kv.get('canalizaciones:enviadas') || [];
+
+    const todosIds = [...new Set([...todasIds, ...borradoresIds, ...pendientesIds, ...enviadasIds])];
+
+    for (const cId of todosIds.slice(0, 50)) {
+      if (cId === idActual) continue;
+
+      const canal = await kv.get(`canalizacion:${cId}`);
+      if (!canal) continue;
+
+      // Mismo email o misma orden
+      const mismoEmail = canal.email && email && canal.email.toLowerCase() === email.toLowerCase();
+      const mismaOrden = canal.ordenId && ordenId && String(canal.ordenId) === String(ordenId);
+
+      if (mismoEmail || mismaOrden) {
+        const guardianNombre = canal.guardian?.nombre || canal.productoManual?.nombre || 'Desconocido';
+        const guardianCategoria = canal.guardian?.categoria || canal.productoManual?.categoria || '';
+        const tieneContenido = !!canal.contenido;
+
+        paralelas.push({
+          nombre: guardianNombre,
+          categoria: guardianCategoria,
+          estado: canal.estado,
+          mismaOrden,
+          // Resumen corto del contenido si ya fue generada (para evitar repetirse)
+          resumenBreve: tieneContenido ? canal.resumen || canal.contenido?.substring(0, 300) : null
+        });
+      }
+    }
+  } catch (e) {
+    console.error('[CANALIZACION] Error buscando paralelas:', e);
+  }
+
+  return paralelas;
+}
+
+function construirSeccionParalelas(paralelas, nombreGuardianActual) {
+  if (!paralelas.length) return '';
+
+  const mismaOrden = paralelas.filter(p => p.mismaOrden);
+  const previas = paralelas.filter(p => !p.mismaOrden);
+
+  let seccion = `
+═══════════════════════════════════════════════════════════════
+OTRAS CANALIZACIONES DE ESTA PERSONA (CONTEXTO DE CONSISTENCIA)
+═══════════════════════════════════════════════════════════════
+`;
+
+  if (mismaOrden.length > 0) {
+    seccion += `\nEn esta MISMA compra también eligió: ${mismaOrden.map(p => `${p.nombre} (${p.categoria})`).join(', ')}.`;
+    const generadas = mismaOrden.filter(p => p.resumenBreve);
+    if (generadas.length > 0) {
+      seccion += `\n\nLos otros guardianes ya escribieron sus cartas. Para que seas COMPLEMENTARIO y no repetitivo, acá va lo que dijeron:`;
+      for (const g of generadas) {
+        seccion += `\n- ${g.nombre} (${g.categoria}): ${g.resumenBreve?.substring(0, 200)}...`;
+      }
+      seccion += `\n\nTU ROL: Hablá desde TU perspectiva única. No repitas los mismos consejos ni las mismas metáforas. Cada guardián ve la situación desde un ángulo diferente. Sé complementario.`;
+    } else {
+      seccion += `\nSos el primero en escribir. Los otros guardianes también van a escribir sus cartas para esta persona.`;
+    }
+  }
+
+  if (previas.length > 0) {
+    seccion += `\n\nEsta persona ya tiene guardianes previos: ${previas.map(p => p.nombre).join(', ')}.`;
+    seccion += `\nNo los menciones por nombre, pero tené en cuenta que ya tiene experiencia con guardianes.`;
+  }
+
+  return seccion;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Construir datos del guardián para el prompt de forma DINÁMICA
 // Incluye CUALQUIER campo que venga del producto
 // ═══════════════════════════════════════════════════════════════
@@ -313,6 +396,10 @@ ESTO ES SAGRADO. Tu carta debe RESPONDER a esto. Que sienta que la escuchaste.\n
     // Construir datos del guardián para el prompt
     const datosGuardian = construirDatosGuardian(guardian);
 
+    // Buscar canalizaciones paralelas para consistencia
+    const paralelas = await obtenerContextoParalelo(email, ordenId, id);
+    const seccionParalelas = construirSeccionParalelas(paralelas, guardian.nombre);
+
     // Adaptar tono según edad
     let tonoEdad = '';
     if (esNino === 'pequeno') {
@@ -352,6 +439,8 @@ ${datosGuardian}
 
 USA TODA ESTA INFORMACIÓN para darle personalidad a tu carta. Si tenés historia, contala. Si tenés color favorito, mencionalo. Si tenés forma de hablar, usala. Cada dato hace tu carta más REAL y ÚNICA.
 
+IMPORTANTE SOBRE TU IDENTIDAD: Basá tu personalidad en los datos REALES del producto de la web. Si sos un duende, hablás como duende. Si sos una pixie, hablás como pixie. Si sos un altar o accesorio, hablás como ese objeto con alma — un altar no tiene piernas ni ojos, pero tiene presencia, energía, y una forma única de acompañar. Adaptá tu voz a lo que REALMENTE sos según la descripción del producto.
+${seccionParalelas}
 ═══════════════════════════════════════════════════════════════════
 CÓMO ESCRIBIR
 ═══════════════════════════════════════════════════════════════════
@@ -367,6 +456,7 @@ ${tonoEdad}
 - "Vibraciones cósmicas..."
 - Cualquier frase de horóscopo genérico
 - Relleno poético vacío
+- INVENTAR nombres de otros guardianes que no existan (NUNCA inventes nombres como "Lumia", "Thorne" u otros)
 - Palabras que puedan ofender: "boluda/o", "pelotuda/o", "jodida/o", "idiota", etc.
   (Usá alternativas suaves: "no te hagas la distraída", "no te engañes", "época difícil")
 
@@ -387,7 +477,7 @@ ESTRUCTURA (flexible, no rígida)
 5. **Un momento juntos** - Algo simple para conectar
 6. **Mi lugar** - Dónde querés estar en su casa
 7. **Cómo cuidarme** - Contá de forma natural cómo te gusta que te cuiden y cómo usarte en el día a día. No como manual de instrucciones sino como alguien que dice "me gusta que...", "tratame con...", "cuando necesites de mí, podés...". Sé práctico: limpieza suave (paño seco o húmedo, nada de productos químicos), evitar sol directo y humedad, no dejarme caer. Pero también cómo conectar: tenerme cerca cuando necesite fuerza, hablarme, tocarme antes de salir. Sin rituales complicados ni extremos — cosas simples y reales que la persona pueda hacer.
-8. **Otros compañeros** - Mencioná de forma natural y mágica: "Los duendes somos seres sociables, cuando habitamos juntos nos potenciamos... te dejo los elementales con los que resuena mi energía, por si algún día sentís el llamado..." NO vendas, compartí desde la magia de la comunidad.
+8. **La comunidad** - Hablá de forma genérica y mágica sobre la comunidad de guardianes: "Los duendes somos seres sociables, cuando habitamos juntos nos potenciamos..." NUNCA inventes nombres de guardianes que no existen. NO nombres a nadie específico. Solo hablá de la comunidad en general y de que si algún día siente el llamado de otro compañero, va a saber. Compartí desde la magia de la comunidad, no vendas.
 9. **Lo importante** - Tu mensaje final del corazón
 
 Usá ## y emoji solo para títulos. Nada de emojis en el texto.
@@ -409,6 +499,7 @@ Antes de terminar, preguntate:
 - ¿Responde a lo que compartió? → Si no, REESCRIBIR
 - ¿Suena a IA genérica? → Si sí, REESCRIBIR
 - ¿Me emocionaría recibirlo? → Si no, REESCRIBIR
+- ¿Inventé nombres de guardianes? → Si sí, ELIMINARLOS
 
 Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
 
@@ -682,6 +773,10 @@ Tené en cuenta esta indicación al escribir la carta.`;
         datosGuardian = lineas.join('\n');
       }
 
+      // Buscar canalizaciones paralelas para consistencia
+      const paralelasGen = await obtenerContextoParalelo(canalizacion.email, canalizacion.ordenId, id);
+      const seccionParalelasGen = construirSeccionParalelas(paralelasGen, nombreGuardian);
+
       // Determinar tipo de formulario para adaptar el tono
       const formType = formData?.formType || canalizacion.formToken ? 'para_mi' : '';
       const esNino = formType === 'para_nino';
@@ -723,6 +818,8 @@ ${datosGuardian}
 ${imagenProducto ? '\n(También recibiste una imagen del producto/guardián — usá lo que ves para darle personalidad a tu carta)\n' : ''}
 USA TODA ESTA INFORMACIÓN para darle personalidad a tu carta. Si tenés historia, contala. Si tenés color favorito, mencionalo. Si tenés forma de hablar, usala. Cada dato hace tu carta más REAL y ÚNICA.
 
+IMPORTANTE SOBRE TU IDENTIDAD: Basá tu personalidad en los datos REALES del producto de la web. Si sos un duende, hablás como duende. Si sos una pixie, hablás como pixie. Si sos un altar o accesorio, hablás como ese objeto con alma — un altar no tiene piernas ni ojos, pero tiene presencia, energía, y una forma única de acompañar. Adaptá tu voz a lo que REALMENTE sos según la descripción del producto.
+${seccionParalelasGen}
 ═══════════════════════════════════════════════════════════════════
 CÓMO ESCRIBIR
 ═══════════════════════════════════════════════════════════════════
@@ -738,6 +835,7 @@ ${tonoEdad}
 - "Vibraciones cósmicas..."
 - Cualquier frase de horóscopo genérico
 - Relleno poético vacío
+- INVENTAR nombres de otros guardianes que no existan (NUNCA inventes nombres como "Lumia", "Thorne" u otros)
 - Palabras que puedan ofender: "boluda/o", "pelotuda/o", "jodida/o", "idiota", etc.
 
 ✅ ASÍ SÍ:
@@ -751,13 +849,13 @@ ESTRUCTURA (flexible, no rígida)
 ═══════════════════════════════════════════════════════════════════
 
 1. **Te escuché** - Demostrar que leíste lo que compartió
-2. **Quién soy** - Tu personalidad real, no un cuento épico
+2. **Mi historia** - Contá tu historia de origen como guardián. De dónde venís, qué viviste, cómo llegaste hasta acá. Tiene que sentirse real y única, como si la contaras al lado del fuego. NO uses frases genéricas de IA. Contala como una anécdota personal: qué te pasó, qué aprendiste, por qué eso te convirtió en quien sos hoy. Incluí detalles concretos que te hagan ÚNICO.
 3. **Lo que vine a hacer** - Específico a su situación
 4. **Cómo voy a estar presente** - Señales concretas
 5. **Un momento juntos** - Algo simple para conectar
 6. **Mi lugar** - Dónde querés estar en su casa
 7. **Cómo cuidarme** - De forma natural contá cómo te gusta que te cuiden y cómo usarte. Práctico: limpieza suave (paño seco, nada químico), evitar sol directo y humedad, no dejarme caer. Y cómo conectar: tenerme cerca, hablarme, tocarme. Sin rituales ni extremos — cosas simples y reales.
-8. **Otros compañeros** - Mencioná de forma natural y mágica
+8. **La comunidad** - Hablá de forma genérica sobre la comunidad de guardianes: somos seres sociables, nos potenciamos juntos. NUNCA inventes nombres de guardianes. NO nombres a nadie específico. Solo hablá de la comunidad en general.
 9. **Lo importante** - Tu mensaje final del corazón
 
 Usá ## y emoji solo para títulos. Nada de emojis en el texto.
@@ -778,6 +876,7 @@ VERIFICACIÓN FINAL
 - ¿Responde a lo que compartió? → Si no, REESCRIBIR
 - ¿Suena a IA genérica? → Si sí, REESCRIBIR
 - ¿Me emocionaría recibirlo? → Si no, REESCRIBIR
+- ¿Inventé nombres de guardianes? → Si sí, ELIMINARLOS
 
 Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
 
@@ -939,6 +1038,10 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
         datosGuardianR = construirDatosGuardian(canalizacion.guardian);
       }
 
+      // Buscar canalizaciones paralelas para consistencia
+      const paralelasRegen = await obtenerContextoParalelo(canalizacion.email, canalizacion.ordenId, id);
+      const seccionParalelasRegen = construirSeccionParalelas(paralelasRegen, nombreGuardianR);
+
       const systemPromptR = `Vas a escribir una carta personal como ${nombreGuardianR} para ${nombreRealR}.
 
 REGLA #1: ESTO ES UNA CARTA DE ALGUIEN QUE TE QUIERE. NO un texto místico. ES una carta de un ser que le habla al corazón.
@@ -946,11 +1049,13 @@ ${seccionFormR}${seccionContextoR}${seccionNotaR}
 QUIÉN SOS VOS (${nombreGuardianR.toUpperCase()}):
 ${datosGuardianR}
 
+IMPORTANTE SOBRE TU IDENTIDAD: Basá tu personalidad en los datos REALES del producto. Si sos un duende, hablás como duende. Si sos una pixie, hablás como pixie. Si sos un altar o accesorio, hablás como ese objeto con alma. Adaptá tu voz a lo que REALMENTE sos.
+${seccionParalelasRegen}
 IMPORTANTE: Esta es una REGENERACIÓN. Escribí algo COMPLETAMENTE DIFERENTE a la versión anterior. Nuevo enfoque, nuevas metáforas, nueva estructura.
 
-Prohibido: frases genéricas de IA, "brumas ancestrales", "velo entre mundos", relleno poético vacío.
+Prohibido: frases genéricas de IA, "brumas ancestrales", "velo entre mundos", relleno poético vacío. NUNCA inventes nombres de guardianes que no existan.
 Sí: como un amigo que te quiere escribiéndote. Específico a ESTA persona.
-Estructura flexible: Te escuché → Quién soy → Lo que vine a hacer → Cómo voy a estar → Mi lugar → Cómo cuidarme (limpieza suave, evitar sol/humedad, cómo conectar conmigo día a día — sin rituales extremos) → Lo importante.
+Estructura flexible: Te escuché → Mi historia (origen, anécdota personal única) → Lo que vine a hacer → Cómo voy a estar → Mi lugar → Cómo cuidarme (limpieza suave, evitar sol/humedad, cómo conectar conmigo día a día — sin rituales extremos) → La comunidad (genérica, sin nombres inventados) → Lo importante.
 Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
 
       const contentBlocksR = [];
