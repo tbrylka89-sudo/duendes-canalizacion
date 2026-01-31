@@ -231,6 +231,17 @@ async function construirContexto(mensaje, intencion, datos) {
       // Siempre usar recomendarGuardianes() para diversidad de precios + shuffle
       recomendados = recomendarGuardianes(intencion.necesidad || null, productos, { limite: 6 });
 
+      // DEBUG: log filter results
+      const disponibles = productos.filter(p => p.disponible);
+      datos._filter_debug = {
+        necesidad: intencion.necesidad,
+        totalDisponibles: disponibles.length,
+        recomendadosCount: recomendados.length,
+        recomendadosNombres: recomendados.map(p => `${p.nombre} (${p.slug})`),
+        sampleSlugs: disponibles.slice(0, 3).map(p => p.slug),
+        sampleCats: disponibles.slice(0, 3).map(p => p.categorias)
+      };
+
       if (recomendados.length > 0) {
         datos._productos = recomendados;
         contexto += `\n\n🛡️ GUARDIANES DISPONIBLES:`;
@@ -849,7 +860,8 @@ ${contexto}
       total_productos: productos.length,
       _debug: {
         enviado_directo: enviado,
-        subscriber_id: subscriberId
+        subscriber_id: subscriberId,
+        filter: datos._filter_debug || null
       }
     });
 
