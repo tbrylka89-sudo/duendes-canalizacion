@@ -17,9 +17,13 @@ export default function SeccionCanalizaciones({ usuario }) {
   const regalosHechos = usuario?.regalosHechos || [];
   const regalosRecibidos = usuario?.regalosRecibidos || [];
 
-  // Buscar canalización para un guardián
+  // Buscar canalización para un guardián (prioriza match fuerte antes de caer a ordenId)
   const getCanalizacion = (guardian) => {
-    return lecturas.find(l => l.guardianId === guardian.id || l.guardian?.id === guardian.id || l.ordenId === guardian.ordenId);
+    return lecturas.find(l =>
+      (l.guardianId && l.guardianId === guardian.id) ||
+      (l.guardian?.id && l.guardian.id === guardian.id) ||
+      l.guardian?.nombre === guardian.nombre
+    ) || lecturas.find(l => l.ordenId === guardian.ordenId);
   };
 
   // Estado de canalización
