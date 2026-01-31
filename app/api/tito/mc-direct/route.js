@@ -228,11 +228,8 @@ async function construirContexto(mensaje, intencion, datos) {
 
     if (productos.length > 0) {
       let recomendados;
-      if (intencion.necesidad) {
-        recomendados = recomendarGuardianes(intencion.necesidad, productos, { limite: 6 });
-      } else {
-        recomendados = productos.filter(p => p.disponible).slice(0, 6);
-      }
+      // Siempre usar recomendarGuardianes() para diversidad de precios + shuffle
+      recomendados = recomendarGuardianes(intencion.necesidad || null, productos, { limite: 6 });
 
       if (recomendados.length > 0) {
         datos._productos = recomendados;
