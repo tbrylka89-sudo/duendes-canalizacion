@@ -169,30 +169,66 @@ function formatearHistorial(historial) {
 
 function parsearRespuesta(texto) {
   const acciones = [];
+  let respuestaLimpia = texto;
 
-  // Extraer acciones [ACCION:tipo:label:datos]
-  const regexAccion = /\[ACCION:([^:]+):([^:]+):(\{[\s\S]*?\})\]/g;
-  let match;
+  // Extraer acciones [ACCION:tipo:label:{json}]
+  // El JSON puede tener objetos anidados, así que necesitamos contar llaves
+  const marcador = '[ACCION:';
+  let pos = 0;
 
-  while ((match = regexAccion.exec(texto)) !== null) {
+  while (pos < respuestaLimpia.length) {
+    const inicio = respuestaLimpia.indexOf(marcador, pos);
+    if (inicio === -1) break;
+
+    // Encontrar tipo y label (separados por :)
+    const despuesMarcador = inicio + marcador.length;
+    const primerColon = respuestaLimpia.indexOf(':', despuesMarcador);
+    const segundoColon = respuestaLimpia.indexOf(':', primerColon + 1);
+
+    if (primerColon === -1 || segundoColon === -1) { pos = despuesMarcador; continue; }
+
+    const tipo = respuestaLimpia.slice(despuesMarcador, primerColon);
+    const label = respuestaLimpia.slice(primerColon + 1, segundoColon);
+
+    // Encontrar el JSON completo contando llaves
+    const inicioJson = respuestaLimpia.indexOf('{', segundoColon);
+    if (inicioJson === -1) { pos = segundoColon; continue; }
+
+    let profundidad = 0;
+    let finJson = -1;
+    for (let i = inicioJson; i < respuestaLimpia.length; i++) {
+      if (respuestaLimpia[i] === '{') profundidad++;
+      else if (respuestaLimpia[i] === '}') {
+        profundidad--;
+        if (profundidad === 0) { finJson = i; break; }
+      }
+    }
+
+    if (finJson === -1) { pos = inicioJson; continue; }
+
+    const jsonStr = respuestaLimpia.slice(inicioJson, finJson + 1);
+
+    // Encontrar el ] de cierre del tag
+    const cierreTag = respuestaLimpia.indexOf(']', finJson + 1);
+    const finCompleto = cierreTag !== -1 ? cierreTag + 1 : finJson + 1;
+
     try {
       acciones.push({
-        tipo: match[1],
-        label: match[2],
-        datos: JSON.parse(match[3])
+        tipo: tipo.trim(),
+        label: label.trim(),
+        datos: JSON.parse(jsonStr)
       });
     } catch (e) {
-      console.error('Error parseando acción:', e, match[3]);
+      console.error('Error parseando acción JSON:', e, jsonStr.slice(0, 200));
     }
+
+    // Remover el tag completo del texto
+    respuestaLimpia = respuestaLimpia.slice(0, inicio) + respuestaLimpia.slice(finCompleto);
+    pos = inicio; // re-check from same position since we removed text
   }
 
-  // Limpiar el texto de los tags
-  let respuestaLimpia = texto
-    .replace(/\[ACCION:[^\]]+\]/g, '')
-    .trim();
-
   return {
-    respuesta: respuestaLimpia,
+    respuesta: respuestaLimpia.trim(),
     acciones: acciones.length > 0 ? acciones : undefined
   };
 }
