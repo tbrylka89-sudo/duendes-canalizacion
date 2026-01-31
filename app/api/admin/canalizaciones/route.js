@@ -1028,7 +1028,6 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
         }
       }
 
-      let seccionNotaR = notaAdmin ? `\nINDICACIÓN DEL ADMIN: "${notaAdmin}"\n` : '';
       let seccionContextoR = canalizacion.contextoManual ? `\nCONTEXTO: "${canalizacion.contextoManual}"\n` : '';
 
       // Datos del guardián
@@ -1042,21 +1041,33 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
       const paralelasRegen = await obtenerContextoParalelo(canalizacion.email, canalizacion.ordenId, id);
       const seccionParalelasRegen = construirSeccionParalelas(paralelasRegen, nombreGuardianR);
 
-      const systemPromptR = `Vas a escribir una carta personal como ${nombreGuardianR} para ${nombreRealR}.
+      // Si hay nota del admin, tiene MÁXIMA prioridad y puede cambiar todo el enfoque
+      let seccionNotaR = '';
+      if (notaAdmin) {
+        seccionNotaR = `
+═══════════════════════════════════════════════════════════════
+⚠️ INDICACIÓN DEL ADMIN — MÁXIMA PRIORIDAD ⚠️
+Estas instrucciones ANULAN cualquier otra indicación del prompt.
+Si el admin dice que cambies el tono, la voz, la estructura o el enfoque, HACELO.
+═══════════════════════════════════════════════════════════════
+${notaAdmin}
+═══════════════════════════════════════════════════════════════`;
+      }
 
-REGLA #1: ESTO ES UNA CARTA DE ALGUIEN QUE TE QUIERE. NO un texto místico. ES una carta de un ser que le habla al corazón.
-${seccionFormR}${seccionContextoR}${seccionNotaR}
-QUIÉN SOS VOS (${nombreGuardianR.toUpperCase()}):
+      const systemPromptR = `Vas a escribir un texto personal sobre ${nombreGuardianR} para ${nombreRealR}.
+${seccionNotaR}
+REGLA #1: ESTO ES UN TEXTO PERSONAL Y CÁLIDO. NO un texto místico. NO prosa poética.
+${seccionFormR}${seccionContextoR}
+DATOS DEL PRODUCTO (${nombreGuardianR.toUpperCase()}):
 ${datosGuardianR}
 
-IMPORTANTE SOBRE TU IDENTIDAD: Basá tu personalidad en los datos REALES del producto. Si sos un duende, hablás como duende. Si sos una pixie, hablás como pixie. Si sos un altar o accesorio, hablás como ese objeto con alma. Adaptá tu voz a lo que REALMENTE sos.
+IDENTIDAD: Basá la personalidad en los datos REALES del producto. Si es un guardián (duende, pixie, etc.), habla en primera persona como ese ser. Si es un accesorio (altar, runas, etc.), NO habla como un personaje — describí el producto con cariño y enseñá cómo usarlo.
 ${seccionParalelasRegen}
 IMPORTANTE: Esta es una REGENERACIÓN. Escribí algo COMPLETAMENTE DIFERENTE a la versión anterior. Nuevo enfoque, nuevas metáforas, nueva estructura.
 
 Prohibido: frases genéricas de IA, "brumas ancestrales", "velo entre mundos", relleno poético vacío. NUNCA inventes nombres de guardianes que no existan.
-Sí: como un amigo que te quiere escribiéndote. Específico a ESTA persona.
-Estructura flexible: Te escuché → Mi historia (origen, anécdota personal única) → Lo que vine a hacer → Cómo voy a estar → Mi lugar → Cómo cuidarme (limpieza suave, evitar sol/humedad, cómo conectar conmigo día a día — sin rituales extremos) → La comunidad (genérica, sin nombres inventados) → Lo importante.
-Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
+Sí: cálido, específico a ESTA persona, que aporte valor real.
+Español rioplatense (vos, tenés, podés). 1500-2500 palabras.`;
 
       const contentBlocksR = [];
       if (imagenProductoR) {
