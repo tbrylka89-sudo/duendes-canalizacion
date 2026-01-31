@@ -989,9 +989,9 @@ Español rioplatense (vos, tenés, podés). 2000-3000 palabras.`;
         formData = await kv.get(`form_data:${canalizacion.formToken}`);
       }
 
-      // Buscar nota del admin
-      let notaAdmin = null;
-      if (canalizacion.formToken) {
+      // Buscar nota del admin (primero en la canalización, luego en el invite)
+      let notaAdmin = canalizacion.notaAdmin || null;
+      if (!notaAdmin && canalizacion.formToken) {
         const invite = await kv.get(`form_invite:${canalizacion.formToken}`);
         if (invite?.notaAdmin) notaAdmin = invite.notaAdmin;
       }
