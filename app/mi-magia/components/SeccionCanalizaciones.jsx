@@ -19,13 +19,13 @@ export default function SeccionCanalizaciones({ usuario }) {
 
   // Buscar canalización para un guardián
   const getCanalizacion = (guardian) => {
-    return lecturas.find(l => l.guardianId === guardian.id || l.ordenId === guardian.ordenId);
+    return lecturas.find(l => l.guardianId === guardian.id || l.guardian?.id === guardian.id || l.ordenId === guardian.ordenId);
   };
 
   // Estado de canalización
   const getEstadoCana = (cana) => {
     if (!cana) return { texto: 'Pendiente', color: '#888', icono: '⏳' };
-    if (cana.estado === 'enviada') return { texto: 'Lista', color: '#2ecc71', icono: '✓' };
+    if (cana.estado === 'enviada' || cana.contenido) return { texto: 'Lista', color: '#2ecc71', icono: '✓' };
     if (cana.estado === 'aprobada') return { texto: 'En camino', color: '#d4af37', icono: '✦' };
     return { texto: 'Procesando', color: '#3498db', icono: '◈' };
   };
@@ -66,7 +66,7 @@ export default function SeccionCanalizaciones({ usuario }) {
                         <span>{estado.icono}</span>
                         <span>Canalización: {estado.texto}</span>
                       </div>
-                      {cana && cana.estado === 'enviada' ? (
+                      {cana && (cana.estado === 'enviada' || cana.contenido) ? (
                         <button className="btn-ver-cana" onClick={() => setCanalizacionAbierta(cana)}>
                           Ver Canalización
                         </button>
@@ -245,7 +245,7 @@ export default function SeccionCanalizaciones({ usuario }) {
             <button className="modal-close" onClick={() => setCanalizacionAbierta(null)}>×</button>
             <div className="modal-cana-header">
               <span>✦</span>
-              <h2>Canalización de {canalizacionAbierta.guardianNombre || 'tu Guardián'}</h2>
+              <h2>Canalización de {canalizacionAbierta.guardianNombre || canalizacionAbierta.guardian?.nombre || canalizacionAbierta.titulo?.replace('Canalización de ', '') || 'tu Guardián'}</h2>
               {canalizacionAbierta.paraQuien && <p>Para: {canalizacionAbierta.paraQuien}</p>}
             </div>
             <div className="modal-cana-content">
@@ -416,7 +416,7 @@ export default function SeccionCanalizaciones({ usuario }) {
       {tab === 'lecturas' && (
         <div className="cana-content">
           {lecturas.length > 0 ? (
-            <div className="lecturas-list">{lecturas.map((l,i) => <div key={i} className="lectura-item"><span className="lec-fecha">{l.fecha}</span><h4>{l.tipo}</h4><p>{l.resumen || l.contenido?.substring(0, 200)}...</p><button className="btn-sec">Ver completa</button></div>)}</div>
+            <div className="lecturas-list">{lecturas.map((l,i) => <div key={i} className="lectura-item"><span className="lec-fecha">{new Date(l.fecha).toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' })}</span><h4>{l.titulo || l.tipo}</h4><p>{l.resumen || l.contenido?.substring(0, 200)}...</p><button className="btn-sec" onClick={() => setCanalizacionAbierta(l)}>Ver completa</button></div>)}</div>
           ) : (
             <div className="seccion-cinematica seccion-lecturas">
               <div className="seccion-simbolo">

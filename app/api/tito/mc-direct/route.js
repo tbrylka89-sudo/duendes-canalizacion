@@ -16,6 +16,11 @@ import {
   PRECIOS_URUGUAY
 } from '@/lib/tito/conocimiento';
 import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+import {
+  detectarCrisis, detectarInsulto, detectarSpam, detectarDespedida,
+  detectarSinDinero, detectarDesahogo, detectarTrolling, detectarIdioma,
+  detectarPreguntaRepetida, tieneSeñalDeCompra
+} from '@/lib/tito/reglas-comportamiento';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -289,6 +294,316 @@ function crearContenidoManychat(texto, productos = []) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SESIÓN Y HISTORIAL EN KV
+// ═══════════════════════════════════════════════════════════════
+
+async function guardarSesionMC(subscriberId, state) {
+  if (!subscriberId || !state) return;
+  try {
+    state.ultimaActividad = Date.now();
+    await kv.set(`tito:sesion:mc:${subscriberId}`, state, { ex: 7200 }); // 2h TTL
+  } catch (e) {}
+}
+
+async function cargarHistorial(subscriberId) {
+  if (!subscriberId) return [];
+  try {
+    return (await kv.get(`tito:mc:historial:${subscriberId}`)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function guardarHistorial(subscriberId, historial) {
+  if (!subscriberId) return;
+  try {
+    const ultimos = historial.slice(-10); // máx 10 mensajes (5 exchanges)
+    await kv.set(`tito:mc:historial:${subscriberId}`, ultimos, { ex: 86400 }); // 24h TTL
+  } catch (e) {}
+}
+
+async function enviarRespuestaRapida(subscriberId, texto, historial, method) {
+  // Guardar en historial
+  historial.push({ role: 'assistant', content: texto });
+  await guardarHistorial(subscriberId, historial);
+
+  // Enviar a ManyChat
+  const contenido = crearContenidoManychat(texto);
+  await enviarMensajeManychat(subscriberId, contenido);
+  return Response.json({ status: 'sent', method });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILTRO PRE-API MC: Reglas de comportamiento (mismas que v3)
+// ═══════════════════════════════════════════════════════════════
+
+async function filtroPreAPIMC(msg, historial, subscriberId) {
+  const msgLower = msg.toLowerCase().trim();
+  const tieneHistorial = historial.length > 1;
+
+  // Cargar o crear estado de sesión
+  let sessionState;
+  try {
+    sessionState = await kv.get(`tito:sesion:mc:${subscriberId}`);
+    if (!sessionState) {
+      sessionState = {
+        contadorSinDinero: 0,
+        contadorDesahogo: 0,
+        contadorInsultos: 0,
+        contadorTrolling: 0,
+        contadorMensajes: 0,
+        contadorSinProgreso: 0,
+        preguntasHechas: [],
+        idiomaDetectado: null,
+        bloqueado: false,
+        ultimaActividad: Date.now()
+      };
+    }
+  } catch (e) {
+    sessionState = null;
+  }
+
+  // Si está bloqueado (insultos reiterados), no responder
+  if (sessionState?.bloqueado) {
+    return { interceptado: true, respuesta: '🍀', razon: 'bloqueado' };
+  }
+
+  // ── 0) CONTEXTO: No filtrar respuestas a preguntas de Tito ──
+  if (historial.length > 0) {
+    const ultimoBot = [...historial].reverse().find(m => m.role === 'assistant');
+    if (ultimoBot) {
+      const textoBot = (ultimoBot.content || '').toLowerCase();
+
+      // A) Tito pidió datos → dejar pasar todo
+      const pideDatos = /n[uú]mero de pedido|n[uú]mero de orden|tu (n[uú]mero|email|nombre|mail|correo)|pas[aá]me (el|tu)|decime (tu|el)|necesito (tu|el|que me)|con qu[eé] (nombre|email|mail)|datos del pedido/i.test(textoBot);
+      if (pideDatos) {
+        if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
+        return { interceptado: false };
+      }
+
+      // B) Tito hizo pregunta u oferta → afirmativos no son spam
+      const titoHizoPregunta = /\?/.test(ultimoBot.content || '');
+      const titoOfreció = /te muestro|quer[eé]s (ver|que)|te cuento|te interesa|te gustaria|te gustaría|mostrar(te|los)|ayudan con eso/i.test(textoBot);
+      const esAfirmativo = /^(s[ií]|si+|ok|dale|bueno|va|vamos|claro|por favor|porfa|obvio|seguro|manda|mostr[aá]|quer[ií]a|quiero|me interesa|por supuesto)[\s!.]*$/i.test(msgLower);
+      if ((titoHizoPregunta || titoOfreció) && esAfirmativo) {
+        if (sessionState) { sessionState.contadorMensajes++; sessionState.contadorSinProgreso = 0; await guardarSesionMC(subscriberId, sessionState); }
+        return { interceptado: false };
+      }
+
+      // C) Mensaje corto en conversación activa → no es spam, es respuesta contextual
+      if (msgLower.length < 3) {
+        if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
+        return { interceptado: false };
+      }
+    }
+  }
+
+  // ── REGLA 1: CRISIS ──
+  const crisis = detectarCrisis(msg);
+  if (crisis.detectado) {
+    if (sessionState) await guardarSesionMC(subscriberId, sessionState);
+    return { interceptado: true, respuesta: crisis.respuesta, razon: 'crisis' };
+  }
+
+  // ── REGLA 2: INSULTOS ──
+  const insulto = detectarInsulto(msg);
+  if (insulto.detectado) {
+    if (sessionState) {
+      sessionState.contadorInsultos = (sessionState.contadorInsultos || 0) + 1;
+      if (sessionState.contadorInsultos >= 2) {
+        sessionState.bloqueado = true;
+        await guardarSesionMC(subscriberId, sessionState);
+        return {
+          interceptado: true,
+          respuesta: 'Mirá, así no podemos charlar. Si algún día te interesa un guardián, acá voy a estar. ¡Chau! 🍀',
+          razon: 'insulto_reiterado'
+        };
+      }
+      await guardarSesionMC(subscriberId, sessionState);
+    }
+    return {
+      interceptado: true,
+      respuesta: 'Ey, tranqui. No estoy para eso. Si querés saber de guardianes, preguntame 🍀',
+      razon: 'insulto'
+    };
+  }
+
+  // ── REGLA 3: SPAM ──
+  const spam = detectarSpam(msg);
+  if (spam.detectado) {
+    if (sessionState) await guardarSesionMC(subscriberId, sessionState);
+    return {
+      interceptado: true,
+      respuesta: '¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.',
+      razon: 'spam'
+    };
+  }
+
+  // ── REGLA 4: DESPEDIDA ──
+  const despedida = detectarDespedida(msg, tieneHistorial);
+  if (despedida.detectado) {
+    if (sessionState) await guardarSesionMC(subscriberId, sessionState);
+    return {
+      interceptado: true,
+      respuesta: '¡Chau! Que la magia te acompañe 🍀 Si algún día sentís el llamado de un guardián, acá voy a estar.',
+      razon: 'despedida'
+    };
+  }
+
+  // ── REGLA 5: SALUDOS SIMPLES (solo inicio) ──
+  if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello|que tal|qué tal)[\s!?.]*$/i.test(msgLower) && historial.length <= 1) {
+    if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
+    return {
+      interceptado: true,
+      respuesta: '¡Ey! ¿Qué andás buscando? 🍀',
+      razon: 'saludo'
+    };
+  }
+
+  // ── REGLA 6: TROLLING ──
+  const troll = detectarTrolling(msg);
+  if (troll.detectado) {
+    if (sessionState) {
+      sessionState.contadorTrolling = (sessionState.contadorTrolling || 0) + 1;
+      if (sessionState.contadorTrolling >= 3) {
+        sessionState.bloqueado = true;
+      }
+      await guardarSesionMC(subscriberId, sessionState);
+    }
+    return { interceptado: true, respuesta: '🍀', razon: 'trolling' };
+  }
+
+  // ── REGLA 7: SIN DINERO (progresivo) ──
+  const sinDinero = detectarSinDinero(msg);
+  if (sinDinero.detectado && sessionState) {
+    sessionState.contadorSinDinero = (sessionState.contadorSinDinero || 0) + 1;
+    sessionState.contadorMensajes++;
+    await guardarSesionMC(subscriberId, sessionState);
+
+    if (sessionState.contadorSinDinero === 1) {
+      return {
+        interceptado: true,
+        respuesta: '¡Hay guardianes desde $70 USD! Y tenemos 3x2: llevás 2 y te regalamos 1 mini. ¿Querés que te muestre los más accesibles?',
+        razon: 'sin_dinero'
+      };
+    } else if (sessionState.contadorSinDinero === 2) {
+      return {
+        interceptado: true,
+        respuesta: 'Entiendo, no es el momento. Te dejo el test para cuando puedas: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀 ¡Nos vemos!',
+        razon: 'sin_dinero_final'
+      };
+    }
+  } else if (sinDinero.detectado && !sessionState) {
+    return {
+      interceptado: true,
+      respuesta: '¡Hay guardianes desde $70 USD! Y tenemos 3x2: llevás 2 y te regalamos 1 mini. ¿Querés que te muestre los más accesibles?',
+      razon: 'sin_dinero'
+    };
+  }
+
+  // ── REGLA 8: DESAHOGO (progresivo) ──
+  const desahogo = detectarDesahogo(msg);
+  if (desahogo.detectado && sessionState) {
+    sessionState.contadorDesahogo = (sessionState.contadorDesahogo || 0) + 1;
+    sessionState.contadorMensajes++;
+    await guardarSesionMC(subscriberId, sessionState);
+
+    if (sessionState.contadorDesahogo === 1) {
+      return {
+        interceptado: true,
+        respuesta: 'Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. ¿Querés que te muestre algunos?',
+        razon: 'desahogo'
+      };
+    } else if (sessionState.contadorDesahogo === 2) {
+      return {
+        interceptado: true,
+        respuesta: 'Ojalá las cosas mejoren pronto. Te dejo el test para cuando estés lista/o: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀 Cuidate mucho.',
+        razon: 'desahogo_final'
+      };
+    }
+  } else if (desahogo.detectado && !sessionState) {
+    return {
+      interceptado: true,
+      respuesta: 'Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. Si querés, te muestro algunos que ayudan con eso.',
+      razon: 'desahogo'
+    };
+  }
+
+  // ── REGLA 9: IDIOMA (en/pt) - solo primera vez ──
+  const idioma = detectarIdioma(msg);
+  if (idioma.idioma && idioma.idioma !== 'es') {
+    const yaDetectado = sessionState?.idiomaDetectado;
+    if (sessionState) {
+      sessionState.idiomaDetectado = idioma.idioma;
+      sessionState.contadorMensajes++;
+      await guardarSesionMC(subscriberId, sessionState);
+    }
+    if (!yaDetectado) {
+      if (idioma.idioma === 'en') {
+        return {
+          interceptado: true,
+          respuesta: 'Hey! We ship worldwide 🌎 Check our store: https://duendesdeluruguay.com/shop/ — Feel free to ask me anything in English!',
+          razon: 'idioma_en'
+        };
+      }
+      if (idioma.idioma === 'pt') {
+        return {
+          interceptado: true,
+          respuesta: 'Oi! Enviamos para o mundo todo 🌎 Veja nossa loja: https://duendesdeluruguay.com/shop/ — Pode me perguntar em português!',
+          razon: 'idioma_pt'
+        };
+      }
+    }
+  }
+
+  // ── REGLA 10: PREGUNTA REPETIDA ──
+  if (sessionState && sessionState.preguntasHechas.length > 0) {
+    const repetida = detectarPreguntaRepetida(msg, sessionState.preguntasHechas);
+    if (repetida.detectado) {
+      sessionState.contadorMensajes++;
+      await guardarSesionMC(subscriberId, sessionState);
+      return {
+        interceptado: true,
+        respuesta: '¡Eso ya te lo conté! 😄 ¿Hay algo más que quieras saber?',
+        razon: 'repetida'
+      };
+    }
+  }
+
+  // ── REGLA 11: MAX EXCHANGES SIN PROGRESO (5+ msgs) ──
+  if (sessionState) {
+    sessionState.contadorMensajes++;
+
+    if (tieneSeñalDeCompra(msg)) {
+      sessionState.contadorSinProgreso = 0;
+    } else {
+      sessionState.contadorSinProgreso = (sessionState.contadorSinProgreso || 0) + 1;
+    }
+
+    // Guardar pregunta para detección de repetidas (máx 5)
+    if (msg.length > 5) {
+      sessionState.preguntasHechas.push(msg);
+      if (sessionState.preguntasHechas.length > 5) {
+        sessionState.preguntasHechas = sessionState.preguntasHechas.slice(-5);
+      }
+    }
+
+    if (sessionState.contadorSinProgreso >= 5) {
+      await guardarSesionMC(subscriberId, sessionState);
+      return {
+        interceptado: true,
+        respuesta: `Mirá, te dejo el test y la tienda para cuando te decidas:\n🔮 Test: https://duendesdeluruguay.com/descubri-que-duende-te-elige/\n🛒 Tienda: https://duendesdeluruguay.com/shop/\n¡Que la magia te acompañe! 🍀`,
+        razon: 'max_exchanges'
+      };
+    }
+
+    await guardarSesionMC(subscriberId, sessionState);
+  }
+
+  return { interceptado: false, sessionState };
+}
+
+// ═══════════════════════════════════════════════════════════════
 // HANDLER PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
 
@@ -327,6 +642,9 @@ export async function POST(request) {
       });
     }
 
+    // Cargar historial de conversación
+    const historial = await cargarHistorial(subscriberId);
+
     // Mensaje vacío = saludo
     if (!msg.trim()) {
       const saludo = `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀\n\n¿Qué andás buscando?`;
@@ -350,105 +668,71 @@ export async function POST(request) {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // RESPUESTAS RÁPIDAS SIN IA - Ahorro de tokens
+    // FILTRO PRE-API: Reglas de comportamiento (crisis, insultos, spam, etc.)
     // ─────────────────────────────────────────────────────────────
 
-    // SPAM / Mensajes genéricos
-    if (
-      /^(amen|amén|bendiciones?|bendecido|amen bendiciones?|bendiciones? amen|dios te bendiga|que dios|la virgen)[\s!.]*$/i.test(msgLower) ||
-      /^(dame suerte|buena vibra|buenas vibras|suerte|buenas energias|buenas energías)[\s!.]*$/i.test(msgLower) ||
-      /^[\p{Emoji}\s!.]+$/u.test(msg.trim()) ||
-      msgLower.length < 3
-    ) {
-      const contenido = crearContenidoManychat('¡Que la magia te acompañe! 🍀 Si algún día sentís el llamado de un guardián, acá estoy.');
+    // Agregar msg del usuario al historial ANTES del filtro
+    historial.push({ role: 'user', content: msg });
+
+    const filtro = await filtroPreAPIMC(msg, historial, subscriberId);
+    if (filtro.interceptado) {
+      historial.push({ role: 'assistant', content: filtro.respuesta });
+      await guardarHistorial(subscriberId, historial);
+
+      const contenido = crearContenidoManychat(filtro.respuesta);
       await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_spam' });
+
+      console.log('[MC-DIRECT] Filtro interceptó:', filtro.razon);
+      return Response.json({ status: 'sent', method: `filtro_${filtro.razon}` });
     }
 
-    // DRAMA / Desahogo emocional - Sin intención de compra
-    const esDrama = /estoy (muy )?(mal|triste|destru[ií]d|deprimi|perdid)|no puedo m[aá]s|todo me sale mal|mi vida es un|nadie me (quiere|entiende)|me siento (sol[oa]|vac[ií]|perdid)|no s[eé] qu[eé] hacer con mi vida|estoy en crisis|mi ex me|me dejaron|estoy rota|coraz[oó]n roto|no tengo fuerzas|quiero llorar|me quiero morir/i.test(msgLower);
-    const tieneIntencionCompra = /precio|cu[aá]nto|guard|duende|compr|quiero (uno|ver|un)|env[ií]o|tienda/i.test(msgLower);
-
-    if (esDrama && !tieneIntencionCompra) {
-      const contenido = crearContenidoManychat('Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. Si querés, te muestro algunos.');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_drama' });
-    }
-
-    // GRACIAS / DESPEDIDA
-    if (/^(gracias|muchas gracias|thanks|thx|grax|ty)[\s!.]*$/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('¡A vos! 🍀 Cuando sientas el llamado de un guardián, acá estoy.');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_gracias' });
-    }
-
-    if (/^(chau|adi[oó]s|bye|nos vemos|hasta luego)[\s!.]*$/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('¡Hasta pronto! 🍀 Que la magia te acompañe.');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_despedida' });
-    }
+    // ─────────────────────────────────────────────────────────────
+    // RESPUESTAS RÁPIDAS FAQ - Ahorro de tokens
+    // ─────────────────────────────────────────────────────────────
 
     // ENVÍOS
     if (/hacen env[ií]os?|env[ií]an a|llegan? a|mandan a|shipping/i.test(msgLower) && !/cu[aá]nto|d[ií]as|tarda/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('Sí, enviamos a todo el mundo 🌎 Por DHL Express, llega en 5-10 días con tracking. ¿De qué país sos?');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_envios' });
+      return enviarRespuestaRapida(subscriberId, 'Sí, enviamos a todo el mundo 🌎 Por DHL Express, llega en 5-10 días con tracking. ¿De qué país sos?', historial, 'quick_envios');
     }
 
     // TIEMPOS DE ENVÍO
     if (/cu[aá]nto (tarda|demora) en llegar|d[ií]as.*llegar|tiempo de env[ií]o/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('📦 Uruguay: 5-7 días hábiles (DAC)\n✈️ Internacional: 5-10 días hábiles (DHL Express)\n\nTodos van con tracking 🍀');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_tiempo_envio' });
+      return enviarRespuestaRapida(subscriberId, '📦 Uruguay: 5-7 días hábiles (DAC)\n✈️ Internacional: 5-10 días hábiles (DHL Express)\n\nTodos van con tracking 🍀', historial, 'quick_tiempo_envio');
     }
 
     // MÉTODOS DE PAGO
     if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('Visa, MasterCard, Amex 💳\n\nInternacional: también Western Union y MoneyGram\nUruguay: + OCA, Redpagos, transferencia bancaria');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_pagos' });
+      return enviarRespuestaRapida(subscriberId, 'Visa, MasterCard, Amex 💳\n\nInternacional: también Western Union y MoneyGram\nUruguay: + OCA, Redpagos, transferencia bancaria', historial, 'quick_pagos');
     }
 
     // PAYPAL
     if (/paypal|pay pal/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('No tenemos PayPal, pero sí Visa, MasterCard y Amex. También Western Union y MoneyGram para pagos internacionales 💳');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_paypal' });
+      return enviarRespuestaRapida(subscriberId, 'No tenemos PayPal, pero sí Visa, MasterCard y Amex. También Western Union y MoneyGram para pagos internacionales 💳', historial, 'quick_paypal');
     }
 
     // GARANTÍA / DEVOLUCIONES
     if (/garant[ií]a|devoluci[oó]n|devolver|reembolso/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('No aceptamos devoluciones por arrepentimiento (cada pieza es única).\n\nSi llega dañado: contactás a DHL o DAC para el reclamo. El envío va asegurado 🍀');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_garantia' });
+      return enviarRespuestaRapida(subscriberId, 'No aceptamos devoluciones por arrepentimiento (cada pieza es única).\n\nSi llega dañado: contactás a DHL o DAC para el reclamo. El envío va asegurado 🍀', historial, 'quick_garantia');
     }
 
     // MATERIALES
     if (/material|de qu[eé] (est[aá]n|son|hechos)|porcelana|cristal/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('Cada guardián está hecho con:\n• Porcelana fría profesional\n• Cristales 100% naturales\n• Ropa cosida a mano\n\n100% artesanal, sin moldes 🍀');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_materiales' });
+      return enviarRespuestaRapida(subscriberId, 'Cada guardián está hecho con:\n• Porcelana fría profesional\n• Cristales 100% naturales\n• Ropa cosida a mano\n\n100% artesanal, sin moldes 🍀', historial, 'quick_materiales');
     }
 
     // PROMO 3x2
     if (/3x2|tres por dos|promo|descuento|oferta/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('¡Sí! Tenemos el 3x2: llevás 2 guardianes y te regalamos 1 mini 🎁\n\nY envío gratis en compras grandes.');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_promo' });
+      return enviarRespuestaRapida(subscriberId, '¡Sí! Tenemos el 3x2: llevás 2 guardianes y te regalamos 1 mini 🎁\n\nY envío gratis en compras grandes.', historial, 'quick_promo');
     }
 
     // EL CÍRCULO
     if (/el c[ií]rculo|membres[ií]a|suscripci[oó]n/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('El Círculo está siendo preparado con algo muy especial 🔮\n\nSi querés ser de los primeros, dejá tu email en: magia.duendesdeluruguay.com/circulo');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_circulo' });
+      return enviarRespuestaRapida(subscriberId, 'El Círculo está siendo preparado con algo muy especial 🔮\n\nSi querés ser de los primeros, dejá tu email en: magia.duendesdeluruguay.com/circulo', historial, 'quick_circulo');
     }
 
     // MI MAGIA
     if (/mi magia|portal.*compra/i.test(msgLower)) {
-      const contenido = crearContenidoManychat('Mi Magia es tu portal exclusivo post-compra 🔮\n\nAhí encontrás tu canalización, la historia de tu guardián, ritual de bienvenida y más.\n\nAccedés en: magia.duendesdeluruguay.com');
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'quick_mimagia' });
+      return enviarRespuestaRapida(subscriberId, 'Mi Magia es tu portal exclusivo post-compra 🔮\n\nAhí encontrás tu canalización, la historia de tu guardián, ritual de bienvenida y más.\n\nAccedés en: magia.duendesdeluruguay.com', historial, 'quick_mimagia');
     }
 
     // Datos
@@ -462,6 +746,13 @@ export async function POST(request) {
     // Construir contexto
     const contexto = await construirContexto(msg, intencion, datos);
 
+    // Idioma detectado en sesión
+    const idiomaInstruccion = filtro.sessionState?.idiomaDetectado === 'en'
+      ? '\n- RESPOND IN ENGLISH. The user speaks English.'
+      : filtro.sessionState?.idiomaDetectado === 'pt'
+        ? '\n- RESPONDE EN PORTUGUÉS. El usuario habla portugués.'
+        : '';
+
     // System prompt
     const systemPrompt = `${PERSONALIDAD_TITO}
 
@@ -474,17 +765,31 @@ ${contexto}
 - 1-2 emojis máximo
 - Respondé DIRECTO a lo que pregunta
 - Si quiere comprar, pedí datos. NO pidas número de pedido a cliente nuevo.
-- Si pregunta por pedido existente, ahí sí pedí número o email.`;
+- Si pregunta por pedido existente, ahí sí pedí número o email.${idiomaInstruccion}`;
+
+    // Preparar messages con historial (últimos 8 mensajes para contexto)
+    // Claude requiere que el primer mensaje sea 'user'
+    let messagesParaClaude = historial.slice(-8);
+    while (messagesParaClaude.length > 0 && messagesParaClaude[0].role !== 'user') {
+      messagesParaClaude = messagesParaClaude.slice(1);
+    }
+    if (messagesParaClaude.length === 0) {
+      messagesParaClaude = [{ role: 'user', content: msg }];
+    }
 
     // Llamar a Claude
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 300,
       system: systemPrompt,
-      messages: [{ role: 'user', content: msg }]
+      messages: messagesParaClaude
     });
 
     const textoRespuesta = response.content[0].text;
+
+    // Guardar respuesta en historial
+    historial.push({ role: 'assistant', content: textoRespuesta });
+    await guardarHistorial(subscriberId, historial);
 
     // Crear contenido con productos si hay
     const contenido = crearContenidoManychat(textoRespuesta, datos._productos);
