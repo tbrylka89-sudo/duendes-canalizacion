@@ -237,9 +237,12 @@ async function construirContexto(mensaje, intencion, datos) {
         necesidad: intencion.necesidad,
         totalDisponibles: disponibles.length,
         recomendadosCount: recomendados.length,
-        recomendadosNombres: recomendados.map(p => `${p.nombre} (${p.slug})`),
-        sampleSlugs: disponibles.slice(0, 3).map(p => p.slug),
-        sampleCats: disponibles.slice(0, 3).map(p => p.categorias)
+        recomendados: recomendados.map(p => ({
+          nombre: p.nombre,
+          slug: p.slug,
+          precio: p.precio,
+          categorias: p.categorias
+        }))
       };
 
       if (recomendados.length > 0) {
