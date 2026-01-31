@@ -50,6 +50,7 @@ export async function GET(request) {
       nombre_humano: 'Querido Humano',
       guardian_nombre: 'Guardián Misterioso',
       guardian_genero: 'f',
+      guardian_imagen: null,
       fecha_canalizacion: new Date().toISOString(),
       mensaje_guardian: 'Este guardián fue canalizado especialmente para vos. Su energía única te acompañará en tu camino.',
       sincrodestino: 'Canalizado bajo la luz de la luna creciente',
@@ -183,6 +184,17 @@ export async function GET(request) {
       height: 2px;
       background: linear-gradient(90deg, transparent, #C6A962, transparent);
       margin: 25px auto;
+    }
+
+    .imagen-guardian {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #C6A962;
+      box-shadow: 0 4px 20px rgba(198, 169, 98, 0.3);
+      margin: 0 auto 20px;
+      display: block;
     }
 
     .contenido {
@@ -386,6 +398,7 @@ export async function GET(request) {
     <div class="linea-dorada"></div>
 
     <div class="contenido">
+      ${datos.guardian_imagen ? `<img src="${datos.guardian_imagen}" alt="${datos.guardian_nombre}" class="imagen-guardian" />` : ''}
       <p class="certifica">Este documento certifica que</p>
       <h2 class="nombre-guardian">${datos.guardian_nombre}</h2>
       <p class="tipo-guardian">Guardián de ${datos.categoria}</p>
@@ -465,6 +478,7 @@ export async function POST(request) {
       nombre_humano,
       guardian_nombre,
       guardian_genero = 'f',
+      guardian_imagen,
       mensaje_guardian,
       sincrodestino,
       categoria
@@ -482,6 +496,7 @@ export async function POST(request) {
       nombre_humano,
       guardian_nombre,
       guardian_genero,
+      guardian_imagen: guardian_imagen || null,
       mensaje_guardian: mensaje_guardian || 'Tu guardián ha sido canalizado con amor y dedicación.',
       sincrodestino: sincrodestino || 'Canalizado en un momento especial del universo',
       categoria: categoria || 'Protección',

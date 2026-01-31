@@ -5035,9 +5035,17 @@ function CanalizacionesLocal({ usuario }) {
                         <span>Canalización: {estado.texto}</span>
                       </div>
                       {cana && (cana.estado === 'enviada' || cana.contenido) ? (
-                        <button className="btn-ver-cana" onClick={() => setCanalizacionAbierta(cana)}>
-                          Ver Canalización
-                        </button>
+                        <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+                          <button className="btn-ver-cana" onClick={() => setCanalizacionAbierta(cana)}>
+                            Ver Canalización
+                          </button>
+                          {g.ordenId && (
+                            <a href={`/api/certificado?order=${g.ordenId}`} target="_blank" rel="noopener"
+                              className="btn-ver-cana" style={{background:'transparent',border:'1px solid #C6A962',color:'#C6A962',textDecoration:'none',display:'inline-flex',alignItems:'center',gap:'4px'}}>
+                              🎫 Certificado
+                            </a>
+                          )}
+                        </div>
                       ) : (
                         <p className="cana-info-text">Tu canalización personalizada está siendo preparada con amor (4-24hs)</p>
                       )}

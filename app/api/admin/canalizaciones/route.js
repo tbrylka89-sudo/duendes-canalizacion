@@ -1245,9 +1245,12 @@ Español rioplatense (vos, tenés, podés). 1500-2500 palabras.`;
       // ═══════════════════════════════════════════════════════════════
       // GUARDAR DATOS DEL CERTIFICADO
       // Necesario para que /api/certificado?order=X funcione
-      // Solo si hay ordenId (canalizaciones de compra)
+      // Solo si hay ordenId y es un guardián (no altares/accesorios)
       // ═══════════════════════════════════════════════════════════════
-      if (canalizacion.ordenId) {
+      const tipoProducto = canalizacion.guardian?.tipo || canalizacion.productoManual?.tipo || '';
+      const categoriaProducto = canalizacion.guardian?.categoria || canalizacion.productoManual?.categoria || '';
+      const esCertificable = tipoProducto === 'guardian' || (tipoProducto !== 'altar' && categoriaProducto !== 'accesorios');
+      if (canalizacion.ordenId && esCertificable) {
         // Extraer un mensaje corto del contenido de la canalización
         let mensajeCorto = canalizacion.contenido || '';
         // Buscar la primera sección significativa (después del saludo)
@@ -1269,6 +1272,7 @@ Español rioplatense (vos, tenés, podés). 1500-2500 palabras.`;
           nombre_humano: canalizacion.nombreDestinatario || canalizacion.nombreCliente,
           guardian_nombre: canalizacion.guardian?.nombre || 'Guardián',
           guardian_genero: esGeneroFemenino ? 'f' : 'm',
+          guardian_imagen: canalizacion.guardian?.imagen || null,
           fecha_canalizacion: fecha.toISOString(),
           mensaje_guardian: mensajeCorto,
           sincrodestino: 'Canalizado con amor desde el Bosque Ancestral de Piriápolis',
@@ -1285,9 +1289,75 @@ Español rioplatense (vos, tenés, podés). 1500-2500 palabras.`;
       }
 
       // ═══════════════════════════════════════════════════════════════
-      // ENVIAR EMAIL "TU CANALIZACIÓN ESTÁ LISTA" VIA BREVO
+      // ENVIAR EMAIL "TU CANALIZACIÓN ESTÁ LISTA" VIA BREVO (HTML inline)
       // ═══════════════════════════════════════════════════════════════
       try {
+        const nombreCliente = canalizacion.nombreDestinatario || canalizacion.nombreCliente;
+        const nombreGuardian = canalizacion.guardian?.nombre || 'Tu Guardián';
+        const certificadoUrl = `https://duendesdeluruguay.com/api/certificado?order=${canalizacion.ordenId}`;
+        const miMagiaUrl = `https://duendesdeluruguay.com/mi-magia?token=${canalizacion.ordenId}`;
+        const imagenGuardian = canalizacion.guardian?.imagen || '';
+
+        const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:Georgia,serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#1a1a1a;border-radius:12px;overflow:hidden;">
+
+  <!-- Header -->
+  <tr><td style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a);padding:40px 40px 20px;text-align:center;">
+    <p style="font-size:12px;letter-spacing:4px;color:#C6A962;margin:0 0 10px;text-transform:uppercase;">Duendes del Uruguay</p>
+    <h1 style="font-size:28px;color:#fff;margin:0;">Tu canalización está lista</h1>
+  </td></tr>
+
+  <!-- Imagen del guardián -->
+  ${imagenGuardian ? `<tr><td style="padding:30px 40px 0;text-align:center;">
+    <img src="${imagenGuardian}" alt="${nombreGuardian}" style="width:120px;height:120px;border-radius:50%;border:3px solid #C6A962;object-fit:cover;" />
+  </td></tr>` : ''}
+
+  <!-- Contenido -->
+  <tr><td style="padding:30px 40px;">
+    <p style="color:rgba(255,255,255,0.85);font-size:18px;line-height:1.7;margin:0 0 20px;">
+      ${nombreCliente},
+    </p>
+    <p style="color:rgba(255,255,255,0.7);font-size:16px;line-height:1.7;margin:0 0 25px;">
+      <strong style="color:#C6A962;">${nombreGuardian}</strong> ya canalizó su mensaje para vos.
+      Es único, personal, y fue preparado con mucho amor.
+    </p>
+
+    <!-- Botón Certificado -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:25px 0;">
+    <tr><td align="center">
+      <a href="${certificadoUrl}" style="display:inline-block;background:linear-gradient(135deg,#C6A962,#a88a42);color:#1a1a1a;padding:16px 40px;text-decoration:none;font-size:16px;font-weight:bold;border-radius:50px;letter-spacing:1px;">
+        VER CERTIFICADO DE CANALIZACIÓN
+      </a>
+    </td></tr>
+    </table>
+
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;text-align:center;margin:20px 0 5px;">
+      También podés acceder desde tu portal:
+    </p>
+    <p style="text-align:center;margin:0 0 20px;">
+      <a href="${miMagiaUrl}" style="color:#C6A962;font-size:14px;">Ir a Mi Magia →</a>
+    </p>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="padding:20px 40px 30px;border-top:1px solid rgba(198,169,98,0.2);text-align:center;">
+    <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0;">
+      Duendes del Uruguay · Piriápolis · duendesdeluruguay.com
+    </p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
         const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
           method: 'POST',
           headers: {
@@ -1297,17 +1367,14 @@ Español rioplatense (vos, tenés, podés). 1500-2500 palabras.`;
           },
           body: JSON.stringify({
             sender: { name: 'Duendes del Uruguay', email: 'info@duendesdeluruguay.com' },
-            to: [{ email: canalizacion.email, name: canalizacion.nombreDestinatario || canalizacion.nombreCliente }],
-            templateId: 15, // Template "Canalización Lista"
-            params: {
-              CUSTOMER_NAME: canalizacion.nombreDestinatario || canalizacion.nombreCliente,
-              GUARDIAN_NAME: canalizacion.guardian?.nombre || 'Tu Guardián',
-            }
+            to: [{ email: canalizacion.email, name: nombreCliente }],
+            subject: `✨ ${nombreGuardian} tiene un mensaje para vos`,
+            htmlContent: emailHtml
           })
         });
 
         if (brevoResponse.ok) {
-          console.log(`[CANALIZACION] Email "canalización lista" enviado a ${canalizacion.email}`);
+          console.log(`[CANALIZACION] Email con certificado enviado a ${canalizacion.email}`);
         } else {
           console.error(`[CANALIZACION] Error enviando email:`, await brevoResponse.text());
         }
