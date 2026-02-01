@@ -236,11 +236,12 @@ async function construirContexto(mensaje, intencion, datos) {
         contexto += `\n\n🛡️ GUARDIANES DISPONIBLES:`;
         recomendados.forEach(p => {
           const cat = (p.categorias || []).join(', ');
-          const sub = p.subtitulo || '';
-          const info = [cat, sub].filter(Boolean).join(' - ');
-          contexto += `\n- ${p.nombre}${info ? ` (${info})` : ''}: $${p.precio} USD`;
+          const desc = (p.descripcion || '').substring(0, 200).trim();
+          contexto += `\n\n• ${p.nombre} — $${p.precio} USD`;
+          if (cat) contexto += `\n  Categoría: ${cat}`;
+          if (desc) contexto += `\n  ${desc}`;
         });
-        contexto += `\n\n💡 Las fotos se mostrarán automáticamente. Usá la info de categoría y subtítulo para hablar de cada guardián con conocimiento real. Conectá emocionalmente.`;
+        contexto += `\n\n💡 Las fotos se mostrarán automáticamente. Usá la descripción real de cada guardián para hablar con conocimiento. NO inventes datos. Conectá emocionalmente.`;
       }
     }
   }
