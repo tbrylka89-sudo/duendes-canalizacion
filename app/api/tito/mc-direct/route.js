@@ -246,6 +246,31 @@ async function construirContexto(mensaje, intencion, datos) {
     }
   }
 
+  // === BÚSQUEDA POR NOMBRE DE GUARDIÁN ===
+  // Si no se cargaron productos, buscar si mencionan un guardián por nombre
+  if (!datos._productos) {
+    const productos = await obtenerProductosWoo();
+    const msgLower = mensaje.toLowerCase();
+    // Solo buscar guardianes reales (excluir runas, altares, círculos)
+    const guardianes = productos.filter(p =>
+      p.precio >= 40 && p.precio <= 2000 &&
+      !/(runa|altar|círculo|circulo|paquete)/i.test(p.nombre)
+    );
+    const mencionado = guardianes.find(p => {
+      const nombre = (p.nombre || '').split(/\s*-\s*/)[0].toLowerCase().trim();
+      return nombre.length >= 3 && msgLower.includes(nombre.toLowerCase());
+    });
+    if (mencionado) {
+      datos._productos = [mencionado];
+      const cat = (mencionado.categorias || []).join(', ');
+      const desc = (mencionado.descripcion || '').substring(0, 400).trim();
+      contexto += `\n\n🛡️ GUARDIÁN MENCIONADO: ${mencionado.nombre} — $${mencionado.precio} USD`;
+      if (cat) contexto += `\n  Categoría: ${cat}`;
+      if (desc) contexto += `\n  ${desc}`;
+      contexto += `\n\n💡 Usá la descripción REAL de arriba. NO inventes datos sobre este guardián. Si no tenés info, decí lo que sí sabés.`;
+    }
+  }
+
   // === PRECIOS ===
   if (intencion.preguntaPrecio && pais === 'UY') {
     contexto += `\n\n💰 ES DE URUGUAY - PRECIOS EN PESOS:
