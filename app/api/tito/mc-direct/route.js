@@ -257,12 +257,10 @@ async function construirContexto(mensaje, intencion, datos) {
         p.precio >= 40 && p.precio <= 2000 &&
         !/(runa|altar|círculo|circulo|paquete)/i.test(p.nombre)
       );
-      console.log(`[MC-DIRECT] Búsqueda nombre: msg="${msgLower}", total_prods=${productos.length}, guardianes=${guardianes.length}`);
       const mencionado = guardianes.find(p => {
         const nombre = (p.nombre || '').split(/\s*-\s*/)[0].toLowerCase().trim();
         return nombre.length >= 3 && msgLower.includes(nombre);
       });
-      console.log(`[MC-DIRECT] Mencionado: ${mencionado ? mencionado.nombre : 'ninguno'}`);
       if (mencionado) {
         datos._productos = [mencionado];
         const cat = (mencionado.categorias || []).join(', ');
@@ -883,13 +881,7 @@ ${contexto}
       total_productos: productos.length,
       _debug: {
         enviado_directo: enviado,
-        subscriber_id: subscriberId,
-        productos_desc: productos.slice(0, 3).map(p => ({
-          n: p.nombre,
-          desc_len: (p.descripcion || '').length,
-          desc_preview: (p.descripcion || '').substring(0, 80),
-          cats: p.categorias
-        }))
+        subscriber_id: subscriberId
       }
     });
 
