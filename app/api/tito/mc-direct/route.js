@@ -235,9 +235,12 @@ async function construirContexto(mensaje, intencion, datos) {
         datos._productos = recomendados;
         contexto += `\n\n🛡️ GUARDIANES DISPONIBLES:`;
         recomendados.forEach(p => {
-          contexto += `\n- ${p.nombre}: $${p.precio} USD`;
+          const cat = (p.categorias || []).join(', ');
+          const sub = p.subtitulo || '';
+          const info = [cat, sub].filter(Boolean).join(' - ');
+          contexto += `\n- ${p.nombre}${info ? ` (${info})` : ''}: $${p.precio} USD`;
         });
-        contexto += `\n\n💡 Las fotos se mostrarán automáticamente. Enfocate en conectar emocionalmente.`;
+        contexto += `\n\n💡 Las fotos se mostrarán automáticamente. Usá la info de categoría y subtítulo para hablar de cada guardián con conocimiento real. Conectá emocionalmente.`;
       }
     }
   }
@@ -270,7 +273,7 @@ function crearContenidoManychat(texto, productos = []) {
   if (productos.length > 0) {
     const cards = productos.slice(0, 10).map(p => ({
       title: p.nombre.substring(0, 80),
-      subtitle: `$${p.precio} USD`,
+      subtitle: `$${p.precio} USD${p.subtitulo ? ' · ' + p.subtitulo : ''}`,
       image_url: p.imagen,
       action_url: p.url || `https://duendesdeluruguay.com/?p=${p.id}`,
       buttons: [{
