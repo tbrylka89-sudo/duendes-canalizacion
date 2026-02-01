@@ -853,7 +853,13 @@ ${contexto}
       total_productos: productos.length,
       _debug: {
         enviado_directo: enviado,
-        subscriber_id: subscriberId
+        subscriber_id: subscriberId,
+        productos_desc: productos.slice(0, 3).map(p => ({
+          n: p.nombre,
+          desc_len: (p.descripcion || '').length,
+          desc_preview: (p.descripcion || '').substring(0, 80),
+          cats: p.categorias
+        }))
       }
     });
 
