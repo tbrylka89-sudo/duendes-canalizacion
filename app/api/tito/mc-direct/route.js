@@ -248,7 +248,7 @@ async function construirContexto(mensaje, intencion, datos) {
 
   // === BÚSQUEDA POR NOMBRE DE GUARDIÁN ===
   // Si no se cargaron productos, buscar si mencionan un guardián por nombre
-  if (!datos._productos) {
+  if (!datos._productos || datos._productos.length === 0) {
     try {
       const productos = await obtenerProductosWoo();
       const msgLower = mensaje.toLowerCase();
@@ -772,7 +772,6 @@ export async function POST(request) {
       nombre: userName,
       subscriberId,
       plataforma,
-      _productos: []
     };
 
     // Construir contexto
