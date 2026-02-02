@@ -661,6 +661,12 @@ export async function POST(request) {
     // Extraer subscriber_id de contact si existe
     const subscriberId = subscriber_id || contact?.id || contact?.subscriber_id;
 
+    // Detectar si viene del video de ManyChat (tag "vino_del_video_duendes")
+    const tags = contact?.tags || [];
+    const vieneDelVideo = tags.some(t =>
+      (typeof t === 'string' ? t : t?.name || '').toLowerCase().includes('vino_del_video')
+    );
+
     // Validar subscriber_id
     if (!subscriberId) {
       console.error('[MC-DIRECT] No hay subscriber_id');
@@ -775,6 +781,16 @@ export async function POST(request) {
     // Construir contexto
     const contexto = await construirContexto(msg, intencion, datos);
 
+    // Contexto del video de ManyChat
+    const videoInstruccion = vieneDelVideo
+      ? `\n\n🎬 CONTEXTO IMPORTANTE: Esta persona viene de un VIDEO donde eligió un guardián por número.
+ManyChat ya le envió un mensaje inicial sobre el guardián que eligió.
+- Ayudala a conocer más sobre ese guardián específico
+- Si menciona un número (5, 7, 9, 11, 33, 44, 222) es el guardián que eligió
+- Guiala hacia la adopción: mostrá el guardián, contá su historia, cerrá la venta
+- No hace falta presentarte, ya interactuó con la automatización`
+      : '';
+
     // Idioma detectado en sesión
     const idiomaInstruccion = filtro.sessionState?.idiomaDetectado === 'en'
       ? '\n- RESPOND IN ENGLISH. The user speaks English.'
@@ -794,7 +810,7 @@ ${contexto}
 - 1-2 emojis máximo
 - Respondé DIRECTO a lo que pregunta
 - Si quiere comprar, pedí datos. NO pidas número de pedido a cliente nuevo.
-- Si pregunta por pedido existente, ahí sí pedí número o email.${idiomaInstruccion}`;
+- Si pregunta por pedido existente, ahí sí pedí número o email.${videoInstruccion}${idiomaInstruccion}`;
 
     // Preparar messages con historial (últimos 8 mensajes para contexto)
     // Claude requiere que el primer mensaje sea 'user'
@@ -874,13 +890,30 @@ ${contexto}
     };
 
     // Devolver respuesta con campos separados para ManyChat
+    // IMPORTANTE: Si ya se envió directo por API, NO incluir el contenido Dynamic Block
+    // para evitar que ManyChat lo envíe de nuevo (mensaje duplicado)
+    if (enviado) {
+      return Response.json({
+        status: 'sent',
+        respuesta: textoRespuesta,
+        ...imagenes,
+        total_productos: productos.length,
+        _debug: {
+          enviado_directo: true,
+          subscriber_id: subscriberId
+        }
+      });
+    }
+
+    // Fallback: si no se pudo enviar directo, devolver en formato Dynamic Block
+    // para que ManyChat lo procese
     return Response.json({
       ...contenido,
       respuesta: textoRespuesta,
       ...imagenes,
       total_productos: productos.length,
       _debug: {
-        enviado_directo: enviado,
+        enviado_directo: false,
         subscriber_id: subscriberId
       }
     });
