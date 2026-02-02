@@ -299,7 +299,7 @@ async function enviarRespuestaRapida(subscriberId, texto, historial, method) {
   await guardarHistorial(subscriberId, historial);
   const contenido = crearContenidoManychat(texto);
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ ...contenido, status: 'sent', method, respuesta: texto });
+  return Response.json({ ...contenido, status: 'sent', method, respuesta: texto, respuesta_tito: texto, hay_productos: 'no' });
 }
 
 async function enviarGreeting(subscriberId, nombre, historial) {
@@ -308,7 +308,7 @@ async function enviarGreeting(subscriberId, nombre, historial) {
   await guardarHistorial(subscriberId, historial);
   const contenido = crearContenidoManychat(texto);
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ ...contenido, status: 'sent', method: 'greeting', respuesta: texto });
+  return Response.json({ ...contenido, status: 'sent', method: 'greeting', respuesta: texto, respuesta_tito: texto, hay_productos: 'no' });
 }
 
 async function enviarConProductos(subscriberId, texto, productos, historial, method) {
@@ -316,7 +316,7 @@ async function enviarConProductos(subscriberId, texto, productos, historial, met
   await guardarHistorial(subscriberId, historial);
   const contenido = crearContenidoManychat(texto, productos);
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ ...contenido, status: 'sent', method, respuesta: texto });
+  return Response.json({ ...contenido, status: 'sent', method, respuesta: texto, respuesta_tito: texto, hay_productos: 'si', imagen_url: productos[0]?.imagen || '', imagen_url_2: productos[1]?.imagen || '', imagen_url_3: productos[2]?.imagen || '' });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -642,11 +642,15 @@ export async function POST(request) {
 
     if (!subscriberId) {
       console.error('[MC-DIRECT] No hay subscriber_id');
+      const fallbackText = '¡Ey! 🍀 ¿En qué te puedo ayudar?';
       return Response.json({
         version: 'v2',
         content: {
-          messages: [{ type: 'text', text: '¡Ey! 🍀 ¿En qué te puedo ayudar?' }]
-        }
+          messages: [{ type: 'text', text: fallbackText }]
+        },
+        respuesta: fallbackText,
+        respuesta_tito: fallbackText,
+        hay_productos: 'no'
       });
     }
 
@@ -676,7 +680,7 @@ export async function POST(request) {
       await guardarHistorial(subscriberId, historial);
       const contenido = crearContenidoManychat(resp);
       await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'video_sin_tag' });
+      return Response.json({ ...contenido, status: 'sent', method: 'video_sin_tag', respuesta: resp, respuesta_tito: resp, hay_productos: 'no' });
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -694,7 +698,7 @@ export async function POST(request) {
       const contenido = crearContenidoManychat(filtro.respuesta);
       await enviarMensajeManychat(subscriberId, contenido);
       console.log('[MC-DIRECT] Filtro interceptó:', filtro.razon);
-      return Response.json({ status: 'sent', method: `filtro_${filtro.razon}` });
+      return Response.json({ ...contenido, status: 'sent', method: `filtro_${filtro.razon}`, respuesta: filtro.respuesta, respuesta_tito: filtro.respuesta, hay_productos: 'no' });
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -780,9 +784,12 @@ export async function POST(request) {
             }
             return `• ${p.nombre}: $${p.precio} USD`;
           }).join('\n');
+          const cierre = mencionados.length === 1
+            ? `\n\n¿Querés que te cuente más sobre ${mencionados[0].nombre}? 🍀`
+            : `\n\n¿Cuál te gustó? 🍀`;
           const resp = esUY
-            ? `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`
-            : `¡Genial! Los precios son en dólares:\n\n${lineas}\n\nPodés ver todo en: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`;
+            ? `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/${cierre}`
+            : `¡Genial! Los precios son en dólares:\n\n${lineas}\n\nPodés ver todo en: https://duendesdeluruguay.com/shop/${cierre}`;
           return enviarRespuestaRapida(subscriberId, resp, historial, esUY ? 'quick_precio_uy' : 'quick_precio_usd');
         }
       } catch (e) {}
@@ -954,8 +961,11 @@ ${contexto}
 
     if (enviado) {
       return Response.json({
+        ...contenido,
         status: 'sent',
         respuesta: textoRespuesta,
+        respuesta_tito: textoRespuesta,
+        hay_productos: productos.length > 0 ? 'si' : 'no',
         ...imagenes,
       });
     }
@@ -963,20 +973,23 @@ ${contexto}
     return Response.json({
       ...contenido,
       respuesta: textoRespuesta,
+      respuesta_tito: textoRespuesta,
+      hay_productos: productos.length > 0 ? 'si' : 'no',
       ...imagenes,
     });
 
   } catch (error) {
     console.error('[MC-DIRECT] Error:', error);
 
+    const errorText = 'Uy, tuve un problemita 😅 ¿Podés escribirme de nuevo?';
     return Response.json({
       version: 'v2',
       content: {
-        messages: [{
-          type: 'text',
-          text: 'Uy, tuve un problemita 😅 ¿Podés escribirme de nuevo?'
-        }]
-      }
+        messages: [{ type: 'text', text: errorText }]
+      },
+      respuesta: errorText,
+      respuesta_tito: errorText,
+      hay_productos: 'no'
     });
   }
 }
