@@ -846,12 +846,11 @@ export async function POST(request) {
 
     // Contexto del video de ManyChat
     const videoInstruccion = vieneDelVideo
-      ? `\n\n🎬 CONTEXTO IMPORTANTE: Esta persona viene de un VIDEO donde eligió un guardián por número.
-ManyChat ya le envió un mensaje inicial sobre el guardián que eligió.
-- Ayudala a conocer más sobre ese guardián específico
-- Si menciona un número (5, 7, 9, 11, 33, 44, 222) es el guardián que eligió
-- Guiala hacia la adopción: mostrá el guardián, contá su historia, cerrá la venta
-- No hace falta presentarte, ya interactuó con la automatización`
+      ? `\n\n🎬 VIENE DEL VIDEO. Eligió un guardián por número. ManyChat ya le mandó mensaje inicial.
+- SÉ BREVE: 2-3 oraciones MÁXIMO. No le cuentes toda la historia.
+- Mostrá el guardián (ya va en la card) y preguntá algo puntual: de dónde es, si quiere adoptarlo
+- NO te presentes, NO des discursos, NO expliques de más
+- Si dice su país → convertí precio y preguntá si lo quiere`
       : '';
 
     // Idioma detectado en sesión
