@@ -877,32 +877,30 @@ export async function POST(request) {
     // ─────────────────────────────────────────────────────────────
     const paisDetectado = detectarPais(msg);
     if (paisDetectado) {
-      const historialTexto = historial.map(m => m.content || '').join(' ');
-      const hayProductosPrevios = /\$\d+\s*USD/.test(historialTexto);
+      const historialTexto = historial.map(m => m.content || '').join(' ').toLowerCase();
 
-      if (hayProductosPrevios) {
-        try {
-          const productos = await obtenerProductosWoo();
-          const mencionados = productos.filter(p => {
-            const nombre = (p.nombre || '').toLowerCase();
-            return nombre.length >= 3 && historialTexto.toLowerCase().includes(nombre);
-          });
-          if (mencionados.length > 0) {
-            const esUY = paisDetectado === 'UY';
-            const lineas = mencionados.map(p => {
-              if (esUY) {
-                const pesos = PRECIOS_URUGUAY.convertir(p.precio);
-                return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos`;
-              }
-              return `• ${p.nombre}: $${p.precio} USD`;
-            }).join('\n');
-            const resp = esUY
-              ? `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`
-              : `¡Genial! Los precios son en dólares:\n\n${lineas}\n\nPodés ver todo en: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`;
-            return enviarRespuestaRapida(subscriberId, resp, historial, esUY ? 'quick_precio_uy' : 'quick_precio_usd');
-          }
-        } catch (e) {}
-      }
+      // Buscar guardianes mencionados en el historial
+      try {
+        const productos = await obtenerProductosWoo();
+        const mencionados = productos.filter(p => {
+          const nombre = (p.nombre || '').toLowerCase();
+          return nombre.length >= 3 && historialTexto.includes(nombre);
+        });
+        if (mencionados.length > 0) {
+          const esUY = paisDetectado === 'UY';
+          const lineas = mencionados.map(p => {
+            if (esUY) {
+              const pesos = PRECIOS_URUGUAY.convertir(p.precio);
+              return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos`;
+            }
+            return `• ${p.nombre}: $${p.precio} USD`;
+          }).join('\n');
+          const resp = esUY
+            ? `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`
+            : `¡Genial! Los precios son en dólares:\n\n${lineas}\n\nPodés ver todo en: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`;
+          return enviarRespuestaRapida(subscriberId, resp, historial, esUY ? 'quick_precio_uy' : 'quick_precio_usd');
+        }
+      } catch (e) {}
     }
 
     // Datos
