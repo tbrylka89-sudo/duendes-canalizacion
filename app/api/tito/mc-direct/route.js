@@ -867,14 +867,16 @@ export async function POST(request) {
       return enviarRespuestaRapida(subscriberId, 'El Círculo está siendo preparado con algo muy especial 🔮\n\nSi querés ser de los primeros, dejá tu email en: magia.duendesdeluruguay.com/circulo', historial, 'quick_circulo');
     }
 
-    // PREGUNTAN POR MONEDA LOCAL (pesos argentinos, mexicanos, colombianos, reales, etc.)
-    if (/en (pesos|mi moneda|moneda local|reales|soles|euros)|cu[aá]nto (es|ser[ií]a|sale) en/i.test(msgLower) && !/pesos uruguayos/i.test(msgLower)) {
-      return enviarRespuestaRapida(subscriberId, 'Nuestros precios son en dólares (USD) 💚\n\nPero en la tienda te aparece automáticamente en tu moneda: https://duendesdeluruguay.com/shop/ 🍀', historial, 'quick_moneda_local');
-    }
-
     // MI MAGIA
     if (/mi magia|portal.*compra/i.test(msgLower)) {
       return enviarRespuestaRapida(subscriberId, 'Mi Magia es tu portal exclusivo post-compra 🔮\n\nAhí encontrás tu canalización, la historia de tu guardián, ritual de bienvenida y más.\n\nAccedés en: magia.duendesdeluruguay.com', historial, 'quick_mimagia');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // INTERCEPTAR MONEDA LOCAL → Dirigir al shop (ANTES de detectar país)
+    // ─────────────────────────────────────────────────────────────
+    if (/en (pesos|mi moneda|moneda local|reales|soles|euros)|cu[aá]nto (es|ser[ií]a|sale|cuesta) en (?!d[oó]lares|usd)|en (pesos\s+)?(argentinos?|mexicanos?|colombianos?|chilenos?|uruguayos)|precio.*(local|moneda)/i.test(msgLower) && !/pesos uruguayos/i.test(msgLower)) {
+      return enviarRespuestaRapida(subscriberId, 'Nuestros precios son en dólares (USD) 💚\n\nPero en la tienda te aparece automáticamente en tu moneda: https://duendesdeluruguay.com/shop/ 🍀', historial, 'quick_moneda_local');
     }
 
     // ─────────────────────────────────────────────────────────────
