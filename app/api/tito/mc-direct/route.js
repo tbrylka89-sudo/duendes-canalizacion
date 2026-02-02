@@ -770,7 +770,10 @@ export async function POST(request) {
     // Agregar msg del usuario al historial ANTES del filtro
     historial.push({ role: 'user', content: msg });
 
-    const filtro = await filtroPreAPIMC(msg, historial, subscriberId);
+    // Si es un número del video, saltear el filtro de spam (números cortos como "5" se interceptan)
+    const esNumeroVideo = detectarNumeroVideo(msg);
+
+    const filtro = esNumeroVideo ? { interceptado: false } : await filtroPreAPIMC(msg, historial, subscriberId);
     if (filtro.interceptado) {
       historial.push({ role: 'assistant', content: filtro.respuesta });
       await guardarHistorial(subscriberId, historial);
