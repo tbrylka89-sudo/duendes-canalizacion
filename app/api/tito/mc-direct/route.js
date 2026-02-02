@@ -442,8 +442,8 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     };
   }
 
-  // ── SALUDO (primer mensaje) → Greeting mágico con 2 caminos ──
-  if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello|que tal|qué tal)[\s!?.]*$/i.test(msgLower) && historial.length <= 1) {
+  // ── SALUDO → Greeting mágico con 2 caminos (siempre, sin importar historial) ──
+  if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello|que tal|qué tal)[\s!?.]*$/i.test(msgLower)) {
     if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
     return {
       interceptado: true,
