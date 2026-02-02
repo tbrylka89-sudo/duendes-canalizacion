@@ -332,14 +332,14 @@ Llegaste a un lugar distinto. Acá los guardianes eligen a su persona, no al rev
 
 Cada uno tarda días en nacer. Manos humanas, cristales reales, ropa cosida puntada a puntada. Cuando se va, no vuelve. Ese diseño desaparece del mundo para siempre.
 
-Y cuando un guardián te elige, te escribe. Una carta personal donde te habla a VOS, de lo que estás viviendo. No es genérica. Es tuya y de nadie más 🍀
+Y cuando un guardián te elige, te escribe una canalización: una carta personal donde te habla a VOS, de lo que estás viviendo. No es genérica. Es tuya y de nadie más 🍀
 
 Tenemos dos caminos para empezar:
 
-1️⃣ Ver la tienda y elegir tu guardián
+1️⃣ Conocer a los guardianes disponibles
 https://duendesdeluruguay.com/shop/
 
-2️⃣ Descubrir qué guardián te elige con el test
+2️⃣ Descubrir qué guardián te elige
 https://duendesdeluruguay.com/descubri-que-duende-te-elige/`;
 }
 
