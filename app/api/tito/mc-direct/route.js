@@ -303,18 +303,12 @@ async function enviarRespuestaRapida(subscriberId, texto, historial, method) {
 }
 
 async function enviarGreeting(subscriberId, nombre, historial) {
-  const mensajes = generarGreetingMensajes(nombre);
-  const textoCompleto = mensajes.join('\n\n');
-  historial.push({ role: 'assistant', content: textoCompleto });
+  const texto = generarGreeting(nombre);
+  historial.push({ role: 'assistant', content: texto });
   await guardarHistorial(subscriberId, historial);
-  const contenido = {
-    version: 'v2',
-    content: {
-      messages: mensajes.map(t => ({ type: 'text', text: t }))
-    }
-  };
+  const contenido = crearContenidoManychat(texto);
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ ...contenido, status: 'sent', method: 'greeting', respuesta: textoCompleto });
+  return Response.json({ ...contenido, status: 'sent', method: 'greeting', respuesta: texto });
 }
 
 async function enviarConProductos(subscriberId, texto, productos, historial, method) {
@@ -329,18 +323,24 @@ async function enviarConProductos(subscriberId, texto, productos, historial, met
 // GREETING MÁGICO
 // ═══════════════════════════════════════════════════════════════
 
-function generarGreetingMensajes(nombre) {
-  return [
-    `✨ ¡Ey${nombre ? ' ' + nombre : ''}!\n\nSoy Tito, duende del bosque de Piriápolis.\n\nLlegaste a un lugar distinto. Acá no se compra nada — acá los guardianes eligen a su persona.`,
+function generarGreeting(nombre) {
+  return `✨ ¡Ey${nombre ? ' ' + nombre : ''}!
 
-    `Cada uno tarda días en nacer. Manos humanas, cristales reales, ropa cosida puntada a puntada.\n\nCuando se va, no vuelve. Ese diseño desaparece del mundo para siempre.\n\nY cuando un guardián te elige, te escribe. Una carta personal donde te habla a VOS, de lo que estás viviendo. No es genérica. Es tuya y de nadie más 🍀`,
+Soy Tito, duende del bosque de Piriápolis.
 
-    `¿Cómo seguimos?\n\n1️⃣ Ver la tienda\nhttps://duendesdeluruguay.com/shop/\n\n2️⃣ Descubrir qué guardián te elige\nhttps://duendesdeluruguay.com/descubri-que-duende-te-elige/`
-  ];
-}
+Llegaste a un lugar distinto. Acá los guardianes eligen a su persona, no al revés.
 
-function generarGreetingTexto(nombre) {
-  return generarGreetingMensajes(nombre).join('\n\n');
+Cada uno tarda días en nacer. Manos humanas, cristales reales, ropa cosida puntada a puntada. Cuando se va, no vuelve. Ese diseño desaparece del mundo para siempre.
+
+Y cuando un guardián te elige, te escribe. Una carta personal donde te habla a VOS, de lo que estás viviendo. No es genérica. Es tuya y de nadie más 🍀
+
+Tenemos dos caminos para empezar:
+
+1️⃣ Ver la tienda y elegir tu guardián
+https://duendesdeluruguay.com/shop/
+
+2️⃣ Descubrir qué guardián te elige con el test
+https://duendesdeluruguay.com/descubri-que-duende-te-elige/`;
 }
 
 // ═══════════════════════════════════════════════════════════════
