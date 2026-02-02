@@ -1,21 +1,14 @@
 /**
- * TITO MC-DIRECT - Envía mensajes DIRECTAMENTE a ManyChat
+ * TITO MC-DIRECT - Filtro/Redirector simplificado
  *
- * En lugar de devolver el contenido para que ManyChat lo procese,
- * este endpoint ENVÍA el mensaje directamente usando la API de ManyChat.
- * Así las cards con imágenes se muestran correctamente.
+ * Tito saluda con intro mágica, explica qué hace único a los guardianes,
+ * y redirige a la tienda o al test. Claude solo se llama para casos raros.
  */
 
 import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
-import {
-  obtenerProductosWoo,
-  recomendarGuardianes,
-  formatearPrecio,
-  FAQ,
-  PRECIOS_URUGUAY
-} from '@/lib/tito/conocimiento';
-import { PERSONALIDAD_TITO, CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad';
+import { obtenerProductosWoo, PRECIOS_URUGUAY } from '@/lib/tito/conocimiento';
+import { PERSONALIDAD_TITO_SIMPLE, CONTEXTO_MANYCHAT_SIMPLE } from '@/lib/tito/personalidad-simple';
 import {
   detectarCrisis, detectarInsulto, detectarSpam, detectarDespedida,
   detectarSinDinero, detectarDesahogo, detectarTrolling, detectarIdioma,
@@ -30,7 +23,6 @@ const MANYCHAT_API_KEY = process.env.MANYCHAT_API_KEY;
 const MANYCHAT_API_URL = 'https://api.manychat.com/fb';
 
 // Mapeo de números del video a guardianes
-// Cada número corresponde a un guardián específico en la web
 const VIDEO_NUMEROS_GUARDIANES = {
   '5':   { nombre: 'Micelio', buscar: ['micelio'] },
   '7':   { nombre: 'Axel',    buscar: ['axel'] },
@@ -43,14 +35,11 @@ const VIDEO_NUMEROS_GUARDIANES = {
 
 /**
  * Detecta si el mensaje menciona un número del video
- * Devuelve el guardián correspondiente o null
  */
 function detectarNumeroVideo(msg) {
   const msgLower = msg.toLowerCase().trim();
-  // Orden: primero los de más dígitos para evitar que "22" matchee antes que "222"
   const numeros = ['222', '44', '33', '11', '9', '7', '5'];
   for (const num of numeros) {
-    // Matchear: "5", "el 5", "número 5", "elegí el 5", "el numero 5", solo el número, etc.
     const regex = new RegExp(`(?:^|\\b|el\\s+|número\\s+|numero\\s+)${num}(?:\\b|$)`);
     if (regex.test(msgLower)) {
       return { numero: num, ...VIDEO_NUMEROS_GUARDIANES[num] };
@@ -98,58 +87,19 @@ async function enviarMensajeManychat(subscriberId, contenido) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// DETECTORES DE INTENCIÓN (MEJORADOS)
+// DETECTORES
 // ═══════════════════════════════════════════════════════════════
 
 function detectarIntencion(mensaje) {
   const msg = mensaje.toLowerCase();
-
-  // NUEVO: Detectar si QUIERE COMPRAR (nuevo cliente)
-  const quiereComprar = /quiero comprar|cómo compro|como compro|quiero pagar|cómo pago|como pago|me lo llevo|lo quiero|quiero uno|quiero ese|quiero una|quiero esa|lo compro|la compro|me interesa comprar|quiero adquirir/i.test(msg);
-
-  // DIFERENTE: Pregunta por pedido EXISTENTE (ya compró)
-  const preguntaPedidoExistente = /mi pedido|mi orden|ya (pagué|pague|compré|compre)|cuándo llega|cuando llega|estado de mi|tracking|rastreo|número de seguimiento|no me llegó|no me llego|dónde está mi/i.test(msg);
-
   return {
-    // NUEVO: Quiere comprar algo nuevo
-    quiereComprar,
-
-    // Pregunta por pedido que YA HIZO
-    preguntaPedidoExistente,
-
-    // Ver productos
-    quiereVer: /mostr[aá]|ver|foto|im[aá]gen|tienen|disponible|cat[aá]logo|tienda|enseñ/i.test(msg),
-
-    // Recomendación
-    quiereRecomendacion: /recomiend|sugier|cu[aá]l.*sirve|ayud[aá].*elegir|necesito|busco|para m[ií]|no s[eé] cu[aá]l/i.test(msg),
-
-    // Necesidad específica
-    necesidad: detectarNecesidad(msg),
-
-    // Preguntas FAQ
-    preguntaFAQ: detectarPreguntaFAQ(msg),
-
-    // Objeción de precio
-    objecionPrecio: /caro|precio|mucho|costoso|barato|descuento|no me alcanza/i.test(msg) && !/cuánto|cuanto|cuesta/.test(msg),
-
-    // Se quiere ir
-    quiereIrse: /gracias.*luego|chau|adiós|después veo|lo pienso|voy a pensar/i.test(msg),
-
-    // Nervioso/molesto
-    nervioso: /preocupad|molest|enoj|urgente|problema|queja|reclamo|estafa/i.test(msg),
-
-    // Saludo simple
     esSaludo: /^(hola|hey|buenas|buenos|hi|hello|ey|qué tal|que tal|buen día)[\s!?.]*$/i.test(msg.trim()),
-
-    // Pregunta por precio
     preguntaPrecio: /cuánto|cuanto|cuesta|vale|precio|valor/i.test(msg),
-
-    // País mencionado
+    quiereComprar: /quiero comprar|cómo compro|como compro|me lo llevo|lo quiero|lo compro|quiero adquirir|quiero pagar|cómo pago|como pago|quiero uno|quiero ese|quiero una|quiero esa|me interesa comprar/i.test(msg),
+    preguntaPedidoExistente: /mi pedido|mi orden|ya (pagué|pague|compré|compre)|cuándo llega|cuando llega|estado de mi|tracking|rastreo|número de seguimiento|no me llegó|no me llego|dónde está mi/i.test(msg),
+    quiereVer: /mostr[aá]me|ver guardianes|cat[aá]logo|qu[eé] tienen/i.test(msg),
+    quiereTest: /test|descubr|cu[aá]l me elige|qu[eé] (duende|guardi[aá]n) (me|soy)/i.test(msg),
     paisMencionado: detectarPais(msg),
-
-    // Info de contacto
-    tieneEmail: msg.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0],
-    tieneNumero: msg.match(/\b\d{5,}\b/)?.[0],
   };
 }
 
@@ -174,28 +124,59 @@ function detectarPais(msg) {
   return null;
 }
 
-function detectarNecesidad(msg) {
-  if (/protecci[oó]n|proteger|escudo|malo|negativ|miedo/i.test(msg)) return 'proteccion';
-  if (/abundancia|dinero|prosperidad|trabajo|negocio|plata/i.test(msg)) return 'abundancia';
-  if (/amor|pareja|coraz[oó]n|relaci[oó]n|soledad/i.test(msg)) return 'amor';
-  if (/san|salud|curar|bienestar/i.test(msg)) return 'sanacion';
-  if (/paz|calma|ansiedad|tranquil/i.test(msg)) return 'paz';
-  if (/hogar|casa|familia/i.test(msg)) return 'hogar';
-  return null;
+/**
+ * Busca un guardián por nombre en el mensaje
+ */
+async function buscarGuardianPorNombre(mensaje) {
+  try {
+    const productos = await obtenerProductosWoo();
+    const msgLower = mensaje.toLowerCase();
+    const guardianes = productos.filter(p =>
+      p.precio >= 40 && p.precio <= 2000 &&
+      !/(runa|altar|círculo|circulo|paquete)/i.test(p.nombre)
+    );
+    // Buscar por nombre
+    const porNombre = guardianes.find(p => {
+      const nombre = (p.nombre || '').split(/\s*-\s*/)[0].toLowerCase().trim();
+      return nombre.length >= 3 && msgLower.includes(nombre);
+    });
+    if (porNombre) return porNombre;
+    // Buscar por slug
+    const porSlug = guardianes.find(p => {
+      const slug = (p.slug || '').toLowerCase();
+      return slug.length >= 3 && msgLower.includes(slug);
+    });
+    return porSlug || null;
+  } catch (e) {
+    return null;
+  }
 }
 
-function detectarPreguntaFAQ(msg) {
-  if (/env[ií]o|llega|cu[aá]nto tarda/i.test(msg)) return 'envios';
-  if (/tama[ñn]o|grande|chico|medida|cm/i.test(msg)) return 'tamanos';
-  if (/material|hecho|porcelana|cristal/i.test(msg)) return 'materiales';
-  if (/reserva|30%|apartado/i.test(msg)) return 'reserva';
-  if (/garant[ií]a|roto|devoluci[oó]n/i.test(msg)) return 'garantia';
-  if (/visita|conocer|ir.*piri/i.test(msg)) return 'visitas';
-  return null;
+/**
+ * Notifica al owner en ManyChat para revisión
+ */
+async function notificarOwner(subscriberId, motivo) {
+  if (!MANYCHAT_API_KEY || !subscriberId) return;
+  try {
+    await fetch(`${MANYCHAT_API_URL}/subscriber/addTagByName`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MANYCHAT_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        subscriber_id: subscriberId,
+        tag_name: 'necesita_revision_tito'
+      })
+    });
+    console.log('[MC-DIRECT] Owner notificado:', motivo);
+  } catch (e) {
+    console.log('[MC-DIRECT] Error notificando owner:', e.message);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CONSTRUIR CONTEXTO PARA CLAUDE
+// CONSTRUIR CONTEXTO MÍNIMO PARA CLAUDE
 // ═══════════════════════════════════════════════════════════════
 
 async function construirContexto(mensaje, intencion, datos) {
@@ -204,12 +185,9 @@ async function construirContexto(mensaje, intencion, datos) {
 
   if (nombre) contexto += `\n👤 Cliente: ${nombre}`;
 
-  // Cargar memoria
   let memoria = null;
   if (subscriberId) {
-    try {
-      memoria = await kv.get(`tito:mc:${subscriberId}`);
-    } catch (e) {}
+    try { memoria = await kv.get(`tito:mc:${subscriberId}`); } catch (e) {}
   }
 
   const esPrimeraVez = !memoria || memoria.interacciones === 0;
@@ -218,71 +196,17 @@ async function construirContexto(mensaje, intencion, datos) {
   datos._esPrimeraVez = esPrimeraVez;
 
   if (esPrimeraVez) {
-    contexto += `\n\n✨ PRIMERA VEZ - Saludá casual y breve.`;
+    contexto += `\n✨ PRIMERA VEZ`;
   } else {
-    contexto += `\n\n🔄 YA SE CONOCEN (interacción #${memoria.interacciones + 1})`;
-    contexto += `\n⚠️ NO te presentes. NO digas "soy Tito". Hablá directo.`;
-    if (memoria.necesidad) contexto += `\n- Busca: ${memoria.necesidad}`;
+    contexto += `\n🔄 Interacción #${(memoria?.interacciones || 0) + 1}`;
+    contexto += `\n⚠️ NO te presentes. Hablá directo.`;
   }
 
-  // === QUIERE COMPRAR (NUEVO CLIENTE) ===
-  if (intencion.quiereComprar) {
-    contexto += `\n\n💳 ¡QUIERE COMPRAR! - MOMENTO DE CIERRE:
-
-1. Preguntá qué guardián le gustó (si no lo dijo)
-2. Pedí sus datos para el envío:
-   "¡Genial! Para coordinar necesito:
-   - Nombre completo
-   - País
-   - Dirección completa
-   - Código postal
-   - Teléfono con código de país
-   - Email"
-3. "Perfecto, te paso con el equipo para coordinar el pago 💚"
-
-⚠️ NO pidas número de pedido - es cliente NUEVO que quiere comprar.
-⚠️ NO confundas con consulta de pedido existente.`;
-  }
-
-  // === PREGUNTA POR PEDIDO EXISTENTE ===
-  if (intencion.preguntaPedidoExistente && !intencion.quiereComprar) {
-    contexto += `\n\n📦 CONSULTA DE PEDIDO EXISTENTE:
-- Pedí número de pedido O email para buscar
-- "¿Me pasás tu número de pedido o el email con que compraste?"
-- Si tienen el dato, buscá en el sistema`;
-  }
-
-  // === VER PRODUCTOS ===
-  if (intencion.quiereVer || intencion.quiereRecomendacion || intencion.necesidad) {
-    const productos = await obtenerProductosWoo();
-
-    if (productos.length > 0) {
-      let recomendados;
-      // Siempre usar recomendarGuardianes() para diversidad de precios + shuffle
-      recomendados = recomendarGuardianes(intencion.necesidad || null, productos, { limite: 6 });
-
-      if (recomendados.length > 0) {
-        datos._productos = recomendados;
-        contexto += `\n\n🛡️ GUARDIANES DISPONIBLES:`;
-        recomendados.forEach(p => {
-          const cat = (p.categorias || []).join(', ');
-          const desc = (p.descripcion || '').substring(0, 200).trim();
-          contexto += `\n\n• ${p.nombre} — $${p.precio} USD`;
-          if (cat) contexto += `\n  Categoría: ${cat}`;
-          if (desc) contexto += `\n  ${desc}`;
-        });
-        contexto += `\n\n💡 Las fotos se mostrarán automáticamente. Usá la descripción real de cada guardián para hablar con conocimiento. NO inventes datos. Conectá emocionalmente.`;
-      }
-    }
-  }
-
-  // === BÚSQUEDA POR NÚMERO DEL VIDEO ===
-  // Si mencionan un número del video, buscar el guardián correspondiente
+  // Contexto de guardián del video
   const guardianVideo = detectarNumeroVideo(mensaje);
-  if (guardianVideo && (!datos._productos || datos._productos.length === 0)) {
+  if (guardianVideo) {
     try {
       const productos = await obtenerProductosWoo();
-      // Buscar por cualquiera de los nombres asociados (nombre o slug)
       const encontrado = productos.find(p => {
         const pNombre = (p.nombre || '').toLowerCase();
         const pSlug = (p.slug || '').toLowerCase();
@@ -292,90 +216,20 @@ async function construirContexto(mensaje, intencion, datos) {
       });
       if (encontrado) {
         datos._productos = [encontrado];
-        const cat = (encontrado.categorias || []).join(', ');
         const desc = (encontrado.descripcion || '').substring(0, 400).trim();
         contexto += `\n\n🎬 GUARDIÁN DEL VIDEO #${guardianVideo.numero}: ${encontrado.nombre} — $${encontrado.precio} USD`;
-        if (cat) contexto += `\n  Categoría: ${cat}`;
         if (desc) contexto += `\n  ${desc}`;
-        contexto += `\n\n💡 Esta persona eligió este guardián en el video. Hablale específicamente de ${encontrado.nombre}: su historia, su energía, por qué la eligió. Guiala a adoptarlo.`;
       } else {
-        contexto += `\n\n🎬 La persona eligió el número ${guardianVideo.numero} (guardián: ${guardianVideo.nombre}) en el video. Hablale de ${guardianVideo.nombre} y guiala a la tienda.`;
-      }
-    } catch (e) {
-      console.error('[MC-DIRECT] Error búsqueda guardián video:', e.message);
-    }
-  }
-
-  // === BÚSQUEDA POR NOMBRE DE GUARDIÁN ===
-  // Si no se cargaron productos, buscar si mencionan un guardián por nombre
-  if (!datos._productos || datos._productos.length === 0) {
-    try {
-      const productos = await obtenerProductosWoo();
-      const msgLower = mensaje.toLowerCase();
-      // Solo buscar guardianes reales (excluir runas, altares, círculos)
-      const guardianes = productos.filter(p =>
-        p.precio >= 40 && p.precio <= 2000 &&
-        !/(runa|altar|círculo|circulo|paquete)/i.test(p.nombre)
-      );
-      const mencionado = guardianes.find(p => {
-        const nombre = (p.nombre || '').split(/\s*-\s*/)[0].toLowerCase().trim();
-        return nombre.length >= 3 && msgLower.includes(nombre);
-      });
-      if (mencionado) {
-        datos._productos = [mencionado];
-        const cat = (mencionado.categorias || []).join(', ');
-        const desc = (mencionado.descripcion || '').substring(0, 400).trim();
-        contexto += `\n\n🛡️ GUARDIÁN MENCIONADO: ${mencionado.nombre} — $${mencionado.precio} USD`;
-        if (cat) contexto += `\n  Categoría: ${cat}`;
-        if (desc) contexto += `\n  ${desc}`;
-        contexto += `\n\n💡 Usá la descripción REAL de arriba. NO inventes datos sobre este guardián. Si no tenés info, decí lo que sí sabés.`;
-      }
-    } catch (e) {
-      console.error('[MC-DIRECT] Error búsqueda nombre:', e.message);
-    }
-  }
-
-  // === PRECIOS URUGUAY ===
-  // Si es de Uruguay, buscar productos en historial si no hay cargados
-  if (pais === 'UY' && (!datos._productos || datos._productos.length === 0)) {
-    try {
-      const productos = await obtenerProductosWoo();
-      const historialTexto = (datos._historial || []).map(m => m.content || '').join(' ');
-      // Buscar guardianes mencionados en el historial (por nombre en cards/mensajes previos)
-      const mencionados = productos.filter(p => {
-        const nombre = (p.nombre || '').toLowerCase();
-        return nombre.length >= 3 && historialTexto.toLowerCase().includes(nombre);
-      });
-      if (mencionados.length > 0) {
-        datos._productos = mencionados;
+        contexto += `\n\n🎬 Eligió #${guardianVideo.numero} (${guardianVideo.nombre}) del video.`;
       }
     } catch (e) {}
   }
 
-  if (pais === 'UY' && datos._productos && datos._productos.length > 0) {
-    const preciosUY = datos._productos.map(p => {
-      const pesos = PRECIOS_URUGUAY.convertir(p.precio);
-      return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos`;
-    }).join('\n');
-    contexto += `\n\n🇺🇾 URUGUAY - PRECIOS FIJOS EN PESOS:
-${preciosUY}
-⚠️ Usá EXACTAMENTE estos precios. NO conviertas USD a pesos.`;
-  } else if (pais === 'UY') {
-    contexto += `\n\n🇺🇾 URUGUAY - Precios fijos en pesos:
-Hasta $75 USD → $2.500 | Hasta $160 → $5.500 | Hasta $210 → $8.000
-Hasta $350 → $12.500 | Hasta $500 → $16.500 | Hasta $700 → $24.500 | Más → $39.800`;
-  } else if (pais && pais !== 'UY') {
-    contexto += `\n\n💰 PRECIOS SOLO EN USD. NUNCA conviertas a moneda local.
-Si preguntan en su moneda → "Podés ver el precio en tu moneda en la tienda: https://duendesdeluruguay.com/shop/ 🍀"`;
-  } else if (intencion.preguntaPrecio && !pais) {
-    contexto += `\n\n💰 PREGUNTA PRECIO - Preguntá: "¿De qué país me escribís?"`;
-  }
-
-  // === OBJECIÓN PRECIO ===
-  if (intencion.objecionPrecio) {
-    contexto += `\n\n💰 OBJECIÓN DE PRECIO - USÁS LA SEÑA:
-"Mirá, con solo [30% del precio] lo reservás 30 días y pagás el resto cuando puedas."
-Ej: Mini $70 → Seña $21 USD`;
+  // País
+  if (pais === 'UY') {
+    contexto += `\n\n🇺🇾 URUGUAY - Precios fijos en pesos uruguayos.`;
+  } else if (pais) {
+    contexto += `\n\n💰 Precios SOLO en USD. Si piden en su moneda → dirigir a la tienda.`;
   }
 
   return contexto;
@@ -419,7 +273,7 @@ async function guardarSesionMC(subscriberId, state) {
   if (!subscriberId || !state) return;
   try {
     state.ultimaActividad = Date.now();
-    await kv.set(`tito:sesion:mc:${subscriberId}`, state, { ex: 7200 }); // 2h TTL
+    await kv.set(`tito:sesion:mc:${subscriberId}`, state, { ex: 7200 });
   } catch (e) {}
 }
 
@@ -435,31 +289,54 @@ async function cargarHistorial(subscriberId) {
 async function guardarHistorial(subscriberId, historial) {
   if (!subscriberId) return;
   try {
-    const ultimos = historial.slice(-10); // máx 10 mensajes (5 exchanges)
-    await kv.set(`tito:mc:historial:${subscriberId}`, ultimos, { ex: 86400 }); // 24h TTL
+    const ultimos = historial.slice(-10);
+    await kv.set(`tito:mc:historial:${subscriberId}`, ultimos, { ex: 86400 });
   } catch (e) {}
 }
 
 async function enviarRespuestaRapida(subscriberId, texto, historial, method) {
-  // Guardar en historial
   historial.push({ role: 'assistant', content: texto });
   await guardarHistorial(subscriberId, historial);
-
-  // Enviar a ManyChat
   const contenido = crearContenidoManychat(texto);
   await enviarMensajeManychat(subscriberId, contenido);
   return Response.json({ status: 'sent', method });
 }
 
+async function enviarConProductos(subscriberId, texto, productos, historial, method) {
+  historial.push({ role: 'assistant', content: texto });
+  await guardarHistorial(subscriberId, historial);
+  const contenido = crearContenidoManychat(texto, productos);
+  await enviarMensajeManychat(subscriberId, contenido);
+  return Response.json({ status: 'sent', method });
+}
+
 // ═══════════════════════════════════════════════════════════════
-// FILTRO PRE-API MC: Reglas de comportamiento (mismas que v3)
+// GREETING MÁGICO
+// ═══════════════════════════════════════════════════════════════
+
+function generarGreeting(nombre) {
+  return `¡Ey${nombre ? ' ' + nombre : ''}! Soy Tito, duende del bosque de Piriápolis 🍀
+
+Acá cada guardián es ÚNICO — hecho a mano, con cristales reales y ropa cosida, sin moldes. Cuando alguien lo adopta, ese diseño desaparece del mundo para siempre.
+
+Cada adopción incluye:
+✨ Canalización personal — una carta donde tu guardián te habla de lo que estás viviendo
+📜 Certificado de autenticidad
+🌿 Ritual de bienvenida
+
+¿Cómo seguimos?
+1️⃣ Ver la tienda → https://duendesdeluruguay.com/shop/
+2️⃣ Descubrir qué guardián te elige → https://duendesdeluruguay.com/descubri-que-duende-te-elige/`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILTRO PRE-API MC
 // ═══════════════════════════════════════════════════════════════
 
 async function filtroPreAPIMC(msg, historial, subscriberId) {
   const msgLower = msg.toLowerCase().trim();
   const tieneHistorial = historial.length > 1;
 
-  // Cargar o crear estado de sesión
   let sessionState;
   try {
     sessionState = await kv.get(`tito:sesion:mc:${subscriberId}`);
@@ -481,7 +358,7 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     sessionState = null;
   }
 
-  // Si está bloqueado (insultos reiterados), no responder
+  // Bloqueado
   if (sessionState?.bloqueado) {
     return { interceptado: true, respuesta: '🍀', razon: 'bloqueado' };
   }
@@ -492,14 +369,12 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     if (ultimoBot) {
       const textoBot = (ultimoBot.content || '').toLowerCase();
 
-      // A) Tito pidió datos → dejar pasar todo
       const pideDatos = /n[uú]mero de pedido|n[uú]mero de orden|tu (n[uú]mero|email|nombre|mail|correo)|pas[aá]me (el|tu)|decime (tu|el)|necesito (tu|el|que me)|con qu[eé] (nombre|email|mail)|datos del pedido/i.test(textoBot);
       if (pideDatos) {
         if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
         return { interceptado: false };
       }
 
-      // B) Tito hizo pregunta u oferta → afirmativos no son spam
       const titoHizoPregunta = /\?/.test(ultimoBot.content || '');
       const titoOfreció = /te muestro|quer[eé]s (ver|que)|te cuento|te interesa|te gustaria|te gustaría|mostrar(te|los)|ayudan con eso/i.test(textoBot);
       const esAfirmativo = /^(s[ií]|si+|ok|dale|bueno|va|vamos|claro|por favor|porfa|obvio|seguro|manda|mostr[aá]|quer[ií]a|quiero|me interesa|por supuesto)[\s!.]*$/i.test(msgLower);
@@ -508,7 +383,6 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
         return { interceptado: false };
       }
 
-      // C) Mensaje corto en conversación activa → no es spam, es respuesta contextual
       if (msgLower.length < 3) {
         if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
         return { interceptado: false };
@@ -516,14 +390,14 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     }
   }
 
-  // ── REGLA 1: CRISIS ──
+  // ── CRISIS ──
   const crisis = detectarCrisis(msg);
   if (crisis.detectado) {
     if (sessionState) await guardarSesionMC(subscriberId, sessionState);
     return { interceptado: true, respuesta: crisis.respuesta, razon: 'crisis' };
   }
 
-  // ── REGLA 2: INSULTOS ──
+  // ── INSULTOS ──
   const insulto = detectarInsulto(msg);
   if (insulto.detectado) {
     if (sessionState) {
@@ -546,7 +420,7 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     };
   }
 
-  // ── REGLA 3: SPAM ──
+  // ── SPAM ──
   const spam = detectarSpam(msg);
   if (spam.detectado) {
     if (sessionState) await guardarSesionMC(subscriberId, sessionState);
@@ -557,7 +431,7 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     };
   }
 
-  // ── REGLA 4: DESPEDIDA ──
+  // ── DESPEDIDA ──
   const despedida = detectarDespedida(msg, tieneHistorial);
   if (despedida.detectado) {
     if (sessionState) await guardarSesionMC(subscriberId, sessionState);
@@ -568,17 +442,17 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     };
   }
 
-  // ── REGLA 5: SALUDOS SIMPLES (solo inicio) ──
+  // ── SALUDO (primer mensaje) → Greeting mágico con 2 caminos ──
   if (/^(hola|buenas?|buenos d[ií]as|buenas tardes|buenas noches|hey|ey|hi|hello|que tal|qué tal)[\s!?.]*$/i.test(msgLower) && historial.length <= 1) {
     if (sessionState) { sessionState.contadorMensajes++; await guardarSesionMC(subscriberId, sessionState); }
     return {
       interceptado: true,
-      respuesta: '¡Ey! ¿Qué andás buscando? 🍀',
+      respuesta: '__GREETING__',
       razon: 'saludo'
     };
   }
 
-  // ── REGLA 6: TROLLING ──
+  // ── TROLLING ──
   const troll = detectarTrolling(msg);
   if (troll.detectado) {
     if (sessionState) {
@@ -591,7 +465,7 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     return { interceptado: true, respuesta: '🍀', razon: 'trolling' };
   }
 
-  // ── REGLA 7: SIN DINERO (progresivo) ──
+  // ── SIN DINERO → Cierre amable ──
   const sinDinero = detectarSinDinero(msg);
   if (sinDinero.detectado && sessionState) {
     sessionState.contadorSinDinero = (sessionState.contadorSinDinero || 0) + 1;
@@ -601,25 +475,25 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     if (sessionState.contadorSinDinero === 1) {
       return {
         interceptado: true,
-        respuesta: '¡Hay guardianes desde $70 USD! Y tenemos 3x2: llevás 2 y te regalamos 1 mini. ¿Querés que te muestre los más accesibles?',
+        respuesta: 'Los guardianes llegan en el momento exacto 🍀\n\nCuando sientas el llamado, acá vamos a estar: https://duendesdeluruguay.com/shop/',
         razon: 'sin_dinero'
       };
-    } else if (sessionState.contadorSinDinero === 2) {
+    } else {
       return {
         interceptado: true,
-        respuesta: 'Entiendo, no es el momento. Te dejo el test para cuando puedas: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀 ¡Nos vemos!',
+        respuesta: 'Te dejo el test para cuando sea el momento: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀 ¡Nos vemos!',
         razon: 'sin_dinero_final'
       };
     }
   } else if (sinDinero.detectado && !sessionState) {
     return {
       interceptado: true,
-      respuesta: '¡Hay guardianes desde $70 USD! Y tenemos 3x2: llevás 2 y te regalamos 1 mini. ¿Querés que te muestre los más accesibles?',
+      respuesta: 'Los guardianes llegan en el momento exacto 🍀\n\nCuando sientas el llamado: https://duendesdeluruguay.com/shop/',
       razon: 'sin_dinero'
     };
   }
 
-  // ── REGLA 8: DESAHOGO (progresivo) ──
+  // ── DESAHOGO → Empática breve + redirect ──
   const desahogo = detectarDesahogo(msg);
   if (desahogo.detectado && sessionState) {
     sessionState.contadorDesahogo = (sessionState.contadorDesahogo || 0) + 1;
@@ -629,25 +503,25 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     if (sessionState.contadorDesahogo === 1) {
       return {
         interceptado: true,
-        respuesta: 'Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. ¿Querés que te muestre algunos?',
+        respuesta: 'Te escucho 💚 A veces un guardián llega justo cuando más lo necesitás.\n\nSi querés descubrir cuál te elige: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀',
         razon: 'desahogo'
       };
-    } else if (sessionState.contadorDesahogo === 2) {
+    } else {
       return {
         interceptado: true,
-        respuesta: 'Ojalá las cosas mejoren pronto. Te dejo el test para cuando estés lista/o: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀 Cuidate mucho.',
+        respuesta: 'Ojalá las cosas mejoren pronto. Cuando estés lista/o: https://duendesdeluruguay.com/shop/ 🍀 Cuidate mucho.',
         razon: 'desahogo_final'
       };
     }
   } else if (desahogo.detectado && !sessionState) {
     return {
       interceptado: true,
-      respuesta: 'Te escucho 💚 A veces un guardián puede ser ese compañero silencioso que acompaña en momentos difíciles. Si querés, te muestro algunos que ayudan con eso.',
+      respuesta: 'Te escucho 💚 A veces un guardián llega justo cuando más lo necesitás.\n\nDescubrí cuál te elige: https://duendesdeluruguay.com/descubri-que-duende-te-elige/ 🍀',
       razon: 'desahogo'
     };
   }
 
-  // ── REGLA 9: IDIOMA (en/pt) - solo primera vez ──
+  // ── IDIOMA (en/pt) ──
   const idioma = detectarIdioma(msg);
   if (idioma.idioma && idioma.idioma !== 'es') {
     const yaDetectado = sessionState?.idiomaDetectado;
@@ -660,21 +534,21 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
       if (idioma.idioma === 'en') {
         return {
           interceptado: true,
-          respuesta: 'Hey! We ship worldwide 🌎 Check our store: https://duendesdeluruguay.com/shop/ — Feel free to ask me anything in English!',
+          respuesta: 'Hey! Each guardian is UNIQUE — handmade, real crystals, no molds. When adopted, that design disappears forever.\n\nEach adoption includes a personal channeling letter just for you ✨\n\n🛒 Shop: https://duendesdeluruguay.com/shop/\n🔮 Find your guardian: https://duendesdeluruguay.com/descubri-que-duende-te-elige/',
           razon: 'idioma_en'
         };
       }
       if (idioma.idioma === 'pt') {
         return {
           interceptado: true,
-          respuesta: 'Oi! Enviamos para o mundo todo 🌎 Veja nossa loja: https://duendesdeluruguay.com/shop/ — Pode me perguntar em português!',
+          respuesta: 'Oi! Cada guardião é ÚNICO — feito à mão, cristais reais, sem moldes. Quando adotado, esse design desaparece para sempre.\n\nCada adoção inclui uma carta pessoal canalizada só pra você ✨\n\n🛒 Loja: https://duendesdeluruguay.com/shop/\n🔮 Descubra seu guardião: https://duendesdeluruguay.com/descubri-que-duende-te-elige/',
           razon: 'idioma_pt'
         };
       }
     }
   }
 
-  // ── REGLA 10: PREGUNTA REPETIDA ──
+  // ── PREGUNTA REPETIDA ──
   if (sessionState && sessionState.preguntasHechas.length > 0) {
     const repetida = detectarPreguntaRepetida(msg, sessionState.preguntasHechas);
     if (repetida.detectado) {
@@ -688,7 +562,7 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
     }
   }
 
-  // ── REGLA 11: MAX EXCHANGES SIN PROGRESO (5+ msgs) ──
+  // ── MAX EXCHANGES SIN PROGRESO ──
   if (sessionState) {
     sessionState.contadorMensajes++;
 
@@ -698,7 +572,6 @@ async function filtroPreAPIMC(msg, historial, subscriberId) {
       sessionState.contadorSinProgreso = (sessionState.contadorSinProgreso || 0) + 1;
     }
 
-    // Guardar pregunta para detección de repetidas (máx 5)
     if (msg.length > 5) {
       sessionState.preguntasHechas.push(msg);
       if (sessionState.preguntasHechas.length > 5) {
@@ -739,14 +612,12 @@ export async function POST(request) {
       nombre,
       first_name,
       subscriber_id,
-      contact,  // Full Contact Data de ManyChat
+      contact,
       plataforma
     } = body;
 
     const msg = mensaje || message || '';
-    // Extraer nombre de contact si existe
     const userName = nombre || first_name || contact?.first_name || contact?.name || '';
-    // Extraer subscriber_id de contact si existe
     const subscriberId = subscriber_id || contact?.id || contact?.subscriber_id;
 
     // Detectar si viene del video de ManyChat (tag "vino_del_video_duendes")
@@ -755,7 +626,6 @@ export async function POST(request) {
       (typeof t === 'string' ? t : t?.name || '').toLowerCase().includes('vino_del_video')
     );
 
-    // Validar subscriber_id
     if (!subscriberId) {
       console.error('[MC-DIRECT] No hay subscriber_id');
       return Response.json({
@@ -766,42 +636,31 @@ export async function POST(request) {
       });
     }
 
-    // Cargar historial de conversación
     const historial = await cargarHistorial(subscriberId);
 
-    // Mensaje vacío = saludo
+    // ─────────────────────────────────────────────────────────────
+    // MENSAJE VACÍO → Greeting mágico
+    // ─────────────────────────────────────────────────────────────
     if (!msg.trim()) {
-      const saludo = `¡Ey${userName ? ' ' + userName : ''}! Soy Tito 🍀\n\n¿Qué andás buscando?`;
-
-      // Enviar directo
-      const contenido = crearContenidoManychat(saludo);
+      const greeting = generarGreeting(userName);
+      historial.push({ role: 'assistant', content: greeting });
+      await guardarHistorial(subscriberId, historial);
+      const contenido = crearContenidoManychat(greeting);
       await enviarMensajeManychat(subscriberId, contenido);
-
-      return Response.json({ status: 'sent', method: 'direct' });
+      return Response.json({ status: 'sent', method: 'greeting' });
     }
 
-    // Detectar intención
     const intencion = detectarIntencion(msg);
     const msgLower = msg.toLowerCase();
 
-    console.log('[MC-DIRECT] Intención:', {
-      quiereComprar: intencion.quiereComprar,
-      preguntaPedidoExistente: intencion.preguntaPedidoExistente,
-      quiereVer: intencion.quiereVer,
-      necesidad: intencion.necesidad
-    });
-
     // ─────────────────────────────────────────────────────────────
-    // FILTRO PRE-API: Reglas de comportamiento (crisis, insultos, spam, etc.)
+    // VIDEO NUMBERS
     // ─────────────────────────────────────────────────────────────
-
-    // Agregar msg del usuario al historial ANTES del filtro
     historial.push({ role: 'user', content: msg });
 
-    // Si es un número del video, decidir según si tiene tag o no
     const esNumeroVideo = detectarNumeroVideo(msg);
 
-    // Si escribe un número del video pero NO tiene el tag → decirle que toque el botón
+    // Número del video sin tag → "tocá el botón"
     if (esNumeroVideo && !vieneDelVideo) {
       const resp = `¡Ey! Para elegir a ${esNumeroVideo.nombre}, tocá el botón con el número ${esNumeroVideo.numero} en el mensaje del video 👆\n\nSi tocás el botón te muestro todo sobre ${esNumeroVideo.nombre} al toque 🍀`;
       historial.push({ role: 'assistant', content: resp });
@@ -811,20 +670,26 @@ export async function POST(request) {
       return Response.json({ status: 'sent', method: 'video_sin_tag' });
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // FILTRO PRE-API
+    // ─────────────────────────────────────────────────────────────
     const filtro = (esNumeroVideo && vieneDelVideo) ? { interceptado: false } : await filtroPreAPIMC(msg, historial, subscriberId);
     if (filtro.interceptado) {
-      historial.push({ role: 'assistant', content: filtro.respuesta });
+      // Si es saludo, usar greeting mágico
+      const respuesta = filtro.respuesta === '__GREETING__'
+        ? generarGreeting(userName)
+        : filtro.respuesta;
+
+      historial.push({ role: 'assistant', content: respuesta });
       await guardarHistorial(subscriberId, historial);
-
-      const contenido = crearContenidoManychat(filtro.respuesta);
+      const contenido = crearContenidoManychat(respuesta);
       await enviarMensajeManychat(subscriberId, contenido);
-
       console.log('[MC-DIRECT] Filtro interceptó:', filtro.razon);
       return Response.json({ status: 'sent', method: `filtro_${filtro.razon}` });
     }
 
     // ─────────────────────────────────────────────────────────────
-    // RESPUESTAS RÁPIDAS FAQ - Ahorro de tokens
+    // RESPUESTAS RÁPIDAS FAQ
     // ─────────────────────────────────────────────────────────────
 
     // ENVÍOS
@@ -839,12 +704,12 @@ export async function POST(request) {
 
     // MÉTODOS DE PAGO
     if (/m[eé]todos? de pago|c[oó]mo (pago|puedo pagar)|formas? de pago/i.test(msgLower)) {
-      return enviarRespuestaRapida(subscriberId, 'Visa, MasterCard, Amex 💳\n\nInternacional: también Western Union y MoneyGram\nUruguay: + OCA, Redpagos, transferencia bancaria', historial, 'quick_pagos');
+      return enviarRespuestaRapida(subscriberId, 'Visa, MasterCard, Amex 💳\nUruguay: + OCA, transferencia bancaria\n\nNo tenemos PayPal.', historial, 'quick_pagos');
     }
 
     // PAYPAL
     if (/paypal|pay pal/i.test(msgLower)) {
-      return enviarRespuestaRapida(subscriberId, 'No tenemos PayPal, pero sí Visa, MasterCard y Amex. También Western Union y MoneyGram para pagos internacionales 💳', historial, 'quick_paypal');
+      return enviarRespuestaRapida(subscriberId, 'No tenemos PayPal, pero sí Visa, MasterCard y Amex 💳 Funcionan desde cualquier país.', historial, 'quick_paypal');
     }
 
     // GARANTÍA / DEVOLUCIONES
@@ -872,21 +737,25 @@ export async function POST(request) {
       return enviarRespuestaRapida(subscriberId, 'Mi Magia es tu portal exclusivo post-compra 🔮\n\nAhí encontrás tu canalización, la historia de tu guardián, ritual de bienvenida y más.\n\nAccedés en: magia.duendesdeluruguay.com', historial, 'quick_mimagia');
     }
 
+    // CANALIZACIÓN
+    if (/canalización|canalizacion|carta personal|carta del guardián/i.test(msgLower)) {
+      return enviarRespuestaRapida(subscriberId, 'Cada guardián viene con su canalización: una carta personal donde te habla a VOS, de lo que estás viviendo ✨\n\nNo es genérica — es única, como el guardián.\n\nPodés verlos acá: https://duendesdeluruguay.com/shop/ 🍀', historial, 'quick_canalizacion');
+    }
+
     // ─────────────────────────────────────────────────────────────
-    // INTERCEPTAR MONEDA LOCAL → Dirigir al shop (ANTES de detectar país)
+    // MONEDA LOCAL → Dirigir al shop
     // ─────────────────────────────────────────────────────────────
     if (/en (pesos|mi moneda|moneda local|reales|soles|euros)|cu[aá]nto (es|ser[ií]a|sale|cuesta) en (?!d[oó]lares|usd)|en (pesos\s+)?(argentinos?|mexicanos?|colombianos?|chilenos?|uruguayos)|precio.*(local|moneda)/i.test(msgLower) && !/pesos uruguayos/i.test(msgLower)) {
       return enviarRespuestaRapida(subscriberId, 'Nuestros precios son en dólares (USD) 💚\n\nPero en la tienda te aparece automáticamente en tu moneda: https://duendesdeluruguay.com/shop/ 🍀', historial, 'quick_moneda_local');
     }
 
     // ─────────────────────────────────────────────────────────────
-    // INTERCEPTAR PAÍS → Precios directos sin Claude
+    // PAÍS → Precios directos
     // ─────────────────────────────────────────────────────────────
     const paisDetectado = detectarPais(msg);
     if (paisDetectado) {
       const historialTexto = historial.map(m => m.content || '').join(' ').toLowerCase();
 
-      // Buscar guardianes mencionados en el historial
       try {
         const productos = await obtenerProductosWoo();
         const mencionados = productos.filter(p => {
@@ -910,7 +779,68 @@ export async function POST(request) {
       } catch (e) {}
     }
 
-    // Datos
+    // ─────────────────────────────────────────────────────────────
+    // SELECCIÓN DE CAMINO (después del greeting)
+    // ─────────────────────────────────────────────────────────────
+    const ultimoBot = historial.slice().reverse().find(m => m.role === 'assistant');
+    const fueGreeting = ultimoBot && /1️⃣.*2️⃣/s.test(ultimoBot.content || '');
+
+    // Elige SHOP
+    if (/^(tienda|shop|ver la tienda|ver guardianes)[\s!?.]*$/i.test(msgLower) || intencion.quiereVer ||
+        (fueGreeting && /^(1|uno)[\s!?.]*$/i.test(msgLower))) {
+      return enviarRespuestaRapida(subscriberId,
+        '¡Dale! En la tienda podés ver todos los guardianes con sus fotos, historia y precios.\n\nEs simple: elegís, sellás el pacto 💚 y te llega a donde estés.\n\n👉 https://duendesdeluruguay.com/shop/\n\nSi necesitás ayuda, preguntame 🍀',
+        historial, 'path_shop');
+    }
+
+    // Elige TEST
+    if (intencion.quiereTest ||
+        (fueGreeting && /^(2|dos)[\s!?.]*$/i.test(msgLower))) {
+      return enviarRespuestaRapida(subscriberId,
+        '¡Buena elección! El test te ayuda a descubrir qué guardián resuena con tu energía.\n\n👉 https://duendesdeluruguay.com/descubri-que-duende-te-elige/\n\nCuando termines, volvé y contame qué salió 🍀',
+        historial, 'path_test');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // QUIERE COMPRAR → Redirect a tienda
+    // ─────────────────────────────────────────────────────────────
+    if (intencion.quiereComprar) {
+      return enviarRespuestaRapida(subscriberId,
+        '¡Dale! Entrá a la tienda, elegí tu guardián y sellá el pacto 💚\n\n👉 https://duendesdeluruguay.com/shop/\n\nEnvío a todo el mundo con tracking. ¿Alguna duda? 🍀',
+        historial, 'quick_comprar');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PEDIDO EXISTENTE → WhatsApp
+    // ─────────────────────────────────────────────────────────────
+    if (intencion.preguntaPedidoExistente) {
+      return enviarRespuestaRapida(subscriberId,
+        'Para consultas de pedidos, escribinos por WhatsApp que ahí el equipo te ayuda con el seguimiento 💚\n\n👉 https://wa.me/59898690629',
+        historial, 'quick_pedido');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PREGUNTA PRECIO (sin país) → Pedir país
+    // ─────────────────────────────────────────────────────────────
+    if (intencion.preguntaPrecio && !paisDetectado) {
+      return enviarRespuestaRapida(subscriberId,
+        'Los precios están en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿De qué país sos? Si sos de Uruguay te doy los precios en pesos.',
+        historial, 'quick_precio_pais');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // BUSCAR GUARDIÁN POR NOMBRE → Link directo o shop
+    // ─────────────────────────────────────────────────────────────
+    const guardianEncontrado = await buscarGuardianPorNombre(msg);
+    if (guardianEncontrado) {
+      const url = guardianEncontrado.url || `https://duendesdeluruguay.com/?p=${guardianEncontrado.id}`;
+      const resp = `¡Acá lo tenés! 🍀\n\n👉 ${url}\n\n¿De qué país sos? Así te doy el precio exacto.`;
+      return enviarConProductos(subscriberId, resp, [guardianEncontrado], historial, 'quick_guardian_found');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // CLAUDE - Solo para casos que no matchearon ningún patrón
+    // ─────────────────────────────────────────────────────────────
     const datos = {
       nombre: userName,
       subscriberId,
@@ -918,29 +848,24 @@ export async function POST(request) {
       _historial: historial,
     };
 
-    // Construir contexto
     const contexto = await construirContexto(msg, intencion, datos);
 
-    // Contexto del video de ManyChat
     const videoInstruccion = vieneDelVideo
-      ? `\n\n🎬 VIENE DEL VIDEO. Eligió un guardián por número. ManyChat ya le mandó mensaje inicial.
-- SÉ BREVE: 2-3 oraciones MÁXIMO. No le cuentes toda la historia.
-- Mostrá el guardián (ya va en la card) y preguntá algo puntual: de dónde es, si quiere adoptarlo
-- NO te presentes, NO des discursos, NO expliques de más
-- Si dice su país → convertí precio y preguntá si lo quiere`
+      ? `\n\n🎬 VIENE DEL VIDEO. Eligió un guardián por número.
+- SÉ BREVE: 2-3 oraciones MÁXIMO
+- Mostrá el guardián y preguntá de dónde es
+- NO te presentes, NO des discursos`
       : '';
 
-    // Idioma detectado en sesión
     const idiomaInstruccion = filtro.sessionState?.idiomaDetectado === 'en'
-      ? '\n- RESPOND IN ENGLISH. The user speaks English.'
+      ? '\n- RESPOND IN ENGLISH.'
       : filtro.sessionState?.idiomaDetectado === 'pt'
-        ? '\n- RESPONDE EN PORTUGUÉS. El usuario habla portugués.'
+        ? '\n- RESPONDE EN PORTUGUÉS.'
         : '';
 
-    // System prompt
-    const systemPrompt = `${PERSONALIDAD_TITO}
+    const systemPrompt = `${PERSONALIDAD_TITO_SIMPLE}
 
-${CONTEXTO_MANYCHAT}
+${CONTEXTO_MANYCHAT_SIMPLE}
 
 ${contexto}
 
@@ -948,11 +873,11 @@ ${contexto}
 - Mensajes CORTOS (2-3 oraciones máximo)
 - 1-2 emojis máximo
 - Respondé DIRECTO a lo que pregunta
-- Si quiere comprar, pedí datos. NO pidas número de pedido a cliente nuevo.
-- Si pregunta por pedido existente, ahí sí pedí número o email.${videoInstruccion}${idiomaInstruccion}`;
+- SIEMPRE dirigí a la tienda o al test
+- Si no sabés algo, decí: "Uy, dejame averiguar eso. Escribime de nuevo en un ratito 🍀" — NO inventes
+- Tienda: https://duendesdeluruguay.com/shop/
+- Test: https://duendesdeluruguay.com/descubri-que-duende-te-elige/${videoInstruccion}${idiomaInstruccion}`;
 
-    // Preparar messages con historial (últimos 8 mensajes para contexto)
-    // Claude requiere que el primer mensaje sea 'user'
     let messagesParaClaude = historial.slice(-8);
     while (messagesParaClaude.length > 0 && messagesParaClaude[0].role !== 'user') {
       messagesParaClaude = messagesParaClaude.slice(1);
@@ -961,7 +886,6 @@ ${contexto}
       messagesParaClaude = [{ role: 'user', content: msg }];
     }
 
-    // Llamar a Claude
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 300,
@@ -971,14 +895,16 @@ ${contexto}
 
     const textoRespuesta = response.content[0].text;
 
-    // Guardar respuesta en historial
+    // Si Claude dice "averiguar" → notificar al owner
+    if (/averiguar|no (tengo|s[eé]) esa info/i.test(textoRespuesta)) {
+      await notificarOwner(subscriberId, `Claude no supo responder: "${msg}"`);
+    }
+
     historial.push({ role: 'assistant', content: textoRespuesta });
     await guardarHistorial(subscriberId, historial);
 
-    // Crear contenido con productos si hay
     const contenido = crearContenidoManychat(textoRespuesta, datos._productos);
 
-    // INTENTAR ENVIAR DIRECTO A MANYCHAT
     let enviado = false;
     if (subscriberId) {
       enviado = await enviarMensajeManychat(subscriberId, contenido);
@@ -993,7 +919,6 @@ ${contexto}
           ultimaInteraccion: new Date().toISOString(),
           interacciones: (memoriaExistente.interacciones || 0) + 1,
           nombre: userName || memoriaExistente.nombre,
-          necesidad: intencion.necesidad || memoriaExistente.necesidad,
           pais: intencion.paisMencionado || memoriaExistente.pais,
         };
         await kv.set(`tito:mc:${subscriberId}`, nuevaMemoria, { ex: 30 * 24 * 60 * 60 });
@@ -1002,59 +927,34 @@ ${contexto}
       }
     }
 
-    console.log('[MC-DIRECT] Completado:', {
+    console.log('[MC-DIRECT] Claude respondió:', {
       tiempo: Date.now() - startTime,
       enviado,
       productos: datos._productos?.length || 0
     });
 
-    // Extraer URLs de imágenes de los productos para mapeo en ManyChat
+    // Productos para ManyChat fields (video flow)
     const productos = datos._productos || [];
     const imagenes = {
       imagen_1: productos[0]?.imagen || '',
-      imagen_2: productos[1]?.imagen || '',
-      imagen_3: productos[2]?.imagen || '',
       nombre_1: productos[0]?.nombre || '',
-      nombre_2: productos[1]?.nombre || '',
-      nombre_3: productos[2]?.nombre || '',
       precio_1: productos[0] ? `$${productos[0].precio} USD` : '',
-      precio_2: productos[1] ? `$${productos[1].precio} USD` : '',
-      precio_3: productos[2] ? `$${productos[2].precio} USD` : '',
       url_1: productos[0]?.url || '',
-      url_2: productos[1]?.url || '',
-      url_3: productos[2]?.url || '',
-      // ManyChat solo mapea campos Text, así que usamos "si"/"no" en vez de true/false
       tiene_productos: productos.length > 0 ? 'si' : 'no',
-      hay_productos: productos.length > 0 ? 'si' : 'no'
     };
 
-    // Devolver respuesta con campos separados para ManyChat
-    // IMPORTANTE: Si ya se envió directo por API, NO incluir el contenido Dynamic Block
-    // para evitar que ManyChat lo envíe de nuevo (mensaje duplicado)
     if (enviado) {
       return Response.json({
         status: 'sent',
         respuesta: textoRespuesta,
         ...imagenes,
-        total_productos: productos.length,
-        _debug: {
-          enviado_directo: true,
-          subscriber_id: subscriberId
-        }
       });
     }
 
-    // Fallback: si no se pudo enviar directo, devolver en formato Dynamic Block
-    // para que ManyChat lo procese
     return Response.json({
       ...contenido,
       respuesta: textoRespuesta,
       ...imagenes,
-      total_productos: productos.length,
-      _debug: {
-        enviado_directo: false,
-        subscriber_id: subscriberId
-      }
     });
 
   } catch (error) {
@@ -1075,15 +975,7 @@ ${contexto}
 export async function GET() {
   return Response.json({
     status: 'ok',
-    endpoint: 'TITO MC-DIRECT',
-    descripcion: 'Envía mensajes directamente a ManyChat vía API',
-    requiere: {
-      env: 'MANYCHAT_API_KEY debe estar configurada',
-      body: {
-        mensaje: 'string',
-        nombre: 'string (opcional)',
-        subscriber_id: 'string (REQUERIDO para envío directo)'
-      }
-    }
+    endpoint: 'TITO MC-DIRECT v2 — Filtro/Redirector',
+    descripcion: 'Tito saluda, explica la magia, y redirige a tienda o test',
   });
 }
