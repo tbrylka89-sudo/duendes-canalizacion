@@ -756,9 +756,17 @@ export async function POST(request) {
     }
 
     // ─────────────────────────────────────────────────────────────
+    // PRECIOS EN PESOS URUGUAYOS → Tabla general UY
+    // ─────────────────────────────────────────────────────────────
+    if (/pesos uruguayos|precios?.*(uruguay|uy)|uruguay.*precios?/i.test(msgLower)) {
+      const tablaUY = `🇺🇾 Precios en pesos uruguayos:\n\n🌿 Mini Clásico — $2.500\n✨ Mini Especial / Pixie — $5.500\n🍀 Mediano Especial — $8.000\n🔮 Mediano Maestros Místicos — $12.500\n💚 Grande Especial — $16.500\n👑 Grande Maestros Místicos — $24.500\n🌟 Gigante Especial — $39.800\n\nPodés verlos todos en la tienda: https://duendesdeluruguay.com/shop/ 🍀`;
+      return enviarRespuestaRapida(subscriberId, tablaUY, historial, 'quick_precios_uy_general');
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // MONEDA LOCAL → Dirigir al shop
     // ─────────────────────────────────────────────────────────────
-    if (/en (pesos|mi moneda|moneda local|reales|soles|euros)|cu[aá]nto (es|ser[ií]a|sale|cuesta) en (?!d[oó]lares|usd)|en (pesos\s+)?(argentinos?|mexicanos?|colombianos?|chilenos?|uruguayos)|precio.*(local|moneda)/i.test(msgLower) && !/pesos uruguayos/i.test(msgLower)) {
+    if (/en (pesos|mi moneda|moneda local|reales|soles|euros)|cu[aá]nto (es|ser[ií]a|sale|cuesta) en (?!d[oó]lares|usd)|en (pesos\s+)?(argentinos?|mexicanos?|colombianos?|chilenos?|uruguayos)|precio.*(local|moneda)/i.test(msgLower)) {
       return enviarRespuestaRapida(subscriberId, 'Nuestros precios son en dólares (USD) 💚\n\nPero en la tienda te aparece automáticamente en tu moneda: https://duendesdeluruguay.com/shop/ 🍀', historial, 'quick_moneda_local');
     }
 
