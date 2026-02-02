@@ -299,7 +299,7 @@ async function enviarRespuestaRapida(subscriberId, texto, historial, method) {
   await guardarHistorial(subscriberId, historial);
   const contenido = crearContenidoManychat(texto);
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ status: 'sent', method });
+  return Response.json({ ...contenido, status: 'sent', method, respuesta: texto });
 }
 
 async function enviarGreeting(subscriberId, nombre, historial) {
@@ -314,7 +314,7 @@ async function enviarGreeting(subscriberId, nombre, historial) {
     }
   };
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ status: 'sent', method: 'greeting' });
+  return Response.json({ ...contenido, status: 'sent', method: 'greeting', respuesta: textoCompleto });
 }
 
 async function enviarConProductos(subscriberId, texto, productos, historial, method) {
@@ -322,7 +322,7 @@ async function enviarConProductos(subscriberId, texto, productos, historial, met
   await guardarHistorial(subscriberId, historial);
   const contenido = crearContenidoManychat(texto, productos);
   await enviarMensajeManychat(subscriberId, contenido);
-  return Response.json({ status: 'sent', method });
+  return Response.json({ ...contenido, status: 'sent', method, respuesta: texto });
 }
 
 // ═══════════════════════════════════════════════════════════════
