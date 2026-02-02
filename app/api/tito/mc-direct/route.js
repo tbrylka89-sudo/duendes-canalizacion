@@ -336,15 +336,30 @@ async function construirContexto(mensaje, intencion, datos) {
   }
 
   // === PRECIOS URUGUAY ===
-  // Si es de Uruguay y hay productos cargados, inyectar precios fijos en pesos
+  // Si es de Uruguay, buscar productos en historial si no hay cargados
+  if (pais === 'UY' && (!datos._productos || datos._productos.length === 0)) {
+    try {
+      const productos = await obtenerProductosWoo();
+      const historialTexto = (datos._historial || []).map(m => m.content || '').join(' ');
+      // Buscar guardianes mencionados en el historial (por nombre en cards/mensajes previos)
+      const mencionados = productos.filter(p => {
+        const nombre = (p.nombre || '').toLowerCase();
+        return nombre.length >= 3 && historialTexto.toLowerCase().includes(nombre);
+      });
+      if (mencionados.length > 0) {
+        datos._productos = mencionados;
+      }
+    } catch (e) {}
+  }
+
   if (pais === 'UY' && datos._productos && datos._productos.length > 0) {
     const preciosUY = datos._productos.map(p => {
       const pesos = PRECIOS_URUGUAY.convertir(p.precio);
-      return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos`;
+      return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos (NO $${Math.round(p.precio * 44).toLocaleString('es-UY')})`;
     }).join('\n');
     contexto += `\n\n🇺🇾 ES DE URUGUAY - PRECIOS FIJOS EN PESOS (NO CALCULES, USÁ ESTOS):
 ${preciosUY}
-⚠️ NUNCA multipliques USD por cotización. Usá EXACTAMENTE estos precios.`;
+⚠️ NUNCA multipliques USD por cotización. Usá EXACTAMENTE estos precios. Son FIJOS.`;
   } else if (pais === 'UY') {
     contexto += `\n\n🇺🇾 ES DE URUGUAY - Tabla de precios fijos en pesos:
 Hasta $75 USD → $2.500 | Hasta $160 → $5.500 | Hasta $210 → $8.000
@@ -781,10 +796,20 @@ export async function POST(request) {
     // Agregar msg del usuario al historial ANTES del filtro
     historial.push({ role: 'user', content: msg });
 
-    // Si es un número del video, saltear el filtro de spam (números cortos como "5" se interceptan)
+    // Si es un número del video, decidir según si tiene tag o no
     const esNumeroVideo = detectarNumeroVideo(msg);
 
-    const filtro = esNumeroVideo ? { interceptado: false } : await filtroPreAPIMC(msg, historial, subscriberId);
+    // Si escribe un número del video pero NO tiene el tag → decirle que toque el botón
+    if (esNumeroVideo && !vieneDelVideo) {
+      const resp = `¡Ey! Para elegir a ${esNumeroVideo.nombre}, tocá el botón con el número ${esNumeroVideo.numero} en el mensaje del video 👆\n\nSi tocás el botón te muestro todo sobre ${esNumeroVideo.nombre} al toque 🍀`;
+      historial.push({ role: 'assistant', content: resp });
+      await guardarHistorial(subscriberId, historial);
+      const contenido = crearContenidoManychat(resp);
+      await enviarMensajeManychat(subscriberId, contenido);
+      return Response.json({ status: 'sent', method: 'video_sin_tag' });
+    }
+
+    const filtro = (esNumeroVideo && vieneDelVideo) ? { interceptado: false } : await filtroPreAPIMC(msg, historial, subscriberId);
     if (filtro.interceptado) {
       historial.push({ role: 'assistant', content: filtro.respuesta });
       await guardarHistorial(subscriberId, historial);
@@ -845,11 +870,41 @@ export async function POST(request) {
       return enviarRespuestaRapida(subscriberId, 'Mi Magia es tu portal exclusivo post-compra 🔮\n\nAhí encontrás tu canalización, la historia de tu guardián, ritual de bienvenida y más.\n\nAccedés en: magia.duendesdeluruguay.com', historial, 'quick_mimagia');
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // INTERCEPTAR PAÍS → Precios directos sin Claude
+    // ─────────────────────────────────────────────────────────────
+    const paisDetectado = detectarPais(msg);
+    if (paisDetectado) {
+      // Buscar si hay productos en el historial
+      const historialTexto = historial.map(m => m.content || '').join(' ');
+      const hayProductosPrevios = /\$\d+\s*USD/.test(historialTexto);
+
+      if (paisDetectado === 'UY' && hayProductosPrevios) {
+        // Buscar nombres de productos mencionados en historial
+        try {
+          const productos = await obtenerProductosWoo();
+          const mencionados = productos.filter(p => {
+            const nombre = (p.nombre || '').toLowerCase();
+            return nombre.length >= 3 && historialTexto.toLowerCase().includes(nombre);
+          });
+          if (mencionados.length > 0) {
+            const lineas = mencionados.map(p => {
+              const pesos = PRECIOS_URUGUAY.convertir(p.precio);
+              return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos ($${p.precio} USD)`;
+            }).join('\n');
+            const resp = `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`;
+            return enviarRespuestaRapida(subscriberId, resp, historial, 'quick_precio_uy');
+          }
+        } catch (e) {}
+      }
+    }
+
     // Datos
     const datos = {
       nombre: userName,
       subscriberId,
       plataforma,
+      _historial: historial,
     };
 
     // Construir contexto
