@@ -29,6 +29,36 @@ const anthropic = new Anthropic({
 const MANYCHAT_API_KEY = process.env.MANYCHAT_API_KEY;
 const MANYCHAT_API_URL = 'https://api.manychat.com/fb';
 
+// Mapeo de números del video a guardianes
+// Cada número corresponde a un guardián específico en la web
+const VIDEO_NUMEROS_GUARDIANES = {
+  '5':   { nombre: 'Micelio', buscar: ['micelio'] },
+  '7':   { nombre: 'Axel',    buscar: ['axel'] },
+  '9':   { nombre: 'Felix',   buscar: ['felix'] },
+  '11':  { nombre: 'Moonstone', buscar: ['moonstone', 'agustina'] },
+  '33':  { nombre: 'Stan',    buscar: ['stan'] },
+  '44':  { nombre: 'Finnian', buscar: ['finnian'] },
+  '222': { nombre: 'Ruth',    buscar: ['ruth'] },
+};
+
+/**
+ * Detecta si el mensaje menciona un número del video
+ * Devuelve el guardián correspondiente o null
+ */
+function detectarNumeroVideo(msg) {
+  const msgLower = msg.toLowerCase().trim();
+  // Orden: primero los de más dígitos para evitar que "22" matchee antes que "222"
+  const numeros = ['222', '44', '33', '11', '9', '7', '5'];
+  for (const num of numeros) {
+    // Matchear: "5", "el 5", "número 5", "elegí el 5", "el numero 5", solo el número, etc.
+    const regex = new RegExp(`(?:^|\\b|el\\s+|número\\s+|numero\\s+)${num}(?:\\b|$)`);
+    if (regex.test(msgLower)) {
+      return { numero: num, ...VIDEO_NUMEROS_GUARDIANES[num] };
+    }
+  }
+  return null;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // ENVIAR MENSAJE DIRECTO A MANYCHAT
 // ═══════════════════════════════════════════════════════════════
@@ -243,6 +273,36 @@ async function construirContexto(mensaje, intencion, datos) {
         });
         contexto += `\n\n💡 Las fotos se mostrarán automáticamente. Usá la descripción real de cada guardián para hablar con conocimiento. NO inventes datos. Conectá emocionalmente.`;
       }
+    }
+  }
+
+  // === BÚSQUEDA POR NÚMERO DEL VIDEO ===
+  // Si mencionan un número del video, buscar el guardián correspondiente
+  const guardianVideo = detectarNumeroVideo(mensaje);
+  if (guardianVideo && (!datos._productos || datos._productos.length === 0)) {
+    try {
+      const productos = await obtenerProductosWoo();
+      // Buscar por cualquiera de los nombres asociados (nombre o slug)
+      const encontrado = productos.find(p => {
+        const pNombre = (p.nombre || '').toLowerCase();
+        const pSlug = (p.slug || '').toLowerCase();
+        return guardianVideo.buscar.some(term =>
+          pNombre.includes(term) || pSlug.includes(term)
+        );
+      });
+      if (encontrado) {
+        datos._productos = [encontrado];
+        const cat = (encontrado.categorias || []).join(', ');
+        const desc = (encontrado.descripcion || '').substring(0, 400).trim();
+        contexto += `\n\n🎬 GUARDIÁN DEL VIDEO #${guardianVideo.numero}: ${encontrado.nombre} — $${encontrado.precio} USD`;
+        if (cat) contexto += `\n  Categoría: ${cat}`;
+        if (desc) contexto += `\n  ${desc}`;
+        contexto += `\n\n💡 Esta persona eligió este guardián en el video. Hablale específicamente de ${encontrado.nombre}: su historia, su energía, por qué la eligió. Guiala a adoptarlo.`;
+      } else {
+        contexto += `\n\n🎬 La persona eligió el número ${guardianVideo.numero} (guardián: ${guardianVideo.nombre}) en el video. Hablale de ${guardianVideo.nombre} y guiala a la tienda.`;
+      }
+    } catch (e) {
+      console.error('[MC-DIRECT] Error búsqueda guardián video:', e.message);
     }
   }
 
