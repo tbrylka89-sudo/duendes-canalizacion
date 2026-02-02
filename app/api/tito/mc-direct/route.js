@@ -302,6 +302,21 @@ async function enviarRespuestaRapida(subscriberId, texto, historial, method) {
   return Response.json({ status: 'sent', method });
 }
 
+async function enviarGreeting(subscriberId, nombre, historial) {
+  const mensajes = generarGreetingMensajes(nombre);
+  const textoCompleto = mensajes.join('\n\n');
+  historial.push({ role: 'assistant', content: textoCompleto });
+  await guardarHistorial(subscriberId, historial);
+  const contenido = {
+    version: 'v2',
+    content: {
+      messages: mensajes.map(t => ({ type: 'text', text: t }))
+    }
+  };
+  await enviarMensajeManychat(subscriberId, contenido);
+  return Response.json({ status: 'sent', method: 'greeting' });
+}
+
 async function enviarConProductos(subscriberId, texto, productos, historial, method) {
   historial.push({ role: 'assistant', content: texto });
   await guardarHistorial(subscriberId, historial);
@@ -314,19 +329,18 @@ async function enviarConProductos(subscriberId, texto, productos, historial, met
 // GREETING MÁGICO
 // ═══════════════════════════════════════════════════════════════
 
-function generarGreeting(nombre) {
-  return `¡Ey${nombre ? ' ' + nombre : ''}! Soy Tito, duende del bosque de Piriápolis 🍀
+function generarGreetingMensajes(nombre) {
+  return [
+    `✨ ¡Ey${nombre ? ' ' + nombre : ''}!\n\nSoy Tito, duende del bosque de Piriápolis.\n\nLlegaste a un lugar distinto. Acá no se compra nada — acá los guardianes eligen a su persona.`,
 
-Acá cada guardián es ÚNICO — hecho a mano, con cristales reales y ropa cosida, sin moldes. Cuando alguien lo adopta, ese diseño desaparece del mundo para siempre.
+    `Cada uno tarda días en nacer. Manos humanas, cristales reales, ropa cosida puntada a puntada.\n\nCuando se va, no vuelve. Ese diseño desaparece del mundo para siempre.\n\nY cuando un guardián te elige, te escribe. Una carta personal donde te habla a VOS, de lo que estás viviendo. No es genérica. Es tuya y de nadie más 🍀`,
 
-Cada adopción incluye:
-✨ Canalización personal — una carta donde tu guardián te habla de lo que estás viviendo
-📜 Certificado de autenticidad
-🌿 Ritual de bienvenida
+    `¿Cómo seguimos?\n\n1️⃣ Ver la tienda\nhttps://duendesdeluruguay.com/shop/\n\n2️⃣ Descubrir qué guardián te elige\nhttps://duendesdeluruguay.com/descubri-que-duende-te-elige/`
+  ];
+}
 
-¿Cómo seguimos?
-1️⃣ Ver la tienda → https://duendesdeluruguay.com/shop/
-2️⃣ Descubrir qué guardián te elige → https://duendesdeluruguay.com/descubri-que-duende-te-elige/`;
+function generarGreetingTexto(nombre) {
+  return generarGreetingMensajes(nombre).join('\n\n');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -639,15 +653,10 @@ export async function POST(request) {
     const historial = await cargarHistorial(subscriberId);
 
     // ─────────────────────────────────────────────────────────────
-    // MENSAJE VACÍO → Greeting mágico
+    // MENSAJE VACÍO → Greeting mágico (3 burbujas)
     // ─────────────────────────────────────────────────────────────
     if (!msg.trim()) {
-      const greeting = generarGreeting(userName);
-      historial.push({ role: 'assistant', content: greeting });
-      await guardarHistorial(subscriberId, historial);
-      const contenido = crearContenidoManychat(greeting);
-      await enviarMensajeManychat(subscriberId, contenido);
-      return Response.json({ status: 'sent', method: 'greeting' });
+      return enviarGreeting(subscriberId, userName, historial);
     }
 
     const intencion = detectarIntencion(msg);
@@ -675,14 +684,14 @@ export async function POST(request) {
     // ─────────────────────────────────────────────────────────────
     const filtro = (esNumeroVideo && vieneDelVideo) ? { interceptado: false } : await filtroPreAPIMC(msg, historial, subscriberId);
     if (filtro.interceptado) {
-      // Si es saludo, usar greeting mágico
-      const respuesta = filtro.respuesta === '__GREETING__'
-        ? generarGreeting(userName)
-        : filtro.respuesta;
+      // Si es saludo, usar greeting mágico (3 burbujas)
+      if (filtro.respuesta === '__GREETING__') {
+        return enviarGreeting(subscriberId, userName, historial);
+      }
 
-      historial.push({ role: 'assistant', content: respuesta });
+      historial.push({ role: 'assistant', content: filtro.respuesta });
       await guardarHistorial(subscriberId, historial);
-      const contenido = crearContenidoManychat(respuesta);
+      const contenido = crearContenidoManychat(filtro.respuesta);
       await enviarMensajeManychat(subscriberId, contenido);
       console.log('[MC-DIRECT] Filtro interceptó:', filtro.razon);
       return Response.json({ status: 'sent', method: `filtro_${filtro.razon}` });
