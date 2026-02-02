@@ -355,16 +355,18 @@ async function construirContexto(mensaje, intencion, datos) {
   if (pais === 'UY' && datos._productos && datos._productos.length > 0) {
     const preciosUY = datos._productos.map(p => {
       const pesos = PRECIOS_URUGUAY.convertir(p.precio);
-      return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos (NO $${Math.round(p.precio * 44).toLocaleString('es-UY')})`;
+      return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos`;
     }).join('\n');
-    contexto += `\n\n🇺🇾 ES DE URUGUAY - PRECIOS FIJOS EN PESOS (NO CALCULES, USÁ ESTOS):
+    contexto += `\n\n🇺🇾 URUGUAY - PRECIOS FIJOS EN PESOS:
 ${preciosUY}
-⚠️ NUNCA multipliques USD por cotización. Usá EXACTAMENTE estos precios. Son FIJOS.`;
+⚠️ Usá EXACTAMENTE estos precios. NO conviertas USD a pesos.`;
   } else if (pais === 'UY') {
-    contexto += `\n\n🇺🇾 ES DE URUGUAY - Tabla de precios fijos en pesos:
+    contexto += `\n\n🇺🇾 URUGUAY - Precios fijos en pesos:
 Hasta $75 USD → $2.500 | Hasta $160 → $5.500 | Hasta $210 → $8.000
-Hasta $350 → $12.500 | Hasta $500 → $16.500 | Hasta $700 → $24.500 | Más → $39.800
-⚠️ NUNCA multipliques USD por cotización. Usá esta tabla.`;
+Hasta $350 → $12.500 | Hasta $500 → $16.500 | Hasta $700 → $24.500 | Más → $39.800`;
+  } else if (pais && pais !== 'UY') {
+    contexto += `\n\n💰 PRECIOS SOLO EN USD. NUNCA conviertas a moneda local.
+Si preguntan en su moneda → "Podés ver el precio en tu moneda en la tienda: https://duendesdeluruguay.com/shop/ 🍀"`;
   } else if (intencion.preguntaPrecio && !pais) {
     contexto += `\n\n💰 PREGUNTA PRECIO - Preguntá: "¿De qué país me escribís?"`;
   }
@@ -875,12 +877,10 @@ export async function POST(request) {
     // ─────────────────────────────────────────────────────────────
     const paisDetectado = detectarPais(msg);
     if (paisDetectado) {
-      // Buscar si hay productos en el historial
       const historialTexto = historial.map(m => m.content || '').join(' ');
       const hayProductosPrevios = /\$\d+\s*USD/.test(historialTexto);
 
-      if (paisDetectado === 'UY' && hayProductosPrevios) {
-        // Buscar nombres de productos mencionados en historial
+      if (hayProductosPrevios) {
         try {
           const productos = await obtenerProductosWoo();
           const mencionados = productos.filter(p => {
@@ -888,12 +888,18 @@ export async function POST(request) {
             return nombre.length >= 3 && historialTexto.toLowerCase().includes(nombre);
           });
           if (mencionados.length > 0) {
+            const esUY = paisDetectado === 'UY';
             const lineas = mencionados.map(p => {
-              const pesos = PRECIOS_URUGUAY.convertir(p.precio);
-              return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos ($${p.precio} USD)`;
+              if (esUY) {
+                const pesos = PRECIOS_URUGUAY.convertir(p.precio);
+                return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos`;
+              }
+              return `• ${p.nombre}: $${p.precio} USD`;
             }).join('\n');
-            const resp = `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`;
-            return enviarRespuestaRapida(subscriberId, resp, historial, 'quick_precio_uy');
+            const resp = esUY
+              ? `🇺🇾 ¡De Uruguay! Acá van los precios:\n\n${lineas}\n\nPodés ver todo en la tienda: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`
+              : `¡Genial! Los precios son en dólares:\n\n${lineas}\n\nPodés ver todo en: https://duendesdeluruguay.com/shop/ 🍀\n\n¿Cuál te gustó?`;
+            return enviarRespuestaRapida(subscriberId, resp, historial, esUY ? 'quick_precio_uy' : 'quick_precio_usd');
           }
         } catch (e) {}
       }
