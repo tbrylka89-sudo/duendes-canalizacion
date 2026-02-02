@@ -335,10 +335,21 @@ async function construirContexto(mensaje, intencion, datos) {
     }
   }
 
-  // === PRECIOS ===
-  if (intencion.preguntaPrecio && pais === 'UY') {
-    contexto += `\n\n💰 ES DE URUGUAY - PRECIOS EN PESOS:
-${PRECIOS_URUGUAY.listaCompleta}`;
+  // === PRECIOS URUGUAY ===
+  // Si es de Uruguay y hay productos cargados, inyectar precios fijos en pesos
+  if (pais === 'UY' && datos._productos && datos._productos.length > 0) {
+    const preciosUY = datos._productos.map(p => {
+      const pesos = PRECIOS_URUGUAY.convertir(p.precio);
+      return `• ${p.nombre}: $${pesos.toLocaleString('es-UY')} pesos uruguayos`;
+    }).join('\n');
+    contexto += `\n\n🇺🇾 ES DE URUGUAY - PRECIOS FIJOS EN PESOS (NO CALCULES, USÁ ESTOS):
+${preciosUY}
+⚠️ NUNCA multipliques USD por cotización. Usá EXACTAMENTE estos precios.`;
+  } else if (pais === 'UY') {
+    contexto += `\n\n🇺🇾 ES DE URUGUAY - Tabla de precios fijos en pesos:
+Hasta $75 USD → $2.500 | Hasta $160 → $5.500 | Hasta $210 → $8.000
+Hasta $350 → $12.500 | Hasta $500 → $16.500 | Hasta $700 → $24.500 | Más → $39.800
+⚠️ NUNCA multipliques USD por cotización. Usá esta tabla.`;
   } else if (intencion.preguntaPrecio && !pais) {
     contexto += `\n\n💰 PREGUNTA PRECIO - Preguntá: "¿De qué país me escribís?"`;
   }
