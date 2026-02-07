@@ -110,6 +110,24 @@ export async function GET(request) {
       }
     }
 
+    // 6. Buscar datos del formulario sincronizados en Vercel KV
+    const formDataKV = await kv.get(`form_data:orden:${orden}`);
+    const sincronizadoVercel = !!formDataKV;
+
+    // 7. Verificar si el meta de sincronización existe en WP
+    const sincronizadoWPMeta = orderData.meta_data?.find(m => m.key === '_duendes_sincronizado_vercel');
+    const sincronizadoWP = sincronizadoWPMeta?.value === 'yes';
+
+    // 8. Estado consolidado del formulario
+    let estadoFormulario = 'sin_datos';
+    if (formularioCompletado && sincronizadoVercel) {
+      estadoFormulario = 'completo';
+    } else if (formularioCompletado && !sincronizadoVercel) {
+      estadoFormulario = 'pendiente_sincronizacion';
+    } else if (!formularioCompletado) {
+      estadoFormulario = 'esperando_cliente';
+    }
+
     return Response.json({
       success: true,
       pedido: {
@@ -124,6 +142,11 @@ export async function GET(request) {
         tipoDestinatario,
         formularioCompletado,
         datosCanalizacion,
+        // Nuevos campos de sincronización
+        sincronizadoVercel,
+        sincronizadoWP,
+        formDataKV: formDataKV || null,
+        estadoFormulario,
         items,
         canalizaciones: canalizacionesOrden,
         invitaciones: invitacionesOrden

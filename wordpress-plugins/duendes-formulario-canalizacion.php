@@ -517,7 +517,15 @@ function duendes_ajax_guardar_canalizacion() {
         duendes_enviar_email_destinatario($order_id, $datos);
     }
 
-    wp_send_json_success(['mensaje' => 'Guardado correctamente']);
+    // ═══════════════════════════════════════════════════════════════
+    // SINCRONIZAR CON VERCEL - Notificar que el formulario se completó
+    // ═══════════════════════════════════════════════════════════════
+    $sincronizado = duendes_sincronizar_formulario_vercel($order_id, $tipo, $datos);
+
+    wp_send_json_success([
+        'mensaje' => 'Guardado correctamente',
+        'sincronizado_vercel' => $sincronizado
+    ]);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1200,4 +1208,208 @@ function duendes_mostrar_mensaje_completado() {
         </p>
     </div>
     <?php
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SINCRONIZACIÓN CON VERCEL
+// ═══════════════════════════════════════════════════════════════════════════
+
+define('DUENDES_VERCEL_WEBHOOK_URL', 'https://duendes-vercel.vercel.app/api/webhooks/formulario-canalizacion');
+define('DUENDES_VERCEL_WEBHOOK_SECRET', 'duendes_form_2026_secret');
+
+/**
+ * Sincronizar datos del formulario con Vercel
+ * Envía los datos al webhook de Vercel para que se asocien con las canalizaciones pendientes
+ */
+function duendes_sincronizar_formulario_vercel($order_id, $tipo_formulario, $datos) {
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        error_log("[DUENDES-SYNC] Orden no encontrada: $order_id");
+        return false;
+    }
+
+    // Obtener nombres de guardianes de la orden
+    $guardianes = [];
+    foreach ($order->get_items() as $item) {
+        $guardianes[] = $item->get_name();
+    }
+
+    $payload = [
+        'order_id' => $order_id,
+        'tipo_formulario' => $tipo_formulario,
+        'datos' => $datos,
+        'email_cliente' => $order->get_billing_email(),
+        'nombre_cliente' => $order->get_billing_first_name() ?: 'Cliente',
+        'guardians' => $guardianes,
+        'timestamp' => current_time('mysql'),
+        'token' => DUENDES_VERCEL_WEBHOOK_SECRET
+    ];
+
+    $response = wp_remote_post(DUENDES_VERCEL_WEBHOOK_URL, [
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'X-Duendes-Token' => DUENDES_VERCEL_WEBHOOK_SECRET
+        ],
+        'body' => json_encode($payload),
+        'timeout' => 15,
+        'sslverify' => true
+    ]);
+
+    if (is_wp_error($response)) {
+        error_log("[DUENDES-SYNC] Error enviando a Vercel: " . $response->get_error_message());
+        // Guardar para reintentar después
+        duendes_guardar_para_reintento($order_id, $payload);
+        return false;
+    }
+
+    $code = wp_remote_retrieve_response_code($response);
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if ($code === 200 && !empty($body['success'])) {
+        error_log("[DUENDES-SYNC] OK - Orden $order_id sincronizada con Vercel");
+        update_post_meta($order_id, '_duendes_sincronizado_vercel', 'yes');
+        update_post_meta($order_id, '_duendes_sincronizado_fecha', current_time('mysql'));
+        return true;
+    } else {
+        error_log("[DUENDES-SYNC] Error respuesta Vercel: " . print_r($body, true));
+        duendes_guardar_para_reintento($order_id, $payload);
+        return false;
+    }
+}
+
+/**
+ * Guardar para reintento si falla la sincronización
+ */
+function duendes_guardar_para_reintento($order_id, $payload) {
+    $pendientes = get_option('duendes_sync_pendientes', []);
+    $pendientes[$order_id] = [
+        'payload' => $payload,
+        'intentos' => 0,
+        'ultimo_intento' => current_time('mysql')
+    ];
+    update_option('duendes_sync_pendientes', $pendientes);
+    error_log("[DUENDES-SYNC] Guardado para reintento: Orden $order_id");
+}
+
+/**
+ * Cron job para reintentar sincronizaciones fallidas
+ */
+add_action('init', function() {
+    if (!wp_next_scheduled('duendes_reintentar_sync')) {
+        wp_schedule_event(time(), 'hourly', 'duendes_reintentar_sync');
+    }
+});
+
+add_action('duendes_reintentar_sync', 'duendes_procesar_reintentos');
+
+function duendes_procesar_reintentos() {
+    $pendientes = get_option('duendes_sync_pendientes', []);
+    if (empty($pendientes)) return;
+
+    $actualizados = [];
+    foreach ($pendientes as $order_id => $data) {
+        if ($data['intentos'] >= 5) {
+            // Demasiados intentos, notificar admin
+            error_log("[DUENDES-SYNC] ALERTA: Orden $order_id falló 5 veces");
+            continue;
+        }
+
+        $payload = $data['payload'];
+        $response = wp_remote_post(DUENDES_VERCEL_WEBHOOK_URL, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'X-Duendes-Token' => DUENDES_VERCEL_WEBHOOK_SECRET
+            ],
+            'body' => json_encode($payload),
+            'timeout' => 15
+        ]);
+
+        if (!is_wp_error($response)) {
+            $code = wp_remote_retrieve_response_code($response);
+            if ($code === 200) {
+                update_post_meta($order_id, '_duendes_sincronizado_vercel', 'yes');
+                update_post_meta($order_id, '_duendes_sincronizado_fecha', current_time('mysql'));
+                error_log("[DUENDES-SYNC] Reintento exitoso: Orden $order_id");
+                continue; // No agregar a actualizados = se elimina
+            }
+        }
+
+        $data['intentos']++;
+        $data['ultimo_intento'] = current_time('mysql');
+        $actualizados[$order_id] = $data;
+    }
+
+    update_option('duendes_sync_pendientes', $actualizados);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ENDPOINT DE DIAGNÓSTICO (para debugging)
+// ═══════════════════════════════════════════════════════════════════════════
+
+add_action('wp_ajax_duendes_diagnostico_canalizacion', 'duendes_diagnostico_canalizacion');
+add_action('wp_ajax_nopriv_duendes_diagnostico_canalizacion', 'duendes_diagnostico_canalizacion');
+
+function duendes_diagnostico_canalizacion() {
+    if (($_GET['token'] ?? '') !== 'duendes2026diagnostico') {
+        wp_send_json_error('No autorizado');
+    }
+
+    $order_id = intval($_GET['order'] ?? 0);
+    if (!$order_id) {
+        // Mostrar últimas órdenes con formularios
+        $args = [
+            'limit' => 20,
+            'orderby' => 'date',
+            'order' => 'DESC',
+            'meta_query' => [
+                [
+                    'key' => '_duendes_tipo_destinatario',
+                    'compare' => 'EXISTS'
+                ]
+            ]
+        ];
+
+        $orders = wc_get_orders($args);
+        $resultado = [];
+
+        foreach ($orders as $order) {
+            $resultado[] = [
+                'orden' => $order->get_id(),
+                'fecha' => $order->get_date_created()->format('Y-m-d H:i'),
+                'email' => $order->get_billing_email(),
+                'tipo_destinatario' => get_post_meta($order->get_id(), '_duendes_tipo_destinatario', true),
+                'formulario_completado' => get_post_meta($order->get_id(), '_duendes_formulario_completado', true),
+                'sincronizado_vercel' => get_post_meta($order->get_id(), '_duendes_sincronizado_vercel', true),
+                'tiene_datos' => !empty(get_post_meta($order->get_id(), '_duendes_datos_canalizacion', true))
+            ];
+        }
+
+        wp_send_json_success([
+            'ordenes' => $resultado,
+            'pendientes_sync' => get_option('duendes_sync_pendientes', [])
+        ]);
+    }
+
+    // Diagnóstico de orden específica
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        wp_send_json_error('Orden no encontrada');
+    }
+
+    $datos_raw = get_post_meta($order_id, '_duendes_datos_canalizacion', true);
+    $datos = $datos_raw ? json_decode($datos_raw, true) : null;
+
+    wp_send_json_success([
+        'orden' => $order_id,
+        'email' => $order->get_billing_email(),
+        'nombre' => $order->get_billing_first_name(),
+        'tipo_destinatario' => get_post_meta($order_id, '_duendes_tipo_destinatario', true),
+        'formulario_completado' => get_post_meta($order_id, '_duendes_formulario_completado', true),
+        'sincronizado_vercel' => get_post_meta($order_id, '_duendes_sincronizado_vercel', true),
+        'sincronizado_fecha' => get_post_meta($order_id, '_duendes_sincronizado_fecha', true),
+        'datos_canalizacion' => $datos,
+        'items' => array_map(function($item) {
+            return $item->get_name();
+        }, $order->get_items())
+    ]);
 }

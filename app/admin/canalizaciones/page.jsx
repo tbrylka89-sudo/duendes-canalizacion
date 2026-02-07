@@ -20,11 +20,31 @@ export default function CanalizacionesAdmin() {
   const [errorPedido, setErrorPedido] = useState(null);
   const [enviandoFormItem, setEnviandoFormItem] = useState(null);
   const [enviandoTodos, setEnviandoTodos] = useState(false);
+  const [sincronizando, setSincronizando] = useState(false);
+  // Alertas
+  const [alertas, setAlertas] = useState(null);
+  const [cargandoAlertas, setCargandoAlertas] = useState(false);
+  const [mostrarAlertas, setMostrarAlertas] = useState(false);
 
   useEffect(() => {
     cargarCanalizaciones(tabActiva);
     cargarContadores();
+    cargarAlertas();
   }, [tabActiva]);
+
+  async function cargarAlertas() {
+    setCargandoAlertas(true);
+    try {
+      const res = await fetch('/api/admin/canalizaciones/alertas?accion=detalle');
+      const data = await res.json();
+      if (data.success) {
+        setAlertas(data);
+      }
+    } catch (error) {
+      console.error('Error cargando alertas:', error);
+    }
+    setCargandoAlertas(false);
+  }
 
   async function cargarCanalizaciones(estado) {
     setCargando(true);
@@ -133,6 +153,29 @@ export default function CanalizacionesAdmin() {
       // silenciar
     }
     setEnviandoFormItem(null);
+  }
+
+  async function sincronizarOrden() {
+    if (!pedido) return;
+    setSincronizando(true);
+    try {
+      const res = await fetch('/api/admin/canalizaciones/sincronizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ordenId: pedido.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Sincronizado: ${data.canalizacionesActualizadas} canalización(es) actualizadas`);
+        buscarPedido();
+        cargarContadores();
+      } else {
+        alert('Error: ' + (data.error || 'No se pudo sincronizar'));
+      }
+    } catch (e) {
+      alert('Error de conexión');
+    }
+    setSincronizando(false);
   }
 
   async function enviarFormTodos() {
@@ -246,6 +289,61 @@ export default function CanalizacionesAdmin() {
         </div>
       </header>
 
+      {/* Panel de Alertas */}
+      {alertas?.hayProblemas && (
+        <div className="alertas-panel">
+          <div className="alertas-header" onClick={() => setMostrarAlertas(!mostrarAlertas)}>
+            <span className="alertas-icono">⚠️</span>
+            <span className="alertas-titulo">
+              {alertas.resumen.problemas} orden{alertas.resumen.problemas > 1 ? 'es' : ''} con problemas de formulario
+            </span>
+            <span className="alertas-toggle">{mostrarAlertas ? '▲' : '▼'}</span>
+          </div>
+
+          {mostrarAlertas && (
+            <div className="alertas-detalle">
+              {alertas.alertas.sinFormulario?.length > 0 && (
+                <div className="alerta-grupo">
+                  <h4 className="alerta-grupo-titulo">
+                    <span className="alerta-badge esperando">{alertas.alertas.sinFormulario.length}</span>
+                    Esperando que el cliente complete el formulario
+                  </h4>
+                  <div className="alerta-items">
+                    {alertas.alertas.sinFormulario.slice(0, 5).map(o => (
+                      <div key={o.ordenId} className="alerta-item">
+                        <span className="alerta-orden">#{o.numero}</span>
+                        <span className="alerta-nombre">{o.nombre}</span>
+                        <span className="alerta-fecha">{o.fecha}</span>
+                        <button className="btn-ver-sm" onClick={() => { setNumeroPedido(o.ordenId.toString()); buscarPedido(); }}>Ver</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {alertas.alertas.pendienteSincronizacion?.length > 0 && (
+                <div className="alerta-grupo">
+                  <h4 className="alerta-grupo-titulo">
+                    <span className="alerta-badge pendiente">{alertas.alertas.pendienteSincronizacion.length}</span>
+                    Formulario completado - Pendiente de sincronizar
+                  </h4>
+                  <div className="alerta-items">
+                    {alertas.alertas.pendienteSincronizacion.slice(0, 5).map(o => (
+                      <div key={o.ordenId} className="alerta-item">
+                        <span className="alerta-orden">#{o.numero}</span>
+                        <span className="alerta-nombre">{o.nombre}</span>
+                        <span className="alerta-fecha">{o.fecha}</span>
+                        <button className="btn-ver-sm" onClick={() => { setNumeroPedido(o.ordenId.toString()); setTimeout(buscarPedido, 100); }}>Ver y Sincronizar</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Buscar por Pedido — para ventas web */}
       <div className="buscar-pedido-container">
         <h3 className="seccion-titulo">Buscar Pedido</h3>
@@ -274,6 +372,61 @@ export default function CanalizacionesAdmin() {
                 <h3 className="pedido-titulo">Pedido #{pedido.numero} — {pedido.nombre}</h3>
                 <p className="pedido-meta">{pedido.email} | {pedido.estado} | ${pedido.total} {pedido.moneda} | Tipo: {pedido.tipoDestinatario || 'no definido'}</p>
               </div>
+            </div>
+
+            {/* Estado del formulario */}
+            <div className="formulario-estado-panel">
+              <div className="formulario-estado-row">
+                <span className="formulario-label">Estado del formulario:</span>
+                {pedido.estadoFormulario === 'completo' && (
+                  <span className="formulario-estado completo">Completo y sincronizado</span>
+                )}
+                {pedido.estadoFormulario === 'pendiente_sincronizacion' && (
+                  <>
+                    <span className="formulario-estado pendiente">Completado en WP - Sin sincronizar</span>
+                    <button className="btn-sincronizar" onClick={sincronizarOrden} disabled={sincronizando}>
+                      {sincronizando ? 'Sincronizando...' : 'Sincronizar ahora'}
+                    </button>
+                  </>
+                )}
+                {pedido.estadoFormulario === 'esperando_cliente' && (
+                  <span className="formulario-estado esperando">Esperando que el cliente lo complete</span>
+                )}
+                {pedido.estadoFormulario === 'sin_datos' && (
+                  <span className="formulario-estado sin-datos">Sin datos</span>
+                )}
+              </div>
+
+              {pedido.datosCanalizacion && (
+                <div className="formulario-resumen">
+                  <details>
+                    <summary className="formulario-resumen-titulo">Ver datos del formulario</summary>
+                    <div className="formulario-datos">
+                      {pedido.datosCanalizacion.nombre && (
+                        <p><strong>Nombre:</strong> {pedido.datosCanalizacion.nombre}</p>
+                      )}
+                      {pedido.datosCanalizacion.momento && (
+                        <p><strong>Momento:</strong> {pedido.datosCanalizacion.momento}</p>
+                      )}
+                      {pedido.datosCanalizacion.necesidades?.length > 0 && (
+                        <p><strong>Necesidades:</strong> {pedido.datosCanalizacion.necesidades.join(', ')}</p>
+                      )}
+                      {pedido.datosCanalizacion.mensaje && (
+                        <p><strong>Mensaje al guardián:</strong> {pedido.datosCanalizacion.mensaje}</p>
+                      )}
+                      {pedido.datosCanalizacion.relacion && (
+                        <p><strong>Relación:</strong> {pedido.datosCanalizacion.relacion}</p>
+                      )}
+                      {pedido.datosCanalizacion.que_necesita && (
+                        <p><strong>Qué necesita escuchar:</strong> {pedido.datosCanalizacion.que_necesita}</p>
+                      )}
+                      {pedido.datosCanalizacion.foto_url && (
+                        <p><strong>Foto:</strong> <a href={pedido.datosCanalizacion.foto_url} target="_blank" rel="noopener">Ver foto</a></p>
+                      )}
+                    </div>
+                  </details>
+                </div>
+              )}
             </div>
             <div className="pedido-items">
               {pedido.items.map(item => {
@@ -957,6 +1110,183 @@ export default function CanalizacionesAdmin() {
         .estado.borrador {
           background: rgba(150,100,255,0.15);
           color: #b89aff;
+        }
+
+        /* Estado del formulario */
+        .formulario-estado-panel {
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 1rem;
+        }
+        .formulario-estado-row {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+        }
+        .formulario-label {
+          color: #888;
+          font-size: 0.85rem;
+        }
+        .formulario-estado {
+          padding: 0.35rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .formulario-estado.completo {
+          background: rgba(100,200,100,0.2);
+          color: #6c6;
+        }
+        .formulario-estado.pendiente {
+          background: rgba(255,180,50,0.2);
+          color: #ffb432;
+        }
+        .formulario-estado.esperando {
+          background: rgba(100,150,255,0.2);
+          color: #7af;
+        }
+        .formulario-estado.sin-datos {
+          background: rgba(255,100,100,0.2);
+          color: #f77;
+        }
+        .btn-sincronizar {
+          padding: 0.35rem 0.75rem;
+          background: linear-gradient(135deg, #d4af37, #aa8a2e);
+          border: none;
+          color: #0a0a0a;
+          font-family: 'Cinzel', serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+        .btn-sincronizar:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .formulario-resumen {
+          margin-top: 0.75rem;
+        }
+        .formulario-resumen-titulo {
+          color: #d4af37;
+          font-size: 0.85rem;
+          cursor: pointer;
+          user-select: none;
+        }
+        .formulario-resumen-titulo:hover {
+          text-decoration: underline;
+        }
+        .formulario-datos {
+          margin-top: 0.75rem;
+          padding: 0.75rem;
+          background: rgba(0,0,0,0.3);
+          border-radius: 6px;
+          font-size: 0.85rem;
+          line-height: 1.6;
+        }
+        .formulario-datos p {
+          margin: 0.25rem 0;
+          color: #ccc;
+        }
+        .formulario-datos strong {
+          color: #d4af37;
+        }
+        .formulario-datos a {
+          color: #7af;
+        }
+
+        /* Panel de Alertas */
+        .alertas-panel {
+          margin: 1rem 2rem;
+          background: rgba(255,100,50,0.08);
+          border: 1px solid rgba(255,100,50,0.3);
+          border-radius: 12px;
+          overflow: hidden;
+        }
+        .alertas-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 1.25rem;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .alertas-header:hover {
+          background: rgba(255,100,50,0.05);
+        }
+        .alertas-icono {
+          font-size: 1.25rem;
+        }
+        .alertas-titulo {
+          flex: 1;
+          color: #ff8844;
+          font-weight: 600;
+        }
+        .alertas-toggle {
+          color: #888;
+          font-size: 0.8rem;
+        }
+        .alertas-detalle {
+          padding: 0 1.25rem 1.25rem;
+          border-top: 1px solid rgba(255,100,50,0.15);
+        }
+        .alerta-grupo {
+          margin-top: 1rem;
+        }
+        .alerta-grupo-titulo {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #ccc;
+          font-size: 0.85rem;
+          font-weight: 500;
+          margin: 0 0 0.75rem;
+        }
+        .alerta-badge {
+          padding: 0.2rem 0.5rem;
+          border-radius: 10px;
+          font-size: 0.7rem;
+          font-weight: 700;
+        }
+        .alerta-badge.esperando {
+          background: rgba(100,150,255,0.2);
+          color: #7af;
+        }
+        .alerta-badge.pendiente {
+          background: rgba(255,180,50,0.2);
+          color: #ffb432;
+        }
+        .alerta-items {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .alerta-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 0.75rem;
+          background: rgba(0,0,0,0.3);
+          border-radius: 6px;
+          font-size: 0.85rem;
+        }
+        .alerta-orden {
+          color: #d4af37;
+          font-weight: 600;
+          min-width: 60px;
+        }
+        .alerta-nombre {
+          flex: 1;
+          color: #ccc;
+        }
+        .alerta-fecha {
+          color: #666;
+          font-size: 0.8rem;
         }
 
       `}</style>
