@@ -19,14 +19,7 @@ import { prepararMensajesOptimizados } from '@/lib/tito/personalidad-compacta';
 import { obtenerCotizaciones, formatearPrecio, PRECIOS_URUGUAY, INFO_PAISES as INFO_PAISES_COTIZACIONES } from '@/lib/tito/cotizaciones';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 import { detectarObjecion, getInstruccionesObjecion } from '@/lib/tito/objeciones';
-import {
-  generarPruebaSocialCategoria,
-  generarPruebaSocialGeneral,
-  generarEscasezSutil,
-  generarReciprocidad,
-  generarLabeling,
-  generarPaquetePersuasion
-} from '@/lib/tito/persuasion';
+// Persuasion eliminado - técnicas integradas en el prompt del Guía Místico
 import {
   detectarCrisis,
   detectarInsulto,
@@ -1230,50 +1223,8 @@ export async function POST(request) {
       contextoCliente += `\nRespuesta sugerida: "${objecionDetectada.respuestaSugerida}"\n`;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // SISTEMA DE PERSUASIÓN DINÁMICA
-    // Genera técnicas contextuales para cada interacción
-    // ═══════════════════════════════════════════════════════════════
+    // País del cliente para contexto
     const paisCliente = infoCliente?.pais || geoData?.pais || null;
-    const categoriaInteres = infoCliente?.necesidad || null;
-    const tipoGuardian = infoCliente?.producto_interesado?.toLowerCase()?.match(/(duende|elfo|hada|gnomo|mago|bruja|dragón)/)?.[1] || null;
-
-    // Generar paquete de persuasión contextual
-    const persuasion = generarPaquetePersuasion({
-      categoria: categoriaInteres,
-      pais: paisCliente,
-      emocion: analisis.emocionDetectada,
-      tipoGuardian: tipoGuardian,
-      precio: 70
-    });
-
-    // Agregar técnicas de persuasión al contexto (para que Claude las use cuando sea apropiado)
-    contextoCliente += `\n\n═══ TÉCNICAS DE PERSUASIÓN DISPONIBLES ═══\n`;
-    contextoCliente += `Usá estas técnicas SOLO cuando sea natural y apropiado:\n\n`;
-
-    contextoCliente += `📊 PRUEBA SOCIAL (usar cuando muestres productos o hablen de categorías):\n`;
-    contextoCliente += `- "${persuasion.pruebaSocial}"\n\n`;
-
-    contextoCliente += `⏰ ESCASEZ REAL (usar cuando estén indecisos o al cerrar):\n`;
-    contextoCliente += `- "${persuasion.escasez}"\n\n`;
-
-    contextoCliente += `🎁 RECIPROCIDAD - dar valor primero (usar al inicio o cuando pidan info):\n`;
-    contextoCliente += `- "${persuasion.reciprocidad}"\n\n`;
-
-    if (persuasion.labeling) {
-      contextoCliente += `💭 LABELING - nombrar la emoción (usar cuando detectés emoción fuerte):\n`;
-      contextoCliente += `- "${persuasion.labeling}"\n\n`;
-    }
-
-    contextoCliente += `🎯 TAKEAWAY - psicología inversa (usar si están muy indecisos):\n`;
-    contextoCliente += `- "${persuasion.takeaway}"\n\n`;
-
-    contextoCliente += `💰 CONTRASTE de valor (usar si dicen "caro"):\n`;
-    contextoCliente += `- "${persuasion.contraste}"\n\n`;
-
-    contextoCliente += `REGLA DE ORO: NUNCA decir "alguien compró el mismo" porque cada guardián es ÚNICO.\n`;
-    contextoCliente += `Siempre hablar de "guardianes similares", "de la misma categoría", "como este".\n`;
-    // ═══════════════════════════════════════════════════════════════
 
     // Determinar si es primera interacción
     const esPrimeraInteraccion = conversationHistory.length === 0;
