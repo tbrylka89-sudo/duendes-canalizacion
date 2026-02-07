@@ -1267,5 +1267,15 @@ add_action('wp_footer', function() {
 }, 100);
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 11. NOMBRE LEGAL EN EL FOOTER
+// ═══════════════════════════════════════════════════════════════════════════
+
+add_action('wp_footer', function() {
+    echo '<div style="text-align:center; padding:20px 10px; font-size:12px; color:rgba(255,255,255,0.5); background:#0a0a0a; font-family:Cormorant Garamond,serif;">
+        © 2026 Mariana Thibisay Mastandrea Brylka y Ricardo Gabriel Ruiz Villegas - RUT: 220092100012
+    </div>';
+}, 999);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // FIN DEL PLUGIN
 // ═══════════════════════════════════════════════════════════════════════════

@@ -17,6 +17,7 @@ define('DUENDES_PROMO_CATEGORIA_MINI', 'mini');
 // ═══════════════════════════════════════════════════════════════════════════
 
 add_action('woocommerce_after_cart_table', 'duendes_verificar_promo_3x2');
+add_action('woocommerce_after_cart', 'duendes_verificar_promo_3x2', 5);
 add_action('woocommerce_before_checkout_form', 'duendes_verificar_promo_3x2', 5);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -383,6 +384,81 @@ function duendes_banner_fijo_3x2() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// JAVASCRIPT DEL SELECTOR DE MINI GRATIS (via wp_footer para que SIEMPRE cargue)
+// ═══════════════════════════════════════════════════════════════════════════
+
+add_action('wp_footer', 'duendes_selector_mini_script', 99);
+
+function duendes_selector_mini_script() {
+    if (!is_cart() && !is_checkout()) return;
+    // Solo si hay selector en la página
+    ?>
+    <script>
+    (function() {
+        var elegido = null;
+        var ajaxUrl = '<?php echo admin_url("admin-ajax.php"); ?>';
+
+        document.addEventListener('click', function(e) {
+            // Buscar si el click fue en un mini-item o dentro de uno
+            var item = e.target;
+            while (item && item !== document) {
+                if (item.classList && item.classList.contains('duendes-mini-item')) break;
+                item = item.parentElement;
+            }
+            if (!item || item === document) return;
+
+            // Seleccionar este mini
+            var todos = document.querySelectorAll('.duendes-mini-item');
+            for (var i = 0; i < todos.length; i++) todos[i].classList.remove('selected');
+            item.classList.add('selected');
+            elegido = item.getAttribute('data-id');
+
+            // Activar botón
+            var btn = document.getElementById('duendes-btn-agregar');
+            if (btn) { btn.style.opacity = '1'; btn.disabled = false; }
+        });
+
+        document.addEventListener('click', function(e) {
+            var btn = e.target;
+            while (btn && btn !== document) {
+                if (btn.id === 'duendes-btn-agregar') break;
+                btn = btn.parentElement;
+            }
+            if (!btn || btn === document || !elegido) return;
+
+            btn.textContent = 'Agregando...';
+            btn.style.opacity = '0.5';
+            btn.disabled = true;
+
+            var fd = new FormData();
+            fd.append('action', 'duendes_agregar_mini_gratis');
+            fd.append('product_id', elegido);
+
+            fetch(ajaxUrl, { method: 'POST', credentials: 'same-origin', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(resp) {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.data || 'Error al agregar');
+                    btn.textContent = 'Agregar mi regalo';
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                }
+            })
+            .catch(function() {
+                alert('Error de conexión');
+                btn.textContent = 'Agregar mi regalo';
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            });
+        });
+    })();
+    </script>
+    <?php
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // NOTIFICACIÓN POPUP AL AGREGAR 2DO GUARDIÁN
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -571,6 +647,10 @@ function duendes_contar_minis_gratis_en_carrito() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1) {
+    static $ya_mostrado = false;
+    if ($ya_mostrado) return;
+    $ya_mostrado = true;
+
     $categoria = get_term_by('slug', DUENDES_PROMO_CATEGORIA_MINI, 'product_cat');
     if (!$categoria) return;
 
@@ -643,13 +723,57 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
             letter-spacing: 0.5px;
             margin-top: 8px;
         }
+        #duendes-promo-3x2 {
+            box-sizing: border-box;
+            max-width: 100%;
+            overflow: hidden;
+        }
         @media (max-width: 600px) {
+            #duendes-promo-3x2 {
+                padding: 20px 12px !important;
+                margin: 15px 0 !important;
+                border-radius: 15px !important;
+            }
+            #duendes-promo-3x2 h3 {
+                font-size: 16px !important;
+                letter-spacing: 1px !important;
+            }
+            #duendes-promo-3x2 > p {
+                font-size: 14px !important;
+            }
+            #duendes-promo-3x2 .duendes-mini-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 10px !important;
+            }
+            .duendes-mini-item {
+                padding: 10px 6px 8px;
+                border-radius: 10px;
+            }
             .duendes-mini-item img {
-                width: 65px;
-                height: 65px;
+                width: 55px;
+                height: 55px;
+                border-width: 2px;
             }
             .duendes-mini-item .mini-nombre {
-                font-size: 11px;
+                font-size: 10px;
+                margin-top: 5px;
+            }
+            #duendes-btn-agregar {
+                padding: 12px 25px !important;
+                font-size: 12px !important;
+            }
+        }
+        @media (max-width: 380px) {
+            #duendes-promo-3x2 .duendes-mini-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+            }
+            .duendes-mini-item img {
+                width: 48px;
+                height: 48px;
+            }
+            .duendes-mini-item .mini-nombre {
+                font-size: 9px;
             }
         }
     </style>
@@ -663,7 +787,7 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
             <?php echo $minis_pendientes > 1 ? "Seleccioná {$minis_pendientes} duendes mini" : "Seleccioná el duende mini que querés de regalo"; ?>
         </p>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:15px;max-width:700px;margin:0 auto 25px;">
+        <div class="duendes-mini-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:15px;max-width:700px;margin:0 auto 25px;">
             <?php foreach ($minis as $mini):
                 $img = wp_get_attachment_image_url($mini->get_image_id(), 'medium') ?: wc_placeholder_img_src();
             ?>
@@ -684,68 +808,6 @@ function duendes_mostrar_selector_mini($minis_pendientes = 1, $minis_totales = 1
         </p>
     </div>
 
-    <script>
-    jQuery(function($) {
-        var elegido = null;
-
-        // Event delegation - funciona aunque el contenido se actualice
-        $(document).on('click', '.duendes-mini-item', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Quitar selección de todos
-            $('.duendes-mini-item').removeClass('selected');
-
-            // Agregar selección al clickeado
-            $(this).addClass('selected');
-
-            // Guardar ID del mini elegido
-            elegido = $(this).data('id');
-
-            // Activar botón
-            $('#duendes-btn-agregar').css('opacity', '1').prop('disabled', false);
-
-            console.log('Mini seleccionado:', elegido);
-        });
-
-        // Click en botón agregar
-        $(document).on('click', '#duendes-btn-agregar', function(e) {
-            e.preventDefault();
-
-            if (!elegido) {
-                alert('Seleccioná un mini guardián primero');
-                return;
-            }
-
-            var $btn = $(this);
-            $btn.text('Agregando...').css('opacity', '0.5').prop('disabled', true);
-
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: {
-                    action: 'duendes_agregar_mini_gratis',
-                    product_id: elegido,
-                    nonce: '<?php echo wp_create_nonce('duendes_mini_gratis'); ?>'
-                },
-                success: function(response) {
-                    console.log('Respuesta:', response);
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        alert(response.data || 'Error al agregar');
-                        $btn.text('Agregar mi regalo').css('opacity', '1').prop('disabled', false);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX:', error);
-                    alert('Error de conexión. Intentá de nuevo.');
-                    $btn.text('Agregar mi regalo').css('opacity', '1').prop('disabled', false);
-                }
-            });
-        });
-    });
-    </script>
     <?php
 }
 
@@ -757,43 +819,142 @@ add_action('wp_ajax_duendes_agregar_mini_gratis', 'duendes_ajax_agregar_mini_gra
 add_action('wp_ajax_nopriv_duendes_agregar_mini_gratis', 'duendes_ajax_agregar_mini_gratis');
 
 function duendes_ajax_agregar_mini_gratis() {
-    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'duendes_mini_gratis')) {
-        wp_send_json_error('Sesión expirada');
-    }
-
     $product_id = intval($_POST['product_id'] ?? 0);
     if (!$product_id) wp_send_json_error('Producto inválido');
+
+    // Asegurar que el carrito esté cargado
+    if (!WC()->cart) {
+        wc_load_cart();
+    }
 
     $guardianes = duendes_contar_guardianes_carrito();
     $merecidos = floor($guardianes / DUENDES_PROMO_GUARDIANES_REQUERIDOS);
     $actuales = duendes_contar_minis_gratis_en_carrito();
 
-    if ($guardianes < DUENDES_PROMO_GUARDIANES_REQUERIDOS) wp_send_json_error('Necesitás 2 guardianes');
-    if ($actuales >= $merecidos) wp_send_json_error('Ya tenés todos tus regalos');
-    if (!has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product_id)) wp_send_json_error('Producto no válido');
+    if ($guardianes < DUENDES_PROMO_GUARDIANES_REQUERIDOS) wp_send_json_error('Necesitás al menos 2 guardianes para la promo');
+    if ($actuales >= $merecidos) wp_send_json_error('Ya tenés tu mini de regalo en el carrito');
+    if (!has_term(DUENDES_PROMO_CATEGORIA_MINI, 'product_cat', $product_id)) wp_send_json_error('Solo podés elegir un mini');
 
     $key = WC()->cart->add_to_cart($product_id, 1, 0, [], [
         'duendes_mini_gratis' => true,
         'duendes_promo_3x2' => true,
     ]);
 
-    $key ? wp_send_json_success() : wp_send_json_error('Error al agregar');
+    if ($key) {
+        wp_send_json_success(['mensaje' => 'Mini agregado gratis']);
+    } else {
+        wp_send_json_error('No se pudo agregar, intentá de nuevo');
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECIO 0 Y DISPLAY
 // ═══════════════════════════════════════════════════════════════════════════
+//
+// CÓMO FUNCIONA:
+// duendes-precios-v3.php muestra precios UYU leyendo de la BASE DE DATOS
+// (get_post_meta), NO del objeto producto. Entonces set_price(0) funciona
+// para WooCommerce internamente (USD), pero los DISPLAY en UYU lo ignoran.
+//
+// Solución:
+// 1. set_price(0) para que WooCommerce cobre USD correcto
+// 2. Filtrar woocommerce_cart_subtotal y woocommerce_cart_total DESPUÉS
+//    de duendes-v3 (prioridad 200 > su 100) excluyendo minis gratis
+// 3. Filtrar items individuales con "¡Gratis!" (ya funcionaba)
+//
 
+// ── 1. Asegurar que el flag sobrevive la sesión de WooCommerce ──
+add_filter('woocommerce_get_cart_item_from_session', function($item, $values, $key) {
+    if (!empty($values['duendes_mini_gratis'])) {
+        $item['duendes_mini_gratis'] = true;
+        $item['duendes_promo_3x2'] = true;
+    }
+    return $item;
+}, 10, 3);
+
+// ── 2. set_price(0) para cálculo interno USD de WooCommerce ──
 add_action('woocommerce_before_calculate_totals', function($cart) {
     if (is_admin() && !defined('DOING_AJAX')) return;
-    if (did_action('woocommerce_before_calculate_totals') >= 2) return;
     foreach ($cart->get_cart() as $item) {
         if (!empty($item['duendes_mini_gratis'])) {
             $item['data']->set_price(0);
         }
     }
-}, 99);
+}, 9999);
 
+// ── 3. CORREGIR SUBTOTAL UYU (después de duendes-precios-v3 que usa prioridad 100) ──
+add_filter('woocommerce_cart_subtotal', function($subtotal, $compound, $cart) {
+    // Solo intervenir si hay minis gratis
+    $tiene_gratis = false;
+    foreach ($cart->get_cart() as $item) {
+        if (!empty($item['duendes_mini_gratis'])) { $tiene_gratis = true; break; }
+    }
+    if (!$tiene_gratis) return $subtotal;
+
+    // Para Uruguay: recalcular UYU excluyendo minis gratis
+    if (function_exists('duendes_v3_get_pais') && duendes_v3_get_pais() === 'UY') {
+        $total_uyu = 0;
+        foreach ($cart->get_cart() as $item) {
+            if (!empty($item['duendes_mini_gratis'])) continue; // SALTAR minis gratis
+            $product = $item['data'];
+            $precio_raw = duendes_v3_get_precio_usd($product);
+            $precio_uyu = duendes_v3_usd_a_uyu($precio_raw);
+            $total_uyu += $precio_uyu * $item['quantity'];
+        }
+        return '<span class="duendes-precio duendes-uy">$' . duendes_v3_formatear($total_uyu) . ' <small>UYU</small></span>';
+    }
+
+    // Para internacional: WooCommerce ya calcula bien con set_price(0), pero por si acaso
+    $total_usd = 0;
+    foreach ($cart->get_cart() as $item) {
+        if (!empty($item['duendes_mini_gratis'])) continue;
+        $total_usd += floatval($item['line_subtotal']);
+    }
+    return wc_price($total_usd);
+}, 200, 3);
+
+// ── 4. CORREGIR TOTAL UYU (después de duendes-precios-v3 que usa prioridad 100) ──
+add_filter('woocommerce_cart_total', function($total) {
+    $cart = WC()->cart;
+    if (!$cart) return $total;
+
+    // Solo intervenir si hay minis gratis
+    $tiene_gratis = false;
+    foreach ($cart->get_cart() as $item) {
+        if (!empty($item['duendes_mini_gratis'])) { $tiene_gratis = true; break; }
+    }
+    if (!$tiene_gratis) return $total;
+
+    // Para Uruguay: recalcular UYU excluyendo minis gratis
+    if (function_exists('duendes_v3_get_pais') && duendes_v3_get_pais() === 'UY') {
+        $total_uyu = 0;
+        foreach ($cart->get_cart() as $item) {
+            if (!empty($item['duendes_mini_gratis'])) continue; // SALTAR minis gratis
+            $product = $item['data'];
+            $precio_raw = duendes_v3_get_precio_usd($product);
+            $precio_uyu = duendes_v3_usd_a_uyu($precio_raw);
+            $total_uyu += $precio_uyu * $item['quantity'];
+        }
+        // Agregar envío si hay
+        $shipping_total = $cart->get_shipping_total();
+        if ($shipping_total > 0) {
+            $total_uyu += round($shipping_total * 43);
+        }
+        return '<span class="duendes-precio duendes-uy">$' . duendes_v3_formatear($total_uyu) . ' <small>UYU</small></span>';
+    }
+
+    // Para internacional: recalcular USD excluyendo minis gratis
+    $total_usd = 0;
+    foreach ($cart->get_cart() as $item) {
+        if (!empty($item['duendes_mini_gratis'])) continue;
+        $total_usd += floatval($item['line_subtotal']);
+    }
+    $shipping_total = $cart->get_shipping_total();
+    if ($shipping_total > 0) $total_usd += $shipping_total;
+    return wc_price($total_usd);
+}, 200);
+
+// ── 5. Display items: mostrar "¡Gratis!" y "REGALO" ──
 add_filter('woocommerce_cart_item_name', function($name, $item, $key) {
     if (!empty($item['duendes_mini_gratis'])) {
         $name .= ' <span style="background:#c9a227;color:#0a0a0a;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;margin-left:8px;">REGALO</span>';
@@ -806,7 +967,14 @@ add_filter('woocommerce_cart_item_price', function($price, $item, $key) {
         return '<span style="color:#c9a227;font-weight:600;">¡Gratis!</span>';
     }
     return $price;
-}, 10, 3);
+}, 999, 3);
+
+add_filter('woocommerce_cart_item_subtotal', function($subtotal, $item, $key) {
+    if (!empty($item['duendes_mini_gratis'])) {
+        return '<span style="color:#c9a227;font-weight:600;">¡Gratis!</span>';
+    }
+    return $subtotal;
+}, 999, 3);
 
 add_filter('woocommerce_cart_item_quantity', function($qty, $key, $item) {
     if (!empty($item['duendes_mini_gratis'])) {

@@ -24,6 +24,12 @@ function duendes_mensajes_guardian_render() {
     global $product;
     if (!$product) return;
 
+    // No mostrar mensajes para productos agotados (ya adoptados)
+    $stock_status = $product->get_stock_status();
+    if ($stock_status === 'outofstock' || !$product->is_in_stock()) {
+        return;
+    }
+
     $product_id = $product->get_id();
     $nombre = $product->get_name();
 
