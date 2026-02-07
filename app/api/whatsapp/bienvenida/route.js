@@ -168,52 +168,38 @@ function detectarIntencion(mensaje) {
 
 function crearRespuesta(intencion) {
   const contenido = CONTENIDO[intencion] || CONTENIDO.bienvenida;
-  const messages = [];
 
-  // Mensaje principal
-  messages.push({
-    type: 'text',
-    text: contenido.texto
-  });
+  // Construir texto completo para WhatsApp
+  let textoCompleto = contenido.texto;
 
   // Si tiene opciones de menú (solo bienvenida)
   if (contenido.opciones) {
-    // WhatsApp permite hasta 3 botones, así que usamos lista o botones
-    // Formato: texto con opciones numeradas
     const opcionesTexto = contenido.opciones
       .map(op => `${op.id}. ${op.emoji} ${op.texto}`)
       .join('\n');
-
-    messages.push({
-      type: 'text',
-      text: `Escribí el número de la opción:\n\n${opcionesTexto}`
-    });
+    textoCompleto += `\n\nEscribí el número de la opción:\n\n${opcionesTexto}`;
   }
 
   // Si tiene botón URL
   if (contenido.botonUrl) {
-    messages.push({
-      type: 'text',
-      text: `👉 ${contenido.botonUrl.url}`
-    });
+    textoCompleto += `\n\n👉 ${contenido.botonUrl.url}`;
   }
 
   // Si tiene opción de volver
   if (contenido.volver) {
-    messages.push({
-      type: 'text',
-      text: `\n_Escribí "menu" para volver al inicio_`
-    });
+    textoCompleto += `\n\n_Escribí "menu" para volver al inicio_`;
   }
 
+  // RESPUESTA PLANA para ManyChat - fácil de mapear
   return {
+    respuesta_tito: textoCompleto,
+    respuesta: textoCompleto,
+    intencion: intencion,
+    // También incluir formato v2 por compatibilidad
     version: 'v2',
     content: {
-      messages: messages
-    },
-    // Campos adicionales para compatibilidad
-    respuesta: contenido.texto,
-    intencion: intencion
+      messages: [{ type: 'text', text: textoCompleto }]
+    }
   };
 }
 
