@@ -16,7 +16,7 @@ import ejecutarTool from '@/lib/tito/tool-executor';
 // Personalidad MEDIA - balance entre tokens y funcionalidad
 import { PERSONALIDAD_TITO_MEDIA as PERSONALIDAD_TITO, CONTEXTO_MANYCHAT_MEDIA as CONTEXTO_MANYCHAT } from '@/lib/tito/personalidad-media';
 import { prepararMensajesOptimizados } from '@/lib/tito/personalidad-compacta';
-import { obtenerCotizaciones, PRECIOS_URUGUAY } from '@/lib/tito/cotizaciones';
+import { obtenerCotizaciones, formatearPrecio, PRECIOS_URUGUAY, INFO_PAISES as INFO_PAISES_COTIZACIONES } from '@/lib/tito/cotizaciones';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 import { detectarObjecion, getInstruccionesObjecion } from '@/lib/tito/objeciones';
 import {
@@ -1278,115 +1278,8 @@ export async function POST(request) {
     // Determinar si es primera interacción
     const esPrimeraInteraccion = conversationHistory.length === 0;
 
-    // Detectar si están diciendo su país después de que mostramos productos
-    const msgLower = msg.toLowerCase();
-    const dicePais = /^(de |soy de |desde )?(uruguay|argentina|mexico|méxico|colombia|chile|peru|perú|brasil|españa|usa|estados unidos|ecuador|panama|panamá)/i.test(msgLower) ||
-                     /^(uruguayo|argentina|mexicano|colombiano|chileno|peruano|brasileño|español)/i.test(msgLower);
-
-    // Verificar si en el historial ya mostramos productos (buscando patrones de precio)
-    const historialTexto = conversationHistory.map(h => h.content || h.t || '').join(' ');
-    const yaSeVieronProductos = /\$\d+\s*(USD|usd)|\$\d{1,3}(\.\d{3})*\s*pesos/i.test(historialTexto);
-
+    // Instrucción específica según contexto
     let instruccionEspecifica = '';
-
-    // CASO ESPECIAL: Dicen el país después de ver productos
-    // En este caso, generamos la respuesta DIRECTAMENTE sin depender de Claude
-    if (dicePais && yaSeVieronProductos && !esPrimeraInteraccion) {
-      // Extraer el país del mensaje
-      const paisMatch = msgLower.match(/(uruguay|argentina|mexico|méxico|colombia|chile|peru|perú|brasil|españa|usa|estados unidos|ecuador|panama|panamá)/i);
-      const paisNombre = paisMatch ? paisMatch[1] : 'uruguay';
-
-      // Mapear país a código
-      const paisCodigos = {
-        'uruguay': 'UY', 'argentina': 'AR', 'mexico': 'MX', 'méxico': 'MX',
-        'colombia': 'CO', 'chile': 'CL', 'peru': 'PE', 'perú': 'PE',
-        'brasil': 'BR', 'españa': 'ES', 'usa': 'US', 'estados unidos': 'US',
-        'ecuador': 'EC', 'panama': 'PA', 'panamá': 'PA'
-      };
-      const paisCode = paisCodigos[paisNombre.toLowerCase()] || 'US';
-
-      // Extraer productos y precios del historial (buscar patrón "Nombre - $XXX USD")
-      const preciosEncontrados = historialTexto.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)\s*USD/gi) || [];
-
-      // Info de países
-      const infoPaises = {
-        'UY': { moneda: 'pesos uruguayos', emoji: '🇺🇾', saludo: '¡Genial, paisano!', codigoMoneda: 'UYU' },
-        'AR': { moneda: 'pesos argentinos', emoji: '🇦🇷', saludo: '¡Genial!', codigoMoneda: 'ARS' },
-        'MX': { moneda: 'pesos mexicanos', emoji: '🇲🇽', saludo: '¡Órale!', codigoMoneda: 'MXN' },
-        'CO': { moneda: 'pesos colombianos', emoji: '🇨🇴', saludo: '¡Qué bien!', codigoMoneda: 'COP' },
-        'CL': { moneda: 'pesos chilenos', emoji: '🇨🇱', saludo: '¡Bacán!', codigoMoneda: 'CLP' },
-        'PE': { moneda: 'soles', emoji: '🇵🇪', saludo: '¡Chevere!', codigoMoneda: 'PEN' },
-        'BR': { moneda: 'reales', emoji: '🇧🇷', saludo: '¡Legal!', codigoMoneda: 'BRL' },
-        'ES': { moneda: 'euros', emoji: '🇪🇸', saludo: '¡Genial!', codigoMoneda: 'EUR' },
-        'US': { moneda: 'dólares', emoji: '🇺🇸', saludo: '¡Great!', codigoMoneda: 'USD' },
-        'EC': { moneda: 'dólares', emoji: '🇪🇨', saludo: '¡Chevere!', codigoMoneda: 'USD' },
-        'PA': { moneda: 'dólares', emoji: '🇵🇦', saludo: '¡Genial!', codigoMoneda: 'USD' }
-      };
-
-      // Si encontramos productos, generar respuesta directamente
-      if (preciosEncontrados.length > 0) {
-        // Obtener cotizaciones en tiempo real y productos para precios reales
-        const cotizaciones = await obtenerCotizaciones();
-        const productosWoo = await obtenerProductosWoo();
-        const infoPais = infoPaises[paisCode] || infoPaises['US'];
-
-        let respuestaDirecta = `${infoPais.saludo} ${infoPais.emoji}\n\nTe paso los precios en ${infoPais.moneda}:\n\n`;
-
-        preciosEncontrados.forEach(match => {
-          const parts = match.match(/([A-Za-záéíóúñÁÉÍÓÚÑ]+)\s*[-–]\s*\$(\d+)/i);
-          if (parts) {
-            const nombreProducto = parts[1];
-            const precioUSD = parseInt(parts[2]);
-
-            // Buscar el producto real para obtener su precio UYU
-            const productoReal = productosWoo.find(p =>
-              p.nombre.toLowerCase().includes(nombreProducto.toLowerCase()) ||
-              nombreProducto.toLowerCase().includes(p.nombre.toLowerCase().split(' ')[0])
-            );
-
-            if (paisCode === 'UY') {
-              // Uruguay: usar precio UYU REAL del producto
-              const precioUYU = productoReal?.precioUYU || PRECIOS_URUGUAY.convertir(precioUSD);
-              respuestaDirecta += `• **${nombreProducto}**: $${precioUYU.toLocaleString('es-UY')} pesos\n`;
-            } else if (['US', 'EC', 'PA'].includes(paisCode)) {
-              // Países dolarizados
-              respuestaDirecta += `• **${nombreProducto}**: $${precioUSD} DÓLARES\n`;
-            } else {
-              // Otros países: X DÓLARES (aproximadamente Y pesos locales)
-              const tasa = cotizaciones[infoPais.codigoMoneda] || 1;
-              const precioLocal = Math.round(precioUSD * tasa);
-              respuestaDirecta += `• **${nombreProducto}**: $${precioUSD} DÓLARES (aproximadamente $${precioLocal.toLocaleString('es')} ${infoPais.moneda})\n`;
-            }
-          }
-        });
-
-        respuestaDirecta += `\n¿Cuál te llamó más la atención? ✨`;
-
-        // Guardar info del cliente
-        if (subscriberId) {
-          try {
-            await kv.set(`tito:cliente:${subscriberId}`, {
-              ...infoCliente,
-              pais: paisCode,
-              paisNombre: paisNombre
-            }, { ex: 30 * 24 * 60 * 60 });
-          } catch (e) {}
-        }
-
-        console.log(`[Tito v3] Respuesta directa - País: ${paisCode} | Productos: ${preciosEncontrados.length}`);
-
-        // Retornar respuesta directa sin llamar a Claude
-        return Response.json({
-          success: true,
-          respuesta: respuestaDirecta,
-          productos: [],
-          analisis: { tipoCliente: 'convertir_precio', paisDetectado: paisCode }
-        }, { headers: CORS_HEADERS });
-      }
-    }
-
-    // Si no se retornó antes, continuar con flujo normal
-    instruccionEspecifica = '';
     if (esPrimeraInteraccion) {
       instruccionEspecifica = `\n\n✨ PRIMERA INTERACCIÓN:
 - El widget YA te presentó, NO digas "Soy Tito"

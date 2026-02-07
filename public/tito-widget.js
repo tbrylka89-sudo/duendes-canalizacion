@@ -815,39 +815,15 @@
           const nombre = p.nombre || p.name || 'Producto';
           let precio = p.precio || p.price || '???';
 
-          // Format price based on visitor country
-          if (precio !== '???') {
-            const usd = parseFloat(precio);
-            const countryCode = this.visitorData?.countryCode || 'US';
-
-            const MONEDAS = {
-              UY: { simbolo: '$', nombre: 'UYU', tasa: 44 },
-              AR: { simbolo: '$', nombre: 'ARS', tasa: 1050 },
-              MX: { simbolo: '$', nombre: 'MXN', tasa: 17 },
-              CO: { simbolo: '$', nombre: 'COP', tasa: 4200 },
-              CL: { simbolo: '$', nombre: 'CLP', tasa: 980 },
-              PE: { simbolo: 'S/', nombre: 'PEN', tasa: 3.8 },
-              BR: { simbolo: 'R$', nombre: 'BRL', tasa: 5.2 },
-              ES: { simbolo: '€', nombre: 'EUR', tasa: 0.92 }
-            };
-
-            if (countryCode === 'UY') {
-              // Uruguay: solo UYU
-              const local = Math.round(usd * MONEDAS.UY.tasa);
-              precio = '$' + local.toLocaleString('es-UY') + ' UYU';
-            } else if (countryCode === 'US' || !MONEDAS[countryCode]) {
-              // USA o desconocido: solo USD
-              precio = '$' + usd + ' USD';
-            } else {
-              // Otros países: USD + equivalente local
-              const info = MONEDAS[countryCode];
-              const local = Math.round(usd * info.tasa);
-              precio = '$' + usd + ' USD';
-              // Mostramos solo USD en tarjeta para mantenerla limpia
-              // El texto de Tito incluirá el equivalente local
-            }
-          } else {
+          // Usar precio_mostrar si viene del backend (ya formateado)
+          // El backend envía precios en la moneda correcta según el país
+          if (p.precio_mostrar) {
+            precio = p.precio_mostrar;
+          } else if (precio !== '???') {
+            // Fallback: mostrar en USD si no hay precio formateado
             precio = '$' + precio + ' USD';
+          } else {
+            precio = 'Consultar';
           }
 
           card.innerHTML = '<img src="' + imgSrc + '" alt="' + nombre + '" onerror="this.src=\'' + CONFIG.AVATAR + '\'">' +

@@ -32,3 +32,8 @@ Thumbs.db
 SFTP-CREDENTIALS.txt
 *-CREDENTIALS.txt
 *.credentials
+
+# Local env files
+.env.prod
+.env.production
+.env.vercel
