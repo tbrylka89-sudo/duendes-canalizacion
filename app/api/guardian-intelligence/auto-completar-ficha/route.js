@@ -164,12 +164,20 @@ export async function POST(request) {
 
       // Inferir categoría de la historia si existe
       let categoriaInferida = 'proteccion';
+      let tamanoInferido = null;
+
       if (historia) {
         const historiaLower = historia.toLowerCase();
         if (historiaLower.includes('abundancia') || historiaLower.includes('prosperidad') || historiaLower.includes('dinero')) categoriaInferida = 'abundancia';
         else if (historiaLower.includes('amor') || historiaLower.includes('corazón') || historiaLower.includes('pareja')) categoriaInferida = 'amor';
         else if (historiaLower.includes('sanación') || historiaLower.includes('sanar') || historiaLower.includes('curar')) categoriaInferida = 'sanacion';
         else if (historiaLower.includes('sabiduría') || historiaLower.includes('conocimiento')) categoriaInferida = 'sabiduria';
+
+        // Intentar extraer tamaño de la historia (ej: "28 centímetros", "mide 15 cm", "sus 22 centímetros")
+        const tamanoMatch = historia.match(/(\d{1,2})\s*(?:centímetros|centimetros|cm)/i);
+        if (tamanoMatch) {
+          tamanoInferido = parseInt(tamanoMatch[1]);
+        }
       }
 
       datosBasicos = {
@@ -177,8 +185,8 @@ export async function POST(request) {
         especie: especieInferida,
         familia: '',
         categoria: categoriaInferida,
-        tipo_tamano: 'mediano',
-        tamano_cm: 23,
+        tipo_tamano: tamanoInferido >= 30 ? 'grande' : (tamanoInferido >= 15 ? 'mediano' : 'mini'),
+        tamano_cm: tamanoInferido || null,  // null si no se encontró, para que el usuario lo complete
         es_unico: 'unico',
         accesorios: ''
       };
