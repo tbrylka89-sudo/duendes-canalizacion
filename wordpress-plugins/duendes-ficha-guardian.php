@@ -833,29 +833,143 @@ class DuendesFichaGuardian {
 
         $nombre = $product->get_name();
         $historia = $product->get_description();
+        $nombre_lower = strtolower($nombre);
 
-        // Llamar a la API de auto-completar
-        $response = wp_remote_post($this->api_url . '/guardian-intelligence/auto-completar-ficha', [
-            'timeout' => 90,
-            'headers' => ['Content-Type' => 'application/json'],
-            'body' => json_encode([
-                'nombre' => $nombre,
-                'historia' => $historia,
-                'soloBaseDatos' => false
-            ])
+        // ══════════════════════════════════════════════════════════════
+        // PASO 1: LEER DATOS BÁSICOS DESDE WORDPRESS (sin llamar API)
+        // ══════════════════════════════════════════════════════════════
+
+        // 1. Intentar leer de ficha existente
+        $ficha_existente = get_post_meta($post_id, '_duendes_ficha', true) ?: [];
+
+        // 2. Leer de atributos WooCommerce
+        $atributos = $product->get_attributes();
+        $attr_especie = '';
+        $attr_tamano = '';
+        $attr_categoria = '';
+
+        foreach ($atributos as $attr_name => $attr) {
+            $nombre_attr = strtolower($attr_name);
+            $valor = '';
+
+            if ($attr->is_taxonomy()) {
+                $terms = wp_get_post_terms($post_id, $attr->get_name(), ['fields' => 'names']);
+                $valor = !empty($terms) ? $terms[0] : '';
+            } else {
+                $opciones = $attr->get_options();
+                $valor = !empty($opciones) ? $opciones[0] : '';
+            }
+
+            if (strpos($nombre_attr, 'especie') !== false || strpos($nombre_attr, 'tipo') !== false) {
+                $attr_especie = $valor;
+            }
+            if (strpos($nombre_attr, 'altura') !== false || strpos($nombre_attr, 'tamaño') !== false || strpos($nombre_attr, 'cm') !== false) {
+                if (preg_match('/(\d+)/', $valor, $m)) {
+                    $attr_tamano = $m[1];
+                }
+            }
+        }
+
+        // 3. Inferir de la historia/descripción
+        $tamano_historia = null;
+        $categoria_historia = 'proteccion';
+
+        if ($historia) {
+            // Buscar tamaño en la historia (ej: "28 centímetros", "mide 15 cm")
+            if (preg_match('/(\d{1,2})\s*(?:centímetros|centimetros|cm)/i', $historia, $m)) {
+                $tamano_historia = intval($m[1]);
+            }
+
+            // Inferir categoría
+            $historia_lower = strtolower($historia);
+            if (strpos($historia_lower, 'abundancia') !== false || strpos($historia_lower, 'prosperidad') !== false) {
+                $categoria_historia = 'abundancia';
+            } elseif (strpos($historia_lower, 'amor') !== false && strpos($historia_lower, 'propio') === false) {
+                $categoria_historia = 'amor';
+            } elseif (strpos($historia_lower, 'sanación') !== false || strpos($historia_lower, 'sanar') !== false) {
+                $categoria_historia = 'sanacion';
+            } elseif (strpos($historia_lower, 'sabiduría') !== false) {
+                $categoria_historia = 'sabiduria';
+            }
+        }
+
+        // 4. Inferir especie del nombre
+        $especie_nombre = 'duende';
+        if (strpos($nombre_lower, 'pixie') !== false) $especie_nombre = 'pixie';
+        elseif (strpos($nombre_lower, 'vikingo') !== false || strpos($nombre_lower, 'vikinga') !== false) $especie_nombre = 'vikingo';
+        elseif (strpos($nombre_lower, 'bruja') !== false || strpos($nombre_lower, 'brujo') !== false) $especie_nombre = 'bruja';
+        elseif (strpos($nombre_lower, 'hada') !== false) $especie_nombre = 'hada';
+        elseif (strpos($nombre_lower, 'elfo') !== false || strpos($nombre_lower, 'elfa') !== false) $especie_nombre = 'elfo';
+        elseif (strpos($nombre_lower, 'mago') !== false || strpos($nombre_lower, 'maga') !== false) $especie_nombre = 'mago';
+        elseif (strpos($nombre_lower, 'chaman') !== false || strpos($nombre_lower, 'chamana') !== false) $especie_nombre = 'chaman';
+
+        // 5. Inferir género del nombre
+        $genero_nombre = 'M';
+        if (strpos($nombre_lower, 'pixie') !== false || preg_match('/(a|ina|ella|ana)$/i', $nombre)) {
+            $genero_nombre = 'F';
+        }
+
+        // 6. Construir datos básicos con prioridad: ficha > atributos > historia > nombre
+        $datosBasicos = [
+            'genero' => $ficha_existente['genero'] ?? $genero_nombre,
+            'especie' => $ficha_existente['especie'] ?? ($attr_especie ?: $especie_nombre),
+            'familia' => $ficha_existente['familia'] ?? '',
+            'categoria' => $ficha_existente['categoria'] ?? $categoria_historia,
+            'tipo_tamano' => $ficha_existente['tipo_tamano'] ?? '',
+            'tamano_cm' => $ficha_existente['tamano_cm'] ?? ($attr_tamano ?: $tamano_historia),
+            'es_unico' => $ficha_existente['recreable'] === 'no' ? 'unico' : ($ficha_existente['recreable'] === 'si' ? 'recreable' : 'auto'),
+            'accesorios' => $ficha_existente['accesorios'] ?? ''
+        ];
+
+        // Determinar tipo_tamano si tenemos cm pero no tipo
+        if (empty($datosBasicos['tipo_tamano']) && $datosBasicos['tamano_cm']) {
+            $cm = intval($datosBasicos['tamano_cm']);
+            if ($cm <= 12) $datosBasicos['tipo_tamano'] = 'mini';
+            elseif ($cm <= 14) $datosBasicos['tipo_tamano'] = 'mini_especial';
+            elseif ($cm <= 20) $datosBasicos['tipo_tamano'] = 'mediano';
+            elseif ($cm <= 25) $datosBasicos['tipo_tamano'] = 'mediano_especial';
+            elseif ($cm <= 30) $datosBasicos['tipo_tamano'] = 'grande';
+            else $datosBasicos['tipo_tamano'] = 'gigante';
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // PASO 2: LLAMAR A LA API SOLO PARA FICHA IA (flor, piedra, etc)
+        // ══════════════════════════════════════════════════════════════
+
+        $fichaIA = null;
+
+        if (!empty($historia)) {
+            $response = wp_remote_post($this->api_url . '/guardian-intelligence/solo-ficha-ia', [
+                'timeout' => 90,
+                'headers' => ['Content-Type' => 'application/json'],
+                'body' => json_encode([
+                    'nombre' => $nombre,
+                    'historia' => $historia,
+                    'datosBasicos' => $datosBasicos
+                ])
+            ]);
+
+            if (!is_wp_error($response)) {
+                $body = json_decode(wp_remote_retrieve_body($response), true);
+                if (isset($body['success']) && $body['success'] && isset($body['fichaIA'])) {
+                    $fichaIA = $body['fichaIA'];
+                }
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // RESPUESTA FINAL
+        // ══════════════════════════════════════════════════════════════
+
+        wp_send_json_success([
+            'success' => true,
+            'encontrado' => true,
+            'producto_db' => $nombre,
+            'datosBasicos' => $datosBasicos,
+            'fichaIA' => $fichaIA,
+            'fuente' => 'wordpress',
+            'mensaje' => 'Datos leídos desde WordPress' . ($fichaIA ? ' + Ficha IA generada' : '')
         ]);
-
-        if (is_wp_error($response)) {
-            wp_send_json_error(['error' => $response->get_error_message()]);
-        }
-
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-
-        if (isset($body['success']) && $body['success']) {
-            wp_send_json_success($body);
-        } else {
-            wp_send_json_error(['error' => $body['error'] ?? 'No se encontró el producto en la base de datos']);
-        }
     }
 
     // ═══════════════════════════════════════════════════════════════

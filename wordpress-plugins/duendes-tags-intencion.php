@@ -180,6 +180,77 @@ add_action('rest_api_init', function() {
         },
         'permission_callback' => '__return_true'
     ]);
+
+    // Endpoint para ejecutar asignación automática (protegido con secret)
+    register_rest_route('duendes/v1', '/auto-asignar-intenciones', [
+        'methods' => 'POST',
+        'callback' => function($request) {
+            $secret = $request->get_param('secret');
+            $expected = 'duendes_intenciones_2026_xK9pL2mN';
+
+            if ($secret !== $expected) {
+                return new WP_Error('forbidden', 'Secret inválido', ['status' => 403]);
+            }
+
+            $solo_sin = $request->get_param('solo_sin_intencion') !== false;
+
+            $args = [
+                'post_type' => 'product',
+                'posts_per_page' => -1,
+                'post_status' => 'publish'
+            ];
+
+            if ($solo_sin) {
+                $args['tax_query'] = [
+                    [
+                        'taxonomy' => 'intencion',
+                        'operator' => 'NOT EXISTS'
+                    ]
+                ];
+            }
+
+            $productos = get_posts($args);
+            $asignados = 0;
+            $detalles = [];
+
+            $patrones = [
+                'proteccion' => '/protecci[oó]n|proteger|protector|escudo|defensa|negativ|envidia|mal de ojo/i',
+                'abundancia' => '/abundancia|prosperidad|dinero|riqueza|emprendedor|abrecaminos|fortuna|suerte|negocio/i',
+                'amor' => '/amor|coraz[oó]n|pareja|relaci[oó]n|romanc/i',
+                'sanacion' => '/sanaci[oó]n|sanar|salud|bienestar|curar|curaci[oó]n/i',
+                'paz' => '/paz|calma|tranquil|armon[ií]a|ansiedad|estr[eé]s|equilibrio/i',
+            ];
+
+            foreach ($productos as $producto) {
+                $texto = strtolower($producto->post_title . ' ' . $producto->post_name . ' ' . $producto->post_content);
+                $intenciones_detectadas = [];
+
+                foreach ($patrones as $slug => $patron) {
+                    if (preg_match($patron, $texto)) {
+                        $intenciones_detectadas[] = $slug;
+                    }
+                }
+
+                if (!empty($intenciones_detectadas)) {
+                    wp_set_post_terms($producto->ID, $intenciones_detectadas, 'intencion', true);
+                    $asignados++;
+                    $detalles[] = [
+                        'id' => $producto->ID,
+                        'nombre' => $producto->post_title,
+                        'intenciones' => $intenciones_detectadas
+                    ];
+                }
+            }
+
+            return [
+                'success' => true,
+                'productos_analizados' => count($productos),
+                'productos_asignados' => $asignados,
+                'detalles' => $detalles
+            ];
+        },
+        'permission_callback' => '__return_true'
+    ]);
 });
 
 // ═══════════════════════════════════════════════════════════════
