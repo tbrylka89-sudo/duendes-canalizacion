@@ -764,12 +764,30 @@ class DuendesFichaGuardian {
         if (!current_user_can('edit_post', $post_id)) return;
 
         if (isset($_POST['duendes_ficha'])) {
-            $ficha = array_map(function($v) {
+            // OBTENER FICHA EXISTENTE para hacer MERGE (no sobrescribir)
+            $ficha_existente = get_post_meta($post_id, '_duendes_ficha', true);
+            if (!is_array($ficha_existente)) {
+                $ficha_existente = [];
+            }
+
+            // Procesar datos del formulario
+            $ficha_nueva = array_map(function($v) {
                 if (is_array($v)) return array_map('sanitize_text_field', $v);
                 return sanitize_text_field($v);
             }, $_POST['duendes_ficha']);
 
-            update_post_meta($post_id, '_duendes_ficha', $ficha);
+            // MERGE: Solo actualizar campos que tienen valor en el formulario
+            // Si el campo viene vacío pero ya existía, mantener el valor existente
+            foreach ($ficha_nueva as $key => $valor) {
+                if ($valor !== '' && $valor !== null && (!is_array($valor) || !empty($valor))) {
+                    $ficha_existente[$key] = $valor;
+                }
+            }
+
+            update_post_meta($post_id, '_duendes_ficha', $ficha_existente);
+
+            // Log para debug
+            error_log('FICHA GUARDADA (MERGE): producto=' . $post_id . ' campos=' . implode(',', array_keys($ficha_nueva)));
         }
     }
 
@@ -791,29 +809,40 @@ class DuendesFichaGuardian {
         $nombre = $product->get_name();
         $ficha_actual = get_post_meta($post_id, '_duendes_ficha', true) ?: [];
 
-        // Llamar a la API de Vercel
-        $response = wp_remote_post($this->api_url . '/guardian-intelligence/generar-ficha', [
-            'timeout' => 60,
+        if (empty($historia)) {
+            wp_send_json_error(['error' => 'El producto no tiene descripción/historia. Generá una historia primero.']);
+        }
+
+        // Construir datos básicos desde la ficha actual
+        $datosBasicos = [
+            'especie' => $ficha_actual['especie'] ?? 'duende',
+            'categoria' => $ficha_actual['categoria'] ?? 'proteccion',
+            'genero' => $ficha_actual['genero'] ?? 'M',
+            'tamano_cm' => $ficha_actual['tamano_cm'] ?? '',
+            'accesorios' => $ficha_actual['accesorios'] ?? ''
+        ];
+
+        // Llamar a la API de Vercel (endpoint nuevo)
+        $response = wp_remote_post($this->api_url . '/guardian-intelligence/solo-ficha-ia', [
+            'timeout' => 90,
             'headers' => ['Content-Type' => 'application/json'],
             'body' => json_encode([
                 'nombre' => $nombre,
                 'historia' => $historia,
-                'especie' => $ficha_actual['especie'] ?? '',
-                'categoria' => $ficha_actual['categoria'] ?? '',
-                'genero' => $ficha_actual['genero'] ?? 'M',
+                'datosBasicos' => $datosBasicos
             ])
         ]);
 
         if (is_wp_error($response)) {
-            wp_send_json_error(['error' => $response->get_error_message()]);
+            wp_send_json_error(['error' => 'Error de conexión: ' . $response->get_error_message()]);
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
-        if (isset($body['success']) && $body['success']) {
-            wp_send_json_success(['ficha' => $body['ficha']]);
+        if (isset($body['success']) && $body['success'] && isset($body['fichaIA'])) {
+            wp_send_json_success(['ficha' => $body['fichaIA']]);
         } else {
-            wp_send_json_error(['error' => $body['error'] ?? 'Error desconocido']);
+            wp_send_json_error(['error' => $body['error'] ?? 'Error generando ficha IA']);
         }
     }
 

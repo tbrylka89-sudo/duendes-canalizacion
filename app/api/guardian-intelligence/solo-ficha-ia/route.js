@@ -2,6 +2,7 @@
  * GUARDIAN INTELLIGENCE - SOLO FICHA IA
  * POST: Genera solo la ficha de personalidad (flor, piedra, gustos, etc)
  * NO toca los datos básicos (tamaño, especie, categoría)
+ * v1.1 - 2026-02-10
  */
 
 import { NextResponse } from 'next/server';
@@ -15,6 +16,16 @@ const corsHeaders = {
 
 export async function OPTIONS() {
   return new Response(null, { headers: corsHeaders });
+}
+
+export async function GET() {
+  return NextResponse.json({
+    status: 'ok',
+    endpoint: 'solo-ficha-ia',
+    version: '1.1',
+    methods: ['POST'],
+    description: 'Genera ficha de personalidad (flor, piedra, gustos, etc) usando IA'
+  }, { headers: corsHeaders });
 }
 
 export async function POST(request) {

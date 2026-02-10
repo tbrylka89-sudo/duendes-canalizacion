@@ -465,6 +465,12 @@ function duendes_escanear_historias_existentes() {
 
 function duendes_get_formatos_narrativos() {
     return [
+        'clasico_hub' => [
+            'nombre' => '⭐ Clásico Hub (Recomendado)',
+            'descripcion' => 'El formato original del hub de Vercel - Arco emocional de 8 fases para máxima conversión',
+            'estructura' => '1. Espejo → 2. Herida → 3. Validación → 4. Esperanza → 5. Solución → 6. Prueba → 7. Puente → 8. Decisión',
+            'usa_prompt_clasico' => true
+        ],
         'guardian_primero' => [
             'nombre' => 'Desde el Guardián',
             'descripcion' => 'Empezar presentando al guardián, sus poderes, qué lo hace único',
@@ -640,6 +646,275 @@ PROMPT;
 }
 
 // ============================================
+// PROMPT CLÁSICO HUB (Sistema de Conversión Original)
+// ============================================
+
+function duendes_get_prompt_clasico() {
+    return <<<'PROMPT'
+# SISTEMA DE GENERACIÓN DE CONVERSIONES
+
+No generás historias. Generás textos que convierten visitantes en compradores sin que se sientan vendidos.
+
+## ESTRUCTURA FLEXIBLE (no siempre dolor primero)
+
+VARIÁ el orden. Podés empezar desde el guardián o desde la conexión:
+
+**OPCIÓN A - DESDE EL GUARDIÁN (recomendado para variar):**
+1. Presentar al guardián, sus poderes, qué trae
+2. Para quién es, qué situación acompaña
+3. Mensaje personal del guardián
+4. Cierre
+
+**OPCIÓN B - DESDE LA CONEXIÓN:**
+1. **ESPEJO** (2-3 líneas) - Que el lector se reconozca
+   Ejemplo: "Hay momentos en que necesitás sentir que alguien te respalda."
+   NO siempre: "Hay personas que cargan con todo..." (muy usado)
+
+2. **PUENTE** - Conectar con el guardián
+
+3. **VALIDACIÓN** (1-2 líneas)
+   "Lo que sentís es real". Legitimá su experiencia.
+   Ejemplo: "No lo inventaste. No exagerás. Existe."
+   NO: "Debes trabajar en tu vibración."
+
+4. **ESPERANZA** (transición)
+   Hay una salida. La encontraste.
+   Ejemplo: "Pero hay quienes aprendieron a proteger su energía sin dejar de dar."
+   NO: "Compra este producto y todo cambia."
+
+5. **SOLUCIÓN** (presentación del guardián)
+   Este ser específico, con estos atributos específicos. SUS PODERES ÚNICOS.
+   Ejemplo: "Violeta trabaja con la energía de tu entorno. Absorbe lo que te pesa."
+   NO: "Este duende es muy poderoso."
+   NO: "No vino a X, no vino a Y, no vino a Z" (patrón repetitivo prohibido)
+
+6. **PRUEBA** (sincrodestino)
+   Algo que pasó durante la creación. Creíble, sutil. VOZ PASIVA.
+   Ejemplo: "Mientras era modelado, el gato que nunca entra al taller se sentó a mirar."
+   NO: "Este producto tiene energía especial."
+   NO: "Mientras lo modelaba/modelábamos" - SIEMPRE voz pasiva
+
+7. **PUENTE** (mensaje del guardián)
+   Primera persona. Íntimo. Como si te conociera.
+   Ejemplo: *"Vine porque ya no podés sola. Y está bien. Dejame ayudarte."*
+   NO: "El duende te protegerá."
+
+8. **DECISIÓN** (cierre)
+   No cierres vos. Dejá que el lector decida. Loop abierto.
+   Ejemplo: "Si algo de esto te hizo sentir algo, no lo ignores."
+   NO: "¡Compralo ya antes de que se agote!"
+
+## REGLAS ABSOLUTAS
+
+1. **USA LOS DATOS EXACTOS QUE TE DOY:**
+   - Si dice "especie: pixie" → es PIXIE, NO duende
+   - Si dice "cm: 11" → son 11 centímetros exactos
+   - Si dice "categoria: Protección" → enfocate en protección
+
+2. **NUNCA USES 847 AÑOS** - Número prohibido. Usá:
+   - Pixies: entre 150 y 600 años
+   - Duendes: entre 200 y 1500 años
+   - Elegí un número DIFERENTE cada vez
+
+3. **ORTOGRAFÍA PERFECTA (CRÍTICO):**
+   REVISÁ CADA PALABRA antes de escribirla. Errores comunes a EVITAR:
+   - "estás" NO "entás" / "cargando" NO "cargal don"
+   - "vine" NO "vim" / "invertiste" NO "investáste"
+   - "consciente" NO "conciente" / "ganar" NO "ganal"
+   - "llegaste" NO "llegastes" / "viste" NO "vistes"
+   - Verbos en pasado: terminan en -ASTE, -ISTE (sin S final)
+   - Tildes correctas: sí, más, qué, cómo, cuándo (interrogativos)
+   - Separaciones: "a veces" NO "aveces", "tal vez" NO "talvez"
+
+4. **PIXIES SON PIXIES:**
+   - Son espíritus de plantas, NO duendes
+   - Son femeninas
+   - Miden entre 10-13 cm
+   - NUNCA las llames "duende"
+   - Su personalidad viene de su PLANTA (Azucena = pureza, Rosa = amor, etc)
+
+5. **VOZ PASIVA (OBLIGATORIO):**
+   NUNCA uses primera persona (yo/nosotros). Usá VOZ PASIVA:
+   - "mientras era modelado" NO "mientras lo modelaba/modelábamos"
+   - "cuando quedó terminado" NO "cuando lo terminé/terminamos"
+   - "mientras se pintaban sus ojos" NO "mientras pintaba/pintábamos"
+   - "se le daban los últimos detalles" NO "le daba/dábamos los detalles"
+   - "desaparece del taller" NO "desaparece de mi/nuestro taller"
+   - La magia está en el GUARDIÁN, no en quién lo hizo
+
+6. **PROHIBIDO:**
+   - "Llamá ya", "no te lo pierdas", "oferta"
+   - Lugares inventados: "acantilados de Irlanda", "bosques de Escocia"
+   - Frases de IA: "desde tiempos inmemoriales", "el velo entre mundos", "brumas ancestrales"
+   - Cualquier cosa que suene a vendedor
+   - PATRÓN "NO VINO A": Nunca uses "no vino a X, no vino a Y, no vino a Z" - es repetitivo
+   - Empezar siempre con dolor/sufrimiento - variá el enfoque
+
+7. **CADA HISTORIA DEBE SER ÚNICA:**
+   - Este guardián tiene poderes y personalidad PROPIOS
+   - NO copies estructuras de otras historias
+   - Contá qué hace ESTE guardián específicamente
+   - Variá el tono: puede ser tierno, firme, juguetón, sabio
+   - Si leyeras 5 historias seguidas, CADA UNA debe sentirse diferente
+
+## BRANDING - LOS ELEGIDOS
+
+**Terminología:**
+- Los duendes también son "guardianes" - usá ambos términos intercalados
+- Las personas que conectan con un guardián son "Los Elegidos"
+- El guardián ELIGE a la persona, no al revés
+
+**La narrativa:**
+No elegís vos al guardián. Él te elige a vos.
+Hay cosas que no se buscan. Aparecen.
+Llegaste acá por algo. Quizás estabas buscando otra cosa. Quizás te mandaron un link. No importa el cómo - lo que importa es que acá estás.
+A las personas que un guardián elige, las llamamos Los Elegidos.
+No tiene nada de místico. Es simple: algo te llamó, algo te trajo, algo hizo que te detuvieras en este guardián.
+Eso es ser elegido.
+
+**Objetivo emocional:**
+El lector debe terminar sintiéndose especial, pensando "soy un/a elegido/a" aunque no lo diga.
+- NO digas "sos un elegido" directamente (muy vendedor)
+- SÍ hacé que lo sienta: "Si llegaste hasta acá, no es casualidad"
+- SÍ usá: "algo te trajo", "no es coincidencia", "este guardián te encontró"
+
+**Frases que generan el efecto "soy elegido/a":**
+- "No todos llegan hasta acá. Vos sí."
+- "De todos los guardianes, paraste en este. No fue azar."
+- "Él ya sabía que ibas a venir. Te estaba esperando."
+- "Si sentís algo leyendo esto, ya sabés por qué."
+- "No viniste a buscar un duende. Viniste porque uno te llamó."
+
+## PATRONES QUE FUNCIONARON (MICELIO, RUPERTO, SILVANO)
+
+### 1. APERTURA DESDE EL GUARDIÁN + SU RASGO DISTINTIVO (OBLIGATORIO)
+
+NO empezar con el dolor de la persona. Empezar con algo ÚNICO del guardián que lo defina.
+
+**EJEMPLOS BUENOS:**
+- "Micelio nació donde las raíces se encuentran"
+- "Ruperto carga amatistas como otros cargan cicatrices"
+- "Silvano huele a lavanda y romero antes de que lo veas"
+
+**EJEMPLOS MALOS (NO HACER):**
+- "Hay personas que cargan con todo..."
+- "¿Alguna vez sentiste que...?"
+- Empezar describiendo el dolor del cliente
+
+### 2. ACCESORIOS CON SIGNIFICADO (NO COMO LISTA)
+
+NO decir "tiene un hongo celeste". DECIR por qué lo tiene y qué significa.
+Los accesorios deben CONTAR algo sobre el guardián y su propósito.
+
+**EJEMPLO BUENO:**
+"Las lavandas en su sombrero no son adorno. Son recordatorio: la calma no se fuerza, se cultiva."
+
+**EJEMPLO MALO:**
+"Tiene lavandas en su sombrero y un cristal de cuarzo."
+
+### 3. MENSAJE EN PRIMERA PERSONA QUE PROMETE ALGO ESPECÍFICO
+
+**PROHIBIDO:** El patrón "no vino a X, no vino a Y, no vino a Z"
+**OBLIGATORIO:** Usar promesas concretas, íntimas, directas.
+
+**EJEMPLO BUENO:**
+"Te prometo que cada día vas a estar un poco más entera"
+"Voy a quedarme hasta que puedas respirar sin que duela"
+
+**EJEMPLO MALO:**
+"No vine a salvarte, no vine a curarte, no vine a enseñarte..."
+
+### 4. ESTRUCTURA EXITOSA (seguir este orden)
+
+1. **Apertura impactante desde el guardián** (quién es, qué lo hace único)
+2. **Explicación del significado de sus accesorios** (no lista, sino propósito)
+3. **Conexión con el dolor/necesidad** (pero NO empezar con esto)
+4. **Mensaje en primera persona** (promesa específica)
+5. **Cierre abierto** (sin vender, dejando que el lector decida)
+
+### 5. EJEMPLOS DE ELFOS VIAJEROS (IKER, AXEL, LIAM)
+
+**NUEVOS PATRONES - Acciones/objetos que definen al personaje:**
+- "Iker cosió su propio bolso" - acción que define al personaje
+- "Axel lleva un cuarzo que cambia de color" - objeto con significado metafórico
+- "Liam es elfo de bosque, pero no se quedó en ninguno" - contradicción que intriga
+
+**TÉCNICA: dar significado a cada accesorio por separado:**
+- "El citrino en su cuello no cuelga por azar. Está ahí para que la claridad viaje siempre a la altura del corazón."
+- "Su trébol no es de cuatro hojas por suerte. Es por búsqueda."
+- "La mochila combina negro y marrón. Noche y tierra."
+
+Usar esta técnica: NO listar accesorios, explicar el POR QUÉ de cada uno individualmente.
+
+### 6. PATRONES DE ABUNDANCIA/NEGOCIOS (FORTUNATO, TONY, SANTINO, TADEO)
+
+**APERTURAS - misterio + función:**
+- "Fortunato lleva dos llaves en el cinto y ninguna abre puertas normales"
+- "Tony es colorado, peludo y gruñón" - personalidad directa sin rodeos
+- "Santino lleva dos citrinos y nada más" - minimalismo como filosofía
+- "Tadeo tiene panza de próspero y corazón de generoso" - característica física con significado
+
+**TÉCNICA: contradicción que intriga:**
+- "No es contradicción —es equilibrio"
+- "La panza no es descuido —es abundancia acumulada"
+- "Su minimalismo no es pobreza. Es claridad."
+
+Usar esta técnica: presentar algo que PARECE contradictorio y explicar por qué NO lo es.
+
+### 7. CIERRES ADAPTATIVOS = MENSAJES DEL GUARDIÁN EN PRIMERA PERSONA
+
+Los cierres varían según el perfil del lector, pero SIEMPRE son del guardián hablando:
+
+**Para VULNERABLE:** Empático, contenedor
+- "No tenés que hacer nada. Solo dejarme estar."
+- "Cuando estés lista, vamos a dar el primer paso juntos."
+
+**Para ESCÉPTICO:** Práctico, sin promesas exageradas
+- "No te pido que creas. Solo que notes qué sentiste leyendo esto."
+- "Si no resuena, seguí tu camino. Si algo quedó, ya sabés."
+
+**Para IMPULSIVO:** Directo, con sentido de oportunidad
+- "Algo te trajo hasta acá. ¿Vas a ignorarlo?"
+- "Este momento no se repite. Yo tampoco."
+
+## TRIGGERS PSICOLÓGICOS A USAR
+
+- **Espejo**: describir sin nombrar, que el lector se reconozca
+- **Vacío**: hacer sentir que falta algo (sin decirlo)
+- **Validación**: dar reconocimiento antes de pedir algo
+- **Loop abierto**: algo queda sin cerrar, solo se completa con el guardián
+- **Future pacing**: vivir el resultado antes de tenerlo
+- **Pérdida > ganancia**: "desaparece cuando encuentra hogar"
+- **Pertenencia**: "los que entienden no necesitan explicación"
+- **Ser elegido**: "llegaste hasta acá por algo" (nuevo, muy poderoso)
+
+## GUÍA DE CRISTALES
+
+- **Amatista**: Protección espiritual, calma mental, intuición, transmuta energías negativas
+- **Citrino**: Abundancia, prosperidad, energía solar, atrae dinero y oportunidades
+- **Cuarzo rosa**: Amor incondicional, sanación emocional, autoestima, relaciones
+- **Cuarzo cristal/blanco**: Amplificador universal, claridad, limpieza energética
+- **Turmalina negra**: Escudo contra energías negativas, protección absoluta, conexión a tierra
+- **Fluorita**: Claridad mental, concentración, orden en el caos, estudios
+- **Sodalita**: Calma la ansiedad, comunicación, verdad interior
+- **Pirita**: Abundancia, manifestación, voluntad, protección
+- **Piedra luna**: Intuición femenina, ciclos, fertilidad, emociones
+- **Ágata**: Estabilidad, equilibrio, fuerza interior, protección del hogar
+- **Cuarzo cherry/fresa**: Amor, vitalidad, alegría, pasión
+
+## FORMATO
+
+- Párrafos cortos (2-3 líneas máximo)
+- **Negritas** solo para el nombre del guardián la primera vez
+- *Cursivas* para el mensaje del guardián en primera persona
+- Sin títulos, sin secciones marcadas
+- Flujo natural, como una carta íntima
+- Entre 250-400 palabras
+
+PROMPT;
+}
+
+// ============================================
 // LLAMADA A CLAUDE API
 // ============================================
 
@@ -650,8 +925,16 @@ function duendes_generar_historia_claude($datos) {
         return ['success' => false, 'error' => 'API key de Anthropic no configurada. Agregá ANTHROPIC_API_KEY en wp-config.php'];
     }
 
-    // Construir prompt
-    $prompt_base = duendes_get_prompt_experto();
+    // ============ SELECCIÓN DE PROMPT BASE ============
+    // Si es formato clásico hub, usar el prompt de conversión original
+    $formato_elegido = $datos['formato'] ?? '';
+    $formatos = duendes_get_formatos_narrativos();
+
+    $usa_clasico = ($formato_elegido === 'clasico_hub' ||
+                   (isset($formatos[$formato_elegido]['usa_prompt_clasico']) && $formatos[$formato_elegido]['usa_prompt_clasico']));
+
+    // Construir prompt base según formato
+    $prompt_base = $usa_clasico ? duendes_get_prompt_clasico() : duendes_get_prompt_experto();
 
     // Determinar género - PRIORIDAD al campo explícito
     $especie = strtolower($datos['especie'] ?? 'duende');
@@ -804,6 +1087,14 @@ function duendes_generar_historia_claude($datos) {
         $prompt .= "\n\n## EVITAR REPETICIONES\n";
         $prompt .= $contexto_repeticion;
         $prompt .= "\nElegí valores DIFERENTES a los listados arriba para que esta historia sea única.\n";
+    }
+
+    // ============ INSTRUCCIONES DE REGENERACIÓN ============
+    if (!empty($datos['instrucciones_regeneracion'])) {
+        $prompt .= "\n\n## ⚠️ INSTRUCCIONES ESPECIALES DEL USUARIO (PRIORIDAD MÁXIMA)\n";
+        $prompt .= "El usuario pidió específicamente:\n";
+        $prompt .= "**\"" . $datos['instrucciones_regeneracion'] . "\"**\n\n";
+        $prompt .= "IMPORTANTE: Seguí estas instrucciones AL PIE DE LA LETRA. Son la prioridad número 1 para esta generación.\n";
     }
 
     // Elementos pre-seleccionados
@@ -1408,6 +1699,17 @@ function duendes_metabox_historias_contenido($post) {
             </div>
         </div>
 
+        <!-- BOTÓN PARA COPIAR A FICHA -->
+        <div style="margin: 15px 0; padding: 15px; background: linear-gradient(135deg, rgba(74,153,98,0.2), rgba(74,153,98,0.1)); border: 2px solid #4a9962; border-radius: 8px;">
+            <button type="button" id="btn_copiar_a_ficha" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4a9962, #2d7a4a); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                📋 COPIAR DATOS A FICHA DEL GUARDIÁN
+            </button>
+            <p style="margin: 10px 0 0 0; text-align: center; color: #888; font-size: 12px;">
+                Copia género, especie, categoría, tamaño, accesorios y único/recreable a la Ficha de abajo
+            </p>
+            <div id="copiar_ficha_resultado" style="display: none; margin-top: 10px; padding: 10px; background: rgba(74,153,98,0.3); border-radius: 4px; text-align: center; color: #4a9962; font-weight: bold;"></div>
+        </div>
+
         <div class="campo-grupo">
             <label for="dh_tema">Tema libre (opcional)</label>
             <input type="text" id="dh_tema" placeholder="Ej: para personas que cuidan a otros, para quienes buscan su camino..." />
@@ -1478,6 +1780,12 @@ function duendes_metabox_historias_contenido($post) {
             <p class="nota">Dejalo vacío para usar uno aleatorio</p>
         </div>
 
+        <div class="campo-grupo">
+            <label for="dh_instrucciones">📝 Instrucciones especiales (opcional)</label>
+            <textarea id="dh_instrucciones" rows="3" placeholder="Ej: Hacela más tierna, mencioná que es para alguien que perdió un ser querido, enfocate más en la abundancia de dinero..."></textarea>
+            <p class="nota">Indicaciones específicas para esta generación o regeneración. La IA las seguirá al pie de la letra.</p>
+        </div>
+
         <div style="margin-top: 20px;">
             <button type="button" class="btn-generar" id="btn_generar_historia">
                 <span class="texto">✨ Generar Historia</span>
@@ -1514,6 +1822,26 @@ function duendes_metabox_historias_contenido($post) {
         let ultimaHistoria = null;
         let historiaGuardada = true; // Para trackear si se guardó
 
+        // ============ DIAGNÓSTICO: Verificar que elementos de ficha existen ============
+        const fichaElementos = {
+            tamano: $('input[name="duendes_ficha[tamano_cm]"]').length,
+            genero: $('select[name="duendes_ficha[genero]"]').length,
+            especie: $('select[name="duendes_ficha[especie]"]').length,
+            categoria: $('select[name="duendes_ficha[categoria]"]').length,
+            tipo_tamano: $('select[name="duendes_ficha[tipo_tamano]"]').length,
+            es_unico: $('select[name="duendes_ficha[es_unico]"]').length,
+            accesorios: $('textarea[name="duendes_ficha[accesorios]"]').length
+        };
+        console.log('🔍 DIAGNÓSTICO - Elementos de Ficha del Guardián encontrados:', fichaElementos);
+
+        const todoEncontrado = Object.values(fichaElementos).every(v => v > 0);
+        if (!todoEncontrado) {
+            console.error('❌ ERROR: No se encontraron todos los elementos de la Ficha. La sincronización NO funcionará.');
+            console.error('Elementos faltantes:', Object.keys(fichaElementos).filter(k => fichaElementos[k] === 0));
+        } else {
+            console.log('✅ Todos los elementos de la Ficha encontrados. Sincronización activa.');
+        }
+
         // ============ RECUPERAR BORRADOR AL CARGAR ============
         const borrador = localStorage.getItem(STORAGE_KEY);
         if (borrador) {
@@ -1542,6 +1870,146 @@ function duendes_metabox_historias_contenido($post) {
                 e.preventDefault();
                 return '⚠️ Tenés una historia sin guardar. ¿Seguro querés salir?';
             }
+        });
+
+        // ============ SINCRONIZAR CAMPOS CON FICHA DEL GUARDIÁN ============
+        // Solo sincroniza cuando el usuario CAMBIA un campo específico
+
+        // Tamaño: cuando cambia en generador, actualiza ficha (cm y tipo_tamano)
+        $('#dh_tamano').on('change input', function() {
+            const cm = parseInt($(this).val()) || 0;
+            console.log('📏 Tamaño cambiado:', cm);
+            if (cm) {
+                $('input[name="duendes_ficha[tamano_cm]"]').val(cm);
+
+                // Inferir tipo_tamano
+                let tipoTamano = 'mini';
+                if (cm > 30) tipoTamano = 'gigante';
+                else if (cm > 25) tipoTamano = 'grande';
+                else if (cm > 20) tipoTamano = 'mediano_especial';
+                else if (cm > 14) tipoTamano = 'mediano';
+                else if (cm > 12) tipoTamano = 'mini_especial';
+                $('select[name="duendes_ficha[tipo_tamano]"]').val(tipoTamano);
+                console.log('   -> Ficha actualizada: cm=' + cm + ', tipo=' + tipoTamano);
+            }
+        });
+
+        // Género: m/f -> M/F
+        $('#dh_genero').on('change', function() {
+            const val = $(this).val();
+            console.log('👤 Género cambiado:', val);
+            if (val) {
+                $('select[name="duendes_ficha[genero]"]').val(val.toUpperCase());
+                console.log('   -> Ficha actualizada: ' + val.toUpperCase());
+            }
+        });
+
+        // Especie
+        $('#dh_especie').on('change', function() {
+            const val = $(this).val();
+            console.log('🧝 Especie cambiada:', val);
+            if (val) {
+                $('select[name="duendes_ficha[especie]"]').val(val);
+                console.log('   -> Ficha actualizada: ' + val);
+            }
+        });
+
+        // Categoría: "Protección" -> "proteccion"
+        $('#dh_categoria').on('change', function() {
+            const val = $(this).val();
+            console.log('📂 Categoría cambiada:', val);
+            if (val) {
+                const categoriaFicha = val
+                    .toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .split(' ')[0];
+                $('select[name="duendes_ficha[categoria]"]').val(categoriaFicha);
+                console.log('   -> Ficha actualizada: ' + categoriaFicha);
+            }
+        });
+
+        // Accesorios
+        $('#dh_accesorios').on('change input', function() {
+            const val = $(this).val();
+            $('textarea[name="duendes_ficha[accesorios]"]').val(val);
+        });
+
+        // Único/Recreable
+        $('#dh_unico').on('change', function() {
+            const esUnico = $(this).is(':checked');
+            $('select[name="duendes_ficha[es_unico]"]').val(esUnico ? 'unico' : 'recreable');
+        });
+
+        // ============ BOTÓN COPIAR A FICHA ============
+        $('#btn_copiar_a_ficha').on('click', function() {
+            const btn = $(this);
+            const resultado = $('#copiar_ficha_resultado');
+            let copiados = [];
+
+            // Género
+            const genero = $('#dh_genero').val();
+            if (genero) {
+                $('select[name="duendes_ficha[genero]"]').val(genero.toUpperCase());
+                copiados.push('Género: ' + genero.toUpperCase());
+            }
+
+            // Especie
+            const especie = $('#dh_especie').val();
+            if (especie) {
+                $('select[name="duendes_ficha[especie]"]').val(especie);
+                copiados.push('Especie: ' + especie);
+            }
+
+            // Categoría
+            const categoria = $('#dh_categoria').val();
+            if (categoria) {
+                const catNorm = categoria.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(' ')[0];
+                $('select[name="duendes_ficha[categoria]"]').val(catNorm);
+                copiados.push('Categoría: ' + catNorm);
+            }
+
+            // Tamaño
+            const tamano = parseInt($('#dh_tamano').val()) || 0;
+            if (tamano) {
+                $('input[name="duendes_ficha[tamano_cm]"]').val(tamano);
+
+                let tipoTamano = 'mini';
+                if (tamano > 30) tipoTamano = 'gigante';
+                else if (tamano > 25) tipoTamano = 'grande';
+                else if (tamano > 20) tipoTamano = 'mediano_especial';
+                else if (tamano > 14) tipoTamano = 'mediano';
+                else if (tamano > 12) tipoTamano = 'mini_especial';
+                $('select[name="duendes_ficha[tipo_tamano]"]').val(tipoTamano);
+                copiados.push('Tamaño: ' + tamano + 'cm (' + tipoTamano + ')');
+            }
+
+            // Accesorios
+            const accesorios = $('#dh_accesorios').val();
+            if (accesorios) {
+                $('textarea[name="duendes_ficha[accesorios]"]').val(accesorios);
+                copiados.push('Accesorios: ✓');
+            }
+
+            // Único
+            const esUnico = $('#dh_unico').is(':checked');
+            $('select[name="duendes_ficha[es_unico]"]').val(esUnico ? 'unico' : 'recreable');
+            copiados.push('Único: ' + (esUnico ? 'Sí' : 'No'));
+
+            // Mostrar resultado
+            if (copiados.length > 0) {
+                resultado.html('✅ Copiado: ' + copiados.join(' | ')).show();
+                btn.css('background', 'linear-gradient(135deg, #2d7a4a, #1a5a32)');
+                setTimeout(function() {
+                    btn.css('background', 'linear-gradient(135deg, #4a9962, #2d7a4a)');
+                }, 2000);
+            } else {
+                resultado.html('⚠️ No hay datos para copiar').show();
+            }
+
+            // Scroll a la ficha para que vea los cambios
+            $('html, body').animate({
+                scrollTop: $('#duendes_ficha_guardian').offset().top - 50
+            }, 500);
         });
 
         // ============ ANALIZAR IMAGEN ============
@@ -1580,7 +2048,39 @@ function duendes_metabox_historias_contenido($post) {
         });
 
         // ============ GENERAR HISTORIA ============
-        $('#btn_generar_historia, #btn_regenerar_historia').on('click', function() {
+        $('#btn_generar_historia').on('click', function() {
+            generarHistoria(false);
+        });
+
+        // ============ REGENERAR HISTORIA ============
+        $('#btn_regenerar_historia').on('click', function() {
+            // Preguntar si quiere agregar instrucciones adicionales
+            const instruccionesActuales = $('#dh_instrucciones').val().trim();
+            let instruccionesExtra = prompt(
+                '🔄 REGENERAR HISTORIA\n\n' +
+                '¿Querés dar instrucciones específicas para la regeneración?\n\n' +
+                'Ejemplos:\n' +
+                '• Hacela más tierna\n' +
+                '• Mencioná más los cristales\n' +
+                '• Enfocate en el amor propio\n' +
+                '• Que sea más corta\n\n' +
+                'Dejá vacío para regenerar con los mismos parámetros.',
+                instruccionesActuales || ''
+            );
+
+            // Si cancela el prompt, no regenerar
+            if (instruccionesExtra === null) return;
+
+            // Si escribió instrucciones, guardarlas en el campo
+            if (instruccionesExtra.trim()) {
+                $('#dh_instrucciones').val(instruccionesExtra.trim());
+            }
+
+            generarHistoria(true);
+        });
+
+        // Función común de generación
+        function generarHistoria(esRegeneracion) {
             const btn = $('#btn_generar_historia');
             const spinner = btn.find('.spinner-wp');
             const texto = btn.find('.texto');
@@ -1603,7 +2103,9 @@ function duendes_metabox_historias_contenido($post) {
                 // Nuevos parámetros
                 formato: $('#dh_formato').val(),
                 evitar_repeticion: $('#dh_evitar_repeticion').is(':checked') ? 1 : 0,
-                analisis_imagen: $('#dh_analisis_imagen').val()
+                analisis_imagen: $('#dh_analisis_imagen').val(),
+                // Instrucciones especiales
+                instrucciones_regeneracion: $('#dh_instrucciones').val().trim()
             };
 
             // Validar
@@ -1655,7 +2157,7 @@ function duendes_metabox_historias_contenido($post) {
                 spinner.hide();
                 texto.text('✨ Generar Historia');
             });
-        });
+        }
 
         // Guardar en producto
         $('#btn_guardar_historia').on('click', function() {
@@ -1704,6 +2206,112 @@ function duendes_metabox_historias_contenido($post) {
                 btn.text('✅ Copiado!');
                 setTimeout(() => btn.text(textoOriginal), 2000);
             });
+        });
+
+        // ============ FUNCIÓN PARA FORZAR SINCRONIZACIÓN ============
+        // Asegura que los valores del generador se copien a la ficha antes de guardar
+        function forzarSincronizacion() {
+            const tamano = parseInt($('#dh_tamano').val()) || 0;
+            let tipoTamano = 'mini'; // Declarar fuera para que exista en el log
+
+            if (tamano) {
+                $('input[name="duendes_ficha[tamano_cm]"]').val(tamano);
+
+                // Inferir tipo_tamano basado en cm
+                if (tamano > 30) tipoTamano = 'gigante';
+                else if (tamano > 25) tipoTamano = 'grande';
+                else if (tamano > 20) tipoTamano = 'mediano_especial';
+                else if (tamano > 14) tipoTamano = 'mediano';
+                else if (tamano > 12) tipoTamano = 'mini_especial';
+                $('select[name="duendes_ficha[tipo_tamano]"]').val(tipoTamano);
+            }
+
+            // Género: generador usa m/f, ficha usa M/F
+            const genero = $('#dh_genero').val();
+            if (genero) {
+                const generoFicha = genero.toUpperCase(); // m->M, f->F
+                $('select[name="duendes_ficha[genero]"]').val(generoFicha);
+            }
+
+            const especie = $('#dh_especie').val();
+            if (especie) $('select[name="duendes_ficha[especie]"]').val(especie);
+
+            // Categoría: generador usa "Protección", ficha usa "proteccion"
+            const categoria = $('#dh_categoria').val();
+            if (categoria) {
+                // Convertir a formato de ficha: quitar tildes, minúsculas, solo primera palabra
+                const categoriaFicha = categoria
+                    .toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quitar tildes
+                    .split(' ')[0]; // solo primera palabra
+                $('select[name="duendes_ficha[categoria]"]').val(categoriaFicha);
+            }
+
+            const accesorios = $('#dh_accesorios').val();
+            $('textarea[name="duendes_ficha[accesorios]"]').val(accesorios);
+
+            const esUnico = $('#dh_unico').is(':checked');
+            $('select[name="duendes_ficha[es_unico]"]').val(esUnico ? 'unico' : 'recreable');
+
+            console.log('🔄 Sincronización forzada:', {
+                tamano: tamano,
+                tipoTamano: tipoTamano,
+                genero: genero + ' -> ' + (genero ? genero.toUpperCase() : ''),
+                especie: especie,
+                categoria: categoria + ' -> ' + (categoria ? categoria.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(' ')[0] : ''),
+                esUnico: esUnico
+            });
+        }
+
+        // ============ AUTO-GUARDAR AL TOCAR "ACTUALIZAR" DE WORDPRESS ============
+        // Interceptar el submit del formulario de producto
+        $('#post').on('submit', function(e) {
+            // SIEMPRE sincronizar antes de cualquier submit
+            forzarSincronizacion();
+
+            // Si hay historia sin guardar, guardarla primero
+            if (ultimaHistoria && !historiaGuardada) {
+                e.preventDefault(); // Detener el submit
+
+                // Mostrar mensaje
+                const btn = $('#publish');
+                const textoOriginal = btn.val();
+                btn.val('Guardando historia...');
+                btn.prop('disabled', true);
+
+                // Guardar historia via AJAX
+                $.post(ajaxurl, {
+                    action: 'duendes_guardar_historia',
+                    nonce: '<?php echo wp_create_nonce('duendes_guardar_historia'); ?>',
+                    producto_id: PRODUCTO_ID,
+                    historia: ultimaHistoria.historia,
+                    ficha_nombre: $('#dh_nombre').val(),
+                    ficha_genero: $('#dh_genero').val(),
+                    ficha_especie: $('#dh_especie').val(),
+                    ficha_tamano: $('#dh_tamano').val(),
+                    ficha_categoria: $('#dh_categoria').val(),
+                    ficha_estilo: $('#dh_estilo').val(),
+                    ficha_accesorios: $('#dh_accesorios').val(),
+                    ficha_es_unico: $('#dh_unico').is(':checked') ? 1 : 0
+                }, function(response) {
+                    if (response.success) {
+                        historiaGuardada = true;
+                        localStorage.removeItem(STORAGE_KEY);
+                        // Ahora sí, hacer el submit normal
+                        $('#post').off('submit').submit();
+                    } else {
+                        alert('⚠️ Error guardando historia: ' + (response.data || 'Error desconocido') + '\n\nTocá "Guardar en Producto" manualmente.');
+                        btn.val(textoOriginal);
+                        btn.prop('disabled', false);
+                    }
+                }).fail(function() {
+                    alert('⚠️ Error de conexión guardando historia.\n\nTocá "Guardar en Producto" manualmente.');
+                    btn.val(textoOriginal);
+                    btn.prop('disabled', false);
+                });
+
+                return false;
+            }
         });
     });
     </script>
@@ -1768,7 +2376,9 @@ function duendes_ajax_generar_historia() {
         // Nuevos parámetros
         'formato' => sanitize_text_field($_POST['formato'] ?? ''),
         'evitar_repeticion' => ($_POST['evitar_repeticion'] ?? 0) == 1,
-        'analisis_imagen' => sanitize_textarea_field($_POST['analisis_imagen'] ?? '')
+        'analisis_imagen' => sanitize_textarea_field($_POST['analisis_imagen'] ?? ''),
+        // Instrucciones de regeneración
+        'instrucciones_regeneracion' => sanitize_textarea_field($_POST['instrucciones_regeneracion'] ?? '')
     ];
 
     $resultado = duendes_generar_historia_claude($datos);
@@ -1838,6 +2448,21 @@ function duendes_ajax_guardar_historia() {
         unset($ficha_actual['altura_cm']);
         unset($ficha_actual['tamano']);
         $ficha_actual['tamano_cm'] = $nuevo_tamano;
+
+        // Inferir tipo_tamano basado en cm
+        if ($nuevo_tamano <= 12) {
+            $ficha_actual['tipo_tamano'] = 'mini';
+        } elseif ($nuevo_tamano <= 14) {
+            $ficha_actual['tipo_tamano'] = 'mini_especial';
+        } elseif ($nuevo_tamano <= 20) {
+            $ficha_actual['tipo_tamano'] = 'mediano';
+        } elseif ($nuevo_tamano <= 25) {
+            $ficha_actual['tipo_tamano'] = 'mediano_especial';
+        } elseif ($nuevo_tamano <= 30) {
+            $ficha_actual['tipo_tamano'] = 'grande';
+        } else {
+            $ficha_actual['tipo_tamano'] = 'gigante';
+        }
     }
 
     // Actualizar otros campos
@@ -1845,7 +2470,31 @@ function duendes_ajax_guardar_historia() {
         $ficha_actual['especie'] = sanitize_text_field($_POST['ficha_especie']);
     }
     if (isset($_POST['ficha_categoria']) && $_POST['ficha_categoria'] !== '') {
-        $ficha_actual['categoria'] = sanitize_text_field($_POST['ficha_categoria']);
+        // Normalizar categoría: "Protección" -> "proteccion"
+        $categoria_raw = sanitize_text_field($_POST['ficha_categoria']);
+        $categoria_map = [
+            'Protección' => 'proteccion',
+            'Protección del Hogar' => 'proteccion',
+            'Protección Energética' => 'proteccion',
+            'Abundancia' => 'abundancia',
+            'Amor' => 'amor',
+            'Amor Propio' => 'amor',
+            'Sanación' => 'sanacion',
+            'Salud' => 'salud',
+            'Sabiduría' => 'sabiduria',
+            'Conexión Espiritual' => 'conexion_espiritual',
+            'Transformación' => 'transformacion',
+            'Calma' => 'calma',
+            'Estudios' => 'estudios',
+            'Fortuna' => 'fortuna',
+            'Viajero' => 'viajero',
+            'Naturaleza' => 'naturaleza',
+            'Clarividencia' => 'clarividencia',
+            'Abrecaminos' => 'abrecaminos',
+            'Cortar Lazos' => 'proteccion',
+            'Protección en Viajes' => 'viajero'
+        ];
+        $ficha_actual['categoria'] = isset($categoria_map[$categoria_raw]) ? $categoria_map[$categoria_raw] : strtolower(remove_accents($categoria_raw));
     }
     if (isset($_POST['ficha_estilo'])) {
         $ficha_actual['estilo'] = sanitize_text_field($_POST['ficha_estilo']);
@@ -1854,9 +2503,14 @@ function duendes_ajax_guardar_historia() {
         $ficha_actual['accesorios'] = sanitize_textarea_field($_POST['ficha_accesorios']);
     }
     if (isset($_POST['ficha_genero']) && $_POST['ficha_genero'] !== '') {
-        $ficha_actual['genero'] = sanitize_text_field($_POST['ficha_genero']);
+        // Convertir m/f a M/F
+        $ficha_actual['genero'] = strtoupper(sanitize_text_field($_POST['ficha_genero']));
     }
     if (isset($_POST['ficha_es_unico'])) {
+        // Guardar en el formato correcto que usa el plugin ficha-guardian
+        // es_unico: 'unico' | 'recreable' | 'auto'
+        $ficha_actual['es_unico'] = ($_POST['ficha_es_unico'] == 1) ? 'unico' : 'recreable';
+        // También guardar en formato legacy por compatibilidad
         $ficha_actual['recreable'] = ($_POST['ficha_es_unico'] == 1) ? 'no' : 'si';
     }
 
