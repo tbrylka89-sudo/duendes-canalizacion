@@ -1143,44 +1143,151 @@ Tu guardián te esperó. Ahora está acá. Y mientras vos creas en él, él va a
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SECCIÓN GRIMORIO
+// SECCIÓN GRIMORIO - DIARIO MÁGICO COMPLETO
 // ═══════════════════════════════════════════════════════════════
 
+// Tipos de entrada del grimorio
+const TIPOS_ENTRADA = {
+  sueno: { id: 'sueno', nombre: 'Sueño', icono: '🌙', color: '#9b59b6', placeholder: 'Describí tu sueño... ¿qué viste? ¿qué sentiste?' },
+  senal: { id: 'senal', nombre: 'Señal', icono: '✦', color: '#c9a227', placeholder: 'Una sincronicidad, un número repetido, algo que llamó tu atención...' },
+  gratitud: { id: 'gratitud', nombre: 'Gratitud', icono: '🙏', color: '#2ecc71', placeholder: '¿Por qué estás agradecida/o hoy?' },
+  ritual: { id: 'ritual', nombre: 'Ritual', icono: '🔮', color: '#3498db', placeholder: '¿Qué ritual hiciste? ¿Cómo te sentiste?' },
+  intencion: { id: 'intencion', nombre: 'Intención', icono: '💫', color: '#e74c3c', placeholder: '¿Qué querés manifestar? ¿Qué intención sembrás?' },
+  libre: { id: 'libre', nombre: 'Libre', icono: '📝', color: '#95a5a6', placeholder: 'Escribí lo que quieras...' }
+};
+
+// Prompts mágicos rotativos
+const PROMPTS_MAGICOS = [
+  "¿Qué mensaje te está dando el universo hoy?",
+  "Si tu guardián pudiera hablarte, ¿qué te diría?",
+  "¿Qué patrón de tu vida querés romper?",
+  "Describí un momento de hoy donde sentiste magia",
+  "¿Qué te está costando soltar?",
+  "¿Qué versión de vos querés invocar?",
+  "Si pudieras hablar con tu yo del pasado, ¿qué le dirías?",
+  "¿Qué sueño recurrente tenés? ¿Qué significa?",
+  "¿Dónde sentís que necesitás protección?",
+  "¿Qué abundancia ya está presente en tu vida?",
+  "¿Cuál es tu miedo más profundo? Nombralo.",
+  "¿Qué estás evitando ver?",
+  "Describí tu día perfecto con todos los sentidos",
+  "¿Qué ancestro sentís que te acompaña?",
+  "¿Qué talento tenés que no estás usando?"
+];
+
 function SeccionGrimorio({ usuario, token, setUsuario }) {
+  const [vista, setVista] = useState('escribir'); // 'escribir' | 'calendario' | 'intenciones'
   const [entrada, setEntrada] = useState('');
+  const [tipoEntrada, setTipoEntrada] = useState('libre');
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
+  const [mesActual, setMesActual] = useState(new Date());
+  const [diaSeleccionado, setDiaSeleccionado] = useState(null);
+  const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [entradaExpandida, setEntradaExpandida] = useState(null);
 
   const diario = usuario?.diario || [];
 
+  // Prompt del día (basado en la fecha)
+  const promptDelDia = PROMPTS_MAGICOS[new Date().getDate() % PROMPTS_MAGICOS.length];
+
+  // Calcular fase lunar con más detalle
+  const calcularFaseLunar = () => {
+    const cicloLunar = 29.530588853;
+    const lunaLlena = new Date(2024, 0, 25);
+    const hoy = new Date();
+    const diff = (hoy - lunaLlena) / (1000 * 60 * 60 * 24);
+    const fase = ((diff % cicloLunar) + cicloLunar) % cicloLunar;
+    const porcentaje = Math.round((fase / cicloLunar) * 100);
+
+    let info = { porcentaje };
+    if (fase < 1.84) {
+      info = { ...info, nombre: 'Luna Nueva', icono: '🌑', energia: 'Momento de sembrar intenciones y comenzar ciclos nuevos.' };
+    } else if (fase < 7.38) {
+      info = { ...info, nombre: 'Luna Creciente', icono: '🌒', energia: 'Tus intenciones cobran fuerza. Actuá hacia tus metas.' };
+    } else if (fase < 9.22) {
+      info = { ...info, nombre: 'Cuarto Creciente', icono: '🌓', energia: 'Momento de decisión. Superá obstáculos.' };
+    } else if (fase < 14.76) {
+      info = { ...info, nombre: 'Gibosa Creciente', icono: '🌔', energia: 'Refiná tus planes. La manifestación se acerca.' };
+    } else if (fase < 16.61) {
+      info = { ...info, nombre: 'Luna Llena', icono: '🌕', energia: 'Máxima energía. Celebrá logros y liberá lo que no sirve.' };
+    } else if (fase < 22.14) {
+      info = { ...info, nombre: 'Gibosa Menguante', icono: '🌖', energia: 'Tiempo de agradecer y compartir lo aprendido.' };
+    } else if (fase < 23.99) {
+      info = { ...info, nombre: 'Cuarto Menguante', icono: '🌗', energia: 'Soltá, perdoná, dejá ir lo que ya cumplió su ciclo.' };
+    } else {
+      info = { ...info, nombre: 'Luna Menguante', icono: '🌘', energia: 'Descanso y preparación. El nuevo ciclo se acerca.' };
+    }
+    return info;
+  };
+
+  const luna = calcularFaseLunar();
+
+  // Estadísticas del grimorio
+  const stats = {
+    totalEntradas: diario.length,
+    entradasEsteMes: diario.filter(e => {
+      const fecha = new Date(e.fechaISO || e.fecha);
+      const ahora = new Date();
+      return fecha.getMonth() === ahora.getMonth() && fecha.getFullYear() === ahora.getFullYear();
+    }).length,
+    tipoMasUsado: (() => {
+      const conteo = {};
+      diario.forEach(e => {
+        conteo[e.tipo] = (conteo[e.tipo] || 0) + 1;
+      });
+      return Object.entries(conteo).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+    })(),
+    racha: (() => {
+      // Calcular días consecutivos escribiendo
+      const hoy = new Date();
+      let racha = 0;
+      for (let i = 0; i < 30; i++) {
+        const dia = new Date(hoy);
+        dia.setDate(dia.getDate() - i);
+        const diaStr = dia.toISOString().split('T')[0];
+        const tieneEntrada = diario.some(e => (e.fechaISO || '').startsWith(diaStr));
+        if (tieneEntrada || i === 0) racha++;
+        else break;
+      }
+      return racha;
+    })()
+  };
+
+  // Guardar entrada
   const guardarEntrada = async () => {
     if (!entrada.trim()) return;
 
     setGuardando(true);
     try {
+      const fechaISO = new Date().toISOString();
       const res = await fetch(`${API_BASE}/api/mi-magia/diario`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: usuario.email,
-          tipo: 'libre',
-          contenido: entrada
+          tipo: tipoEntrada,
+          contenido: entrada,
+          fechaISO,
+          faseLunar: luna.nombre
         })
       });
       const data = await res.json();
 
       if (data.success) {
         const nuevaEntrada = {
-          tipo: 'libre',
+          tipo: tipoEntrada,
           contenido: entrada,
-          fecha: new Date().toLocaleDateString('es-UY')
+          fecha: new Date().toLocaleDateString('es-UY'),
+          fechaISO,
+          faseLunar: luna.nombre
         };
         setUsuario({
           ...usuario,
           diario: [...diario, nuevaEntrada]
         });
         setEntrada('');
-        setMensaje({ tipo: 'ok', texto: 'Guardado en tu grimorio' });
+        setMensaje({ tipo: 'ok', texto: '✦ Guardado en tu grimorio' });
         setTimeout(() => setMensaje(null), 3000);
       }
     } catch (e) {
@@ -1189,84 +1296,330 @@ function SeccionGrimorio({ usuario, token, setUsuario }) {
     setGuardando(false);
   };
 
-  // Calcular fase lunar
-  const calcularFaseLunar = () => {
-    const cicloLunar = 29.530588853;
-    const lunaLlena = new Date(2024, 0, 25);
-    const hoy = new Date();
-    const diff = (hoy - lunaLlena) / (1000 * 60 * 60 * 24);
-    const fase = ((diff % cicloLunar) + cicloLunar) % cicloLunar;
+  // Generar días del calendario
+  const generarCalendario = () => {
+    const year = mesActual.getFullYear();
+    const month = mesActual.getMonth();
+    const primerDia = new Date(year, month, 1);
+    const ultimoDia = new Date(year, month + 1, 0);
+    const diasEnMes = ultimoDia.getDate();
+    const diaInicio = primerDia.getDay(); // 0 = domingo
 
-    if (fase < 1.84) return { nombre: 'Luna Nueva', icono: '🌑' };
-    if (fase < 7.38) return { nombre: 'Luna Creciente', icono: '🌒' };
-    if (fase < 9.22) return { nombre: 'Cuarto Creciente', icono: '🌓' };
-    if (fase < 14.76) return { nombre: 'Gibosa Creciente', icono: '🌔' };
-    if (fase < 16.61) return { nombre: 'Luna Llena', icono: '🌕' };
-    if (fase < 22.14) return { nombre: 'Gibosa Menguante', icono: '🌖' };
-    if (fase < 23.99) return { nombre: 'Cuarto Menguante', icono: '🌗' };
-    return { nombre: 'Luna Menguante', icono: '🌘' };
+    const dias = [];
+    // Días vacíos al inicio
+    for (let i = 0; i < diaInicio; i++) {
+      dias.push({ dia: null, entradas: [] });
+    }
+    // Días del mes
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fechaStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const entradasDia = diario.filter(e => (e.fechaISO || '').startsWith(fechaStr));
+      dias.push({ dia: d, fecha: fechaStr, entradas: entradasDia });
+    }
+    return dias;
   };
 
-  const luna = calcularFaseLunar();
+  // Filtrar entradas
+  const entradasFiltradas = filtroTipo === 'todos'
+    ? diario
+    : diario.filter(e => e.tipo === filtroTipo);
+
+  // Vista de escribir
+  const renderEscribir = () => (
+    <>
+      {/* Panel de la luna */}
+      <div className="grimorio-luna-panel">
+        <div className="luna-grande">
+          <span className="luna-icono-grande">{luna.icono}</span>
+          <div className="luna-info">
+            <span className="luna-nombre-grande">{luna.nombre}</span>
+            <p className="luna-energia">{luna.energia}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Prompt del día */}
+      <div className="grimorio-prompt">
+        <span className="prompt-label">✦ Pregunta del día</span>
+        <p className="prompt-texto">{promptDelDia}</p>
+      </div>
+
+      {/* Selector de tipo */}
+      <div className="grimorio-tipos">
+        {Object.values(TIPOS_ENTRADA).map(tipo => (
+          <button
+            key={tipo.id}
+            className={`tipo-btn ${tipoEntrada === tipo.id ? 'activo' : ''}`}
+            onClick={() => setTipoEntrada(tipo.id)}
+            style={{ '--tipo-color': tipo.color }}
+          >
+            <span className="tipo-icono">{tipo.icono}</span>
+            <span className="tipo-nombre">{tipo.nombre}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Área de escritura */}
+      <div className="grimorio-escribir">
+        <textarea
+          value={entrada}
+          onChange={(e) => setEntrada(e.target.value)}
+          placeholder={TIPOS_ENTRADA[tipoEntrada].placeholder}
+          rows={6}
+        />
+        <div className="grimorio-escribir-footer">
+          <span className="escribir-fecha">
+            {new Date().toLocaleDateString('es-UY', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </span>
+          <div className="escribir-acciones">
+            {mensaje && (
+              <span className={`grimorio-mensaje ${mensaje.tipo}`}>
+                {mensaje.texto}
+              </span>
+            )}
+            <button
+              className="btn-guardar-grimorio"
+              onClick={guardarEntrada}
+              disabled={guardando || !entrada.trim()}
+            >
+              {guardando ? 'Guardando...' : `Guardar ${TIPOS_ENTRADA[tipoEntrada].icono}`}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats rápidas */}
+      {diario.length > 0 && (
+        <div className="grimorio-stats">
+          <div className="stat">
+            <span className="stat-numero">{stats.totalEntradas}</span>
+            <span className="stat-label">entradas</span>
+          </div>
+          <div className="stat">
+            <span className="stat-numero">{stats.entradasEsteMes}</span>
+            <span className="stat-label">este mes</span>
+          </div>
+          <div className="stat">
+            <span className="stat-numero">{stats.racha}</span>
+            <span className="stat-label">días seguidos</span>
+          </div>
+          {stats.tipoMasUsado && (
+            <div className="stat">
+              <span className="stat-numero">{TIPOS_ENTRADA[stats.tipoMasUsado]?.icono}</span>
+              <span className="stat-label">más usado</span>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+
+  // Vista de calendario
+  const renderCalendario = () => {
+    const dias = generarCalendario();
+    const hoy = new Date();
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+    return (
+      <>
+        <div className="calendario-nav">
+          <button onClick={() => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() - 1))}>
+            ←
+          </button>
+          <span className="calendario-mes">
+            {mesActual.toLocaleDateString('es-UY', { month: 'long', year: 'numeric' })}
+          </span>
+          <button onClick={() => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() + 1))}>
+            →
+          </button>
+        </div>
+
+        <div className="calendario-grid">
+          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
+            <div key={d} className="calendario-dia-nombre">{d}</div>
+          ))}
+          {dias.map((d, idx) => (
+            <div
+              key={idx}
+              className={`calendario-dia ${d.dia ? '' : 'vacio'} ${d.fecha === hoyStr ? 'hoy' : ''} ${d.entradas.length > 0 ? 'tiene-entradas' : ''} ${diaSeleccionado === d.fecha ? 'seleccionado' : ''}`}
+              onClick={() => d.dia && d.entradas.length > 0 && setDiaSeleccionado(d.fecha === diaSeleccionado ? null : d.fecha)}
+            >
+              {d.dia && (
+                <>
+                  <span className="dia-numero">{d.dia}</span>
+                  {d.entradas.length > 0 && (
+                    <div className="dia-indicadores">
+                      {[...new Set(d.entradas.map(e => e.tipo))].slice(0, 3).map(tipo => (
+                        <span key={tipo} className="indicador" style={{ background: TIPOS_ENTRADA[tipo]?.color || '#c9a227' }} />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Entradas del día seleccionado */}
+        {diaSeleccionado && (
+          <div className="calendario-entradas-dia">
+            <h4>
+              {new Date(diaSeleccionado + 'T12:00:00').toLocaleDateString('es-UY', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </h4>
+            {dias.find(d => d.fecha === diaSeleccionado)?.entradas.map((e, idx) => (
+              <div key={idx} className="entrada-mini" style={{ '--tipo-color': TIPOS_ENTRADA[e.tipo]?.color }}>
+                <span className="entrada-mini-icono">{TIPOS_ENTRADA[e.tipo]?.icono}</span>
+                <p>{e.contenido}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Leyenda */}
+        <div className="calendario-leyenda">
+          {Object.values(TIPOS_ENTRADA).map(tipo => (
+            <span key={tipo.id} className="leyenda-item">
+              <span className="leyenda-color" style={{ background: tipo.color }} />
+              {tipo.nombre}
+            </span>
+          ))}
+        </div>
+      </>
+    );
+  };
+
+  // Vista de intenciones (manifestaciones)
+  const renderIntenciones = () => {
+    const intenciones = diario.filter(e => e.tipo === 'intencion');
+
+    return (
+      <>
+        <div className="intenciones-header">
+          <h3>Tus Intenciones Sembradas</h3>
+          <p>Cada intención que escribís es una semilla. Mirá tu jardín crecer.</p>
+        </div>
+
+        {intenciones.length === 0 ? (
+          <div className="intenciones-vacio">
+            <span className="intenciones-vacio-icono">💫</span>
+            <p>Todavía no sembraste intenciones.</p>
+            <button className="btn-dorado-sm" onClick={() => { setVista('escribir'); setTipoEntrada('intencion'); }}>
+              Sembrar mi primera intención
+            </button>
+          </div>
+        ) : (
+          <div className="intenciones-lista">
+            {[...intenciones].reverse().map((e, idx) => (
+              <div key={idx} className="intencion-card">
+                <div className="intencion-fecha">
+                  <span className="intencion-luna">{e.faseLunar || '🌙'}</span>
+                  <span>{e.fecha}</span>
+                </div>
+                <p className="intencion-contenido">{e.contenido}</p>
+                <div className="intencion-estado">
+                  <button className="estado-btn">🌱 Germinando</button>
+                  <button className="estado-btn">🌿 Creciendo</button>
+                  <button className="estado-btn">🌸 Floreciendo</button>
+                  <button className="estado-btn">✨ Manifestada</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // Vista de historial con filtros
+  const renderHistorial = () => (
+    <>
+      <div className="historial-filtros">
+        <button
+          className={`filtro-btn ${filtroTipo === 'todos' ? 'activo' : ''}`}
+          onClick={() => setFiltroTipo('todos')}
+        >
+          Todas
+        </button>
+        {Object.values(TIPOS_ENTRADA).map(tipo => (
+          <button
+            key={tipo.id}
+            className={`filtro-btn ${filtroTipo === tipo.id ? 'activo' : ''}`}
+            onClick={() => setFiltroTipo(tipo.id)}
+            style={{ '--tipo-color': tipo.color }}
+          >
+            {tipo.icono}
+          </button>
+        ))}
+      </div>
+
+      {entradasFiltradas.length === 0 ? (
+        <div className="grimorio-vacio">
+          <p>No hay entradas {filtroTipo !== 'todos' ? `de tipo "${TIPOS_ENTRADA[filtroTipo]?.nombre}"` : ''}.</p>
+        </div>
+      ) : (
+        <div className="entradas-lista">
+          {[...entradasFiltradas].reverse().map((e, idx) => (
+            <div
+              key={idx}
+              className={`entrada ${entradaExpandida === idx ? 'expandida' : ''}`}
+              style={{ '--tipo-color': TIPOS_ENTRADA[e.tipo]?.color }}
+              onClick={() => setEntradaExpandida(entradaExpandida === idx ? null : idx)}
+            >
+              <div className="entrada-header">
+                <span className="entrada-tipo-icono">{TIPOS_ENTRADA[e.tipo]?.icono}</span>
+                <span className="entrada-fecha">{e.fecha}</span>
+                {e.faseLunar && <span className="entrada-luna">{e.faseLunar}</span>}
+              </div>
+              <p className="entrada-contenido">{e.contenido}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
 
   return (
     <section className="seccion seccion-grimorio">
       <div className="seccion-header">
         <h1>Tu Grimorio</h1>
-        <p>Tu diario mágico personal</p>
+        <p>Diario mágico · Registro de tu camino</p>
       </div>
 
-      <div className="grimorio-luna">
-        <span className="luna-icono">{luna.icono}</span>
-        <span className="luna-nombre">{luna.nombre}</span>
+      {/* Navegación del grimorio */}
+      <div className="grimorio-nav">
+        <button
+          className={`grim-nav-btn ${vista === 'escribir' ? 'activo' : ''}`}
+          onClick={() => setVista('escribir')}
+        >
+          <span>✎</span> Escribir
+        </button>
+        <button
+          className={`grim-nav-btn ${vista === 'calendario' ? 'activo' : ''}`}
+          onClick={() => setVista('calendario')}
+        >
+          <span>◐</span> Calendario
+        </button>
+        <button
+          className={`grim-nav-btn ${vista === 'intenciones' ? 'activo' : ''}`}
+          onClick={() => setVista('intenciones')}
+        >
+          <span>💫</span> Intenciones
+        </button>
+        <button
+          className={`grim-nav-btn ${vista === 'historial' ? 'activo' : ''}`}
+          onClick={() => setVista('historial')}
+        >
+          <span>☰</span> Historial
+        </button>
       </div>
 
-      <div className="grimorio-escribir">
-        <h3>Nueva entrada</h3>
-        <textarea
-          value={entrada}
-          onChange={(e) => setEntrada(e.target.value)}
-          placeholder="Escribí lo que quieras... reflexiones, sueños, señales, gratitud, intenciones..."
-          rows={5}
-        />
-        <div className="grimorio-acciones">
-          {mensaje && (
-            <span className={`grimorio-mensaje ${mensaje.tipo}`}>
-              {mensaje.texto}
-            </span>
-          )}
-          <button
-            className="btn-dorado"
-            onClick={guardarEntrada}
-            disabled={guardando || !entrada.trim()}
-          >
-            {guardando ? 'Guardando...' : 'Guardar en el grimorio'}
-          </button>
-        </div>
+      {/* Contenido según vista */}
+      <div className="grimorio-contenido">
+        {vista === 'escribir' && renderEscribir()}
+        {vista === 'calendario' && renderCalendario()}
+        {vista === 'intenciones' && renderIntenciones()}
+        {vista === 'historial' && renderHistorial()}
       </div>
-
-      {diario.length > 0 && (
-        <div className="grimorio-entradas">
-          <h3>Entradas anteriores</h3>
-          <div className="entradas-lista">
-            {[...diario].reverse().map((e, idx) => (
-              <div key={idx} className="entrada">
-                <span className="entrada-fecha">{e.fecha}</span>
-                <p className="entrada-contenido">{e.contenido}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {diario.length === 0 && (
-        <div className="grimorio-vacio">
-          <p>
-            Tu grimorio está vacío. Cada entrada que escribas quedará guardada acá,
-            creando un registro de tu camino mágico.
-          </p>
-        </div>
-      )}
     </section>
   );
 }
@@ -2147,71 +2500,220 @@ const estilos = `
     color: #c9a227;
   }
 
-  /* Sección Grimorio */
-  .grimorio-luna {
+  /* ═══════════════════════════════════════════════════════════════ */
+  /* GRIMORIO MEJORADO */
+  /* ═══════════════════════════════════════════════════════════════ */
+
+  .grimorio-nav {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .grim-nav-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 2.5rem;
-    padding: 1rem;
-    background: rgba(201,162,39,0.1);
-    border-radius: 30px;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 25px;
+    color: rgba(255,255,255,0.7);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
   }
 
-  .luna-icono {
+  .grim-nav-btn:hover {
+    border-color: rgba(201,162,39,0.5);
+    color: #c9a227;
+  }
+
+  .grim-nav-btn.activo {
+    background: rgba(201,162,39,0.15);
+    border-color: #c9a227;
+    color: #c9a227;
+  }
+
+  .grimorio-contenido {
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* Panel de la Luna */
+  .grimorio-luna-panel {
+    background: linear-gradient(145deg, rgba(201,162,39,0.15), rgba(26,26,26,0.9));
+    border: 1px solid rgba(201,162,39,0.3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .luna-grande {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .luna-icono-grande {
+    font-size: 3.5rem;
+  }
+
+  .luna-info {
+    flex: 1;
+  }
+
+  .luna-nombre-grande {
+    font-family: 'Cinzel', serif;
     font-size: 1.5rem;
+    color: #c9a227;
+    display: block;
+    margin-bottom: 0.25rem;
   }
 
-  .luna-nombre {
-    color: rgba(255,255,255,0.8);
+  .luna-energia {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
+  /* Prompt del día */
+  .grimorio-prompt {
+    background: rgba(26,26,26,0.5);
+    border-left: 3px solid #c9a227;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .prompt-label {
+    font-size: 0.8rem;
+    color: #c9a227;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .prompt-texto {
+    color: rgba(255,255,255,0.85);
+    font-size: 1.1rem;
+    font-style: italic;
+    margin-top: 0.5rem;
+  }
+
+  /* Tipos de entrada */
+  .grimorio-tipos {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .tipo-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(26,26,26,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.7);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .tipo-btn:hover {
+    border-color: var(--tipo-color);
+    color: var(--tipo-color);
+  }
+
+  .tipo-btn.activo {
+    background: var(--tipo-color);
+    border-color: var(--tipo-color);
+    color: #0a0a0a;
+  }
+
+  .tipo-icono {
+    font-size: 1rem;
+  }
+
+  /* Área de escritura */
   .grimorio-escribir {
     background: rgba(26,26,26,0.5);
     border: 1px solid rgba(201,162,39,0.15);
     border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .grimorio-escribir h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: #c9a227;
-    margin-bottom: 1rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
   }
 
   .grimorio-escribir textarea {
     width: 100%;
-    padding: 1rem;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(201,162,39,0.2);
-    border-radius: 8px;
+    padding: 1.25rem;
+    background: transparent;
+    border: none;
     color: rgba(255,255,255,0.9);
     font-family: inherit;
     font-size: 1rem;
-    line-height: 1.7;
+    line-height: 1.8;
     resize: vertical;
-    min-height: 120px;
+    min-height: 150px;
   }
 
   .grimorio-escribir textarea:focus {
     outline: none;
-    border-color: rgba(201,162,39,0.5);
   }
 
   .grimorio-escribir textarea::placeholder {
     color: rgba(255,255,255,0.4);
   }
 
-  .grimorio-acciones {
+  .grimorio-escribir-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(201,162,39,0.1);
+    flex-wrap: wrap;
     gap: 1rem;
+  }
+
+  .escribir-fecha {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    text-transform: capitalize;
+  }
+
+  .escribir-acciones {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .btn-guardar-grimorio {
+    padding: 0.65rem 1.25rem;
+    background: linear-gradient(135deg, #c9a227, #a8892b);
+    border: none;
+    border-radius: 8px;
+    color: #0a0a0a;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-guardar-grimorio:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(201,162,39,0.3);
+  }
+
+  .btn-guardar-grimorio:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .grimorio-mensaje {
@@ -2226,38 +2728,376 @@ const estilos = `
     color: #e74c3c;
   }
 
-  .grimorio-entradas h3 {
+  /* Stats */
+  .grimorio-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: rgba(26,26,26,0.3);
+    border-radius: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-numero {
+    display: block;
     font-family: 'Cinzel', serif;
-    font-size: 1.25rem;
-    font-weight: 400;
+    font-size: 1.75rem;
     color: #c9a227;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Calendario */
+  .calendario-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
     margin-bottom: 1.5rem;
   }
 
-  .entradas-lista {
+  .calendario-nav button {
+    background: transparent;
+    border: 1px solid rgba(201,162,39,0.3);
+    color: #c9a227;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .calendario-nav button:hover {
+    background: rgba(201,162,39,0.2);
+  }
+
+  .calendario-mes {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    color: #c9a227;
+    text-transform: capitalize;
+  }
+
+  .calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 1.5rem;
+  }
+
+  .calendario-dia-nombre {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+
+  .calendario-dia {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26,26,26,0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    gap: 2px;
+  }
+
+  .calendario-dia.vacio {
+    background: transparent;
+    cursor: default;
+  }
+
+  .calendario-dia:not(.vacio):hover {
+    background: rgba(201,162,39,0.15);
+  }
+
+  .calendario-dia.hoy {
+    border: 2px solid #c9a227;
+  }
+
+  .calendario-dia.tiene-entradas {
+    background: rgba(201,162,39,0.1);
+  }
+
+  .calendario-dia.seleccionado {
+    background: rgba(201,162,39,0.25);
+  }
+
+  .dia-numero {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .dia-indicadores {
+    display: flex;
+    gap: 2px;
+  }
+
+  .indicador {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .calendario-entradas-dia {
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .calendario-entradas-dia h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 1rem;
+    text-transform: capitalize;
+  }
+
+  .entrada-mini {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border-left: 3px solid var(--tipo-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .entrada-mini:last-child {
+    margin-bottom: 0;
+  }
+
+  .entrada-mini-icono {
+    font-size: 1rem;
+  }
+
+  .entrada-mini p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .calendario-leyenda {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .leyenda-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* Intenciones */
+  .intenciones-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .intenciones-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 0.5rem;
+  }
+
+  .intenciones-header p {
+    color: rgba(255,255,255,0.6);
+  }
+
+  .intenciones-vacio {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(26,26,26,0.3);
+    border-radius: 16px;
+  }
+
+  .intenciones-vacio-icono {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .intenciones-vacio p {
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 1.5rem;
+  }
+
+  .intenciones-lista {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
+  .intencion-card {
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(233,79,79,0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  .intencion-fecha {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .intencion-luna {
+    font-size: 1rem;
+  }
+
+  .intencion-contenido {
+    color: rgba(255,255,255,0.85);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .intencion-estado {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .estado-btn {
+    padding: 0.4rem 0.75rem;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px;
+    color: rgba(255,255,255,0.5);
+    font-family: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .estado-btn:hover {
+    background: rgba(201,162,39,0.2);
+    border-color: rgba(201,162,39,0.3);
+    color: #c9a227;
+  }
+
+  /* Historial con filtros */
+  .historial-filtros {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filtro-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.6);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .filtro-btn:hover {
+    border-color: var(--tipo-color, rgba(201,162,39,0.5));
+    color: var(--tipo-color, #c9a227);
+  }
+
+  .filtro-btn.activo {
+    background: rgba(201,162,39,0.15);
+    border-color: #c9a227;
+    color: #c9a227;
+  }
+
+  .entradas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .entrada {
     background: rgba(26,26,26,0.5);
     border: 1px solid rgba(201,162,39,0.1);
-    border-radius: 12px;
-    padding: 1.25rem;
+    border-left: 3px solid var(--tipo-color, #c9a227);
+    border-radius: 0 12px 12px 0;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .entrada:hover {
+    background: rgba(26,26,26,0.8);
+  }
+
+  .entrada.expandida {
+    background: rgba(26,26,26,0.8);
+    border-color: var(--tipo-color, #c9a227);
+  }
+
+  .entrada-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .entrada-tipo-icono {
+    font-size: 1rem;
   }
 
   .entrada-fecha {
     font-size: 0.8rem;
-    color: rgba(201,162,39,0.8);
-    margin-bottom: 0.5rem;
-    display: block;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .entrada-luna {
+    font-size: 0.75rem;
+    color: rgba(201,162,39,0.7);
+    margin-left: auto;
   }
 
   .entrada-contenido {
     color: rgba(255,255,255,0.8);
     line-height: 1.7;
     white-space: pre-wrap;
+  }
+
+  .entrada:not(.expandida) .entrada-contenido {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .grimorio-vacio {
