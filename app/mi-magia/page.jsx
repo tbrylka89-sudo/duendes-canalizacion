@@ -473,7 +473,7 @@ function SeccionGuardianes({ usuario }) {
 function SeccionRunas({ usuario }) {
   const runasActuales = usuario?.runas || 0;
 
-  // Paquetes de runas (deben coincidir con productos en WooCommerce)
+  // Paquetes de runas (coinciden con productos en WooCommerce)
   const paquetes = [
     {
       id: 'chispa',
@@ -487,40 +487,40 @@ function SeccionRunas({ usuario }) {
     {
       id: 'destello',
       nombre: 'Destello',
-      runas: 80,
+      runas: 90,
       precio: 10,
       bonus: 10,
       slug: 'paquete-runas-80',
       popular: true,
-      descripcion: '+10 runas de regalo'
+      descripcion: '80 + 10 de regalo'
     },
     {
       id: 'resplandor',
       nombre: 'Resplandor',
-      runas: 200,
+      runas: 240,
       precio: 20,
       bonus: 40,
       slug: 'paquete-runas-200',
-      descripcion: '+40 runas de regalo'
+      descripcion: '200 + 40 de regalo'
     },
     {
       id: 'fulgor',
       nombre: 'Fulgor',
-      runas: 550,
+      runas: 700,
       precio: 50,
       bonus: 150,
       slug: 'paquete-runas-550',
-      descripcion: '+150 runas de regalo'
+      descripcion: '550 + 150 de regalo'
     },
     {
       id: 'aurora',
       nombre: 'Aurora',
-      runas: 1200,
+      runas: 1600,
       precio: 100,
       bonus: 400,
       slug: 'paquete-runas-1200',
       destacado: true,
-      descripcion: 'El mejor valor'
+      descripcion: '1200 + 400 de regalo'
     }
   ];
 
@@ -559,7 +559,7 @@ function SeccionRunas({ usuario }) {
           {paquetes.map((paq) => (
             <a
               key={paq.id}
-              href={`${WORDPRESS_URL}/producto/${paq.slug}/`}
+              href={`${WORDPRESS_URL}/product/${paq.slug}/`}
               target="_blank"
               rel="noopener noreferrer"
               className={`paquete-card ${paq.popular ? 'popular' : ''} ${paq.destacado ? 'destacado' : ''}`}
