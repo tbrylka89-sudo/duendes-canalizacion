@@ -102,6 +102,24 @@ export async function POST(request) {
     const nombre = orden.billing.first_name || 'Amiga';
     const ordenId = orden.id;
     const total = parseFloat(orden.total) || 0;
+    const estadoOrden = orden.status?.toLowerCase() || '';
+
+    // ═══════════════════════════════════════════════════════════
+    // VERIFICAR QUE LA ORDEN ESTÉ PAGADA
+    // ═══════════════════════════════════════════════════════════
+    // Solo procesar órdenes con estado: processing, completed
+    // Ignorar: pending, on-hold, cancelled, refunded, failed
+
+    const estadosPagados = ['processing', 'completed'];
+    if (!estadosPagados.includes(estadoOrden)) {
+      console.log(`[WEBHOOK-WOO] Orden ${ordenId} ignorada - estado: ${estadoOrden} (no pagada)`);
+      return Response.json({
+        success: true,
+        ignored: true,
+        reason: 'not_paid',
+        status: estadoOrden
+      });
+    }
 
     // ═══════════════════════════════════════════════════════════
     // VERIFICAR DUPLICADOS
