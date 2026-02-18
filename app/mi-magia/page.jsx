@@ -65,6 +65,7 @@ function MiMagiaContent() {
   const secciones = [
     { id: 'inicio', nombre: 'Inicio', icono: '◇' },
     { id: 'guardianes', nombre: 'Mis Guardianes', icono: '◆' },
+    { id: 'runas', nombre: 'Runas', icono: 'ᚱ' },
     { id: 'contenido', nombre: 'Sabiduría', icono: '✦' },
     { id: 'grimorio', nombre: 'Grimorio', icono: '▣' }
   ];
@@ -127,6 +128,7 @@ function MiMagiaContent() {
       <main className="contenido-principal">
         {seccion === 'inicio' && <SeccionInicio usuario={usuario} ir={setSeccion} />}
         {seccion === 'guardianes' && <SeccionGuardianes usuario={usuario} />}
+        {seccion === 'runas' && <SeccionRunas usuario={usuario} />}
         {seccion === 'contenido' && <SeccionContenido />}
         {seccion === 'grimorio' && <SeccionGrimorio usuario={usuario} token={token} setUsuario={setUsuario} />}
       </main>
@@ -283,6 +285,13 @@ function SeccionInicio({ usuario, ir }) {
             </a>
           </div>
         )}
+
+        <div className="card" onClick={() => ir('runas')}>
+          <div className="card-icono">ᚱ</div>
+          <h3>Runas de Poder</h3>
+          <p>Tenés {usuario?.runas || 0} runas para experiencias mágicas</p>
+          <span className="card-link">Ver runas →</span>
+        </div>
 
         <div className="card" onClick={() => ir('contenido')}>
           <div className="card-icono">✦</div>
@@ -453,6 +462,139 @@ function SeccionGuardianes({ usuario }) {
           </div>
         </div>
       )}
+    </section>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECCIÓN RUNAS DE PODER
+// ═══════════════════════════════════════════════════════════════
+
+function SeccionRunas({ usuario }) {
+  const runasActuales = usuario?.runas || 0;
+
+  // Paquetes de runas (deben coincidir con productos en WooCommerce)
+  const paquetes = [
+    {
+      id: 'chispa',
+      nombre: 'Chispa',
+      runas: 30,
+      precio: 5,
+      bonus: 0,
+      slug: 'paquete-runas-30',
+      descripcion: 'Perfecto para empezar'
+    },
+    {
+      id: 'destello',
+      nombre: 'Destello',
+      runas: 80,
+      precio: 10,
+      bonus: 10,
+      slug: 'paquete-runas-80',
+      popular: true,
+      descripcion: '+10 runas de regalo'
+    },
+    {
+      id: 'resplandor',
+      nombre: 'Resplandor',
+      runas: 200,
+      precio: 20,
+      bonus: 40,
+      slug: 'paquete-runas-200',
+      descripcion: '+40 runas de regalo'
+    },
+    {
+      id: 'fulgor',
+      nombre: 'Fulgor',
+      runas: 550,
+      precio: 50,
+      bonus: 150,
+      slug: 'paquete-runas-550',
+      descripcion: '+150 runas de regalo'
+    },
+    {
+      id: 'aurora',
+      nombre: 'Aurora',
+      runas: 1200,
+      precio: 100,
+      bonus: 400,
+      slug: 'paquete-runas-1200',
+      destacado: true,
+      descripcion: 'El mejor valor'
+    }
+  ];
+
+  return (
+    <section className="seccion seccion-runas">
+      <div className="seccion-header">
+        <h1>Runas de Poder</h1>
+        <p>Tu moneda mágica para experiencias únicas</p>
+      </div>
+
+      {/* Balance actual */}
+      <div className="runas-balance">
+        <span className="balance-icono">ᚱ</span>
+        <div className="balance-info">
+          <span className="balance-cantidad">{runasActuales.toLocaleString()}</span>
+          <span className="balance-label">runas disponibles</span>
+        </div>
+      </div>
+
+      {/* Qué son las runas */}
+      <div className="runas-explicacion">
+        <h3>¿Qué podés hacer con tus runas?</h3>
+        <ul>
+          <li>✦ Tiradas de runas y lecturas de tarot</li>
+          <li>✦ Registros akáshicos y mensajes del alma</li>
+          <li>✦ Rituales y guías personalizadas</li>
+          <li>✦ Experiencias mágicas exclusivas</li>
+        </ul>
+        <p className="runas-nota">Las runas nunca expiran. Usalas cuando quieras.</p>
+      </div>
+
+      {/* Paquetes */}
+      <div className="runas-paquetes">
+        <h3>Conseguir más runas</h3>
+        <div className="paquetes-grid">
+          {paquetes.map((paq) => (
+            <a
+              key={paq.id}
+              href={`${WORDPRESS_URL}/producto/${paq.slug}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`paquete-card ${paq.popular ? 'popular' : ''} ${paq.destacado ? 'destacado' : ''}`}
+            >
+              {paq.popular && <span className="paquete-badge">Popular</span>}
+              {paq.destacado && <span className="paquete-badge destacado">Mejor valor</span>}
+
+              <div className="paquete-runas">
+                <span className="paquete-cantidad">{paq.runas}</span>
+                <span className="paquete-unidad">runas</span>
+              </div>
+
+              <div className="paquete-nombre">{paq.nombre}</div>
+
+              {paq.bonus > 0 && (
+                <div className="paquete-bonus">+{paq.bonus} gratis</div>
+              )}
+
+              <div className="paquete-precio">USD ${paq.precio}</div>
+
+              <div className="paquete-descripcion">{paq.descripcion}</div>
+
+              <span className="paquete-btn">Conseguir →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Nota de acreditación */}
+      <div className="runas-acreditacion">
+        <p>
+          <strong>¿Cómo funciona?</strong> Comprás el paquete en nuestra tienda y
+          las runas se acreditan automáticamente en tu cuenta dentro de los próximos minutos.
+        </p>
+      </div>
     </section>
   );
 }
@@ -1384,6 +1526,217 @@ const estilos = `
     margin-bottom: 1rem;
     color: rgba(255,255,255,0.8);
     line-height: 1.9;
+  }
+
+  /* Sección Runas */
+  .seccion-runas {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .runas-balance {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(145deg, rgba(201,162,39,0.15), rgba(26,26,26,0.9));
+    border: 1px solid rgba(201,162,39,0.3);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+  }
+
+  .balance-icono {
+    font-size: 3rem;
+    color: #c9a227;
+  }
+
+  .balance-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .balance-cantidad {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    color: #c9a227;
+    font-weight: 400;
+  }
+
+  .balance-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem;
+  }
+
+  .runas-explicacion {
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.15);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .runas-explicacion h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 1rem;
+  }
+
+  .runas-explicacion ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+
+  .runas-explicacion li {
+    color: rgba(255,255,255,0.8);
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+
+  .runas-nota {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  .runas-paquetes h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .paquetes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .paquete-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    background: rgba(26,26,26,0.7);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .paquete-card:hover {
+    border-color: rgba(201,162,39,0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(201,162,39,0.15);
+  }
+
+  .paquete-card.popular {
+    border-color: rgba(201,162,39,0.4);
+    background: linear-gradient(145deg, rgba(201,162,39,0.1), rgba(26,26,26,0.9));
+  }
+
+  .paquete-card.destacado {
+    border-color: #c9a227;
+    background: linear-gradient(145deg, rgba(201,162,39,0.2), rgba(26,26,26,0.9));
+  }
+
+  .paquete-badge {
+    position: absolute;
+    top: -10px;
+    right: -5px;
+    background: #c9a227;
+    color: #0a0a0a;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .paquete-badge.destacado {
+    background: linear-gradient(135deg, #c9a227, #e8d48b);
+  }
+
+  .paquete-runas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .paquete-cantidad {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: #c9a227;
+  }
+
+  .paquete-unidad {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .paquete-nombre {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+
+  .paquete-bonus {
+    font-size: 0.8rem;
+    color: #2ecc71;
+    margin-bottom: 0.5rem;
+  }
+
+  .paquete-precio {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .paquete-descripcion {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .paquete-btn {
+    font-size: 0.85rem;
+    color: #c9a227;
+    transition: color 0.3s;
+  }
+
+  .paquete-card:hover .paquete-btn {
+    color: #e8d48b;
+  }
+
+  .runas-acreditacion {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(201,162,39,0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(201,162,39,0.1);
+  }
+
+  .runas-acreditacion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .runas-acreditacion strong {
+    color: #c9a227;
   }
 
   /* Sección Grimorio */
