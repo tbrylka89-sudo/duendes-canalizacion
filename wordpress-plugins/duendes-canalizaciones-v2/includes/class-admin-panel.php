@@ -332,8 +332,18 @@ class Duendes_Canal_Admin_Panel {
      */
     public function modal_template() {
         $screen = get_current_screen();
-        if (!$screen || strpos($screen->id, 'duendes_canalizacion') === false &&
-            strpos($screen->id, 'duendes-canalizaciones') === false) {
+        if (!$screen) {
+            return;
+        }
+
+        // Mostrar modal en: listado CPT, edicion CPT, dashboard canalizaciones
+        $dominated_screens = (
+            $screen->post_type === 'duendes_canalizacion' ||
+            strpos($screen->id, 'duendes_canalizacion') !== false ||
+            strpos($screen->id, 'duendes-canalizaciones') !== false
+        );
+
+        if (!$dominated_screens) {
             return;
         }
         ?>
@@ -379,16 +389,65 @@ class Duendes_Canal_Admin_Panel {
                             <div class="formulario-datos"></div>
                         </div>
 
-                        <!-- Contenido de la canalizacion -->
-                        <div class="modal-canalizacion">
-                            <h4>Canalizacion <span class="version-num"></span></h4>
-                            <div class="canalizacion-contenido" contenteditable="true"></div>
-                            <div class="canalizacion-palabras">0 palabras</div>
+                        <!-- TABS para las 5 secciones -->
+                        <div class="modal-tabs">
+                            <button class="tab-btn active" data-tab="canalizacion">Canalizacion</button>
+                            <button class="tab-btn" data-tab="mensaje">Mensaje del Ser</button>
+                            <button class="tab-btn" data-tab="cuidados">Cuidados</button>
+                            <button class="tab-btn" data-tab="historia">Historia</button>
+                            <button class="tab-btn" data-tab="ficha">Ficha</button>
+                        </div>
+
+                        <!-- TAB: Canalizacion (GENERADA) -->
+                        <div class="tab-content active" data-tab="canalizacion">
+                            <div class="seccion-header">
+                                <span class="seccion-tag seccion-generada">GENERADA</span>
+                                <span class="version-num"></span>
+                            </div>
+                            <div class="seccion-contenido canalizacion-contenido" contenteditable="true"></div>
+                            <div class="seccion-palabras canalizacion-palabras">0 palabras</div>
+                        </div>
+
+                        <!-- TAB: Mensaje del Ser (GENERADO) -->
+                        <div class="tab-content" data-tab="mensaje">
+                            <div class="seccion-header">
+                                <span class="seccion-tag seccion-generada">GENERADO</span>
+                                <p class="seccion-desc">Resumen poderoso de lo que el guardian quiere transmitir</p>
+                            </div>
+                            <div class="seccion-contenido mensaje-contenido" contenteditable="true"></div>
+                        </div>
+
+                        <!-- TAB: Cuidados (GENERADOS) -->
+                        <div class="tab-content" data-tab="cuidados">
+                            <div class="seccion-header">
+                                <span class="seccion-tag seccion-generada">GENERADO</span>
+                                <p class="seccion-desc">Instrucciones para cuidar al guardian (NUNCA caramelos/licor)</p>
+                            </div>
+                            <div class="seccion-contenido cuidados-contenido" contenteditable="true"></div>
+                        </div>
+
+                        <!-- TAB: Historia (COPIADA) -->
+                        <div class="tab-content" data-tab="historia">
+                            <div class="seccion-header">
+                                <span class="seccion-tag seccion-copiada">COPIADA DEL PRODUCTO</span>
+                                <p class="seccion-desc">Historia del guardian desde la tienda</p>
+                            </div>
+                            <div class="seccion-contenido historia-contenido"></div>
+                        </div>
+
+                        <!-- TAB: Ficha (COPIADA) -->
+                        <div class="tab-content" data-tab="ficha">
+                            <div class="seccion-header">
+                                <span class="seccion-tag seccion-copiada">COPIADA DEL PRODUCTO</span>
+                                <p class="seccion-desc">Datos tecnicos del guardian</p>
+                            </div>
+                            <div class="seccion-contenido ficha-contenido"></div>
                         </div>
 
                         <!-- Regenerar con instrucciones -->
                         <div class="modal-regenerar" style="display:none;">
                             <h4>Regenerar con instrucciones</h4>
+                            <p class="regen-nota">Solo se regeneran las secciones GENERADAS (Canalizacion, Mensaje, Cuidados)</p>
                             <textarea class="instrucciones-regen" rows="3"
                                       placeholder="Ej: Hace mas enfasis en X, menciona Y, que sea mas corto..."></textarea>
                             <button class="button btn-ejecutar-regen">Regenerar</button>
@@ -571,6 +630,105 @@ class Duendes_Canal_Admin_Panel {
             margin-top: 0;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
+        }
+
+        /* TABS */
+        .modal-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0;
+        }
+        .tab-btn {
+            padding: 10px 15px;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover {
+            background: #e0e0e0;
+        }
+        .tab-btn.active {
+            background: #0073aa;
+            color: #fff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Secciones */
+        .seccion-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .seccion-tag {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .seccion-generada {
+            background: #d4edda;
+            color: #155724;
+        }
+        .seccion-copiada {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .seccion-desc {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+        .seccion-contenido {
+            border: 1px solid #ddd;
+            padding: 15px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #fafafa;
+            white-space: pre-wrap;
+            font-family: Georgia, serif;
+            line-height: 1.6;
+            border-radius: 5px;
+        }
+        .seccion-contenido[contenteditable="true"] {
+            background: #fff;
+        }
+        .seccion-contenido[contenteditable="true"]:focus {
+            border-color: #0073aa;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,115,170,0.2);
+        }
+        .seccion-palabras {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .regen-nota {
+            font-size: 12px;
+            color: #666;
+            margin: 0 0 10px 0;
+            font-style: italic;
+        }
+
+        /* Historia y ficha no editables */
+        .historia-contenido,
+        .ficha-contenido {
+            background: #f0f0f0;
+            cursor: default;
         }
         </style>
         <?php

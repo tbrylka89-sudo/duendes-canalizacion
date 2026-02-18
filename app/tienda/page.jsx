@@ -143,59 +143,35 @@ export default function TiendaMagica() {
       <section className="tienda-hero">
         <div className="hero-bg"></div>
         <div className="hero-pattern"></div>
-        <h1>Encontrá al que ya te eligió</h1>
+        <h1>Encontrá tu guardián</h1>
         <p>Cada uno nació para alguien. Uno de ellos, para vos.</p>
+      </section>
 
-        {/* Categorías */}
-        <div className="cat-nav">
+      {/* Sección de Categorías Grande */}
+      <section className="categorias-section">
+        <div className="categorias-grid">
           <div
-            className={`cat-card ${!categoriaActiva ? 'active' : ''}`}
+            className={`categoria-grande ${!categoriaActiva ? 'active' : ''}`}
             onClick={() => setCategoriaActiva(null)}
           >
-            <div className="cat-card-inner">
-              <div className="cat-bg-glow"></div>
-              <div className="cat-frame"></div>
-              <div className="cat-corner tl"></div>
-              <div className="cat-corner tr"></div>
-              <div className="cat-corner bl"></div>
-              <div className="cat-corner br"></div>
-              <div className="cat-icon-container">
-                <span className="cat-icon-main">🌟</span>
-              </div>
-              <span className="cat-name">Todos</span>
-              <span className="cat-count">{productos.length} guardianes</span>
-            </div>
+            <div className="categoria-icono">🌟</div>
+            <h3 className="categoria-titulo">Todos</h3>
+            <p className="categoria-desc">{productos.length} guardianes disponibles</p>
           </div>
 
           {CATEGORIAS.map((cat) => {
             const cantidad = productos.filter(p => getCategoriaKey(p.categories) === cat.key).length;
-            const catKey = cat.key;
             return (
               <div
                 key={cat.slug}
-                className={`cat-card ${categoriaActiva === catKey ? 'active' : ''}`}
-                data-cat={catKey}
-                onClick={() => setCategoriaActiva(categoriaActiva === catKey ? null : catKey)}
+                className={`categoria-grande ${categoriaActiva === cat.key ? 'active' : ''}`}
+                data-cat={cat.key}
+                onClick={() => setCategoriaActiva(categoriaActiva === cat.key ? null : cat.key)}
               >
-                <div className="cat-card-inner">
-                  <div className="cat-bg-glow"></div>
-                  <div className="cat-frame"></div>
-                  <div className="cat-corner tl"></div>
-                  <div className="cat-corner tr"></div>
-                  <div className="cat-corner bl"></div>
-                  <div className="cat-corner br"></div>
-                  <div className="cat-particles">
-                    {PARTICULAS[catKey]?.map((p, i) => (
-                      <span key={i} className="particle" style={{ left: `${15 + i * 20}%`, animationDelay: `${i * 0.5}s` }}>{p}</span>
-                    ))}
-                  </div>
-                  <div className="cat-icon-container">
-                    <div className="cat-ring"></div>
-                    <span className="cat-icon-main">{cat.icono}</span>
-                  </div>
-                  <span className="cat-name">{cat.nombre}</span>
-                  <span className="cat-count">{cat.desc}</span>
-                </div>
+                <div className="categoria-icono">{cat.icono}</div>
+                <h3 className="categoria-titulo">{cat.nombre}</h3>
+                <p className="categoria-desc">{cat.desc}</p>
+                <span className="categoria-cantidad">{cantidad} guardianes</span>
               </div>
             );
           })}
@@ -266,6 +242,12 @@ export default function TiendaMagica() {
 
                     <div className="tarot-glow"></div>
                   </a>
+                  <Link
+                    href={`/producto/${producto.slug}`}
+                    className="btn-conocer-historia"
+                  >
+                    CONOCER HISTORIA
+                  </Link>
                 </article>
               );
             })}
@@ -329,170 +311,110 @@ export default function TiendaMagica() {
         }
 
         .tienda-hero p {
-          font-size: 16px;
+          font-size: 18px;
           color: rgba(255,255,255,0.6);
           font-style: italic;
-          margin: 0 0 30px 0;
+          margin: 0;
           position: relative;
         }
 
-        /* Categorías */
-        .cat-nav {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          flex-wrap: wrap;
-          position: relative;
-          padding: 20px 0;
+        /* Sección de Categorías Grande */
+        .categorias-section {
+          background: linear-gradient(180deg, #1a1510 0%, #FAF8F5 100%);
+          padding: 60px 20px 80px;
         }
 
-        .cat-card {
-          position: relative;
-          width: 100px;
-          height: 130px;
+        .categorias-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 24px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .categoria-grande {
+          background: #0a0a0a;
+          border: 1px solid rgba(198,169,98,0.2);
+          border-radius: 16px;
+          padding: 40px 30px;
+          text-align: center;
           cursor: pointer;
-        }
-
-        .cat-card-inner {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(145deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%);
-          border: 1px solid rgba(198,169,98,0.3);
-          border-radius: 12px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        .cat-card:hover .cat-card-inner {
-          transform: translateY(-8px) scale(1.03);
-          border-color: var(--cat-color, #C6A962);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px var(--cat-glow, rgba(198,169,98,0.2));
-        }
-
-        .cat-card.active .cat-card-inner {
-          border-color: var(--cat-color, #C6A962);
-          box-shadow: 0 0 25px var(--cat-glow, rgba(198,169,98,0.3));
-        }
-
-        .cat-icon-container {
           position: relative;
-          width: 50px;
-          height: 50px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 8px;
+          overflow: hidden;
         }
 
-        .cat-icon-main {
-          font-size: 28px;
-          position: relative;
-          z-index: 2;
-          transition: transform 0.4s;
-          filter: drop-shadow(0 0 10px var(--cat-glow, rgba(198,169,98,0.5)));
-        }
-
-        .cat-card:hover .cat-icon-main {
-          transform: scale(1.15);
-        }
-
-        .cat-name {
-          font-family: 'Cinzel', serif;
-          font-size: 10px;
-          color: #fff;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          transition: color 0.3s;
-        }
-
-        .cat-card:hover .cat-name,
-        .cat-card.active .cat-name {
-          color: var(--cat-color, #C6A962);
-        }
-
-        .cat-count {
-          font-size: 9px;
-          color: rgba(255,255,255,0.4);
-          margin-top: 4px;
-        }
-
-        /* Colores por categoría */
-        .cat-card[data-cat="proteccion"] { --cat-color: #3b82f6; --cat-glow: rgba(59, 130, 246, 0.4); }
-        .cat-card[data-cat="amor"] { --cat-color: #ec4899; --cat-glow: rgba(236, 72, 153, 0.4); }
-        .cat-card[data-cat="abundancia"] { --cat-color: #f59e0b; --cat-glow: rgba(245, 158, 11, 0.4); }
-        .cat-card[data-cat="salud"] { --cat-color: #22c55e; --cat-glow: rgba(34, 197, 94, 0.4); }
-        .cat-card[data-cat="sabiduria"] { --cat-color: #8b5cf6; --cat-glow: rgba(139, 92, 246, 0.4); }
-
-        .cat-bg-glow, .cat-frame, .cat-corner, .cat-ring, .cat-particles, .particle {
+        .categoria-grande::before {
+          content: '';
           position: absolute;
-        }
-
-        .cat-bg-glow {
-          inset: -50%;
-          background: radial-gradient(circle, var(--cat-glow, rgba(198,169,98,0.1)) 0%, transparent 70%);
+          inset: 0;
+          background: radial-gradient(circle at center, var(--cat-glow, rgba(198,169,98,0.1)) 0%, transparent 70%);
           opacity: 0;
           transition: opacity 0.4s;
         }
 
-        .cat-card:hover .cat-bg-glow { opacity: 1; }
-
-        .cat-frame {
-          inset: 4px;
-          border: 1px solid rgba(198,169,98,0.15);
-          border-radius: 10px;
-          pointer-events: none;
+        .categoria-grande:hover::before {
+          opacity: 1;
         }
 
-        .cat-corner {
-          width: 12px;
-          height: 12px;
-          border: 2px solid var(--cat-color, #C6A962);
-          opacity: 0.5;
-          transition: opacity 0.3s;
-        }
-        .cat-corner.tl { top: 6px; left: 6px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
-        .cat-corner.tr { top: 6px; right: 6px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
-        .cat-corner.bl { bottom: 6px; left: 6px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
-        .cat-corner.br { bottom: 6px; right: 6px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
-
-        .cat-card:hover .cat-corner { opacity: 1; }
-
-        .cat-ring {
-          width: 70px;
-          height: 70px;
-          border: 1px solid var(--cat-color, rgba(198,169,98,0.3));
-          border-radius: 50%;
-          opacity: 0;
-          transition: all 0.4s;
+        .categoria-grande:hover {
+          transform: translateY(-8px);
+          border-color: var(--cat-color, #C6A962);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px var(--cat-glow, rgba(198,169,98,0.2));
         }
 
-        .cat-particles {
-          inset: 0;
-          overflow: hidden;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity 0.3s;
+        .categoria-grande.active {
+          border-color: var(--cat-color, #C6A962);
+          box-shadow: 0 0 30px var(--cat-glow, rgba(198,169,98,0.3));
+          background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
         }
 
-        .cat-card:hover .cat-particles { opacity: 1; }
+        .categoria-grande[data-cat="proteccion"] { --cat-color: #3b82f6; --cat-glow: rgba(59, 130, 246, 0.4); }
+        .categoria-grande[data-cat="amor"] { --cat-color: #ec4899; --cat-glow: rgba(236, 72, 153, 0.4); }
+        .categoria-grande[data-cat="abundancia"] { --cat-color: #f59e0b; --cat-glow: rgba(245, 158, 11, 0.4); }
+        .categoria-grande[data-cat="salud"] { --cat-color: #22c55e; --cat-glow: rgba(34, 197, 94, 0.4); }
+        .categoria-grande[data-cat="sabiduria"] { --cat-color: #8b5cf6; --cat-glow: rgba(139, 92, 246, 0.4); }
 
-        .particle {
-          font-size: 10px;
-          opacity: 0;
-          animation: floatParticle 3s ease-in-out infinite;
+        .categoria-icono {
+          font-size: 48px;
+          margin-bottom: 16px;
+          filter: drop-shadow(0 0 15px var(--cat-glow, rgba(198,169,98,0.5)));
+          transition: transform 0.4s;
         }
 
-        @keyframes floatParticle {
-          0% { opacity: 0; transform: translateY(100%) scale(0.5); }
-          20% { opacity: 1; }
-          80% { opacity: 1; }
-          100% { opacity: 0; transform: translateY(-100%) scale(0.8) rotate(20deg); }
+        .categoria-grande:hover .categoria-icono {
+          transform: scale(1.15);
+        }
+
+        .categoria-titulo {
+          font-family: 'Cinzel', serif;
+          font-size: 22px;
+          color: #fff;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          margin: 0 0 8px 0;
+          transition: color 0.3s;
+        }
+
+        .categoria-grande:hover .categoria-titulo,
+        .categoria-grande.active .categoria-titulo {
+          color: var(--cat-color, #C6A962);
+        }
+
+        .categoria-desc {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 16px;
+          color: rgba(255,255,255,0.5);
+          font-style: italic;
+          margin: 0 0 12px 0;
+        }
+
+        .categoria-cantidad {
+          font-family: 'Cinzel', serif;
+          font-size: 12px;
+          color: var(--cat-color, #C6A962);
+          letter-spacing: 1px;
+          opacity: 0.8;
         }
 
         /* Productos */
@@ -513,14 +435,15 @@ export default function TiendaMagica() {
         /* Card Tarot */
         .tarot-card {
           position: relative;
-          aspect-ratio: 2/3;
-          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          text-align: center;
         }
 
         .tarot-inner {
           position: relative;
           width: 100%;
-          height: 100%;
+          aspect-ratio: 2/3;
           background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
           border-radius: 14px;
           overflow: hidden;
@@ -528,6 +451,34 @@ export default function TiendaMagica() {
           text-decoration: none;
           display: block;
           box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+        }
+
+        /* Botón CONOCER HISTORIA */
+        .btn-conocer-historia {
+          display: block;
+          margin-top: 16px;
+          padding: 16px 32px;
+          background: #0a0a0a;
+          color: #fff;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-align: center;
+        }
+
+        .btn-conocer-historia:hover {
+          background: #1a1a1a;
+          border-color: #C6A962;
+          color: #C6A962;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+          transform: translateY(-2px);
         }
 
         .tarot-card:hover .tarot-inner {
@@ -735,17 +686,36 @@ export default function TiendaMagica() {
 
         /* Responsive */
         @media (max-width: 768px) {
-          .cat-card {
-            width: 80px;
-            height: 105px;
+          .categorias-section {
+            padding: 40px 15px 60px;
           }
 
-          .cat-icon-main {
-            font-size: 22px;
+          .categorias-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
           }
 
-          .cat-name {
-            font-size: 8px;
+          .categoria-grande {
+            padding: 25px 15px;
+          }
+
+          .categoria-icono {
+            font-size: 36px;
+            margin-bottom: 10px;
+          }
+
+          .categoria-titulo {
+            font-size: 14px;
+            letter-spacing: 1px;
+          }
+
+          .categoria-desc {
+            font-size: 12px;
+            margin-bottom: 8px;
+          }
+
+          .categoria-cantidad {
+            font-size: 10px;
           }
 
           .productos-grid {
@@ -753,7 +723,7 @@ export default function TiendaMagica() {
             gap: 12px;
           }
 
-          .tarot-card {
+          .tarot-inner {
             aspect-ratio: 2/2.8;
           }
 
@@ -764,6 +734,13 @@ export default function TiendaMagica() {
 
           .tarot-price {
             font-size: 12px;
+          }
+
+          .btn-conocer-historia {
+            padding: 12px 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-top: 12px;
           }
 
           /* Animación de respiración en móvil */
@@ -782,12 +759,28 @@ export default function TiendaMagica() {
           }
         }
 
+        @media (max-width: 480px) {
+          .categorias-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+
+          .categoria-grande {
+            padding: 20px;
+          }
+        }
+
         @media (max-width: 380px) {
           .productos-grid {
             gap: 8px;
           }
 
           .tarot-name {
+            font-size: 10px;
+          }
+
+          .btn-conocer-historia {
+            padding: 10px 16px;
             font-size: 10px;
           }
         }

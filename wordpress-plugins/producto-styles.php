@@ -10,20 +10,12 @@ add_action('wp_head', function() {
     ?>
     <style>
     /* ═══════════════════════════════════════════════════════════════
-       1. OCULTAR SVGs FEOS (hongos) EN EL HERO
+       1. ANIMACIONES SVG VISIBLES (restauradas)
        ═══════════════════════════════════════════════════════════════ */
-    .prod-hero svg,
-    .prod-hero img[src*="hongo"],
-    .prod-hero .prod-decorative-icons,
-    .prod-hero [class*="mushroom"],
-    .prod-hero .elementor-widget-image:has(svg) {
-        display: none !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-    }
+    /* Las animaciones SVG ahora se muestran correctamente */
 
     /* ═══════════════════════════════════════════════════════════════
-       2. OCULTAR SECCION CARACTERISTICAS GIGANTE
+       2. OCULTAR SECCION CARACTERISTICAS DUPLICADA
        ═══════════════════════════════════════════════════════════════ */
     .prod-white,
     section.prod-caracteristicas,
@@ -32,12 +24,11 @@ add_action('wp_head', function() {
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       3. HERO MAS COMPACTO
+       3. HERO CON ANIMACIONES
        ═══════════════════════════════════════════════════════════════ */
     .prod-hero {
-        min-height: 50vh !important;
-        max-height: 60vh !important;
-        padding: 60px 20px 30px !important;
+        min-height: 100vh !important;
+        padding: 100px 20px 60px !important;
     }
 
     /* ═══════════════════════════════════════════════════════════════

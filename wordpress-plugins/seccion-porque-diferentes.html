@@ -1,7 +1,7 @@
 <!--
-  SECCIÓN: Por Qué Son Diferentes
-  Con fotos reales y animaciones
-  CORREGIDO: Colores con !important para que no se sobreescriban
+  SECCIÓN: Beneficios / Por Qué Funcionan
+  TRIGGER: DOLOR → SOLUCIÓN (identificación emocional)
+  Actualizado según escalera emocional de neuromarketing
 -->
 
 <style>
@@ -24,7 +24,7 @@
     position: relative;
   }
 
-  /* Título con animación - COLORES FORZADOS */
+  /* Titulo con animacion - COLORES FORZADOS */
   .porque-titulo {
     font-family: 'Cinzel Decorative', serif !important;
     color: #d4af37 !important;
@@ -61,11 +61,11 @@
     }
   }
 
-  /* Grid de pilares */
+  /* Grid de pilares - 4 columnas */
   .pilares-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 35px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
   }
 
   /* Tarjeta pilar */
@@ -80,8 +80,9 @@
   }
 
   .pilar-card:nth-child(1) { animation: subirCard 0.8s ease 0.3s forwards; }
-  .pilar-card:nth-child(2) { animation: subirCard 0.8s ease 0.5s forwards; }
-  .pilar-card:nth-child(3) { animation: subirCard 0.8s ease 0.7s forwards; }
+  .pilar-card:nth-child(2) { animation: subirCard 0.8s ease 0.45s forwards; }
+  .pilar-card:nth-child(3) { animation: subirCard 0.8s ease 0.6s forwards; }
+  .pilar-card:nth-child(4) { animation: subirCard 0.8s ease 0.75s forwards; }
 
   @keyframes subirCard {
     to {
@@ -98,101 +99,40 @@
       0 0 40px rgba(212, 175, 55, 0.15);
   }
 
-  /* Imagen del pilar */
-  .pilar-imagen {
-    position: relative;
-    height: 220px;
-    overflow: hidden;
-  }
-
-  .pilar-imagen img {
+  /* Icono del pilar */
+  .pilar-icono {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease, filter 0.6s ease;
-    filter: saturate(0.8);
-  }
-
-  .pilar-card:hover .pilar-imagen img {
-    transform: scale(1.1);
-    filter: saturate(1);
-  }
-
-  /* Overlay con gradiente */
-  .pilar-imagen::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60%;
-    background: linear-gradient(to top, #0a0a0a 0%, transparent 100%);
-    pointer-events: none;
-  }
-
-  /* Brillo animado en la imagen */
-  .pilar-imagen::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
-    z-index: 2;
-    animation: brilloImagen 4s ease-in-out infinite;
-  }
-
-  .pilar-card:nth-child(1) .pilar-imagen::before { animation-delay: 0s; }
-  .pilar-card:nth-child(2) .pilar-imagen::before { animation-delay: 1.3s; }
-  .pilar-card:nth-child(3) .pilar-imagen::before { animation-delay: 2.6s; }
-
-  @keyframes brilloImagen {
-    0% { left: -100%; }
-    30%, 100% { left: 150%; }
+    padding: 30px 20px 20px;
+    text-align: center;
+    font-size: 2.5rem;
   }
 
   /* Contenido del pilar */
   .pilar-contenido {
-    padding: 25px 25px 30px;
+    padding: 0 20px 25px;
     background: transparent !important;
   }
 
-  .pilar-titulo {
+  /* Titulo del dolor (lo que siente) */
+  .pilar-dolor {
     font-family: 'Cinzel', serif !important;
-    color: #d4af37 !important;
-    -webkit-text-fill-color: #d4af37 !important;
-    font-size: 1.25rem !important;
-    font-weight: 600 !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
     margin-bottom: 15px !important;
-    letter-spacing: 1px !important;
-    position: relative;
-    display: inline-block;
+    line-height: 1.4 !important;
     background: transparent !important;
-  }
-
-  .pilar-titulo::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #d4af37 !important;
-    transition: width 0.4s ease;
-  }
-
-  .pilar-card:hover .pilar-titulo::after {
-    width: 100%;
+    min-height: 45px;
   }
 
   .pilar-texto {
     font-family: 'Cinzel', serif !important;
-    color: rgba(255, 255, 255, 0.85) !important;
-    -webkit-text-fill-color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 0.95rem !important;
-    line-height: 1.85 !important;
-    margin-bottom: 20px !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.75) !important;
+    font-size: 0.9rem !important;
+    line-height: 1.7 !important;
+    margin-bottom: 0 !important;
     background: transparent !important;
   }
 
@@ -200,17 +140,6 @@
     color: #d4af37 !important;
     -webkit-text-fill-color: #d4af37 !important;
     font-weight: 500 !important;
-  }
-
-  .pilar-cita {
-    font-family: 'Cinzel', serif !important;
-    color: #d4af37 !important;
-    -webkit-text-fill-color: #d4af37 !important;
-    font-size: 0.9rem !important;
-    padding: 15px !important;
-    background: rgba(212, 175, 55, 0.05) !important;
-    border-left: 2px solid #d4af37 !important;
-    border-radius: 0 6px 6px 0;
   }
 
   /* Frase de cierre */
@@ -227,17 +156,18 @@
     font-family: 'Cinzel', serif !important;
     color: #fff !important;
     -webkit-text-fill-color: #fff !important;
-    font-size: clamp(1.2rem, 2.5vw, 1.6rem) !important;
+    font-size: clamp(1.1rem, 2vw, 1.4rem) !important;
     margin-bottom: 30px !important;
     line-height: 1.6 !important;
     background: transparent !important;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .cierre-texto span {
     color: #d4af37 !important;
     -webkit-text-fill-color: #d4af37 !important;
-    display: block;
-    margin-top: 5px;
   }
 
   .cierre-btn {
@@ -281,7 +211,7 @@
     transform: translateY(-3px);
   }
 
-  /* Partículas flotantes */
+  /* Particulas flotantes */
   .particula-flotante {
     position: absolute;
     width: 4px;
@@ -316,16 +246,24 @@
   }
 
   /* Responsive */
-  @media (max-width: 900px) {
+  @media (max-width: 1000px) {
+    .pilares-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 600px) {
     .pilares-grid {
       grid-template-columns: 1fr;
-      max-width: 450px;
+      max-width: 400px;
       margin: 0 auto;
     }
 
     .pilar-card:nth-child(1),
     .pilar-card:nth-child(2),
-    .pilar-card:nth-child(3) {
+    .pilar-card:nth-child(3),
+    .pilar-card:nth-child(4) {
       animation-delay: 0.3s;
     }
 
@@ -333,8 +271,8 @@
       padding: 60px 15px;
     }
 
-    .pilar-imagen {
-      height: 200px;
+    .pilar-dolor {
+      min-height: auto;
     }
   }
 
@@ -353,7 +291,7 @@
     }
 
     .pilar-contenido {
-      padding: 20px 18px 25px;
+      padding: 0 15px 20px;
     }
 
     .cierre-btn {
@@ -365,7 +303,7 @@
 
 <section class="seccion-porque">
 
-  <!-- Partículas flotantes -->
+  <!-- Particulas flotantes -->
   <div class="particula-flotante"></div>
   <div class="particula-flotante"></div>
   <div class="particula-flotante"></div>
@@ -374,50 +312,60 @@
 
   <div class="porque-container">
 
-    <h2 class="porque-titulo">Por Que Estos Guardianes Son Diferentes</h2>
-    <p class="porque-subtitulo">Tres razones que no vas a encontrar en ningun otro lugar</p>
+    <h2 class="porque-titulo">Para Que Sirven</h2>
+    <p class="porque-subtitulo">Cada guardian trabaja en algo especifico</p>
 
     <div class="pilares-grid">
 
-      <!-- Pilar 1: El Lugar -->
+      <!-- Pilar 1: Proteccion -->
       <div class="pilar-card">
-        <div class="pilar-imagen">
-          <img src="https://duendesdeluruguay.com/wp-content/uploads/luna.jpg" alt="Guardian Luna - Piriapolis">
-        </div>
+        <div class="pilar-icono">&#9876;</div>
         <div class="pilar-contenido">
-          <h3 class="pilar-titulo">Nacen en un Portal</h3>
+          <h3 class="pilar-dolor">"Cuando sentis que todo el mundo te drena"</h3>
           <p class="pilar-texto">
-            Piriapolis no es un lugar cualquiera. <strong>Los cerros sagrados y el oceano crean un punto de poder unico en el mundo.</strong> Cada guardian absorbe esa energia antes de llegar a vos.
+            Tu guardian crea un campo que <strong>repele lo que no es tuyo</strong>.
+            Envidias, cargas ajenas, energia pesada.
+            Dejas de absorber lo que no te pertenece.
           </p>
-          <p class="pilar-cita">Geografia energetica, no folklore.</p>
         </div>
       </div>
 
-      <!-- Pilar 2: La Canalización -->
+      <!-- Pilar 2: Sanacion -->
       <div class="pilar-card">
-        <div class="pilar-imagen">
-          <img src="https://duendesdeluruguay.com/wp-content/uploads/aurora.jpg" alt="Guardian Aurora - Canalizacion">
-        </div>
+        <div class="pilar-icono">&#10084;</div>
         <div class="pilar-contenido">
-          <h3 class="pilar-titulo">Traen un Mensaje</h3>
+          <h3 class="pilar-dolor">"Cuando el pecho duele y no sabes por que"</h3>
           <p class="pilar-texto">
-            No es un horoscopo. <strong>Es una canalizacion especifica para vos</strong>, que llega en el momento exacto que la necesitas. Muchos la releen meses despues y recien ahi entienden todo.
+            Trabaja en silencio mientras dormis.
+            <strong>Desata nudos viejos.</strong>
+            Hace espacio para lo que quiere llegar.
           </p>
-          <p class="pilar-cita">Tu guardian ya tiene algo que decirte.</p>
         </div>
       </div>
 
-      <!-- Pilar 3: Únicos -->
+      <!-- Pilar 3: Abundancia -->
       <div class="pilar-card">
-        <div class="pilar-imagen">
-          <img src="https://duendesdeluruguay.com/wp-content/uploads/2025/12/Finnian.jpg" alt="Guardian Finnian - Unico">
-        </div>
+        <div class="pilar-icono">&#10026;</div>
         <div class="pilar-contenido">
-          <h3 class="pilar-titulo">Existen Una Sola Vez</h3>
+          <h3 class="pilar-dolor">"Cuando la plata nunca alcanza"</h3>
           <p class="pilar-texto">
-            Cada guardian pasa por las manos de Thibisay. <strong>No hay moldes. No hay produccion en serie.</strong> El que llega a vos fue creado una unica vez en la historia.
+            No atrae dinero magicamente.
+            <strong>Te sintoniza con la frecuencia del recibir.</strong>
+            Dejas de rechazar sin darte cuenta.
           </p>
-          <p class="pilar-cita">Tu guardian solo existe contigo.</p>
+        </div>
+      </div>
+
+      <!-- Pilar 4: Guia -->
+      <div class="pilar-card">
+        <div class="pilar-icono">&#9733;</div>
+        <div class="pilar-contenido">
+          <h3 class="pilar-dolor">"Cuando tenes corazonadas pero no les haces caso"</h3>
+          <p class="pilar-texto">
+            <strong>Amplifica tu intuicion.</strong>
+            Esas senales que ignoras empiezan a hablar mas fuerte.
+            Y vos, finalmente, escuchas.
+          </p>
         </div>
       </div>
 
@@ -426,8 +374,8 @@
     <!-- Cierre -->
     <div class="cierre-frase">
       <p class="cierre-texto">
-        Si llegaste hasta aca,
-        <span>quizas uno ya te esta buscando.</span>
+        Cada guardian existe <span>una sola vez</span>.<br>
+        Cuando se adopta, desaparece para siempre.
       </p>
       <a href="/shop" class="cierre-btn">Ver Guardianes</a>
     </div>

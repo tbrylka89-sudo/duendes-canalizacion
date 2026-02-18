@@ -65,6 +65,7 @@ function MiMagiaContent() {
   const secciones = [
     { id: 'inicio', nombre: 'Inicio', icono: '◇' },
     { id: 'guardianes', nombre: 'Mis Guardianes', icono: '◆' },
+    { id: 'estudios', nombre: 'Estudios', icono: '☽' },
     { id: 'runas', nombre: 'Runas', icono: 'ᚱ' },
     { id: 'contenido', nombre: 'Sabiduría', icono: '✦' },
     { id: 'grimorio', nombre: 'Grimorio', icono: '▣' }
@@ -128,7 +129,8 @@ function MiMagiaContent() {
       <main className="contenido-principal">
         {seccion === 'inicio' && <SeccionInicio usuario={usuario} ir={setSeccion} />}
         {seccion === 'guardianes' && <SeccionGuardianes usuario={usuario} />}
-        {seccion === 'runas' && <SeccionRunas usuario={usuario} />}
+        {seccion === 'estudios' && <SeccionEstudios usuario={usuario} token={token} setUsuario={setUsuario} />}
+        {seccion === 'runas' && <SeccionRunas usuario={usuario} ir={setSeccion} />}
         {seccion === 'contenido' && <SeccionContenido />}
         {seccion === 'grimorio' && <SeccionGrimorio usuario={usuario} token={token} setUsuario={setUsuario} />}
       </main>
@@ -285,6 +287,13 @@ function SeccionInicio({ usuario, ir }) {
             </a>
           </div>
         )}
+
+        <div className="card card-destacada" onClick={() => ir('estudios')}>
+          <div className="card-icono">☽</div>
+          <h3>Estudios Místicos</h3>
+          <p>Lecturas, numerología, registros akáshicos y más</p>
+          <span className="card-link">Explorar estudios →</span>
+        </div>
 
         <div className="card" onClick={() => ir('runas')}>
           <div className="card-icono">ᚱ</div>
@@ -470,7 +479,7 @@ function SeccionGuardianes({ usuario }) {
 // SECCIÓN RUNAS DE PODER
 // ═══════════════════════════════════════════════════════════════
 
-function SeccionRunas({ usuario }) {
+function SeccionRunas({ usuario, ir }) {
   const runasActuales = usuario?.runas || 0;
 
   // Paquetes de runas (coinciden con productos en WooCommerce)
@@ -544,12 +553,17 @@ function SeccionRunas({ usuario }) {
       <div className="runas-explicacion">
         <h3>¿Qué podés hacer con tus runas?</h3>
         <ul>
-          <li>✦ Tiradas de runas y lecturas de tarot</li>
+          <li>✦ Tiradas de runas nórdicas y oráculos</li>
           <li>✦ Registros akáshicos y mensajes del alma</li>
-          <li>✦ Rituales y guías personalizadas</li>
-          <li>✦ Experiencias mágicas exclusivas</li>
+          <li>✦ Numerología y carta astral</li>
+          <li>✦ Estudios de linaje élfico y sanación ancestral</li>
         </ul>
         <p className="runas-nota">Las runas nunca expiran. Usalas cuando quieras.</p>
+        {ir && (
+          <button className="btn-dorado-sm" onClick={() => ir('estudios')} style={{marginTop: '1rem'}}>
+            Explorar estudios místicos →
+          </button>
+        )}
       </div>
 
       {/* Paquetes */}
@@ -593,6 +607,400 @@ function SeccionRunas({ usuario }) {
         <p>
           <strong>¿Cómo funciona?</strong> Comprás el paquete en nuestra tienda y
           las runas se acreditan automáticamente en tu cuenta dentro de los próximos minutos.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECCIÓN ESTUDIOS MÍSTICOS
+// ═══════════════════════════════════════════════════════════════
+
+function SeccionEstudios({ usuario, token, setUsuario }) {
+  const [catalogo, setCatalogo] = useState(null);
+  const [categorias, setCategorias] = useState(null);
+  const [categoriaActiva, setCategoriaActiva] = useState('simple');
+  const [estudioSeleccionado, setEstudioSeleccionado] = useState(null);
+  const [historial, setHistorial] = useState([]);
+  const [verHistorial, setVerHistorial] = useState(false);
+  const [generando, setGenerando] = useState(false);
+  const [resultado, setResultado] = useState(null);
+  const [error, setError] = useState('');
+
+  // Campos del formulario
+  const [pregunta, setPregunta] = useState('');
+  const [fechaNacimiento, setFechaNacimiento] = useState('');
+  const [horaNacimiento, setHoraNacimiento] = useState('');
+  const [momento, setMomento] = useState('');
+
+  const runasActuales = usuario?.runas || 0;
+
+  // Cargar catálogo al montar
+  useEffect(() => {
+    cargarCatalogo();
+    cargarHistorial();
+  }, []);
+
+  const cargarCatalogo = async () => {
+    try {
+      const res = await fetch('/api/mi-magia/estudios?accion=catalogo');
+      const data = await res.json();
+      if (data.success) {
+        setCatalogo(data.estudios);
+        setCategorias(data.categorias);
+      }
+    } catch (e) {
+      console.error('Error cargando catálogo:', e);
+    }
+  };
+
+  const cargarHistorial = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`/api/mi-magia/estudios?accion=historial&token=${token}`);
+      const data = await res.json();
+      if (data.success) {
+        setHistorial(data.historial || []);
+      }
+    } catch (e) {
+      console.error('Error cargando historial:', e);
+    }
+  };
+
+  const generarEstudio = async () => {
+    if (!estudioSeleccionado) return;
+
+    const estudio = catalogo.find(e => e.id === estudioSeleccionado);
+    if (!estudio) return;
+
+    // Validaciones
+    if (estudio.requierePregunta && !pregunta.trim()) {
+      setError('Escribí tu pregunta o situación');
+      return;
+    }
+    if (estudio.requiereFechaNacimiento && !fechaNacimiento) {
+      setError('Ingresá tu fecha de nacimiento');
+      return;
+    }
+    if (runasActuales < estudio.runas) {
+      setError(`Necesitás ${estudio.runas} runas. Tenés ${runasActuales}.`);
+      return;
+    }
+
+    setGenerando(true);
+    setError('');
+    setResultado(null);
+
+    try {
+      const res = await fetch('/api/mi-magia/estudios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          estudioId: estudioSeleccionado,
+          datos: {
+            pregunta: pregunta.trim(),
+            fechaNacimiento,
+            horaNacimiento,
+            momento: momento.trim()
+          }
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setResultado(data.estudio);
+        // Actualizar runas del usuario
+        setUsuario(prev => ({
+          ...prev,
+          runas: data.runasRestantes
+        }));
+        // Actualizar historial
+        cargarHistorial();
+        // Limpiar formulario
+        setPregunta('');
+        setMomento('');
+      } else {
+        setError(data.error || 'Error al generar el estudio');
+      }
+    } catch (e) {
+      setError('Error de conexión. Intentá de nuevo.');
+    }
+
+    setGenerando(false);
+  };
+
+  const verEstudioHistorial = async (estudioId) => {
+    try {
+      const res = await fetch(`/api/mi-magia/estudios?accion=ver&token=${token}&id=${estudioId}`);
+      const data = await res.json();
+      if (data.success) {
+        setResultado(data.estudio);
+        setVerHistorial(false);
+      }
+    } catch (e) {
+      console.error('Error cargando estudio:', e);
+    }
+  };
+
+  // Vista de resultado
+  if (resultado) {
+    return (
+      <section className="seccion seccion-estudios">
+        <div className="estudio-resultado">
+          <button className="btn-volver" onClick={() => { setResultado(null); setEstudioSeleccionado(null); }}>
+            ← Volver a estudios
+          </button>
+
+          <div className="resultado-header">
+            <span className="resultado-icono">{resultado.icono}</span>
+            <h2>{resultado.nombre}</h2>
+            <p className="resultado-fecha">
+              {new Date(resultado.fechaGenerado).toLocaleDateString('es-UY', {
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+              })}
+            </p>
+          </div>
+
+          <div className="resultado-contenido">
+            {resultado.contenido?.split('\n').map((linea, i) => {
+              if (linea.startsWith('**') && linea.endsWith('**')) {
+                return <h3 key={i} className="resultado-subtitulo">{linea.replace(/\*\*/g, '')}</h3>;
+              }
+              if (linea.trim()) {
+                return <p key={i}>{linea}</p>;
+              }
+              return <br key={i} />;
+            })}
+          </div>
+
+          <div className="resultado-footer">
+            <small>✦ Este estudio fue generado especialmente para vos</small>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Vista de historial
+  if (verHistorial) {
+    return (
+      <section className="seccion seccion-estudios">
+        <div className="seccion-header">
+          <h1>Mis Estudios</h1>
+          <p>Tu historial de lecturas y estudios</p>
+        </div>
+
+        <button className="btn-volver" onClick={() => setVerHistorial(false)}>
+          ← Volver al catálogo
+        </button>
+
+        {historial.length === 0 ? (
+          <div className="historial-vacio">
+            <p>Todavía no tenés estudios. ¡Hacé tu primera lectura!</p>
+          </div>
+        ) : (
+          <div className="historial-lista">
+            {historial.map((item, idx) => (
+              <div key={idx} className="historial-item" onClick={() => verEstudioHistorial(item.id)}>
+                <span className="historial-icono">{item.icono}</span>
+                <div className="historial-info">
+                  <h4>{item.nombre}</h4>
+                  <p className="historial-preview">{item.preview}</p>
+                  <span className="historial-fecha">
+                    {new Date(item.fecha).toLocaleDateString('es-UY')}
+                  </span>
+                </div>
+                <span className="historial-ver">Ver →</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // Vista de formulario para estudio seleccionado
+  if (estudioSeleccionado && catalogo) {
+    const estudio = catalogo.find(e => e.id === estudioSeleccionado);
+    if (!estudio) return null;
+
+    const puedePagar = runasActuales >= estudio.runas;
+
+    return (
+      <section className="seccion seccion-estudios">
+        <button className="btn-volver" onClick={() => { setEstudioSeleccionado(null); setError(''); }}>
+          ← Volver al catálogo
+        </button>
+
+        <div className="estudio-formulario">
+          <div className="formulario-header">
+            <span className="formulario-icono">{estudio.icono}</span>
+            <h2>{estudio.nombre}</h2>
+            <p>{estudio.descripcion}</p>
+            <div className="formulario-costo">
+              <span className="costo-runas">{estudio.runas} runas</span>
+              <span className="costo-tengo">Tenés: {runasActuales}</span>
+            </div>
+          </div>
+
+          <div className="formulario-campos">
+            {estudio.requierePregunta && (
+              <div className="campo-estudio">
+                <label>Tu pregunta o situación</label>
+                <textarea
+                  value={pregunta}
+                  onChange={(e) => setPregunta(e.target.value)}
+                  placeholder="¿Qué querés saber? ¿Qué situación estás atravesando?"
+                  rows={3}
+                />
+              </div>
+            )}
+
+            {estudio.requiereFechaNacimiento && (
+              <div className="campo-estudio">
+                <label>Fecha de nacimiento</label>
+                <input
+                  type="date"
+                  value={fechaNacimiento}
+                  onChange={(e) => setFechaNacimiento(e.target.value)}
+                />
+              </div>
+            )}
+
+            {estudio.requiereHoraNacimiento && (
+              <div className="campo-estudio">
+                <label>Hora de nacimiento (opcional)</label>
+                <input
+                  type="time"
+                  value={horaNacimiento}
+                  onChange={(e) => setHoraNacimiento(e.target.value)}
+                />
+                <small>Si no sabés la hora exacta, dejalo vacío</small>
+              </div>
+            )}
+
+            {!estudio.requierePregunta && !estudio.requiereFechaNacimiento && (
+              <div className="campo-estudio">
+                <label>¿Hay algo que quieras compartir? (opcional)</label>
+                <textarea
+                  value={momento}
+                  onChange={(e) => setMomento(e.target.value)}
+                  placeholder="Tu momento actual, lo que estás sintiendo..."
+                  rows={2}
+                />
+              </div>
+            )}
+          </div>
+
+          {error && <p className="error-estudio">{error}</p>}
+
+          <button
+            className={`btn-generar ${!puedePagar ? 'disabled' : ''}`}
+            onClick={generarEstudio}
+            disabled={generando || !puedePagar}
+          >
+            {generando ? (
+              <>Generando tu estudio...</>
+            ) : !puedePagar ? (
+              <>Te faltan {estudio.runas - runasActuales} runas</>
+            ) : (
+              <>✦ Generar {estudio.nombre}</>
+            )}
+          </button>
+
+          {!puedePagar && (
+            <p className="nota-runas">
+              Podés conseguir más runas en la sección <strong>Runas</strong>
+            </p>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  // Vista principal - catálogo
+  if (!catalogo || !categorias) {
+    return (
+      <section className="seccion seccion-estudios">
+        <div className="cargando-estudios">
+          <span>✦</span>
+          <p>Cargando estudios...</p>
+        </div>
+      </section>
+    );
+  }
+
+  const estudiosCategoria = catalogo.filter(e => e.categoria === categoriaActiva);
+
+  return (
+    <section className="seccion seccion-estudios">
+      <div className="seccion-header">
+        <h1>Estudios Místicos</h1>
+        <p>Lecturas personalizadas generadas con magia ancestral</p>
+      </div>
+
+      {/* Balance de runas */}
+      <div className="estudios-balance">
+        <span className="balance-mini-icono">ᚱ</span>
+        <span className="balance-mini-cantidad">{runasActuales}</span>
+        <span className="balance-mini-label">runas disponibles</span>
+        {historial.length > 0 && (
+          <button className="btn-historial" onClick={() => setVerHistorial(true)}>
+            Ver mis estudios ({historial.length})
+          </button>
+        )}
+      </div>
+
+      {/* Categorías */}
+      <div className="estudios-categorias">
+        {Object.entries(categorias).map(([key, cat]) => (
+          <button
+            key={key}
+            className={`categoria-btn ${categoriaActiva === key ? 'activa' : ''}`}
+            onClick={() => setCategoriaActiva(key)}
+            style={{ '--cat-color': cat.color }}
+          >
+            <span className="categoria-nombre">{cat.nombre}</span>
+            <span className="categoria-desc">{cat.descripcion}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Grid de estudios */}
+      <div className="estudios-grid">
+        {estudiosCategoria.map((estudio) => {
+          const puedePagar = runasActuales >= estudio.runas;
+          return (
+            <div
+              key={estudio.id}
+              className={`estudio-card ${!puedePagar ? 'sin-runas' : ''}`}
+              onClick={() => setEstudioSeleccionado(estudio.id)}
+            >
+              <div className="estudio-icono">{estudio.icono}</div>
+              <h3 className="estudio-nombre">{estudio.nombre}</h3>
+              <p className="estudio-descripcion">{estudio.descripcion}</p>
+              <div className="estudio-meta">
+                <span className="estudio-runas">{estudio.runas} runas</span>
+                <span className="estudio-duracion">{estudio.duracion}</span>
+              </div>
+              <span className="estudio-cta">
+                {puedePagar ? 'Hacer estudio →' : 'Necesitás más runas'}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Info */}
+      <div className="estudios-info">
+        <h4>¿Cómo funciona?</h4>
+        <p>
+          Cada estudio es único y generado especialmente para vos en el momento.
+          Pagás con runas y recibís tu lectura personalizada al instante.
+          Todos tus estudios quedan guardados en tu historial.
         </p>
       </div>
     </section>
@@ -2067,6 +2475,544 @@ const estilos = `
   .footer p {
     color: rgba(255,255,255,0.4);
     font-size: 0.85rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════ */
+  /* SECCIÓN ESTUDIOS */
+  /* ═══════════════════════════════════════════════════════════════ */
+
+  .seccion-estudios {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .estudios-balance {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(201,162,39,0.1);
+    border-radius: 30px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .balance-mini-icono {
+    font-size: 1.25rem;
+    color: #c9a227;
+  }
+
+  .balance-mini-cantidad {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #c9a227;
+  }
+
+  .balance-mini-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+  }
+
+  .btn-historial {
+    margin-left: auto;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(201,162,39,0.3);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.7);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-historial:hover {
+    border-color: #c9a227;
+    color: #c9a227;
+  }
+
+  /* Categorías */
+  .estudios-categorias {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .categoria-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+
+  .categoria-btn:hover {
+    border-color: var(--cat-color, #c9a227);
+    background: rgba(201,162,39,0.05);
+  }
+
+  .categoria-btn.activa {
+    border-color: var(--cat-color, #c9a227);
+    background: rgba(201,162,39,0.15);
+  }
+
+  .categoria-nombre {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+
+  .categoria-btn.activa .categoria-nombre {
+    color: var(--cat-color, #c9a227);
+  }
+
+  .categoria-desc {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Grid de estudios */
+  .estudios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .estudio-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: rgba(26,26,26,0.7);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .estudio-card:hover {
+    border-color: rgba(201,162,39,0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(201,162,39,0.1);
+  }
+
+  .estudio-card.sin-runas {
+    opacity: 0.6;
+  }
+
+  .estudio-card.sin-runas:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .estudio-icono {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .estudio-nombre {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 0.5rem;
+  }
+
+  .estudio-descripcion {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+
+  .estudio-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .estudio-runas {
+    color: #c9a227;
+    font-weight: 600;
+  }
+
+  .estudio-duracion {
+    color: rgba(255,255,255,0.4);
+  }
+
+  .estudio-cta {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    transition: color 0.3s;
+  }
+
+  .estudio-card:hover .estudio-cta {
+    color: #c9a227;
+  }
+
+  .estudio-card.sin-runas .estudio-cta {
+    color: rgba(255,100,100,0.7);
+  }
+
+  /* Info */
+  .estudios-info {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(201,162,39,0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(201,162,39,0.1);
+  }
+
+  .estudios-info h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 0.5rem;
+  }
+
+  .estudios-info p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Botón volver */
+  .btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: color 0.3s;
+  }
+
+  .btn-volver:hover {
+    color: #c9a227;
+  }
+
+  /* Formulario estudio */
+  .estudio-formulario {
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 20px;
+    padding: 2.5rem;
+  }
+
+  .formulario-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(201,162,39,0.15);
+  }
+
+  .formulario-icono {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .formulario-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 0.5rem;
+  }
+
+  .formulario-header p {
+    color: rgba(255,255,255,0.6);
+  }
+
+  .formulario-costo {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .costo-runas {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: #c9a227;
+  }
+
+  .costo-tengo {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.95rem;
+  }
+
+  .formulario-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .campo-estudio {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .campo-estudio label {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .campo-estudio textarea,
+  .campo-estudio input {
+    padding: 1rem;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .campo-estudio textarea:focus,
+  .campo-estudio input:focus {
+    outline: none;
+    border-color: rgba(201,162,39,0.5);
+  }
+
+  .campo-estudio textarea::placeholder {
+    color: rgba(255,255,255,0.4);
+  }
+
+  .campo-estudio small {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .error-estudio {
+    color: #e74c3c;
+    text-align: center;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn-generar {
+    width: 100%;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #c9a227, #a8892b);
+    border: none;
+    border-radius: 12px;
+    color: #0a0a0a;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-generar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(201,162,39,0.3);
+  }
+
+  .btn-generar:disabled {
+    cursor: not-allowed;
+  }
+
+  .btn-generar.disabled {
+    background: rgba(201,162,39,0.3);
+    color: rgba(255,255,255,0.5);
+  }
+
+  .nota-runas {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .nota-runas strong {
+    color: #c9a227;
+  }
+
+  /* Resultado */
+  .estudio-resultado {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .resultado-header {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(145deg, rgba(201,162,39,0.15), rgba(26,26,26,0.9));
+    border: 1px solid rgba(201,162,39,0.3);
+    border-radius: 20px 20px 0 0;
+  }
+
+  .resultado-icono {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .resultado-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 0.5rem;
+  }
+
+  .resultado-fecha {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+  }
+
+  .resultado-contenido {
+    background: rgba(26,26,26,0.5);
+    border-left: 1px solid rgba(201,162,39,0.3);
+    border-right: 1px solid rgba(201,162,39,0.3);
+    padding: 2.5rem;
+  }
+
+  .resultado-contenido p {
+    margin-bottom: 1rem;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .resultado-subtitulo {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin: 1.5rem 0 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(201,162,39,0.2);
+  }
+
+  .resultado-contenido p:first-child {
+    margin-top: 0;
+  }
+
+  .resultado-footer {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.3);
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .resultado-footer small {
+    color: rgba(201,162,39,0.8);
+  }
+
+  /* Historial */
+  .historial-vacio {
+    text-align: center;
+    padding: 3rem;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .historial-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .historial-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(26,26,26,0.5);
+    border: 1px solid rgba(201,162,39,0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .historial-item:hover {
+    border-color: rgba(201,162,39,0.4);
+    background: rgba(201,162,39,0.05);
+  }
+
+  .historial-icono {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .historial-info {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .historial-info h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #c9a227;
+    margin-bottom: 0.25rem;
+  }
+
+  .historial-preview {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.25rem;
+  }
+
+  .historial-fecha {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .historial-ver {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .historial-item:hover .historial-ver {
+    color: #c9a227;
+  }
+
+  /* Cargando estudios */
+  .cargando-estudios {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .cargando-estudios span {
+    font-size: 2.5rem;
+    color: #c9a227;
+    display: block;
+    animation: pulso 2s ease infinite;
+    margin-bottom: 1rem;
+  }
+
+  .cargando-estudios p {
+    color: rgba(255,255,255,0.6);
   }
 `;
 

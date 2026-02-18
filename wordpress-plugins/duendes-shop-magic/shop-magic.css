@@ -1,0 +1,394 @@
+/* ═══════════════════════════════════════════════════════════════
+   DUENDES SHOP MAGIC — CSS v1.0
+   Overlay mágico sobre guardian-card existentes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ RESET — hide old conflicting layers ═══ */
+.dte-header,
+.dsp-wrapper,
+.dsp-productos-grid { display: none !important; }
+
+/* ═══ GLOBAL DARK ATMOSPHERE ═══ */
+body.woocommerce-shop,
+body.post-type-archive-product {
+  background: #0a0c08 !important;
+}
+.dte-tienda {
+  background: transparent !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ CURSOR GLOW ═══ */
+#cursor-glow {
+  position: fixed;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184,151,58,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease-out, top 0.3s ease-out;
+  display: none;
+}
+@media (hover: hover) { #cursor-glow { display: block; } }
+
+/* ═══ CATEGORY PILLS ═══ */
+.dte-categorias {
+  display: flex !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  padding: 10px 0 30px !important;
+  margin: 0 !important;
+}
+.dte-cat {
+  font-family: 'Cinzel', serif !important;
+  font-size: 10px !important;
+  letter-spacing: 2px !important;
+  color: rgba(232,224,208,0.4) !important;
+  padding: 10px 22px !important;
+  border: 1px solid rgba(184,151,58,0.12) !important;
+  border-radius: 0 !important;
+  background: rgba(184,151,58,0.03) !important;
+  cursor: pointer !important;
+  transition: all 0.4s ease !important;
+  text-transform: uppercase !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.dte-cat::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(135deg, rgba(184,151,58,0.3), transparent) !important;
+  opacity: 0 !important;
+  transition: opacity 0.4s !important;
+}
+.dte-cat:hover::before,
+.dte-cat.active::before { opacity: 1 !important; }
+.dte-cat:hover,
+.dte-cat.active {
+  color: #fff !important;
+  border-color: rgba(184,151,58,0.6) !important;
+  box-shadow: 0 0 20px rgba(184,151,58,0.12) !important;
+}
+
+/* ═══ GRID ═══ */
+.productos-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 20px !important;
+  padding: 0 !important;
+  max-width: 1300px !important;
+  margin: 0 auto !important;
+}
+
+/* ═══ SIZE SECTION HEADERS ═══ */
+.size-section-header {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px 0 20px;
+  position: relative;
+}
+.size-section-header:first-child { padding-top: 10px; }
+.size-section-header .ssh-line {
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184,151,58,0.4), transparent);
+  margin: 0 auto 16px;
+}
+.size-section-header .ssh-rune {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 18px;
+  color: rgba(184,151,58,0.5);
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(184,151,58,0.3);
+}
+.size-section-header h2 {
+  font-family: 'Cinzel', serif !important;
+  font-size: clamp(18px, 3vw, 28px) !important;
+  font-weight: 400 !important;
+  letter-spacing: 6px !important;
+  color: #e8e0d0 !important;
+  margin: 0 0 6px !important;
+}
+.size-section-header h2 em {
+  color: #B8973A;
+  font-style: normal;
+}
+.size-section-header .ssh-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: rgba(232,224,208,0.35);
+  font-style: italic;
+}
+.size-section-header .ssh-count {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(184,151,58,0.3);
+  margin-top: 10px;
+}
+
+/* ═══ CARD — dark, mystical ═══ */
+.guardian-card {
+  background: linear-gradient(160deg, #141814 0%, #0d100d 100%) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(184,151,58,0.06) !important;
+  overflow: hidden !important;
+  transition: all 0.5s cubic-bezier(0.22,1,0.36,1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+  /* Start hidden for reveal animation */
+  opacity: 0;
+  transform: translateY(30px);
+}
+.guardian-card.revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1) !important;
+}
+
+/* Golden border glow on hover */
+.guardian-card::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: -1px !important;
+  border-radius: 6px !important;
+  padding: 1px !important;
+  background: linear-gradient(135deg, rgba(184,151,58,0.5), transparent 50%, rgba(184,151,58,0.2)) !important;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) !important;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  opacity: 0 !important;
+  transition: opacity 0.5s !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+}
+.guardian-card:hover::before { opacity: 1 !important; }
+.guardian-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.35),
+    0 0 30px rgba(184,151,58,0.06) !important;
+  border-color: rgba(184,151,58,0.15) !important;
+}
+
+/* ═══ Image ═══ */
+.guardian-imagen {
+  aspect-ratio: 3/4 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+.guardian-imagen img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  transition: transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease !important;
+  filter: brightness(0.88) saturate(0.95) !important;
+}
+.guardian-card:hover .guardian-imagen img {
+  transform: scale(1.06) !important;
+  filter: brightness(1) saturate(1.05) !important;
+}
+
+/* Mystical glow from below */
+.guardian-imagen::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: radial-gradient(ellipse at center bottom, rgba(184,151,58,0.25), transparent 65%) !important;
+  opacity: 0 !important;
+  transition: opacity 0.6s !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+.guardian-card:hover .guardian-imagen::after { opacity: 1 !important; }
+
+/* ═══ Size badge ═══ */
+.guardian-tamano {
+  position: absolute !important;
+  top: 10px !important; left: 10px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 8px !important;
+  letter-spacing: 1.5px !important;
+  color: #fff !important;
+  background: rgba(10,12,8,0.7) !important;
+  backdrop-filter: blur(8px) !important;
+  padding: 4px 9px !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 0 !important;
+  z-index: 2 !important;
+  text-transform: uppercase !important;
+}
+
+/* ═══ Category emoji ═══ */
+.guardian-categoria {
+  position: absolute !important;
+  top: 10px !important; right: 10px !important;
+  font-size: 14px !important;
+  z-index: 2 !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)) !important;
+  background: none !important;
+  border: none !important;
+}
+
+/* ═══ Hover CTA overlay ═══ */
+.guardian-card .hover-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 40px 14px 14px;
+  background: linear-gradient(transparent, rgba(10,12,8,0.95));
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.4s ease;
+  text-align: center;
+  z-index: 4;
+}
+.guardian-card:hover .hover-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hover-overlay .ho-btn {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #0a0c08;
+  background: #B8973A;
+  padding: 9px 20px;
+  transition: all 0.3s;
+}
+.hover-overlay .ho-btn:hover { background: #fff; }
+
+/* ═══ Card info ═══ */
+.guardian-info {
+  padding: 14px 14px 18px !important;
+  background: transparent !important;
+  border-top: 1px solid rgba(184,151,58,0.06) !important;
+}
+.guardian-tipo {
+  font-family: 'Cinzel', serif !important;
+  font-size: 8px !important;
+  letter-spacing: 2.5px !important;
+  color: rgba(184,151,58,0.5) !important;
+  margin-bottom: 4px !important;
+  text-transform: uppercase !important;
+}
+.guardian-nombre {
+  font-family: 'Cinzel', serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #e8e0d0 !important;
+  letter-spacing: 1px !important;
+  margin: 0 0 6px !important;
+}
+.guardian-precio {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-size: 16px !important;
+  color: #e8e0d0 !important;
+  font-weight: 500 !important;
+}
+.guardian-cta {
+  font-family: 'Cinzel', serif !important;
+  font-size: 8px !important;
+  letter-spacing: 1.5px !important;
+  color: rgba(232,224,208,0.25) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-top: 4px !important;
+  transition: color 0.3s !important;
+}
+.guardian-card:hover .guardian-cta {
+  color: rgba(184,151,58,0.7) !important;
+}
+
+/* ═══ ADOPTADO ═══ */
+.guardian-card.adoptado {
+  opacity: 0.45 !important;
+}
+.guardian-card.adoptado .guardian-imagen img {
+  filter: grayscale(0.6) brightness(0.5) !important;
+  border-radius: 0 !important;
+}
+.guardian-card.adoptado::before {
+  content: 'ADOPTADO' !important;
+  position: absolute !important;
+  top: 50% !important; left: 50% !important;
+  transform: translate(-50%,-50%) rotate(-12deg) !important;
+  background: rgba(120,40,40,0.7) !important;
+  color: rgba(255,255,255,0.8) !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px !important;
+  padding: 8px 20px !important;
+  border: 1px solid rgba(255,200,200,0.15) !important;
+  border-radius: 0 !important;
+  z-index: 10 !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(4px) !important;
+  box-shadow: none !important;
+  inset: auto !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  -webkit-mask-composite: unset !important;
+  mask-composite: unset !important;
+}
+
+/* ═══ SOCIAL PROOF TOAST ═══ */
+#sp-toast {
+  position: fixed;
+  bottom: 20px; left: 20px;
+  z-index: 9999;
+  background: #181c14;
+  border: 1px solid rgba(184,151,58,0.1);
+  border-radius: 4px;
+  padding: 12px 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 15px rgba(184,151,58,0.04);
+  display: flex; align-items: center; gap: 12px;
+  max-width: 320px;
+  transform: translateX(-120%);
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+#sp-toast.show { transform: translateX(0); }
+#sp-toast .sp-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #6abf69; flex-shrink: 0;
+  animation: spPulse 2s infinite;
+}
+@keyframes spPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+#sp-toast .sp-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px; color: #e8e0d0; line-height: 1.4;
+}
+#sp-toast .sp-text strong { color: #B8973A; font-weight: 600; }
+#sp-toast .sp-time {
+  font-size: 12px; color: rgba(232,224,208,0.3); margin-top: 2px;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 1024px) {
+  .productos-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; }
+}
+@media (max-width: 768px) {
+  .productos-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .guardian-card .hover-overlay { display: none; }
+  .guardian-info { padding: 10px 10px 14px !important; }
+  .guardian-nombre { font-size: 12px !important; }
+  .size-section-header h2 { font-size: 16px !important; letter-spacing: 4px !important; }
+  .size-section-header { padding: 35px 0 12px; }
+  #sp-toast { bottom: 14px; left: 8px; right: 8px; max-width: none; }
+}
+@media (max-width: 480px) {
+  .productos-grid { gap: 6px !important; }
+  .guardian-tamano { font-size: 7px !important; padding: 3px 7px !important; top: 6px !important; left: 6px !important; }
+  .guardian-categoria { font-size: 12px !important; top: 6px !important; right: 6px !important; }
+  .guardian-cta { display: none !important; }
+}

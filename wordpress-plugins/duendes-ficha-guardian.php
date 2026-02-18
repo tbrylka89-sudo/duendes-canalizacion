@@ -792,7 +792,7 @@ class DuendesFichaGuardian {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // AJAX: GENERAR FICHA CON IA
+    // AJAX: GENERAR FICHA CON IA (DIRECTO A ANTHROPIC)
     // ═══════════════════════════════════════════════════════════════
 
     public function ajax_generar_ficha() {
@@ -813,37 +813,120 @@ class DuendesFichaGuardian {
             wp_send_json_error(['error' => 'El producto no tiene descripción/historia. Generá una historia primero.']);
         }
 
-        // Construir datos básicos desde la ficha actual
-        $datosBasicos = [
-            'especie' => $ficha_actual['especie'] ?? 'duende',
-            'categoria' => $ficha_actual['categoria'] ?? 'proteccion',
-            'genero' => $ficha_actual['genero'] ?? 'M',
-            'tamano_cm' => $ficha_actual['tamano_cm'] ?? '',
-            'accesorios' => $ficha_actual['accesorios'] ?? ''
-        ];
+        // Generar ficha directamente con Anthropic
+        $fichaIA = $this->generar_ficha_con_anthropic($nombre, $historia, $ficha_actual);
 
-        // Llamar a la API de Vercel (endpoint nuevo)
-        $response = wp_remote_post($this->api_url . '/guardian-intelligence/solo-ficha-ia', [
+        if ($fichaIA) {
+            wp_send_json_success(['ficha' => $fichaIA]);
+        } else {
+            wp_send_json_error(['error' => 'Error generando ficha IA']);
+        }
+    }
+
+    // Generar ficha llamando directamente a Anthropic API
+    private function generar_ficha_con_anthropic($nombre, $historia, $ficha_actual) {
+        // Obtener API key de wp-config.php
+        $api_key = defined('ANTHROPIC_API_KEY') ? ANTHROPIC_API_KEY : '';
+
+        if (empty($api_key)) {
+            error_log('[Ficha Guardian] ANTHROPIC_API_KEY no definida en wp-config.php');
+            return null;
+        }
+
+        $especie = $ficha_actual['especie'] ?? 'duende';
+        $categoria = $ficha_actual['categoria'] ?? 'proteccion';
+        $genero = ($ficha_actual['genero'] ?? 'M') === 'F' ? 'Femenino' : 'Masculino';
+        $tamano = $ficha_actual['tamano_cm'] ?? '?';
+        $accesorios = $ficha_actual['accesorios'] ?? 'No especificados';
+
+        $prompt = "Sos un experto en crear fichas de personalidad para guardianes místicos de \"Duendes del Uruguay\".
+Basándote en la historia y datos de este guardián, generá una ficha coherente con su esencia.
+
+GUARDIÁN:
+- Nombre: {$nombre}
+- Especie: {$especie}
+- Categoría: {$categoria}
+- Género: {$genero}
+- Tamaño: {$tamano} cm
+- Accesorios: {$accesorios}
+
+HISTORIA:
+{$historia}
+
+INSTRUCCIONES:
+Generá una ficha que sea COHERENTE con la historia, los accesorios y la personalidad del guardián.
+- La flor debe resonar con su energía y colores
+- La piedra/cristal debe conectar con los que ya tiene o su propósito
+- El color debe reflejar su esencia visual
+- Los gustos deben ser específicos y únicos, basados en su historia
+- El dato curioso debe hacer que alguien diga \"ayyy es como yo\"
+- La frase/lema debe ser algo que ESTE guardián DIRÍA, no genérico
+
+FORMATO DE RESPUESTA (JSON exacto):
+{
+  \"flor_favorita\": \"nombre de la flor\",
+  \"piedra_favorita\": \"nombre del cristal/piedra\",
+  \"color_favorito\": \"color específico (ej: violeta profundo)\",
+  \"espacio_casa\": \"lugar específico de la casa\",
+  \"elemento\": \"Fuego|Agua|Tierra|Aire|Éter\",
+  \"estacion\": \"Primavera|Verano|Otoño|Invierno\",
+  \"momento_dia\": \"momento específico\",
+  \"le_gusta_pasear\": \"Sí, le encanta|No, prefiere quedarse|Que le pregunte primero\",
+  \"le_gusta\": [\"cosa1\", \"cosa2\", \"cosa3\"],
+  \"no_le_gusta\": [\"cosa1\", \"cosa2\", \"cosa3\"],
+  \"frase_lema\": \"frase que diría este guardián\",
+  \"dato_curioso\": \"algo único y entrañable\"
+}
+
+Respondé SOLO con el JSON.";
+
+        $response = wp_remote_post('https://api.anthropic.com/v1/messages', [
             'timeout' => 90,
-            'headers' => ['Content-Type' => 'application/json'],
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'x-api-key' => $api_key,
+                'anthropic-version' => '2023-06-01'
+            ],
             'body' => json_encode([
-                'nombre' => $nombre,
-                'historia' => $historia,
-                'datosBasicos' => $datosBasicos
+                'model' => 'claude-sonnet-4-20250514',
+                'max_tokens' => 1024,
+                'messages' => [
+                    ['role' => 'user', 'content' => $prompt]
+                ]
             ])
         ]);
 
         if (is_wp_error($response)) {
-            wp_send_json_error(['error' => 'Error de conexión: ' . $response->get_error_message()]);
+            error_log('[Ficha Guardian] Error llamando Anthropic: ' . $response->get_error_message());
+            return null;
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
-        if (isset($body['success']) && $body['success'] && isset($body['fichaIA'])) {
-            wp_send_json_success(['ficha' => $body['fichaIA']]);
-        } else {
-            wp_send_json_error(['error' => $body['error'] ?? 'Error generando ficha IA']);
+        if (!isset($body['content'][0]['text'])) {
+            error_log('[Ficha Guardian] Respuesta inesperada de Anthropic: ' . print_r($body, true));
+            return null;
         }
+
+        $texto = $body['content'][0]['text'];
+
+        // Extraer JSON de la respuesta
+        if (preg_match('/\{[\s\S]*\}/', $texto, $matches)) {
+            $fichaIA = json_decode($matches[0], true);
+            if ($fichaIA) {
+                // Asegurar arrays
+                if (!is_array($fichaIA['le_gusta'] ?? null)) {
+                    $fichaIA['le_gusta'] = [$fichaIA['le_gusta'] ?? ''];
+                }
+                if (!is_array($fichaIA['no_le_gusta'] ?? null)) {
+                    $fichaIA['no_le_gusta'] = [$fichaIA['no_le_gusta'] ?? ''];
+                }
+                return $fichaIA;
+            }
+        }
+
+        error_log('[Ficha Guardian] No se pudo parsear JSON de Anthropic: ' . $texto);
+        return null;
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -962,28 +1045,14 @@ class DuendesFichaGuardian {
         }
 
         // ══════════════════════════════════════════════════════════════
-        // PASO 2: LLAMAR A LA API SOLO PARA FICHA IA (flor, piedra, etc)
+        // PASO 2: GENERAR FICHA IA DIRECTAMENTE CON ANTHROPIC
         // ══════════════════════════════════════════════════════════════
 
         $fichaIA = null;
 
         if (!empty($historia)) {
-            $response = wp_remote_post($this->api_url . '/guardian-intelligence/solo-ficha-ia', [
-                'timeout' => 90,
-                'headers' => ['Content-Type' => 'application/json'],
-                'body' => json_encode([
-                    'nombre' => $nombre,
-                    'historia' => $historia,
-                    'datosBasicos' => $datosBasicos
-                ])
-            ]);
-
-            if (!is_wp_error($response)) {
-                $body = json_decode(wp_remote_retrieve_body($response), true);
-                if (isset($body['success']) && $body['success'] && isset($body['fichaIA'])) {
-                    $fichaIA = $body['fichaIA'];
-                }
-            }
+            // Usar la función que llama directamente a Anthropic
+            $fichaIA = $this->generar_ficha_con_anthropic($nombre, $historia, $datosBasicos);
         }
 
         // ══════════════════════════════════════════════════════════════

@@ -288,7 +288,14 @@ function duendes_header_universal() {
             gap: 25px;
         }
 
-        .dh-left .dh-nav-link {
+        .dh-desktop-nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .dh-left .dh-nav-link,
+        .dh-desktop-nav .dh-nav-link {
             color: rgba(255,255,255,0.85);
             text-decoration: none;
             font-size: 0.8rem;
@@ -297,7 +304,8 @@ function duendes_header_universal() {
             text-transform: uppercase;
         }
 
-        .dh-left .dh-nav-link:hover {
+        .dh-left .dh-nav-link:hover,
+        .dh-desktop-nav .dh-nav-link:hover {
             color: #d4af37;
         }
 
@@ -539,22 +547,27 @@ function duendes_header_universal() {
                 <span class="dh-logo-tagline">Canalizados para vos</span>
             </a>
 
-            <!-- Links desktop (después del logo) -->
-            <a href="<?php echo esc_url($home); ?>" class="dh-desktop-only dh-nav-link">Inicio</a>
-
-            <div class="dh-dropdown dh-desktop-only">
-                <span class="dh-dropdown-trigger">Tienda Mágica</span>
-                <div class="dh-dropdown-menu">
-                    <a href="<?php echo esc_url($shop); ?>">Ver Todo</a>
-                    <a href="<?php echo esc_url(home_url('/product-category/proteccion/')); ?>">Protección</a>
-                    <a href="<?php echo esc_url(home_url('/product-category/amor/')); ?>">Amor</a>
-                    <a href="<?php echo esc_url(home_url('/product-category/dinero-abundancia-negocios/')); ?>">Abundancia</a>
-                    <a href="<?php echo esc_url(home_url('/product-category/salud/')); ?>">Salud</a>
-                </div>
-            </div>
-
-            <a href="<?php echo esc_url(home_url('/descubri-que-duende-te-elige/')); ?>" class="dh-desktop-only dh-nav-link">Test</a>
-            <a href="<?php echo esc_url(home_url('/nosotros/')); ?>" class="dh-desktop-only dh-nav-link">Nosotros</a>
+            <!-- Links desktop - Menu de WordPress -->
+            <nav class="dh-desktop-nav dh-desktop-only">
+            <?php
+            wp_nav_menu([
+                'theme_location' => 'duendes-menu-principal',
+                'container' => false,
+                'menu_class' => 'dh-menu-list',
+                'fallback_cb' => function() {
+                    // Fallback si no hay menu asignado
+                    echo '<a href="' . home_url('/') . '" class="dh-nav-link">Inicio</a>';
+                    echo '<a href="' . home_url('/shop/') . '" class="dh-nav-link">Tienda</a>';
+                },
+                'items_wrap' => '%3$s',
+                'walker' => new class extends Walker_Nav_Menu {
+                    function start_el(&$output, $item, $depth = 0, $args = null, $id = 0) {
+                        $output .= '<a href="' . esc_url($item->url) . '" class="dh-nav-link">' . esc_html($item->title) . '</a>';
+                    }
+                }
+            ]);
+            ?>
+            </nav>
         </div>
 
         <!-- DERECHA - Iconos + Hamburguesa -->
@@ -657,15 +670,7 @@ function duendes_header_universal() {
                 </svg>
             </a>
 
-            <a href="<?php echo esc_url($cart); ?>" class="dh-icon-link dh-cart" title="Carrito">
-                <svg class="dh-icon" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M6 6h15l-1.5 9h-12z"/>
-                    <circle cx="9" cy="20" r="1"/>
-                    <circle cx="18" cy="20" r="1"/>
-                    <path d="M6 6L5 3H2"/>
-                </svg>
-                <span class="dh-cart-badge" data-count="<?php echo $cart_count; ?>"><?php echo $cart_count ?: ''; ?></span>
-            </a>
+            <!-- Carrito removido - usar el de FunnelKit en el menú -->
 
             <!-- Hamburguesa (solo móvil) -->
             <div class="dh-hamburger" id="dhHamburger">
@@ -686,25 +691,47 @@ function duendes_header_universal() {
             </svg>
             <span>Cerrar</span>
         </div>
-        <a href="<?php echo esc_url($home); ?>">Inicio</a>
-        <a href="<?php echo esc_url($shop); ?>">Tienda Mágica</a>
-        <a href="<?php echo esc_url(home_url('/descubri-que-duende-te-elige/')); ?>">Descubrí qué Duende te elige</a>
-        <a href="<?php echo esc_url(home_url('/testimonios/')); ?>">Experiencias Mágicas</a>
-        <a href="<?php echo esc_url(home_url('/como-funciona/')); ?>">Cómo Funciona</a>
-        <a href="<?php echo esc_url(home_url('/nosotros/')); ?>">Nosotros</a>
-        <a href="<?php echo esc_url(home_url('/faq/')); ?>">Preguntas Frecuentes</a>
-        <a href="<?php echo esc_url(home_url('/contacto/')); ?>">Contacto</a>
-        <a href="https://magia.duendesdeluruguay.com" class="dh-mi-magia-link">Mi Magia</a>
+
+        <!-- Menu Mobile de WordPress -->
+        <?php
+        wp_nav_menu([
+            'theme_location' => 'duendes-menu-mobile',
+            'container' => false,
+            'menu_class' => 'dh-mobile-nav',
+            'fallback_cb' => function() use ($home, $shop, $account, $cart, $cart_count) {
+                // Fallback si no hay menu asignado
+                echo '<a href="' . esc_url($home) . '">Inicio</a>';
+                echo '<a href="' . esc_url($shop) . '">Tienda</a>';
+                echo '<a href="' . esc_url(home_url('/como-funciona/')) . '">Como Funciona</a>';
+                echo '<a href="' . esc_url(home_url('/nosotros/')) . '">Nosotros</a>';
+                echo '<div class="dh-mobile-divider"></div>';
+                echo '<a href="' . esc_url($account) . '">Mi Cuenta</a>';
+                echo '<a href="' . esc_url($cart) . '">Carrito' . ($cart_count ? " ($cart_count)" : '') . '</a>';
+            },
+            'items_wrap' => '%3$s',
+            'walker' => new class extends Walker_Nav_Menu {
+                function start_el(&$output, $item, $depth = 0, $args = null, $id = 0) {
+                    $classes = '';
+                    if (in_array('dh-mi-magia', $item->classes)) {
+                        $classes = ' class="dh-mi-magia-link"';
+                    }
+                    $output .= '<a href="' . esc_url($item->url) . '"' . $classes . '>' . esc_html($item->title) . '</a>';
+                }
+            }
+        ]);
+        ?>
 
         <div class="dh-mobile-divider"></div>
 
-        <a href="<?php echo esc_url(home_url('/politica-de-privacidad/')); ?>" class="dh-small-link">Política de Privacidad</a>
-        <a href="<?php echo esc_url(home_url('/terminos-y-condiciones/')); ?>" class="dh-small-link">Términos y Condiciones</a>
-
-        <div class="dh-mobile-divider"></div>
-
+        <!-- Links fijos -->
         <a href="<?php echo esc_url($account); ?>">Mi Cuenta</a>
         <a href="<?php echo esc_url($cart); ?>">Carrito<?php if ($cart_count) echo " ($cart_count)"; ?></a>
+
+        <div class="dh-mobile-divider"></div>
+
+        <!-- Legal -->
+        <a href="<?php echo esc_url(home_url('/terminos/')); ?>" class="dh-small-link">Términos</a>
+        <a href="<?php echo esc_url(home_url('/politica-de-privacidad/')); ?>" class="dh-small-link">Privacidad</a>
     </div>
 
     <script>
@@ -994,7 +1021,7 @@ function duendes_overlay_bienvenida() {
         // Bloquear scroll
         document.body.style.overflow = 'hidden';
 
-        // Después de 3s, detectar país
+        // Después de 1s, detectar país
         setTimeout(function() {
             mostrar('dob-confirmar');
 
@@ -1014,7 +1041,7 @@ function duendes_overlay_bienvenida() {
                 mostrar('dob-buscar');
                 listar('');
             });
-        }, 3000);
+        }, 1000);
     })();
     </script>
     <?php

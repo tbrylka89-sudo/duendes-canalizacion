@@ -1,192 +1,237 @@
 <!--
-  SECCIÓN PIRIÁPOLIS - Duendes del Uruguay
-  Neuromarketing + Emoción + Conexión
-  Para insertar en WordPress via Elementor o HTML block
+  SECCIÓN "LA VERDAD" - Duendes del Uruguay
+  TRIGGER: AUTORIDAD (datos concretos, no destino místico)
+  Actualizado según escalera emocional de neuromarketing
 -->
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Uncial+Antiqua&display=swap');
 
   .seccion-piriapolis {
-    background-color: #0a0a0a;
-    padding: 80px 20px;
-    overflow: hidden;
+    background-color: #0a0a0a !important;
+    padding: 80px 20px !important;
+    overflow: hidden !important;
+  }
+
+  .seccion-piriapolis * {
+    box-sizing: border-box !important;
   }
 
   .piriapolis-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
   }
 
   .titulo-magico {
-    font-family: 'Uncial Antiqua', cursive;
-    color: #d4af37;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-    letter-spacing: 3px;
+    font-family: 'Uncial Antiqua', cursive !important;
+    color: #d4af37 !important;
+    -webkit-text-fill-color: #d4af37 !important;
+    font-size: clamp(2rem, 5vw, 3.5rem) !important;
+    text-align: center !important;
+    margin-bottom: 20px !important;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
+    letter-spacing: 3px !important;
+    background: transparent !important;
   }
 
   .subtitulo-seccion {
-    font-family: 'Cinzel', serif;
-    color: #ffffff;
-    font-size: clamp(1rem, 2vw, 1.3rem);
-    text-align: center;
-    margin-bottom: 60px;
-    opacity: 0.9;
-    font-weight: 400;
-    letter-spacing: 1px;
+    font-family: 'Cinzel', serif !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: clamp(1rem, 2vw, 1.3rem) !important;
+    text-align: center !important;
+    margin-bottom: 60px !important;
+    opacity: 0.9 !important;
+    font-weight: 400 !important;
+    letter-spacing: 1px !important;
+    background: transparent !important;
   }
 
   /* Slider */
   .piriapolis-slider {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
+    position: relative !important;
+    width: 100% !important;
+    overflow: hidden !important;
   }
 
   .slider-track {
-    display: flex;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex !important;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   .slide {
-    min-width: 100%;
-    padding: 40px;
-    box-sizing: border-box;
+    min-width: 100% !important;
+    padding: 40px !important;
+    box-sizing: border-box !important;
   }
 
   .slide-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 900px;
-    margin: 0 auto;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    max-width: 900px !important;
+    margin: 0 auto !important;
   }
 
   .slide-icono {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 30px;
-    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+    width: 80px !important;
+    height: 80px !important;
+    margin-bottom: 30px !important;
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)) !important;
   }
 
   .slide-titulo {
-    font-family: 'Cinzel', serif;
-    color: #d4af37;
-    font-size: clamp(1.3rem, 3vw, 2rem);
-    text-align: center;
-    margin-bottom: 25px;
-    font-weight: 600;
-    letter-spacing: 2px;
+    font-family: 'Cinzel', serif !important;
+    color: #d4af37 !important;
+    -webkit-text-fill-color: #d4af37 !important;
+    font-size: clamp(1.3rem, 3vw, 2rem) !important;
+    text-align: center !important;
+    margin-bottom: 25px !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px !important;
+    background: transparent !important;
   }
 
   .slide-texto {
-    font-family: 'Cinzel', serif;
-    color: #ffffff;
-    font-size: clamp(1rem, 1.5vw, 1.15rem);
-    text-align: center;
-    line-height: 1.9;
-    opacity: 0.95;
-    max-width: 750px;
+    font-family: 'Cinzel', serif !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: clamp(1rem, 1.5vw, 1.15rem) !important;
+    text-align: center !important;
+    line-height: 1.9 !important;
+    opacity: 0.95 !important;
+    max-width: 750px !important;
+    background: transparent !important;
   }
 
   .slide-texto em {
-    color: #d4af37;
-    font-style: normal;
-    font-weight: 500;
+    color: #d4af37 !important;
+    -webkit-text-fill-color: #d4af37 !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
   }
 
   .slide-destacado {
-    font-family: 'Cinzel', serif;
-    color: #d4af37;
-    font-size: clamp(1.1rem, 1.8vw, 1.3rem);
-    text-align: center;
-    margin-top: 30px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    padding: 15px 30px;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 4px;
-    background: rgba(212, 175, 55, 0.05);
+    font-family: 'Cinzel', serif !important;
+    color: #d4af37 !important;
+    -webkit-text-fill-color: #d4af37 !important;
+    font-size: clamp(1.1rem, 1.8vw, 1.3rem) !important;
+    text-align: center !important;
+    margin-top: 30px !important;
+    font-weight: 500 !important;
+    letter-spacing: 1px !important;
+    padding: 15px 30px !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 4px !important;
+    background: rgba(212, 175, 55, 0.05) !important;
   }
 
-  /* Controles del slider */
+  /* Número grande destacado */
+  .numero-grande {
+    font-family: 'Cinzel', serif !important;
+    font-size: clamp(3rem, 8vw, 5rem) !important;
+    color: #d4af37 !important;
+    -webkit-text-fill-color: #d4af37 !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    margin-bottom: 10px !important;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.4) !important;
+    background: transparent !important;
+  }
+
+  .numero-label {
+    font-family: 'Cinzel', serif !important;
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem) !important;
+    color: rgba(255,255,255,0.7) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 3px !important;
+    margin-bottom: 30px !important;
+    background: transparent !important;
+  }
+
+  /* Controles del slider - DORADO, NO VERDE */
   .slider-controles {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    margin-top: 50px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 30px !important;
+    margin-top: 50px !important;
   }
 
   .slider-btn {
-    background: transparent;
-    border: 1px solid #d4af37;
-    color: #d4af37;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: transparent !important;
+    border: 1px solid #d4af37 !important;
+    color: #d4af37 !important;
+    -webkit-text-fill-color: #d4af37 !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    font-size: 1.5rem !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .slider-btn:hover {
-    background: #d4af37;
-    color: #0a0a0a;
+    background: #d4af37 !important;
+    color: #0a0a0a !important;
+    -webkit-text-fill-color: #0a0a0a !important;
   }
 
   .slider-dots {
-    display: flex;
-    gap: 12px;
+    display: flex !important;
+    gap: 12px !important;
   }
 
   .slider-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(212, 175, 55, 0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    background: rgba(212, 175, 55, 0.3) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
   }
 
   .slider-dot.active {
-    background: #d4af37;
-    transform: scale(1.2);
+    background: #d4af37 !important;
+    transform: scale(1.2) !important;
   }
 
-  /* Línea decorativa */
+  /* Linea decorativa */
   .linea-dorada {
-    width: 100px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
-    margin: 0 auto 40px;
+    width: 100px !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent) !important;
+    margin: 0 auto 40px !important;
   }
 
   /* Responsive */
   @media (max-width: 768px) {
     .seccion-piriapolis {
-      padding: 60px 15px;
+      padding: 60px 15px !important;
     }
 
     .slide {
-      padding: 20px;
+      padding: 20px !important;
     }
 
     .slide-icono {
-      width: 60px;
-      height: 60px;
+      width: 60px !important;
+      height: 60px !important;
     }
 
     .slider-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
+      width: 40px !important;
+      height: 40px !important;
+      font-size: 1.2rem !important;
+    }
+
+    .numero-grande {
+      font-size: 3rem !important;
     }
   }
 </style>
@@ -194,38 +239,54 @@
 <section class="seccion-piriapolis">
   <div class="piriapolis-container">
 
-    <h2 class="titulo-magico">Donde la Magia Nace</h2>
+    <h2 class="titulo-magico">La Verdad Detrás de la Magia</h2>
     <div class="linea-dorada"></div>
-    <p class="subtitulo-seccion">Tres verdades que hacen únicos a nuestros guardianes</p>
+    <p class="subtitulo-seccion">Datos reales. Sin marketing, sin exageraciones.</p>
 
     <div class="piriapolis-slider">
       <div class="slider-track" id="sliderTrack">
 
-        <!-- Slide 1: El Punto Energético -->
+        <!-- Slide 1: Las horas -->
         <div class="slide">
           <div class="slide-content">
-            <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r="45" stroke="#d4af37" stroke-width="2"/>
-              <path d="M50 15 L55 45 L85 50 L55 55 L50 85 L45 55 L15 50 L45 45 Z" fill="#d4af37"/>
-              <circle cx="50" cy="50" r="8" fill="#d4af37"/>
-            </svg>
-            <h3 class="slide-titulo">Piriápolis: Portal Energético del Sur</h3>
+            <div class="numero-grande">847</div>
+            <div class="numero-label">horas de trabajo al año</div>
+            <h3 class="slide-titulo">No Son Figuras. Es Tiempo de Vida.</h3>
             <p class="slide-texto">
-              Francisco Piria no eligió este lugar por casualidad. Los antiguos ya lo sabían:
-              hay puntos en la Tierra donde <em>la energía se concentra</em>, donde lo invisible
-              se hace más accesible. Piriápolis es uno de ellos.
+              Cada guardián requiere entre <em>30 y 45 días de trabajo</em>.
+              No hay atajos. No hay moldes. No hay producción en serie.
               <br><br>
-              Aquí, en la intersección de cerros sagrados y el océano, cada guardián absorbe
-              una carga energética que no encontrarás en ningún otro lugar del mundo.
-              <em>No es folklore. Es geografía energética.</em>
+              Hay un ritual, una meditación, y dos manos que no paran
+              hasta que la pieza dice <em>"estoy lista"</em>.
             </p>
             <div class="slide-destacado">
-              Cada pieza nace cargada con la energía de este punto único del planeta
+              Por eso no podemos hacer más de 60 guardianes por año
             </div>
           </div>
         </div>
 
-        <!-- Slide 2: La Canalización -->
+        <!-- Slide 2: La unicidad -->
+        <div class="slide">
+          <div class="slide-content">
+            <div class="numero-grande">1</div>
+            <div class="numero-label">existencia en el universo</div>
+            <h3 class="slide-titulo">Cada Guardián Existe Una Sola Vez</h3>
+            <p class="slide-texto">
+              No es un slogan. Es un hecho verificable.
+              <br><br>
+              Cada pieza viene con <em>nombre propio y certificado de autenticidad</em>.
+              Cuando alguien lo adopta, ese diseño exacto desaparece para siempre.
+              <br><br>
+              El que llega a tus manos <em>no tiene copia</em>. Nadie más lo tiene.
+              Nadie más lo tendrá.
+            </p>
+            <div class="slide-destacado">
+              Tu guardián solo existe contigo
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: La canalización -->
         <div class="slide">
           <div class="slide-content">
             <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -235,76 +296,42 @@
               <circle cx="50" cy="75" r="8" stroke="#d4af37" stroke-width="2"/>
               <path d="M30 50 Q40 40 50 50 Q60 60 70 50" stroke="#d4af37" stroke-width="2"/>
             </svg>
-            <h3 class="slide-titulo">Canalización: El Mensaje que te Encuentra</h3>
+            <h3 class="slide-titulo">Un Mensaje Escrito Para Vos</h3>
             <p class="slide-texto">
-              Un guardián sin canalización es solo una figura. Con ella, <em>es un puente</em>.
+              No es un texto genérico. No es un horóscopo con tu nombre.
               <br><br>
-              Cuando elegís un guardián, recibís un mensaje que fue canalizado específicamente
-              para vos. No es un texto genérico. No es un horóscopo. Es una comunicación
-              directa que llega en el momento exacto en que la necesitás.
+              Es una <em>canalización específica</em> basada en lo que compartís
+              cuando hacés tu compra. Llega en el momento exacto que la necesitás.
               <br><br>
-              <em>Muchos nos escriben meses después</em>: "Releí la canalización y ahora
-              entiendo todo". El mensaje sabe esperar.
+              Muchos la releen meses después y recién ahí entienden todo.
+              <em>El mensaje sabe esperar.</em>
             </p>
             <div class="slide-destacado">
-              Tu guardián ya tiene algo que decirte. Solo falta que lo escuches.
+              Tu guardián ya tiene algo que decirte
             </div>
           </div>
         </div>
 
-        <!-- Slide 3: Hecho a Mano -->
+        <!-- Slide 4: Piriápolis -->
         <div class="slide">
           <div class="slide-content">
             <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M50 20 C30 30 25 50 30 70 C35 85 50 90 50 90 C50 90 65 85 70 70 C75 50 70 30 50 20" stroke="#d4af37" stroke-width="2"/>
-              <path d="M40 45 Q50 55 60 45" stroke="#d4af37" stroke-width="2"/>
-              <circle cx="42" cy="38" r="3" fill="#d4af37"/>
-              <circle cx="58" cy="38" r="3" fill="#d4af37"/>
-              <path d="M35 60 L65 60" stroke="#d4af37" stroke-width="1" stroke-dasharray="2 2"/>
+              <circle cx="50" cy="50" r="45" stroke="#d4af37" stroke-width="2"/>
+              <path d="M50 15 L55 45 L85 50 L55 55 L50 85 L45 55 L15 50 L45 45 Z" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#d4af37"/>
             </svg>
-            <h3 class="slide-titulo">Manos que Crean, No Máquinas</h3>
+            <h3 class="slide-titulo">Nacen en Piriápolis, Uruguay</h3>
             <p class="slide-texto">
-              Cada guardián pasa por las manos de Thibisay. <em>Literalmente cada uno.</em>
+              Un taller frente al mar, entre cerros y océano.
               <br><br>
-              No hay moldes. No hay producción en serie. Cada rostro tiene expresiones
-              únicas, cada detalle cuenta una historia diferente. Por eso dos guardianes
-              del mismo tipo nunca son idénticos.
+              Cada guardián absorbe esa energía antes de llegar a vos.
+              No es folklore — es el lugar donde Thibisay elige crear,
+              lejos del ruido, conectada con algo más grande.
               <br><br>
-              El que llega a tus manos <em>fue creado una sola vez en la historia del universo</em>.
-              Nadie más tiene exactamente el mismo. Nadie más lo tendrá.
+              <em>El lugar importa.</em> Y este lugar es especial.
             </p>
             <div class="slide-destacado">
-              Tu guardián no existe en ningún otro lugar. Solo contigo.
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 4: La Conexión -->
-        <div class="slide">
-          <div class="slide-content">
-            <svg class="slide-icono" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="30" cy="50" r="15" stroke="#d4af37" stroke-width="2"/>
-              <circle cx="70" cy="50" r="15" stroke="#d4af37" stroke-width="2"/>
-              <path d="M45 50 L55 50" stroke="#d4af37" stroke-width="2"/>
-              <path d="M30 35 L30 25 L70 25 L70 35" stroke="#d4af37" stroke-width="1.5"/>
-              <path d="M30 65 L30 75 L70 75 L70 65" stroke="#d4af37" stroke-width="1.5"/>
-              <circle cx="50" cy="25" r="4" fill="#d4af37"/>
-              <circle cx="50" cy="75" r="4" fill="#d4af37"/>
-            </svg>
-            <h3 class="slide-titulo">Energía + Mensaje + Singularidad = Conexión Real</h3>
-            <p class="slide-texto">
-              Estas tres cosas juntas crean algo que no se puede replicar:
-              <em>un vínculo que sentís desde el primer momento</em>.
-              <br><br>
-              No te estamos vendiendo una figura decorativa. Te estamos ofreciendo
-              un compañero energético que nace en un lugar de poder, llega con un
-              mensaje para vos, y existe únicamente en tu realidad.
-              <br><br>
-              <em>Los guardianes encuentran a sus personas.</em> Si llegaste hasta acá,
-              quizás uno ya te está buscando.
-            </p>
-            <div class="slide-destacado">
-              ¿Sentís el llamado? Tu guardián está esperando.
+              Geografía + intención + tiempo = algo que se siente
             </div>
           </div>
         </div>
@@ -312,7 +339,7 @@
       </div>
     </div>
 
-    <!-- Controles -->
+    <!-- Controles DORADOS -->
     <div class="slider-controles">
       <button class="slider-btn" id="btnPrev" aria-label="Anterior">&#8249;</button>
       <div class="slider-dots">

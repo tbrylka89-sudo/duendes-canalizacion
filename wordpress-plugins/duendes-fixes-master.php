@@ -1277,5 +1277,125 @@ add_action('wp_footer', function() {
 }, 999);
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 12. BOTONES DORADOS GLOBALES - Fuerza color #B8973A en todos los botones
+// ═══════════════════════════════════════════════════════════════════════════
+
+// CSS en el head
+add_action('wp_head', function() {
+    ?>
+    <style id="duendes-botones-dorados">
+    /* DUENDES - BOTONES DORADOS */
+    html body .elementor-button,
+    html body .elementor-widget-button .elementor-button,
+    html body a.elementor-button,
+    html body [class*="elementor-button"],
+    html body .e-button {
+        background: #B8973A !important;
+        background-color: #B8973A !important;
+        background-image: none !important;
+        color: #070906 !important;
+        border: none !important;
+    }
+    html body .elementor-button:hover,
+    html body a.elementor-button:hover,
+    html body [class*="elementor-button"]:hover {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #070906 !important;
+    }
+    html body .elementor-button span,
+    html body .elementor-button .elementor-button-text,
+    html body [class*="elementor-button"] span {
+        color: inherit !important;
+        background: transparent !important;
+    }
+    html body .elementor-background-overlay {
+        opacity: 0.2 !important;
+    }
+
+    /* FAQ / ACCORDION / TOGGLE - Fondo dorado */
+    html body .elementor-accordion-item,
+    html body .elementor-accordion .elementor-tab-title,
+    html body .elementor-accordion .elementor-accordion-title,
+    html body .elementor-toggle .elementor-tab-title,
+    html body .elementor-toggle .elementor-toggle-title,
+    html body .elementor-widget-accordion .elementor-tab-title,
+    html body .elementor-widget-toggle .elementor-tab-title,
+    html body [class*="elementor-accordion"] .elementor-tab-title,
+    html body [class*="elementor-toggle"] .elementor-tab-title,
+    html body .elementor-tab-title,
+    html body .e-n-accordion-item,
+    html body .e-n-accordion-item-title {
+        background: #B8973A !important;
+        background-color: #B8973A !important;
+        color: #070906 !important;
+        border: none !important;
+    }
+    html body .elementor-accordion-item:hover,
+    html body .elementor-accordion .elementor-tab-title:hover,
+    html body .elementor-toggle .elementor-tab-title:hover,
+    html body .elementor-tab-title:hover,
+    html body .e-n-accordion-item:hover,
+    html body .e-n-accordion-item-title:hover {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #070906 !important;
+    }
+    html body .elementor-accordion-icon,
+    html body .elementor-accordion-title,
+    html body .elementor-toggle-title,
+    html body .elementor-tab-title a,
+    html body .elementor-tab-title span,
+    html body .e-n-accordion-item-title span {
+        color: inherit !important;
+    }
+    </style>
+    <?php
+}, 999999);
+
+// JavaScript que fuerza los colores
+add_action('wp_footer', function() {
+    ?>
+    <script id="duendes-botones-js">
+    (function(){
+        console.log('[DUENDES BOTONES] Iniciando fix de colores...');
+        var G='#B8973A',B='#070906';
+
+        // Inyectar CSS adicional
+        var s=document.createElement('style');
+        s.textContent='.elementor-button,[class*="elementor-button"]{background:'+G+' !important;background-color:'+G+' !important;color:'+B+' !important}.elementor-background-overlay{opacity:0.2 !important}';
+        document.head.appendChild(s);
+
+        function fix(){
+            var c=0;
+            document.querySelectorAll('.elementor-button,[class*="elementor-button"],a.elementor-button').forEach(function(b){
+                b.style.cssText='background:'+G+' !important;background-color:'+G+' !important;color:'+B+' !important;border:none !important;';
+                b.querySelectorAll('span,.elementor-button-text').forEach(function(x){
+                    x.style.cssText='color:'+B+' !important;background:transparent !important;';
+                });
+                c++;
+            });
+            document.querySelectorAll('.elementor-background-overlay').forEach(function(o){
+                o.style.cssText='opacity:0.2 !important;';
+            });
+            if(c>0)console.log('[DUENDES BOTONES] Arreglados: '+c);
+        }
+
+        fix();
+        document.addEventListener('DOMContentLoaded',fix);
+        window.addEventListener('load',function(){
+            fix();
+            setTimeout(fix,100);
+            setTimeout(fix,500);
+            setTimeout(fix,1000);
+            setTimeout(fix,2000);
+        });
+        setInterval(fix,3000);
+    })();
+    </script>
+    <?php
+}, 999999);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // FIN DEL PLUGIN
 // ═══════════════════════════════════════════════════════════════════════════

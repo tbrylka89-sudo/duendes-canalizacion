@@ -48,6 +48,7 @@ class Duendes_Canalizaciones_V2 {
         add_action('wp_ajax_duendes_regenerar_canalizacion', [$this, 'ajax_regenerar_canalizacion']);
         add_action('wp_ajax_duendes_enviar_canalizacion', [$this, 'ajax_enviar_canalizacion']);
         add_action('wp_ajax_duendes_obtener_canalizacion', [$this, 'ajax_obtener_canalizacion']);
+        add_action('wp_ajax_duendes_guardar_canalizacion', [$this, 'ajax_guardar_canalizacion']);
 
         // WooCommerce hooks
         add_action('woocommerce_thankyou', [$this, 'mostrar_formulario_thankyou'], 5);
@@ -99,10 +100,21 @@ class Duendes_Canalizaciones_V2 {
     }
 
     public function enqueue_admin_assets($hook) {
-        if (strpos($hook, 'duendes_canalizacion') !== false ||
-            strpos($hook, 'duendes-canalizaciones') !== false) {
+        global $post_type;
 
-            wp_enqueue_style(
+        // Cargar en: listado CPT, edicion CPT, paginas del menu
+        $dominated_pages = (
+            $hook === 'edit.php' && $post_type === 'duendes_canalizacion' ||
+            $hook === 'post.php' && $post_type === 'duendes_canalizacion' ||
+            strpos($hook, 'duendes_canalizacion') !== false ||
+            strpos($hook, 'duendes-canalizaciones') !== false
+        );
+
+        if (!$dominated_pages) {
+            return;
+        }
+
+        wp_enqueue_style(
                 'duendes-canal-admin',
                 DUENDES_CANAL_URL . 'assets/css/admin.css',
                 [],
@@ -117,19 +129,18 @@ class Duendes_Canalizaciones_V2 {
                 true
             );
 
-            wp_localize_script('duendes-canal-admin', 'duendesCanalAdmin', [
-                'ajaxUrl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('duendes_canal_admin_nonce'),
-                'strings' => [
-                    'generando' => 'Generando canalizacion con IA...',
-                    'regenerando' => 'Regenerando con tus instrucciones...',
-                    'enviando' => 'Enviando al cliente...',
-                    'confirmEnviar' => 'Seguro que queres enviar esta canalizacion?',
-                    'exito' => 'Operacion completada!',
-                    'error' => 'Error en la operacion.',
-                ]
-            ]);
-        }
+        wp_localize_script('duendes-canal-admin', 'duendesCanalAdmin', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('duendes_canal_admin_nonce'),
+            'strings' => [
+                'generando' => 'Generando canalizacion con IA...',
+                'regenerando' => 'Regenerando con tus instrucciones...',
+                'enviando' => 'Enviando al cliente...',
+                'confirmEnviar' => 'Seguro que queres enviar esta canalizacion?',
+                'exito' => 'Operacion completada!',
+                'error' => 'Error en la operacion.',
+            ]
+        ]);
     }
 
     private function is_canalizacion_page() {
@@ -383,6 +394,22 @@ class Duendes_Canalizaciones_V2 {
 
         $canalizacion_id = absint($_POST['canalizacion_id'] ?? 0);
 
+        if (!$canalizacion_id) {
+            wp_send_json_error(['message' => 'ID de canalizacion no valido']);
+        }
+
+        // Verificar que existe el post
+        $post = get_post($canalizacion_id);
+        if (!$post || $post->post_type !== 'duendes_canalizacion') {
+            wp_send_json_error(['message' => 'Canalizacion no encontrada (ID: ' . $canalizacion_id . ')']);
+        }
+
+        // Verificar API key
+        $api_key = defined('ANTHROPIC_API_KEY') ? ANTHROPIC_API_KEY : get_option('duendes_anthropic_key', '');
+        if (empty($api_key)) {
+            wp_send_json_error(['message' => 'ANTHROPIC_API_KEY no configurada. Agregala en wp-config.php o en Canalizaciones > Configuracion']);
+        }
+
         $generator = new Duendes_Claude_Generator();
         $resultado = $generator->generar($canalizacion_id);
 
@@ -473,15 +500,54 @@ class Duendes_Canalizaciones_V2 {
             wp_send_json_error(['message' => 'Canalizacion no encontrada']);
         }
 
+        // Extraer secciones del contenido
+        $secciones = Duendes_Claude_Generator::extraer_secciones($post->post_content);
+
+        // Si no hay historia o ficha en las secciones, obtenerlas del producto
+        $guardian_id = get_post_meta($canalizacion_id, '_guardian_id', true);
+        $guardian_nombre = get_post_meta($canalizacion_id, '_guardian_nombre', true);
+        $guardian_categoria = get_post_meta($canalizacion_id, '_guardian_categoria', true);
+
+        if ($guardian_id && (empty($secciones['historia']) || empty($secciones['ficha']))) {
+            $product = wc_get_product($guardian_id);
+            if ($product) {
+                // Obtener historia del producto (limpiando HTML)
+                if (empty($secciones['historia'])) {
+                    $historia_raw = $product->get_description();
+                    // Limpiar comentarios HTML y tags
+                    $historia = preg_replace('/<!--.*?-->/s', '', $historia_raw);
+                    $historia = strip_tags($historia, '<p><br><strong><em><b><i>');
+                    $historia = preg_replace('/\s+/', ' ', $historia);
+                    $secciones['historia'] = trim($historia);
+                }
+
+                // La FICHA es la descripcion corta del producto (cosas favoritas, personalidad, etc.)
+                if (empty($secciones['ficha'])) {
+                    $ficha_raw = $product->get_short_description();
+                    // Limpiar HTML pero mantener estructura
+                    $ficha = preg_replace('/<!--.*?-->/s', '', $ficha_raw);
+                    $ficha = strip_tags($ficha, '<p><br><strong><em><b><i><ul><li>');
+                    $ficha = trim($ficha);
+
+                    if (!empty($ficha)) {
+                        $secciones['ficha'] = $ficha;
+                    } else {
+                        $secciones['ficha'] = '(Este guardian no tiene ficha en la tienda)';
+                    }
+                }
+            }
+        }
+
         $datos = [
             'id' => $canalizacion_id,
             'contenido' => $post->post_content,
+            'secciones' => $secciones,
             'estado' => get_post_meta($canalizacion_id, '_estado', true),
             'orden_id' => get_post_meta($canalizacion_id, '_orden_id', true),
             'email' => get_post_meta($canalizacion_id, '_email', true),
             'nombre_cliente' => get_post_meta($canalizacion_id, '_nombre_cliente', true),
-            'guardian_nombre' => get_post_meta($canalizacion_id, '_guardian_nombre', true),
-            'guardian_categoria' => get_post_meta($canalizacion_id, '_guardian_categoria', true),
+            'guardian_nombre' => $guardian_nombre,
+            'guardian_categoria' => $guardian_categoria,
             'tipo_destinatario' => get_post_meta($canalizacion_id, '_tipo_destinatario', true),
             'datos_formulario' => get_post_meta($canalizacion_id, '_datos_formulario', true),
             'versiones' => get_post_meta($canalizacion_id, '_versiones', true) ?: [],
@@ -491,6 +557,50 @@ class Duendes_Canalizaciones_V2 {
         ];
 
         wp_send_json_success($datos);
+    }
+
+    /**
+     * AJAX: Guardar cambios manuales en canalizacion
+     */
+    public function ajax_guardar_canalizacion() {
+        check_ajax_referer('duendes_canal_admin_nonce', 'nonce');
+
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(['message' => 'Sin permisos']);
+        }
+
+        $canalizacion_id = absint($_POST['canalizacion_id'] ?? 0);
+        $contenido = wp_kses_post($_POST['contenido'] ?? '');
+
+        $post = get_post($canalizacion_id);
+        if (!$post || $post->post_type !== 'duendes_canalizacion') {
+            wp_send_json_error(['message' => 'Canalizacion no encontrada']);
+        }
+
+        // Guardar version anterior
+        Duendes_Canal_CPT::guardar_version($canalizacion_id, 'Edicion manual');
+
+        // Actualizar contenido
+        wp_update_post([
+            'ID' => $canalizacion_id,
+            'post_content' => $contenido,
+        ]);
+
+        // Actualizar contenido generado tambien
+        $secciones = Duendes_Claude_Generator::extraer_secciones($contenido);
+        $contenido_generado = '';
+        if ($secciones['canalizacion']) {
+            $contenido_generado .= "===CANALIZACION===\n" . $secciones['canalizacion'] . "\n\n";
+        }
+        if ($secciones['mensaje_del_ser']) {
+            $contenido_generado .= "===MENSAJE DEL SER===\n" . $secciones['mensaje_del_ser'] . "\n\n";
+        }
+        if ($secciones['cuidados']) {
+            $contenido_generado .= "===CUIDADOS===\n" . $secciones['cuidados'];
+        }
+        update_post_meta($canalizacion_id, '_contenido_generado', $contenido_generado);
+
+        wp_send_json_success(['message' => 'Cambios guardados']);
     }
 
     /**

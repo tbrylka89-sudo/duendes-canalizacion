@@ -1,0 +1,76 @@
+/* DUENDES GLOBAL STYLES - Botones dorados */
+
+/* Máxima especificidad para Elementor */
+body .elementor-button,
+body .elementor-widget-button .elementor-button,
+body .elementor-button.elementor-size-sm,
+body .elementor-button.elementor-size-md,
+body .elementor-button.elementor-size-lg,
+body .elementor-button.elementor-size-xl,
+body a.elementor-button,
+body a.elementor-button-link,
+.elementor .elementor-button,
+.elementor-widget-button a,
+#content .elementor-button,
+main .elementor-button,
+.elementor-element .elementor-button {
+    background: #B8973A !important;
+    background-color: #B8973A !important;
+    background-image: none !important;
+    color: #070906 !important;
+    border: none !important;
+    border-color: #B8973A !important;
+    fill: #070906 !important;
+}
+
+body .elementor-button:hover,
+body .elementor-widget-button .elementor-button:hover,
+body a.elementor-button:hover,
+.elementor .elementor-button:hover {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #070906 !important;
+}
+
+body .elementor-button span,
+body .elementor-button .elementor-button-text,
+body .elementor-button .elementor-button-content-wrapper,
+body .elementor-button .elementor-button-icon,
+.elementor-button-text {
+    color: #070906 !important;
+    fill: #070906 !important;
+}
+
+body .elementor-button:hover span,
+body .elementor-button:hover .elementor-button-text {
+    color: #070906 !important;
+}
+
+/* Hero overlay más claro */
+.elementor-background-overlay,
+.elementor-section > .elementor-background-overlay {
+    opacity: 0.2 !important;
+    background-color: rgba(0,0,0,0.2) !important;
+}
+
+/* WooCommerce buttons */
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit,
+.woocommerce a.button.alt,
+.woocommerce button.button.alt,
+.woocommerce input.button.alt {
+    background: #B8973A !important;
+    background-color: #B8973A !important;
+    color: #070906 !important;
+    border: none !important;
+}
+
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #070906 !important;
+}
