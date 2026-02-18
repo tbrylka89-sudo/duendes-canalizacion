@@ -44,7 +44,63 @@ export async function GET(request) {
       console.log('[certificado] No se encontró orden en KV');
     }
 
-    // Si no hay datos en KV, usar datos de ejemplo/prueba
+    // Si no hay datos en KV o están incompletos, buscar en WooCommerce
+    if (!ordenData || ordenData.nombre_humano === 'Querido Humano' || !ordenData.guardian_nombre) {
+      try {
+        const wpUrl = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
+        const auth = Buffer.from(`${process.env.WC_KEY}:${process.env.WC_SECRET}`).toString('base64');
+
+        const orderRes = await fetch(`${wpUrl}/wp-json/wc/v3/orders/${orderId}`, {
+          headers: { 'Authorization': `Basic ${auth}` }
+        });
+
+        if (orderRes.ok) {
+          const orderData = await orderRes.json();
+          const nombreCliente = `${orderData.billing?.first_name || ''} ${orderData.billing?.last_name || ''}`.trim();
+
+          // Buscar el primer item que sea guardián
+          const items = orderData.line_items || [];
+          const guardianItem = items.find(item => {
+            const nombre = (item.name || '').toLowerCase();
+            return nombre.includes('duende') || nombre.includes('hada') ||
+                   nombre.includes('pixie') || nombre.includes('gnomo') ||
+                   nombre.includes('guardian') || nombre.includes('guardiana');
+          }) || items[0];
+
+          const nombreGuardian = guardianItem?.name || 'Guardián';
+          const imagenGuardian = guardianItem?.image?.src || null;
+
+          // Buscar categoría en meta_data del producto
+          let categoria = 'Protección';
+          const categoriaMeta = guardianItem?.meta_data?.find(m =>
+            m.key === 'categoria' || m.key === '_categoria' || m.display_key === 'Categoría'
+          );
+          if (categoriaMeta) {
+            categoria = categoriaMeta.value || categoriaMeta.display_value || 'Protección';
+          }
+
+          ordenData = {
+            orden_id: orderId,
+            nombre_humano: nombreCliente || 'Querido Humano',
+            guardian_nombre: nombreGuardian,
+            guardian_genero: nombreGuardian.toLowerCase().endsWith('a') ? 'f' : 'm',
+            guardian_imagen: imagenGuardian,
+            fecha_canalizacion: orderData.date_created || new Date().toISOString(),
+            mensaje_guardian: 'Tu guardián ha sido canalizado con amor y dedicación especialmente para vos.',
+            sincrodestino: 'Canalizado con amor desde el Bosque Ancestral de Piriápolis',
+            categoria: categoria
+          };
+
+          // Guardar en KV para futuras consultas
+          await kv.set(`orden:${orderId}`, ordenData, { ex: 60 * 60 * 24 * 365 });
+          console.log(`[certificado] Datos obtenidos de WooCommerce y guardados para orden ${orderId}`);
+        }
+      } catch (wcError) {
+        console.log('[certificado] Error obteniendo de WooCommerce:', wcError.message);
+      }
+    }
+
+    // Datos finales (con fallback si todo falla)
     const datos = ordenData || {
       orden_id: orderId,
       nombre_humano: 'Querido Humano',
