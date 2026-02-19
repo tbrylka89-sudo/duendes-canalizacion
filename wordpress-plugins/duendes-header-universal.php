@@ -704,9 +704,6 @@ function duendes_header_universal() {
                 echo '<a href="' . esc_url($shop) . '">Tienda</a>';
                 echo '<a href="' . esc_url(home_url('/como-funciona/')) . '">Como Funciona</a>';
                 echo '<a href="' . esc_url(home_url('/nosotros/')) . '">Nosotros</a>';
-                echo '<div class="dh-mobile-divider"></div>';
-                echo '<a href="' . esc_url($account) . '">Mi Cuenta</a>';
-                echo '<a href="' . esc_url($cart) . '">Carrito' . ($cart_count ? " ($cart_count)" : '') . '</a>';
             },
             'items_wrap' => '%3$s',
             'walker' => new class extends Walker_Nav_Menu {
@@ -720,6 +717,11 @@ function duendes_header_universal() {
             }
         ]);
         ?>
+
+        <div class="dh-mobile-divider"></div>
+
+        <!-- Mi Magia - destacado -->
+        <a href="https://magia.duendesdeluruguay.com" class="dh-mi-magia-link">✦ Mi Magia</a>
 
         <div class="dh-mobile-divider"></div>
 

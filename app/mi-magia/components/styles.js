@@ -2938,6 +2938,224 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   .onb-genero-btns{grid-template-columns:1fr}
   .onb-paises{justify-content:center}
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PANTALLA DE LOGIN - PALETA BOSQUE
+   ═══════════════════════════════════════════════════════════════ */
+
+.pantalla-login {
+  min-height: 100vh;
+  background: var(--bosque-crema);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(45,90,74,0.15);
+  border: 1px solid var(--bosque-verde-claro);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-simbolo {
+  font-size: 2.5rem;
+  color: var(--bosque-verde);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.login-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  color: var(--bosque-negro);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.login-header p {
+  color: var(--bosque-gris);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-form .campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-form label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: var(--bosque-negro);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.login-form input {
+  padding: 1rem;
+  border: 2px solid var(--bosque-verde-claro);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+  background: #fff;
+  color: var(--bosque-negro);
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: var(--bosque-verde);
+  box-shadow: 0 0 0 3px rgba(45,90,74,0.1);
+}
+
+.login-form input::placeholder {
+  color: #aaa;
+}
+
+.btn-dorado {
+  background: var(--bosque-verde);
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.btn-dorado:hover {
+  background: var(--bosque-verde-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(45,90,74,0.3);
+}
+
+.btn-dorado:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-nota {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--bosque-gris);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.login-form .error {
+  color: #dc3545;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+  padding: 0.75rem;
+  background: #fff5f5;
+  border-radius: 8px;
+}
+
+.login-exito {
+  text-align: center;
+}
+
+.exito-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: var(--bosque-verde-claro);
+  color: var(--bosque-verde);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.login-exito h2 {
+  font-family: 'Cinzel', serif;
+  color: var(--bosque-negro);
+  margin: 0 0 0.5rem;
+}
+
+.login-exito p {
+  color: var(--bosque-gris);
+  margin: 0 0 1.5rem;
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 2px solid var(--bosque-verde);
+  color: var(--bosque-verde);
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secundario:hover {
+  background: var(--bosque-verde);
+  color: #fff;
+}
+
+/* CARGANDO */
+.pantalla-carga, .pantalla-cargando {
+  min-height: 100vh;
+  background: var(--bosque-crema);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carga-contenido, .cargando-contenido {
+  text-align: center;
+  color: var(--bosque-verde);
+}
+
+.carga-simbolo, .cargando-runa {
+  font-size: 3rem;
+  animation: pulse 2s ease-in-out infinite;
+  color: var(--bosque-verde);
+}
+
+.carga-contenido p, .cargando-contenido p {
+  color: var(--bosque-gris);
+  margin-top: 1rem;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+@media(max-width:500px) {
+  .login-card {
+    padding: 2rem 1.5rem;
+  }
+  .login-header h1 {
+    font-size: 1.6rem;
+  }
+}
 `;
 
 export { estilos };
