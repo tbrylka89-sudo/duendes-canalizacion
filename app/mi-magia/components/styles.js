@@ -2746,6 +2746,15 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 .btn-ver-cana:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(212,175,55,0.3)}
 .cana-info-text{font-size:0.8rem;color:#888;text-align:right;margin:0;max-width:180px}
 
+/* Estado del Formulario de Canalización */
+.formulario-pendiente{display:flex;flex-direction:column;align-items:flex-end;margin-bottom:1rem;padding:0.75rem;background:rgba(212,175,55,0.1);border-radius:10px;border:1px solid rgba(212,175,55,0.3)}
+.btn-completar-formulario{display:inline-flex;align-items:center;gap:0.5rem;padding:10px 18px;background:linear-gradient(135deg,#d4af37,#b8962e);border:none;border-radius:8px;color:#1a1a1a;font-family:'Cinzel',serif;font-weight:600;font-size:0.9rem;text-decoration:none;cursor:pointer;transition:all 0.3s;box-shadow:0 2px 8px rgba(212,175,55,0.3);animation:pulse-gold 2s infinite}
+.btn-completar-formulario:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(212,175,55,0.5)}
+@keyframes pulse-gold{0%,100%{box-shadow:0 2px 8px rgba(212,175,55,0.3)}50%{box-shadow:0 2px 16px rgba(212,175,55,0.6)}}
+.formulario-info{font-size:0.75rem;color:#888;margin:0.5rem 0 0;text-align:right;max-width:200px}
+.formulario-completado{display:flex;align-items:center;justify-content:flex-end;margin-bottom:0.75rem}
+.formulario-ok{display:inline-flex;align-items:center;gap:0.35rem;padding:6px 12px;background:rgba(46,204,113,0.15);border-radius:6px;color:#2ecc71;font-size:0.85rem;font-weight:500}
+
 /* Modal Canalización */
 .modal-cana-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem}
 .modal-cana{background:#fff;border-radius:16px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;position:relative}
@@ -2765,6 +2774,10 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   .guardian-foto{width:100%;height:180px}
   .guardian-cana{align-items:stretch;min-width:100%;margin-top:1rem}
   .cana-info-text{text-align:center;max-width:none}
+  .formulario-pendiente{align-items:stretch}
+  .btn-completar-formulario{justify-content:center}
+  .formulario-info{text-align:center;max-width:none}
+  .formulario-completado{justify-content:center}
 }
 
 @media(max-width:1200px){.contenido.con-sidebar{width:calc(100% - 240px)}.sidebar-oportunidades{display:none}.sidebar-toggle{display:none}}

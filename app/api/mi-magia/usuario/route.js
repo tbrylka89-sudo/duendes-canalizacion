@@ -6,6 +6,46 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
+const WOO_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
+const WOO_KEY = process.env.WC_CONSUMER_KEY;
+const WOO_SECRET = process.env.WC_CONSUMER_SECRET;
+
+function getWooAuthHeader() {
+  if (!WOO_KEY || !WOO_SECRET) return null;
+  return `Basic ${Buffer.from(`${WOO_KEY}:${WOO_SECRET}`).toString('base64')}`;
+}
+
+// Verificar estado del formulario para una orden (con caché de 5 min)
+async function verificarFormularioOrden(ordenId) {
+  if (!ordenId) return null;
+
+  const cacheKey = `formulario:estado:${ordenId}`;
+  const cached = await kv.get(cacheKey);
+  if (cached !== null) return cached;
+
+  const authHeader = getWooAuthHeader();
+  if (!authHeader) return null;
+
+  try {
+    const res = await fetch(`${WOO_URL}/wp-json/wc/v3/orders/${ordenId}`, {
+      headers: { 'Authorization': authHeader, 'Content-Type': 'application/json' }
+    });
+
+    if (!res.ok) return null;
+
+    const order = await res.json();
+    const completadoMeta = order.meta_data?.find(m => m.key === '_duendes_formulario_completado');
+    const completado = completadoMeta?.value === 'yes';
+
+    // Cachear por 5 minutos
+    await kv.set(cacheKey, completado, { ex: 300 });
+    return completado;
+  } catch (e) {
+    console.error(`Error verificando formulario orden ${ordenId}:`, e.message);
+    return null;
+  }
+}
+
 export async function OPTIONS() {
   return new Response(null, { headers: CORS_HEADERS });
 }
@@ -63,9 +103,29 @@ export async function GET(request) {
     
     // Cargar lecturas completadas
     const lecturasCompletadas = await kv.get(`lecturas:${email}`) || [];
-    
+
     // Calcular nivel de acceso
     const nivelAcceso = calcularNivelAcceso(elegido, circulo);
+
+    // Verificar estado del formulario para cada guardián
+    const guardianes = elegido.guardianes || [];
+    const ordenesUnicas = [...new Set(guardianes.map(g => g.ordenId).filter(Boolean))];
+
+    // Verificar formularios en paralelo
+    const estadosFormularios = {};
+    await Promise.all(
+      ordenesUnicas.map(async (ordenId) => {
+        const completado = await verificarFormularioOrden(ordenId);
+        estadosFormularios[ordenId] = completado;
+      })
+    );
+
+    // Agregar estado del formulario a cada guardián
+    const guardianesConFormulario = guardianes.map(g => ({
+      ...g,
+      formularioCompletado: g.ordenId ? estadosFormularios[g.ordenId] : null,
+      formularioPendiente: g.ordenId ? estadosFormularios[g.ordenId] === false : false
+    }));
 
     // Construir objeto de usuario
     const usuario = {
@@ -100,7 +160,7 @@ export async function GET(request) {
       runas: elegido.runas || 0,
 
       // Compras
-      guardianes: elegido.guardianes || [],
+      guardianes: guardianesConFormulario,
       talismanes: elegido.talismanes || [],
       varas: elegido.varas || [],
       libros: elegido.libros || [],

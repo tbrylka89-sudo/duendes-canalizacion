@@ -66,6 +66,26 @@ export default function SeccionCanalizaciones({ usuario }) {
                       {g.paraQuien && <p className="guardian-para">Para: {g.paraQuien}</p>}
                     </div>
                     <div className="guardian-cana">
+                      {/* Estado del formulario de canalización */}
+                      {g.formularioPendiente && (
+                        <div className="formulario-pendiente">
+                          <a
+                            href={`${WORDPRESS_URL}/formulario-canalizacion?order=${g.ordenId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-completar-formulario"
+                          >
+                            ✦ Completá tu formulario
+                          </a>
+                          <p className="formulario-info">Para que tu guardián pueda conocerte y escribirte personalmente</p>
+                        </div>
+                      )}
+                      {g.formularioCompletado && (
+                        <div className="formulario-completado">
+                          <span className="formulario-ok">✓ Formulario completado</span>
+                        </div>
+                      )}
+
                       <div className="cana-estado" style={{color: estado.color}}>
                         <span>{estado.icono}</span>
                         <span>Canalización: {estado.texto}</span>
