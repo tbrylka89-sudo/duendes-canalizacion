@@ -74,7 +74,7 @@ function MiMagiaContent() {
 
   return (
     <div className="mi-magia-app">
-      <style jsx global>{estilos}</style>
+      <style dangerouslySetInnerHTML={{ __html: estilos }} />
 
       {/* Header elegante */}
       <header className="header">
@@ -151,7 +151,7 @@ function MiMagiaContent() {
 function Cargando() {
   return (
     <div className="pantalla-carga">
-      <style jsx global>{estilos}</style>
+      <style dangerouslySetInnerHTML={{ __html: estilos }} />
       <div className="carga-contenido">
         <div className="carga-simbolo">✦</div>
         <p>Preparando tu magia...</p>
@@ -197,7 +197,7 @@ function LoginMagicLink() {
 
   return (
     <div className="pantalla-login">
-      <style jsx global>{estilos}</style>
+      <style dangerouslySetInnerHTML={{ __html: estilos }} />
       <div className="login-card">
         <div className="login-header">
           <span className="login-simbolo">✦</span>
