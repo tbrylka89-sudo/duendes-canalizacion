@@ -98,8 +98,8 @@ export async function POST(request) {
     await kv.set(rateLimitKey, intentos + 1, { ex: 3600 }); // 1 hora
 
     // URL del magic link
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://duendes-vercel.vercel.app';
-    const magicLinkUrl = `${baseUrl}/mi-magia?token=${token}`;
+    const baseUrl = 'https://magia.duendesdeluruguay.com';
+    const magicLinkUrl = `${baseUrl}?token=${token}`;
 
     // Verificar si el usuario ya existe
     const usuarioExistente = await kv.get(`elegido:${emailLower}`);
