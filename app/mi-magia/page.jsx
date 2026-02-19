@@ -1631,10 +1631,10 @@ function SeccionGrimorio({ usuario, token, setUsuario }) {
 export default function MiMagiaPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a' }}>
-        <div style={{ textAlign: 'center', color: '#c9a227' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FBF8F1' }}>
+        <div style={{ textAlign: 'center', color: '#2D5A4A' }}>
           <div style={{ fontSize: '3rem', animation: 'pulse 2s infinite' }}>✦</div>
-          <p style={{ color: 'rgba(255,255,255,0.6)', marginTop: '1rem' }}>Cargando...</p>
+          <p style={{ color: '#666', marginTop: '1rem' }}>Cargando...</p>
         </div>
       </div>
     }>
