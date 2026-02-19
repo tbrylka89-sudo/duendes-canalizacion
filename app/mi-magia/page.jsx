@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { estilos } from './components/styles';
+import './mi-magia.css';
 
 const API_BASE = '';
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
@@ -74,8 +74,6 @@ function MiMagiaContent() {
 
   return (
     <div className="mi-magia-app">
-      <style dangerouslySetInnerHTML={{ __html: estilos }} />
-
       {/* Header elegante */}
       <header className="header">
         <div className="header-content">
@@ -151,7 +149,6 @@ function MiMagiaContent() {
 function Cargando() {
   return (
     <div className="pantalla-carga">
-      <style dangerouslySetInnerHTML={{ __html: estilos }} />
       <div className="carga-contenido">
         <div className="carga-simbolo">✦</div>
         <p>Preparando tu magia...</p>
@@ -197,7 +194,6 @@ function LoginMagicLink() {
 
   return (
     <div className="pantalla-login">
-      <style dangerouslySetInnerHTML={{ __html: estilos }} />
       <div className="login-card">
         <div className="login-header">
           <span className="login-simbolo">✦</span>
