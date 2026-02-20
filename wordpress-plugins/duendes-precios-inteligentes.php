@@ -317,24 +317,25 @@ function duendes_precio_inteligente_html($price_html, $product) {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // RESTO DEL MUNDO - USD + aproximado en moneda local
+    // RESTO DEL MUNDO - Precio en dólares con mensaje claro
     // ═══════════════════════════════════════════════════════════════
     $precio_usd_formateado = number_format($precio_usd, 0, ',', '.');
     $html = '<span class="duendes-precio duendes-precio-usd">';
-    $html .= '<span class="precio-principal">$' . $precio_usd_formateado . ' <small>USD</small></span>';
+    $html .= '<span class="precio-principal">$' . $precio_usd_formateado . ' dólares americanos</span>';
 
-    // Agregar aproximado si tenemos la moneda del país
+    // Mensaje explicativo solo para países que NO usan USD
     global $duendes_monedas;
-    if (isset($duendes_monedas[$pais]) && $pais !== 'US') {
+    if (isset($duendes_monedas[$pais]) && $pais !== 'US' && $duendes_monedas[$pais]['codigo'] !== 'USD') {
         $moneda_info = $duendes_monedas[$pais];
-        $precio_local = duendes_convertir_usd_a_moneda($precio_usd, $moneda_info['codigo']);
-
-        if ($precio_local) {
-            $precio_local_formateado = number_format($precio_local, 0, ',', '.');
-            $html .= '<span class="precio-aproximado">';
-            $html .= '(aprox. ' . $moneda_info['simbolo'] . $precio_local_formateado . ' ' . $moneda_info['nombre'] . ')';
-            $html .= '</span>';
-        }
+        $html .= '<div class="duendes-precio-info">';
+        $html .= '<div class="precio-info-header"><span class="precio-info-emoji">💡</span> <strong>¿Por qué en dólares?</strong></div>';
+        $html .= '<div class="precio-info-texto">';
+        $html .= 'Enviamos desde Uruguay a todo el mundo.<br><br>';
+        $html .= 'Antes de confirmar tu compra, vas a ver el ';
+        $html .= '<strong>TOTAL EXACTO en ' . $moneda_info['nombre'] . '</strong> (producto + envío).<br><br>';
+        $html .= 'Pagás en tu moneda. Sin sorpresas.';
+        $html .= '</div>';
+        $html .= '</div>';
     }
 
     $html .= '</span>';
@@ -423,15 +424,47 @@ function duendes_precios_estilos() {
         opacity: 0.8;
     }
 
-    .duendes-precio .precio-aproximado {
-        font-size: 0.8em;
-        color: #9a8866;
-        font-style: italic;
+    /* === MENSAJE EXPLICATIVO DE PRECIOS === */
+    .duendes-precio-info {
+        margin-top: 12px;
+        padding: 15px;
+        background: rgba(212, 175, 55, 0.08);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 8px;
+        font-size: 0.85em;
+        line-height: 1.5;
+        max-width: 320px;
     }
 
-    /* En tienda/catálogo */
-    .products .duendes-precio .precio-aproximado {
-        font-size: 0.75em;
+    .duendes-precio-info .precio-info-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 10px;
+        color: #d4af37;
+        font-size: 0.95em;
+    }
+
+    .duendes-precio-info .precio-info-emoji {
+        font-size: 1.1em;
+    }
+
+    .duendes-precio-info .precio-info-texto {
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .duendes-precio-info .precio-info-texto strong {
+        color: #d4af37;
+    }
+
+    /* En catálogo: ocultar el mensaje largo, solo mostrar precio */
+    .products .duendes-precio-info {
+        display: none;
+    }
+
+    /* En página de producto individual: mostrar todo */
+    .single-product .duendes-precio-info {
+        display: block;
     }
 
     /* En página de producto */
@@ -648,17 +681,16 @@ function duendes_ajax_get_precio() {
         $response['precio_uyu'] = intval($precio_uyu);
         $response['precio_mostrar'] = '$' . number_format($precio_uyu, 0, ',', '.') . ' UYU';
     } else {
-        $response['precio_mostrar'] = '$' . number_format($precio_usd, 0) . ' USD';
+        $response['precio_mostrar'] = '$' . number_format($precio_usd, 0) . ' dólares americanos';
 
+        // Ya no mostramos precio aproximado - el cliente verá el precio exacto en checkout (dLocal)
         global $duendes_monedas;
-        if (isset($duendes_monedas[$pais]) && $pais !== 'US') {
+        if (isset($duendes_monedas[$pais]) && $pais !== 'US' && $duendes_monedas[$pais]['codigo'] !== 'USD') {
             $moneda_info = $duendes_monedas[$pais];
-            $precio_local = duendes_convertir_usd_a_moneda($precio_usd, $moneda_info['codigo']);
-            if ($precio_local) {
-                $response['precio_local'] = $precio_local;
-                $response['moneda_local'] = $moneda_info['codigo'];
-                $response['precio_aproximado'] = 'aprox. ' . $moneda_info['simbolo'] . number_format($precio_local, 0, ',', '.') . ' ' . $moneda_info['nombre'];
-            }
+            $response['moneda_local'] = $moneda_info['codigo'];
+            $response['moneda_nombre'] = $moneda_info['nombre'];
+            // Mensaje claro en lugar de aproximado
+            $response['mensaje_precio'] = 'Vas a ver el TOTAL EXACTO en ' . $moneda_info['nombre'] . ' antes de pagar.';
         }
     }
 
@@ -742,12 +774,12 @@ function duendes_corregir_precios_elementor() {
                         var uyu = usdToUyu(usd);
                         txt = txt.replace(/\$[\d.,]+\s*PESOS/i, '$' + fmt(uyu) + ' UYU');
                     } else {
-                        txt = txt.replace(/\$[\d.,]+\s*PESOS/i, '$' + usd + ' USD');
+                        txt = txt.replace(/\$[\d.,]+\s*PESOS/i, '$' + usd + ' dólares americanos');
                     }
                 }
 
-                // Caso 2: "DÓLARES" → "USD"
-                txt = txt.replace(/DÓLARES/gi, 'USD');
+                // Caso 2: "DÓLARES" → mantener (ya está bien)
+                // txt = txt.replace(/DÓLARES/gi, 'USD'); // Comentado - dólares está bien
 
                 // Caso 3: "USD ARGENTINOS" → "pesos argentinos"
                 txt = txt.replace(/USD\s+ARGENTINOS/gi, 'pesos argentinos');

@@ -415,6 +415,23 @@ function SeccionGuardianes({ usuario }) {
                   >
                     ✦ Ver Canalización
                   </button>
+                ) : guardian.formularioPendiente ? (
+                  <a
+                    href={`https://duendesdeluruguay.com/formulario-canalizacion/?order=${guardian.ordenId}`}
+                    className="btn-formulario-pendiente"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span className="formulario-icono">📝</span>
+                    <span>Completá tu formulario</span>
+                    <small>Para recibir tu canalización personalizada</small>
+                  </a>
+                ) : guardian.formularioCompletado ? (
+                  <div className="cana-pendiente formulario-ok">
+                    <span className="pendiente-icono">✓</span>
+                    <span>Formulario completado</span>
+                    <small>Tu canalización está en preparación</small>
+                  </div>
                 ) : (
                   <div className="cana-pendiente">
                     <span className="pendiente-icono">⏳</span>

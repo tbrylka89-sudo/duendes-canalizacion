@@ -1,0 +1,10 @@
+image: atlassian/default-image:4
+
+pipelines:
+  tags:
+    '*':
+      - step:
+          name: Deploy to WordPress.org SVN
+          script:
+            - apt-get update && apt-get install -y subversion rsync git
+            - bash ./.bitbucket/deploy-wporg.sh

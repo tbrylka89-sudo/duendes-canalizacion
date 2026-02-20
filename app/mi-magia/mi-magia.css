@@ -5379,3 +5379,57 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
     color: var(--bosque-gris);
   }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   FORMULARIO PENDIENTE - Botón destacado
+   ═══════════════════════════════════════════════════════════════ */
+
+.btn-formulario-pendiente {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  animation: pulse-naranja 2s infinite;
+}
+
+.btn-formulario-pendiente:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+}
+
+.btn-formulario-pendiente .formulario-icono {
+  font-size: 1.5rem;
+}
+
+.btn-formulario-pendiente span {
+  font-family: 'Cinzel', serif;
+  font-weight: 500;
+}
+
+.btn-formulario-pendiente small {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+@keyframes pulse-naranja {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(255, 107, 0, 0); }
+}
+
+.formulario-ok {
+  background: var(--bosque-verde-claro) !important;
+  border-color: var(--bosque-verde) !important;
+}
+
+.formulario-ok .pendiente-icono {
+  color: var(--bosque-verde);
+}

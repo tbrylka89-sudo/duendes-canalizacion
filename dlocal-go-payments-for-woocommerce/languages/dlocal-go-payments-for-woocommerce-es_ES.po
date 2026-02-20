@@ -1,0 +1,381 @@
+# Spanish (Spain) translation for dLocal Go Payments for WooCommerce
+# Copyright (C) 2024 dLocal
+# This file is distributed under the same license as the dLocal Go Payments for WooCommerce plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: dLocal Go Payments for WooCommerce 1.0.0\n"
+"Report-Msgid-Bugs-To: https://dlocal.com\n"
+"POT-Creation-Date: 2024-12-30 00:00+0000\n"
+"PO-Revision-Date: 2024-12-30 00:00+0000\n"
+"Last-Translator: dLocal <info@dlocal.com>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: iloc-dlocal-go.php
+msgid "dLocal Go Payments requires WooCommerce to work. Please install and activate WooCommerce."
+msgstr "dLocal Go Payments requiere WooCommerce para funcionar. Por favor, instala y activa WooCommerce."
+
+#: iloc-dlocal-go.php
+msgid "Settings"
+msgstr "Configuración"
+
+#: iloc-dlocal-go.php
+msgid "dLocal Go Payments: Your store must have HTTPS enabled to process payments in production."
+msgstr "dLocal Go Payments: Tu tienda debe tener HTTPS habilitado para procesar pagos en producción."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "dLocal Go"
+msgstr "dLocal Go"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Pay using dLocal Go Checkout."
+msgstr "Paga usando dLocal Go Checkout."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Enable/Disable"
+msgstr "Habilitar/Deshabilitar"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Enable dLocal Go"
+msgstr "Habilitar dLocal Go"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Title"
+msgstr "Título"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Title shown to the customer during checkout."
+msgstr "Título mostrado al cliente durante el checkout."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Description"
+msgstr "Descripción"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Description shown to the customer during checkout."
+msgstr "Descripción mostrada al cliente durante el checkout."
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI
+msgid "Environment"
+msgstr "Entorno"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Enable production mode"
+msgstr "Activar modo producción"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "When disabled, sandbox mode is used for testing."
+msgstr "Cuando está desactivado, se usa el modo sandbox para pruebas."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "API Key"
+msgstr "API Key"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "API Secret"
+msgstr "API Secret"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Your dLocal Go API Key for sandbox."
+msgstr "Tu API Key de dLocal Go para sandbox."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Your dLocal Go API Secret for sandbox."
+msgstr "Tu API Secret de dLocal Go para sandbox."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Your dLocal Go API Key for production."
+msgstr "Tu API Key de dLocal Go para producción."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Your dLocal Go API Secret for production."
+msgstr "Tu API Secret de dLocal Go para producción."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Production"
+msgstr "Producción"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Sandbox"
+msgstr "Sandbox"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Auto-complete orders"
+msgstr "Auto-completar órdenes"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Automatically complete orders when payment is received"
+msgstr "Completar automáticamente las órdenes cuando se recibe el pago"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Default country"
+msgstr "País por defecto"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Country to use when it cannot be determined from billing or shipping address."
+msgstr "País a usar cuando no se puede determinar desde la dirección de facturación o envío."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "None"
+msgstr "Ninguno"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Debug mode"
+msgstr "Modo debug"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Enable logging"
+msgstr "Habilitar registro de logs"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Logs are saved in: %s"
+msgstr "Los logs se guardan en: %s"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Tabs
+msgid "General"
+msgstr "General"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Tabs
+msgid "API Credentials"
+msgstr "Credenciales API"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Tabs
+msgid "Advanced"
+msgstr "Avanzado"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Header
+msgid "Payment gateway for growing businesses"
+msgstr "Pasarela de pagos para negocios en expansión"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Credentials
+msgid "Sandbox Credentials"
+msgstr "Credenciales Sandbox"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Credentials
+msgid "Use sandbox credentials for testing. No real transactions will be processed."
+msgstr "Usa las credenciales de sandbox para pruebas. No se procesarán transacciones reales."
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Credentials
+msgid "Production Credentials"
+msgstr "Credenciales Producción"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Credentials
+msgid "Use production credentials for live transactions. Make sure to enable Production mode in the General tab."
+msgstr "Usa las credenciales de producción para transacciones reales. Asegúrate de activar Modo Producción en la pestaña General."
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Webhook
+msgid "Webhook URL"
+msgstr "URL del Webhook"
+
+#: includes/class-wc-gateway-dlocal-go.php - Admin UI Webhook
+msgid "Configure this URL in your dLocal Go dashboard to receive payment notifications:"
+msgstr "Configura esta URL en tu panel de dLocal Go para recibir notificaciones de pago:"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Invalid order."
+msgstr "Orden no válida."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "The order amount is too low for this payment method. Please add more items to your cart."
+msgstr "El monto del pedido es muy bajo para este método de pago. Por favor, agrega más productos a tu carrito."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment gateway error. Please try again or choose another payment method."
+msgstr "Error en la pasarela de pago. Por favor, intenta de nuevo o elige otro método de pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment initiated in dLocal Go. Payment ID: %s"
+msgstr "Pago iniciado en dLocal Go. Payment ID: %s"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "No redirect URL received."
+msgstr "No se recibió URL de redirección."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "An error occurred while processing your payment. Please try again."
+msgstr "Ocurrió un error al procesar tu pago. Por favor, intenta de nuevo."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "The selected currency is not supported by this payment method."
+msgstr "La moneda seleccionada no es compatible con este método de pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "This payment method is not available for your country."
+msgstr "Este método de pago no está disponible para tu país."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment gateway configuration error. Please contact support."
+msgstr "Error de configuración de la pasarela de pago. Por favor, contacta a soporte."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment could not be processed. Please try again or choose another payment method."
+msgstr "No se pudo procesar el pago. Por favor, intenta de nuevo o elige otro método de pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund failed: No transaction ID."
+msgstr "Reembolso fallido: No hay ID de transacción."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund failed: Payment ID not found."
+msgstr "Reembolso fallido: No se encontró el ID de pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund amount must be greater than zero."
+msgstr "El monto del reembolso debe ser mayor a cero."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Maximum refundable amount is %s."
+msgstr "El monto máximo reembolsable es %s."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund failed: %s"
+msgstr "Reembolso fallido: %s"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund processed via dLocal Go. Refund ID: %1$s - Amount: %2$s - Status: %3$s - Reason: %4$s"
+msgstr "Reembolso procesado vía dLocal Go. Refund ID: %1$s - Monto: %2$s - Estado: %3$s - Razón: %4$s"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund created successfully, pending confirmation."
+msgstr "Reembolso creado exitosamente, está pendiente de confirmación."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Error processing refund."
+msgstr "Error al procesar el reembolso."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment completed via dLocal Go."
+msgstr "Pago completado vía dLocal Go."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment confirmed via status check on return."
+msgstr "Pago confirmado mediante verificación de estado al regresar."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment rejected."
+msgstr "Pago rechazado."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment cancelled."
+msgstr "Pago cancelado."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment expired."
+msgstr "Pago expirado."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment rejected via dLocal Go."
+msgstr "Pago rechazado vía dLocal Go."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment cancelled via dLocal Go."
+msgstr "Pago cancelado vía dLocal Go."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment expired via dLocal Go."
+msgstr "Pago expirado vía dLocal Go."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund ID: %1$s - Status: %2$s - Amount: %3$s"
+msgstr "Refund ID: %1$s - Estado: %2$s - Monto: %3$s"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund via dLocal Go"
+msgstr "Reembolso vía dLocal Go"
+
+#: includes/class-dlocal-go-api.php
+msgid "Error connecting to dLocal Go."
+msgstr "Error al conectar con dLocal Go."
+
+#: includes/class-dlocal-go-api.php
+msgid "dLocal Go returned no data."
+msgstr "dLocal Go no devolvió datos."
+
+#: includes/class-dlocal-go-api.php
+msgid "Invalid response from dLocal Go."
+msgstr "Respuesta inválida de dLocal Go."
+
+#: includes/class-dlocal-go-api.php
+msgid "An error occurred while communicating with the payment gateway."
+msgstr "Ocurrió un error al comunicarse con la pasarela de pago."
+
+#: includes/class-dlocal-go-api.php
+msgid "Unknown error"
+msgstr "Error desconocido"
+
+#: includes/class-dlocal-go-refund.php
+msgid "Cannot refund an order that has not been paid."
+msgstr "No se puede reembolsar una orden que no ha sido pagada."
+
+#: includes/class-dlocal-go-refund.php
+msgid "Invalid response from dLocal."
+msgstr "Respuesta inválida de dLocal."
+
+#: includes/class-dlocal-go-refund.php
+msgid "Refund created in dLocal Go. ID: %1$s | Amount: %2$s | Status: %3$s"
+msgstr "Reembolso creado en dLocal Go. ID: %1$s | Monto: %2$s | Estado: %3$s"
+
+#: includes/class-dlocal-go-refund.php
+msgid "Total"
+msgstr "Total"
+
+#: includes/class-dlocal-go-refund.php
+msgid "Reason:"
+msgstr "Razón:"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Frequently Asked Questions"
+msgstr "Preguntas frecuentes"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund failed: Invalid order."
+msgstr "Reembolso fallido: Pedido inválido."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund failed: Could not verify payment status."
+msgstr "Reembolso fallido: No se pudo verificar el estado del pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Refund failed: The payment has not been completed yet. Wait for the payment to be confirmed by dLocal."
+msgstr "Reembolso fallido: El pago aún no se ha completado. Espera a que dLocal confirme el pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment completed via dLocal Go. Order restored from cancelled status."
+msgstr "Pago completado vía dLocal Go. Pedido restaurado desde estado cancelado."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Customer returned from payment page without completing payment."
+msgstr "El cliente regresó de la página de pago sin completar el pago."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Payment was not completed. Your cart has been restored."
+msgstr "El pago no se completó. Tu carrito ha sido restaurado."
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Get your Sandbox API credentials"
+msgstr "Obtén tus credenciales API de Sandbox"
+
+#: includes/class-wc-gateway-dlocal-go.php
+msgid "Get your Production API credentials"
+msgstr "Obtén tus credenciales API de Producción"
+
+#: includes/class-dlocal-go-api.php
+msgid "Invalid transaction ID."
+msgstr "ID de transacción inválido."
+
+#: includes/class-dlocal-go-api.php
+msgid "Refund amount must be greater than zero."
+msgstr "El monto del reembolso debe ser mayor a cero."
+
+#: includes/class-dlocal-go-api.php
+msgid "Invalid currency code."
+msgstr "Código de moneda inválido."
+
+#: includes/class-dlocal-go-api.php
+msgid "Invalid refund response."
+msgstr "Respuesta de reembolso inválida."
+
