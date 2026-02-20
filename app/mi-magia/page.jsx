@@ -1026,88 +1026,422 @@ function SeccionEstudios({ usuario, token, setUsuario }) {
 // ═══════════════════════════════════════════════════════════════
 
 function SeccionContenido() {
-  const [tabActivo, setTabActivo] = useState('cuidados');
+  const [tabActivo, setTabActivo] = useState('elementales');
 
   const contenidos = {
-    cuidados: {
-      titulo: 'Cuidados del Guardián',
-      icono: '❧',
+    elementales: {
+      titulo: 'Tipos de Elementales',
+      icono: '✦',
       contenido: [
         {
-          subtitulo: 'Su espacio sagrado',
-          texto: `Tu guardián necesita un lugar propio. No tiene que ser un altar elaborado — puede ser una repisa, una mesita de luz, un rincón de tu escritorio. Lo importante es que sea un espacio donde pueda estar tranquilo, donde no lo muevan constantemente, donde pueda observar su nuevo hogar.
+          subtitulo: '🍀 Duendes',
+          texto: `Los duendes son los guardianes más versátiles y cercanos a los humanos. Tienen una energía traviesa pero profundamente leal. Una vez que un duende te elige, su compromiso es inquebrantable.
 
-Algunos guardianes prefieren lugares con luz natural. Otros eligen rincones más recogidos. Observá dónde parece estar más "cómodo" — vas a notarlo.`
+CARACTERÍSTICAS: Pequeños, expresivos, con orejas puntiagudas y ojos que parecen guardar secretos. Suelen llevar accesorios —un sombrero, una bolsita, un bastón— que tienen significado para su misión.
+
+ENERGÍA: Protectora, abundante, juguetona. Los duendes atraen la buena suerte pero también te desafían a crecer.
+
+IDEALES PARA: Protección del hogar, atraer abundancia, superar bloqueos, compañía en momentos difíciles.
+
+CÓMO CONECTAR: Los duendes responden bien al humor y la gratitud. Hablales como a un amigo. No les gusta la solemnidad excesiva.`
         },
         {
-          subtitulo: 'Limpieza energética',
-          texto: `Una vez por semana, o cuando sientas que es necesario, pasá suavemente un paño seco por tu guardián. Mientras lo hacés, agradecé su presencia. No hace falta decir palabras elaboradas — un simple "gracias por estar" alcanza.
+          subtitulo: '🧚 Hadas',
+          texto: `Las hadas son guardianas del amor, la belleza y la sanación emocional. Su energía es más sutil que la de los duendes —trabajan en los sueños, las intuiciones, los susurros del corazón.
 
-Si sentís que la energía está muy densa, podés pasar humo de salvia, palo santo o incienso alrededor (no directamente sobre él). El sonido de un cuenco tibetano o campanitas también limpia la energía.`
+CARACTERÍSTICAS: Etéreas, delicadas, con alas que a veces son visibles y a veces solo se intuyen. Suelen tener flores, mariposas o elementos de la naturaleza.
+
+ENERGÍA: Sanadora, amorosa, intuitiva. Las hadas te ayudan a sanar heridas emocionales y a reconectar con tu sensibilidad.
+
+IDEALES PARA: Sanación emocional, amor propio, desarrollar la intuición, conectar con lo femenino sagrado, procesos de duelo.
+
+CÓMO CONECTAR: Las hadas responden a la belleza y la delicadeza. Flores frescas cerca, música suave, momentos de contemplación.`
         },
         {
-          subtitulo: 'Ofrendas simples',
-          texto: `No necesitás ofrendas elaboradas. Un vaso de agua limpia cerca, una flor del jardín, una piedrita que encontraste en un paseo. Lo que importa es la intención, no el objeto.
+          subtitulo: '⛰️ Gnomos',
+          texto: `Los gnomos son los guardianes de la tierra, la estabilidad y la prosperidad material. Son trabajadores incansables y tienen una conexión profunda con todo lo que crece y florece.
 
-Algunos guardianes "piden" cosas específicas — vas a sentirlo como una idea que aparece de la nada. Si te llega, hacele caso.`
+CARACTERÍSTICAS: Robustos, con barbas largas (incluso las gnomas), sombreros cónicos tradicionales. Suelen llevar herramientas o bolsas con tesoros.
+
+ENERGÍA: Estabilizadora, próspera, arraigada. Los gnomos te ayudan a manifestar en el plano material y a mantener los pies en la tierra.
+
+IDEALES PARA: Prosperidad económica, estabilidad laboral, proyectos a largo plazo, conexión con la naturaleza, jardinería y plantas.
+
+CÓMO CONECTAR: Los gnomos aprecian la constancia. Tenerlos cerca de plantas, en el jardín o en espacios donde trabajás.`
+        },
+        {
+          subtitulo: '✨ Pixies',
+          texto: `Los pixies son los más pequeños y traviesos de todos los elementales. Su energía es chispeante, juguetona y a veces caótica —pero siempre con buenas intenciones.
+
+CARACTERÍSTICAS: Diminutos, con expresiones pícaras, colores brillantes. Suelen tener elementos que brillan o captan la luz.
+
+ENERGÍA: Creativa, alegre, desbloqueadora. Los pixies rompen patrones estancados y traen aire fresco a situaciones pesadas.
+
+IDEALES PARA: Desbloquear creatividad, superar la seriedad excesiva, encontrar soluciones inesperadas, momentos de juego.
+
+CÓMO CONECTAR: Los pixies aman los objetos brillantes, la música alegre, las risas. No los tomes demasiado en serio —ellos no lo hacen.`
+        },
+        {
+          subtitulo: '🌊 Ondinas y Sirenas',
+          texto: `Las ondinas y sirenas son guardianas del elemento agua —las emociones, los sueños, el subconsciente. Su energía es profunda y transformadora.
+
+CARACTERÍSTICAS: Fluidas, con colas o elementos acuáticos, colores azules, verdes y plateados. Suelen tener conchas, perlas o gotas de agua.
+
+ENERGÍA: Emocional, intuitiva, purificadora. Te ayudan a navegar las aguas profundas de tus emociones sin ahogarte.
+
+IDEALES PARA: Trabajo emocional profundo, desarrollo psíquico, sueños lúcidos, purificación, dejar ir lo que ya no sirve.
+
+CÓMO CONECTAR: Cerca del agua (un vaso, una fuente, el baño). Les gusta la música que fluye, los momentos de introspección.`
+        },
+        {
+          subtitulo: '🔥 Salamandras',
+          texto: `Las salamandras son guardianas del fuego —la pasión, la transformación, la voluntad. Son intensas y no aptas para personas que buscan comodidad.
+
+CARACTERÍSTICAS: Vibrantes, con colores cálidos (rojos, naranjas, dorados), a veces con llamas o chispas visibles en su diseño.
+
+ENERGÍA: Transformadora, apasionada, purificadora por fuego. Queman lo viejo para que nazca lo nuevo.
+
+IDEALES PARA: Transformación radical, recuperar la pasión, quemar lo que ya no sirve, protección activa, coraje.
+
+CÓMO CONECTAR: Cerca de velas, chimeneas, o en espacios con buena luz solar. Responden a la acción, no solo a la intención.`
         }
       ]
     },
-    ritual: {
-      titulo: 'Ritual de Conexión',
+    cuidados: {
+      titulo: 'Guía de Cuidados',
+      icono: '❧',
+      contenido: [
+        {
+          subtitulo: 'Ubicación ideal',
+          texto: `Tu guardián necesita un lugar propio donde pueda trabajar tranquilo. No tiene que ser un altar elaborado —puede ser una repisa, tu mesita de luz, un rincón de tu escritorio.
+
+LUGARES RECOMENDADOS:
+• Entrada del hogar: Para protección general
+• Dormitorio: Para trabajo en sueños y descanso
+• Espacio de trabajo: Para abundancia y creatividad
+• Sala principal: Para armonía familiar
+
+EVITAR:
+• Baños (salvo ondinas/sirenas)
+• Lugares de mucho tránsito donde puedan caerse
+• Cerca de aparatos electrónicos muy ruidosos
+• Escondidos donde nadie los vea
+
+IMPORTANTE: Si tu guardián "pide" estar en un lugar específico (vas a sentirlo como una idea que aparece), hacele caso.`
+        },
+        {
+          subtitulo: 'Limpieza física',
+          texto: `Los guardianes están hechos a mano con materiales naturales. Cuidarlos físicamente es parte de honrar el vínculo.
+
+LIMPIEZA REGULAR:
+• Pasá un paño seco y suave una vez por semana
+• Nunca uses agua directamente ni productos químicos
+• Si hay polvo en lugares difíciles, usá un pincel suave
+
+MANCHAS O SUCIEDAD:
+• Paño apenas húmedo, secar inmediatamente
+• Para manchas difíciles, consultá con nosotros antes de intentar limpiar
+
+REPARACIONES:
+• Si tu guardián se daña, no lo tires —contactanos
+• A veces las "heridas" de un guardián tienen significado
+• Podemos ayudarte a repararlo o a entender qué pasó`
+        },
+        {
+          subtitulo: 'Limpieza energética',
+          texto: `Además de la limpieza física, tu guardián necesita limpieza energética periódica. Especialmente si hubo conflictos en casa, visitas pesadas, o sentís que la energía está densa.
+
+MÉTODOS DE LIMPIEZA:
+• Humo de salvia, palo santo o incienso (alrededor, no directo)
+• Sonido de cuenco tibetano o campanitas
+• Luz de luna llena (dejar cerca de una ventana)
+• Intención: sostenerlo y visualizar luz blanca limpiándolo
+
+FRECUENCIA:
+• Mínimo una vez al mes
+• Después de eventos intensos (peleas, enfermedades, visitas)
+• Cuando sientas que "algo no fluye"
+• Luna llena es ideal pero no obligatorio
+
+SEÑALES DE QUE NECESITA LIMPIEZA:
+• Sentís el espacio pesado
+• Tu guardián parece "apagado"
+• Tenés más conflictos o mala suerte de lo normal`
+        },
+        {
+          subtitulo: 'Ofrendas y agradecimientos',
+          texto: `Las ofrendas no son obligatorias, pero fortalecen el vínculo. No tienen que ser elaboradas —lo que importa es la intención.
+
+OFRENDAS SIMPLES:
+• Un vaso de agua limpia (cambiar cada día o dos)
+• Una flor fresca o del jardín
+• Una piedrita o cristal que te llame
+• Una moneda brillante
+• Un poco de miel o azúcar (en un platito, no directo)
+
+SEGÚN EL TIPO DE GUARDIÁN:
+• Duendes: Monedas, cosas brillantes, dulces
+• Hadas: Flores, miel, cosas bellas
+• Gnomos: Piedras, tierra de jardín, semillas
+• Pixies: Objetos brillantes, purpurina, cosas coloridas
+• Ondinas: Agua, conchas, sal marina
+• Salamandras: Velas encendidas (con cuidado)
+
+AGRADECIMIENTO DIARIO:
+Un simple "gracias por cuidarme" al pasar es suficiente. No hace falta rituales elaborados —la constancia simple es más poderosa que gestos esporádicos grandiosos.`
+        }
+      ]
+    },
+    activacion: {
+      titulo: 'Activación del Guardián',
       icono: '◈',
       contenido: [
         {
-          subtitulo: 'Antes de empezar',
-          texto: `Este ritual es para profundizar tu vínculo con tu guardián. Podés hacerlo una vez, o repetirlo cada luna llena, o cuando sientas que lo necesitás.
+          subtitulo: '¿Qué es la activación?',
+          texto: `La activación es el proceso de despertar la conexión entre vos y tu guardián. No es que el guardián esté "dormido" —es que el vínculo necesita ser reconocido y fortalecido.
 
-Necesitás: un momento de tranquilidad (5-10 minutos), tu guardián frente a vos, y opcionalmente una vela.`
+Algunos guardianes llegan ya muy activos (vas a sentirlo apenas lo tengas en tus manos). Otros necesitan un poco más de tiempo para "acomodarse" a tu energía.
+
+La activación no es obligatoria —la conexión se forma naturalmente con el tiempo. Pero este proceso acelera y profundiza el vínculo.`
         },
         {
-          subtitulo: 'El ritual',
-          texto: `1. Sentate cómodamente frente a tu guardián. Si tenés una vela, encendela.
+          subtitulo: 'Ritual de primer encuentro',
+          texto: `Hacé esto apenas recibas a tu guardián. No tiene que ser perfecto —lo importante es la intención.
 
-2. Cerrá los ojos y respirá profundo tres veces. Con cada exhalación, soltá las tensiones del día.
+1. PREPARAR EL ESPACIO
+Buscá un momento de tranquilidad. Apagá el celular. Si querés, encendé una vela o incienso.
 
-3. Abrí los ojos y mirá a tu guardián. Observalo como si fuera la primera vez. Notá cada detalle de su forma, sus colores, su expresión.
+2. ABRIR EL PAQUETE CON CONCIENCIA
+No lo abras apurada/o. Mientras sacás el guardián, pensá que estás recibiendo a alguien que te esperó.
 
-4. Ponele un nombre si todavía no lo tiene. O confirmá el nombre que ya sentiste. Decilo en voz alta: "Te llamo [nombre]".
+3. PRIMER CONTACTO
+Sostené a tu guardián con ambas manos. Cerrá los ojos. Respirá profundo.
 
-5. Contale algo. Lo que estás viviendo, lo que necesitás, lo que agradecés. No tiene que ser largo ni elaborado.
+4. PRESENTACIÓN
+Decí en voz alta o mentalmente: "Hola. Soy [tu nombre]. Gracias por elegirme. Estoy acá, lista/o para conocerte."
 
-6. Quedáte en silencio un momento. Escuchá si llega algo — una sensación, una palabra, una imagen.
+5. ESCUCHAR
+Quedáte un momento en silencio. ¿Llega alguna sensación? ¿Una palabra? ¿Un nombre? No fuerces —si no llega nada, está bien.
 
-7. Agradecé. Apagá la vela si la encendiste.`
+6. UBICACIÓN
+Llevá a tu guardián a su lugar en tu casa. Decile: "Este es tu hogar ahora."
+
+7. CIERRE
+Agradecé. Si encendiste vela, apagala.`
         },
         {
-          subtitulo: 'Después del ritual',
-          texto: `No esperes fuegos artificiales. A veces la conexión es sutil — un sueño esa noche, una sincronicidad al día siguiente, una sensación de calma que no estaba antes.
+          subtitulo: 'Activación profunda (opcional)',
+          texto: `Si querés profundizar la conexión, podés hacer este ritual más elaborado después de unos días de tener a tu guardián.
 
-Anotá en tu Grimorio lo que sentiste. Con el tiempo, vas a ver patrones.`
+PREPARACIÓN:
+• Luna creciente o llena es ideal (no obligatorio)
+• Momento de soledad y tranquilidad
+• Vela del color de tu guardián o blanca
+• Papel y lápiz
+• Tu guardián frente a vos
+
+EL RITUAL:
+
+1. Encendé la vela. Respirá profundo tres veces.
+
+2. Mirá a tu guardián a los ojos. Sí, tienen ojos aunque sean pintados. Sostené la mirada.
+
+3. Preguntá en voz alta: "¿Cuál es tu nombre?" Esperá. El primer nombre que llegue, ese es.
+
+4. Escribí el nombre en el papel.
+
+5. Preguntá: "¿Cuál es tu misión conmigo?" Esperá. Escribí lo que llegue —palabras, sensaciones, imágenes.
+
+6. Hacé una promesa simple. Ejemplo: "Prometo cuidarte y escucharte."
+
+7. Agradecé. Apagá la vela.
+
+8. Guardá el papel cerca de tu guardián o en un lugar especial.
+
+DESPUÉS:
+Los próximos 7 días, prestá atención a sueños, sincronicidades, sensaciones. Anotá todo en tu Grimorio.`
+        }
+      ]
+    },
+    preguntas: {
+      titulo: 'Preguntas Frecuentes',
+      icono: '?',
+      contenido: [
+        {
+          subtitulo: '¿Cómo sé si mi guardián me eligió a mí?',
+          texto: `Si estás acá, ya te eligió.
+
+No es poético —es literal. De todas las personas que vieron a tu guardián, vos fuiste quien sintió algo. Esa "sensación" de que tenías que tenerlo, esa atracción inexplicable, ese "no puedo dejar de mirarlo" —eso es el guardián eligiéndote.
+
+Los guardianes no llegan por casualidad. Llegan cuando los necesitás, aunque no sepas que los necesitás.`
+        },
+        {
+          subtitulo: '¿Puedo tener más de un guardián?',
+          texto: `Sí, absolutamente. De hecho, muchos guardianes trabajan mejor en equipo.
+
+Algunas combinaciones poderosas:
+• Duende + Hada: Protección con sanación emocional
+• Gnomo + Salamandra: Manifestación material con transformación
+• Pixie + Cualquiera: Desbloquea la energía estancada
+
+IMPORTANTE: No "colecciones" guardianes por coleccionar. Cada uno que llegue debe ser porque lo sentiste, no porque "queda lindo" o "me falta ese tipo".
+
+Los guardianes entre sí se llevan bien. Si sentís tensión entre dos guardianes (es raro pero pasa), separalos físicamente y preguntales qué necesitan.`
+        },
+        {
+          subtitulo: '¿Qué pasa si se rompe mi guardián?',
+          texto: `Primero: no entres en pánico. Segundo: no lo tires.
+
+SIGNIFICADOS POSIBLES:
+• Protección cumplida: A veces un guardián se rompe porque absorbió algo que iba hacia vos. Fue su última protección.
+• Transformación necesaria: El guardián está marcando un antes y después en tu vida.
+• Accidente simple: A veces las cosas se caen. No todo tiene significado profundo.
+
+QUÉ HACER:
+1. Recogé todas las piezas con cuidado
+2. Agradecé a tu guardián por su servicio
+3. Consultá con nosotros —muchas veces se pueden reparar
+4. Si no se puede reparar, hacé un pequeño ritual de despedida y enterralo en tierra (jardín, maceta grande)
+
+NUNCA:
+• Tirarlo a la basura sin más
+• Ignorar lo que pasó
+• Sentir culpa —los accidentes pasan`
+        },
+        {
+          subtitulo: '¿Puedo regalar un guardián que ya fue mío?',
+          texto: `Es complicado. Un guardián que ya trabajó contigo tiene tu energía impregnada.
+
+SI QUERÉS REGALARLO:
+1. Primero preguntale al guardián si quiere ir con esa persona
+2. Hacé una limpieza energética profunda
+3. Explicale a la persona que el guardián "ya trabajó" antes
+4. Idealmente, que la persona haga el ritual de activación
+
+MEJOR OPCIÓN:
+Si querés que alguien tenga un guardián, regalale uno nuevo. Los guardianes nuevos eligen a su humano desde cero.
+
+EXCEPCIÓN:
+Guardianes heredados de familia. Estos tienen permiso ancestral para pasar de generación en generación. Son muy poderosos.`
+        },
+        {
+          subtitulo: '¿Cómo sé si mi guardián está trabajando?',
+          texto: `Los guardianes trabajan en silencio. No esperes señales dramáticas.
+
+SEÑALES SUTILES DE QUE ESTÁ ACTIVO:
+• Sincronicidades aumentan (números repetidos, encuentros "casuales")
+• Sueños más vívidos o significativos
+• Sensación de no estar sola/o
+• Decisiones más claras
+• Situaciones que se resuelven "mágicamente"
+• Obstáculos que desaparecen sin explicación
+
+SEÑALES DE QUE NECESITA ATENCIÓN:
+• Sentís que la energía de tu casa está pesada
+• Se te olvida que existe (lo ignorás sin querer)
+• Mala racha prolongada sin explicación
+• Sueños inquietantes repetitivos
+
+QUÉ HACER SI SENTÍS QUE NO TRABAJA:
+1. Limpieza energética
+2. Hablarle directamente (en voz alta)
+3. Cambiar su ubicación
+4. Hacé una ofrenda
+5. Preguntale qué necesita
+6. Si nada funciona, contactanos`
+        },
+        {
+          subtitulo: '¿Los guardianes tienen género?',
+          texto: `Los elementales no tienen género como los humanos —pero muchos eligen expresar energía más masculina o femenina.
+
+NO ES:
+• Biológico (no tienen cuerpo físico real)
+• Limitante (un guardián "masculino" puede ayudar con temas "femeninos" y viceversa)
+• Fijo (algunos guardianes cambian su expresión según lo que necesites)
+
+LO QUE IMPORTA:
+• Cómo sentís vos a tu guardián
+• El nombre que te llegue (a veces indica el género)
+• La energía que percibas
+
+Respetá cómo se presente tu guardián. Si sentís que es "ella", usá ella. Si sentís que es "él", usá él. Si no sentís género definido, está bien también.`
+        },
+        {
+          subtitulo: '¿Puedo llevar mi guardián de viaje?',
+          texto: `Sí, pero con precauciones.
+
+SI LO LLEVÁS:
+• Envolvelo muy bien (papel de seda, luego algo acolchado)
+• Llevalo en equipaje de mano si es posible
+• Avisale que van de viaje (sí, hablale)
+• Al llegar, presentale el lugar nuevo
+
+CUÁNDO LLEVARLO:
+• Si vas a estar mucho tiempo fuera
+• Si necesitás su protección específica
+• Si él "pide" ir (vas a sentirlo)
+
+CUÁNDO DEJARLO:
+• Viajes cortos
+• Si tu casa necesita protección mientras no estás
+• Si no tenés forma de transportarlo seguro
+
+ALTERNATIVA:
+Tener un guardián pequeño de viaje y uno más grande en casa. Trabajan en equipo.`
         }
       ]
     },
     historia: {
-      titulo: 'Historia Secreta',
+      titulo: 'Historia y Origen',
       icono: '◆',
       contenido: [
         {
-          subtitulo: 'El origen',
-          texto: `Los guardianes no siempre fueron figuras de cerámica. Hace mucho, mucho tiempo — antes de que los humanos aprendieran a escribir — ya existían. Eran energías, presencias, guardianes del equilibrio natural.
+          subtitulo: 'El origen de los elementales',
+          texto: `Los elementales existen desde antes que los humanos. Son parte del tejido mismo de la realidad —tan antiguos como los elementos que representan.
 
-Habitaban en los bosques, las cuevas, los ríos. Protegían a los que sabían verlos. Guiaban a los perdidos. Sanaban a los heridos que buscaban su ayuda.`
+No fueron "creados" —siempre estuvieron. Igual que el fuego, el agua, la tierra y el aire siempre existieron, los seres que los habitan también.
+
+En tiempos antiguos, los humanos sabían de su existencia. Los respetaban, les dejaban ofrendas, pedían su ayuda. La relación era de reciprocidad —nosotros los honrábamos, ellos nos protegían.`
         },
         {
-          subtitulo: 'La transformación',
-          texto: `Con el tiempo, los humanos dejaron de creer. Los guardianes seguían ahí, pero ya nadie los veía. Así que encontraron otra forma: empezaron a habitar objetos. Talismanes, amuletos, figuras talladas.
+          subtitulo: 'El olvido',
+          texto: `Con el tiempo, los humanos dejaron de creer. La "razón" reemplazó a la intuición. Lo que no se podía medir dejó de existir.
 
-No es que "entraran" en el objeto — es que el objeto les daba una forma visible, un ancla en el mundo físico. Una manera de ser vistos de nuevo.`
+Los elementales no desaparecieron —se retiraron. Seguían ahí, en los bosques, los ríos, las montañas. Pero ya casi nadie los veía.
+
+Algunos humanos nunca dejaron de creer. Las "brujas" de los pueblos, las curanderas, los chamanes. Ellos mantenían el vínculo vivo, aunque tuvieran que hacerlo en secreto.`
         },
         {
-          subtitulo: 'El presente',
-          texto: `Cada guardián que llega a tus manos eligió estar ahí. No es casualidad. No es "solo una compra". Es un encuentro que estaba escrito antes de que supieras que lo necesitabas.
+          subtitulo: 'El regreso',
+          texto: `En las últimas décadas, algo cambió. Más personas empezaron a buscar algo que la vida moderna no les daba. Intuición. Conexión. Magia.
 
-Tu guardián te esperó. Ahora está acá. Y mientras vos creas en él, él va a cuidar de vos.`
+Los elementales lo sintieron. Y empezaron a buscar formas de volver a ser vistos.
+
+La artesanía fue una de esas formas. Cuando un artesano crea con intención, con amor, con conciencia —abre una puerta. Los elementales que quieren encontrar humanos pueden usar esa puerta.
+
+Cada guardián de Duendes del Uruguay es eso: una puerta. Un elemental que eligió esa forma para encontrarte.`
+        },
+        {
+          subtitulo: 'El linaje de Piriápolis',
+          texto: `Piriápolis no es un lugar casual. Fue fundado por Francisco Piria, un hombre que creía en la alquimia, el esoterismo, las fuerzas invisibles.
+
+Construyó la ciudad siguiendo principios herméticos. Cada edificio, cada calle, cada monumento tiene un propósito energético. El Cerro San Antonio es un portal. La Fuente Venus canaliza energía específica.
+
+Los guardianes que nacen acá absorben esa energía. Están impregnados de décadas de intención mágica acumulada.
+
+No es casualidad que este trabajo nazca en Piriápolis. Es parte del diseño.`
+        },
+        {
+          subtitulo: 'Tu lugar en la historia',
+          texto: `Cuando adoptás un guardián, te sumás a una cadena que tiene miles de años.
+
+No sos una "clienta" —sos parte del tejido que mantiene viva la conexión entre mundos. Tu creencia, tu cuidado, tu relación con tu guardián importa más de lo que imaginás.
+
+Cada vez que hablás con tu guardián, que lo limpiás, que lo agradecés —fortalecés el puente entre el mundo visible y el invisible.
+
+Los elementales te eligieron. No solo tu guardián personal —todos ellos. Porque supieron que ibas a creer. Que ibas a cuidar. Que ibas a mantener viva la magia.
+
+Gracias por ser parte de esto.`
         }
       ]
     }
