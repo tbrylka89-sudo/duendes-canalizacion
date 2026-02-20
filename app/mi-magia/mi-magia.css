@@ -11,9 +11,15 @@
   --bosque-verde-claro: #E8F0ED;
   --bosque-verde-suave: #D4E5DD;
   --bosque-marron: #5D4E3C;
-  --bosque-negro: #1a1a1a;
-  --bosque-gris: #666;
-  --bosque-gris-claro: #999;
+  --bosque-negro: #000000;
+  --bosque-texto: #000000;
+  --bosque-texto-suave: #333333;
+  --bosque-gris: #444444;
+  --bosque-gris-claro: #666666;
+  --bosque-dorado: #c9a227;
+  --bosque-dorado-claro: #e8d48b;
+  --bosque-sombra: rgba(0,0,0,0.12);
+  --bosque-sombra-fuerte: rgba(0,0,0,0.2);
 }
 
 *{margin:0;padding:0;box-sizing:border-box!important}
@@ -5767,5 +5773,839 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* MEJORAS VISUALES - INTERFAZ RICA Y ELEGANTE */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Forzar textos en negro en toda la interfaz */
+.mi-magia-app h1,
+.mi-magia-app h2,
+.mi-magia-app h3,
+.mi-magia-app h4,
+.mi-magia-app .nombre-usuario,
+.mi-magia-app .seccion-header h1,
+.mi-magia-app .card h3,
+.mi-magia-app .guardian-card h3 {
+  color: #000000 !important;
+}
+
+.mi-magia-app p,
+.mi-magia-app .mensaje-bienvenida,
+.mi-magia-app .card p,
+.mi-magia-app .guardian-info p {
+  color: #1a1a1a !important;
+}
+
+/* Header mejorado con gradiente sutil */
+.mi-magia-app .header {
+  background: linear-gradient(180deg, #ffffff 0%, #fdfcfa 100%) !important;
+  border-bottom: 2px solid var(--bosque-verde-claro) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+}
+
+.mi-magia-app .logo-text {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  letter-spacing: 2px !important;
+}
+
+/* Cards mejoradas con más profundidad */
+.mi-magia-app .card {
+  background: linear-gradient(145deg, #ffffff 0%, #fefefe 50%, #faf9f7 100%) !important;
+  border: 1px solid rgba(45, 90, 74, 0.15) !important;
+  box-shadow: 
+    0 4px 6px rgba(0,0,0,0.04),
+    0 10px 20px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.8) !important;
+  border-radius: 20px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.mi-magia-app .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--bosque-verde), var(--bosque-dorado, #c9a227), var(--bosque-verde));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mi-magia-app .card:hover::before {
+  opacity: 1;
+}
+
+.mi-magia-app .card:hover {
+  transform: translateY(-12px) !important;
+  box-shadow: 
+    0 20px 40px rgba(0,0,0,0.12),
+    0 8px 16px rgba(45, 90, 74, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+/* Card destacada con borde dorado */
+.mi-magia-app .card-destacada {
+  border: 2px solid var(--bosque-dorado, #c9a227) !important;
+  background: linear-gradient(145deg, #fffef9 0%, #ffffff 50%, #fdfbf5 100%) !important;
+}
+
+.mi-magia-app .card-destacada::after {
+  content: '★';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--bosque-dorado, #c9a227);
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Iconos de cards más elaborados */
+.mi-magia-app .card-icono {
+  font-size: 2.5rem !important;
+  color: var(--bosque-verde) !important;
+  text-shadow: 0 2px 4px rgba(45, 90, 74, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mi-magia-app .card:hover .card-icono {
+  transform: scale(1.3) rotate(5deg) !important;
+  text-shadow: 0 4px 8px rgba(45, 90, 74, 0.3);
+}
+
+/* Links de cards con flecha animada */
+.mi-magia-app .card-link {
+  color: var(--bosque-verde) !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mi-magia-app .card-link::after {
+  content: '→';
+  transition: transform 0.3s ease;
+}
+
+.mi-magia-app .card:hover .card-link::after {
+  transform: translateX(5px);
+}
+
+/* Bienvenida más impactante */
+.mi-magia-app .inicio-bienvenida {
+  text-align: center;
+  padding: 3rem 1rem !important;
+  position: relative;
+}
+
+.mi-magia-app .inicio-bienvenida::before {
+  content: '✦';
+  display: block;
+  font-size: 2rem;
+  color: var(--bosque-dorado, #c9a227);
+  margin-bottom: 1rem;
+  animation: floatSuave 3s ease-in-out infinite;
+}
+
+.mi-magia-app .saludo-hora {
+  font-size: 1.1rem !important;
+  color: #666 !important;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+}
+
+.mi-magia-app .nombre-usuario {
+  font-family: 'Cinzel', serif !important;
+  font-size: clamp(2rem, 6vw, 3.5rem) !important;
+  font-weight: 500 !important;
+  background: linear-gradient(135deg, #000000 0%, #333333 50%, #000000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0.5rem 0 !important;
+}
+
+.mi-magia-app .mensaje-bienvenida {
+  font-size: 1.15rem !important;
+  color: #444 !important;
+  font-style: italic;
+}
+
+/* Grid de cards mejorado */
+.mi-magia-app .inicio-cards {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 1.5rem !important;
+  padding: 1rem !important;
+}
+
+/* Guardian cards con diseño premium */
+.mi-magia-app .guardian-card {
+  background: linear-gradient(160deg, #ffffff 0%, #fefefe 100%) !important;
+  border: 1px solid rgba(45, 90, 74, 0.12) !important;
+  border-radius: 24px !important;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 6px rgba(0,0,0,0.05),
+    0 10px 30px rgba(0,0,0,0.08) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mi-magia-app .guardian-card:hover {
+  transform: translateY(-15px) scale(1.02) !important;
+  box-shadow: 
+    0 25px 50px rgba(0,0,0,0.15),
+    0 10px 20px rgba(45, 90, 74, 0.1) !important;
+}
+
+.mi-magia-app .guardian-imagen {
+  position: relative;
+  overflow: hidden;
+}
+
+.mi-magia-app .guardian-imagen::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+
+.mi-magia-app .guardian-imagen img {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mi-magia-app .guardian-card:hover .guardian-imagen img {
+  transform: scale(1.1) !important;
+}
+
+.mi-magia-app .guardian-info h3 {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1.4rem !important;
+  color: #000 !important;
+}
+
+/* Estado del formulario siempre visible */
+.mi-magia-app .estado-formulario-container {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 1px solid rgba(45, 90, 74, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+/* Formulario pendiente - destacado */
+.mi-magia-app .btn-formulario-pendiente {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background: linear-gradient(135deg, #c9a227 0%, #e8d48b 50%, #c9a227 100%) !important;
+  color: #000 !important;
+  padding: 1.25rem !important;
+  border-radius: 16px !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  box-shadow: 
+    0 4px 15px rgba(201, 162, 39, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.4) !important;
+  transition: all 0.3s ease !important;
+  animation: pulseSuave 2s ease-in-out infinite;
+}
+
+.mi-magia-app .btn-formulario-pendiente:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 
+    0 8px 25px rgba(201, 162, 39, 0.4),
+    inset 0 1px 0 rgba(255,255,255,0.5) !important;
+}
+
+.mi-magia-app .btn-formulario-pendiente .formulario-icono {
+  font-size: 1.5rem;
+}
+
+.mi-magia-app .btn-formulario-pendiente small {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Formulario completado - elegante */
+.mi-magia-app .cana-pendiente.formulario-ok {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+  border: 1px solid #81c784 !important;
+  color: #2e7d32 !important;
+}
+
+.mi-magia-app .cana-pendiente.formulario-ok .pendiente-icono {
+  color: #2e7d32 !important;
+}
+
+/* Canalización en preparación */
+.mi-magia-app .cana-pendiente {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
+  border: 1px solid #ffb74d !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  text-align: center !important;
+}
+
+.mi-magia-app .cana-pendiente .pendiente-icono {
+  font-size: 1.5rem !important;
+  animation: spin 3s linear infinite;
+}
+
+/* Botón ver canalización premium */
+.mi-magia-app .btn-cana {
+  background: linear-gradient(135deg, var(--bosque-verde) 0%, #3D7A5A 100%) !important;
+  color: #fff !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 12px !important;
+  border: none !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(45, 90, 74, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.mi-magia-app .btn-cana:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 25px rgba(45, 90, 74, 0.4) !important;
+}
+
+/* Botón certificado */
+.mi-magia-app .btn-certificado {
+  background: transparent !important;
+  color: var(--bosque-verde) !important;
+  border: 2px solid var(--bosque-verde) !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+}
+
+.mi-magia-app .btn-certificado:hover {
+  background: var(--bosque-verde) !important;
+  color: #fff !important;
+}
+
+/* Modal de canalización mejorado */
+.mi-magia-app .modal-overlay {
+  backdrop-filter: blur(8px) !important;
+  background: rgba(0,0,0,0.6) !important;
+}
+
+.mi-magia-app .modal-cana {
+  background: linear-gradient(180deg, #ffffff 0%, #fdfcfa 100%) !important;
+  border-radius: 24px !important;
+  box-shadow: 
+    0 25px 80px rgba(0,0,0,0.25),
+    0 10px 30px rgba(0,0,0,0.15) !important;
+  border: 2px solid var(--bosque-dorado, #c9a227) !important;
+}
+
+.mi-magia-app .modal-header {
+  border-bottom: 1px solid rgba(45, 90, 74, 0.1) !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.mi-magia-app .modal-simbolo {
+  font-size: 2.5rem !important;
+  color: var(--bosque-dorado, #c9a227) !important;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.mi-magia-app .modal-header h2 {
+  font-family: 'Cinzel', serif !important;
+  color: #000 !important;
+  font-size: 1.5rem !important;
+}
+
+.mi-magia-app .modal-contenido p {
+  color: #1a1a1a !important;
+  line-height: 1.8 !important;
+  font-size: 1.1rem !important;
+}
+
+/* Navegación mejorada */
+.mi-magia-app .nav-btn {
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  color: #333 !important;
+}
+
+.mi-magia-app .nav-btn:hover {
+  background: var(--bosque-verde-claro) !important;
+}
+
+.mi-magia-app .nav-btn.activo {
+  background: var(--bosque-verde) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 15px rgba(45, 90, 74, 0.3) !important;
+}
+
+.mi-magia-app .nav-nombre {
+  color: inherit !important;
+}
+
+/* Sección header mejorada */
+.mi-magia-app .seccion-header {
+  text-align: center;
+  margin-bottom: 2rem !important;
+  position: relative;
+}
+
+.mi-magia-app .seccion-header::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--bosque-dorado, #c9a227), transparent);
+  margin: 1rem auto 0;
+}
+
+.mi-magia-app .seccion-header h1 {
+  font-family: 'Cinzel', serif !important;
+  font-size: clamp(1.8rem, 4vw, 2.5rem) !important;
+  color: #000 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.mi-magia-app .seccion-header p {
+  color: #555 !important;
+  font-size: 1.1rem !important;
+}
+
+/* Mensaje inspirador mejorado */
+.mi-magia-app .inicio-mensaje {
+  background: linear-gradient(135deg, var(--bosque-verde-claro) 0%, #e0ebe7 100%) !important;
+  border-left: 4px solid var(--bosque-verde) !important;
+  padding: 1.5rem 2rem !important;
+  margin: 2rem 0 !important;
+  border-radius: 0 16px 16px 0 !important;
+  position: relative;
+}
+
+.mi-magia-app .inicio-mensaje::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  font-size: 4rem;
+  color: var(--bosque-verde);
+  opacity: 0.3;
+  font-family: serif;
+  line-height: 1;
+}
+
+.mi-magia-app .inicio-mensaje p {
+  font-style: italic !important;
+  color: #333 !important;
+  font-size: 1.1rem !important;
+  margin: 0 !important;
+  padding-left: 1rem !important;
+}
+
+/* Animaciones adicionales */
+@keyframes pulseSuave {
+  0%, 100% { 
+    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  50% { 
+    box-shadow: 0 4px 25px rgba(201, 162, 39, 0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Efecto shimmer en elementos destacados */
+.mi-magia-app .card-destacada::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.4),
+    transparent
+  );
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Footer mejorado */
+.mi-magia-app .footer {
+  background: linear-gradient(180deg, transparent 0%, rgba(45, 90, 74, 0.05) 100%) !important;
+  padding: 2rem !important;
+  text-align: center;
+  border-top: 1px solid var(--bosque-verde-claro) !important;
+}
+
+.mi-magia-app .footer p {
+  color: #666 !important;
+  font-size: 0.95rem !important;
+}
+
+/* Decoración sutil en el fondo */
+.mi-magia-app .contenido-principal {
+  position: relative;
+}
+
+.mi-magia-app .contenido-principal::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(45, 90, 74, 0.03) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Responsive mejorado */
+@media (max-width: 768px) {
+  .mi-magia-app .nombre-usuario {
+    font-size: 2rem !important;
+  }
+  
+  .mi-magia-app .card {
+    margin-bottom: 1rem !important;
+  }
+  
+  .mi-magia-app .inicio-cards {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ESTADOS DE FORMULARIO - SIEMPRE VISIBLES */
+/* ═══════════════════════════════════════════════════════════════ */
+
+.mi-magia-app .estado-formulario-container,
+.mi-magia-app .estado-canalizacion-container {
+  background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+  border: 1px solid rgba(45, 90, 74, 0.15);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.mi-magia-app .estado-formulario-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(45, 90, 74, 0.1);
+}
+
+.mi-magia-app .estado-titulo {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Formulario pendiente - MUY destacado */
+.mi-magia-app .btn-formulario-pendiente {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  background: linear-gradient(135deg, #c9a227 0%, #dbb838 50%, #c9a227 100%) !important;
+  color: #000 !important;
+  padding: 1.5rem !important;
+  border-radius: 16px !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  box-shadow: 
+    0 4px 15px rgba(201, 162, 39, 0.35),
+    0 8px 30px rgba(201, 162, 39, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.5) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: pulseSuave 2.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.mi-magia-app .btn-formulario-pendiente::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255,255,255,0.3) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.mi-magia-app .btn-formulario-pendiente:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow: 
+    0 8px 25px rgba(201, 162, 39, 0.45),
+    0 15px 40px rgba(201, 162, 39, 0.25),
+    inset 0 1px 0 rgba(255,255,255,0.6) !important;
+}
+
+.mi-magia-app .btn-formulario-pendiente .formulario-icono {
+  font-size: 2rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.mi-magia-app .btn-formulario-pendiente .formulario-texto-principal {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.mi-magia-app .btn-formulario-pendiente small {
+  font-weight: 400;
+  opacity: 0.85;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.mi-magia-app .btn-formulario-pendiente .formulario-cta {
+  background: rgba(0,0,0,0.15);
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Formulario completado - Verde elegante */
+.mi-magia-app .cana-pendiente.formulario-ok {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%) !important;
+  border: 2px solid #66bb6a !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  text-align: center !important;
+  position: relative;
+}
+
+.mi-magia-app .cana-pendiente.formulario-ok .pendiente-icono {
+  font-size: 2rem !important;
+  color: #2e7d32 !important;
+  background: #fff;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
+}
+
+.mi-magia-app .cana-pendiente.formulario-ok .formulario-texto-principal {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1b5e20 !important;
+}
+
+.mi-magia-app .cana-pendiente.formulario-ok small {
+  color: #2e7d32 !important;
+}
+
+.mi-magia-app .preparacion-tiempo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+  color: #1b5e20;
+  font-weight: 500;
+}
+
+.mi-magia-app .tiempo-icono {
+  animation: spin 3s linear infinite;
+}
+
+/* Sin formulario pendiente - Neutral elegante */
+.mi-magia-app .cana-pendiente.sin-formulario {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%) !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+  padding: 1.25rem !important;
+  text-align: center !important;
+}
+
+.mi-magia-app .cana-pendiente.sin-formulario .pendiente-icono {
+  font-size: 1.5rem !important;
+  color: var(--bosque-verde) !important;
+}
+
+.mi-magia-app .cana-pendiente.sin-formulario .formulario-texto-principal {
+  color: #555 !important;
+  font-weight: 600;
+}
+
+.mi-magia-app .cana-pendiente.sin-formulario small {
+  color: #777 !important;
+}
+
+/* Canalización en preparación */
+.mi-magia-app .cana-pendiente {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
+  border: 1px solid #ffc107 !important;
+  border-radius: 12px !important;
+  padding: 1.25rem !important;
+  text-align: center !important;
+}
+
+.mi-magia-app .cana-pendiente .pendiente-icono {
+  font-size: 1.75rem !important;
+  animation: spin 4s linear infinite;
+}
+
+/* Botón ver canalización - Premium */
+.mi-magia-app .btn-cana {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  background: linear-gradient(135deg, var(--bosque-verde) 0%, #3a7a5a 50%, var(--bosque-verde) 100%) !important;
+  color: #fff !important;
+  padding: 1.25rem !important;
+  border-radius: 16px !important;
+  border: none !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  box-shadow: 
+    0 4px 15px rgba(45, 90, 74, 0.35),
+    inset 0 1px 0 rgba(255,255,255,0.2) !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.mi-magia-app .btn-cana::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.mi-magia-app .btn-cana:hover::before {
+  left: 100%;
+}
+
+.mi-magia-app .btn-cana:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 
+    0 8px 25px rgba(45, 90, 74, 0.45),
+    inset 0 1px 0 rgba(255,255,255,0.25) !important;
+}
+
+.mi-magia-app .btn-cana .cana-icono {
+  font-size: 1.5rem;
+}
+
+.mi-magia-app .btn-cana small {
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* Botón certificado mejorado */
+.mi-magia-app .btn-certificado {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  background: transparent !important;
+  color: var(--bosque-verde) !important;
+  border: 2px solid var(--bosque-verde) !important;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+  margin-top: 1rem !important;
+}
+
+.mi-magia-app .btn-certificado:hover {
+  background: var(--bosque-verde) !important;
+  color: #fff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 15px rgba(45, 90, 74, 0.3) !important;
+}
+
+/* Guardian card acciones mejoradas */
+.mi-magia-app .guardian-acciones {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mi-magia-app .btn-formulario-pendiente {
+    padding: 1.25rem !important;
+  }
+  
+  .mi-magia-app .estado-formulario-container,
+  .mi-magia-app .estado-canalizacion-container {
+    padding: 1rem;
   }
 }

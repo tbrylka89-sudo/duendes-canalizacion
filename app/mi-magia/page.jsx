@@ -1,7 +1,32 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import './mi-magia.css';
+
+// Variantes de animación reutilizables
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.4 } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+  }
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 const API_BASE = '';
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
@@ -257,70 +282,167 @@ function SeccionInicio({ usuario, ir }) {
   };
 
   return (
-    <section className="seccion seccion-inicio">
-      <div className="inicio-bienvenida">
-        <p className="saludo-hora">{saludoHora()},</p>
-        <h1 className="nombre-usuario">{nombre}</h1>
-        <p className="mensaje-bienvenida">
+    <motion.section
+      className="seccion seccion-inicio"
+      initial="hidden"
+      animate="visible"
+      variants={fadeIn}
+    >
+      <motion.div
+        className="inicio-bienvenida"
+        variants={fadeInUp}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.p
+          className="saludo-hora"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {saludoHora()},
+        </motion.p>
+        <motion.h1
+          className="nombre-usuario"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+        >
+          {nombre}
+        </motion.h1>
+        <motion.p
+          className="mensaje-bienvenida"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           Bienvenida a tu espacio mágico personal
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
-      <div className="inicio-cards">
+      <motion.div
+        className="inicio-cards"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {tieneGuardianes ? (
-          <div className="card card-destacada" onClick={() => ir('guardianes')}>
-            <div className="card-icono">◆</div>
+          <motion.div
+            className="card card-destacada"
+            onClick={() => ir('guardianes')}
+            variants={fadeInUp}
+            whileHover={{ scale: 1.03, y: -8 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <motion.div
+              className="card-icono"
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 4 }}
+            >
+              ◆
+            </motion.div>
             <h3>Mis Guardianes</h3>
             <p>Tenés {guardianes.length} guardián{guardianes.length > 1 ? 'es' : ''} a tu lado</p>
-            <span className="card-link">Ver mis guardianes →</span>
-          </div>
+            <span className="card-link">Ver mis guardianes</span>
+          </motion.div>
         ) : (
-          <div className="card card-vacia">
+          <motion.div
+            className="card card-vacia"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02 }}
+          >
             <div className="card-icono">◇</div>
             <h3>Tu primer guardián te espera</h3>
             <p>Cuando adoptes un guardián, aparecerá acá con su canalización personal</p>
             <a href={`${WORDPRESS_URL}/shop/`} target="_blank" rel="noopener" className="btn-dorado-sm">
               Explorar guardianes ↗
             </a>
-          </div>
+          </motion.div>
         )}
 
-        <div className="card card-destacada" onClick={() => ir('estudios')}>
-          <div className="card-icono">☽</div>
+        <motion.div
+          className="card card-destacada"
+          onClick={() => ir('estudios')}
+          variants={fadeInUp}
+          whileHover={{ scale: 1.03, y: -8 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <motion.div
+            className="card-icono"
+            animate={{ rotate: [0, 360] }}
+            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+          >
+            ☽
+          </motion.div>
           <h3>Estudios Místicos</h3>
           <p>Lecturas, numerología, registros akáshicos y más</p>
-          <span className="card-link">Explorar estudios →</span>
-        </div>
+          <span className="card-link">Explorar estudios</span>
+        </motion.div>
 
-        <div className="card" onClick={() => ir('runas')}>
-          <div className="card-icono">ᚱ</div>
+        <motion.div
+          className="card"
+          onClick={() => ir('runas')}
+          variants={fadeInUp}
+          whileHover={{ scale: 1.03, y: -8 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <motion.div
+            className="card-icono"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+          >
+            ᚱ
+          </motion.div>
           <h3>Runas de Poder</h3>
           <p>Tenés {usuario?.runas || 0} runas para experiencias mágicas</p>
-          <span className="card-link">Ver runas →</span>
-        </div>
+          <span className="card-link">Ver runas</span>
+        </motion.div>
 
-        <div className="card" onClick={() => ir('contenido')}>
-          <div className="card-icono">✦</div>
+        <motion.div
+          className="card"
+          onClick={() => ir('contenido')}
+          variants={fadeInUp}
+          whileHover={{ scale: 1.03, y: -8 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <motion.div
+            className="card-icono"
+            animate={{ opacity: [1, 0.6, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            ✦
+          </motion.div>
           <h3>Sabiduría Guardiana</h3>
           <p>Cuidados, rituales y secretos ancestrales</p>
-          <span className="card-link">Explorar →</span>
-        </div>
+          <span className="card-link">Explorar</span>
+        </motion.div>
 
-        <div className="card" onClick={() => ir('grimorio')}>
+        <motion.div
+          className="card"
+          onClick={() => ir('grimorio')}
+          variants={fadeInUp}
+          whileHover={{ scale: 1.03, y: -8 }}
+          whileTap={{ scale: 0.98 }}
+        >
           <div className="card-icono">▣</div>
           <h3>Tu Grimorio</h3>
           <p>Tu diario mágico personal</p>
-          <span className="card-link">Escribir →</span>
-        </div>
-      </div>
+          <span className="card-link">Escribir</span>
+        </motion.div>
+      </motion.div>
 
-      <div className="inicio-mensaje">
+      <motion.div
+        className="inicio-mensaje"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
         <p>
           "Los guardianes no llegan por casualidad. Cada uno encuentra a su humano
           en el momento exacto en que más lo necesita."
         </p>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
 
@@ -408,44 +530,76 @@ function SeccionGuardianes({ usuario }) {
               </div>
 
               <div className="guardian-acciones">
-                {tieneCana ? (
-                  <button
-                    className="btn-cana"
-                    onClick={() => setCanalizacionAbierta(cana)}
-                  >
-                    ✦ Ver Canalización
-                  </button>
-                ) : guardian.formularioPendiente ? (
-                  <a
-                    href={`https://duendesdeluruguay.com/formulario-canalizacion/?order=${guardian.ordenId}`}
-                    className="btn-formulario-pendiente"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span className="formulario-icono">📝</span>
-                    <span>Completá tu formulario</span>
-                    <small>Para recibir tu canalización personalizada</small>
-                  </a>
-                ) : guardian.formularioCompletado ? (
-                  <div className="cana-pendiente formulario-ok">
-                    <span className="pendiente-icono">✓</span>
-                    <span>Formulario completado</span>
-                    <small>Tu canalización está en preparación</small>
+                {/* Estado del formulario - SIEMPRE VISIBLE */}
+                <div className="estado-formulario-container">
+                  <div className="estado-formulario-header">
+                    <span className="estado-titulo">Estado del Formulario</span>
                   </div>
-                ) : (
-                  <div className="cana-pendiente">
-                    <span className="pendiente-icono">⏳</span>
-                    <span>Canalización en preparación</span>
-                    <small>Estará lista en 4-24 horas</small>
+
+                  {guardian.formularioPendiente ? (
+                    // ESTADO 1: Formulario pendiente de llenar
+                    <a
+                      href={`https://duendesdeluruguay.com/formulario-canalizacion/?order=${guardian.ordenId}`}
+                      className="btn-formulario-pendiente"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span className="formulario-icono">📝</span>
+                      <span className="formulario-texto-principal">Completá tu formulario</span>
+                      <small>Para que tu guardián pueda conocerte y escribirte personalmente</small>
+                      <span className="formulario-cta">Completar ahora →</span>
+                    </a>
+                  ) : guardian.formularioCompletado ? (
+                    // ESTADO 2: Formulario ya completado
+                    <div className="cana-pendiente formulario-ok">
+                      <span className="pendiente-icono">✓</span>
+                      <span className="formulario-texto-principal">Formulario completado</span>
+                      <small>Tu canalización personalizada está siendo preparada con amor</small>
+                      <div className="preparacion-tiempo">
+                        <span className="tiempo-icono">⏱</span>
+                        <span>Estará lista en 4-24 horas</span>
+                      </div>
+                    </div>
+                  ) : (
+                    // ESTADO 3: Sin formulario pendiente (canalización lista o no requiere)
+                    <div className="cana-pendiente sin-formulario">
+                      <span className="pendiente-icono">✦</span>
+                      <span className="formulario-texto-principal">Sin formulario pendiente</span>
+                      <small>Tu guardián ya tiene toda la información que necesita</small>
+                    </div>
+                  )}
+                </div>
+
+                {/* Estado de la canalización */}
+                <div className="estado-canalizacion-container">
+                  <div className="estado-formulario-header">
+                    <span className="estado-titulo">Canalización</span>
                   </div>
-                )}
+
+                  {tieneCana ? (
+                    <button
+                      className="btn-cana"
+                      onClick={() => setCanalizacionAbierta(cana)}
+                    >
+                      <span className="cana-icono">✦</span>
+                      <span>Ver Canalización</span>
+                      <small>Tu mensaje personalizado está listo</small>
+                    </button>
+                  ) : (
+                    <div className="cana-pendiente">
+                      <span className="pendiente-icono">⏳</span>
+                      <span>En preparación</span>
+                      <small>Tu canalización está siendo creada con dedicación</small>
+                    </div>
+                  )}
+                </div>
 
                 {guardian.ordenId && (
                   <button
                     className="btn-certificado"
                     onClick={() => descargarCertificado(guardian.ordenId)}
                   >
-                    📜 Descargar Certificado
+                    📜 Descargar Certificado de Adopción
                   </button>
                 )}
               </div>
