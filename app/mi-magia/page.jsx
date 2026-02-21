@@ -179,7 +179,7 @@ function MiMagiaContent() {
 
       {/* Contenido principal */}
       <main className="contenido-principal">
-        {seccion === 'inicio' && <SeccionInicio usuario={usuario} ir={setSeccion} />}
+        {seccion === 'inicio' && <SeccionInicio usuario={usuario} ir={setSeccion} token={token} />}
         {seccion === 'guardianes' && <SeccionGuardianes usuario={usuario} />}
         {seccion === 'estudios' && <SeccionEstudios usuario={usuario} token={token} setUsuario={setUsuario} />}
         {seccion === 'runas' && <SeccionRunas usuario={usuario} ir={setSeccion} />}
@@ -294,20 +294,67 @@ function LoginMagicLink() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SECCIÓN INICIO
+// SECCIÓN INICIO - EXPERIENCIA PERSONALIZADA
 // ═══════════════════════════════════════════════════════════════
 
-function SeccionInicio({ usuario, ir }) {
-  const nombre = usuario?.nombrePreferido || usuario?.nombre || 'viajera';
+function SeccionInicio({ usuario, ir, token }) {
+  const [mensajeDiario, setMensajeDiario] = useState(null);
+  const [cargandoMensaje, setCargandoMensaje] = useState(true);
+
+  const nombrePreferido = usuario?.nombrePreferido || usuario?.nombre || 'viajera';
   const guardianes = usuario?.guardianes || [];
   const tieneGuardianes = guardianes.length > 0;
+  const guardianPrincipal = guardianes[0];
+  const lecturas = usuario?.lecturas || [];
+  const lecturasPendientes = usuario?.lecturasPendientes || [];
 
+  // Detectar canalizaciones pendientes o listas
+  const canalizacionPendiente = lecturasPendientes.find(l => l.estado !== 'enviada');
+  const canalizacionLista = lecturas.find(l => l.estado === 'enviada' || l.contenido);
+
+  // Saludo según hora (6-11:59 = días, 12-18:59 = tardes, 19-5:59 = noches)
   const saludoHora = () => {
     const hora = new Date().getHours();
-    if (hora < 12) return 'Buenos días';
-    if (hora < 19) return 'Buenas tardes';
+    if (hora >= 6 && hora < 12) return 'Buenos días';
+    if (hora >= 12 && hora < 19) return 'Buenas tardes';
     return 'Buenas noches';
   };
+
+  // Cargar mensaje diario del guardián
+  useEffect(() => {
+    if (!tieneGuardianes || !token) {
+      setCargandoMensaje(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    fetch(`/api/mi-magia/mensaje-diario?token=${token}`, {
+      signal: controller.signal
+    })
+      .then(res => res.json())
+      .then(data => {
+        clearTimeout(timeoutId);
+        if (data.success && data.mensaje) {
+          setMensajeDiario({
+            texto: data.mensaje,
+            guardianNombre: data.guardianNombre,
+            fecha: data.fechaFormateada
+          });
+        }
+        setCargandoMensaje(false);
+      })
+      .catch(() => {
+        clearTimeout(timeoutId);
+        setCargandoMensaje(false);
+      });
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [tieneGuardianes, token]);
 
   return (
     <motion.section
@@ -316,6 +363,7 @@ function SeccionInicio({ usuario, ir }) {
       animate="visible"
       variants={fadeIn}
     >
+      {/* 1. SALUDO PERSONALIZADO */}
       <motion.div
         className="inicio-bienvenida"
         variants={cardVariant}
@@ -336,18 +384,96 @@ function SeccionInicio({ usuario, ir }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
-          {nombre}
+          {nombrePreferido} <span className="saludo-simbolo">✦</span>
         </motion.h1>
         <motion.p
-          className="mensaje-bienvenida"
+          className="mensaje-bienvenida mensaje-guardian"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Bienvenida a tu espacio mágico personal
+          {tieneGuardianes
+            ? <><strong>{guardianPrincipal.nombre}</strong> ya siente tu presencia.</>
+            : <>Tu guardián ya te está buscando.</>
+          }
         </motion.p>
       </motion.div>
 
+      {/* 2. BANNER DE ESTADO DE CANALIZACIÓN */}
+      {canalizacionPendiente && (
+        <motion.div
+          className="banner-canalizacion banner-pendiente"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <span className="banner-icono">✦</span>
+          <div className="banner-contenido">
+            <p className="banner-titulo">Tu canalización está siendo preparada con dedicación</p>
+            <p className="banner-detalle">
+              {canalizacionPendiente.guardian?.nombre || guardianPrincipal?.nombre || 'Tu guardián'} · En preparación
+            </p>
+          </div>
+        </motion.div>
+      )}
+
+      {!canalizacionPendiente && canalizacionLista && (
+        <motion.div
+          className="banner-canalizacion banner-lista"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          onClick={() => ir('guardianes')}
+          style={{ cursor: 'pointer' }}
+        >
+          <span className="banner-icono">✦</span>
+          <div className="banner-contenido">
+            <p className="banner-titulo">Tu canalización está lista</p>
+            <p className="banner-detalle">
+              {canalizacionLista.guardian?.nombre || guardianPrincipal?.nombre || 'Tu guardián'}
+            </p>
+          </div>
+          <button className="banner-btn">Leer mi canalización</button>
+        </motion.div>
+      )}
+
+      {/* 3. MENSAJE DIARIO DEL GUARDIÁN */}
+      {tieneGuardianes && (
+        <motion.div
+          className="mensaje-diario-container"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          {cargandoMensaje ? (
+            <div className="mensaje-diario-loading">
+              <span className="loading-icono">✦</span>
+              <p>Escuchando a {guardianPrincipal.nombre}...</p>
+            </div>
+          ) : mensajeDiario ? (
+            <>
+              <p className="mensaje-diario-header">
+                <span className="mensaje-simbolo">✦</span> {mensajeDiario.guardianNombre} te dice hoy:
+              </p>
+              <blockquote className="mensaje-diario-texto">
+                "{mensajeDiario.texto}"
+              </blockquote>
+              <p className="mensaje-diario-fecha">{mensajeDiario.fecha}</p>
+            </>
+          ) : (
+            <>
+              <p className="mensaje-diario-header">
+                <span className="mensaje-simbolo">✦</span> {guardianPrincipal.nombre} te acompaña:
+              </p>
+              <blockquote className="mensaje-diario-texto mensaje-fallback">
+                "Tu guardián está en silencio hoy. Escuchalo en la quietud."
+              </blockquote>
+            </>
+          )}
+        </motion.div>
+      )}
+
+      {/* 4. CARDS DE NAVEGACIÓN */}
       <motion.div
         className="inicio-cards"
         variants={staggerContainer}

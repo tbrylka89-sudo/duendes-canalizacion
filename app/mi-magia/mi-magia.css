@@ -5962,14 +5962,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   position: relative;
 }
 
-.mi-magia-app .inicio-bienvenida::before {
-  content: '✦';
-  display: block;
-  font-size: 2rem;
-  color: var(--bosque-dorado, #c9a227);
-  margin-bottom: 1rem;
-  animation: floatSuave 3s ease-in-out infinite;
-}
+/* Removido el ::before con ✦ - ahora el símbolo está en el JSX */
 
 .mi-magia-app .saludo-hora {
   font-size: 1.1rem !important;
@@ -5993,6 +5986,197 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   font-size: 1.15rem !important;
   color: #444 !important;
   font-style: italic;
+}
+
+/* Símbolo del saludo */
+.mi-magia-app .saludo-simbolo {
+  color: var(--bosque-dorado, #B8973A);
+  font-size: 0.8em;
+  margin-left: 0.25rem;
+}
+
+/* Mensaje del guardián en saludo */
+.mi-magia-app .mensaje-guardian {
+  font-style: normal !important;
+  color: var(--bosque-gris, #4A4A4A) !important;
+}
+
+.mi-magia-app .mensaje-guardian strong {
+  color: var(--bosque-verde, #2D5A3D);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BANNER DE CANALIZACIÓN
+   ═══════════════════════════════════════════════════════════════ */
+
+.mi-magia-app .banner-canalizacion {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin: 0 1rem 1.5rem 1rem;
+  background: rgba(184, 151, 58, 0.04);
+  border-left: 3px solid var(--bosque-dorado, #B8973A);
+  border-radius: 0 12px 12px 0;
+  transition: all 0.3s ease;
+}
+
+.mi-magia-app .banner-canalizacion:hover {
+  background: rgba(184, 151, 58, 0.08);
+}
+
+.mi-magia-app .banner-canalizacion .banner-icono {
+  font-size: 1.5rem;
+  color: var(--bosque-dorado, #B8973A);
+  flex-shrink: 0;
+}
+
+.mi-magia-app .banner-canalizacion .banner-contenido {
+  flex: 1;
+}
+
+.mi-magia-app .banner-canalizacion .banner-titulo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--bosque-texto, #0A0A0A);
+  margin: 0 0 0.25rem 0;
+}
+
+.mi-magia-app .banner-canalizacion .banner-detalle {
+  font-size: 0.95rem;
+  color: var(--bosque-gris, #4A4A4A);
+  margin: 0;
+}
+
+.mi-magia-app .banner-canalizacion .banner-btn {
+  background: var(--bosque-dorado, #B8973A);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.mi-magia-app .banner-canalizacion .banner-btn:hover {
+  background: var(--bosque-dorado-claro, #D4AF5A);
+  transform: translateY(-2px);
+}
+
+.mi-magia-app .banner-lista {
+  background: rgba(45, 90, 61, 0.04);
+  border-left-color: var(--bosque-verde, #2D5A3D);
+}
+
+.mi-magia-app .banner-lista .banner-icono {
+  color: var(--bosque-verde, #2D5A3D);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MENSAJE DIARIO DEL GUARDIÁN
+   ═══════════════════════════════════════════════════════════════ */
+
+.mi-magia-app .mensaje-diario-container {
+  margin: 0 1rem 2rem 1rem;
+  padding: 1.5rem 2rem;
+  background: rgba(45, 90, 61, 0.03);
+  border: 1px solid rgba(184, 151, 58, 0.15);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.mi-magia-app .mensaje-diario-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.mi-magia-app .mensaje-diario-loading .loading-icono {
+  font-size: 1.5rem;
+  color: var(--bosque-dorado, #B8973A);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.mi-magia-app .mensaje-diario-loading p {
+  color: var(--bosque-gris, #4A4A4A);
+  font-style: italic;
+  margin: 0;
+}
+
+.mi-magia-app .mensaje-diario-header {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  color: var(--bosque-gris, #4A4A4A);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.mi-magia-app .mensaje-diario-header .mensaje-simbolo {
+  color: var(--bosque-dorado, #B8973A);
+}
+
+.mi-magia-app .mensaje-diario-texto {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--bosque-texto, #0A0A0A);
+  margin: 0 0 1rem 0;
+  padding: 0;
+  border: none;
+  quotes: none;
+}
+
+.mi-magia-app .mensaje-diario-texto.mensaje-fallback {
+  color: var(--bosque-gris, #4A4A4A);
+  font-size: 1.1rem;
+}
+
+.mi-magia-app .mensaje-diario-fecha {
+  font-size: 0.9rem;
+  color: var(--bosque-gris-claro, #8A8A8A);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* Responsive para banner y mensaje diario */
+@media (max-width: 640px) {
+  .mi-magia-app .banner-canalizacion {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+    margin: 0 0.5rem 1rem 0.5rem;
+  }
+
+  .mi-magia-app .banner-canalizacion .banner-btn {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .mi-magia-app .mensaje-diario-container {
+    margin: 0 0.5rem 1.5rem 0.5rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .mi-magia-app .mensaje-diario-texto {
+    font-size: 1.1rem;
+  }
 }
 
 /* Grid de cards mejorado */
