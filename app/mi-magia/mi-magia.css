@@ -4133,8 +4133,8 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
   /* Panel de la Luna */
   .grimorio-luna-panel {
-    background: linear-gradient(145deg, rgba(45,90,74,0.15), #fff);
-    border: 1px solid rgba(45,90,74,0.3);
+    background: linear-gradient(145deg, #FFFFFF, var(--bosque-fondo-secundario, #F8F8F6));
+    border: 1px solid var(--bosque-borde, #E8E8E4);
     border-radius: 20px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -4157,21 +4157,21 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   .luna-nombre-grande {
     font-family: 'Cinzel', serif;
     font-size: 1.5rem;
-    color: var(--bosque-verde);
+    color: var(--bosque-texto, #0A0A0A);
     display: block;
     margin-bottom: 0.25rem;
   }
 
   .luna-energia {
-    color: var(--bosque-gris);
+    color: var(--bosque-gris, #4A4A4A);
     font-size: 0.95rem;
     line-height: 1.5;
   }
 
   /* Prompt del día */
   .grimorio-prompt {
-    background: rgba(45,90,74,0.08);
-    border-left: 3px solid var(--bosque-verde);
+    background: var(--bosque-fondo-secundario, #F8F8F6);
+    border-left: 3px solid var(--bosque-verde, #2D5A3D);
     padding: 1rem 1.5rem;
     margin-bottom: 1.5rem;
     border-radius: 0 12px 12px 0;
@@ -4179,13 +4179,16 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
   .prompt-label {
     font-size: 0.8rem;
-    color: var(--bosque-verde);
+    color: var(--bosque-verde, #2D5A3D);
     text-transform: uppercase;
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .prompt-texto {
-    color: var(--bosque-negro);
+    color: var(--bosque-texto, #0A0A0A);
     font-size: 1.1rem;
     font-style: italic;
     margin-top: 0.5rem;
@@ -4204,10 +4207,10 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
     align-items: center;
     gap: 0.4rem;
     padding: 0.5rem 0.85rem;
-    background: rgba(26,26,26,0.7);
-    border: 1px solid rgba(45,90,74,0.15);
+    background: #FFFFFF;
+    border: 1px solid var(--bosque-borde, #E8E8E4);
     border-radius: 20px;
-    color: var(--bosque-gris);
+    color: var(--bosque-texto, #0A0A0A);
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
@@ -4215,14 +4218,14 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   }
 
   .tipo-btn:hover {
-    border-color: var(--tipo-color);
-    color: var(--tipo-color);
+    border-color: var(--bosque-verde, #2D5A3D);
+    background: var(--bosque-fondo-secundario, #F8F8F6);
   }
 
   .tipo-btn.activo {
-    background: var(--tipo-color);
-    border-color: var(--tipo-color);
-    color: var(--bosque-verde);
+    background: var(--bosque-verde, #2D5A3D);
+    border-color: var(--bosque-verde, #2D5A3D);
+    color: #FFFFFF;
   }
 
   .tipo-icono {
@@ -4231,11 +4234,12 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
   /* Área de escritura */
   .grimorio-escribir {
-    background: rgba(45,90,74,0.08);
-    border: 1px solid rgba(45,90,74,0.15);
+    background: #FFFFFF;
+    border: 1px solid var(--bosque-borde, #E8E8E4);
     border-radius: 16px;
     overflow: hidden;
     margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
 
   .grimorio-escribir textarea {
@@ -4243,7 +4247,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
     padding: 1.25rem;
     background: transparent;
     border: none;
-    color: var(--bosque-negro);
+    color: var(--bosque-texto, #0A0A0A);
     font-family: inherit;
     font-size: 1rem;
     line-height: 1.8;
@@ -4256,7 +4260,7 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   }
 
   .grimorio-escribir textarea::placeholder {
-    color: var(--bosque-gris-claro);
+    color: var(--bosque-gris, #4A4A4A);
   }
 
   .grimorio-escribir-footer {
@@ -4264,14 +4268,14 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.25rem;
-    background: rgba(0,0,0,0.2);
-    border-top: 1px solid rgba(45,90,74,0.1);
+    background: var(--bosque-fondo-terciario, #F2F2F0);
+    border-top: 1px solid var(--bosque-borde, #E8E8E4);
     flex-wrap: wrap;
     gap: 1rem;
   }
 
   .escribir-fecha {
-    color: var(--bosque-gris-claro);
+    color: var(--bosque-gris, #4A4A4A);
     font-size: 0.85rem;
     text-transform: capitalize;
   }
@@ -4284,10 +4288,10 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
   .btn-guardar-grimorio {
     padding: 0.65rem 1.25rem;
-    background: linear-gradient(135deg, var(--bosque-verde), #a8892b);
+    background: var(--bosque-dorado, #B8973A);
     border: none;
     border-radius: 8px;
-    color: var(--bosque-verde);
+    color: #FFFFFF;
     font-family: inherit;
     font-size: 0.9rem;
     font-weight: 600;
@@ -4296,8 +4300,9 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   }
 
   .btn-guardar-grimorio:hover:not(:disabled) {
+    background: var(--bosque-dorado-claro, #D4AF5A);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(45,90,74,0.3);
+    box-shadow: 0 5px 15px rgba(184, 151, 58, 0.3);
   }
 
   .btn-guardar-grimorio:disabled {
@@ -5020,17 +5025,18 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
-    background: rgba(26,26,26,0.7);
-    border: 1px solid rgba(45,90,74,0.2);
+    background: #FFFFFF;
+    border: 1px solid var(--bosque-borde, #E8E8E4);
     border-radius: 16px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
 
   .estudio-card:hover {
-    border-color: rgba(45,90,74,0.6);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(45,90,74,0.1);
+    border-color: var(--bosque-verde, #2D5A3D);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(45,90,74,0.12);
   }
 
   .estudio-card.sin-runas {
@@ -5039,27 +5045,29 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
 
   .estudio-card.sin-runas:hover {
     transform: none;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
 
   .estudio-icono {
     font-size: 2rem;
     margin-bottom: 0.75rem;
+    color: var(--bosque-verde, #2D5A3D);
   }
 
   .estudio-nombre {
     font-family: 'Cinzel', serif;
     font-size: 1.1rem;
-    font-weight: 400;
-    color: var(--bosque-verde);
+    font-weight: 500;
+    color: var(--bosque-texto, #0A0A0A);
     margin-bottom: 0.5rem;
   }
 
   .estudio-descripcion {
     font-size: 0.9rem;
-    color: var(--bosque-gris);
+    color: var(--bosque-gris, #4A4A4A);
     margin-bottom: 1rem;
     flex-grow: 1;
+    line-height: 1.5;
   }
 
   .estudio-meta {
@@ -5071,26 +5079,26 @@ body{overflow-x:hidden!important;width:100%!important;max-width:100%!important;f
   }
 
   .estudio-runas {
-    color: var(--bosque-verde);
+    color: var(--bosque-dorado, #B8973A);
     font-weight: 600;
   }
 
   .estudio-duracion {
-    color: var(--bosque-gris-claro);
+    color: var(--bosque-gris, #4A4A4A);
   }
 
   .estudio-cta {
-    color: var(--bosque-gris);
+    color: var(--bosque-gris, #4A4A4A);
     font-size: 0.85rem;
     transition: color 0.3s;
   }
 
   .estudio-card:hover .estudio-cta {
-    color: var(--bosque-verde);
+    color: var(--bosque-verde, #2D5A3D);
   }
 
   .estudio-card.sin-runas .estudio-cta {
-    color: rgba(255,100,100,0.7);
+    color: #cc6666;
   }
 
   /* Info */
