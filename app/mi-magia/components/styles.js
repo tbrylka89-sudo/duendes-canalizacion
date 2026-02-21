@@ -6,19 +6,38 @@ const estilos = `
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
 
 /* ═══════════════════════════════════════════════════════════════ */
-/* PALETA BOSQUE - VARIABLES CSS */
+/* MI MAGIA - SISTEMA DE DISEÑO CLARO */
 /* ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bosque-crema: #FBF8F1;
-  --bosque-crema-claro: #FFFDF7;
-  --bosque-verde: #2D5A4A;
-  --bosque-verde-hover: #3D7A5A;
-  --bosque-verde-claro: #E8F0ED;
-  --bosque-verde-suave: #D4E5DD;
-  --bosque-marron: #5D4E3C;
-  --bosque-negro: #1a1a1a;
-  --bosque-gris: #666;
-  --bosque-gris-claro: #999;
+  /* Fondos */
+  --bosque-crema: #FFFFFF;
+  --bosque-crema-claro: #F8F8F6;
+  --bosque-verde-claro: #F2F2F0;
+  --bosque-verde-suave: #E8F0ED;
+
+  /* Acentos */
+  --bosque-verde: #2D5A3D;
+  --bosque-verde-hover: #3D7A52;
+  --bosque-dorado: #B8973A;
+  --bosque-dorado-claro: #D4AF5A;
+
+  /* Textos */
+  --bosque-negro: #0A0A0A;
+  --bosque-texto: #0A0A0A;
+  --bosque-texto-suave: #4A4A4A;
+  --bosque-gris: #4A4A4A;
+  --bosque-gris-claro: #8A8A8A;
+  --bosque-marron: #4A4A4A;
+
+  /* Bordes y sombras */
+  --bosque-borde: #E8E8E4;
+  --bosque-sombra: 0 2px 16px rgba(0,0,0,0.06);
+  --bosque-sombra-fuerte: 0 8px 32px rgba(0,0,0,0.12);
+
+  /* Radii */
+  --radius-card: 16px;
+  --radius-boton: 8px;
+  --radius-pill: 100px;
 }
 
 *{margin:0;padding:0;box-sizing:border-box!important}

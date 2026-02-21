@@ -4,23 +4,28 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import './mi-magia.css';
 
-// Variantes de animación reutilizables
+// Variantes de animación - Sistema de diseño Mi Magia
 const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
 };
 
 const fadeIn = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4 } }
+  visible: { opacity: 1, transition: { duration: 0.4, ease: "easeOut" } }
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 }
   }
+};
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
 };
 
 const scaleIn = {
@@ -30,6 +35,29 @@ const scaleIn = {
 
 const API_BASE = '';
 const WORDPRESS_URL = 'https://duendesdeluruguay.com';
+
+// Función para formatear fechas en español
+const formatearFecha = (fecha) => {
+  if (!fecha) return 'recientemente';
+
+  const meses = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ];
+
+  try {
+    const date = new Date(fecha);
+    if (isNaN(date.getTime())) return 'recientemente';
+
+    const dia = date.getDate();
+    const mes = meses[date.getMonth()];
+    const anio = date.getFullYear();
+
+    return `${dia} de ${mes} de ${anio}`;
+  } catch {
+    return 'recientemente';
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════
 // MI MAGIA - VERSIÓN SIMPLIFICADA Y ELEGANTE
@@ -290,7 +318,7 @@ function SeccionInicio({ usuario, ir }) {
     >
       <motion.div
         className="inicio-bienvenida"
-        variants={fadeInUp}
+        variants={cardVariant}
         initial="hidden"
         animate="visible"
       >
@@ -330,7 +358,7 @@ function SeccionInicio({ usuario, ir }) {
           <motion.div
             className="card card-destacada"
             onClick={() => ir('guardianes')}
-            variants={fadeInUp}
+            variants={cardVariant}
             whileHover={{ scale: 1.03, y: -8 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -348,7 +376,7 @@ function SeccionInicio({ usuario, ir }) {
         ) : (
           <motion.div
             className="card card-vacia"
-            variants={fadeInUp}
+            variants={cardVariant}
             whileHover={{ scale: 1.02 }}
           >
             <div className="card-icono">◇</div>
@@ -363,7 +391,7 @@ function SeccionInicio({ usuario, ir }) {
         <motion.div
           className="card card-destacada"
           onClick={() => ir('estudios')}
-          variants={fadeInUp}
+          variants={cardVariant}
           whileHover={{ scale: 1.03, y: -8 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -382,7 +410,7 @@ function SeccionInicio({ usuario, ir }) {
         <motion.div
           className="card"
           onClick={() => ir('runas')}
-          variants={fadeInUp}
+          variants={cardVariant}
           whileHover={{ scale: 1.03, y: -8 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -401,7 +429,7 @@ function SeccionInicio({ usuario, ir }) {
         <motion.div
           className="card"
           onClick={() => ir('contenido')}
-          variants={fadeInUp}
+          variants={cardVariant}
           whileHover={{ scale: 1.03, y: -8 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -420,7 +448,7 @@ function SeccionInicio({ usuario, ir }) {
         <motion.div
           className="card"
           onClick={() => ir('grimorio')}
-          variants={fadeInUp}
+          variants={cardVariant}
           whileHover={{ scale: 1.03, y: -8 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -522,7 +550,7 @@ function SeccionGuardianes({ usuario }) {
                   {guardian.categoria && <span className="guardian-categoria">{guardian.categoria}</span>}
                 </div>
                 <p className="guardian-fecha">
-                  Adoptado el {guardian.fecha || 'recientemente'}
+                  Adoptado el {formatearFecha(guardian.fecha)}
                 </p>
                 {guardian.paraQuien && (
                   <p className="guardian-para">Para: {guardian.paraQuien}</p>
@@ -2132,10 +2160,10 @@ function SeccionGrimorio({ usuario, token, setUsuario }) {
 export default function MiMagiaPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FBF8F1' }}>
-        <div style={{ textAlign: 'center', color: '#2D5A4A' }}>
-          <div style={{ fontSize: '3rem', animation: 'pulse 2s infinite' }}>✦</div>
-          <p style={{ color: '#666', marginTop: '1rem' }}>Cargando...</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFFFFF' }}>
+        <div style={{ textAlign: 'center', color: '#0A0A0A' }}>
+          <div style={{ fontSize: '3rem', animation: 'pulse 2s infinite', color: '#B8973A' }}>✦</div>
+          <p style={{ color: '#4A4A4A', marginTop: '1rem' }}>Cargando...</p>
         </div>
       </div>
     }>
