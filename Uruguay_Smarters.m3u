@@ -1,0 +1,21 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="Canal 4 HD" tvg-logo="https://pbs.twimg.com/media/EgmG3hlWoAEtj2J.jpg" tvg-name="Canal 4 HD",Canal 4 Opción 2
+http://chromecast.cvattv.com.ar/live/c5eds/Canal4_URU/verimatrix_rotating/Canal4_URU.m3u8
+#EXTINF:-1 tvg-id="Canal 10 HD" tvg-name="Canal 10 HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/c/c3/Canal10_Logo_Actual.jpg" tvg-url="" ,Canal 10 Opc 4
+http://chromecast.cvattv.com.ar/live/c5eds/Canal10_URU/verimatrix_rotating/Canal10_URU.m3u8
+#EXTINF:0 tvg-id="La Tele HD" tvg-logo="https://www.teledoce.com/wp-content/uploads/2019/09/logo-teledoce-2019_azul.png" tvg-name="Teledoce Opc 2",Teledoce Opc 2
+https://mdstrm.com/live-stream-playlist/5aba9ca777ed89391543b607.m3u8
+#EXTINF:-1 tvg-id="La Tele HD" tvg-logo="https://www.teledoce.com/wp-content/uploads/2019/09/logo-teledoce-2019_azul.png" tvg-name="La Tele HD",Teledoce Opc 3
+http://chromecast.cvattv.com.ar/live/c5eds/Canal12URU/verimatrix_rotating/Canal12URU.m3u8
+#EXTINF:-1 tvg-id="Canal UCL" tvg-logo="https://i1.wp.com/uclplay.com/wp-content/uploads/2020/04/logo-horizontal-1.png?" tvg-name="Canal UCL",Canal UCL
+https://livedelta.cdn.antel.net.uy/out/u/url_canalu_4.m3u8?
+#EXTINF:-1 tvg-id="Montevideo Portal" tvg-logo="https://www.canalm.tv/plantillas/temas17/canal-M-17/images/canalm@3.png" tvg-name="Montevideo Portal",Montevideo Portal
+https://wowza.montevideo.com.uy:2443/live/mvdstrem/playlist.m3u8
+#EXTINF:-1 tvg-id="TVF Florida" tvg-logo="https://www.canalm.tv/plantillas/temas17/canal-M-17/images/canalm@3.png" tvg-name="TVF Florida",TVF Florida
+http://s5.mexside.net:1935/tvflorida/tvflorida/playlist.m3u8
+#EXTINF:0 tvg-logo="https://veratvimgs.cdn.antel.net.uy/dynamic/content_images/6056/240/default.jpg", Maroñas
+https://codere-mls-uruguay.akamaized.net/hls/live/2004038/MSL4URUGUAY/video_0/video_0.m3u8
+#EXTINF:0 tvg-logo="https://veratvimgs.cdn.antel.net.uy/dynamic/content_images/6056/240/default.jpg", Maroñas 2
+http://wowza.montevideo.net.uy:1941/hipica/livestream/chunklist.m3u8
+#EXTINF:0 group-title="Montevideo", Nuevo Tiempo
+https://stream.live.novotempo.com/radio/smil:radionuevotiempo.smil/chunklist_b96000_slesp.m3u8
