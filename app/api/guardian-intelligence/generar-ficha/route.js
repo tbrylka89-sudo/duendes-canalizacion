@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API GENERAR FICHA
  * POST: Genera datos de ficha del guardián usando IA

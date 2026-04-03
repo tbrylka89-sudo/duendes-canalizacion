@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE ANÁLISIS
  * POST: Analiza una o todas las historias del catálogo

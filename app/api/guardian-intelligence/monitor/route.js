@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE MONITOREO 24/7
  * GET: Ejecuta verificación y devuelve estado

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * API Route: SEO PRO Update
  * Sistema profesional para actualizar SEO completo incluyendo:

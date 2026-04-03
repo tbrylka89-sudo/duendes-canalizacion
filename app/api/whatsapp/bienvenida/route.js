@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * MENÚ DE BIENVENIDA WHATSAPP - Duendes del Uruguay
  *

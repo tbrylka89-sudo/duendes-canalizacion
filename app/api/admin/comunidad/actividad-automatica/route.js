@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * ADMIN: ACTIVIDAD AUTOMATICA DE LA COMUNIDAD

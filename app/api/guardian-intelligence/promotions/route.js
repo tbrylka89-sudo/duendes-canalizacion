@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE PROMOCIONES
  * GET: Obtener promociones activas o todas

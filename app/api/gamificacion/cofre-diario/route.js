@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { kv } from '@vercel/kv';
 import { RACHAS, XP_ACCIONES } from '@/lib/gamificacion/config';
 

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // ═══════════════════════════════════════════════════════════════════════════
 // API - ESTADISTICAS WOOCOMMERCE
 // Obtiene datos reales de ventas, pedidos y clientes desde WooCommerce

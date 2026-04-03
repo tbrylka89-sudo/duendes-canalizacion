@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE SEO AUTOMÁTICO
  * POST: Genera SEO optimizado para Rank Math 100/100

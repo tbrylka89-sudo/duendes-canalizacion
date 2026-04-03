@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE ESTADÍSTICAS
  * GET: Obtiene estadísticas completas del sistema

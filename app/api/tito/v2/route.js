@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * TITO 2.0 - EL DUENDE MAESTRO
  * Endpoint unificado para ManyChat (Instagram, Facebook, WhatsApp)

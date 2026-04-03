@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - CORREGIR TAMAÑOS
  * POST: Actualiza el atributo "Altura" en WooCommerce con los tamaños reales de la base de datos

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { kv } from '@vercel/kv';
 
 // GET: Recuperar perfil de visitante

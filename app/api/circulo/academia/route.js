@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * API: ACADEMIA - ENDPOINT PÚBLICO PARA USUARIOS DEL CÍRCULO

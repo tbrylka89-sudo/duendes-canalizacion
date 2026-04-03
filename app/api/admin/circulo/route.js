@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { kv } from '@vercel/kv';
 
 // GET - Listar miembros del circulo

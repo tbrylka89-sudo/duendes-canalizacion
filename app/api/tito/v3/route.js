@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * TITO 3.0 - EL DUENDE QUE CONVIERTE

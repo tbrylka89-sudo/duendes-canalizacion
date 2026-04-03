@@ -3,6 +3,7 @@
  * - GPT para consultas simples (barato)
  * - Claude para situaciones importantes (inteligente)
  */
+export const dynamic = 'force-dynamic';
 
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';

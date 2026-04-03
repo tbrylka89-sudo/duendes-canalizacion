@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * API de Cotizaciones
  * GET - Ver cotizaciones actuales

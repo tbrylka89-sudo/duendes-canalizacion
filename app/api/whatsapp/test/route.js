@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * ENDPOINT DE PRUEBA - Solo devuelve texto fijo
  * Para debuggear ManyChat

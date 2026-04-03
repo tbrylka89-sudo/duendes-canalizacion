@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * TITO para ManyChat - Versión optimizada para Dynamic Block
  * Timeout de ManyChat: 10 segundos

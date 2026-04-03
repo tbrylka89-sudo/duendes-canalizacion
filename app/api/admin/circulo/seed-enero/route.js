@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: Seed contenido de Enero 2026 a Vercel KV
 // POST /api/admin/circulo/seed-enero

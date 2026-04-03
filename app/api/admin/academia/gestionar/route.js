@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * API: GESTIÓN DE CURSOS - ACADEMIA DE GUARDIANES

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { infoDiaActual, sugerirContenido } from '@/lib/ciclos-naturales';
 
 // ═══════════════════════════════════════════════════════════════════════════════

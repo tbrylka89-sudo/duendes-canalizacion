@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // API para generar voz con Eleven Labs
 // Sistema completo de voces - IDs verificados de la biblioteca pública
 // Actualizado con 60+ voces premium organizadas por categorías

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE GENERACIÓN
  * POST: Genera historia única para un guardián

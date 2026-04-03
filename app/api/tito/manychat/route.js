@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * TITO para ManyChat - Instagram, Facebook, WhatsApp
  *

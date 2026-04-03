@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - AUTO-COMPLETAR FICHA
  * POST: Busca producto en base de datos y completa todos los campos + genera ficha IA

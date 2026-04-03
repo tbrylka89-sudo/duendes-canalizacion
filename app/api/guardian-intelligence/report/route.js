@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE REPORTES
  * GET: Ver último reporte o reportes anteriores

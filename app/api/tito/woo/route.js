@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // ═══════════════════════════════════════════════════════════════════════════
 // 🍀 API TITO + WOOCOMMERCE
 // Conecta Tito con el carrito y productos de WooCommerce en tiempo real

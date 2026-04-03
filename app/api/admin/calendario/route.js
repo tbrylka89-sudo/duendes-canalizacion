@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { kv } from '@vercel/kv';
 import { calcularFaseLunar, ESTACIONES_CELTAS } from '@/lib/ciclos-naturales';
 

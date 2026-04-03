@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * API Route: SEO Bulk Update
  * POST: Actualiza SEO de multiples productos en WooCommerce usando RankMath

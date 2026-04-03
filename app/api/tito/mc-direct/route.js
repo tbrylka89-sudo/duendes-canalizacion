@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * TITO MC-DIRECT - Filtro/Redirector simplificado
  *

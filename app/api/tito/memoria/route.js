@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // ═══════════════════════════════════════════════════════════════════════════
 // TITO - SISTEMA DE MEMORIA ACUMULATIVA v2.0
 // Guarda aprendizajes de cada conversación para mejorar y dar insights

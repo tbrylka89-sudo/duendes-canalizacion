@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import { registrarEvento, TIPOS_EVENTO } from '@/lib/guardian-intelligence/daily-report';

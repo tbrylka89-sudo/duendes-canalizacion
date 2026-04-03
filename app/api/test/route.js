@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * TEST DEL GUARDIÁN - API ENDPOINT
  * Con CORS habilitado

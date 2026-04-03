@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - CRON JOB
  * Se ejecuta una vez por día (7:00 AM Uruguay) para generar reporte diario

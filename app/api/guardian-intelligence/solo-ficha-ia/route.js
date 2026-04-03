@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - SOLO FICHA IA
  * POST: Genera solo la ficha de personalidad (flor, piedra, gustos, etc)

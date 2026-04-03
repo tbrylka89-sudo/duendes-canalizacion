@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * MANYCHAT UNIFIED ENDPOINT
  * Handles all ManyChat automations for Instagram, Facebook, WhatsApp

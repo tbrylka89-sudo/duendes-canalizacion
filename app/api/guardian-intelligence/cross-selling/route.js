@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE CROSS-SELLING
  * GET: Obtener sugerencias de productos relacionados

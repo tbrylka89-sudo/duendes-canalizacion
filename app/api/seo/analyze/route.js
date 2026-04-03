@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * API Route: SEO Analyze
  * GET: Analiza SEO actual de un producto y retorna score + sugerencias

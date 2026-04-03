@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE CORRECCIÓN AUTOMÁTICA
  * POST: Corrige historias problemáticas automáticamente

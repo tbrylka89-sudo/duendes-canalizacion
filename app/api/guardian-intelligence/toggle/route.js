@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 /**
  * GUARDIAN INTELLIGENCE - API DE TOGGLE
  * POST: Activa/desactiva funcionalidades del sistema
