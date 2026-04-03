@@ -8,9 +8,9 @@ import OpenAI from 'openai';
 
 export const dynamic = 'force-dynamic';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 // Estilo base para todas las imágenes de duendes
 const ESTILO_DUENDES = `
@@ -106,7 +106,7 @@ like a still from a mystical movie.`;
     }
 
     // Generar imagen con DALL-E 3
-    const response = await openai.images.generate({
+    const response = await getOpenAI().images.generate({
       model: 'dall-e-3',
       prompt: promptCompleto,
       n: 1,
