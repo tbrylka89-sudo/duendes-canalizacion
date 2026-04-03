@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 // Preguntas del Test del Guardian - DISEÑO DE CONVERSIÓN
 // Cada pregunta tiene doble propósito: conectar emocionalmente + detectar perfil de compra
@@ -586,7 +586,7 @@ Extrae en formato JSON:
 
 Solo responde con el JSON, nada mas.`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }]
@@ -650,7 +650,7 @@ Formato JSON:
   "ritual_sugerido": "Un ritual simple de 1-2 oraciones"
 }`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 500,
       messages: [{ role: 'user', content: prompt }]

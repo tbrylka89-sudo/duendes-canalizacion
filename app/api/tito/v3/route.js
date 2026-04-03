@@ -34,9 +34,9 @@ import {
   tieneSeñalDeCompra
 } from '@/lib/tito/reglas-comportamiento';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
+}); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════
 // CORS HEADERS - Permitir llamadas desde WordPress
@@ -1274,7 +1274,7 @@ ANÁLISIS: ${analisis.tipo} | ${analisis.totalMensajes} msgs | compra:${analisis
       : getToolsParaContexto(esAdmin);
 
     // Llamar a Claude con tools
-    let response = await anthropic.messages.create({
+    let response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 500,
       system: systemPrompt,
@@ -1331,7 +1331,7 @@ ANÁLISIS: ${analisis.tipo} | ${analisis.totalMensajes} msgs | compra:${analisis
       }
 
       // Continuar la conversación con los resultados de las tools
-      response = await anthropic.messages.create({
+      response = await getAnthropic().messages.create({
         model: 'claude-3-5-haiku-20241022',
         max_tokens: 500,
         system: systemPrompt,

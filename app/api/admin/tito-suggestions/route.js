@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 /**
  * API de Sugerencias de Tito
@@ -187,7 +187,7 @@ IMPORTANTE:
 - Máximo 3 items por categoría para mantenerlo accionable`;
 
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }]

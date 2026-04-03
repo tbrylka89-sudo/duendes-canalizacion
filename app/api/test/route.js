@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // Headers CORS
 const corsHeaders = {
@@ -109,7 +109,7 @@ RESPONDE SOLO CON ESTE JSON (sin markdown, sin backticks):
     "alternativas_ids": [[ID1], [ID2]]
 }`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }]

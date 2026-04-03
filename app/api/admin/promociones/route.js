@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -66,7 +66,7 @@ REGLAS:
 - Incluir el código de forma destacada
 - Generar urgencia sutil sin ser agresivo`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 500,
         messages: [{ role: 'user', content: prompt }]
@@ -118,7 +118,7 @@ REGLAS:
 - Tono místico y emocionante
 - Sin frases genéricas de IA`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]
@@ -154,7 +154,7 @@ REGLAS:
 - Hacé que se sientan especiales
 - Tono cálido y místico`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
@@ -191,7 +191,7 @@ REGLAS:
 - Místico pero directo
 - Generar curiosidad o emoción`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 500,
         messages: [{ role: 'user', content: prompt }]

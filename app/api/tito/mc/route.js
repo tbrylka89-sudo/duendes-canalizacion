@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
+}); return _anthropic; }
 
 const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 
@@ -130,7 +130,7 @@ export async function POST(request) {
       });
     }
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 150, // Reducido para respuesta más rápida
       system: SYSTEM + contexto,

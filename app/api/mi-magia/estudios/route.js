@@ -5,9 +5,9 @@ import { getEstudio, ESTUDIOS, CATEGORIAS } from '@/lib/estudios/catalogo';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
+}); return _anthropic; }
 
 // GET: Obtener catálogo de estudios o historial del usuario
 export async function GET(request) {
@@ -164,7 +164,7 @@ export async function POST(request) {
     try {
       const prompt = estudioConfig.prompt(datosPrompt);
 
-      const response = await anthropic.messages.create({
+      const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         messages: [

@@ -2,9 +2,9 @@ export const dynamic = "force-dynamic";
 import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 const WP_URL = process.env.WORDPRESS_URL || 'https://duendesdeluruguay.com';
 
@@ -258,7 +258,7 @@ SIEMPRE usá el formato correcto. Nunca el incorrecto.`;
     messages.push({ role: 'user', content: mensaje });
 
     // Llamar a Claude
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1500,
       system: systemPrompt,
@@ -995,7 +995,7 @@ ESTRUCTURA:
 3. Call to action
 ${red === 'instagram' ? '4. Hashtags' : ''}`;
 
-        const response = await anthropic.messages.create({
+        const response = await getAnthropic().messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1500,
           messages: [{ role: 'user', content: promptRedes }],
@@ -1051,7 +1051,7 @@ ESTRUCTURA:
    - Despedida cálida
    - Firma de Duendes`;
 
-        const response = await anthropic.messages.create({
+        const response = await getAnthropic().messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 2000,
           messages: [{ role: 'user', content: promptEmail }],
@@ -1112,7 +1112,7 @@ REGLAS:
 - Incluí timestamps aproximados
 - Sugiere transiciones`;
 
-        const response = await anthropic.messages.create({
+        const response = await getAnthropic().messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1500,
           messages: [{ role: 'user', content: promptGuion }],

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 
 const SYSTEM_PROMPT = `Sos el Cronista del Bosque Ancestral de Piriápolis, Uruguay.
 Canalizás la historia y energía de cada guardián que llega al mundo humano.
@@ -111,7 +111,7 @@ export async function POST(request) {
 
       // Si no hay nombre, generarlo primero
       if (!nombre) {
-        const resNombre = await anthropic.messages.create({
+        const resNombre = await getAnthropic().messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 50,
           system: SYSTEM_PROMPT,
@@ -128,7 +128,7 @@ export async function POST(request) {
       const promesas = Object.entries(CAMPOS)
         .filter(([key]) => key !== 'nombre')
         .map(async ([key, config]) => {
-          const res = await anthropic.messages.create({
+          const res = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: config.maxTokens,
             system: SYSTEM_PROMPT,
@@ -165,7 +165,7 @@ export async function POST(request) {
     }
 
     const config = CAMPOS[campo];
-    const res = await anthropic.messages.create({
+    const res = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: config.maxTokens,
       system: SYSTEM_PROMPT,

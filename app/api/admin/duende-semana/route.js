@@ -9,9 +9,9 @@ import { generarBannerDuendeSemana, generarImagenDuende, verificarConfiguracion 
 // Con generación automática de imágenes cuando se activa un duende
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // Keys de Vercel KV
 const KEYS = {
@@ -601,7 +601,7 @@ IMPORTANTE:
 Responde SOLO con un JSON válido, sin explicaciones adicionales ni markdown.`;
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1500,
       messages: [{ role: 'user', content: prompt }]

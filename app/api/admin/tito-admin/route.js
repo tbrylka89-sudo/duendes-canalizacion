@@ -7,9 +7,9 @@ import Anthropic from '@anthropic-ai/sdk';
 // Interpreta comandos en lenguaje natural y ejecuta acciones del sistema
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // Funciones disponibles para Tito
 const FUNCIONES_DISPONIBLES = `
@@ -154,7 +154,7 @@ export async function POST(request) {
     });
 
     // Llamar a Claude para interpretar el comando
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       system: SYSTEM_PROMPT,

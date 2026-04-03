@@ -9,7 +9,7 @@ import Anthropic from '@anthropic-ai/sdk';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // 5 minutos max
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 
 // Configuración de tipos de contenido por día de la semana
 const PLANTILLA_SEMANA = {
@@ -333,7 +333,7 @@ IMPORTANTE:
 FORMATO: Devolvé SOLO el contenido, sin explicaciones.
 Usá ## para subtítulos si es necesario.`;
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 2500,
     messages: [{ role: 'user', content: prompt }]

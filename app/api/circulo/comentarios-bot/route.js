@@ -7,9 +7,9 @@ import Anthropic from '@anthropic-ai/sdk';
 // Genera comentarios naturales para publicaciones del Círculo
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // Perfiles de bots con personalidades únicas
 const BOTS_PERFILES = [
@@ -171,7 +171,7 @@ export async function POST(request) {
 
 async function generarComentarioBot(bot, contenidoPost, tituloPost) {
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 200,
       system: `Sos ${bot.nombre}, una usuaria real del Círculo de Duendes (comunidad de mujeres que coleccionan guardianes mágicos artesanales).

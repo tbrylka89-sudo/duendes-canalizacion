@@ -11,13 +11,13 @@ import { kv } from '@vercel/kv';
 import { obtenerProductosWoo } from '@/lib/tito/conocimiento';
 import { obtenerCotizaciones, PRECIOS_URUGUAY, convertirPrecio } from '@/lib/tito/cotizaciones';
 
-const openai = new OpenAI({
+let _openai; function getOpenAI() { if(!_openai) _openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}); return _openai; }
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
+}); return _anthropic; }
 
 // Detectar si el mensaje requiere Claude (más inteligente)
 function necesitaClaude(mensaje, historial = []) {
@@ -655,7 +655,7 @@ INSTRUCCIONES:
 - Preguntá si quiere adoptarlo
 - Máximo 120 palabras`;
 
-          const claudeResponse = await anthropic.messages.create({
+          const claudeResponse = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 350,
             messages: [{ role: 'user', content: promptClaude }]
@@ -822,7 +822,7 @@ REGLAS:
 - Máximo 150 palabras
 - NO pongas links ni URLs`;
 
-          const claudeResponse = await anthropic.messages.create({
+          const claudeResponse = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 400,
             messages: [{ role: 'user', content: promptClaude }]
@@ -1221,7 +1221,7 @@ Accedés en: magia.duendesdeluruguay.com 🍀`,
     messages.push({ role: 'user', content: mensajeConContexto });
 
     // Llamar a GPT
-    let response = await openai.chat.completions.create({
+    let response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages,
       tools: TOOLS,
@@ -1261,7 +1261,7 @@ Accedés en: magia.duendesdeluruguay.com 🍀`,
       messages.push(assistantMessage);
       messages.push(...toolResults);
 
-      response = await openai.chat.completions.create({
+      response = await getOpenAI().chat.completions.create({
         model: 'gpt-4o-mini',
         messages,
         tools: TOOLS,
@@ -1327,7 +1327,7 @@ Accedés en: magia.duendesdeluruguay.com 🍀`,
           content: `Basándote en los datos del pedido, respondé al cliente. Recordá usar el país de envío correcto (${datosDelPedido?.pais_envio || pais || 'verificar'}) para los tiempos de entrega.`
         });
 
-        const claudeResponse = await anthropic.messages.create({
+        const claudeResponse = await getAnthropic().messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 500,
           system: instruccionClaude,

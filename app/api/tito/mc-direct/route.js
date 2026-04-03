@@ -16,9 +16,9 @@ import {
   detectarPreguntaRepetida, tieneSeñalDeCompra
 } from '@/lib/tito/reglas-comportamiento';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
+}); return _anthropic; }
 
 const MANYCHAT_API_KEY = process.env.MANYCHAT_API_KEY;
 const MANYCHAT_API_URL = 'https://api.manychat.com/fb';
@@ -911,7 +911,7 @@ ${contexto}
       messagesParaClaude = [{ role: 'user', content: msg }];
     }
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 300,
       system: systemPrompt,

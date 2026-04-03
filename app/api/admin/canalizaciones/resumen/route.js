@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: GENERAR RESUMEN INTELIGENTE DE CANALIZACIÓN
@@ -98,7 +98,7 @@ GENERÁ UN RESUMEN ESTRUCTURADO EN ESTE FORMATO JSON:
 
 Respondé SOLO con el JSON, sin explicaciones.`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       messages: [{

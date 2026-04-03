@@ -6,7 +6,7 @@ import { kv } from '@vercel/kv';
 // IMPORTANTE: Aumentar el timeout a 60 segundos para las llamadas a Claude
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 // Headers CORS para permitir llamadas desde WordPress
 const corsHeaders = {
@@ -89,7 +89,7 @@ async function generateStory(data) {
     const prompt = buildGenerationPrompt(data, existingProducts, imageDescriptions, titoInsights);
 
     // Llamar a Claude
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]
@@ -142,7 +142,7 @@ DESCRIPCION: [historia completa mejorada]
 SEO_TITLE: [título SEO optimizado, máximo 60 caracteres]
 SEO_DESCRIPTION: [meta description, máximo 155 caracteres]`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]
@@ -199,7 +199,7 @@ DESCRIPCION: [historia completa regenerada]
 SEO_TITLE: [título SEO optimizado, máximo 60 caracteres]
 SEO_DESCRIPTION: [meta description, máximo 155 caracteres]`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]

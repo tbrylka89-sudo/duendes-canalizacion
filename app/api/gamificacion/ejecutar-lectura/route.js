@@ -14,9 +14,9 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -536,7 +536,7 @@ ${fechaNacimiento ? `Fecha de nacimiento: ${fechaNacimiento}` : ''}
 Mínimo ${lectura.palabras} palabras. Que sea profundo, personal y memorable.${memoria ? `\n\nIMPORTANTE: Ya tiene ${memoria.cantidad} lecturas previas. Reconocé su evolución.` : ''}`;
   }
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 8000,
     system: systemPrompt,

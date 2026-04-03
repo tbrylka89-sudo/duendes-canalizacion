@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -139,7 +139,7 @@ export async function POST(request) {
             systemPrompt += `\n\nCONTEXTO ACTUAL:\n${JSON.stringify(context, null, 2)}`;
         }
 
-        const response = await anthropic.messages.create({
+        const response = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 4000,
             system: systemPrompt,

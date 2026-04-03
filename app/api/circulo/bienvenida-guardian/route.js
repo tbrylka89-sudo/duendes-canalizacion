@@ -7,7 +7,7 @@ import Anthropic from '@anthropic-ai/sdk';
 // Usa duendes REALES de WooCommerce sincronizados en KV
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 
 // Obtener guardián de la semana desde rotación de Enero 2026
 async function obtenerGuardianSemana() {
@@ -101,7 +101,7 @@ export async function POST(request) {
     }
 
     // Generar mensaje personalizado con Claude
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 500,
       messages: [{

@@ -4,9 +4,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 import { GUARDIANS, RESULT_GENERATION_PROMPT, analyzeTextForKeywords } from '@/lib/test-questions';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 export async function POST(request) {
   try {
@@ -43,7 +43,7 @@ export async function POST(request) {
         .replace('{edad}', edad)
         .replace('{respuestas_completas}', respuestasTexto);
 
-      const message = await anthropic.messages.create({
+      const message = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]

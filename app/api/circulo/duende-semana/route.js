@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 // Endpoint para que los miembros del Círculo vean el guardián protagonista
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GET - Obtener duende actual de la semana con su contenido
@@ -166,7 +166,7 @@ async function generarMensajeBienvenida(duende, portal) {
   const diaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][new Date().getDay()];
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 600,
       system: `Sos ${duende.nombre}, un guardián mágico del Círculo de Duendes del Uruguay.

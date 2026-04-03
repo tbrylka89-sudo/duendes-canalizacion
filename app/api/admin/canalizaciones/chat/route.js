@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API: CHAT EDITOR PARA MODIFICAR CANALIZACIONES
@@ -40,7 +40,7 @@ export async function POST(request) {
     // Procesar mensaje conversacional
     const systemPrompt = construirSystemPrompt(canalizacion);
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
       system: systemPrompt,
@@ -293,7 +293,7 @@ Escribí SOLO el contenido nuevo de la sección (sin el título ##).
 Mantené el tono y estilo del resto de la canalización.
 Español rioplatense, sin frases genéricas de IA.`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       messages: [{ role: 'user', content: promptRegenerar }]

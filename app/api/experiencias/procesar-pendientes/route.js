@@ -3,9 +3,9 @@ import { kv } from '@vercel/kv';
 import Anthropic from '@anthropic-ai/sdk';
 import canon from '@/lib/canon.json';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -187,7 +187,7 @@ ${datosAdicionales ? `Datos adicionales: ${JSON.stringify(datosAdicionales)}` : 
 Creá un contenido profundo, personal y mágico de mínimo ${experiencia.palabras || 1000} palabras.
 Que sea útil, sanador y memorable para quien lo recibe.`;
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 8000,
     system: systemPrompt,

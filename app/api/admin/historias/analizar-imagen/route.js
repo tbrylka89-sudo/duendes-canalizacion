@@ -2,9 +2,9 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // POST - Analizar imagen de guardián
 export async function POST(request) {
@@ -44,7 +44,7 @@ export async function POST(request) {
       mediaType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
     }
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       messages: [

@@ -4,9 +4,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import canon from '@/lib/canon.json';
 import { XP_ACCIONES, obtenerNivel } from '@/lib/gamificacion/config';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════
 // HELPER: Actualizar gamificación al completar experiencia
@@ -1751,7 +1751,7 @@ REGLAS CRÍTICAS:
 - Profundo, significativo y personalizado
 - Firmá siempre como parte de la familia Duendes del Uruguay`;
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 8000,
     system: systemEnhanced,
@@ -1794,7 +1794,7 @@ ${preguntaEspecifica ? `Pregunta: ${preguntaEspecifica}` : ''}
 Creá un contenido profundo, personal y mágico de mínimo ${experiencia.palabras} palabras.
 Que sea útil, sanador y memorable para quien lo recibe.`;
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 8000,
     system: systemPrompt,

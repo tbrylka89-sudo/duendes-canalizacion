@@ -117,7 +117,7 @@ GENERAR JSON (sin texto antes ni después)
 
 IMPORTANTE: Respondé SOLO con el JSON, sin texto adicional.`
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 8000,
     messages: [{ role: 'user', content: prompt }]

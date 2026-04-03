@@ -5,9 +5,9 @@ import canon from '@/lib/canon.json';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════
 // SABBATS Y EVENTOS MÁGICOS - ADAPTADOS POR HEMISFERIO
@@ -538,7 +538,7 @@ Formato JSON:
   "mensaje": "mensaje canalizado..."
 }`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }]

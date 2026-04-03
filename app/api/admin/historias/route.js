@@ -16,9 +16,9 @@ import {
 import { getInstruccionesEspecie } from '@/lib/conversion/especies.js';
 import { getInstruccionesEspecializacion, especializaciones } from '@/lib/conversion/especializaciones.js';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // Configuración WooCommerce
 const WC_URL = process.env.WORDPRESS_URL;
@@ -400,7 +400,7 @@ Recordá: tono Duendes del Uruguay, cercano, místico pero real, sin frases de I
 Si el creador dio datos específicos (materiales, cristales, propósito), usalos.`;
 
       // Generar con Claude
-      const response = await anthropic.messages.create({
+      const response = await getAnthropic().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
         temperature: 0.6,
@@ -710,7 +710,7 @@ CHECKLIST OBLIGATORIO:
 IMPORTANTE: El texto debe hacer que el lector piense "esto habla de mí" y sienta que NECESITA este guardián sin que le hayas vendido nada.`;
 
     // === GENERAR CON CLAUDE ===
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2500,
       temperature: 0.5, // Reducido de 0.7 - todavía había errores tipo "paral", "bloqueal"
@@ -1413,7 +1413,7 @@ export async function GET(request) {
   const catalogoResumen = searchParams.get('catalogo');
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 800,
       temperature: 0.7,

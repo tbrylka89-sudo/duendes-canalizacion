@@ -2,9 +2,9 @@ export const dynamic = "force-dynamic";
 import Anthropic from '@anthropic-ai/sdk';
 import { kv } from '@vercel/kv';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // ═══════════════════════════════════════════════════════════════
 // TITO MAESTRO - EL ASISTENTE OMNIPOTENTE
@@ -211,7 +211,7 @@ Sos el asistente mas completo y capaz. No hay nada que no puedas resolver.`;
     messages.push({ role: 'user', content: mensaje });
 
     // Llamar a Claude
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 4000,
       system: systemPrompt,
@@ -1520,7 +1520,7 @@ async function statsProductos(tipo = 'mas_vendidos') {
 
 async function generarContenido(tema, palabras = 3000, categoria = 'esoterico') {
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 8000,
       messages: [{
@@ -1564,7 +1564,7 @@ _Contenido completo disponible. Palabras totales: ${palabrasCount}_`
 
 async function generarEmailMarketing(objetivo, contexto) {
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 2000,
       messages: [{
@@ -1599,7 +1599,7 @@ CONTENIDO:
 
 async function generarPostRedes(plataforma, tema) {
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 1000,
       messages: [{

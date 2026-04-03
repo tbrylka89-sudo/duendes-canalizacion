@@ -2,9 +2,9 @@ export const dynamic = "force-dynamic";
 import Anthropic from '@anthropic-ai/sdk';
 import canon from '@/lib/canon.json';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
-});
+}); return _anthropic; }
 
 // POST - Generar canalización épica (3500+ palabras)
 export async function POST(request) {
@@ -167,7 +167,7 @@ INSTRUCCIONES FINALES
 
 GENERA LA CANALIZACIÓN COMPLETA AHORA.`;
 
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 16000,
       system: systemPrompt,

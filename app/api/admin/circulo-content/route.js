@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -133,7 +133,7 @@ Cada sección debe ser sustancial y valiosa, no relleno.
 Los mensajes de los guardianes deben sentirse canalizados, no escritos por IA.
 ${instrucciones_claude ? 'IMPORTANTE: Seguí las instrucciones especiales de la creadora con prioridad.' : ''}`;
 
-        const response = await anthropic.messages.create({
+        const response = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 8000,
             messages: [{ role: 'user', content: prompt }]

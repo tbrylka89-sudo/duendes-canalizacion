@@ -23,7 +23,7 @@ import {
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 
 // Configuracion
 const MODELO_IA = 'claude-sonnet-4-20250514';
@@ -152,7 +152,7 @@ async function generarComentario(perfil, contexto, usarIA) {
   // Generar con IA
   const prompt = generarPromptComentario(perfil, contexto);
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: MODELO_IA,
     max_tokens: MAX_TOKENS,
     messages: [
@@ -193,7 +193,7 @@ async function generarPost(perfil, contexto, usarIA) {
 
   const prompt = generarPromptPost(perfil, contexto);
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: MODELO_IA,
     max_tokens: MAX_TOKENS * 2,
     messages: [

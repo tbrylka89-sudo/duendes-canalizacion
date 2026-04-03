@@ -21,7 +21,7 @@ import {
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // 5 minutos para generacion masiva
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 const MODELO_IA = 'claude-sonnet-4-20250514';
 
 // Categorias del foro
@@ -266,7 +266,7 @@ REGLAS:
 
 NO INCLUYAS EL TITULO, solo el contenido del post.`;
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: MODELO_IA,
     max_tokens: 800,
     messages: [{ role: 'user', content: prompt }]
@@ -361,7 +361,7 @@ REGLAS:
 - Suena autentica, como ${perfil.nombreCorto}
 - ${perfil.guardianes.length > 0 ? `Si es relevante, mencioná a ${perfil.guardianes[0].nombre}` : ''}`;
 
-      const response = await anthropic.messages.create({
+      const response = await getAnthropic().messages.create({
         model: MODELO_IA,
         max_tokens: 300,
         messages: [{ role: 'user', content: prompt }]

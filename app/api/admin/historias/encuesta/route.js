@@ -2,9 +2,9 @@ export const dynamic = "force-dynamic";
 import Anthropic from '@anthropic-ai/sdk';
 import { NextResponse } from 'next/server';
 
-const anthropic = new Anthropic({
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-});
+}); return _anthropic; }
 
 export async function POST(request) {
   try {
@@ -58,7 +58,7 @@ IMPORTANTE sobre tamaños:
 
 Sé amable pero eficiente. El objetivo es tener toda la info necesaria para crear la historia del guardián.`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       system: systemPrompt,

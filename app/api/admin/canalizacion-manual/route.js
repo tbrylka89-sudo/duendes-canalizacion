@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const maxDuration = 60;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -72,7 +72,7 @@ Palabras finales del guardián, cerrando con calidez y dejando una semilla de es
 
 Generá la canalización completa ahora:`;
 
-        const response = await anthropic.messages.create({
+        const response = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 2000,
             messages: [{ role: 'user', content: prompt }]

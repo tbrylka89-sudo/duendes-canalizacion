@@ -7,7 +7,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const dynamic = 'force-dynamic';
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 
 export async function POST(request) {
   try {
@@ -37,7 +37,7 @@ export async function POST(request) {
                       contentType.includes('webp') ? 'image/webp' : 'image/jpeg';
 
     // Analizar con Claude Vision
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       messages: [

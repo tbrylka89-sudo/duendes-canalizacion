@@ -9,7 +9,7 @@ export const maxDuration = 120;
 // Interpreta pedidos en lenguaje natural y ejecuta acciones
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }); return _anthropic; }
 
 // Duendes disponibles (cargados de KV o fallback)
 async function obtenerDuendes() {
@@ -45,7 +45,7 @@ export async function POST(request) {
     const systemPrompt = construirSystemPrompt(duendes, duendeActual);
 
     // Llamar a Claude para interpretar
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       system: systemPrompt,

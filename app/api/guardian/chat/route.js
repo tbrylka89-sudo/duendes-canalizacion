@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic();
+let _anthropic; function getAnthropic() { if(!_anthropic) _anthropic = new Anthropic(); return _anthropic; }
 
 export async function POST(request) {
   try {
@@ -24,7 +24,7 @@ REGLAS ABSOLUTAS:
 - Podés usar metáforas de la naturaleza
 - Si te saludan, saludá cálidamente de vuelta`;
 
-    const res = await anthropic.messages.create({
+    const res = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 200,
       system: systemPrompt,
