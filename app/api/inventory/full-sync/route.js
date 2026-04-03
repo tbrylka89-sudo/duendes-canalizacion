@@ -56,6 +56,8 @@ export async function POST(request) {
         const uyVariant = uyProduct.variants[i];
 
         try {
+          // Throttle to stay under 2 req/sec per store
+          await new Promise(r => setTimeout(r, 600));
           const [usLevels, uyLevels] = await Promise.all([
             getInventoryLevel('us', usVariant.inventory_item_id),
             getInventoryLevel('uy', uyVariant.inventory_item_id),
